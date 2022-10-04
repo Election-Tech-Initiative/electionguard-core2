@@ -154,3 +154,4 @@ sample-data-container.zip
 bindings/netstandard/ElectionGuard/*.user
 
 .vscode/**/*.log
+*.ncrunchsolution
