@@ -1,30 +1,30 @@
-![Microsoft Defending Democracy Program: ElectionGuard Python][banner image]
+![Microsoft Defending Democracy Program: ElectionGuard Core2][banner image]
 
-# 🗳 ElectionGuard C++
+# 🗳 ElectionGuard Core2
 
-[![ElectionGuard Specification 0.95.0](https://img.shields.io/badge/🗳%20ElectionGuard%20Specification-0.95.0-green)](https://www.electionguard.vote) ![Github Package Action](https://github.com/microsoft/electionguard-cpp/workflows/Release/badge.svg) [![license](https://img.shields.io/github/license/microsoft/electionguard-cpp)](https://github.com/microsoft/electionguard-cpp/blob/main/LICENSE) [![license](https://img.shields.io/nuget/v/Electionguard.Encryption)](https://www.nuget.org/packages/ElectionGuard.Encryption/)
+[![ElectionGuard Specification 1.1.0](https://img.shields.io/badge/🗳%20ElectionGuard%20Specification-1.1.0-green)](https://www.electionguard.vote) ![Github Package Action](https://github.com/microsoft/electionguard-core2/workflows/Release/badge.svg) [![license](https://img.shields.io/github/license/microsoft/electionguard-core2)](https://github.com/microsoft/electionguard-core2/blob/main/LICENSE) [![license](https://img.shields.io/nuget/v/Electionguard.Encryption)](https://www.nuget.org/packages/ElectionGuard.Encryption/)
 
-This repository is a "reference implementation" of an ElectionGuard ballot encryption library written in c++ and includes a C-compatible API for referencing the library from pure-c application. This core SDK performs ballot encryption and verification functions and is suitable for execution on voting system hardware and low powered devices. It is designed to be integrated into existing (or new) voting system software.
+This monorepo contains the ElectionGuard 2.0+ code. The core functionality is implemented in C++ for performance and interoperability. It provides functionality for all ElectionGuard workflows including key ceremony, ballot encryption, tally, ballot decryption, and verification. It is designed to be integrated into existing (or new) voting system software. It includes a variety of interop layers to provide functionality to languages including C, .NET, and Java.
 
 This repository is `pre-release` software to showcase the ElectionGuard API implemented in a native language. It is not feature complete and should not be used for production applications.
 
 ## 📁 In This Repository
 
-| File/folder                            | Description                                |
-| -------------------------------------  | ------------------------------------------ |
-| [`.github`](.github)                   | Github workflows and issue templates       |
-| [`.vscode`](.vscode)                   | VS Code configurations                     |
-| [`/bindings`](/bindings)               | Binding interfaces for different languages |
-| [`/cmake`](/cmake)                     | `CMake` dependencies`                      |
-| [`/include`](/include)                 | Public include headers                     |
-| [`/src`](/src)                         | ElectionGuard source code                  |
-| [`/test`](/test)                       | Unit tests                                 |
-| [`.clang-format`](.clang-format)       | Style guidelines                           |
-| [`.gitignore`](.gitignore)             | Define what to ignore at commit time.      |
-| [`CMakeLists.txt`](CMakeLists.txt)     | Root CMake file                            |
-| [`CONTRIBUTING.md`](CONTRIBUTING.md)   | Guidelines for contributing to the sample. |
-| [`README.md`](README.md)               | This README file.                          |
-| [`LICENSE`](LICENSE)                   | The license for the sample.                |
+| File/folder                          | Description                                |
+| ------------------------------------ | ------------------------------------------ |
+| [`.github`](.github)                 | Github workflows and issue templates       |
+| [`.vscode`](.vscode)                 | VS Code configurations                     |
+| [`/bindings`](/bindings)             | Binding interfaces for different languages |
+| [`/cmake`](/cmake)                   | `CMake` dependencies`                      |
+| [`/include`](/include)               | Public include headers                     |
+| [`/src`](/src)                       | ElectionGuard source code                  |
+| [`/test`](/test)                     | Unit tests                                 |
+| [`.clang-format`](.clang-format)     | Style guidelines                           |
+| [`.gitignore`](.gitignore)           | Define what to ignore at commit time.      |
+| [`CMakeLists.txt`](CMakeLists.txt)   | Root CMake file                            |
+| [`CONTRIBUTING.md`](CONTRIBUTING.md) | Guidelines for contributing to the sample. |
+| [`README.md`](README.md)             | This README file.                          |
+| [`LICENSE`](LICENSE)                 | The license for the sample.                |
 
 ## ❓ What Is ElectionGuard?
 
@@ -218,7 +218,7 @@ make test-netstandard
 
 To run the tests when building for a mobile device, you can run the .Net Standard tests using the Xamarin Test runner on the Android Emulator or the iOS simulator:
 
-**NOTE: Xamarin build support is temporarily disabled while the project migrates to the new SDK style project format.**  Please refer to ISSUE #195 for more information.
+**NOTE: Xamarin build support is temporarily disabled while the project migrates to the new SDK style project format.** Please refer to ISSUE #195 for more information.
 
 ```sh
 make build-netstandard
@@ -256,6 +256,10 @@ A huge thank you to those who helped to contribute to this project so far, inclu
 
 <a href="https://www.microsoft.com/en-us/research/people/benaloh/"><img src="https://www.microsoft.com/en-us/research/wp-content/uploads/2016/09/avatar_user__1473484671-180x180.jpg" title="Josh Benaloh" width="80" height="80"></a>
 
+**[Steve Maier](https://github.com/SteveMaier-IRT) [_(InfernoRed Technology)_](https://infernored.com/)**
+
+<a href="https://github.com/SteveMaier-IRT"><img src="https://avatars2.githubusercontent.com/u82616727?v=4" title="SteveMaier-IRT" width="80" height="80"></a>
+
 **[Keith Fung](https://github.com/keithrfung) [_(InfernoRed Technology)_](https://infernored.com/)**
 
 <a href="https://github.com/keithrfung"><img src="https://avatars2.githubusercontent.com/u/10125297?v=4" title="keithrfung" width="80" height="80"></a>
@@ -284,6 +288,6 @@ A huge thank you to those who helped to contribute to this project so far, inclu
 
 [banner image]: https://raw.githubusercontent.com/microsoft/electionguard-python/main/images/electionguard-banner.svg
 [pull request workflow]: https://github.com/microsoft/electionguard-ccpp/blob/main/.github/workflows/pull_request.yml
-[contributing]: https://github.com/microsoft/electionguard-cpp/blob/main/CONTRIBUTING.md
-[security]: https://github.com/microsoft/electionguard-cpp/blob/main/SECURITY.md
-[mit license]: https://github.com/microsoft/electionguard-cpp/blob/main/LICENSE
+[contributing]: https://github.com/microsoft/electionguard-core2/blob/main/CONTRIBUTING.md
+[security]: https://github.com/microsoft/electionguard-core2/blob/main/SECURITY.md
+[mit license]: https://github.com/microsoft/electionguard-core2/blob/main/LICENSE
