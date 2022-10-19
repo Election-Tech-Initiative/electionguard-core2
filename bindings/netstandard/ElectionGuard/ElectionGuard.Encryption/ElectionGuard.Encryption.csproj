@@ -21,8 +21,8 @@
     <Authors>Microsoft</Authors>
     <PackageVersion>1.0.1</PackageVersion>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
-    <PackageProjectUrl>https://github.com/microsoft/electionguard-cpp</PackageProjectUrl>
-    <RepositoryUrl>https://github.com/microsoft/electionguard-cpp</RepositoryUrl>
+    <PackageProjectUrl>https://github.com/microsoft/electionguard-core2</PackageProjectUrl>
+    <RepositoryUrl>https://github.com/microsoft/electionguard-core2</RepositoryUrl>
     <PackageTags>Microsoft;Electionguard;Encryption;Windows;MacOS;Linux</PackageTags>
     <PackageReadmeFile>README.md</PackageReadmeFile>
     <PackageIcon>icon.png</PackageIcon>
