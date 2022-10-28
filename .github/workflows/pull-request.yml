@@ -107,9 +107,6 @@ jobs:
         run: make test-msvc
       - name: Run .Net Tests
         run: make test-netstandard
-      - name: Run Sanitizer
-        if: (runner.os == 'Linux' && matrix.os == 'ubuntu-20.04')
-        run: make sanitize-asan
       - name: Run Benchmarks
         if: (runner.os == 'Linux' || runner.os == 'macOS')
         run: make bench
