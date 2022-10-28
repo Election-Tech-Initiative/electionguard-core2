@@ -428,25 +428,6 @@ namespace ElectionGuard
             return new PlaintextBallotSelection(value);
         }
 
-        /// <Summary>
-        /// Given a PlaintextBallotContest returns true if the state is representative of the expected values.
-        ///
-        /// Note: because this class supports partial representations, undervotes are considered a valid state.
-        /// </Summary>
-        public unsafe bool IsValid(
-            string expectedObjectId,
-            ulong expectedNumSelections,
-            ulong expectedNumElected,
-            ulong votesAllowed = 0)
-        {
-            return NativeInterface.PlaintextBallotContest.IsValid(
-                Handle,
-                expectedObjectId,
-                expectedNumSelections,
-                expectedNumElected,
-                votesAllowed);
-        }
-
 #pragma warning disable CS1591 // Missing XML comment for publicly visible type or member
         protected override unsafe void DisposeUnmanaged()
 #pragma warning restore CS1591 // Missing XML comment for publicly visible type or member

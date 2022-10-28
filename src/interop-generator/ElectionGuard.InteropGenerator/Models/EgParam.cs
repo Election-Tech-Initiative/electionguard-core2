@@ -4,17 +4,32 @@ namespace ElectionGuard.InteropGenerator.Models;
 
 public record EgParam(
     string Name, 
-    string TypeCs
+    string TypeCs,
+    string? DefaultValue
 )
 {
     public string TypeC => TypeHelper.CsToC(TypeCs);
 
-    public string MarshallAs()
+    public string? MarshallAs()
     {
-        if (TypeCs == "string")
+        return TypeCs switch
         {
-            return "UnmanagedType.LPStr";
-        }
-        throw new NotImplementedException("Unsupported marshall type " + TypeCs);
+            "string" => "UnmanagedType.LPStr",
+            "ulong" => null,
+            _ => throw new NotImplementedException("Unsupported marshall type " + TypeCs)
+        };
+    }
+
+    public string AsCsParam()
+    {
+        var defaultVal = DefaultValue == null ? "" : $" = {DefaultValue}";
+        return $"{TypeCs} {Name}{defaultVal}";
+    }
+
+    public string AsCppInteropParam()
+    {
+        var marshallAs = MarshallAs();
+        var marshallAsAttribute = marshallAs == null ? "" : $"[MarshalAs({marshallAs})] ";
+        return $"{marshallAsAttribute}{TypeCs} {Name}";
     }
 }

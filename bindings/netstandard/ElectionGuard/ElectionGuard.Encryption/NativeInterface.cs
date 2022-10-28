@@ -2624,15 +2624,6 @@ namespace ElectionGuard
                 PlaintextBallotContestHandle handle,
                 ulong index,
                 out PlaintextBallotSelection.PlaintextBallotSelectionHandle selection);
-
-            [DllImport(DllName, EntryPoint = "eg_plaintext_ballot_contest_is_valid",
-                CallingConvention = CallingConvention.Cdecl, SetLastError = true)]
-            internal static extern bool IsValid(
-                PlaintextBallotContestHandle handle,
-                [MarshalAs(UnmanagedType.LPStr)] string expected_object_id,
-                ulong expected_num_selections,
-                ulong expected_num_elected,
-                ulong votes_allowed);
         }
 
         internal static unsafe class CiphertextBallotContest

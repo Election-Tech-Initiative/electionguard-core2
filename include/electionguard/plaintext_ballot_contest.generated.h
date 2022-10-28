@@ -36,6 +36,17 @@ EG_API uint64_t eg_plaintext_ballot_contest_get_selections_size(
 	eg_plaintext_ballot_contest_t *handle
 	);
 
+/**
+ * Given a PlaintextBallotContest returns true if the state is representative of the expected values.  Note: because this class supports partial representations, undervotes are considered a valid state.
+ */
+EG_API bool eg_plaintext_ballot_contest_is_valid(
+	eg_plaintext_ballot_selection_t *handle,
+	char *in_expected_object_id,
+	uint64_t in_expected_num_selections,
+	uint64_t in_expected_num_elected,
+	uint64_t in_votes_allowed
+	);
+
 #endif // ifndef PlaintextBallotContest
 
 #ifdef __cplusplus

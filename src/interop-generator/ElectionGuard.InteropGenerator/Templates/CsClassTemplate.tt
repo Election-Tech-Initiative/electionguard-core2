@@ -54,10 +54,14 @@ namespace ElectionGuard
         /// <#= method.Description #>
         /// </summary>
         public unsafe <#= method.ReturnTypeCs #> <#= method.Name #>(
-            <#= string.Join(", ", method.Params.Select(p => $"{p.TypeCs} {p.Name}")) #>
+            <#= string.Join(", ", method.Params.Select(p => p.AsCsParam())) #>
         ) {
             return External.<#= method.Name #>(
-                Handle, expectedObjectId);
+                Handle<# 
+foreach (var p in method.Params) {
+    this.Write($", {p.Name}");
+}
+                #>);
         }
 <# } // foreach method #>
         #endregion
@@ -91,8 +95,11 @@ namespace ElectionGuard
             [DllImport(NativeInterface.DllName, EntryPoint = "<#= entryPoint #>",
                 CallingConvention = CallingConvention.Cdecl, SetLastError = true)]
             internal static extern <#= method.ReturnTypeCs #> <#= method.Name #>(
-                NativeInterface.<#= className #>.<#= className #>Handle handle,
-                <#= string.Join(", ", method.Params.Select(p => $"[MarshalAs({p.MarshallAs()})] {p.TypeCs} {p.Name}")) #>
+                NativeInterface.<#= className #>.<#= className #>Handle handle<#
+foreach (var p in method.Params) { #>,
+                <#= p.AsCppInteropParam() #><# 
+} // end foreach param #>
+
                 );
 <# } #>
         }

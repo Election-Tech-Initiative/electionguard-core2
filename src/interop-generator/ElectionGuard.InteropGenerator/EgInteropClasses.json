@@ -54,6 +54,30 @@
       }
     ],
     "Methods": [
+      {
+        "Name": "IsValid",
+        "ReturnTypeCs": "bool",
+        "Description": "Given a PlaintextBallotContest returns true if the state is representative of the expected values.  Note: because this class supports partial representations, undervotes are considered a valid state.",
+        "Params": [
+          {
+            "Name": "expectedObjectId",
+            "TypeCs": "string"
+          },
+          {
+            "Name": "expectedNumSelections",
+            "TypeCs": "ulong"
+          },
+          {
+            "Name": "expectedNumElected",
+            "TypeCs": "ulong"
+          },
+          {
+            "Name": "votesAllowed",
+            "TypeCs": "ulong",
+            "DefaultValue": "0"
+          }
+        ]
+      }
     ]
   },
   {

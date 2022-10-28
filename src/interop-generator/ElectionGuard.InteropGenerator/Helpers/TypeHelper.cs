@@ -11,8 +11,8 @@ namespace ElectionGuard.InteropGenerator.Helpers
         private static readonly Dictionary<string, string> ReturnTypes = new()
         {
             { "string", "char *" },
-            { "bool", "bool" },
-            { "ulong", "uint64_t" },
+            { "bool", "bool " },
+            { "ulong", "uint64_t " },
         };
 
         public static string CsToC(string csType)

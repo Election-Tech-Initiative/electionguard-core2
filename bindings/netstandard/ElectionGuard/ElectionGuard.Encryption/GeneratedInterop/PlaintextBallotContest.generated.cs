@@ -38,6 +38,15 @@ namespace ElectionGuard
         #endregion
 
         #region Methods
+        /// <summary>
+        /// Given a PlaintextBallotContest returns true if the state is representative of the expected values.  Note: because this class supports partial representations, undervotes are considered a valid state.
+        /// </summary>
+        public unsafe bool IsValid(
+            string expectedObjectId, ulong expectedNumSelections, ulong expectedNumElected, ulong votesAllowed = 0
+        ) {
+            return External.IsValid(
+                Handle, expectedObjectId, expectedNumSelections, expectedNumElected, votesAllowed);
+        }
         #endregion
 
         #region Extern
@@ -63,6 +72,15 @@ namespace ElectionGuard
                 NativeInterface.PlaintextBallotContest.PlaintextBallotContestHandle handle
             );
 
+            [DllImport(NativeInterface.DllName, EntryPoint = "eg_plaintext_ballot_contest_is_valid",
+                CallingConvention = CallingConvention.Cdecl, SetLastError = true)]
+            internal static extern bool IsValid(
+                NativeInterface.PlaintextBallotContest.PlaintextBallotContestHandle handle,
+                [MarshalAs(UnmanagedType.LPStr)] string expectedObjectId,
+                ulong expectedNumSelections,
+                ulong expectedNumElected,
+                ulong votesAllowed
+                );
         }
         #endregion
     }
