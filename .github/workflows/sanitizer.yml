@@ -1,0 +1,53 @@
+name: Run Sanitizer
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - ".github/**"
+      - "apps/**"
+      - "bindings/**"
+      - "include/**"
+      - "src/**"
+      - "test/**"
+#  schedule:
+#    - cron: '0 0 * * 2-6' Daily at 00:00 UTC Tuesday-saturday
+
+env:
+  TARGET: Release
+  compiler: clang
+  compiler_version: "10"
+
+jobs:
+  Test:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Fail if non Linux OS
+        if: runner.os != 'Linux'
+        run: exit 1
+      - name: Checkout Code
+        uses: actions/checkout@v2
+      - name: Update Environment
+        run: |
+          sudo apt-get update
+
+          if [ "${{ env.compiler }}" = "gcc" ]; then
+            echo "CC=gcc-${{ env.compiler_version }}" >> $GITHUB_ENV
+            echo "CXX=g++-${{ env.compiler_version }}" >> $GITHUB_ENV
+          else
+            sudo apt-get install -y clang-${{ env.compiler_version }} g++-multilib
+            echo "CC=clang-${{ env.compiler_version }}" >> $GITHUB_ENV
+            echo "CXX=clang++-${{ env.compiler_version }}" >> $GITHUB_ENV
+          fi
+      - name: Configure Environment
+        run: make environment
+      - name: Run Tests
+        run: make test
+      - name: Run .Net Tests
+        run: make test-netstandard
+
+      - name: Run Sanitizer
+        run: make sanitize-asan # TODO: Add other sanitizers
+      - name: Run Benchmarks
+        run: make bench
