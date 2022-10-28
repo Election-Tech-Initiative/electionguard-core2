@@ -184,7 +184,6 @@ namespace ElectionGuard.Encrypt.Tests
                 new ContactInformation("na"));
 
             var json = result.ToJson();
-            Assert.IsTrue(json.Contains("\"value\":\"Ra\\\\u00fal\""));
             Assert.IsTrue(json.Contains("\"value\":\"Ra\\u00fal\""));
         }
     }
