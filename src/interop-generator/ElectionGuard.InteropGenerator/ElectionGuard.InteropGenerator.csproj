@@ -16,10 +16,6 @@
       <Generator>TextTemplatingFilePreprocessor</Generator>
       <LastGenOutput>CHeaderTemplate.cs</LastGenOutput>
     </None>
-    <None Update="Templates\CppClassTemplate.tt">
-      <Generator>TextTemplatingFilePreprocessor</Generator>
-      <LastGenOutput>CppClassTemplate.cs</LastGenOutput>
-    </None>
     <None Update="Templates\CsClassTemplate.tt">
       <Generator>TextTemplatingFilePreprocessor</Generator>
       <LastGenOutput>CsClassTemplate.cs</LastGenOutput>
@@ -42,11 +38,6 @@
     <Compile Update="FileGenerators\CsFileGenerator.cs">
       <DesignTime>True</DesignTime>
       <AutoGen>True</AutoGen>
-    </Compile>
-    <Compile Update="Templates\CppClassTemplate.cs">
-      <DesignTime>True</DesignTime>
-      <AutoGen>True</AutoGen>
-      <DependentUpon>CppClassTemplate.tt</DependentUpon>
     </Compile>
     <Compile Update="Templates\CsClassTemplate.cs">
       <DesignTime>True</DesignTime>
