@@ -164,14 +164,6 @@ else
 	echo "iOS builds are only supported on MacOS"
 endif
 
-build-netframework: build-msvc
-	@echo 🖥️ BUILD NET FRAMEWORK
-ifeq ($(OPERATING_SYSTEM),Windows)
-	pwsh -Command "msbuild ./bindings/netframework/ElectionGuard.NetFramework/ElectionGuard.NetFramework.x64.sln /t:Build /p:Configuration=$(TARGET); $$null"
-else
-	echo "Net Framework builds are only supported on Windows"
-endif
-
 build-netstandard:
 ifeq ($(OPERATING_SYSTEM),Windows)
 	make build-msvc

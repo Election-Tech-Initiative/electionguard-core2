@@ -72,9 +72,9 @@ Building on windows is supported using the `MSVC` toolchain.
 
 - Install [Chocolatey](https://chocolatey.org/install)
 - Install [Powershell Core](https://github.com/powershell/powershell)
-- Install [VS 2019](https://visualstudio.microsoft.com/vs/)
+- Install [VS 2022](https://visualstudio.microsoft.com/vs/)
 - Open the Visual Studio Installer and install
-  -- MSVC v142 - VS 2019 C++ x64/x86 build tools
+  -- MSVC v142 - VS 2022 C++ x64/x86 build tools
   -- Windows 10 SDK (latest)
   -- C++ CMake tools for Windows
   -- C++/CLI support for v142 build tools
@@ -177,21 +177,6 @@ Wraps the build artifacts in a C# wrapper conforming to .Net Standard 2.0.
 ```sh
 make build-netstandard
 ```
-
-### .Net Framework v4.8
-
-Wraps the MSVC build artifacts in a C++/CLI wrapper to be consumed from a .Net Framework 4.8 application (windows desktop only). Only works on Windows.
-
-```pwsh
-// ensure the windows msvc binaries are built
-make build-msvc
-```
-
-open `./bindings/netframework//ElectionGuard.NetFramework/ElectionGuard.NetFramework.XXX.sln` in VS 2019 and build.
-
-#### Running the .Net Framework Benchmark
-
-Open the NetFramework solution and run the `ElectionGuard.Bench` project
 
 ## Test
 
