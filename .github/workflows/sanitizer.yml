@@ -16,7 +16,7 @@ on:
 env:
   TARGET: Release
   compiler: clang
-  compiler_version: "10"
+  compiler_version: "14"
 
 jobs:
   Test:
@@ -31,15 +31,9 @@ jobs:
       - name: Update Environment
         run: |
           sudo apt-get update
-
-          if [ "${{ env.compiler }}" = "gcc" ]; then
-            echo "CC=gcc-${{ env.compiler_version }}" >> $GITHUB_ENV
-            echo "CXX=g++-${{ env.compiler_version }}" >> $GITHUB_ENV
-          else
-            sudo apt-get install -y clang-${{ env.compiler_version }} g++-multilib
-            echo "CC=clang-${{ env.compiler_version }}" >> $GITHUB_ENV
-            echo "CXX=clang++-${{ env.compiler_version }}" >> $GITHUB_ENV
-          fi
+          sudo apt-get install -y clang-${{ env.compiler_version }} g++-multilib
+          echo "CC=clang-${{ env.compiler_version }}" >> $GITHUB_ENV
+          echo "CXX=clang++-${{ env.compiler_version }}" >> $GITHUB_ENV
       - name: Configure Environment
         run: make environment
       - name: Run Tests

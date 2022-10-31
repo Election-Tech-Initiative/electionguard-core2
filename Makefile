@@ -49,7 +49,7 @@ ifeq ($(OPERATING_SYSTEM),Linux)
 	sudo apt install -y build-essential
 	sudo apt install -y iwyu
 	sudo apt install -y llvm
-	sudo apt install -y clang-9
+	sudo apt install -y clang-12
 	sudo apt install -y cmake
 	sudo apt install -y lcov
 	sudo apt install -y cppcheck
