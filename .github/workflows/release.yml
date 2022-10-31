@@ -38,22 +38,16 @@ jobs:
     runs-on: ubuntu-latest
     env:
       compiler: clang
-      compiler_version: 10
+      compiler_version: 14
     steps:
       - name: Checkout Code
         uses: actions/checkout@v2
       - name: Update Environment
         run: |
           sudo apt-get update
-
-          if [ "${{ env.compiler }}" = "gcc" ]; then
-            echo "CC=gcc-${{ env.compiler_version }}" >> $GITHUB_ENV
-            echo "CXX=g++-${{ env.compiler_version }}" >> $GITHUB_ENV
-          else
-            sudo apt-get install -y clang-${{ env.compiler_version }} g++-multilib
-            echo "CC=clang-${{ env.compiler_version }}" >> $GITHUB_ENV
-            echo "CXX=clang++-${{ env.compiler_version }}" >> $GITHUB_ENV
-          fi
+          sudo apt-get install -y clang-${{ env.compiler_version }} g++-multilib
+          echo "CC=clang-${{ env.compiler_version }}" >> $GITHUB_ENV
+          echo "CXX=clang++-${{ env.compiler_version }}" >> $GITHUB_ENV
       - name: Configure Environment
         run: make environment
       - name: Build
@@ -68,7 +62,7 @@ jobs:
     name: MacOS Build
     runs-on: macos-latest
     env:
-      compiler_version: 12.5.1
+      compiler_version: 14
     steps:
       - name: Checkout Code
         uses: actions/checkout@v2

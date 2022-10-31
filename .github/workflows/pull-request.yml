@@ -24,34 +24,39 @@ jobs:
       matrix:
         name:
           [
-            "ubuntu-20.04-clang-10.0.0",
-            "ubuntu-18.04-gcc-9.3.0",
-            "ubuntu-18.04-clang-10.0.0",
-            "macos-10.15-xcode-12.0",
-            "windows-2022-gcc-9.2.0",
+            "ubuntu-22.04-clang-14.0.0",
+            "ubuntu-22.04-gcc-11.2.0",
+            "ubuntu-20.04-gcc-10.3.0",
+            "ubuntu-20.04-clang-12.0.0",
+            "macos-latest-xcode-14.0",
+            "windows-2022-gcc-11",
             "windows-2022-msvc-latest",
           ]
         include:
-          - name: ubuntu-20.04-clang-10.0.0
+          - name: ubuntu-22.04-clang-14.0.0
+            os: ubuntu-22.04
+            compiler: clang
+            version: "14"
+          - name: ubuntu-22.04-gcc-11.3.0
+            os: ubuntu-22.04
+            compiler: gcc
+            version: "11"
+          - name: ubuntu-20.04-gcc-10.3.0
+            os: ubuntu-20.04
+            compiler: gcc
+            version: "10"
+          - name: ubuntu-20.04-clang-12.0.0
             os: ubuntu-20.04
             compiler: clang
-            version: "10"
-          - name: ubuntu-18.04-gcc-9.3.0
-            os: ubuntu-18.04
-            compiler: gcc
-            version: "9"
-          - name: ubuntu-18.04-clang-10.0.0
-            os: ubuntu-18.04
-            compiler: clang
-            version: "10"
-          - name: macOS-10.15-xcode-12.0
-            os: macOS-10.15
-            compiler: xcode
             version: "12"
-          - name: windows-2022-gcc-9.2.0
+          - name: macOS-latest-xcode-14.0
+            os: macOS-latest
+            compiler: xcode
+            version: "14"
+          - name: windows-2022-gcc-11
             os: windows-2022
             compiler: gcc
-            version: "9"
+            version: "11"
           - name: windows-2022-msvc-latest
             os: windows-2022
             compiler: msvc
@@ -102,7 +107,7 @@ jobs:
       - name: Run Tests
         if: (runner.os == 'Windows' && matrix.compiler != 'msvc')
         run: make test
-      - name: Run Tests
+      - name: Run MSVC Tests
         if: (runner.os == 'Windows' && matrix.compiler == 'msvc')
         run: make test-msvc
       - name: Run .Net Tests
@@ -113,7 +118,7 @@ jobs:
       - name: Make Release Build
         if: runner.os == 'Linux'
         env:
-          NDK_PATH: $$ANDROID_SDK_ROOT/ndk/21.3.6528147
+          NDK_PATH: $$ANDROID_NDK_HOME
         run: |
           make build
           # if [ "${{ matrix.compiler }}" = "clang" ]; then
@@ -122,7 +127,7 @@ jobs:
       - name: Make Release Build
         if: runner.os == 'macOS'
         env:
-          NDK_PATH: $$ANDROID_HOME/ndk/21.3.6528147
+          NDK_PATH: $$ANDROID_NDK_HOME
         run: |
           make build
           # make build-android
