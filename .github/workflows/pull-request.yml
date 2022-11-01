@@ -109,7 +109,7 @@ jobs:
         run: make test
       - name: Run MSVC Tests
         if: (runner.os == 'Windows' && matrix.compiler == 'msvc')
-        run: make test-msvc
+        run: make test-msvc TARGET=DEBUG
       - name: Run .Net Tests
         run: make test-netstandard
       - name: Run Benchmarks
