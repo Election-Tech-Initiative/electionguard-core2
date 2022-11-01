@@ -22,11 +22,6 @@ jobs:
         run: make environment
       - name: Build
         run: make build-msvc
-      - name: Upload Library (x86)
-        uses: actions/upload-artifact@v2
-        with:
-          name: win-x86
-          path: build/libs/msvc/Win32/src/Release/*.dll*
       - name: Upload Library (x64)
         uses: actions/upload-artifact@v2
         with:
@@ -85,11 +80,6 @@ jobs:
     steps:
       - name: Checkout Code
         uses: actions/checkout@v2
-      - name: Get Windows x86 Build
-        uses: actions/download-artifact@v2
-        with:
-          name: win-x86
-          path: build/libs/msvc/Win32/src/Release
       - name: Get Windows x64 Build
         uses: actions/download-artifact@v2
         with:
