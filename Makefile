@@ -92,16 +92,11 @@ endif
 build-msvc:
 	@echo 🖥️ BUILD MSVC
 ifeq ($(OPERATING_SYSTEM),Windows)
-	cmake -S . -B $(ELECTIONGUARD_BUILD_LIBS_DIR)/msvc/Win32 -G "Visual Studio 17 2022" -A Win32 \
-		-DCMAKE_BUILD_TYPE=$(TARGET) \
-		-DBUILD_SHARED_LIBS=ON \
-		-DCPM_SOURCE_CACHE=$(CPM_SOURCE_CACHE)
 	cmake -S . -B $(ELECTIONGUARD_BUILD_LIBS_DIR)/msvc/x64 -G "Visual Studio 17 2022" -A x64 \
 		-DCMAKE_BUILD_TYPE=$(TARGET) \
 		-DBUILD_SHARED_LIBS=ON \
 		-DCAN_USE_VECTOR_INTRINSICS=ON \
 		-DCPM_SOURCE_CACHE=$(CPM_SOURCE_CACHE)
-	cmake --build $(ELECTIONGUARD_BUILD_LIBS_DIR)/msvc/Win32 --config $(TARGET)
 	cmake --build $(ELECTIONGUARD_BUILD_LIBS_DIR)/msvc/x64 --config $(TARGET)
 else
 	echo "MSVC builds are only supported on Windows"
@@ -128,15 +123,6 @@ build-android:
 		-DCMAKE_SYSTEM_VERSION=26 \
 		-DCMAKE_ANDROID_ARM_NEON=ON
 	cmake --build $(ELECTIONGUARD_BUILD_LIBS_DIR)/android/$(TARGET)/armeabi-v7a
-	cmake -S . -B $(ELECTIONGUARD_BUILD_LIBS_DIR)/android/$(TARGET)/x86 \
-		-DCMAKE_BUILD_TYPE=$(TARGET) \
-		-DBUILD_SHARED_LIBS=ON \
-		-DCPM_SOURCE_CACHE=$(CPM_SOURCE_CACHE) \
-		-DCMAKE_SYSTEM_NAME=Android \
-		-DCMAKE_ANDROID_NDK=$(NDK_PATH) \
-		-DCMAKE_ANDROID_ARCH_ABI=x86 \
-		-DCMAKE_SYSTEM_VERSION=26
-	cmake --build $(ELECTIONGUARD_BUILD_LIBS_DIR)/android/$(TARGET)/x86
 	cmake -S . -B $(ELECTIONGUARD_BUILD_LIBS_DIR)/android/$(TARGET)/x86_64 \
 		-DCMAKE_BUILD_TYPE=$(TARGET) \
 		-DBUILD_SHARED_LIBS=ON \
@@ -173,7 +159,6 @@ endif
 
 	@echo 🖥️ BUILD NETSTANDARD
 	cd ./bindings/netstandard/ElectionGuard && dotnet restore
-	dotnet build --configuration $(TARGET) ./bindings/netstandard/ElectionGuard/ElectionGuard.sln /property:Platform=x86
 	dotnet build --configuration $(TARGET) ./bindings/netstandard/ElectionGuard/ElectionGuard.sln /property:Platform=x64
 
 clean:
@@ -315,10 +300,6 @@ endif
 
 bench-netstandard: build-netstandard
 	@echo 🧪 BENCHMARK
-	@echo net 6.0 x86
-	./bindings/netstandard/ElectionGuard/ElectionGuard.Encryption.Bench/bin/x86/$(TARGET)/net6.0/ElectionGuard.Encryption.Bench
-	@echo net 4.8 x86
-	./bindings/netstandard/ElectionGuard/ElectionGuard.Encryption.Bench/bin/x86/$(TARGET)/net48/ElectionGuard.Encryption.Bench
 	@echo net 6.0 x64
 	./bindings/netstandard/ElectionGuard/ElectionGuard.Encryption.Bench/bin/x64/$(TARGET)/net6.0/ElectionGuard.Encryption.Bench
 	@echo net 4.8 x64
@@ -372,9 +353,6 @@ endif
 test-netstandard: build-netstandard
 	@echo 🧪 TEST NETSTANDARD
 	dotnet test --configuration $(TARGET) ./bindings/netstandard/ElectionGuard/ElectionGuard.sln
-ifeq ($(OPERATING_SYSTEM),Windows)
-	dotnet test --configuration $(TARGET) ./bindings/netstandard/ElectionGuard/ElectionGuard.sln /property:Platform=x86
-endif
 
 coverage:
 	@echo ✅ CHECK COVERAGE
