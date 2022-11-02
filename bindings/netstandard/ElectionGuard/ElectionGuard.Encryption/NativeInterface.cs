@@ -346,7 +346,7 @@ namespace ElectionGuard
 
     internal static unsafe class NativeInterface
     {
-        const string DllName = "electionguard";
+        internal const string DllName = "electionguard";
 
         internal unsafe struct CharPtr { };
 
@@ -2482,34 +2482,6 @@ namespace ElectionGuard
             [DllImport(DllName, EntryPoint = "eg_plaintext_ballot_selection_free",
                 CallingConvention = CallingConvention.Cdecl, SetLastError = true)]
             internal static extern Status Free(PlaintextBallotSelectionType* handle);
-
-            [DllImport(DllName, EntryPoint = "eg_plaintext_ballot_selection_get_object_id",
-                CallingConvention = CallingConvention.Cdecl, SetLastError = true)]
-            internal static extern Status GetObjectId(
-                PlaintextBallotSelectionHandle handle, out IntPtr object_id);
-
-            [DllImport(DllName, EntryPoint = "eg_plaintext_ballot_selection_get_vote",
-                CallingConvention = CallingConvention.Cdecl, SetLastError = true)]
-            internal static extern ulong GetVote(
-                PlaintextBallotSelectionHandle handle);
-
-            [DllImport(DllName,
-                EntryPoint = "eg_plaintext_ballot_selection_get_is_placeholder",
-                CallingConvention = CallingConvention.Cdecl, SetLastError = true)]
-            internal static extern bool GetIsPlaceholder(
-                PlaintextBallotSelectionHandle handle);
-
-            [DllImport(DllName,
-                EntryPoint = "eg_plaintext_ballot_selection_get_extended_data",
-                CallingConvention = CallingConvention.Cdecl, SetLastError = true)]
-            internal static extern Status GetExtendedData(
-                PlaintextBallotSelectionHandle handle, out ExtendedData.ExtendedDataHandle extended_data);
-
-            [DllImport(DllName, EntryPoint = "eg_plaintext_ballot_selection_is_valid",
-                CallingConvention = CallingConvention.Cdecl, SetLastError = true)]
-            internal static extern bool IsValid(
-                PlaintextBallotSelectionHandle handle,
-                [MarshalAs(UnmanagedType.LPStr)] string expectedObjectId);
         }
 
         internal static unsafe class CiphertextBallotSelection
@@ -2641,11 +2613,6 @@ namespace ElectionGuard
                 CallingConvention = CallingConvention.Cdecl, SetLastError = true)]
             internal static extern Status Free(PlaintextBallotContestType* handle);
 
-            [DllImport(DllName, EntryPoint = "eg_plaintext_ballot_contest_get_object_id",
-                CallingConvention = CallingConvention.Cdecl, SetLastError = true)]
-            internal static extern Status GetObjectId(
-                PlaintextBallotContestHandle handle, out IntPtr object_id);
-
             [DllImport(DllName, EntryPoint = "eg_plaintext_ballot_contest_get_selections_size",
                 CallingConvention = CallingConvention.Cdecl, SetLastError = true)]
             internal static extern ulong GetSelectionsSize(
@@ -2657,15 +2624,6 @@ namespace ElectionGuard
                 PlaintextBallotContestHandle handle,
                 ulong index,
                 out PlaintextBallotSelection.PlaintextBallotSelectionHandle selection);
-
-            [DllImport(DllName, EntryPoint = "eg_plaintext_ballot_contest_is_valid",
-                CallingConvention = CallingConvention.Cdecl, SetLastError = true)]
-            internal static extern bool IsValid(
-                PlaintextBallotContestHandle handle,
-                [MarshalAs(UnmanagedType.LPStr)] string expected_object_id,
-                ulong expected_num_selections,
-                ulong expected_num_elected,
-                ulong votes_allowed);
         }
 
         internal static unsafe class CiphertextBallotContest
@@ -2818,20 +2776,6 @@ namespace ElectionGuard
             [DllImport(DllName, EntryPoint = "eg_plaintext_ballot_free",
                 CallingConvention = CallingConvention.Cdecl, SetLastError = true)]
             internal static extern Status Free(PlaintextBallotType* handle);
-
-            [DllImport(DllName, EntryPoint = "eg_plaintext_ballot_get_object_id",
-                CallingConvention = CallingConvention.Cdecl, SetLastError = true)]
-            internal static extern Status GetObjectId(
-                PlaintextBallotHandle handle, out IntPtr object_id);
-
-            [DllImport(DllName, EntryPoint = "eg_plaintext_ballot_get_style_id",
-                CallingConvention = CallingConvention.Cdecl, SetLastError = true)]
-            internal static extern Status GetStyleId(
-                PlaintextBallotHandle handle, out IntPtr style_id);
-
-            [DllImport(DllName, EntryPoint = "eg_plaintext_ballot_get_contests_size",
-                CallingConvention = CallingConvention.Cdecl, SetLastError = true)]
-            internal static extern ulong GetContestsSize(PlaintextBallotHandle handle);
 
             [DllImport(DllName, EntryPoint = "eg_plaintext_ballot_get_contest_at_index",
                 CallingConvention = CallingConvention.Cdecl, SetLastError = true)]

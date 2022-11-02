@@ -94,39 +94,6 @@ EG_API eg_electionguard_status_t
 eg_plaintext_ballot_selection_free(eg_plaintext_ballot_selection_t *handle);
 
 /**
-* @brief Get the ObjectId
-* @param[in] handle A poiner to the `eg_plaintext_ballot_selection_t` opaque instance
-* @param[out] out_object_id A pointer to the output object id.  
-                            The caller is responsible for freeing the string.
-* @return eg_electionguard_status_t indicating success or failure
-* @retval ELECTIONGUARD_STATUS_SUCCESS The function was successfully executed
-* @retval ELECTIONGUARD_STATUS_ERROR_BAD_ALLOC The function was unable to allocate memory
-*/
-EG_API eg_electionguard_status_t eg_plaintext_ballot_selection_get_object_id(
-  eg_plaintext_ballot_selection_t *handle, char **out_object_id);
-
-/**
- * Get the plaintext vote
- */
-EG_API uint64_t eg_plaintext_ballot_selection_get_vote(eg_plaintext_ballot_selection_t *handle);
-
-/**
- * Determines if this is a placeholder selection
- */
-EG_API bool
-eg_plaintext_ballot_selection_get_is_placeholder(eg_plaintext_ballot_selection_t *handle);
-
-/**
- * an optional field of arbitrary data, such as the value of a write-in candidate
- * 
- * @param[in] handle A poiner to the `eg_plaintext_ballot_selection_t` opaque instance
- * @param[out] out_extended_data_ref A pointer to the extended data.  
-                                     The value is a reference and is not owned by the caller
- */
-EG_API eg_electionguard_status_t eg_plaintext_ballot_selection_get_extended_data(
-  eg_plaintext_ballot_selection_t *handle, eg_extended_data_t **out_extended_data_ref);
-
-/**
  * Given a PlaintextBallotSelection validates that the object matches an expected object
  * and that the plaintext value can resolve to a valid representation
  */
@@ -295,19 +262,6 @@ EG_API eg_electionguard_status_t
 eg_plaintext_ballot_contest_free(eg_plaintext_ballot_contest_t *handle);
 
 /**
- * Get the objectId of the contest, which is the unique id for
- * the contest in a specific ballot style described in the election manifest.
- */
-EG_API eg_electionguard_status_t eg_plaintext_ballot_contest_get_object_id(
-  eg_plaintext_ballot_contest_t *handle, char **out_object_id);
-
-/**
- * Get the Size of the selections collection
- */
-EG_API uint64_t
-eg_plaintext_ballot_contest_get_selections_size(eg_plaintext_ballot_contest_t *handle);
-
-/**
  * Get a selection at a specific index.
  * 
  * @param[in] in_index The index of the selection
@@ -317,17 +271,6 @@ eg_plaintext_ballot_contest_get_selections_size(eg_plaintext_ballot_contest_t *h
 EG_API eg_electionguard_status_t eg_plaintext_ballot_contest_get_selection_at_index(
   eg_plaintext_ballot_contest_t *handle, uint64_t in_index,
   eg_plaintext_ballot_selection_t **out_selection_ref);
-
-/**
- * Given a PlaintextBallotContest returns true if the state is representative of the expected values.
- * 
- * Note: because this class supports partial representations, undervotes are considered a valid state.
- */
-EG_API bool eg_plaintext_ballot_contest_is_valid(eg_plaintext_ballot_contest_t *handle,
-                                                 char *in_expected_object_id,
-                                                 uint64_t in_expected_num_selections,
-                                                 uint64_t in_expected_num_elected,
-                                                 uint64_t in_votes_allowed);
 
 #endif
 
@@ -511,26 +454,6 @@ EG_API eg_electionguard_status_t eg_plaintext_ballot_new(
   const uint64_t in_contests_size, eg_plaintext_ballot_t **out_handle);
 
 EG_API eg_electionguard_status_t eg_plaintext_ballot_free(eg_plaintext_ballot_t *handle);
-
-/**
- * A unique Ballot ID that is relevant to the external system and must be unique
- * within the dataset of the election.
- */
-EG_API eg_electionguard_status_t eg_plaintext_ballot_get_object_id(eg_plaintext_ballot_t *handle,
-                                                                   char **out_object_id);
-
-/**
- * The Object Id of the ballot style in the election manifest.  This value is used
- * to determine which contests to expect on the ballot, to fill in missing values,
- * and to validate that the ballot is well-formed
- */
-EG_API eg_electionguard_status_t eg_plaintext_ballot_get_style_id(eg_plaintext_ballot_t *handle,
-                                                                  char **out_style_id);
-
-/**
- * Get the size of the contest collection
- */
-EG_API uint64_t eg_plaintext_ballot_get_contests_size(eg_plaintext_ballot_t *handle);
 
 /**
  * Get a contest at a specific index.

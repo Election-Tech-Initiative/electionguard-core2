@@ -123,61 +123,8 @@ namespace ElectionGuard
     /// of a write-in candidate value.  In the current implementation these values are
     /// discarded when encrypting.
     /// </summary>
-    public class PlaintextBallotSelection : DisposableBase
+    public partial class PlaintextBallotSelection : DisposableBase
     {
-        /// <Summary>
-        /// Get the objectId of the selection, which is the unique id for
-        /// the selection in a specific contest described in the election manifest.
-        /// </Summary>
-        public unsafe string ObjectId
-        {
-            get
-            {
-                var status = NativeInterface.PlaintextBallotSelection.GetObjectId(
-                    Handle, out IntPtr value);
-                status.ThrowIfError();
-                var data = Marshal.PtrToStringAnsi(value);
-                NativeInterface.Memory.FreeIntPtr(value);
-                return data;
-            }
-        }
-
-        /// <Summary>
-        /// Get the plaintext vote
-        /// </Summary>
-        public unsafe ulong Vote
-        {
-            get
-            {
-                return NativeInterface.PlaintextBallotSelection.GetVote(Handle);
-            }
-        }
-
-        /// <summary>
-        /// Determines if this is a placeholder selection
-        /// </summary>
-        public unsafe bool IsPlaceholder
-        {
-            get
-            {
-                return NativeInterface.PlaintextBallotSelection.GetIsPlaceholder(Handle);
-            }
-        }
-
-        /// <summary>
-        /// an optional field of arbitrary data, such as the value of a write-in candidate
-        /// </summary>
-        public unsafe ExtendedData ExtendedData
-        {
-            get
-            {
-                var status = NativeInterface.PlaintextBallotSelection.GetExtendedData(
-                    Handle, out NativeExtendedData value);
-                status.ThrowIfError();
-                return new ExtendedData(value);
-            }
-        }
-
         internal unsafe NativePlaintextBallotSelection Handle;
 
         unsafe internal PlaintextBallotSelection(NativePlaintextBallotSelection handle)
@@ -213,16 +160,6 @@ namespace ElectionGuard
                 objectId, vote, isPlaceholder,
                 extendedData, (ulong)extendedData.Length, out Handle);
             status.ThrowIfError();
-        }
-
-        /// <summary>
-        /// Given a PlaintextBallotSelection validates that the object matches an expected object
-        /// and that the plaintext value can resolve to a valid representation
-        /// </summary>
-        public unsafe bool IsValid(string expectedObjectId)
-        {
-            return NativeInterface.PlaintextBallotSelection.IsValid(
-                Handle, expectedObjectId);
         }
 
 #pragma warning disable CS1591 // Missing XML comment for publicly visible type or member
@@ -451,38 +388,8 @@ namespace ElectionGuard
     /// Typically partial contests may be passed into Electionguard for memory constrained systems,
     /// while complete contests are passed into ElectionGuard when running encryption on an existing dataset.
     /// </summary>
-    public class PlaintextBallotContest : DisposableBase
+    public partial class PlaintextBallotContest : DisposableBase
     {
-        /// <Summary>
-        /// Get the objectId of the contest, which is the unique id for
-        /// the contest in a specific ballot style described in the election manifest.
-        /// </Summary>
-        public unsafe string ObjectId
-        {
-            get
-            {
-                var status = NativeInterface.PlaintextBallotContest.GetObjectId(
-                    Handle, out IntPtr value);
-                status.ThrowIfError();
-                var data = Marshal.PtrToStringAnsi(value);
-                NativeInterface.Memory.FreeIntPtr(value);
-                return data;
-            }
-        }
-
-        /// <Summary>
-        /// Get the Size of the selections collection
-        /// </Summary>
-        public unsafe ulong SelectionsSize
-        {
-            get
-            {
-                var size = NativeInterface.PlaintextBallotContest.GetSelectionsSize(
-                    Handle);
-                return size;
-            }
-        }
-
         internal unsafe NativePlaintextBallotContest Handle;
 
         unsafe internal PlaintextBallotContest(
@@ -519,25 +426,6 @@ namespace ElectionGuard
                 Handle, index, out NativePlaintextBallotSelection value);
             status.ThrowIfError();
             return new PlaintextBallotSelection(value);
-        }
-
-        /// <Summary>
-        /// Given a PlaintextBallotContest returns true if the state is representative of the expected values.
-        ///
-        /// Note: because this class supports partial representations, undervotes are considered a valid state.
-        /// </Summary>
-        public unsafe bool IsValid(
-            string expectedObjectId,
-            ulong expectedNumSelections,
-            ulong expectedNumElected,
-            ulong votesAllowed = 0)
-        {
-            return NativeInterface.PlaintextBallotContest.IsValid(
-                Handle,
-                expectedObjectId,
-                expectedNumSelections,
-                expectedNumElected,
-                votesAllowed);
         }
 
 #pragma warning disable CS1591 // Missing XML comment for publicly visible type or member
@@ -777,55 +665,8 @@ namespace ElectionGuard
     /// A complete representation of a ballot must include both affirmative and negative selections of
     /// every contest, AND the placeholder selections necessary to satisfy the NIZKPs for each contest and selection.
     /// </summary>
-    public class PlaintextBallot : DisposableBase
+    public partial class PlaintextBallot : DisposableBase
     {
-        /// <Summary>
-        /// A unique Ballot ID that is relevant to the external system and must be unique
-        /// within the dataset of the election.
-        /// </Summary>
-        public unsafe string ObjectId
-        {
-            get
-            {
-                var status = NativeInterface.PlaintextBallot.GetObjectId(
-                    Handle, out IntPtr value);
-                status.ThrowIfError();
-                var data = Marshal.PtrToStringAnsi(value);
-                NativeInterface.Memory.FreeIntPtr(value);
-                return data;
-            }
-        }
-
-        /// <Summary>
-        /// The Object Id of the ballot style in the election manifest.  This value is used
-        /// to determine which contests to expect on the ballot, to fill in missing values,
-        /// and to validate that the ballot is well-formed
-        /// </Summary>
-        public unsafe string StyleId
-        {
-            get
-            {
-                var status = NativeInterface.PlaintextBallot.GetStyleId(
-                    Handle, out IntPtr value);
-                status.ThrowIfError();
-                var data = Marshal.PtrToStringAnsi(value);
-                NativeInterface.Memory.FreeIntPtr(value);
-                return data;
-            }
-        }
-
-        /// <summary>
-        /// The size of the Contests collection
-        /// </summary>
-        public unsafe ulong ContestsSize
-        {
-            get
-            {
-                var size = NativeInterface.PlaintextBallot.GetContestsSize(Handle);
-                return size;
-            }
-        }
-
         internal unsafe NativePlaintextBallot Handle;
 
         /// <summary>
