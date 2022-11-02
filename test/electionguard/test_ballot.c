@@ -3,6 +3,7 @@
 
 #include <assert.h>
 #include <electionguard/ballot.h>
+#include <electionguard/plaintext_ballot.generated.h>
 #include <stdlib.h>
 
 bool strings_are_equal(char *expected, char *actual);
