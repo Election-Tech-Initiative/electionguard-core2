@@ -41,7 +41,7 @@ jobs:
       - name: Run .Net Tests
         run: make test-netstandard
 
-      - name: Run Sanitizer
-        run: make sanitize-asan # TODO: Add other sanitizers
       - name: Run Benchmarks
         run: make bench
+      - name: Run Sanitizer
+        run: make sanitize-asan # TODO: Add other sanitizers
