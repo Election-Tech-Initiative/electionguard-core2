@@ -29,9 +29,10 @@ jobs:
         uses: actions/checkout@v2
       - name: Update Environment
         run: |
-          echo "compiler_version=$(echo | clang -dM -E - | grep __clang_version__ | tail -1 |  grep -o ' "[0-9]*' | sed 's/ "//g')" >> $GITHUB_ENV
-          echo "CC=clang-${{ env.compiler_version }}" >> $GITHUB_ENV
-          echo "CXX=clang++-${{ env.compiler_version }}" >> $GITHUB_ENV
+          CV=$(echo | clang -dM -E - | grep __clang_version__ | tail -1 |  grep -o ' "[0-9]*' | sed 's/ "//g')
+          echo "compiler_version=$CV" >> $GITHUB_ENV
+          echo "CC=clang-$CV" >> $GITHUB_ENV
+          echo "CXX=clang++-$CV" >> $GITHUB_ENV
           sudo apt-get update
           sudo apt-get install -y clang-${{ env.compiler_version }} g++-multilib
       - name: Configure Environment
