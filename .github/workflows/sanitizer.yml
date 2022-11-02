@@ -30,11 +30,14 @@ jobs:
       - name: Update Environment
         run: |
           CV=$(echo | clang -dM -E - | grep __clang_version__ | tail -1 |  grep -o ' "[0-9]*' | sed 's/ "//g')
+          if [ $CV -eq 11 ]; then
+            CV=12
+          fi
           echo "compiler_version=$CV" >> $GITHUB_ENV
           echo "CC=clang-$CV" >> $GITHUB_ENV
           echo "CXX=clang++-$CV" >> $GITHUB_ENV
           sudo apt-get update
-          sudo apt-get install -y clang-$CV g++-multilib
+          sudo apt-get install -y clang clang-$CV g++-multilib
       - name: Configure Environment
         run: make environment
       - name: Run Tests
