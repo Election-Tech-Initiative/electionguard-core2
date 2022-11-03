@@ -156,17 +156,6 @@ namespace ElectionGuard
                 extendedData, (ulong)extendedData.Length, out Handle);
             status.ThrowIfError();
         }
-
-#pragma warning disable CS1591 // Missing XML comment for publicly visible type or member
-        protected override unsafe void DisposeUnmanaged()
-#pragma warning restore CS1591 // Missing XML comment for publicly visible type or member
-        {
-            base.DisposeUnmanaged();
-
-            if (Handle == null || Handle.IsInvalid) return;
-            Handle.Dispose();
-            Handle = null;
-        }
     }
 
     #endregion
@@ -419,17 +408,6 @@ namespace ElectionGuard
                 Handle, index, out PlaintextBallotSelection.External.PlaintextBallotSelectionHandle value);
             status.ThrowIfError();
             return new PlaintextBallotSelection(value);
-        }
-
-#pragma warning disable CS1591 // Missing XML comment for publicly visible type or member
-        protected override unsafe void DisposeUnmanaged()
-#pragma warning restore CS1591 // Missing XML comment for publicly visible type or member
-        {
-            base.DisposeUnmanaged();
-
-            if (Handle == null || Handle.IsInvalid) return;
-            Handle.Dispose();
-            Handle = null;
         }
     }
 
@@ -719,18 +697,6 @@ namespace ElectionGuard
             status.ThrowIfError();
             return new PlaintextBallotContest(value);
         }
-
-#pragma warning disable CS1591 // Missing XML comment for publicly visible type or member
-        protected override unsafe void DisposeUnmanaged()
-#pragma warning restore CS1591 // Missing XML comment for publicly visible type or member
-        {
-            base.DisposeUnmanaged();
-
-            if (Handle == null || Handle.IsInvalid) return;
-            Handle.Dispose();
-            Handle = null;
-        }
-
 
         /// <Summary>
         /// Export the ballot representation as JSON

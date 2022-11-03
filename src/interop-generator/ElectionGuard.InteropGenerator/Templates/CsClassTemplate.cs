@@ -223,24 +223,38 @@ foreach (var p in method.Params) {
             
             #line default
             #line hidden
-            this.Write("        #endregion\r\n\r\n        #region Extern\r\n        internal unsafe static clas" +
-                    "s External {\r\n            internal unsafe struct ");
+            this.Write(@"
+#pragma warning disable CS1591 // Missing XML comment for publicly visible type or member
+        protected override unsafe void DisposeUnmanaged()
+#pragma warning restore CS1591 // Missing XML comment for publicly visible type or member
+        {
+            base.DisposeUnmanaged();
+
+            if (Handle == null || Handle.IsInvalid) return;
+            Handle.Dispose();
+            Handle = null;
+        }
+        #endregion
+
+        #region Extern
+        internal unsafe static class External {
+            internal unsafe struct ");
             
-            #line 75 "C:\dev\ElectionGuard\electionguard-core2\src\interop-generator\ElectionGuard.InteropGenerator\Templates\CsClassTemplate.tt"
+            #line 86 "C:\dev\ElectionGuard\electionguard-core2\src\interop-generator\ElectionGuard.InteropGenerator\Templates\CsClassTemplate.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(className));
             
             #line default
             #line hidden
             this.Write("Type { };\r\n\r\n            internal class ");
             
-            #line 77 "C:\dev\ElectionGuard\electionguard-core2\src\interop-generator\ElectionGuard.InteropGenerator\Templates\CsClassTemplate.tt"
+            #line 88 "C:\dev\ElectionGuard\electionguard-core2\src\interop-generator\ElectionGuard.InteropGenerator\Templates\CsClassTemplate.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(className));
             
             #line default
             #line hidden
             this.Write("Handle : ElectionguardSafeHandle<");
             
-            #line 77 "C:\dev\ElectionGuard\electionguard-core2\src\interop-generator\ElectionGuard.InteropGenerator\Templates\CsClassTemplate.tt"
+            #line 88 "C:\dev\ElectionGuard\electionguard-core2\src\interop-generator\ElectionGuard.InteropGenerator\Templates\CsClassTemplate.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(className));
             
             #line default
@@ -249,7 +263,7 @@ foreach (var p in method.Params) {
                     "ruptState, Cer.MayFail)]\r\n                protected override bool Free()\r\n      " +
                     "          {\r\n");
             
-            #line 82 "C:\dev\ElectionGuard\electionguard-core2\src\interop-generator\ElectionGuard.InteropGenerator\Templates\CsClassTemplate.tt"
+            #line 93 "C:\dev\ElectionGuard\electionguard-core2\src\interop-generator\ElectionGuard.InteropGenerator\Templates\CsClassTemplate.tt"
 
 if (EgClass.NeverFree) {
 
@@ -260,7 +274,7 @@ if (EgClass.NeverFree) {
                     " object e.g. ballot, see https://github.com/microsoft/electionguard-core2/issues" +
                     "/29\r\n                    return true;\r\n");
             
-            #line 87 "C:\dev\ElectionGuard\electionguard-core2\src\interop-generator\ElectionGuard.InteropGenerator\Templates\CsClassTemplate.tt"
+            #line 98 "C:\dev\ElectionGuard\electionguard-core2\src\interop-generator\ElectionGuard.InteropGenerator\Templates\CsClassTemplate.tt"
 
 } else {
 
@@ -274,7 +288,7 @@ if (EgClass.NeverFree) {
                     {
                         throw new ElectionGuardException($""");
             
-            #line 95 "C:\dev\ElectionGuard\electionguard-core2\src\interop-generator\ElectionGuard.InteropGenerator\Templates\CsClassTemplate.tt"
+            #line 106 "C:\dev\ElectionGuard\electionguard-core2\src\interop-generator\ElectionGuard.InteropGenerator\Templates\CsClassTemplate.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(className));
             
             #line default
@@ -282,7 +296,7 @@ if (EgClass.NeverFree) {
             this.Write(" Error Free: {status}\", status);\r\n                    }\r\n                    retu" +
                     "rn true;\r\n");
             
-            #line 98 "C:\dev\ElectionGuard\electionguard-core2\src\interop-generator\ElectionGuard.InteropGenerator\Templates\CsClassTemplate.tt"
+            #line 109 "C:\dev\ElectionGuard\electionguard-core2\src\interop-generator\ElectionGuard.InteropGenerator\Templates\CsClassTemplate.tt"
 
 }
 
@@ -292,7 +306,7 @@ if (EgClass.NeverFree) {
             this.Write("                }\r\n            }\r\n\r\n            [DllImport(NativeInterface.DllNam" +
                     "e, EntryPoint = \"eg_");
             
-            #line 104 "C:\dev\ElectionGuard\electionguard-core2\src\interop-generator\ElectionGuard.InteropGenerator\Templates\CsClassTemplate.tt"
+            #line 115 "C:\dev\ElectionGuard\electionguard-core2\src\interop-generator\ElectionGuard.InteropGenerator\Templates\CsClassTemplate.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(className.ToSnakeCase()));
             
             #line default
@@ -300,14 +314,14 @@ if (EgClass.NeverFree) {
             this.Write("_free\",\r\n                CallingConvention = CallingConvention.Cdecl, SetLastErro" +
                     "r = true)]\r\n            internal static extern Status Free(");
             
-            #line 106 "C:\dev\ElectionGuard\electionguard-core2\src\interop-generator\ElectionGuard.InteropGenerator\Templates\CsClassTemplate.tt"
+            #line 117 "C:\dev\ElectionGuard\electionguard-core2\src\interop-generator\ElectionGuard.InteropGenerator\Templates\CsClassTemplate.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(className));
             
             #line default
             #line hidden
             this.Write("Type* handle);\r\n\r\n");
             
-            #line 108 "C:\dev\ElectionGuard\electionguard-core2\src\interop-generator\ElectionGuard.InteropGenerator\Templates\CsClassTemplate.tt"
+            #line 119 "C:\dev\ElectionGuard\electionguard-core2\src\interop-generator\ElectionGuard.InteropGenerator\Templates\CsClassTemplate.tt"
  foreach (var egProperty in EgClass.Properties) {
         var entryPoint = egProperty.GetEntryPoint(className);
         var isInternalType = egProperty.NativeHandleType != null;
@@ -319,7 +333,7 @@ if (EgClass.NeverFree) {
             this.Write("            [DllImport(\r\n                NativeInterface.DllName,\r\n              " +
                     "  EntryPoint = \"");
             
-            #line 115 "C:\dev\ElectionGuard\electionguard-core2\src\interop-generator\ElectionGuard.InteropGenerator\Templates\CsClassTemplate.tt"
+            #line 126 "C:\dev\ElectionGuard\electionguard-core2\src\interop-generator\ElectionGuard.InteropGenerator\Templates\CsClassTemplate.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(entryPoint));
             
             #line default
@@ -327,62 +341,62 @@ if (EgClass.NeverFree) {
             this.Write("\",\r\n                CallingConvention = CallingConvention.Cdecl, \r\n              " +
                     "  SetLastError = true\r\n            )]\r\n            internal static extern ");
             
-            #line 119 "C:\dev\ElectionGuard\electionguard-core2\src\interop-generator\ElectionGuard.InteropGenerator\Templates\CsClassTemplate.tt"
+            #line 130 "C:\dev\ElectionGuard\electionguard-core2\src\interop-generator\ElectionGuard.InteropGenerator\Templates\CsClassTemplate.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(isComplexType ? "Status" : egProperty.TypeCs));
             
             #line default
             #line hidden
             this.Write(" Get");
             
-            #line 119 "C:\dev\ElectionGuard\electionguard-core2\src\interop-generator\ElectionGuard.InteropGenerator\Templates\CsClassTemplate.tt"
+            #line 130 "C:\dev\ElectionGuard\electionguard-core2\src\interop-generator\ElectionGuard.InteropGenerator\Templates\CsClassTemplate.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(egProperty.Name));
             
             #line default
             #line hidden
             this.Write("(\r\n                ");
             
-            #line 120 "C:\dev\ElectionGuard\electionguard-core2\src\interop-generator\ElectionGuard.InteropGenerator\Templates\CsClassTemplate.tt"
+            #line 131 "C:\dev\ElectionGuard\electionguard-core2\src\interop-generator\ElectionGuard.InteropGenerator\Templates\CsClassTemplate.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(className));
             
             #line default
             #line hidden
             this.Write("Handle handle\r\n");
             
-            #line 121 "C:\dev\ElectionGuard\electionguard-core2\src\interop-generator\ElectionGuard.InteropGenerator\Templates\CsClassTemplate.tt"
+            #line 132 "C:\dev\ElectionGuard\electionguard-core2\src\interop-generator\ElectionGuard.InteropGenerator\Templates\CsClassTemplate.tt"
  if (isInternalType) { 
             
             #line default
             #line hidden
             this.Write("                , out ");
             
-            #line 122 "C:\dev\ElectionGuard\electionguard-core2\src\interop-generator\ElectionGuard.InteropGenerator\Templates\CsClassTemplate.tt"
+            #line 133 "C:\dev\ElectionGuard\electionguard-core2\src\interop-generator\ElectionGuard.InteropGenerator\Templates\CsClassTemplate.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(egProperty.NativeHandleType));
             
             #line default
             #line hidden
             this.Write(" objectId\r\n");
             
-            #line 123 "C:\dev\ElectionGuard\electionguard-core2\src\interop-generator\ElectionGuard.InteropGenerator\Templates\CsClassTemplate.tt"
+            #line 134 "C:\dev\ElectionGuard\electionguard-core2\src\interop-generator\ElectionGuard.InteropGenerator\Templates\CsClassTemplate.tt"
  } else if (egProperty.TypeCs == "string") { 
             
             #line default
             #line hidden
             this.Write("                , out IntPtr objectId\r\n");
             
-            #line 125 "C:\dev\ElectionGuard\electionguard-core2\src\interop-generator\ElectionGuard.InteropGenerator\Templates\CsClassTemplate.tt"
+            #line 136 "C:\dev\ElectionGuard\electionguard-core2\src\interop-generator\ElectionGuard.InteropGenerator\Templates\CsClassTemplate.tt"
  } // end is internal type 
             
             #line default
             #line hidden
             this.Write("            );\r\n\r\n");
             
-            #line 128 "C:\dev\ElectionGuard\electionguard-core2\src\interop-generator\ElectionGuard.InteropGenerator\Templates\CsClassTemplate.tt"
+            #line 139 "C:\dev\ElectionGuard\electionguard-core2\src\interop-generator\ElectionGuard.InteropGenerator\Templates\CsClassTemplate.tt"
  } // end foreach property 
             
             #line default
             #line hidden
             
-            #line 129 "C:\dev\ElectionGuard\electionguard-core2\src\interop-generator\ElectionGuard.InteropGenerator\Templates\CsClassTemplate.tt"
+            #line 140 "C:\dev\ElectionGuard\electionguard-core2\src\interop-generator\ElectionGuard.InteropGenerator\Templates\CsClassTemplate.tt"
  foreach (var method in EgClass.Methods) {
     var entryPoint = method.GetEntryPoint(className);
 
@@ -391,7 +405,7 @@ if (EgClass.NeverFree) {
             #line hidden
             this.Write("            [DllImport(NativeInterface.DllName, EntryPoint = \"");
             
-            #line 132 "C:\dev\ElectionGuard\electionguard-core2\src\interop-generator\ElectionGuard.InteropGenerator\Templates\CsClassTemplate.tt"
+            #line 143 "C:\dev\ElectionGuard\electionguard-core2\src\interop-generator\ElectionGuard.InteropGenerator\Templates\CsClassTemplate.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(entryPoint));
             
             #line default
@@ -399,28 +413,28 @@ if (EgClass.NeverFree) {
             this.Write("\",\r\n                CallingConvention = CallingConvention.Cdecl, SetLastError = t" +
                     "rue)]\r\n            internal static extern ");
             
-            #line 134 "C:\dev\ElectionGuard\electionguard-core2\src\interop-generator\ElectionGuard.InteropGenerator\Templates\CsClassTemplate.tt"
+            #line 145 "C:\dev\ElectionGuard\electionguard-core2\src\interop-generator\ElectionGuard.InteropGenerator\Templates\CsClassTemplate.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(method.ReturnTypeCs));
             
             #line default
             #line hidden
             this.Write(" ");
             
-            #line 134 "C:\dev\ElectionGuard\electionguard-core2\src\interop-generator\ElectionGuard.InteropGenerator\Templates\CsClassTemplate.tt"
+            #line 145 "C:\dev\ElectionGuard\electionguard-core2\src\interop-generator\ElectionGuard.InteropGenerator\Templates\CsClassTemplate.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(method.Name));
             
             #line default
             #line hidden
             this.Write("(\r\n                ");
             
-            #line 135 "C:\dev\ElectionGuard\electionguard-core2\src\interop-generator\ElectionGuard.InteropGenerator\Templates\CsClassTemplate.tt"
+            #line 146 "C:\dev\ElectionGuard\electionguard-core2\src\interop-generator\ElectionGuard.InteropGenerator\Templates\CsClassTemplate.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(className));
             
             #line default
             #line hidden
             this.Write("Handle handle");
             
-            #line 135 "C:\dev\ElectionGuard\electionguard-core2\src\interop-generator\ElectionGuard.InteropGenerator\Templates\CsClassTemplate.tt"
+            #line 146 "C:\dev\ElectionGuard\electionguard-core2\src\interop-generator\ElectionGuard.InteropGenerator\Templates\CsClassTemplate.tt"
 
 foreach (var p in method.Params) { 
             
@@ -428,13 +442,13 @@ foreach (var p in method.Params) {
             #line hidden
             this.Write(",\r\n                ");
             
-            #line 137 "C:\dev\ElectionGuard\electionguard-core2\src\interop-generator\ElectionGuard.InteropGenerator\Templates\CsClassTemplate.tt"
+            #line 148 "C:\dev\ElectionGuard\electionguard-core2\src\interop-generator\ElectionGuard.InteropGenerator\Templates\CsClassTemplate.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(p.AsCppInteropParam()));
             
             #line default
             #line hidden
             
-            #line 137 "C:\dev\ElectionGuard\electionguard-core2\src\interop-generator\ElectionGuard.InteropGenerator\Templates\CsClassTemplate.tt"
+            #line 148 "C:\dev\ElectionGuard\electionguard-core2\src\interop-generator\ElectionGuard.InteropGenerator\Templates\CsClassTemplate.tt"
  
 } // end foreach param 
             
@@ -442,7 +456,7 @@ foreach (var p in method.Params) {
             #line hidden
             this.Write("\r\n                );\r\n");
             
-            #line 141 "C:\dev\ElectionGuard\electionguard-core2\src\interop-generator\ElectionGuard.InteropGenerator\Templates\CsClassTemplate.tt"
+            #line 152 "C:\dev\ElectionGuard\electionguard-core2\src\interop-generator\ElectionGuard.InteropGenerator\Templates\CsClassTemplate.tt"
  } 
             
             #line default

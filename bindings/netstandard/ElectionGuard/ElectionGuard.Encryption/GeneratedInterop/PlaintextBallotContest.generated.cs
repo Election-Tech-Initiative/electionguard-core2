@@ -50,6 +50,17 @@ namespace ElectionGuard
             return External.IsValid(
                 Handle, expectedObjectId, expectedNumSelections, expectedNumElected, votesAllowed);
         }
+
+#pragma warning disable CS1591 // Missing XML comment for publicly visible type or member
+        protected override unsafe void DisposeUnmanaged()
+#pragma warning restore CS1591 // Missing XML comment for publicly visible type or member
+        {
+            base.DisposeUnmanaged();
+
+            if (Handle == null || Handle.IsInvalid) return;
+            Handle.Dispose();
+            Handle = null;
+        }
         #endregion
 
         #region Extern
