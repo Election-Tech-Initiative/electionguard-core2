@@ -4,6 +4,7 @@
 <#@ import namespace="System.Text" #>
 <#@ import namespace="System.Collections.Generic" #>
 <#@ import namespace="System.Text.Json" #>
+<#@ import namespace="ElectionGuard.InteropGenerator.Helpers" #>
 <#
 var className = EgClass.ClassName;
 #>
@@ -12,11 +13,14 @@ var className = EgClass.ClassName;
 
 using System;
 using System.Runtime.InteropServices;
+using System.Runtime.ConstrainedExecution;
 
 namespace ElectionGuard
 {
     public partial class <#= className #>
     {
+        internal unsafe External.<#= className #>Handle Handle;
+
         #region Properties
 <# foreach (var egProperty in EgClass.Properties) { 
         var isInternalType = egProperty.NativeHandleType != null;
@@ -67,7 +71,29 @@ foreach (var p in method.Params) {
         #endregion
 
         #region Extern
-        private unsafe static class External {
+        internal unsafe static class External {
+            internal unsafe struct <#= className #>Type { };
+
+            internal class <#= className #>Handle : ElectionguardSafeHandle<<#= className #>Type>
+            {
+                [ReliabilityContract(Consistency.WillNotCorruptState, Cer.MayFail)]
+                protected override bool Free()
+                {
+                    if (IsFreed) return true;
+
+                    var status = External.Free(TypedPtr);
+                    if (status != Status.ELECTIONGUARD_STATUS_SUCCESS)
+                    {
+                        throw new ElectionGuardException($"<#= className #> Error Free: {status}", status);
+                    }
+                    return true;
+                }
+            }
+
+            [DllImport(NativeInterface.DllName, EntryPoint = "eg_<#= className.ToSnakeCase() #>_free",
+                CallingConvention = CallingConvention.Cdecl, SetLastError = true)]
+            internal static extern Status Free(<#= className #>Type* handle);
+
 <# foreach (var egProperty in EgClass.Properties) {
         var entryPoint = egProperty.GetEntryPoint(className);
         var isInternalType = egProperty.NativeHandleType != null;
@@ -80,7 +106,7 @@ foreach (var p in method.Params) {
                 SetLastError = true
             )]
             internal static extern <#= isComplexType ? "Status" : egProperty.TypeCs #> Get<#= egProperty.Name #>(
-                NativeInterface.<#= className #>.<#= className #>Handle handle
+                <#= className #>Handle handle
 <# if (isInternalType) { #>
                 , out <#= egProperty.NativeHandleType #> objectId
 <# } else if (egProperty.TypeCs == "string") { #>
@@ -95,7 +121,7 @@ foreach (var p in method.Params) {
             [DllImport(NativeInterface.DllName, EntryPoint = "<#= entryPoint #>",
                 CallingConvention = CallingConvention.Cdecl, SetLastError = true)]
             internal static extern <#= method.ReturnTypeCs #> <#= method.Name #>(
-                NativeInterface.<#= className #>.<#= className #>Handle handle<#
+                <#= className #>Handle handle<#
 foreach (var p in method.Params) { #>,
                 <#= p.AsCppInteropParam() #><# 
 } // end foreach param #>

@@ -3,11 +3,14 @@
 
 using System;
 using System.Runtime.InteropServices;
+using System.Runtime.ConstrainedExecution;
 
 namespace ElectionGuard
 {
     public partial class PlaintextBallotContest
     {
+        internal unsafe External.PlaintextBallotContestHandle Handle;
+
         #region Properties
         /// <Summary>
         /// Get the objectId of the contest, which is the unique id for the contest in a specific ballot style described in the election manifest.
@@ -50,7 +53,29 @@ namespace ElectionGuard
         #endregion
 
         #region Extern
-        private unsafe static class External {
+        internal unsafe static class External {
+            internal unsafe struct PlaintextBallotContestType { };
+
+            internal class PlaintextBallotContestHandle : ElectionguardSafeHandle<PlaintextBallotContestType>
+            {
+                [ReliabilityContract(Consistency.WillNotCorruptState, Cer.MayFail)]
+                protected override bool Free()
+                {
+                    if (IsFreed) return true;
+
+                    var status = External.Free(TypedPtr);
+                    if (status != Status.ELECTIONGUARD_STATUS_SUCCESS)
+                    {
+                        throw new ElectionGuardException($"PlaintextBallotContest Error Free: {status}", status);
+                    }
+                    return true;
+                }
+            }
+
+            [DllImport(NativeInterface.DllName, EntryPoint = "eg_plaintext_ballot_contest_free",
+                CallingConvention = CallingConvention.Cdecl, SetLastError = true)]
+            internal static extern Status Free(PlaintextBallotContestType* handle);
+
             [DllImport(
                 NativeInterface.DllName,
                 EntryPoint = "eg_plaintext_ballot_contest_get_object_id",
@@ -58,7 +83,7 @@ namespace ElectionGuard
                 SetLastError = true
             )]
             internal static extern Status GetObjectId(
-                NativeInterface.PlaintextBallotContest.PlaintextBallotContestHandle handle
+                PlaintextBallotContestHandle handle
                 , out IntPtr objectId
             );
 
@@ -69,13 +94,13 @@ namespace ElectionGuard
                 SetLastError = true
             )]
             internal static extern ulong GetSelectionsSize(
-                NativeInterface.PlaintextBallotContest.PlaintextBallotContestHandle handle
+                PlaintextBallotContestHandle handle
             );
 
             [DllImport(NativeInterface.DllName, EntryPoint = "eg_plaintext_ballot_contest_is_valid",
                 CallingConvention = CallingConvention.Cdecl, SetLastError = true)]
             internal static extern bool IsValid(
-                NativeInterface.PlaintextBallotContest.PlaintextBallotContestHandle handle,
+                PlaintextBallotContestHandle handle,
                 [MarshalAs(UnmanagedType.LPStr)] string expectedObjectId,
                 ulong expectedNumSelections,
                 ulong expectedNumElected,

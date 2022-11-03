@@ -14,9 +14,6 @@ namespace ElectionGuard
     using NativeElementModQ = NativeInterface.ElementModQ.ElementModQHandle;
     using NativeElGamalCiphertext = NativeInterface.ElGamalCiphertext.ElGamalCiphertextHandle;
     using NativeExtendedData = NativeInterface.ExtendedData.ExtendedDataHandle;
-    using NativePlaintextBallot = NativeInterface.PlaintextBallot.PlaintextBallotHandle;
-    using NativePlaintextBallotContest = NativeInterface.PlaintextBallotContest.PlaintextBallotContestHandle;
-    using NativePlaintextBallotSelection = NativeInterface.PlaintextBallotSelection.PlaintextBallotSelectionHandle;
     using NativeSubmittedBallot = NativeInterface.SubmittedBallot.SubmittedBallotHandle;
 
     /// <summary>
@@ -125,9 +122,7 @@ namespace ElectionGuard
     /// </summary>
     public partial class PlaintextBallotSelection : DisposableBase
     {
-        internal unsafe NativePlaintextBallotSelection Handle;
-
-        unsafe internal PlaintextBallotSelection(NativePlaintextBallotSelection handle)
+        unsafe internal PlaintextBallotSelection(External.PlaintextBallotSelectionHandle handle)
         {
             Handle = handle;
         }
@@ -390,10 +385,8 @@ namespace ElectionGuard
     /// </summary>
     public partial class PlaintextBallotContest : DisposableBase
     {
-        internal unsafe NativePlaintextBallotContest Handle;
-
         unsafe internal PlaintextBallotContest(
-            NativePlaintextBallotContest handle)
+            External.PlaintextBallotContestHandle handle)
         {
             Handle = handle;
         }
@@ -423,7 +416,7 @@ namespace ElectionGuard
         public unsafe PlaintextBallotSelection GetSelectionAt(ulong index)
         {
             var status = NativeInterface.PlaintextBallotContest.GetSelectionAtIndex(
-                Handle, index, out NativePlaintextBallotSelection value);
+                Handle, index, out PlaintextBallotSelection.External.PlaintextBallotSelectionHandle value);
             status.ThrowIfError();
             return new PlaintextBallotSelection(value);
         }
@@ -667,8 +660,6 @@ namespace ElectionGuard
     /// </summary>
     public partial class PlaintextBallot : DisposableBase
     {
-        internal unsafe NativePlaintextBallot Handle;
-
         /// <summary>
         /// Create a Plaintext Ballot
         /// </summary>
@@ -724,7 +715,7 @@ namespace ElectionGuard
         public unsafe PlaintextBallotContest GetContestAt(ulong index)
         {
             var status = NativeInterface.PlaintextBallot.GetContestAtIndex(
-                Handle, index, out NativePlaintextBallotContest value);
+                Handle, index, out PlaintextBallotContest.External.PlaintextBallotContestHandle value);
             status.ThrowIfError();
             return new PlaintextBallotContest(value);
         }
