@@ -64,7 +64,7 @@ namespace ElectionGuard.Encrypt.Tests
             var contest = ballot.GetContestAt(0);
             var selection = contest.GetSelectionAt(0);
 
-            Assert.That(selection.Vote == 1);
+            Assert.AreEqual(1, selection.Vote);
         }
 
         [Test]

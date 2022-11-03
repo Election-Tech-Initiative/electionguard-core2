@@ -83,7 +83,6 @@ namespace ElectionGuard
 
             internal class PlaintextBallotSelectionHandle : ElectionguardSafeHandle<PlaintextBallotSelectionType>
             {
-                [ReliabilityContract(Consistency.WillNotCorruptState, Cer.MayFail)]
                 protected override bool Free()
                 {
                     if (IsFreed) return true;

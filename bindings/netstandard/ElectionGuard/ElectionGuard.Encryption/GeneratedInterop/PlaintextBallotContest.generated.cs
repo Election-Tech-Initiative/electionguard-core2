@@ -61,7 +61,7 @@ namespace ElectionGuard
                 [ReliabilityContract(Consistency.WillNotCorruptState, Cer.MayFail)]
                 protected override bool Free()
                 {
-                    if (IsFreed) return true;
+                    if (IsClosed) return true;
 
                     var status = External.Free(TypedPtr);
                     if (status != Status.ELECTIONGUARD_STATUS_SUCCESS)
