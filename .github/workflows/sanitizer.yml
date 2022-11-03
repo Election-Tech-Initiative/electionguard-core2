@@ -37,7 +37,7 @@ jobs:
           echo "CC=clang-$CV" >> $GITHUB_ENV
           echo "CXX=clang++-$CV" >> $GITHUB_ENV
           sudo apt-get update
-          sudo apt-get install -y clang clang-$CV g++-multilib
+          sudo apt-get install -y clang-$CV g++-multilib
       - name: Configure Environment
         run: make environment
       - name: Run Tests
