@@ -61,13 +61,7 @@ namespace ElectionGuard
                 [ReliabilityContract(Consistency.WillNotCorruptState, Cer.MayFail)]
                 protected override bool Free()
                 {
-                    if (IsClosed) return true;
-
-                    var status = External.Free(TypedPtr);
-                    if (status != Status.ELECTIONGUARD_STATUS_SUCCESS)
-                    {
-                        throw new ElectionGuardException($"PlaintextBallotContest Error Free: {status}", status);
-                    }
+                    // releasing the C++ memory is currently handeled by a parent object e.g. ballot, see https://github.com/microsoft/electionguard-core2/issues/29
                     return true;
                 }
             }

@@ -1,6 +1,7 @@
 ﻿[
   {
     "ClassName": "PlaintextBallotSelection",
+    "NeverFree": true,
     "Properties": [
       {
         "Name": "ObjectId",
@@ -41,6 +42,7 @@
   },
   {
     "ClassName": "PlaintextBallotContest",
+    "NeverFree": true,
     "Properties": [
       {
         "Name": "ObjectId",

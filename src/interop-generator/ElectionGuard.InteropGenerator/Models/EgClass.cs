@@ -3,5 +3,6 @@
 public record EgClass(
     string ClassName, 
     EgProperty[] Properties, 
-    EgMethod[] Methods
+    EgMethod[] Methods,
+    bool NeverFree = false
     );

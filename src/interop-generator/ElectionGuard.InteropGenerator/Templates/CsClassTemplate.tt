@@ -79,6 +79,14 @@ foreach (var p in method.Params) {
                 [ReliabilityContract(Consistency.WillNotCorruptState, Cer.MayFail)]
                 protected override bool Free()
                 {
+<#
+if (EgClass.NeverFree) {
+#>
+                    // releasing the C++ memory is currently handeled by a parent object e.g. ballot, see https://github.com/microsoft/electionguard-core2/issues/29
+                    return true;
+<#
+} else {
+#>
                     if (IsFreed) return true;
 
                     var status = External.Free(TypedPtr);
@@ -87,6 +95,9 @@ foreach (var p in method.Params) {
                         throw new ElectionGuardException($"<#= className #> Error Free: {status}", status);
                     }
                     return true;
+<#
+}
+#>
                 }
             }
 
