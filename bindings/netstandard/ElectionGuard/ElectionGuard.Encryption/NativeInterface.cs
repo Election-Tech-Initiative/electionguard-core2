@@ -2460,10 +2460,6 @@ namespace ElectionGuard
                 [MarshalAs(UnmanagedType.LPStr)] string extendedData,
                 ulong extendedDataLength,
                 out ElectionGuard.PlaintextBallotSelection.External.PlaintextBallotSelectionHandle handle);
-
-            [DllImport(DllName, EntryPoint = "eg_plaintext_ballot_selection_free",
-                CallingConvention = CallingConvention.Cdecl, SetLastError = true)]
-            internal static extern Status Free(ElectionGuard.PlaintextBallotSelection.External.PlaintextBallotSelectionType* handle);
         }
 
         internal static unsafe class CiphertextBallotSelection
@@ -2571,15 +2567,6 @@ namespace ElectionGuard
                 [MarshalAs(UnmanagedType.LPArray)] IntPtr[] selections,
                 ulong selectionsSize,
                 out ElectionGuard.PlaintextBallotContest.External.PlaintextBallotContestHandle handle);
-
-            [DllImport(DllName, EntryPoint = "eg_plaintext_ballot_contest_free",
-                CallingConvention = CallingConvention.Cdecl, SetLastError = true)]
-            internal static extern Status Free(ElectionGuard.PlaintextBallotContest.External.PlaintextBallotContestType* handle);
-
-            [DllImport(DllName, EntryPoint = "eg_plaintext_ballot_contest_get_selections_size",
-                CallingConvention = CallingConvention.Cdecl, SetLastError = true)]
-            internal static extern ulong GetSelectionsSize(
-                ElectionGuard.PlaintextBallotContest.External.PlaintextBallotContestHandle handle);
 
             [DllImport(DllName, EntryPoint = "eg_plaintext_ballot_contest_get_selection_at_index",
                 CallingConvention = CallingConvention.Cdecl, SetLastError = true)]
