@@ -1,6 +1,4 @@
-﻿using System;
-using ElectionGuard.Encryption.Utils;
-using NUnit.Framework;
+﻿using NUnit.Framework;
 
 namespace ElectionGuard.Encryption.Tests
 {

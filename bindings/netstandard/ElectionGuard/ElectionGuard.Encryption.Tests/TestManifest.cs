@@ -1,11 +1,9 @@
 using System;
-using System.Diagnostics;
-using NUnit.Framework;
 using System.Collections.Generic;
-
 using ElectionGuard.Encryption.Utils;
+using NUnit.Framework;
 
-namespace ElectionGuard.Encrypt.Tests
+namespace ElectionGuard.Encryption.Tests
 {
     [TestFixture]
     public class TestManifest
@@ -14,10 +12,10 @@ namespace ElectionGuard.Encrypt.Tests
         [Test]
         public void Test_Votes_Allowed_On_Create_Contest()
         {
-            List<SelectionDescription> selections = new List<SelectionDescription>();
+            var selections = new SelectionDescription[] { };
 
             var contestThreeVotes = new ContestDescription("contest-id", "district-id", 1, VoteVariationType.n_of_m, 3,
-                                      "test election", selections.ToArray());
+                                      "test election", selections);
 
             // Assert
             Assert.AreEqual(3, contestThreeVotes.VotesAllowed);
@@ -35,9 +33,9 @@ namespace ElectionGuard.Encrypt.Tests
         public void Test_Can_Construct_Internationalized_Text()
         {
             // Arrange
-            var language_1 = new Language("some words", "en");
-            var language_2 = new Language("algunas palabras", "es");
-            var languages = new[] { language_1, language_2 };
+            var language1 = new Language("some words", "en");
+            var language2 = new Language("algunas palabras", "es");
+            var languages = new[] { language1, language2 };
 
             // Act
             var subject = new InternationalizedText(languages);
