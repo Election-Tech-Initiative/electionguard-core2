@@ -136,9 +136,6 @@ typedef struct eg_ciphertext_ballot_selection_s eg_ciphertext_ballot_selection_t
 EG_API eg_electionguard_status_t
 eg_ciphertext_ballot_selection_free(eg_ciphertext_ballot_selection_t *handle);
 
-EG_API eg_electionguard_status_t eg_ciphertext_ballot_selection_get_object_id(
-  eg_ciphertext_ballot_selection_t *handle, char **out_object_id);
-
 /*
  * Get the sequence order of the selection
  */
