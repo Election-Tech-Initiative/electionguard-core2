@@ -5,7 +5,6 @@ namespace ElectionGuard
 {
     using NativeCiphertextBallot = NativeInterface.CiphertextBallot.CiphertextBallotHandle;
     using NativeCiphertextBallotContest = NativeInterface.CiphertextBallotContest.CiphertextBallotContestHandle;
-    using NativeCiphertextBallotSelection = NativeInterface.CiphertextBallotSelection.CiphertextBallotSelectionHandle;
     using NativeCompactCiphertextBallot = NativeInterface.CompactCiphertextBallot.CompactCiphertextBallotHandle;
     using NativeCompactPlaintextBallot = NativeInterface.CompactPlaintextBallot.CompactPlaintextBallotHandle;
     using NativeConstantChaumPedersenProof = NativeInterface.ConstantChaumPedersenProof.ConstantChaumPedersenProofHandle;
@@ -185,25 +184,8 @@ namespace ElectionGuard
     ///
     /// By keeping the `proof` the nonce is not required fotor verify the encrypted selection.
     /// </summary>
-    public class CiphertextBallotSelection : DisposableBase
+    public partial class CiphertextBallotSelection : DisposableBase
     {
-        /// <Summary>
-        /// Get the objectId of the selection, which is the unique id for
-        /// the selection in a specific contest described in the election manifest.
-        /// </Summary>
-        public unsafe string ObjectId
-        {
-            get
-            {
-                var status = NativeInterface.CiphertextBallotSelection.GetObjectId(
-                    Handle, out IntPtr value);
-                status.ThrowIfError();
-                var data = Marshal.PtrToStringAnsi(value);
-                NativeInterface.Memory.FreeIntPtr(value);
-                return data;
-            }
-        }
-
         /// <Summary>
         /// Get the sequence order of the selection
         /// </Summary>
@@ -297,9 +279,7 @@ namespace ElectionGuard
             }
         }
 
-        internal unsafe NativeCiphertextBallotSelection Handle;
-
-        unsafe internal CiphertextBallotSelection(NativeCiphertextBallotSelection handle)
+        unsafe internal CiphertextBallotSelection(External.CiphertextBallotSelectionHandle handle)
         {
             Handle = handle;
         }
@@ -342,17 +322,6 @@ namespace ElectionGuard
             return NativeInterface.CiphertextBallotSelection.IsValidEncryption(
                 Handle, encryptionSeed.Handle,
                 elGamalPublicKey.Handle, cryptoExtendedBaseHash.Handle);
-        }
-
-#pragma warning disable CS1591 // Missing XML comment for publicly visible type or member
-        protected override unsafe void DisposeUnmanaged()
-#pragma warning restore CS1591 // Missing XML comment for publicly visible type or member
-        {
-            base.DisposeUnmanaged();
-
-            if (Handle == null || Handle.IsInvalid) return;
-            Handle.Dispose();
-            Handle = null;
         }
     }
 
@@ -541,7 +510,7 @@ namespace ElectionGuard
         public unsafe CiphertextBallotSelection GetSelectionAt(ulong index)
         {
             var status = NativeInterface.CiphertextBallotContest.GetSelectionAtIndex(
-                Handle, index, out NativeCiphertextBallotSelection value);
+                Handle, index, out CiphertextBallotSelection.External.CiphertextBallotSelectionHandle value);
             status.ThrowIfError();
             return new CiphertextBallotSelection(value);
         }

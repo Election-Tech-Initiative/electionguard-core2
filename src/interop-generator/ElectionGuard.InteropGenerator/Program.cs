@@ -1,12 +1,14 @@
 ﻿/*
  * To generate the proxy code for ElectionGuard
  *
- * 1. modify EgInteropClasses.json, then either:
- * 2a.Run this from Visual Studio via F5, or
- * 2b.From project root `make generate-interop`, or
+ * 1.  Modify EgInteropClasses.json, then either:
+ * 2a. Run this from Visual Studio via F5, or
+ * 2b. From project root `make generate-interop`, or
  * 2c. dotnet run -- [InteropJsonPath][ProjectRootDir]
- * 3. Review source control changes very carefully
- * 4. Rerun all unit tests
+ * 3.  Review source control changes very carefully
+ * 4.  Delete any newly created dead code, starting with NativeInterface and working out
+ * 5.  Try to compile
+ * 6.  Rerun all unit tests
  */
 
 using ElectionGuard.InteropGenerator.FileGenerators;

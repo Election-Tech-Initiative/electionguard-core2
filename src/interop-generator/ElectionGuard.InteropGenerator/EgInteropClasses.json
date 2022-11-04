@@ -103,5 +103,17 @@
     ],
     "Methods": [
     ]
+  },
+  {
+    "ClassName": "CiphertextBallotSelection",
+    "Properties": [
+      {
+        "Name": "ObjectId",
+        "TypeCs": "string",
+        "Description": "Get the objectId of the selection, which is the unique id for the selection in a specific contest described in the election manifest."
+      }
+    ],
+    "Methods": [
+    ]
   }
 ]
