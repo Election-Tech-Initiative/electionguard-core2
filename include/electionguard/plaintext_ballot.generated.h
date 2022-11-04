@@ -49,6 +49,8 @@ EG_API uint64_t eg_plaintext_ballot_get_contests_size(
 	eg_plaintext_ballot_t *handle
 	);
 
+EG_API eg_electionguard_status_t eg_plaintext_ballot_free(eg_plaintext_ballot_t *handle);
+
 #endif // ifndef PlaintextBallot
 
 #ifdef __cplusplus

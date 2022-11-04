@@ -47,6 +47,8 @@ EG_API bool eg_plaintext_ballot_contest_is_valid(
 	uint64_t in_votes_allowed
 	);
 
+EG_API eg_electionguard_status_t eg_plaintext_ballot_contest_free(eg_plaintext_ballot_contest_t *handle);
+
 #endif // ifndef PlaintextBallotContest
 
 #ifdef __cplusplus

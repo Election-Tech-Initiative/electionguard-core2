@@ -15,7 +15,7 @@ extern "C" {
 #ifndef CiphertextBallotSelection
 
 /**
- * @brief Get the objectId of the contest, which is the unique id for the contest in a specific ballot style described in the election manifest.
+ * @brief Get the objectId of the selection, which is the unique id for the selection in a specific contest described in the election manifest.
  * @param[in] handle A pointer to the `eg_plaintext_ballot_selection_t` opaque instance
  * @param[out] out_object_id A pointer to the output ObjectId.  The caller is responsible for freeing it.
  * @return eg_electionguard_status_t indicating success or failure
@@ -26,6 +26,8 @@ EG_API eg_electionguard_status_t eg_ciphertext_ballot_selection_get_object_id(
 	eg_ciphertext_ballot_selection_t *handle,
 	char **out_object_id
 	);
+
+EG_API eg_electionguard_status_t eg_ciphertext_ballot_selection_free(eg_ciphertext_ballot_selection_t *handle);
 
 #endif // ifndef CiphertextBallotSelection
 

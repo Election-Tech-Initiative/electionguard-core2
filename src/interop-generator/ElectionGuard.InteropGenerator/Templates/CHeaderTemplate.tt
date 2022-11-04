@@ -74,6 +74,8 @@ foreach (var parameter in egMethod.Params) {
 	);
 
 <# } // foreach method #>
+EG_API eg_electionguard_status_t eg_<#= classNameSnakeCase #>_free(eg_<#= classNameSnakeCase #>_t *handle);
+
 #endif // ifndef <#= EgClass.ClassName #>
 
 #ifdef __cplusplus

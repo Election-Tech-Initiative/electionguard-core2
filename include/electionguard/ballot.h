@@ -90,9 +90,6 @@ EG_API eg_electionguard_status_t eg_plaintext_ballot_selection_new_with_extended
   const char *in_extended_data_value, uint64_t in_extended_data_length,
   eg_plaintext_ballot_selection_t **out_handle);
 
-EG_API eg_electionguard_status_t
-eg_plaintext_ballot_selection_free(eg_plaintext_ballot_selection_t *handle);
-
 /**
  * Given a PlaintextBallotSelection validates that the object matches an expected object
  * and that the plaintext value can resolve to a valid representation
@@ -132,9 +129,6 @@ struct eg_ciphertext_ballot_selection_s;
 typedef struct eg_ciphertext_ballot_selection_s eg_ciphertext_ballot_selection_t;
 
 // no constructors defined.  use `eg_encrypt_selection` in encrypt.h
-
-EG_API eg_electionguard_status_t
-eg_ciphertext_ballot_selection_free(eg_ciphertext_ballot_selection_t *handle);
 
 /*
  * Get the sequence order of the selection
@@ -254,9 +248,6 @@ typedef struct eg_plaintext_ballot_contest_s eg_plaintext_ballot_contest_t;
 EG_API eg_electionguard_status_t eg_plaintext_ballot_contest_new(
   char *object_id, eg_plaintext_ballot_selection_t *in_selections[],
   const uint64_t in_selections_size, eg_plaintext_ballot_contest_t **out_handle);
-
-EG_API eg_electionguard_status_t
-eg_plaintext_ballot_contest_free(eg_plaintext_ballot_contest_t *handle);
 
 /**
  * Get a selection at a specific index.
@@ -449,8 +440,6 @@ typedef struct eg_plaintext_ballot_s eg_plaintext_ballot_t;
 EG_API eg_electionguard_status_t eg_plaintext_ballot_new(
   char *in_object_id, char *in_style_id, eg_plaintext_ballot_contest_t *in_contests[],
   const uint64_t in_contests_size, eg_plaintext_ballot_t **out_handle);
-
-EG_API eg_electionguard_status_t eg_plaintext_ballot_free(eg_plaintext_ballot_t *handle);
 
 /**
  * Get a contest at a specific index.
