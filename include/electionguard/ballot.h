@@ -130,12 +130,6 @@ typedef struct eg_ciphertext_ballot_selection_s eg_ciphertext_ballot_selection_t
 
 // no constructors defined.  use `eg_encrypt_selection` in encrypt.h
 
-/*
- * Get the sequence order of the selection
- */
-EG_API uint64_t
-eg_ciphertext_ballot_selection_get_sequence_order(eg_ciphertext_ballot_selection_t *handle);
-
 /**
  * The SelectionDescription hash
  * 
@@ -144,12 +138,6 @@ eg_ciphertext_ballot_selection_get_sequence_order(eg_ciphertext_ballot_selection
  */
 EG_API eg_electionguard_status_t eg_ciphertext_ballot_selection_get_description_hash(
   eg_ciphertext_ballot_selection_t *handle, eg_element_mod_q_t **out_hash_ref);
-
-/**
- * Determines if this is a placeholder selection
- */
-EG_API bool
-eg_ciphertext_ballot_selection_get_is_placeholder(eg_ciphertext_ballot_selection_t *handle);
 
 /**
  * The encrypted representation of the vote field

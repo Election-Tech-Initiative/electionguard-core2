@@ -27,6 +27,28 @@ namespace ElectionGuard
             }
         }
 
+        /// <Summary>
+        /// Get the sequence order of the selection
+        /// </Summary>
+        public unsafe ulong SequenceOrder
+        {
+            get
+            {
+                return External.GetSequenceOrder(Handle);
+            }
+        }
+
+        /// <Summary>
+        /// Determines if this is a placeholder selection
+        /// </Summary>
+        public unsafe bool IsPlaceholder
+        {
+            get
+            {
+                return External.GetIsPlaceholder(Handle);
+            }
+        }
+
         #endregion
 
         #region Methods
@@ -76,6 +98,26 @@ namespace ElectionGuard
             internal static extern Status GetObjectId(
                 CiphertextBallotSelectionHandle handle
                 , out IntPtr objectId
+            );
+
+            [DllImport(
+                NativeInterface.DllName,
+                EntryPoint = "eg_ciphertext_ballot_selection_get_sequence_order",
+                CallingConvention = CallingConvention.Cdecl, 
+                SetLastError = true
+            )]
+            internal static extern ulong GetSequenceOrder(
+                CiphertextBallotSelectionHandle handle
+            );
+
+            [DllImport(
+                NativeInterface.DllName,
+                EntryPoint = "eg_ciphertext_ballot_selection_get_is_placeholder",
+                CallingConvention = CallingConvention.Cdecl, 
+                SetLastError = true
+            )]
+            internal static extern bool GetIsPlaceholder(
+                CiphertextBallotSelectionHandle handle
             );
 
         }

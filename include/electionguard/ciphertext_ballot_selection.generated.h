@@ -27,6 +27,24 @@ EG_API eg_electionguard_status_t eg_ciphertext_ballot_selection_get_object_id(
 	char **out_object_id
 	);
 
+/**
+ * @brief Get the sequence order of the selection
+ * @param[in] handle A pointer to the `eg_plaintext_ballot_selection_t` opaque instance
+ * @return The value of the property
+ */
+EG_API uint64_t eg_ciphertext_ballot_selection_get_sequence_order(
+	eg_ciphertext_ballot_selection_t *handle
+	);
+
+/**
+ * @brief Determines if this is a placeholder selection
+ * @param[in] handle A pointer to the `eg_plaintext_ballot_selection_t` opaque instance
+ * @return The value of the property
+ */
+EG_API bool eg_ciphertext_ballot_selection_get_is_placeholder(
+	eg_ciphertext_ballot_selection_t *handle
+	);
+
 EG_API eg_electionguard_status_t eg_ciphertext_ballot_selection_free(eg_ciphertext_ballot_selection_t *handle);
 
 #endif // ifndef CiphertextBallotSelection

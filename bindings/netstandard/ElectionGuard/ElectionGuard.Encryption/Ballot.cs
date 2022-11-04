@@ -186,17 +186,6 @@ namespace ElectionGuard
     /// </summary>
     public partial class CiphertextBallotSelection : DisposableBase
     {
-        /// <Summary>
-        /// Get the sequence order of the selection
-        /// </Summary>
-        public unsafe ulong SequenceOrder
-        {
-            get
-            {
-                return NativeInterface.CiphertextBallotSelection.GetSequenceOrder(Handle);
-            }
-        }
-
         /// <summary>
         /// The hash of the string representation of the Selection Description from the election manifest
         /// </summary>
@@ -208,17 +197,6 @@ namespace ElectionGuard
                     Handle, out NativeElementModQ value);
                 status.ThrowIfError();
                 return new ElementModQ(value);
-            }
-        }
-
-        /// <summary>
-        /// Determines if this is a placeholder selection
-        /// </summary>
-        public unsafe bool IsPlaceholder
-        {
-            get
-            {
-                return NativeInterface.CiphertextBallotSelection.GetIsPlaceholder(Handle);
             }
         }
 
