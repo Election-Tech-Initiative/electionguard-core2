@@ -89,6 +89,11 @@ else
 endif
 	cmake --build $(ELECTIONGUARD_BUILD_LIBS_DIR)/x86_64/$(TARGET)
 
+generate-interop:
+	cd ./src/interop-generator/ElectionGuard.InteropGenerator && \
+		dotnet run -- ./EgInteropClasses.json ../../../ && \
+		cd ../../../
+
 build-msvc:
 	@echo 🖥️ BUILD MSVC
 ifeq ($(OPERATING_SYSTEM),Windows)
