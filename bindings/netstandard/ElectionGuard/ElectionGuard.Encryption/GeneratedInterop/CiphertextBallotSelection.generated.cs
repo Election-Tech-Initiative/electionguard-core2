@@ -13,7 +13,7 @@ namespace ElectionGuard
 
         #region Properties
         /// <Summary>
-        /// Get the objectId of the contest, which is the unique id for the contest in a specific ballot style described in the election manifest.
+        /// Get the objectId of the selection, which is the unique id for the selection in a specific contest described in the election manifest.
         /// </Summary>
         public unsafe string ObjectId
         {
