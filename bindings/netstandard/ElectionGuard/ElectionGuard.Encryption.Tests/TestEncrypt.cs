@@ -7,7 +7,6 @@ namespace ElectionGuard.Encryption.Tests
     [TestFixture]
     public class TestEncrypt
     {
-
         [Test]
         public void Test_Device_Serialization_Succeeds()
         {
@@ -274,14 +273,16 @@ namespace ElectionGuard.Encryption.Tests
             {
                 for (i = 0; i < 10000; i++)
                 {
-
                     //Log::debug("%d test", i);
                     var submitted = new SubmittedBallot(ciphertext, BallotBoxState.Cast);
                     submitted.Dispose();
-                    submitted = null;
                 }
             }
-            catch (Exception e) { }
+            catch (Exception)
+            {
+                // ignored
+            }
+
             Assert.AreEqual(10000, i);
 
         }
