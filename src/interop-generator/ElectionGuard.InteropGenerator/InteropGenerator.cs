@@ -20,9 +20,9 @@ namespace ElectionGuard.InteropGenerator
             };
         }
 
-        public async Task GenerateAll()
+        public async Task GenerateAll(string interopJsonPath)
         {
-            var egClasses = await GetInteropClasses();
+            var egClasses = await GetInteropClasses(interopJsonPath);
             foreach (var egClass in egClasses)
             {
                 var generatedResults = _generators.Select(g => g.Generate(egClass));
@@ -33,10 +33,9 @@ namespace ElectionGuard.InteropGenerator
             }
         }
 
-        private static async Task<EgClass[]> GetInteropClasses()
+        private static async Task<EgClass[]> GetInteropClasses(string interopJsonPath)
         {
-            var propertiesPath = Path.Join(Directory.GetCurrentDirectory(), "/EgInteropClasses.json");
-            await using var openStream = File.OpenRead(propertiesPath);
+            await using var openStream = File.OpenRead(interopJsonPath);
             var egClasses = JsonSerializer.Deserialize<EgClass[]>(openStream);
             if (egClasses == null) throw new Exception("EgInteropClasses.json was empty");
             return egClasses;

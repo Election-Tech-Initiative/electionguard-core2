@@ -6,7 +6,7 @@ namespace ElectionGuard.InteropGenerator.FileGenerators;
 
 internal class CFileGenerator : FileGeneratorBase
 {
-    const string COutputDir = "../../../../../../include/electionguard";
+    string COutputDir => ProjectRootDir + "include/electionguard";
 
     public override GeneratedClass Generate(EgClass egClass)
     {
