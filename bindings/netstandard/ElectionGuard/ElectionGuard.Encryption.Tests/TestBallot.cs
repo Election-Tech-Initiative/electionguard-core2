@@ -62,11 +62,11 @@ namespace ElectionGuard.Encrypt.Tests
             var ballot = new PlaintextBallot("some-ballot-id", "some-ballot-style-id", contests);
 
             var contest = ballot.GetContestAt(0);
-            var selection0 = contest.GetSelectionAt(0);
-            Assert.AreEqual(1, selection0.Vote);
+            var selection1 = contest.GetSelectionAt(0);
+            Assert.AreEqual(1, selection1.Vote);
 
-            var selection1 = contest.GetSelectionAt(1);
-            Assert.AreEqual(0, selection1.Vote);
+            var selection2 = contest.GetSelectionAt(1);
+            Assert.AreEqual(0, selection2.Vote);
         }
 
         [Test]
