@@ -9,6 +9,11 @@
  * 4.  Delete any newly created dead code, starting with NativeInterface and working out
  * 5.  Try to compile
  * 6.  Rerun all unit tests
+ *
+ * Tips:
+ * - Make small changes
+ * - Start with C# then move to C
+ * - Unfortunately you'll need Visual Studio if you need to change the .tt files
  */
 
 using ElectionGuard.InteropGenerator.FileGenerators;
