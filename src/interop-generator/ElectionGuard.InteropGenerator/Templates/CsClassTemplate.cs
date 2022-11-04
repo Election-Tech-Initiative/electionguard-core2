@@ -270,9 +270,9 @@ if (EgClass.NeverFree) {
             
             #line default
             #line hidden
-            this.Write("                    // releasing the C++ memory is currently handeled by a parent" +
-                    " object e.g. ballot, see https://github.com/microsoft/electionguard-core2/issues" +
-                    "/29\r\n                    return true;\r\n");
+            this.Write("                    // releasing the C++ memory is currently handled by a parent " +
+                    "object e.g. ballot, see https://github.com/microsoft/electionguard-core2/issues/" +
+                    "29\r\n                    return true;\r\n");
             
             #line 98 "C:\dev\ElectionGuard\electionguard-core2\src\interop-generator\ElectionGuard.InteropGenerator\Templates\CsClassTemplate.tt"
 
