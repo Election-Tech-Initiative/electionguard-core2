@@ -18,7 +18,7 @@ internal class EncryptOptions
     public string? Device { get; set; }
 
     [Option('s', "spoiled_ids", Required = false, Separator = ',', HelpText = "Json file containing device information like launch code and location.")]
-    public IEnumerable<string> SpoiledDeviceIds { get; set; }
+    public IEnumerable<string> SpoiledDeviceIds { get; set; } = Enumerable.Empty<string>();
 
     [Option('o', "out", Required = true, HelpText = "File folder in which to place encrypted ballots.")]
     public string? OutDir { get; set; }
