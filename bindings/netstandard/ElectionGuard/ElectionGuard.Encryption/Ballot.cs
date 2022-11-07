@@ -187,20 +187,6 @@ namespace ElectionGuard
     public partial class CiphertextBallotSelection : DisposableBase
     {
         /// <summary>
-        /// The encrypted representation of the vote field
-        /// </summary>
-        public unsafe ElGamalCiphertext Ciphertext
-        {
-            get
-            {
-                var status = NativeInterface.CiphertextBallotSelection.GetCiphertext(
-                    Handle, out NativeElGamalCiphertext value);
-                status.ThrowIfError();
-                return new ElGamalCiphertext(value);
-            }
-        }
-
-        /// <summary>
         /// The hash of the encrypted values
         /// </summary>
         public unsafe ElementModQ CryptoHash

@@ -63,6 +63,20 @@ namespace ElectionGuard
             }
         }
 
+        /// <Summary>
+        /// The encrypted representation of the vote field
+        /// </Summary>
+        public unsafe ElGamalCiphertext Ciphertext
+        {
+            get
+            {
+                var status = External.GetCiphertext(
+                    Handle, out NativeInterface.ElGamalCiphertext.ElGamalCiphertextHandle value);
+                status.ThrowIfError();
+                return new ElGamalCiphertext(value);
+            }
+        }
+
         #endregion
 
         #region Methods
@@ -143,6 +157,17 @@ namespace ElectionGuard
             internal static extern Status GetDescriptionHash(
                 CiphertextBallotSelectionHandle handle
                 , out NativeInterface.ElementModQ.ElementModQHandle objectId
+            );
+
+            [DllImport(
+                NativeInterface.DllName,
+                EntryPoint = "eg_ciphertext_ballot_selection_get_ciphertext",
+                CallingConvention = CallingConvention.Cdecl, 
+                SetLastError = true
+            )]
+            internal static extern Status GetCiphertext(
+                CiphertextBallotSelectionHandle handle
+                , out NativeInterface.ElGamalCiphertext.ElGamalCiphertextHandle objectId
             );
 
         }

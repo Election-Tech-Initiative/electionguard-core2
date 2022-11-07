@@ -131,15 +131,6 @@ typedef struct eg_ciphertext_ballot_selection_s eg_ciphertext_ballot_selection_t
 // no constructors defined.  use `eg_encrypt_selection` in encrypt.h
 
 /**
- * The encrypted representation of the vote field
- * 
- * @param[out] out_ciphertext_ref An opaque pointer to the ciphertext.  
- *                          The value is a reference and is not owned by the caller
- */
-EG_API eg_electionguard_status_t eg_ciphertext_ballot_selection_get_ciphertext(
-  eg_ciphertext_ballot_selection_t *handle, eg_elgamal_ciphertext_t **out_ciphertext_ref);
-
-/**
  * The hash of the encrypted values
  * 
  * @param[out] out_hash_ref An opaque pointer to the crypto hash.  

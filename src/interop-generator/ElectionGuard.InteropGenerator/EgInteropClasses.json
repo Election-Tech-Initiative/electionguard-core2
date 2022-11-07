@@ -109,25 +109,32 @@
     "Properties": [
       {
         "Name": "ObjectId",
-        "TypeCs": "string",
-        "Description": "Get the objectId of the selection, which is the unique id for the selection in a specific contest described in the election manifest."
+        "Description": "Get the objectId of the selection, which is the unique id for the selection in a specific contest described in the election manifest.",
+        "TypeCs": "string"
       },
       {
         "Name": "SequenceOrder",
-        "TypeCs": "ulong",
-        "Description": "Get the sequence order of the selection"
+        "Description": "Get the sequence order of the selection",
+        "TypeCs": "ulong"
       },
       {
         "Name": "IsPlaceholder",
-        "TypeCs": "bool",
-        "Description": "Determines if this is a placeholder selection"
+        "Description": "Determines if this is a placeholder selection",
+        "TypeCs": "bool"
       },
       {
         "Name": "DescriptionHash",
+        "Description": "The hash of the string representation of the Selection Description from the election manifest",
         "TypeCs": "ElementModQ",
-        "TypeC": "eg_element_mod_q_t",
         "NativeHandleType": "NativeInterface.ElementModQ.ElementModQHandle",
-        "Description": "The hash of the string representation of the Selection Description from the election manifest"
+        "TypeC": "eg_element_mod_q_t"
+      },
+      {
+        "Name": "Ciphertext",
+        "Description": "The encrypted representation of the vote field",
+        "TypeCs": "ElGamalCiphertext",
+        "NativeHandleType": "NativeInterface.ElGamalCiphertext.ElGamalCiphertextHandle",
+        "TypeC": "eg_elgamal_ciphertext_t"
       }
     ],
     "Methods": [
