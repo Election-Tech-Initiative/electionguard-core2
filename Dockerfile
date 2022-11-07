@@ -15,4 +15,4 @@ ENV PATH="$PATH:/root/.dotnet"
 #Container runtime
 FROM base AS build
 WORKDIR /usr/src/app
-RUN make clean
+RUN make clean environment
