@@ -106,6 +106,7 @@
   },
   {
     "ClassName": "CiphertextBallotSelection",
+    "NeverFree": true,
     "Properties": [
       {
         "Name": "ObjectId",
