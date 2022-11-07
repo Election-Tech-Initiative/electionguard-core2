@@ -159,7 +159,7 @@ endif
 
 	@echo 🖥️ BUILD NETSTANDARD
 	cd ./bindings/netstandard/ElectionGuard && dotnet restore
-	dotnet build --configuration $(TARGET) ./bindings/netstandard/ElectionGuard/ElectionGuard.sln /property:Platform=x64
+	dotnet build --configuration $(TARGET) ./bindings/netstandard/ElectionGuard/ElectionGuard.sln /p:Platform="Any CPU"
 
 clean:
 	@echo 🗑️ Cleaning Output Directory
