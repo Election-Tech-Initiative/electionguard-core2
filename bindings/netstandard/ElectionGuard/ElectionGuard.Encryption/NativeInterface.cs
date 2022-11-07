@@ -2465,13 +2465,6 @@ namespace ElectionGuard
         internal static unsafe class CiphertextBallotSelection
         {
             [DllImport(DllName,
-                EntryPoint = "eg_ciphertext_ballot_selection_get_description_hash",
-                CallingConvention = CallingConvention.Cdecl, SetLastError = true)]
-            internal static extern Status GetDescriptionHash(
-                ElectionGuard.CiphertextBallotSelection.External.CiphertextBallotSelectionHandle handle,
-                out ElementModQ.ElementModQHandle description_hash);
-
-            [DllImport(DllName,
                 EntryPoint = "eg_ciphertext_ballot_selection_get_ciphertext",
                 CallingConvention = CallingConvention.Cdecl, SetLastError = true)]
             internal static extern Status GetCiphertext(

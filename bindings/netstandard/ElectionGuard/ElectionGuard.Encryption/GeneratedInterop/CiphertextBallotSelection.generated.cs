@@ -49,6 +49,20 @@ namespace ElectionGuard
             }
         }
 
+        /// <Summary>
+        /// The hash of the string representation of the Selection Description from the election manifest
+        /// </Summary>
+        public unsafe ElementModQ DescriptionHash
+        {
+            get
+            {
+                var status = External.GetDescriptionHash(
+                    Handle, out NativeInterface.ElementModQ.ElementModQHandle value);
+                status.ThrowIfError();
+                return new ElementModQ(value);
+            }
+        }
+
         #endregion
 
         #region Methods
@@ -118,6 +132,17 @@ namespace ElectionGuard
             )]
             internal static extern bool GetIsPlaceholder(
                 CiphertextBallotSelectionHandle handle
+            );
+
+            [DllImport(
+                NativeInterface.DllName,
+                EntryPoint = "eg_ciphertext_ballot_selection_get_description_hash",
+                CallingConvention = CallingConvention.Cdecl, 
+                SetLastError = true
+            )]
+            internal static extern Status GetDescriptionHash(
+                CiphertextBallotSelectionHandle handle
+                , out NativeInterface.ElementModQ.ElementModQHandle objectId
             );
 
         }

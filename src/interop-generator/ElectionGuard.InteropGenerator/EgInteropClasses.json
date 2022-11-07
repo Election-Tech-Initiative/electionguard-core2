@@ -121,6 +121,13 @@
         "Name": "IsPlaceholder",
         "TypeCs": "bool",
         "Description": "Determines if this is a placeholder selection"
+      },
+      {
+        "Name": "DescriptionHash",
+        "TypeCs": "ElementModQ",
+        "TypeC": "eg_element_mod_q_t",
+        "NativeHandleType": "NativeInterface.ElementModQ.ElementModQHandle",
+        "Description": "The hash of the string representation of the Selection Description from the election manifest"
       }
     ],
     "Methods": [
