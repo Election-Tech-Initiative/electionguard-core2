@@ -77,6 +77,48 @@ namespace ElectionGuard
             }
         }
 
+        /// <Summary>
+        /// The hash of the encrypted values
+        /// </Summary>
+        public unsafe ElementModQ CryptoHash
+        {
+            get
+            {
+                var status = External.GetCryptoHash(
+                    Handle, out NativeInterface.ElementModQ.ElementModQHandle value);
+                status.ThrowIfError();
+                return new ElementModQ(value);
+            }
+        }
+
+        /// <Summary>
+        /// The nonce used to generate the encryption. Sensitive &amp; should be treated as a secret
+        /// </Summary>
+        public unsafe ElementModQ Nonce
+        {
+            get
+            {
+                var status = External.GetNonce(
+                    Handle, out NativeInterface.ElementModQ.ElementModQHandle value);
+                status.ThrowIfError();
+                return new ElementModQ(value);
+            }
+        }
+
+        /// <Summary>
+        /// The proof that demonstrates the selection is an encryption of 0 or 1, and was encrypted using the `nonce`
+        /// </Summary>
+        public unsafe DisjunctiveChaumPedersenProof Proof
+        {
+            get
+            {
+                var status = External.GetProof(
+                    Handle, out NativeInterface.DisjunctiveChaumPedersenProof.DisjunctiveChaumPedersenProofHandle value);
+                status.ThrowIfError();
+                return new DisjunctiveChaumPedersenProof(value);
+            }
+        }
+
         #endregion
 
         #region Methods
@@ -168,6 +210,39 @@ namespace ElectionGuard
             internal static extern Status GetCiphertext(
                 CiphertextBallotSelectionHandle handle
                 , out NativeInterface.ElGamalCiphertext.ElGamalCiphertextHandle objectId
+            );
+
+            [DllImport(
+                NativeInterface.DllName,
+                EntryPoint = "eg_ciphertext_ballot_selection_get_crypto_hash",
+                CallingConvention = CallingConvention.Cdecl, 
+                SetLastError = true
+            )]
+            internal static extern Status GetCryptoHash(
+                CiphertextBallotSelectionHandle handle
+                , out NativeInterface.ElementModQ.ElementModQHandle objectId
+            );
+
+            [DllImport(
+                NativeInterface.DllName,
+                EntryPoint = "eg_ciphertext_ballot_selection_get_nonce",
+                CallingConvention = CallingConvention.Cdecl, 
+                SetLastError = true
+            )]
+            internal static extern Status GetNonce(
+                CiphertextBallotSelectionHandle handle
+                , out NativeInterface.ElementModQ.ElementModQHandle objectId
+            );
+
+            [DllImport(
+                NativeInterface.DllName,
+                EntryPoint = "eg_ciphertext_ballot_selection_get_proof",
+                CallingConvention = CallingConvention.Cdecl, 
+                SetLastError = true
+            )]
+            internal static extern Status GetProof(
+                CiphertextBallotSelectionHandle handle
+                , out NativeInterface.DisjunctiveChaumPedersenProof.DisjunctiveChaumPedersenProofHandle objectId
             );
 
         }

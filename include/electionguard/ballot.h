@@ -131,34 +131,6 @@ typedef struct eg_ciphertext_ballot_selection_s eg_ciphertext_ballot_selection_t
 // no constructors defined.  use `eg_encrypt_selection` in encrypt.h
 
 /**
- * The hash of the encrypted values
- * 
- * @param[out] out_hash_ref An opaque pointer to the crypto hash.  
- *                          The value is a reference and is not owned by the caller
- */
-EG_API eg_electionguard_status_t eg_ciphertext_ballot_selection_get_crypto_hash(
-  eg_ciphertext_ballot_selection_t *handle, eg_element_mod_q_t **out_hash_ref);
-
-/**
- * The nonce used to generate the encryption. Sensitive &amp; should be treated as a secret
- * 
- * @param[out] out_nonce_ref An opaque pointer to the nonce.  
- *                          The value is a reference and is not owned by the caller
- */
-EG_API eg_electionguard_status_t eg_ciphertext_ballot_selection_get_nonce(
-  eg_ciphertext_ballot_selection_t *handle, eg_element_mod_q_t **out_nonce_ref);
-
-/**
- * The proof that demonstrates the selection is an encryption of 0 or 1, 
- * and was encrypted using the `nonce`
- * 
- * @param[out] out_proof_ref An opaque pointer to the proof.  
- *                          The value is a reference and is not owned by the caller
- */
-EG_API eg_electionguard_status_t eg_ciphertext_ballot_selection_get_proof(
-  eg_ciphertext_ballot_selection_t *handle, eg_disjunctive_chaum_pedersen_proof_t **out_proof_ref);
-
-/**
  * Given an encrypted BallotSelection, generates a hash, suitable for rolling up
  * into a hash / tracking code for an entire ballot. Of note, this particular hash examines
  * the `encryptionSeed` and `message`, but not the proof.

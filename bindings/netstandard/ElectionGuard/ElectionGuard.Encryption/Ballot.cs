@@ -186,49 +186,6 @@ namespace ElectionGuard
     /// </summary>
     public partial class CiphertextBallotSelection : DisposableBase
     {
-        /// <summary>
-        /// The hash of the encrypted values
-        /// </summary>
-        public unsafe ElementModQ CryptoHash
-        {
-            get
-            {
-                var status = NativeInterface.CiphertextBallotSelection.GetCryptoHash(
-                    Handle, out NativeElementModQ value);
-                status.ThrowIfError();
-                return new ElementModQ(value);
-            }
-        }
-
-        /// <summary>
-        /// The nonce used to generate the encryption. Sensitive &amp; should be treated as a secret
-        /// </summary>
-        public unsafe ElementModQ Nonce
-        {
-            get
-            {
-                var status = NativeInterface.CiphertextBallotSelection.GetNonce(
-                    Handle, out NativeElementModQ value);
-                status.ThrowIfError();
-                return new ElementModQ(value);
-            }
-        }
-
-        /// <summary>
-        /// The proof that demonstrates the selection is an encryption of 0 or 1,
-        /// and was encrypted using the `nonce`
-        /// </summary>
-        public unsafe DisjunctiveChaumPedersenProof Proof
-        {
-            get
-            {
-                var status = NativeInterface.CiphertextBallotSelection.GetProof(
-                    Handle, out NativeDisjunctiveChaumPedersenProof value);
-                status.ThrowIfError();
-                return new DisjunctiveChaumPedersenProof(value);
-            }
-        }
-
         unsafe internal CiphertextBallotSelection(External.CiphertextBallotSelectionHandle handle)
         {
             Handle = handle;

@@ -135,6 +135,27 @@
         "TypeCs": "ElGamalCiphertext",
         "NativeHandleType": "NativeInterface.ElGamalCiphertext.ElGamalCiphertextHandle",
         "TypeC": "eg_elgamal_ciphertext_t"
+      },
+      {
+        "Name": "CryptoHash",
+        "Description": "The hash of the encrypted values",
+        "TypeCs": "ElementModQ",
+        "NativeHandleType": "NativeInterface.ElementModQ.ElementModQHandle",
+        "TypeC": "eg_element_mod_q_t"
+      },
+      {
+        "Name": "Nonce",
+        "Description": "The nonce used to generate the encryption. Sensitive &amp; should be treated as a secret",
+        "TypeCs": "ElementModQ",
+        "NativeHandleType": "NativeInterface.ElementModQ.ElementModQHandle",
+        "TypeC": "eg_element_mod_q_t"
+      },
+      {
+        "Name": "Proof",
+        "Description": "The proof that demonstrates the selection is an encryption of 0 or 1, and was encrypted using the `nonce`",
+        "TypeCs": "DisjunctiveChaumPedersenProof",
+        "NativeHandleType": "NativeInterface.DisjunctiveChaumPedersenProof.DisjunctiveChaumPedersenProofHandle",
+        "TypeC": "eg_disjunctive_chaum_pedersen_proof_t"
       }
     ],
     "Methods": [
