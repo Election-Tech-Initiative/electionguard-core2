@@ -5,9 +5,7 @@ ENV DEBIAN_FRONTEND=noninteractive
 SHELL ["/bin/bash", "-c"]
 COPY . /usr/src/app
 RUN apt-get -y update && apt-get install -y
-RUN apt-get -y update && apt-get install -y
-RUN apt-get install wget curl unzip git make sudo -y
-RUN apt-get install mono-complete -y
+RUN apt-get install wget curl unzip git make sudo mono-complete -y
 WORKDIR /tmp
 RUN wget https://dot.net/v1/dotnet-install.sh && chmod +x dotnet-install.sh && ./dotnet-install.sh -c 6.0
 ENV PATH="$PATH:/root/.dotnet"
