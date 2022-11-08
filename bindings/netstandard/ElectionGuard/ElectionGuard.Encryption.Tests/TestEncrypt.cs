@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 using ElectionGuard.Encryption.Utils;
 using NUnit.Framework;
 
@@ -271,16 +272,13 @@ namespace ElectionGuard.Encryption.Tests
             int i = 0;
             try
             {
-                for (i = 0; i < 10000; i++)
-                {
-                    //Log::debug("%d test", i);
-                    var submitted = new SubmittedBallot(ciphertext, BallotBoxState.Cast);
-                    submitted.Dispose();
-                }
+                Enumerable.Range(1, 10000)
+                    .ToList()
+                    .ForEach(_ => new SubmittedBallot(ciphertext, BallotBoxState.Cast).Dispose());
             }
-            catch (Exception)
+            catch (Exception ex)
             {
-                // ignored
+                Assert.Fail("Something went wrong while creating and ", ex);
             }
 
             Assert.AreEqual(10000, i);
