@@ -269,19 +269,12 @@ namespace ElectionGuard.Encryption.Tests
 
             // Act
             var ciphertext = mediator.Encrypt(ballot);
-            int i = 0;
-            try
+            Assert.DoesNotThrow(() =>
             {
                 Enumerable.Range(1, 10000)
                     .ToList()
                     .ForEach(_ => new SubmittedBallot(ciphertext, BallotBoxState.Cast).Dispose());
-            }
-            catch (Exception ex)
-            {
-                Assert.Fail("Something went wrong while creating and ", ex);
-            }
-
-            Assert.AreEqual(10000, i);
+            });
 
         }
     }
