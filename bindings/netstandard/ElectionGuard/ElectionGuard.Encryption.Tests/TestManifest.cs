@@ -12,10 +12,20 @@ namespace ElectionGuard.Encryption.Tests
         [Test]
         public void Test_Votes_Allowed_On_Create_Contest()
         {
-            var selections = new SelectionDescription[] { };
+            var selections = Array.Empty<SelectionDescription>();
 
-            var contestThreeVotes = new ContestDescription("contest-id", "district-id", 1, VoteVariationType.n_of_m, 3,
-                                      "test election", selections);
+            const int sequenceOrder = 1;
+            const string electoralDistrictId = "district-id";
+            const int numberElected = 3;
+
+            var contestThreeVotes = new ContestDescription(
+                "contest-id", 
+                electoralDistrictId, 
+                sequenceOrder, 
+                VoteVariationType.n_of_m, 
+                (ulong)numberElected,
+                "test election", 
+                selections);
 
             // Assert
             Assert.AreEqual(3, contestThreeVotes.VotesAllowed);
