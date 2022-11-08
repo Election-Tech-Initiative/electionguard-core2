@@ -16,15 +16,17 @@ namespace ElectionGuard.Encryption.Tests
 
             const int sequenceOrder = 1;
             const string electoralDistrictId = "district-id";
+            const string contestId = "contest-id";
             const int numberElected = 3;
-
+            const string contestName = "test election";
+            
             var contestThreeVotes = new ContestDescription(
-                "contest-id", 
+                contestId, 
                 electoralDistrictId, 
                 sequenceOrder, 
                 VoteVariationType.n_of_m, 
-                (ulong)numberElected,
-                "test election", 
+                numberElected,
+                contestName, 
                 selections);
 
             // Assert
