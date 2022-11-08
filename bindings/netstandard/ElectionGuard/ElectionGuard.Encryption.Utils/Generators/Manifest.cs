@@ -2,10 +2,8 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
-namespace ElectionGuard.Encryption.Utils
+namespace ElectionGuard.Encryption.Utils.Generators
 {
     public class ManifestGenerator
     {

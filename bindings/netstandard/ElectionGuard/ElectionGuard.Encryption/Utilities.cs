@@ -1,5 +1,4 @@
-﻿using System;
-namespace ElectionGuard.Encryption
+﻿namespace ElectionGuard
 {
     /// <summary>
     /// Class for wrapping around utility functions

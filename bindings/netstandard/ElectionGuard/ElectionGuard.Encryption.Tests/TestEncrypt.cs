@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Linq;
 using ElectionGuard.Encryption.Utils;
+using ElectionGuard.Encryption.Utils.Generators;
 using NUnit.Framework;
 
 namespace ElectionGuard.Encryption.Tests
