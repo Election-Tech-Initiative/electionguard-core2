@@ -232,9 +232,23 @@ foreach (var parameter in egMethod.Params) {
             
             #line default
             #line hidden
-            this.Write("#endif // ifndef ");
+            this.Write("EG_API eg_electionguard_status_t eg_");
             
             #line 77 "C:\dev\ElectionGuard\electionguard-core2\src\interop-generator\ElectionGuard.InteropGenerator\Templates\CHeaderTemplate.tt"
+            this.Write(this.ToStringHelper.ToStringWithCulture(classNameSnakeCase));
+            
+            #line default
+            #line hidden
+            this.Write("_free(eg_");
+            
+            #line 77 "C:\dev\ElectionGuard\electionguard-core2\src\interop-generator\ElectionGuard.InteropGenerator\Templates\CHeaderTemplate.tt"
+            this.Write(this.ToStringHelper.ToStringWithCulture(classNameSnakeCase));
+            
+            #line default
+            #line hidden
+            this.Write("_t *handle);\r\n\r\n#endif // ifndef ");
+            
+            #line 79 "C:\dev\ElectionGuard\electionguard-core2\src\interop-generator\ElectionGuard.InteropGenerator\Templates\CHeaderTemplate.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(EgClass.ClassName));
             
             #line default

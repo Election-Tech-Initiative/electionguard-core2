@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 using ElectionGuard.Encryption.Utils;
 using NUnit.Framework;
 
@@ -7,7 +8,6 @@ namespace ElectionGuard.Encryption.Tests
     [TestFixture]
     public class TestEncrypt
     {
-
         [Test]
         public void Test_Device_Serialization_Succeeds()
         {
@@ -269,20 +269,12 @@ namespace ElectionGuard.Encryption.Tests
 
             // Act
             var ciphertext = mediator.Encrypt(ballot);
-            int i = 0;
-            try
+            Assert.DoesNotThrow(() =>
             {
-                for (i = 0; i < 10000; i++)
-                {
-
-                    //Log::debug("%d test", i);
-                    var submitted = new SubmittedBallot(ciphertext, BallotBoxState.Cast);
-                    submitted.Dispose();
-                    submitted = null;
-                }
-            }
-            catch (Exception e) { }
-            Assert.AreEqual(10000, i);
+                Enumerable.Range(1, 10000)
+                    .ToList()
+                    .ForEach(_ => new SubmittedBallot(ciphertext, BallotBoxState.Cast).Dispose());
+            });
 
         }
     }

@@ -90,9 +90,6 @@ EG_API eg_electionguard_status_t eg_plaintext_ballot_selection_new_with_extended
   const char *in_extended_data_value, uint64_t in_extended_data_length,
   eg_plaintext_ballot_selection_t **out_handle);
 
-EG_API eg_electionguard_status_t
-eg_plaintext_ballot_selection_free(eg_plaintext_ballot_selection_t *handle);
-
 /**
  * Given a PlaintextBallotSelection validates that the object matches an expected object
  * and that the plaintext value can resolve to a valid representation
@@ -132,70 +129,6 @@ struct eg_ciphertext_ballot_selection_s;
 typedef struct eg_ciphertext_ballot_selection_s eg_ciphertext_ballot_selection_t;
 
 // no constructors defined.  use `eg_encrypt_selection` in encrypt.h
-
-EG_API eg_electionguard_status_t
-eg_ciphertext_ballot_selection_free(eg_ciphertext_ballot_selection_t *handle);
-
-EG_API eg_electionguard_status_t eg_ciphertext_ballot_selection_get_object_id(
-  eg_ciphertext_ballot_selection_t *handle, char **out_object_id);
-
-/*
- * Get the sequence order of the selection
- */
-EG_API uint64_t
-eg_ciphertext_ballot_selection_get_sequence_order(eg_ciphertext_ballot_selection_t *handle);
-
-/**
- * The SelectionDescription hash
- * 
- * @param[out] out_hash_ref An opaque pointer to the description hash.  
- *                          The value is a reference and is not owned by the caller
- */
-EG_API eg_electionguard_status_t eg_ciphertext_ballot_selection_get_description_hash(
-  eg_ciphertext_ballot_selection_t *handle, eg_element_mod_q_t **out_hash_ref);
-
-/**
- * Determines if this is a placeholder selection
- */
-EG_API bool
-eg_ciphertext_ballot_selection_get_is_placeholder(eg_ciphertext_ballot_selection_t *handle);
-
-/**
- * The encrypted representation of the vote field
- * 
- * @param[out] out_ciphertext_ref An opaque pointer to the ciphertext.  
- *                          The value is a reference and is not owned by the caller
- */
-EG_API eg_electionguard_status_t eg_ciphertext_ballot_selection_get_ciphertext(
-  eg_ciphertext_ballot_selection_t *handle, eg_elgamal_ciphertext_t **out_ciphertext_ref);
-
-/**
- * The hash of the encrypted values
- * 
- * @param[out] out_hash_ref An opaque pointer to the crypto hash.  
- *                          The value is a reference and is not owned by the caller
- */
-EG_API eg_electionguard_status_t eg_ciphertext_ballot_selection_get_crypto_hash(
-  eg_ciphertext_ballot_selection_t *handle, eg_element_mod_q_t **out_hash_ref);
-
-/**
- * The nonce used to generate the encryption. Sensitive &amp; should be treated as a secret
- * 
- * @param[out] out_nonce_ref An opaque pointer to the nonce.  
- *                          The value is a reference and is not owned by the caller
- */
-EG_API eg_electionguard_status_t eg_ciphertext_ballot_selection_get_nonce(
-  eg_ciphertext_ballot_selection_t *handle, eg_element_mod_q_t **out_nonce_ref);
-
-/**
- * The proof that demonstrates the selection is an encryption of 0 or 1, 
- * and was encrypted using the `nonce`
- * 
- * @param[out] out_proof_ref An opaque pointer to the proof.  
- *                          The value is a reference and is not owned by the caller
- */
-EG_API eg_electionguard_status_t eg_ciphertext_ballot_selection_get_proof(
-  eg_ciphertext_ballot_selection_t *handle, eg_disjunctive_chaum_pedersen_proof_t **out_proof_ref);
 
 /**
  * Given an encrypted BallotSelection, generates a hash, suitable for rolling up
@@ -257,9 +190,6 @@ typedef struct eg_plaintext_ballot_contest_s eg_plaintext_ballot_contest_t;
 EG_API eg_electionguard_status_t eg_plaintext_ballot_contest_new(
   char *object_id, eg_plaintext_ballot_selection_t *in_selections[],
   const uint64_t in_selections_size, eg_plaintext_ballot_contest_t **out_handle);
-
-EG_API eg_electionguard_status_t
-eg_plaintext_ballot_contest_free(eg_plaintext_ballot_contest_t *handle);
 
 /**
  * Get a selection at a specific index.
@@ -452,8 +382,6 @@ typedef struct eg_plaintext_ballot_s eg_plaintext_ballot_t;
 EG_API eg_electionguard_status_t eg_plaintext_ballot_new(
   char *in_object_id, char *in_style_id, eg_plaintext_ballot_contest_t *in_contests[],
   const uint64_t in_contests_size, eg_plaintext_ballot_t **out_handle);
-
-EG_API eg_electionguard_status_t eg_plaintext_ballot_free(eg_plaintext_ballot_t *handle);
 
 /**
  * Get a contest at a specific index.

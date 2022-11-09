@@ -5,7 +5,7 @@ namespace ElectionGuard.InteropGenerator.FileGenerators;
 
 internal class CsFileGenerator : FileGeneratorBase
 {
-    const string CsOutputDir = "../../../../../../bindings/netstandard/ElectionGuard/ElectionGuard.Encryption/GeneratedInterop";
+    string CsOutputDir => ProjectRootDir + "bindings/netstandard/ElectionGuard/ElectionGuard.Encryption/GeneratedInterop";
 
     public override GeneratedClass Generate(EgClass egClass)
     {

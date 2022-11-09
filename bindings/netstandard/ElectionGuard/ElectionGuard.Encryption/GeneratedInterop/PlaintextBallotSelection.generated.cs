@@ -97,7 +97,7 @@ namespace ElectionGuard
                 [ReliabilityContract(Consistency.WillNotCorruptState, Cer.MayFail)]
                 protected override bool Free()
                 {
-                    // releasing the C++ memory is currently handeled by a parent object e.g. ballot, see https://github.com/microsoft/electionguard-core2/issues/29
+                    // releasing the C++ memory is currently handled by a parent object e.g. ballot, see https://github.com/microsoft/electionguard-core2/issues/29
                     return true;
                 }
             }

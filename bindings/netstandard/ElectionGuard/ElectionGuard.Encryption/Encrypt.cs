@@ -8,7 +8,7 @@ namespace ElectionGuard
     using NativeEncryptionMediator = NativeInterface.EncryptionMediator.EncryptionMediatorHandle;
     using NativeCiphertextBallot = NativeInterface.CiphertextBallot.CiphertextBallotHandle;
     using NativeCiphertextBallotContest = NativeInterface.CiphertextBallotContest.CiphertextBallotContestHandle;
-    using NativeCiphertextBallotSelection = NativeInterface.CiphertextBallotSelection.CiphertextBallotSelectionHandle;
+    using NativeCiphertextBallotSelection = CiphertextBallotSelection.External.CiphertextBallotSelectionHandle;
     using NativeCompactCiphertextBallot = NativeInterface.CompactCiphertextBallot.CompactCiphertextBallotHandle;
 
     /// <summary>

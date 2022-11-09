@@ -1,8 +1,6 @@
-using System;
-using System.Diagnostics;
 using NUnit.Framework;
 
-namespace ElectionGuard.Encrypt.Tests
+namespace ElectionGuard.Encryption.Tests
 {
     [TestFixture]
     public class TestBallot
@@ -79,7 +77,7 @@ namespace ElectionGuard.Encrypt.Tests
             var subject = new PlaintextBallotSelection(objectId, 1);
 
             // Assert
-            Assert.That(subject.IsValid(objectId) == true);
+            Assert.IsTrue(subject.IsValid(objectId));
         }
 
         [Test]
@@ -96,7 +94,7 @@ namespace ElectionGuard.Encrypt.Tests
         }
 
         [Test]
-        public void Test_Plaintext_Ballot_Selection_Is_InValid_With_overvote()
+        public void Test_Plaintext_Ballot_Selection_Is_InValid_With_Overvote()
         {
             // Arrange
             const string objectId = "some-object-id";
