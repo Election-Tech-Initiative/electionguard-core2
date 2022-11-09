@@ -51,7 +51,7 @@ namespace ElectionGuard
 
         internal unsafe NativeInterface.Language.LanguageHandle Handle;
 
-        unsafe internal Language(
+        internal unsafe Language(
             NativeInterface.Language.LanguageHandle handle)
         {
             Handle = handle;

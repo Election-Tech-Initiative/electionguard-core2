@@ -11,7 +11,7 @@ namespace ElectionGuard
     /// selections for any contest type are considered a "candidate".
     /// for instance, on a yes-no referendum contest, two `candidate` objects
     /// would be included in the model to represent the `affirmative` and `negative`
-    /// selections for the contest.  See the wiki, readme's, and tests in this repo for more info.
+    /// selections for the contest.  See the wiki, readme, and tests in this repo for more info.
     /// </Summary>
     public class Candidate : DisposableBase
     {
@@ -112,7 +112,7 @@ namespace ElectionGuard
 
         internal unsafe NativeInterface.Candidate.CandidateHandle Handle;
 
-        unsafe internal Candidate(
+        internal unsafe Candidate(
             NativeInterface.Candidate.CandidateHandle handle)
         {
             Handle = handle;

@@ -23,7 +23,7 @@ namespace ElectionGuard
 
         internal unsafe NativeInterface.InternationalizedText.InternationalizedTextHandle Handle;
 
-        unsafe internal InternationalizedText(
+        internal unsafe InternationalizedText(
             NativeInterface.InternationalizedText.InternationalizedTextHandle handle)
         {
             Handle = handle;

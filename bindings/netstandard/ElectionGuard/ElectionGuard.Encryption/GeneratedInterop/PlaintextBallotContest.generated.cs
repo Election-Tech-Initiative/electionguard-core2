@@ -67,7 +67,7 @@ namespace ElectionGuard
         internal unsafe static class External {
             internal unsafe struct PlaintextBallotContestType { };
 
-            internal class PlaintextBallotContestHandle : ElectionguardSafeHandle<PlaintextBallotContestType>
+            internal class PlaintextBallotContestHandle : ElectionGuardSafeHandle<PlaintextBallotContestType>
             {
                 [ReliabilityContract(Consistency.WillNotCorruptState, Cer.MayFail)]
                 protected override bool Free()

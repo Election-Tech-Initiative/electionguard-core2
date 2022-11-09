@@ -6,7 +6,7 @@ namespace ElectionGuard
     /// </summary>
     public class DisposableBase: IDisposable
     {
-        private bool disposedValue;
+        private bool _disposedValue;
 
         /// <summary>
         /// Default Ctor
@@ -39,14 +39,14 @@ namespace ElectionGuard
         /// <param name="disposing"></param>
         protected virtual void Dispose(bool disposing)
         {
-            if (!disposedValue)
+            if (!_disposedValue)
             {
                 if (disposing)
                 {
                     DisposeManaged();
                 }
                 DisposeUnmanaged();
-                disposedValue = true;
+                _disposedValue = true;
             }
         }
 

@@ -139,7 +139,7 @@ namespace ElectionGuard
         internal unsafe static class External {
             internal unsafe struct CiphertextBallotSelectionType { };
 
-            internal class CiphertextBallotSelectionHandle : ElectionguardSafeHandle<CiphertextBallotSelectionType>
+            internal class CiphertextBallotSelectionHandle : ElectionGuardSafeHandle<CiphertextBallotSelectionType>
             {
                 [ReliabilityContract(Consistency.WillNotCorruptState, Cer.MayFail)]
                 protected override bool Free()

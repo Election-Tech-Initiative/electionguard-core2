@@ -72,7 +72,7 @@ namespace ElectionGuard
 
         internal unsafe NativeInterface.GeopoliticalUnit.GeopoliticalUnitHandle Handle;
 
-        unsafe internal GeopoliticalUnit(
+        internal unsafe GeopoliticalUnit(
             NativeInterface.GeopoliticalUnit.GeopoliticalUnitHandle handle)
         {
             Handle = handle;

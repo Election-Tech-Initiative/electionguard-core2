@@ -1,7 +1,7 @@
 ﻿namespace ElectionGuard
 {
     /// <summary>
-    /// An exponential ElGamal keypair
+    /// An exponential ElGamal key pair
     /// </summary>
     public class ElGamalKeyPair : DisposableBase
     {
@@ -35,12 +35,12 @@
 
         internal unsafe NativeInterface.ElGamalKeyPair.ElGamalKeyPairHandle Handle;
 
-        unsafe internal ElGamalKeyPair(NativeInterface.ElGamalKeyPair.ElGamalKeyPairHandle handle)
+        internal unsafe ElGamalKeyPair(NativeInterface.ElGamalKeyPair.ElGamalKeyPairHandle handle)
         {
             Handle = handle;
         }
 
-        unsafe internal ElGamalKeyPair(ElementModQ secretKey)
+        internal unsafe ElGamalKeyPair(ElementModQ secretKey)
         {
             var status = NativeInterface.ElGamalKeyPair.New(
                 secretKey.Handle, out Handle);
@@ -48,9 +48,9 @@
         }
 
         /// <Summary>
-        /// Make an elgamal keypair from a secret.
+        /// Make an elgamal key pair from a secret.
         /// </Summary>
-        unsafe static public ElGamalKeyPair FromSecret(ElementModQ secretKey)
+        public static unsafe ElGamalKeyPair FromSecret(ElementModQ secretKey)
         {
             return new ElGamalKeyPair(secretKey);
         }

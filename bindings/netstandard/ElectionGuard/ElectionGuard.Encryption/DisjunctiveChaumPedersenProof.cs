@@ -1,10 +1,8 @@
-﻿using System;
-namespace ElectionGuard
+﻿namespace ElectionGuard
 {
     // Declare native types for convenience
     using NativeElementModP = NativeInterface.ElementModP.ElementModPHandle;
     using NativeElementModQ = NativeInterface.ElementModQ.ElementModQHandle;
-    using NativeElGamalCiphertext = NativeInterface.ElGamalCiphertext.ElGamalCiphertextHandle;
     using NativeDisjunctiveChaumPedersenProof = NativeInterface.DisjunctiveChaumPedersenProof.DisjunctiveChaumPedersenProofHandle;
 
     /// <Summary>
@@ -147,7 +145,7 @@ namespace ElectionGuard
 
         internal unsafe NativeDisjunctiveChaumPedersenProof Handle;
 
-        unsafe internal DisjunctiveChaumPedersenProof(NativeDisjunctiveChaumPedersenProof handle)
+        internal unsafe DisjunctiveChaumPedersenProof(NativeDisjunctiveChaumPedersenProof handle)
         {
             Handle = handle;
         }
@@ -165,7 +163,7 @@ namespace ElectionGuard
         /// <param name="plaintext">The constant value to prove, zero or one</param>
         /// <returns>A unique pointer</returns>
         /// </Summary>
-        unsafe public DisjunctiveChaumPedersenProof(
+        public unsafe DisjunctiveChaumPedersenProof(
             ElGamalCiphertext message,
             ElementModQ r,
             ElementModP k,
@@ -181,7 +179,7 @@ namespace ElectionGuard
         /// make function for a `DisjunctiveChaumPedersenProof`
         ///
         /// This overload accepts a seed value and calculates
-        /// proofs deterministically based on the seed. (slower, but reproduceable proofs)
+        /// proofs deterministically based on the seed. (slower, but reproducible proofs)
         /// <param name="message"> The ciphertext message</param>
         /// <param name="r"> The nonce used creating the ElGamal ciphertext</param>
         /// <param name="k"> The public key of the election</param>
@@ -191,7 +189,7 @@ namespace ElectionGuard
         /// <param name="plaintext">The constant value to prove, zero or one</param>
         /// <returns>A unique pointer</returns>
         /// </Summary>
-        unsafe public DisjunctiveChaumPedersenProof(
+        public unsafe DisjunctiveChaumPedersenProof(
             ElGamalCiphertext message,
             ElementModQ r,
             ElementModP k,

@@ -169,7 +169,7 @@ namespace ElectionGuard
         public unsafe string ToJson()
         {
             var status = NativeInterface.InternalManifest.ToJson(
-                Handle, out IntPtr pointer, out ulong size);
+                Handle, out IntPtr pointer, out _);
             if (status != Status.ELECTIONGUARD_STATUS_SUCCESS)
             {
                 throw new ElectionGuardException($"ToJson Error Status: {status}");

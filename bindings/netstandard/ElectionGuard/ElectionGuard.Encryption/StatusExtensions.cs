@@ -2,7 +2,7 @@
 
 namespace ElectionGuard
 {
-    static internal class StatusExtensions
+    internal static class StatusExtensions
     {
         public static void ThrowIfError(this Status status)
         {

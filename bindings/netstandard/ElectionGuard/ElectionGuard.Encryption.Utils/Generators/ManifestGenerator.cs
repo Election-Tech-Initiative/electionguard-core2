@@ -44,7 +44,7 @@ namespace ElectionGuard.Encryption.Utils.Generators
         {
             var gpUnits = new List<GeopoliticalUnit>
             {
-                new GeopoliticalUnit("jefferson-county", "Jefferson County", ReportingUnitType.county)
+                new GeopoliticalUnit("jefferson-county", "Jefferson County", ReportingUnitType.County)
             };
 
             var candidates = new List<Candidate>
@@ -84,7 +84,7 @@ namespace ElectionGuard.Encryption.Utils.Generators
 
             return new Manifest(
                 "jefferson-county-open-primary",
-                ElectionType.primary,
+                ElectionType.Primary,
                 startDate: DateTime.UtcNow,
                 endDate: DateTime.UtcNow.AddDays(1),
                 gpUnits.ToArray(),
@@ -106,9 +106,9 @@ namespace ElectionGuard.Encryption.Utils.Generators
         {
             var gpUnits = new List<GeopoliticalUnit>
             {
-                new GeopoliticalUnit("jefferson-county", "Jefferson County", ReportingUnitType.county),
+                new GeopoliticalUnit("jefferson-county", "Jefferson County", ReportingUnitType.County),
                 new GeopoliticalUnit(
-                    "jefferson-county-school-district-1", "Jefferson County School District 1", ReportingUnitType.school)
+                    "jefferson-county-school-district-1", "Jefferson County School District 1", ReportingUnitType.School)
             };
 
             var parties = new List<Party>
@@ -215,7 +215,7 @@ namespace ElectionGuard.Encryption.Utils.Generators
 
             return new Manifest(
                 "jefferson-county-open-primary",
-                ElectionType.primary,
+                ElectionType.Primary,
                 startDate: DateTime.UtcNow,
                 endDate: DateTime.UtcNow.AddDays(1),
                 gpUnits.ToArray(),

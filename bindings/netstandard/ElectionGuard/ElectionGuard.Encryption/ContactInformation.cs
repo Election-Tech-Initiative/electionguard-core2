@@ -54,7 +54,7 @@ namespace ElectionGuard
 
         internal unsafe NativeInterface.ContactInformation.ContactInformationHandle Handle;
 
-        unsafe internal ContactInformation(
+        internal unsafe ContactInformation(
             NativeInterface.ContactInformation.ContactInformationHandle handle)
         {
             Handle = handle;

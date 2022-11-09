@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Runtime.ConstrainedExecution;
 using System.Runtime.InteropServices;
+// ReSharper disable InconsistentNaming
 
 namespace ElectionGuard
 {
@@ -17,7 +18,7 @@ namespace ElectionGuard
             internal unsafe struct LinkedListType { };
 
             internal class LinkedListHandle
-                : ElectionguardSafeHandle<LinkedListType>
+                : ElectionGuardSafeHandle<LinkedListType>
             {
                 protected override bool Free()
                 {
@@ -81,7 +82,7 @@ namespace ElectionGuard
             internal unsafe struct ElementModPType { };
 
             internal class ElementModPHandle
-                : ElectionguardSafeHandle<ElementModPType>
+                : ElectionGuardSafeHandle<ElementModPType>
             {
                 protected override bool Free()
                 {
@@ -126,7 +127,7 @@ namespace ElectionGuard
             internal unsafe struct ElementModQType { };
 
             internal class ElementModQHandle
-                : ElectionguardSafeHandle<ElementModQType>
+                : ElectionGuardSafeHandle<ElementModQType>
             {
                 protected override bool Free()
                 {
@@ -239,7 +240,7 @@ namespace ElectionGuard
             internal unsafe struct ElGamalKeyPairType { };
 
             internal class ElGamalKeyPairHandle
-                : ElectionguardSafeHandle<ElGamalKeyPairType>
+                : ElectionGuardSafeHandle<ElGamalKeyPairType>
             {
                 protected override bool Free()
                 {
@@ -283,7 +284,7 @@ namespace ElectionGuard
             internal unsafe struct ElGamalCiphertextType { };
 
             internal class ElGamalCiphertextHandle
-                : ElectionguardSafeHandle<ElGamalCiphertextType>
+                : ElectionGuardSafeHandle<ElGamalCiphertextType>
             {
                 protected override bool Free()
                 {
@@ -349,7 +350,7 @@ namespace ElectionGuard
             internal unsafe struct DisjunctiveChaumPedersenProofType { };
 
             internal class DisjunctiveChaumPedersenProofHandle
-                : ElectionguardSafeHandle<DisjunctiveChaumPedersenProofType>
+                : ElectionGuardSafeHandle<DisjunctiveChaumPedersenProofType>
             {
                 protected override bool Free()
                 {
@@ -458,7 +459,7 @@ namespace ElectionGuard
             internal unsafe struct ConstantChaumPedersenProofType { };
 
             internal class ConstantChaumPedersenProofHandle
-                : ElectionguardSafeHandle<ConstantChaumPedersenProofType>
+                : ElectionGuardSafeHandle<ConstantChaumPedersenProofType>
             {
                 protected override bool Free()
                 {
@@ -532,7 +533,7 @@ namespace ElectionGuard
             internal unsafe struct AnnotatedStringType { };
 
             internal class AnnotatedStringHandle
-                : ElectionguardSafeHandle<AnnotatedStringType>
+                : ElectionGuardSafeHandle<AnnotatedStringType>
             {
                 protected override bool Free()
                 {
@@ -585,7 +586,7 @@ namespace ElectionGuard
             internal unsafe struct LanguageType { };
 
             internal class LanguageHandle
-                : ElectionguardSafeHandle<LanguageType>
+                : ElectionGuardSafeHandle<LanguageType>
             {
                 protected override bool Free()
                 {
@@ -639,7 +640,7 @@ namespace ElectionGuard
             internal unsafe struct InternationalizedTextType { };
 
             internal class InternationalizedTextHandle
-                : ElectionguardSafeHandle<InternationalizedTextType>
+                : ElectionGuardSafeHandle<InternationalizedTextType>
             {
                 protected override bool Free()
                 {
@@ -694,7 +695,7 @@ namespace ElectionGuard
             internal unsafe struct ContactInformationType { };
 
             internal class ContactInformationHandle
-                : ElectionguardSafeHandle<ContactInformationType>
+                : ElectionGuardSafeHandle<ContactInformationType>
             {
                 protected override bool Free()
                 {
@@ -778,7 +779,7 @@ namespace ElectionGuard
             internal unsafe struct GeopoliticalUnitType { };
 
             internal class GeopoliticalUnitHandle
-                : ElectionguardSafeHandle<GeopoliticalUnitType>
+                : ElectionGuardSafeHandle<GeopoliticalUnitType>
             {
                 protected override bool Free()
                 {
@@ -845,7 +846,7 @@ namespace ElectionGuard
             internal unsafe struct BallotStyleType { };
 
             internal class BallotStyleHandle
-                : ElectionguardSafeHandle<BallotStyleType>
+                : ElectionGuardSafeHandle<BallotStyleType>
             {
                 protected override bool Free()
                 {
@@ -924,7 +925,7 @@ namespace ElectionGuard
             internal unsafe struct PartyType { };
 
             internal class PartyHandle
-                : ElectionguardSafeHandle<PartyType>
+                : ElectionGuardSafeHandle<PartyType>
             {
                 protected override bool Free()
                 {
@@ -1000,7 +1001,7 @@ namespace ElectionGuard
             internal unsafe struct CandidateType { };
 
             internal class CandidateHandle
-                : ElectionguardSafeHandle<CandidateType>
+                : ElectionGuardSafeHandle<CandidateType>
             {
                 protected override bool Free()
                 {
@@ -1085,7 +1086,7 @@ namespace ElectionGuard
             internal unsafe struct SelectionDescriptionType { };
 
             internal class SelectionDescriptionHandle
-                : ElectionguardSafeHandle<SelectionDescriptionType>
+                : ElectionGuardSafeHandle<SelectionDescriptionType>
             {
                 protected override bool Free()
                 {
@@ -1143,7 +1144,7 @@ namespace ElectionGuard
             internal unsafe struct ContestDescriptionType { };
 
             internal class ContestDescriptionHandle
-                : ElectionguardSafeHandle<ContestDescriptionType>
+                : ElectionGuardSafeHandle<ContestDescriptionType>
             {
                 protected override bool Free()
                 {
@@ -1305,7 +1306,7 @@ namespace ElectionGuard
             internal unsafe struct ContestDescriptionWithPlaceholdersType { };
 
             internal class ContestDescriptionWithPlaceholdersHandle
-                : ElectionguardSafeHandle<ContestDescriptionWithPlaceholdersType>
+                : ElectionGuardSafeHandle<ContestDescriptionWithPlaceholdersType>
             {
                 protected override bool Free()
                 {
@@ -1518,7 +1519,7 @@ namespace ElectionGuard
             internal unsafe struct ManifestType { };
 
             internal class ManifestHandle
-                : ElectionguardSafeHandle<ManifestType>
+                : ElectionGuardSafeHandle<ManifestType>
             {
                 protected override bool Free()
                 {
@@ -1730,7 +1731,7 @@ namespace ElectionGuard
             internal unsafe struct InternalManifestType { };
 
             internal class InternalManifestHandle
-                : ElectionguardSafeHandle<InternalManifestType>
+                : ElectionGuardSafeHandle<InternalManifestType>
             {
                 protected override bool Free()
                 {
@@ -1840,7 +1841,7 @@ namespace ElectionGuard
             internal unsafe struct ContextConfigurationType { };
 
             internal class ContextConfigurationHandle
-                : ElectionguardSafeHandle<ContextConfigurationType>
+                : ElectionGuardSafeHandle<ContextConfigurationType>
             {
                 protected override bool Free()
                 {
@@ -1894,7 +1895,7 @@ namespace ElectionGuard
             internal unsafe struct CiphertextElectionType { };
 
             internal class CiphertextElectionContextHandle
-                : ElectionguardSafeHandle<CiphertextElectionType>
+                : ElectionGuardSafeHandle<CiphertextElectionType>
             {
                 protected override bool Free()
                 {
@@ -2059,7 +2060,7 @@ namespace ElectionGuard
             internal unsafe struct ExtendedDataType { };
 
             internal class ExtendedDataHandle
-                : ElectionguardSafeHandle<ExtendedDataType>
+                : ElectionGuardSafeHandle<ExtendedDataType>
             {
                 protected override bool Free()
                 {
@@ -2167,7 +2168,7 @@ namespace ElectionGuard
             internal unsafe struct CiphertextBallotContestType { };
 
             internal class CiphertextBallotContestHandle
-                : ElectionguardSafeHandle<CiphertextBallotContestType>
+                : ElectionGuardSafeHandle<CiphertextBallotContestType>
             {
                 [ReliabilityContract(Consistency.WillNotCorruptState, Cer.MayFail)]
                 protected override bool Free()
@@ -2338,7 +2339,7 @@ namespace ElectionGuard
             internal unsafe struct CompactPlaintextBallotType { };
 
             internal class CompactPlaintextBallotHandle
-                : ElectionguardSafeHandle<CompactPlaintextBallotType>
+                : ElectionGuardSafeHandle<CompactPlaintextBallotType>
             {
                 [ReliabilityContract(Consistency.WillNotCorruptState, Cer.MayFail)]
                 protected override bool Free()
@@ -2378,7 +2379,7 @@ namespace ElectionGuard
             internal unsafe struct CiphertextBallotType { };
 
             internal class CiphertextBallotHandle
-                : ElectionguardSafeHandle<CiphertextBallotType>
+                : ElectionGuardSafeHandle<CiphertextBallotType>
             {
                 [ReliabilityContract(Consistency.WillNotCorruptState, Cer.MayFail)]
                 protected override bool Free()
@@ -2522,7 +2523,7 @@ namespace ElectionGuard
             internal unsafe struct CompactCiphertextBallotType { };
 
             internal class CompactCiphertextBallotHandle
-                : ElectionguardSafeHandle<CompactCiphertextBallotType>
+                : ElectionGuardSafeHandle<CompactCiphertextBallotType>
             {
                 [ReliabilityContract(Consistency.WillNotCorruptState, Cer.MayFail)]
                 protected override bool Free()
@@ -2572,7 +2573,7 @@ namespace ElectionGuard
             internal unsafe struct SubmittedBallotType { };
 
             internal class SubmittedBallotHandle
-                : ElectionguardSafeHandle<SubmittedBallotType>
+                : ElectionGuardSafeHandle<SubmittedBallotType>
             {
                 [ReliabilityContract(Consistency.WillNotCorruptState, Cer.MayFail)]
                 protected override bool Free()
@@ -2715,7 +2716,7 @@ namespace ElectionGuard
             internal unsafe struct EncryptionDeviceType { };
 
             internal class EncryptionDeviceHandle
-                : ElectionguardSafeHandle<EncryptionDeviceType>
+                : ElectionGuardSafeHandle<EncryptionDeviceType>
             {
                 [ReliabilityContract(Consistency.WillNotCorruptState, Cer.MayFail)]
                 protected override bool Free()
@@ -2772,7 +2773,7 @@ namespace ElectionGuard
             internal unsafe struct EncryptionMediatorType { };
 
             internal class EncryptionMediatorHandle
-                : ElectionguardSafeHandle<EncryptionMediatorType>
+                : ElectionGuardSafeHandle<EncryptionMediatorType>
             {
                 [ReliabilityContract(Consistency.WillNotCorruptState, Cer.MayFail)]
                 protected override bool Free()

@@ -1,8 +1,4 @@
-﻿using System.Collections.Generic;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace ElectionGuard
+﻿namespace ElectionGuard
 {
     /// <summary>
     /// Status for the precompute process

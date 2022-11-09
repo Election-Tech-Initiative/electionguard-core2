@@ -225,7 +225,7 @@ namespace ElectionGuard
 
         internal unsafe NativeManifest Handle;
 
-        unsafe internal Manifest(NativeManifest handle)
+        internal unsafe Manifest(NativeManifest handle)
         {
             Handle = handle;
         }
@@ -503,7 +503,7 @@ namespace ElectionGuard
         }
 
         /// <Summary>
-        /// Check wether the election manifest is valid and well-formed.
+        /// Check whether the election manifest is valid and well-formed.
         /// </Summary>
         public unsafe bool IsValid()
         {
@@ -517,7 +517,7 @@ namespace ElectionGuard
         public unsafe string ToJson()
         {
             var status = NativeInterface.Manifest.ToJson(
-                Handle, out IntPtr pointer, out ulong size);
+                Handle, out IntPtr pointer, out _);
             if (status != Status.ELECTIONGUARD_STATUS_SUCCESS)
             {
                 throw new ElectionGuardException($"ToJson Error Status: {status}");

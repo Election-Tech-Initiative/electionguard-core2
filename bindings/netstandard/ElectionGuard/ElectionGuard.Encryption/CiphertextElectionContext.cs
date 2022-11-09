@@ -1,5 +1,7 @@
 using System;
+using System.Diagnostics.CodeAnalysis;
 using System.Runtime.InteropServices;
+// ReSharper disable UnusedMember.Global
 
 namespace ElectionGuard
 {
@@ -9,7 +11,7 @@ namespace ElectionGuard
     /// this object includes fields that are populated in the course of encrypting an election
     /// Specifically, `crypto_base_hash`, `crypto_extended_base_hash` and `elgamal_public_key`
     /// are populated with election-specific information necessary for encrypting the election.
-    /// Refer to the [Electionguard Specification](https://github.com/microsoft/electionguard) for more information.
+    /// Refer to the [ElectionGuard Specification](https://github.com/microsoft/electionguard) for more information.
     /// </summary>
     public class CiphertextElectionContext : DisposableBase
     {
@@ -178,7 +180,7 @@ namespace ElectionGuard
         /// <param name="publicKey"> the public key of the election </param>
         /// <param name="commitmentHash"> the hash of the commitments the guardians make to each other </param>
         /// <param name="manifestHash"> the hash of the election metadata </param>
-        /// <param name="extendedData"> an unordered map of key value strings revelant to the consuming application </param>
+        /// <param name="extendedData"> an unordered map of key value strings relevant to the consuming application </param>
         /// </summary>
         public unsafe CiphertextElectionContext(ulong numberOfGuardians,
             ulong quorum,
@@ -203,7 +205,7 @@ namespace ElectionGuard
         /// <param name="commitmentHash"> the hash of the commitments the guardians make to each other </param>
         /// <param name="manifestHash"> the hash of the election metadata </param>
         /// <param name="config"> the context configuration</param>
-        /// <param name="extendedData"> an unordered map of key value strings revelant to the consuming application </param>
+        /// <param name="extendedData"> an unordered map of key value strings relevant to the consuming application </param>
         /// </summary>
         public unsafe CiphertextElectionContext(ulong numberOfGuardians,
             ulong quorum,
@@ -236,11 +238,11 @@ namespace ElectionGuard
         /// <Summary>
         /// Export the representation as JSON
         /// </Summary>
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Style", "IDE0059:Unnecessary assignment of a value", Justification = "<Pending>")]
+        [SuppressMessage("Style", "IDE0059:Unnecessary assignment of a value", Justification = "<Pending>")]
         public unsafe string ToJson()
         {
             var status = NativeInterface.CiphertextElectionContext.ToJson(
-                Handle, out IntPtr pointer, out ulong size);
+                Handle, out IntPtr pointer, out _);
             status.ThrowIfError();
             var json = Marshal.PtrToStringAnsi(pointer);
             NativeInterface.Memory.FreeIntPtr(pointer);

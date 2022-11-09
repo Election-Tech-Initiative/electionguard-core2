@@ -6,7 +6,7 @@ namespace ElectionGuard
     /// <Summary>
     /// Use this entity to describe a political party that can then be referenced from other entities.
     ///
-    /// It is not required to define a party for Electionguard.
+    /// It is not required to define a party for ElectionGuard.
     ///
     /// See: https://developers.google.com/elections-data/reference/party
     /// </Summary>
@@ -107,7 +107,7 @@ namespace ElectionGuard
 
         internal unsafe NativeInterface.Party.PartyHandle Handle;
 
-        unsafe internal Party(
+        internal unsafe Party(
             NativeInterface.Party.PartyHandle handle)
         {
             Handle = handle;

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Runtime.InteropServices;
+// ReSharper disable UnusedMember.Global
 
 namespace ElectionGuard
 {
@@ -49,7 +50,7 @@ namespace ElectionGuard
 
         internal unsafe NativeInterface.AnnotatedString.AnnotatedStringHandle Handle;
 
-        unsafe internal AnnotatedString(
+        internal unsafe AnnotatedString(
             NativeInterface.AnnotatedString.AnnotatedStringHandle handle)
         {
             Handle = handle;

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Runtime.InteropServices;
+// ReSharper disable UnusedMember.Global
 
 namespace ElectionGuard
 {
@@ -9,7 +10,7 @@ namespace ElectionGuard
     /// For ElectionGuard, each contest is associated with a specific geopolitical unit,
     /// and each ballot style is associated with at least one geopolitical unit.
     ///
-    /// It is up to the consuming application to determine how to interpreit the relationships
+    /// It is up to the consuming application to determine how to interpret the relationships
     /// between these entity types.
     /// </Summary>
     public class BallotStyle : DisposableBase
@@ -61,7 +62,7 @@ namespace ElectionGuard
 
         internal unsafe NativeInterface.BallotStyle.BallotStyleHandle Handle;
 
-        unsafe internal BallotStyle(
+        internal unsafe BallotStyle(
             NativeInterface.BallotStyle.BallotStyleHandle handle)
         {
             Handle = handle;

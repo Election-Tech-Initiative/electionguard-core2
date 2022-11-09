@@ -19,7 +19,7 @@ namespace ElectionGuard
         /// </summary>
         /// <param name="deviceUuid">a unique identifier tied to the device hardware</param>
         /// <param name="sessionUuid">a unique identifier tied to the runtime session</param>
-        /// <param name="launchCode">a unique identifer tied to the election</param>
+        /// <param name="launchCode">a unique identifier tied to the election</param>
         /// <param name="location">an arbitrary string meaningful to the external system
         ///                        such as a friendly name, description, or some other value</param>
         public unsafe EncryptionDevice(
@@ -40,12 +40,12 @@ namespace ElectionGuard
         /// </summary>
         public unsafe ElementModQ GetHash()
         {
-            var status = NativeInterface.EncryptionDevice.GetHash(Handle, out NativeInterface.ElementModQ.ElementModQHandle value);
+            NativeInterface.EncryptionDevice.GetHash(Handle, out NativeInterface.ElementModQ.ElementModQHandle value);
             return new ElementModQ(value);
         }
 
         /// <summary>
-        /// produces encription device when given json
+        /// produces encryption device when given json
         /// </summary>
         /// <param name="json"></param>
         public unsafe EncryptionDevice(string json)
@@ -54,11 +54,11 @@ namespace ElectionGuard
             status.ThrowIfError();
         }
         /// <Summary>
-        /// Export the encryptiondevice representation as JSON
+        /// Export the encryption device representation as JSON
         /// </Summary>
         public unsafe string ToJson()
         {
-            var status = NativeInterface.EncryptionDevice.ToJson(Handle, out IntPtr pointer, out ulong size);
+            var status = NativeInterface.EncryptionDevice.ToJson(Handle, out IntPtr pointer, out _);
             status.ThrowIfError();
             var json = Marshal.PtrToStringAnsi(pointer);
             NativeInterface.Memory.FreeIntPtr(pointer);

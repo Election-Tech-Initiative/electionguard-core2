@@ -136,7 +136,7 @@ namespace ElectionGuard.Encryption.Tests
             List<ContestDescription> contests = new List<ContestDescription>();
             List<BallotStyle> ballotStyles = new List<BallotStyle>();
 
-            gpUnits.Add(new GeopoliticalUnit("mydistrict", "first unit", ReportingUnitType.city));
+            gpUnits.Add(new GeopoliticalUnit("mydistrict", "first unit", ReportingUnitType.City));
             parties.Add(new Party("myparty"));
             candidates.Add(new Candidate("mycandidate", false));
             List<SelectionDescription> selections = new List<SelectionDescription>();
@@ -147,7 +147,7 @@ namespace ElectionGuard.Encryption.Tests
 
             var result = new Manifest(
                 "test-manifest",
-                ElectionType.general,
+                ElectionType.General,
                 DateTime.Now.AddDays(1),
                 DateTime.Now.AddDays(1).AddDays(1),
                 gpUnits.ToArray(),
@@ -182,7 +182,7 @@ namespace ElectionGuard.Encryption.Tests
 
             var result = new Manifest(
                 "test-manifest",
-                ElectionType.general,
+                ElectionType.General,
                 DateTime.Now,
                 DateTime.Now,
                 new GeopoliticalUnit[] { },

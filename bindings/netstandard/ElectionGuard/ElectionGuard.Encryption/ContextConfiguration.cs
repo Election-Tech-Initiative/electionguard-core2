@@ -11,7 +11,7 @@ namespace ElectionGuard
     public class ContextConfiguration : DisposableBase
     {
         internal unsafe NativeContextConfig Handle;
-        unsafe internal ContextConfiguration(NativeContextConfig handle)
+        internal unsafe ContextConfiguration(NativeContextConfig handle)
         {
             Handle = handle;
         }

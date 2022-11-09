@@ -73,7 +73,7 @@ namespace ElectionGuard
 
         internal unsafe NativeInterface.SelectionDescription.SelectionDescriptionHandle Handle;
 
-        unsafe internal SelectionDescription(
+        internal unsafe SelectionDescription(
             NativeInterface.SelectionDescription.SelectionDescriptionHandle handle)
         {
             Handle = handle;

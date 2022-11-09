@@ -13,17 +13,11 @@ namespace ElectionGuard
         /// <Summary>
         /// Get the count of elements in the list.
         /// </Summary>
-        public unsafe ulong Count
-        {
-            get
-            {
-                return NativeInterface.LinkedList.GetCount(Handle);
-            }
-        }
+        public unsafe ulong Count => NativeInterface.LinkedList.GetCount(Handle);
 
         internal unsafe NativeLinkedList Handle;
 
-        unsafe internal LinkedList(NativeLinkedList handle)
+        internal unsafe LinkedList(NativeLinkedList handle)
         {
             Handle = handle;
         }
@@ -31,7 +25,7 @@ namespace ElectionGuard
         /// <summary>
         /// Default constructor
         /// </summary>
-        unsafe public LinkedList()
+        public unsafe LinkedList()
         {
             var status = NativeInterface.LinkedList.New(out Handle);
             status.ThrowIfError();

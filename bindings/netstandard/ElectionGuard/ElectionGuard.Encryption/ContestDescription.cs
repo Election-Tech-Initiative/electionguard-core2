@@ -172,7 +172,7 @@ namespace ElectionGuard
 
         internal unsafe NativeInterface.ContestDescription.ContestDescriptionHandle Handle;
 
-        unsafe internal ContestDescription(
+        internal unsafe ContestDescription(
             NativeInterface.ContestDescription.ContestDescriptionHandle handle)
         {
             Handle = handle;

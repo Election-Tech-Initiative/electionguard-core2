@@ -71,7 +71,7 @@
 
         internal unsafe NativeInterface.ConstantChaumPedersenProof.ConstantChaumPedersenProofHandle Handle;
 
-        unsafe internal ConstantChaumPedersenProof(NativeInterface.ConstantChaumPedersenProof.ConstantChaumPedersenProofHandle handle)
+        internal unsafe ConstantChaumPedersenProof(NativeInterface.ConstantChaumPedersenProof.ConstantChaumPedersenProofHandle handle)
         {
             Handle = handle;
         }
@@ -88,7 +88,7 @@
         /// <param name="constant">The constant value to prove</param>
         /// <returns>An instance</returns>
         /// </Summary>
-        unsafe public ConstantChaumPedersenProof(
+        public unsafe ConstantChaumPedersenProof(
             ElGamalCiphertext message,
             ElementModQ r,
             ElementModP k,
