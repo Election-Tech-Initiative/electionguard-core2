@@ -388,5 +388,10 @@ endif
 
 # Sample Data
 
+lint-cs:
+	dotnet tool restore
+	dotnet jb inspectcode -o="lint-results.xml" -f="Xml" --build -s="Warning" bindings/netstandard/ElectionGuard/ElectionGuard.sln
+	dotnet nvika parsereport "lint-results.xml" --treatwarningsaserrors
+
 generate-sample-data:
 	@echo Generate Sample Data

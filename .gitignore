@@ -155,3 +155,5 @@ bindings/netstandard/ElectionGuard/*.user
 
 .vscode/**/*.log
 *.ncrunchsolution
+
+lint-results.xml
