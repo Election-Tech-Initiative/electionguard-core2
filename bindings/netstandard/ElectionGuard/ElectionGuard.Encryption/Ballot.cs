@@ -1,5 +1,7 @@
 using System;
 using System.Runtime.InteropServices;
+// ReSharper disable RedundantUnsafeContext
+// ReSharper disable UnusedMember.Global
 
 namespace ElectionGuard
 {
@@ -59,17 +61,11 @@ namespace ElectionGuard
         /// <Summary>
         /// The length of the string value
         /// </Summary>
-        public unsafe ulong Length
-        {
-            get
-            {
-                return NativeInterface.ExtendedData.GetLength(Handle);
-            }
-        }
+        public unsafe ulong Length => NativeInterface.ExtendedData.GetLength(Handle);
 
         internal unsafe NativeExtendedData Handle;
 
-        unsafe internal ExtendedData(NativeExtendedData handle)
+        internal unsafe ExtendedData(NativeExtendedData handle)
         {
             Handle = handle;
         }
@@ -121,7 +117,7 @@ namespace ElectionGuard
     /// </summary>
     public partial class PlaintextBallotSelection : DisposableBase
     {
-        unsafe internal PlaintextBallotSelection(External.PlaintextBallotSelectionHandle handle)
+        internal unsafe PlaintextBallotSelection(External.PlaintextBallotSelectionHandle handle)
         {
             Handle = handle;
         }
@@ -182,11 +178,11 @@ namespace ElectionGuard
     /// By keeping the `nonce`, or deriving the selection nonce from the ballot nonce, an external system can
     /// regenerate the proofs on demand.  This is useful for storage or memory constrained systems.
     ///
-    /// By keeping the `proof` the nonce is not required fotor verify the encrypted selection.
+    /// By keeping the `proof` the nonce is not required footer verify the encrypted selection.
     /// </summary>
     public partial class CiphertextBallotSelection : DisposableBase
     {
-        unsafe internal CiphertextBallotSelection(External.CiphertextBallotSelectionHandle handle)
+        internal unsafe CiphertextBallotSelection(External.CiphertextBallotSelectionHandle handle)
         {
             Handle = handle;
         }
@@ -245,12 +241,12 @@ namespace ElectionGuard
     /// the contest, AND the placeholder selections necessary to satisfy the ConstantChaumPedersen proof
     /// in the CiphertextBallotContest.
     ///
-    /// Typically partial contests may be passed into Electionguard for memory constrained systems,
+    /// Typically partial contests may be passed into ElectionGuard for memory constrained systems,
     /// while complete contests are passed into ElectionGuard when running encryption on an existing dataset.
     /// </summary>
     public partial class PlaintextBallotContest : DisposableBase
     {
-        unsafe internal PlaintextBallotContest(
+        internal unsafe PlaintextBallotContest(
             External.PlaintextBallotContestHandle handle)
         {
             Handle = handle;
@@ -327,13 +323,7 @@ namespace ElectionGuard
         /// <Summary>
         /// Get the sequence order of the contest
         /// </Summary>
-        public unsafe ulong SequenceOrder
-        {
-            get
-            {
-                return NativeInterface.CiphertextBallotContest.GetSequenceOrder(Handle);
-            }
-        }
+        public unsafe ulong SequenceOrder => NativeInterface.CiphertextBallotContest.GetSequenceOrder(Handle);
 
         /// <summary>
         /// The hash of the string representation of the Contest Description from the election manifest
@@ -406,7 +396,7 @@ namespace ElectionGuard
 
         internal unsafe NativeCiphertextBallotContest Handle;
 
-        unsafe internal CiphertextBallotContest(NativeCiphertextBallotContest handle)
+        internal unsafe CiphertextBallotContest(NativeCiphertextBallotContest handle)
         {
             Handle = handle;
         }
@@ -581,7 +571,7 @@ namespace ElectionGuard
         public unsafe string ToJson()
         {
             var status = NativeInterface.PlaintextBallot.ToJson(
-                Handle, out IntPtr pointer, out ulong size);
+                Handle, out IntPtr pointer, out _);
             status.ThrowIfError();
             var json = Marshal.PtrToStringAnsi(pointer);
             NativeInterface.Memory.FreeIntPtr(pointer);
@@ -600,7 +590,7 @@ namespace ElectionGuard
 
             if (size > int.MaxValue)
             {
-                throw new ElectionGuardException($"PlaintextBallot Error ToBson: size is too big");
+                throw new ElectionGuardException("PlaintextBallot Error ToBson: size is too big");
             }
 
             var byteArray = new byte[(int)size];
@@ -622,7 +612,7 @@ namespace ElectionGuard
 
             if (size > int.MaxValue)
             {
-                throw new ElectionGuardException($"PlaintextBallot Error ToMsgPack: size is too big");
+                throw new ElectionGuardException("PlaintextBallot Error ToMsgPack: size is too big");
             }
 
             var byteArray = new byte[(int)size];
@@ -663,7 +653,7 @@ namespace ElectionGuard
             }
         }
 
-        unsafe internal CompactPlaintextBallot(NativeCompactPlaintextBallot handle)
+        internal unsafe CompactPlaintextBallot(NativeCompactPlaintextBallot handle)
         {
             Handle = handle;
         }
@@ -684,7 +674,7 @@ namespace ElectionGuard
 
             if (size > int.MaxValue)
             {
-                throw new ElectionGuardException($"CompactPlaintextBallot Error ToMsgPack: size is too big");
+                throw new ElectionGuardException("CompactPlaintextBallot Error ToMsgPack: size is too big");
             }
 
             var byteArray = new byte[(int)size];
@@ -713,8 +703,8 @@ namespace ElectionGuard
     /// A CiphertextBallot represents a voters encrypted selections for a given ballot and ballot style.
     ///
     /// When a ballot is in it's complete, encrypted state, the `nonce` is the seed nonce
-    /// from which all other nonces can be derived to encrypt the ballot.  Allong with the `nonce`
-    /// fields on `Ballotcontest` and `BallotSelection`, this value is sensitive.
+    /// from which all other nonces can be derived to encrypt the ballot.  Along with the `nonce`
+    /// fields on `BallotContest` and `BallotSelection`, this value is sensitive.
     ///
     /// Don't make this directly. Use `make_ciphertext_ballot` instead.
     /// </summary>
@@ -870,7 +860,7 @@ namespace ElectionGuard
             }
         }
 
-        unsafe internal CiphertextBallot(NativeCiphertextBallot handle)
+        internal unsafe CiphertextBallot(NativeCiphertextBallot handle)
         {
             Handle = handle;
         }
@@ -912,9 +902,9 @@ namespace ElectionGuard
         {
             var status = withNonces
                 ? NativeInterface.CiphertextBallot.ToJsonWithNonces(
-                Handle, out IntPtr pointer, out ulong size)
+                Handle, out IntPtr pointer, out _)
                 : NativeInterface.CiphertextBallot.ToJson(
-                Handle, out pointer, out size);
+                Handle, out pointer, out _);
             status.ThrowIfError();
             var json = Marshal.PtrToStringAnsi(pointer);
             NativeInterface.Memory.FreeIntPtr(pointer);
@@ -937,7 +927,7 @@ namespace ElectionGuard
 
             if (size > int.MaxValue)
             {
-                throw new ElectionGuardException($"CiphertextBallot Error ToBson: size is too big");
+                throw new ElectionGuardException("CiphertextBallot Error ToBson: size is too big");
             }
 
             var byteArray = new byte[(int)size];
@@ -961,7 +951,7 @@ namespace ElectionGuard
 
             if (size > int.MaxValue)
             {
-                throw new ElectionGuardException($"CiphertextBallot Error ToMsgPack: size is too big");
+                throw new ElectionGuardException("CiphertextBallot Error ToMsgPack: size is too big");
             }
 
             var byteArray = new byte[(int)size];
@@ -1029,7 +1019,7 @@ namespace ElectionGuard
             }
         }
 
-        unsafe internal CompactCiphertextBallot(NativeCompactCiphertextBallot handle)
+        internal unsafe CompactCiphertextBallot(NativeCompactCiphertextBallot handle)
         {
             Handle = handle;
         }
@@ -1046,7 +1036,7 @@ namespace ElectionGuard
 
             if (size > int.MaxValue)
             {
-                throw new ElectionGuardException($"CompactCiphertextBallot Error ToMsgPack: size is too big");
+                throw new ElectionGuardException("CompactCiphertextBallot Error ToMsgPack: size is too big");
             }
 
             var byteArray = new byte[(int)size];
@@ -1086,13 +1076,7 @@ namespace ElectionGuard
         /// <summary>
         /// Get the BallotBoxState
         /// </summary>
-        public unsafe BallotBoxState State
-        {
-            get
-            {
-                return NativeInterface.SubmittedBallot.GetState(Handle);
-            }
-        }
+        public unsafe BallotBoxState State => NativeInterface.SubmittedBallot.GetState(Handle);
 
         /// <summary>
         /// Get the ObjectId
@@ -1204,7 +1188,7 @@ namespace ElectionGuard
 
         internal unsafe NativeSubmittedBallot Handle;
 
-        unsafe internal SubmittedBallot(NativeSubmittedBallot handle)
+        internal unsafe SubmittedBallot(NativeSubmittedBallot handle)
         {
             Handle = handle;
         }
@@ -1281,7 +1265,7 @@ namespace ElectionGuard
         public unsafe string ToJson()
         {
             var status = NativeInterface.SubmittedBallot.ToJson(
-                Handle, out IntPtr pointer, out ulong size);
+                Handle, out IntPtr pointer, out _);
             status.ThrowIfError();
             var json = Marshal.PtrToStringAnsi(pointer);
             NativeInterface.Memory.FreeIntPtr(pointer);
@@ -1300,7 +1284,7 @@ namespace ElectionGuard
 
             if (size > int.MaxValue)
             {
-                throw new ElectionGuardException($"SubmittedBallot Error ToBson: size is too big");
+                throw new ElectionGuardException("SubmittedBallot Error ToBson: size is too big");
             }
 
             var byteArray = new byte[(int)size];
@@ -1322,7 +1306,7 @@ namespace ElectionGuard
 
             if (size > int.MaxValue)
             {
-                throw new ElectionGuardException($"SubmittedBallot Error ToMsgPack: size is too big");
+                throw new ElectionGuardException("SubmittedBallot Error ToMsgPack: size is too big");
             }
 
             var byteArray = new byte[(int)size];
