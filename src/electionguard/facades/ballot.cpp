@@ -13,10 +13,11 @@
 
 extern "C" {
 #include "electionguard/ballot.h"
+#include "electionguard/ciphertext_ballot_contest.generated.h"
+#include "electionguard/ciphertext_ballot_selection.generated.h"
+#include "electionguard/plaintext_ballot.generated.h"
 #include "electionguard/plaintext_ballot_contest.generated.h"
 #include "electionguard/plaintext_ballot_selection.generated.h"
-#include "electionguard/plaintext_ballot.generated.h"
-#include "electionguard/ciphertext_ballot_selection.generated.h"
 }
 
 using electionguard::BallotBoxState;
@@ -111,8 +112,7 @@ eg_plaintext_ballot_selection_new(const char *in_object_id, uint64_t in_vote,
 
 eg_electionguard_status_t eg_plaintext_ballot_selection_new_with_write_in(
   const char *in_object_id, const uint64_t in_vote, bool in_is_placeholder_selection,
-  const char *in_write_in,
-  eg_plaintext_ballot_selection_t **out_handle)
+  const char *in_write_in, eg_plaintext_ballot_selection_t **out_handle)
 {
     try {
         auto result = make_unique<PlaintextBallotSelection>(
@@ -170,7 +170,7 @@ bool eg_plaintext_ballot_selection_get_is_placeholder(eg_plaintext_ballot_select
 
 eg_electionguard_status_t
 eg_plaintext_ballot_selection_get_write_in(eg_plaintext_ballot_selection_t *handle,
-                                                char **out_write_in)
+                                           char **out_write_in)
 {
     try {
         auto result = AS_TYPE(PlaintextBallotSelection, handle)->getWriteIn();

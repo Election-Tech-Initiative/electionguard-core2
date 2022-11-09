@@ -43,7 +43,7 @@ namespace electionguard
     /// <returns>BallotBoxState.unknown if the value cannot be resolved</returns>
     /// </Summary>
     EG_API BallotBoxState getBallotBoxState(const std::string &value);
-    
+
     /// <summary>
     /// ExtendedData represents any arbitrary data expressible as a string with a length.
     ///
@@ -72,7 +72,7 @@ namespace electionguard
             return std::make_unique<ExtendedData>(this->value, this->length);
         }
     };
-    
+
     /// <summary>
     /// A BallotSelection represents an individual selection on a ballot.
     ///
@@ -284,11 +284,9 @@ namespace electionguard
         /// given nonce isn't `None`. Likewise, if a crypto_hash is not provided, it will be derived from
         /// the other fields.
         ///</summary>
-        static std::unique_ptr<CiphertextBallotSelection>
-        make_with_precomputed(
-          const std::string &objectId, uint64_t sequenceOrder,
-          const ElementModQ &descriptionHash, std::unique_ptr<ElGamalCiphertext> ciphertext,
-          const ElementModQ &cryptoExtendedBaseHash,
+        static std::unique_ptr<CiphertextBallotSelection> make_with_precomputed(
+          const std::string &objectId, uint64_t sequenceOrder, const ElementModQ &descriptionHash,
+          std::unique_ptr<ElGamalCiphertext> ciphertext, const ElementModQ &cryptoExtendedBaseHash,
           uint64_t plaintext,
           std::unique_ptr<TwoTriplesAndAQuadruple> precomputedTwoTriplesAndAQuad,
           bool isPlaceholder = false, bool computeProof = true,
@@ -380,7 +378,8 @@ namespace electionguard
         /// </Summary>
         eg_valid_contest_return_type_t isValid(const std::string &expectedObjectId,
                                                uint64_t expectedNumberSelections,
-                                               uint64_t expectedNumberElected, uint64_t votesAllowd = 0,
+                                               uint64_t expectedNumberElected,
+                                               uint64_t votesAllowd = 0,
                                                bool supportOvervotes = true) const;
 
       private:

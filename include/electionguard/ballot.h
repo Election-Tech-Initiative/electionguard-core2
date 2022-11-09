@@ -226,37 +226,6 @@ typedef struct eg_ciphertext_ballot_contest_s eg_ciphertext_ballot_contest_t;
 
 // no constructors defined.  use `eg_encrypt_contest` in encrypt.h
 
-EG_API eg_electionguard_status_t
-eg_ciphertext_ballot_contest_free(eg_ciphertext_ballot_contest_t *handle);
-
-/**
- * Get the objectId of the contest, which is the unique id for
- * the contest in a specific ballot style described in the election manifest.
- */
-EG_API eg_electionguard_status_t eg_ciphertext_ballot_contest_get_object_id(
-  eg_ciphertext_ballot_contest_t *handle, char **out_object_id);
-
-/**
- * Get the sequence order of the contest
- */
-EG_API uint64_t
-eg_ciphertext_ballot_contest_get_sequence_order(eg_ciphertext_ballot_contest_t *handle);
-
-/**
- * The hash of the string representation of the Contest Description from the election manifest
- * 
- * @param[out] out_hash_ref An opaque pointer to the description hash.  
- *                          The value is a reference and is not owned by the caller
- */
-EG_API eg_electionguard_status_t eg_ciphertext_ballot_contest_get_description_hash(
-  eg_ciphertext_ballot_contest_t *handle, eg_element_mod_q_t **out_hash_ref);
-
-/**
- * Get the Size of the selections collection
- */
-EG_API uint64_t
-eg_ciphertext_ballot_contest_get_selections_size(eg_ciphertext_ballot_contest_t *handle);
-
 /**
  * Get a selection at a specific index.
  * 
@@ -269,15 +238,6 @@ EG_API eg_electionguard_status_t eg_ciphertext_ballot_contest_get_selection_at_i
   eg_ciphertext_ballot_selection_t **out_selection_ref);
 
 /**
- * The nonce used to generate the encryption. Sensitive & should be treated as a secret
- * 
- * @param[out] out_nonce_ref An opaque pointer to the ElementModQ nonce.  
- *                           The value is a reference and is not owned by the caller
- */
-EG_API eg_electionguard_status_t eg_ciphertext_ballot_contest_get_nonce(
-  eg_ciphertext_ballot_contest_t *handle, eg_element_mod_q_t **out_nonce_ref);
-
-/**
  * The encrypted representation of all of the vote fields (the contest total)
  * 
  * @param[out] out_ciphertext_accumulation_ref An opaque pointer to the ElGamalCiphertext accumulation.  
@@ -286,25 +246,6 @@ EG_API eg_electionguard_status_t eg_ciphertext_ballot_contest_get_nonce(
 EG_API eg_electionguard_status_t eg_ciphertext_ballot_contest_get_ciphertext_accumulation(
   eg_ciphertext_ballot_contest_t *handle,
   eg_elgamal_ciphertext_t **out_ciphertext_accumulation_ref);
-
-/**
- * Hash of the encrypted values
- * 
- * @param[out] out_hash_ref An opaque pointer to the ElementModQ crypto hash.  
- *                           The value is a reference and is not owned by the caller
- */
-EG_API eg_electionguard_status_t eg_ciphertext_ballot_contest_get_crypto_hash(
-  eg_ciphertext_ballot_contest_t *handle, eg_element_mod_q_t **out_hash_ref);
-
-/**
- * The proof demonstrates the sum of the selections does not exceed the maximum
- * available selections for the contest, and that the proof was generated with the nonce
- * 
- * @param[out] out_proof_ref An opaque pointer to the ConstantChaumPedersenProof proof.  
- *                           The value is a reference and is not owned by the caller
- */
-EG_API eg_electionguard_status_t eg_ciphertext_ballot_contest_get_proof(
-  eg_ciphertext_ballot_contest_t *handle, eg_disjunctive_chaum_pedersen_proof_t **out_proof_ref);
 
 /**
  * Given an encrypted Ballotcontest, generates a hash, suitable for rolling up

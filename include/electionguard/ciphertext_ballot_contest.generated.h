@@ -85,7 +85,7 @@ EG_API eg_electionguard_status_t eg_ciphertext_ballot_contest_get_nonce(
 	);
 
 /**
- * @brief he proof demonstrates the sum of the selections does not exceed the maximum available selections for the contest, and that the proof was generated with the nonce
+ * @brief The proof demonstrates the sum of the selections does not exceed the maximum available selections for the contest, and that the proof was generated with the nonce
  * @param[in] handle A pointer to the `eg_plaintext_ballot_selection_t` opaque instance
  * @param[out] out_proof A pointer to the output Proof.  The value is a reference and is not owned by the caller.
  * @return eg_electionguard_status_t indicating success or failure
