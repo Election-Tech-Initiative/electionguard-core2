@@ -101,8 +101,7 @@
         "Description": "The size of the Contests collection."
       }
     ],
-    "Methods": [
-    ]
+    "Methods": []
   },
   {
     "ClassName": "CiphertextBallotSelection",
@@ -159,7 +158,55 @@
         "TypeC": "eg_disjunctive_chaum_pedersen_proof_t"
       }
     ],
-    "Methods": [
-    ]
+    "Methods": []
+  },
+  {
+    "ClassName": "CiphertextBallotContest",
+    "Properties": [
+      {
+        "Name": "ObjectId",
+        "Description": "Get the objectId of the contest, which is the unique id for the contest in a specific ballot described in the election manifest.",
+        "TypeCs": "string"
+      },
+      {
+        "Name": "SequenceOrder",
+        "Description": "Get the sequence order of the contest",
+        "TypeCs": "ulong"
+      },
+      {
+        "Name": "DescriptionHash",
+        "Description": "The hash of the string representation of the Contest Description from the election manifest",
+        "TypeCs": "ElementModQ",
+        "NativeHandleType": "NativeInterface.ElementModQ.ElementModQHandle",
+        "TypeC": "eg_element_mod_q_t"
+      },
+      {
+        "Name": "SelectionsSize",
+        "Description": "Get the Size of the selections collection",
+        "TypeCs": "ulong"
+      },
+      {
+        "Name": "CryptoHash",
+        "Description": "The hash of the encrypted values",
+        "TypeCs": "ElementModQ",
+        "NativeHandleType": "NativeInterface.ElementModQ.ElementModQHandle",
+        "TypeC": "eg_element_mod_q_t"
+      },
+      {
+        "Name": "Nonce",
+        "Description": "The nonce used to generate the encryption. Sensitive &amp; should be treated as a secret",
+        "TypeCs": "ElementModQ",
+        "NativeHandleType": "NativeInterface.ElementModQ.ElementModQHandle",
+        "TypeC": "eg_element_mod_q_t"
+      },
+      {
+        "Name": "Proof",
+        "Description": "he proof demonstrates the sum of the selections does not exceed the maximum available selections for the contest, and that the proof was generated with the nonce",
+        "TypeCs": "DisjunctiveChaumPedersenProof",
+        "NativeHandleType": "NativeInterface.DisjunctiveChaumPedersenProof.DisjunctiveChaumPedersenProofHandle",
+        "TypeC": "eg_disjunctive_chaum_pedersen_proof_t"
+      }
+    ],
+    "Methods": []
   }
 ]

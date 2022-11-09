@@ -1,4 +1,4 @@
-/// @file ciphertext_ballot_selection.generated.h
+/// @file ciphertext_ballot_contest.generated.h
 #pragma once
 
 #include "chaum_pedersen.h"
@@ -12,63 +12,50 @@
 extern "C" {
 #endif
 
-#ifndef CiphertextBallotSelection
+#ifndef CiphertextBallotContest
 
 /**
- * @brief Get the objectId of the selection, which is the unique id for the selection in a specific contest described in the election manifest.
+ * @brief Get the objectId of the contest, which is the unique id for the contest in a specific ballot described in the election manifest.
  * @param[in] handle A pointer to the `eg_plaintext_ballot_selection_t` opaque instance
  * @param[out] out_object_id A pointer to the output ObjectId.  The caller is responsible for freeing it.
  * @return eg_electionguard_status_t indicating success or failure
  * @retval ELECTIONGUARD_STATUS_SUCCESS The function was successfully executed
  * @retval ELECTIONGUARD_STATUS_ERROR_BAD_ALLOC The function was unable to allocate memory
  */
-EG_API eg_electionguard_status_t eg_ciphertext_ballot_selection_get_object_id(
-	eg_ciphertext_ballot_selection_t *handle,
+EG_API eg_electionguard_status_t eg_ciphertext_ballot_contest_get_object_id(
+	eg_ciphertext_ballot_contest_t *handle,
 	char **out_object_id
 	);
 
 /**
- * @brief Get the sequence order of the selection
+ * @brief Get the sequence order of the contest
  * @param[in] handle A pointer to the `eg_plaintext_ballot_selection_t` opaque instance
  * @return The value of the property
  */
-EG_API uint64_t eg_ciphertext_ballot_selection_get_sequence_order(
-	eg_ciphertext_ballot_selection_t *handle
+EG_API uint64_t eg_ciphertext_ballot_contest_get_sequence_order(
+	eg_ciphertext_ballot_contest_t *handle
 	);
 
 /**
- * @brief Determines if this is a placeholder selection
- * @param[in] handle A pointer to the `eg_plaintext_ballot_selection_t` opaque instance
- * @return The value of the property
- */
-EG_API bool eg_ciphertext_ballot_selection_get_is_placeholder(
-	eg_ciphertext_ballot_selection_t *handle
-	);
-
-/**
- * @brief The hash of the string representation of the Selection Description from the election manifest
+ * @brief The hash of the string representation of the Contest Description from the election manifest
  * @param[in] handle A pointer to the `eg_plaintext_ballot_selection_t` opaque instance
  * @param[out] out_description_hash A pointer to the output DescriptionHash.  The value is a reference and is not owned by the caller.
  * @return eg_electionguard_status_t indicating success or failure
  * @retval ELECTIONGUARD_STATUS_SUCCESS The function was successfully executed
  * @retval ELECTIONGUARD_STATUS_ERROR_BAD_ALLOC The function was unable to allocate memory
  */
-EG_API eg_electionguard_status_t eg_ciphertext_ballot_selection_get_description_hash(
-	eg_ciphertext_ballot_selection_t *handle,
+EG_API eg_electionguard_status_t eg_ciphertext_ballot_contest_get_description_hash(
+	eg_ciphertext_ballot_contest_t *handle,
 	eg_element_mod_q_t **out_description_hash
 	);
 
 /**
- * @brief The encrypted representation of the vote field
+ * @brief Get the Size of the selections collection
  * @param[in] handle A pointer to the `eg_plaintext_ballot_selection_t` opaque instance
- * @param[out] out_ciphertext A pointer to the output Ciphertext.  The value is a reference and is not owned by the caller.
- * @return eg_electionguard_status_t indicating success or failure
- * @retval ELECTIONGUARD_STATUS_SUCCESS The function was successfully executed
- * @retval ELECTIONGUARD_STATUS_ERROR_BAD_ALLOC The function was unable to allocate memory
+ * @return The value of the property
  */
-EG_API eg_electionguard_status_t eg_ciphertext_ballot_selection_get_ciphertext(
-	eg_ciphertext_ballot_selection_t *handle,
-	eg_elgamal_ciphertext_t **out_ciphertext
+EG_API uint64_t eg_ciphertext_ballot_contest_get_selections_size(
+	eg_ciphertext_ballot_contest_t *handle
 	);
 
 /**
@@ -79,8 +66,8 @@ EG_API eg_electionguard_status_t eg_ciphertext_ballot_selection_get_ciphertext(
  * @retval ELECTIONGUARD_STATUS_SUCCESS The function was successfully executed
  * @retval ELECTIONGUARD_STATUS_ERROR_BAD_ALLOC The function was unable to allocate memory
  */
-EG_API eg_electionguard_status_t eg_ciphertext_ballot_selection_get_crypto_hash(
-	eg_ciphertext_ballot_selection_t *handle,
+EG_API eg_electionguard_status_t eg_ciphertext_ballot_contest_get_crypto_hash(
+	eg_ciphertext_ballot_contest_t *handle,
 	eg_element_mod_q_t **out_crypto_hash
 	);
 
@@ -92,27 +79,27 @@ EG_API eg_electionguard_status_t eg_ciphertext_ballot_selection_get_crypto_hash(
  * @retval ELECTIONGUARD_STATUS_SUCCESS The function was successfully executed
  * @retval ELECTIONGUARD_STATUS_ERROR_BAD_ALLOC The function was unable to allocate memory
  */
-EG_API eg_electionguard_status_t eg_ciphertext_ballot_selection_get_nonce(
-	eg_ciphertext_ballot_selection_t *handle,
+EG_API eg_electionguard_status_t eg_ciphertext_ballot_contest_get_nonce(
+	eg_ciphertext_ballot_contest_t *handle,
 	eg_element_mod_q_t **out_nonce
 	);
 
 /**
- * @brief The proof that demonstrates the selection is an encryption of 0 or 1, and was encrypted using the `nonce`
+ * @brief he proof demonstrates the sum of the selections does not exceed the maximum available selections for the contest, and that the proof was generated with the nonce
  * @param[in] handle A pointer to the `eg_plaintext_ballot_selection_t` opaque instance
  * @param[out] out_proof A pointer to the output Proof.  The value is a reference and is not owned by the caller.
  * @return eg_electionguard_status_t indicating success or failure
  * @retval ELECTIONGUARD_STATUS_SUCCESS The function was successfully executed
  * @retval ELECTIONGUARD_STATUS_ERROR_BAD_ALLOC The function was unable to allocate memory
  */
-EG_API eg_electionguard_status_t eg_ciphertext_ballot_selection_get_proof(
-	eg_ciphertext_ballot_selection_t *handle,
+EG_API eg_electionguard_status_t eg_ciphertext_ballot_contest_get_proof(
+	eg_ciphertext_ballot_contest_t *handle,
 	eg_disjunctive_chaum_pedersen_proof_t **out_proof
 	);
 
-EG_API eg_electionguard_status_t eg_ciphertext_ballot_selection_free(eg_ciphertext_ballot_selection_t *handle);
+EG_API eg_electionguard_status_t eg_ciphertext_ballot_contest_free(eg_ciphertext_ballot_contest_t *handle);
 
-#endif // ifndef CiphertextBallotSelection
+#endif // ifndef CiphertextBallotContest
 
 #ifdef __cplusplus
 }

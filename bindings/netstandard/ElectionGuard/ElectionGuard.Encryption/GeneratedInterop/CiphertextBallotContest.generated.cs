@@ -7,13 +7,13 @@ using System.Runtime.ConstrainedExecution;
 
 namespace ElectionGuard
 {
-    public partial class CiphertextBallotSelection
+    public partial class CiphertextBallotContest
     {
-        internal unsafe External.CiphertextBallotSelectionHandle Handle;
+        internal unsafe External.CiphertextBallotContestHandle Handle;
 
         #region Properties
         /// <Summary>
-        /// Get the objectId of the selection, which is the unique id for the selection in a specific contest described in the election manifest.
+        /// Get the objectId of the contest, which is the unique id for the contest in a specific ballot described in the election manifest.
         /// </Summary>
         public unsafe string ObjectId
         {
@@ -28,7 +28,7 @@ namespace ElectionGuard
         }
 
         /// <Summary>
-        /// Get the sequence order of the selection
+        /// Get the sequence order of the contest
         /// </Summary>
         public unsafe ulong SequenceOrder
         {
@@ -39,18 +39,7 @@ namespace ElectionGuard
         }
 
         /// <Summary>
-        /// Determines if this is a placeholder selection
-        /// </Summary>
-        public unsafe bool IsPlaceholder
-        {
-            get
-            {
-                return External.GetIsPlaceholder(Handle);
-            }
-        }
-
-        /// <Summary>
-        /// The hash of the string representation of the Selection Description from the election manifest
+        /// The hash of the string representation of the Contest Description from the election manifest
         /// </Summary>
         public unsafe ElementModQ DescriptionHash
         {
@@ -64,16 +53,13 @@ namespace ElectionGuard
         }
 
         /// <Summary>
-        /// The encrypted representation of the vote field
+        /// Get the Size of the selections collection
         /// </Summary>
-        public unsafe ElGamalCiphertext Ciphertext
+        public unsafe ulong SelectionsSize
         {
             get
             {
-                var status = External.GetCiphertext(
-                    Handle, out NativeInterface.ElGamalCiphertext.ElGamalCiphertextHandle value);
-                status.ThrowIfError();
-                return new ElGamalCiphertext(value);
+                return External.GetSelectionsSize(Handle);
             }
         }
 
@@ -106,7 +92,7 @@ namespace ElectionGuard
         }
 
         /// <Summary>
-        /// The proof that demonstrates the selection is an encryption of 0 or 1, and was encrypted using the `nonce`
+        /// he proof demonstrates the sum of the selections does not exceed the maximum available selections for the contest, and that the proof was generated with the nonce
         /// </Summary>
         public unsafe DisjunctiveChaumPedersenProof Proof
         {
@@ -137,105 +123,100 @@ namespace ElectionGuard
 
         #region Extern
         internal unsafe static class External {
-            internal unsafe struct CiphertextBallotSelectionType { };
+            internal unsafe struct CiphertextBallotContestType { };
 
-            internal class CiphertextBallotSelectionHandle : ElectionguardSafeHandle<CiphertextBallotSelectionType>
+            internal class CiphertextBallotContestHandle : ElectionguardSafeHandle<CiphertextBallotContestType>
             {
                 [ReliabilityContract(Consistency.WillNotCorruptState, Cer.MayFail)]
                 protected override bool Free()
                 {
-                    // releasing the C++ memory is currently handled by a parent object e.g. ballot, see https://github.com/microsoft/electionguard-core2/issues/29
+                    if (IsFreed) return true;
+
+                    var status = External.Free(TypedPtr);
+                    if (status != Status.ELECTIONGUARD_STATUS_SUCCESS)
+                    {
+                        throw new ElectionGuardException($"CiphertextBallotContest Error Free: {status}", status);
+                    }
                     return true;
                 }
             }
 
-            [DllImport(NativeInterface.DllName, EntryPoint = "eg_ciphertext_ballot_selection_free",
+            [DllImport(NativeInterface.DllName, EntryPoint = "eg_ciphertext_ballot_contest_free",
                 CallingConvention = CallingConvention.Cdecl, SetLastError = true)]
-            internal static extern Status Free(CiphertextBallotSelectionType* handle);
+            internal static extern Status Free(CiphertextBallotContestType* handle);
 
             [DllImport(
                 NativeInterface.DllName,
-                EntryPoint = "eg_ciphertext_ballot_selection_get_object_id",
+                EntryPoint = "eg_ciphertext_ballot_contest_get_object_id",
                 CallingConvention = CallingConvention.Cdecl, 
                 SetLastError = true
             )]
             internal static extern Status GetObjectId(
-                CiphertextBallotSelectionHandle handle
+                CiphertextBallotContestHandle handle
                 , out IntPtr objectId
             );
 
             [DllImport(
                 NativeInterface.DllName,
-                EntryPoint = "eg_ciphertext_ballot_selection_get_sequence_order",
+                EntryPoint = "eg_ciphertext_ballot_contest_get_sequence_order",
                 CallingConvention = CallingConvention.Cdecl, 
                 SetLastError = true
             )]
             internal static extern ulong GetSequenceOrder(
-                CiphertextBallotSelectionHandle handle
+                CiphertextBallotContestHandle handle
             );
 
             [DllImport(
                 NativeInterface.DllName,
-                EntryPoint = "eg_ciphertext_ballot_selection_get_is_placeholder",
-                CallingConvention = CallingConvention.Cdecl, 
-                SetLastError = true
-            )]
-            internal static extern bool GetIsPlaceholder(
-                CiphertextBallotSelectionHandle handle
-            );
-
-            [DllImport(
-                NativeInterface.DllName,
-                EntryPoint = "eg_ciphertext_ballot_selection_get_description_hash",
+                EntryPoint = "eg_ciphertext_ballot_contest_get_description_hash",
                 CallingConvention = CallingConvention.Cdecl, 
                 SetLastError = true
             )]
             internal static extern Status GetDescriptionHash(
-                CiphertextBallotSelectionHandle handle
+                CiphertextBallotContestHandle handle
                 , out NativeInterface.ElementModQ.ElementModQHandle objectId
             );
 
             [DllImport(
                 NativeInterface.DllName,
-                EntryPoint = "eg_ciphertext_ballot_selection_get_ciphertext",
+                EntryPoint = "eg_ciphertext_ballot_contest_get_selections_size",
                 CallingConvention = CallingConvention.Cdecl, 
                 SetLastError = true
             )]
-            internal static extern Status GetCiphertext(
-                CiphertextBallotSelectionHandle handle
-                , out NativeInterface.ElGamalCiphertext.ElGamalCiphertextHandle objectId
+            internal static extern ulong GetSelectionsSize(
+                CiphertextBallotContestHandle handle
             );
 
             [DllImport(
                 NativeInterface.DllName,
-                EntryPoint = "eg_ciphertext_ballot_selection_get_crypto_hash",
+                EntryPoint = "eg_ciphertext_ballot_contest_get_crypto_hash",
                 CallingConvention = CallingConvention.Cdecl, 
                 SetLastError = true
             )]
             internal static extern Status GetCryptoHash(
-                CiphertextBallotSelectionHandle handle
+                CiphertextBallotContestHandle handle
                 , out NativeInterface.ElementModQ.ElementModQHandle objectId
             );
 
             [DllImport(
                 NativeInterface.DllName,
-                EntryPoint = "eg_ciphertext_ballot_selection_get_nonce",
+                EntryPoint = "eg_ciphertext_ballot_contest_get_nonce",
                 CallingConvention = CallingConvention.Cdecl, 
                 SetLastError = true
             )]
             internal static extern Status GetNonce(
-                CiphertextBallotSelectionHandle handle
+                CiphertextBallotContestHandle handle
                 , out NativeInterface.ElementModQ.ElementModQHandle objectId
             );
 
             [DllImport(
                 NativeInterface.DllName,
-                EntryPoint = "eg_ciphertext_ballot_selection_get_proof",
+                EntryPoint = "eg_ciphertext_ballot_contest_get_proof",
                 CallingConvention = CallingConvention.Cdecl, 
                 SetLastError = true
             )]
             internal static extern Status GetProof(
-                CiphertextBallotSelectionHandle handle
+                CiphertextBallotContestHandle handle
                 , out NativeInterface.DisjunctiveChaumPedersenProof.DisjunctiveChaumPedersenProofHandle objectId
             );
 

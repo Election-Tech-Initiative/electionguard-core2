@@ -71,9 +71,14 @@
         )
         {
             var status = NativeInterface.Encrypt.Contest(
-                    plaintext.Handle, description.Handle, elgamalPublicKey.Handle,
-                    cryptoExtendedBaseHash.Handle, nonceSeed.Handle, shouldVerifyProofs,
-                    out NativeCiphertextBallotContest ciphertext);
+                plaintext.Handle,
+                description.Handle,
+                elgamalPublicKey.Handle,
+                cryptoExtendedBaseHash.Handle,
+                nonceSeed.Handle,
+                shouldVerifyProofs,
+                out var ciphertext);
+
             status.ThrowIfError();
             return new CiphertextBallotContest(ciphertext);
         }
