@@ -334,6 +334,7 @@ namespace ElectionGuard
         {
             [DllImport(DllName, EntryPoint = "eg_elgamal_encrypt",
                 CallingConvention = CallingConvention.Cdecl, SetLastError = true)]
+            // ReSharper disable once MemberHidesStaticFromOuterClass
             internal static extern Status Encrypt(
                 ulong plaintext,
                 ElementModQ.ElementModQHandle nonce,
@@ -1068,7 +1069,7 @@ namespace ElectionGuard
             [DllImport(DllName, EntryPoint = "eg_candidate_get_image_uri",
                 CallingConvention = CallingConvention.Cdecl, SetLastError = true)]
             internal static extern Status GetImageUri(
-                CandidateHandle handle, out IntPtr iamgeUri);
+                CandidateHandle handle, out IntPtr imageUrl);
 
             [DllImport(DllName, EntryPoint = "eg_candidate_crypto_hash",
                 CallingConvention = CallingConvention.Cdecl, SetLastError = true)]

@@ -1,9 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Diagnostics;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace ElectionGuard.Encryption.Bench
 {
@@ -20,12 +15,13 @@ namespace ElectionGuard.Encryption.Bench
 
             Run(() =>
             {
-                var language_1 = new Language("some words", "en");
-                var language_2 = new Language("algunas palabras", "es");
-                var languages = new[] { language_1, language_2 };
+                var language1 = new Language("some words", "en");
+                var language2 = new Language("algunas palabras", "es");
+                var languages = new[] { language1, language2 };
                 var subject = new InternationalizedText(languages);
 
                 // Assert
+                // ReSharper disable once UnusedVariable
                 var actual = subject.GetTextAt(0);
             });
         }

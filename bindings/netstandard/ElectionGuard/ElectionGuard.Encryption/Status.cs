@@ -1,4 +1,5 @@
-﻿namespace ElectionGuard
+﻿// ReSharper disable InconsistentNaming
+namespace ElectionGuard
 {
     /// <summary>
     /// Enumeration used to keep the status error messages for the exception handling

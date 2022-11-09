@@ -60,7 +60,7 @@ namespace ElectionGuard.Encryption.Utils.Generators
                     objectId: "justice-supreme-court",
                     electoralDistrictId: gpUnits[0].ObjectId,
                     sequenceOrder: 0,
-                    VoteVariationType.n_of_m,
+                    VoteVariationType.NOfM,
                     numberElected: 1,
                     name: "Justice of the Supreme Court",
                     selections: new[]
@@ -145,7 +145,7 @@ namespace ElectionGuard.Encryption.Utils.Generators
                     objectId: "justice-supreme-court",
                     electoralDistrictId: gpUnits[0].ObjectId,  // jefferson-county
                     sequenceOrder: 0,
-                    VoteVariationType.n_of_m,
+                    VoteVariationType.NOfM,
                     numberElected: 1,
                     name: "Justice of the Supreme Court",
                     selections: new[]
@@ -169,7 +169,7 @@ namespace ElectionGuard.Encryption.Utils.Generators
                     objectId: "referendum-pineapple",
                     electoralDistrictId: gpUnits[1].ObjectId, // jefferson-county-school-district-1 
                     sequenceOrder: 1,
-                    VoteVariationType.n_of_m,
+                    VoteVariationType.NOfM,
                     numberElected: 1,
                     votesAllowed: 1,
                     name: "The Pineapple Question",

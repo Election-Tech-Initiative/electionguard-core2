@@ -1,4 +1,5 @@
 ﻿using System;
+// ReSharper disable UnusedAutoPropertyAccessor.Global
 
 namespace ElectionGuard
 {
@@ -32,7 +33,7 @@ namespace ElectionGuard
         /// <returns>New ElectionGuardException object</returns>
         public ElectionGuardException(string message, Status code) : base(message)
         {
-            this.Status = code;
+            Status = code;
         }
 
         /// <summary>

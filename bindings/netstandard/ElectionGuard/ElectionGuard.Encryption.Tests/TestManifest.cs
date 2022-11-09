@@ -24,7 +24,7 @@ namespace ElectionGuard.Encryption.Tests
                 contestId, 
                 electoralDistrictId, 
                 sequenceOrder, 
-                VoteVariationType.n_of_m, 
+                VoteVariationType.NOfM, 
                 numberElected,
                 contestName, 
                 selections);
@@ -141,7 +141,7 @@ namespace ElectionGuard.Encryption.Tests
             candidates.Add(new Candidate("mycandidate", false));
             List<SelectionDescription> selections = new List<SelectionDescription>();
             selections.Add(new SelectionDescription("selection1", "mycandidate", 1));
-            contests.Add(new ContestDescription("firstcontest", "mydistrict", 1, VoteVariationType.n_of_m, 1, "mrmayor", selections.ToArray()));
+            contests.Add(new ContestDescription("firstcontest", "mydistrict", 1, VoteVariationType.NOfM, 1, "mrmayor", selections.ToArray()));
             string[] gps = { "mydistrict" };
             ballotStyles.Add(new BallotStyle("style1", gps));
 
