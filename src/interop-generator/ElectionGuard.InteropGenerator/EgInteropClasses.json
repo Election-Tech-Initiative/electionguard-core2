@@ -162,6 +162,7 @@
   },
   {
     "ClassName": "CiphertextBallotContest",
+    "NeverFree": true,
     "Properties": [
       {
         "Name": "ObjectId",
