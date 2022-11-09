@@ -3,80 +3,6 @@ using System.Runtime.InteropServices;
 
 namespace ElectionGuard
 {
-    using NativeCiphertextElectionContext = NativeInterface.CiphertextElectionContext.CiphertextElectionContextHandle;
-    using NativeElementModP = NativeInterface.ElementModP.ElementModPHandle;
-    using NativeElementModQ = NativeInterface.ElementModQ.ElementModQHandle;
-    using NativeLinkedList = NativeInterface.LinkedList.LinkedListHandle;
-    using NativeContextConfig = NativeInterface.ContextConfiguration.ContextConfigurationHandle;
-
-
-    /// <summary>
-    /// Class to handle configuration settings for the ElectionContext
-    /// </summary>
-    public class ContextConfiguration : DisposableBase
-    {
-        internal unsafe NativeContextConfig Handle;
-        unsafe internal ContextConfiguration(NativeContextConfig handle)
-        {
-            Handle = handle;
-        }
-
-        /// <summary>
-        /// Determines if overvotes are allowed for the election.  This defaults to true
-        /// </summary>
-        public unsafe bool AllowedOverVotes
-        {
-            get
-            {
-                bool value = true;
-                var status = NativeInterface.ContextConfiguration.GetAllowedOverVotes(
-                    Handle, ref value);
-                status.ThrowIfError();
-                return value;
-            }
-        }
-        /// <summary>
-        /// Determines the maximum number of votes that an election can have, Defaults to 1000000
-        /// </summary>
-        public unsafe UInt64 MaxBallots
-        {
-            get
-            {
-                UInt64 value = 1;
-                var status = NativeInterface.ContextConfiguration.GetMaxBallots(
-                    Handle, ref value);
-                status.ThrowIfError();
-                return value;
-            }
-        }
-
-        /// <summary>
-        /// Parameterized constructor for the configuration class
-        /// </summary>
-        /// <param name="allowOverVotes">if overvotes are allowed</param>
-        /// <param name="maxVotes">maximum number of votes</param>
-        public unsafe ContextConfiguration(bool allowOverVotes, UInt64 maxVotes)
-        {
-            var status = NativeInterface.ContextConfiguration.Make(
-                allowOverVotes, maxVotes, out Handle);
-            status.ThrowIfError();
-        }
-
-
-#pragma warning disable CS1591 // Missing XML comment for publicly visible type or member
-        protected override unsafe void DisposeUnmanaged()
-#pragma warning restore CS1591 // Missing XML comment for publicly visible type or member
-        {
-            base.DisposeUnmanaged();
-
-            if (Handle == null || Handle.IsInvalid) return;
-            Handle.Dispose();
-            Handle = null;
-        }
-
-
-    }
-
     /// <summary>
     /// `CiphertextElectionContext` is the ElectionGuard representation of a specific election
     /// Note: The ElectionGuard Data Spec deviates from the NIST model in that
@@ -95,7 +21,7 @@ namespace ElectionGuard
             get
             {
                 var status = NativeInterface.CiphertextElectionContext.GetElGamalPublicKey(
-                    Handle, out NativeElementModP value);
+                    Handle, out NativeInterface.ElementModP.ElementModPHandle value);
                 status.ThrowIfError();
                 return new ElementModP(value);
             }
@@ -110,7 +36,7 @@ namespace ElectionGuard
             get
             {
                 var status = NativeInterface.CiphertextElectionContext.GetCommitmentHash(
-                    Handle, out NativeElementModQ value);
+                    Handle, out NativeInterface.ElementModQ.ElementModQHandle value);
                 status.ThrowIfError();
                 return new ElementModQ(value);
             }
@@ -124,7 +50,7 @@ namespace ElectionGuard
             get
             {
                 var status = NativeInterface.CiphertextElectionContext.GetManifestHash(
-                    Handle, out NativeElementModQ value);
+                    Handle, out NativeInterface.ElementModQ.ElementModQHandle value);
                 status.ThrowIfError();
                 return new ElementModQ(value);
             }
@@ -138,7 +64,7 @@ namespace ElectionGuard
             get
             {
                 var status = NativeInterface.CiphertextElectionContext.GetCryptoBaseHash(
-                     Handle, out NativeElementModQ value);
+                    Handle, out NativeInterface.ElementModQ.ElementModQHandle value);
                 status.ThrowIfError();
                 return new ElementModQ(value);
             }
@@ -152,7 +78,7 @@ namespace ElectionGuard
             get
             {
                 var status = NativeInterface.CiphertextElectionContext.GetCryptoExtendedBaseHash(
-                    Handle, out NativeElementModQ value);
+                    Handle, out NativeInterface.ElementModQ.ElementModQHandle value);
                 status.ThrowIfError();
                 return new ElementModQ(value);
             }
@@ -166,7 +92,7 @@ namespace ElectionGuard
             get
             {
                 var status = NativeInterface.CiphertextElectionContext.GetExtendedData(
-                    Handle, out NativeLinkedList value);
+                    Handle, out NativeInterface.LinkedList.LinkedListHandle value);
                 status.ThrowIfError();
                 return new LinkedList(value);
             }
@@ -180,14 +106,14 @@ namespace ElectionGuard
             get
             {
                 var status = NativeInterface.CiphertextElectionContext.GetConfiguration(
-                    Handle, out NativeContextConfig value);
+                    Handle, out NativeInterface.ContextConfiguration.ContextConfigurationHandle value);
                 status.ThrowIfError();
                 return new ContextConfiguration(value);
             }
         }
 
 
-        internal unsafe NativeCiphertextElectionContext Handle;
+        internal unsafe NativeInterface.CiphertextElectionContext.CiphertextElectionContextHandle Handle;
 
         /// <summary>
         /// Makes a CiphertextElectionContext object.
@@ -209,10 +135,10 @@ namespace ElectionGuard
         /// <param name="manifestHash"> the hash of the election metadata </param>
         /// </summary>
         public unsafe CiphertextElectionContext(ulong numberOfGuardians,
-                ulong quorum,
-                ElementModP publicKey,
-                ElementModQ commitmentHash,
-                ElementModQ manifestHash)
+            ulong quorum,
+            ElementModP publicKey,
+            ElementModQ commitmentHash,
+            ElementModQ manifestHash)
         {
             var status = NativeInterface.CiphertextElectionContext.Make(
                 numberOfGuardians, quorum, publicKey.Handle,
@@ -231,11 +157,11 @@ namespace ElectionGuard
         /// <param name="config"> the context configuration</param>
         /// </summary>
         public unsafe CiphertextElectionContext(ulong numberOfGuardians,
-                ulong quorum,
-                ElementModP publicKey,
-                ElementModQ commitmentHash,
-                ElementModQ manifestHash,
-                ContextConfiguration config)
+            ulong quorum,
+            ElementModP publicKey,
+            ElementModQ commitmentHash,
+            ElementModQ manifestHash,
+            ContextConfiguration config)
         {
             var status = NativeInterface.CiphertextElectionContext.Make(
                 numberOfGuardians, quorum, publicKey.Handle,
@@ -255,11 +181,11 @@ namespace ElectionGuard
         /// <param name="extendedData"> an unordered map of key value strings revelant to the consuming application </param>
         /// </summary>
         public unsafe CiphertextElectionContext(ulong numberOfGuardians,
-                ulong quorum,
-                ElementModP publicKey,
-                ElementModQ commitmentHash,
-                ElementModQ manifestHash,
-                LinkedList extendedData)
+            ulong quorum,
+            ElementModP publicKey,
+            ElementModQ commitmentHash,
+            ElementModQ manifestHash,
+            LinkedList extendedData)
         {
             var status = NativeInterface.CiphertextElectionContext.Make(
                 numberOfGuardians, quorum, publicKey.Handle,
@@ -280,12 +206,12 @@ namespace ElectionGuard
         /// <param name="extendedData"> an unordered map of key value strings revelant to the consuming application </param>
         /// </summary>
         public unsafe CiphertextElectionContext(ulong numberOfGuardians,
-                ulong quorum,
-                ElementModP publicKey,
-                ElementModQ commitmentHash,
-                ElementModQ manifestHash,
-                ContextConfiguration config,
-                LinkedList extendedData)
+            ulong quorum,
+            ElementModP publicKey,
+            ElementModQ commitmentHash,
+            ElementModQ manifestHash,
+            ContextConfiguration config,
+            LinkedList extendedData)
         {
             var status = NativeInterface.CiphertextElectionContext.Make(
                 numberOfGuardians, quorum, publicKey.Handle,

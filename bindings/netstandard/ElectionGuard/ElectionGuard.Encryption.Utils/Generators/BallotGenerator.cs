@@ -1,8 +1,7 @@
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 
-namespace ElectionGuard.Encryption.Utils
+namespace ElectionGuard.Encryption.Utils.Generators
 {
     public class BallotGenerator
     {

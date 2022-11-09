@@ -6,6 +6,7 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using ElectionGuard.Encryption.Utils;
+using ElectionGuard.Encryption.Utils.Generators;
 
 namespace ElectionGuard.Encryption.Bench
 {

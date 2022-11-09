@@ -1,8 +1,6 @@
-﻿using System;
-using System.Diagnostics;
-using NUnit.Framework;
+﻿using NUnit.Framework;
 
-namespace ElectionGuard.Encrypt.Tests
+namespace ElectionGuard.Encryption.Tests
 {
     [TestFixture]
     public class TestElection
