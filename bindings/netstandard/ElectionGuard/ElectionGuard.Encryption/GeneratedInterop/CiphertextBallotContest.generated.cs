@@ -2,8 +2,8 @@
 // This file is generated via ElectionGuard.InteropGenerator at /src/interop-generator
 
 using System;
-using System.Runtime.InteropServices;
 using System.Runtime.ConstrainedExecution;
+using System.Runtime.InteropServices;
 
 namespace ElectionGuard
 {
@@ -92,7 +92,7 @@ namespace ElectionGuard
         }
 
         /// <Summary>
-        /// he proof demonstrates the sum of the selections does not exceed the maximum available selections for the contest, and that the proof was generated with the nonce
+        /// The proof demonstrates the sum of the selections does not exceed the maximum available selections for the contest, and that the proof was generated with the nonce
         /// </Summary>
         public unsafe DisjunctiveChaumPedersenProof Proof
         {
@@ -122,7 +122,8 @@ namespace ElectionGuard
         #endregion
 
         #region Extern
-        internal unsafe static class External {
+        internal unsafe static class External
+        {
             internal unsafe struct CiphertextBallotContestType { };
 
             internal class CiphertextBallotContestHandle : ElectionguardSafeHandle<CiphertextBallotContestType>
@@ -142,7 +143,7 @@ namespace ElectionGuard
             [DllImport(
                 NativeInterface.DllName,
                 EntryPoint = "eg_ciphertext_ballot_contest_get_object_id",
-                CallingConvention = CallingConvention.Cdecl, 
+                CallingConvention = CallingConvention.Cdecl,
                 SetLastError = true
             )]
             internal static extern Status GetObjectId(
@@ -153,7 +154,7 @@ namespace ElectionGuard
             [DllImport(
                 NativeInterface.DllName,
                 EntryPoint = "eg_ciphertext_ballot_contest_get_sequence_order",
-                CallingConvention = CallingConvention.Cdecl, 
+                CallingConvention = CallingConvention.Cdecl,
                 SetLastError = true
             )]
             internal static extern ulong GetSequenceOrder(
@@ -163,7 +164,7 @@ namespace ElectionGuard
             [DllImport(
                 NativeInterface.DllName,
                 EntryPoint = "eg_ciphertext_ballot_contest_get_description_hash",
-                CallingConvention = CallingConvention.Cdecl, 
+                CallingConvention = CallingConvention.Cdecl,
                 SetLastError = true
             )]
             internal static extern Status GetDescriptionHash(
@@ -174,7 +175,7 @@ namespace ElectionGuard
             [DllImport(
                 NativeInterface.DllName,
                 EntryPoint = "eg_ciphertext_ballot_contest_get_selections_size",
-                CallingConvention = CallingConvention.Cdecl, 
+                CallingConvention = CallingConvention.Cdecl,
                 SetLastError = true
             )]
             internal static extern ulong GetSelectionsSize(
@@ -184,7 +185,7 @@ namespace ElectionGuard
             [DllImport(
                 NativeInterface.DllName,
                 EntryPoint = "eg_ciphertext_ballot_contest_get_crypto_hash",
-                CallingConvention = CallingConvention.Cdecl, 
+                CallingConvention = CallingConvention.Cdecl,
                 SetLastError = true
             )]
             internal static extern Status GetCryptoHash(
@@ -195,7 +196,7 @@ namespace ElectionGuard
             [DllImport(
                 NativeInterface.DllName,
                 EntryPoint = "eg_ciphertext_ballot_contest_get_nonce",
-                CallingConvention = CallingConvention.Cdecl, 
+                CallingConvention = CallingConvention.Cdecl,
                 SetLastError = true
             )]
             internal static extern Status GetNonce(
@@ -206,7 +207,7 @@ namespace ElectionGuard
             [DllImport(
                 NativeInterface.DllName,
                 EntryPoint = "eg_ciphertext_ballot_contest_get_proof",
-                CallingConvention = CallingConvention.Cdecl, 
+                CallingConvention = CallingConvention.Cdecl,
                 SetLastError = true
             )]
             internal static extern Status GetProof(

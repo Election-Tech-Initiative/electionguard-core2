@@ -202,7 +202,7 @@
       },
       {
         "Name": "Proof",
-        "Description": "he proof demonstrates the sum of the selections does not exceed the maximum available selections for the contest, and that the proof was generated with the nonce",
+        "Description": "The proof demonstrates the sum of the selections does not exceed the maximum available selections for the contest, and that the proof was generated with the nonce",
         "TypeCs": "DisjunctiveChaumPedersenProof",
         "NativeHandleType": "NativeInterface.DisjunctiveChaumPedersenProof.DisjunctiveChaumPedersenProofHandle",
         "TypeC": "eg_disjunctive_chaum_pedersen_proof_t"
