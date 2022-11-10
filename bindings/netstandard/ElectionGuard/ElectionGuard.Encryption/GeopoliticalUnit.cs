@@ -21,7 +21,7 @@ namespace ElectionGuard
         /// <Summary>
         /// Unique internal identifier that's used by other elements to reference this element.
         /// </Summary>
-        public unsafe string ObjectId
+        public string ObjectId
         {
             get
             {
@@ -40,7 +40,7 @@ namespace ElectionGuard
         /// <Summary>
         /// Name of the geopolitical unit.
         /// </Summary>
-        public unsafe string Name
+        public string Name
         {
             get
             {
@@ -59,7 +59,7 @@ namespace ElectionGuard
         /// <Summary>
         /// The type of reporting unit
         /// </Summary>
-        public unsafe ReportingUnitType ReportingUnitType
+        public ReportingUnitType ReportingUnitType
         {
             get
             {
@@ -70,9 +70,9 @@ namespace ElectionGuard
             }
         }
 
-        internal unsafe NativeInterface.GeopoliticalUnit.GeopoliticalUnitHandle Handle;
+        internal NativeInterface.GeopoliticalUnit.GeopoliticalUnitHandle Handle;
 
-        internal unsafe GeopoliticalUnit(
+        internal GeopoliticalUnit(
             NativeInterface.GeopoliticalUnit.GeopoliticalUnitHandle handle)
         {
             Handle = handle;
@@ -84,7 +84,7 @@ namespace ElectionGuard
         /// <param name="objectId">string to identify the unit</param>
         /// <param name="name">name of the unit</param>
         /// <param name="reportingUnitType">type of geopolitical unit</param>
-        public unsafe GeopoliticalUnit(
+        public GeopoliticalUnit(
             string objectId, string name, ReportingUnitType reportingUnitType)
         {
             var status = NativeInterface.GeopoliticalUnit.New(
@@ -96,7 +96,7 @@ namespace ElectionGuard
         }
 
 #pragma warning disable CS1591 // Missing XML comment for publicly visible type or member
-        protected override unsafe void DisposeUnmanaged()
+        protected override void DisposeUnmanaged()
 #pragma warning restore CS1591 // Missing XML comment for publicly visible type or member
         {
             base.DisposeUnmanaged();
@@ -109,7 +109,7 @@ namespace ElectionGuard
         /// <Summary>
         /// A hash representation of the object
         /// </Summary>
-        public unsafe ElementModQ CryptoHash()
+        public ElementModQ CryptoHash()
         {
             var status = NativeInterface.GeopoliticalUnit.CryptoHash(
                 Handle, out NativeInterface.ElementModQ.ElementModQHandle value);

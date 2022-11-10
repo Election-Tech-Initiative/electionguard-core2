@@ -16,7 +16,7 @@ namespace ElectionGuard
         /// <Summary>
         /// Get the size of the address collection
         /// </Summary>
-        public unsafe ulong AddressLineSize
+        public ulong AddressLineSize
         {
             get
             {
@@ -29,7 +29,7 @@ namespace ElectionGuard
         /// <Summary>
         /// Get the size of the email collection
         /// </Summary>
-        public unsafe ulong EmailLineSize
+        public ulong EmailLineSize
         {
             get
             {
@@ -42,7 +42,7 @@ namespace ElectionGuard
         /// <Summary>
         /// Get the size of the phone collection
         /// </Summary>
-        public unsafe ulong PhoneLineSeize
+        public ulong PhoneLineSeize
         {
             get
             {
@@ -52,9 +52,9 @@ namespace ElectionGuard
             }
         }
 
-        internal unsafe NativeInterface.ContactInformation.ContactInformationHandle Handle;
+        internal NativeInterface.ContactInformation.ContactInformationHandle Handle;
 
-        internal unsafe ContactInformation(
+        internal ContactInformation(
             NativeInterface.ContactInformation.ContactInformationHandle handle)
         {
             Handle = handle;
@@ -64,7 +64,7 @@ namespace ElectionGuard
         /// Create a `ContactInformation` object
         /// </summary>
         /// <param name="name">name of the contact</param>
-        public unsafe ContactInformation(string name)
+        public ContactInformation(string name)
         {
             var status = NativeInterface.ContactInformation.New(name, out Handle);
             if (status != Status.ELECTIONGUARD_STATUS_SUCCESS)
@@ -74,7 +74,7 @@ namespace ElectionGuard
         }
 
 #pragma warning disable CS1591 // Missing XML comment for publicly visible type or member
-        protected override unsafe void DisposeUnmanaged()
+        protected override void DisposeUnmanaged()
 #pragma warning restore CS1591 // Missing XML comment for publicly visible type or member
         {
             base.DisposeUnmanaged();
@@ -90,7 +90,7 @@ namespace ElectionGuard
         /// enter into a web mapping service to find the address on a map.
         /// That is, the value of the field needs to geocode the contact location.
         /// </Summary>
-        public unsafe string GetAddressLineAt(ulong index)
+        public string GetAddressLineAt(ulong index)
         {
             var status = NativeInterface.ContactInformation.GetAddressLineAtIndex(
                 Handle, index, out IntPtr value);
@@ -106,7 +106,7 @@ namespace ElectionGuard
         /// <Summary>
         /// Associates an email address with the contact.
         /// </Summary>
-        public unsafe InternationalizedText GetEmailLineAt(ulong index)
+        public InternationalizedText GetEmailLineAt(ulong index)
         {
             var status = NativeInterface.ContactInformation.GetEmailLineAtIndex(
                 Handle, index, out NativeInterface.InternationalizedText.InternationalizedTextHandle value);
@@ -120,7 +120,7 @@ namespace ElectionGuard
         /// <Summary>
         /// Associates a phone number with the contact.
         /// </Summary>
-        public unsafe InternationalizedText GetPhoneLineAt(ulong index)
+        public InternationalizedText GetPhoneLineAt(ulong index)
         {
             var status = NativeInterface.ContactInformation.GetPhoneLineAtIndex(
                 Handle, index, out NativeInterface.InternationalizedText.InternationalizedTextHandle value);
@@ -134,7 +134,7 @@ namespace ElectionGuard
         /// <Summary>
         /// A hash representation of the object
         /// </Summary>
-        public unsafe ElementModQ CryptoHash()
+        public ElementModQ CryptoHash()
         {
             var status = NativeInterface.ContactInformation.CryptoHash(
                 Handle, out NativeInterface.ElementModQ.ElementModQHandle value);

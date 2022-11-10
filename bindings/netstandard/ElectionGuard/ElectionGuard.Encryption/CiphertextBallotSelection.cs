@@ -25,7 +25,7 @@ namespace ElectionGuard
     /// </summary>
     public partial class CiphertextBallotSelection : DisposableBase
     {
-        internal unsafe CiphertextBallotSelection(External.CiphertextBallotSelectionHandle handle)
+        internal CiphertextBallotSelection(External.CiphertextBallotSelectionHandle handle)
         {
             Handle = handle;
         }
@@ -40,7 +40,7 @@ namespace ElectionGuard
         ///
         /// In most cases the encryption_seed should match the `description_hash`
         /// </summary>
-        public unsafe ElementModQ CryptoHashWith(ElementModQ encryptionSeed)
+        public ElementModQ CryptoHashWith(ElementModQ encryptionSeed)
         {
             var status = NativeInterface.CiphertextBallotSelection.CryptoHashWith(
                 Handle, encryptionSeed.Handle, out NativeInterface.ElementModQ.ElementModQHandle cryptoHash);
@@ -60,7 +60,7 @@ namespace ElectionGuard
         /// <param name="elGamalPublicKey">The election public key</param>
         /// <param name="cryptoExtendedBaseHash">The extended base hash of the election</param>
         /// </summary>
-        public unsafe bool IsValidEncryption(
+        public bool IsValidEncryption(
             ElementModQ encryptionSeed,
             ElementModP elGamalPublicKey,
             ElementModQ cryptoExtendedBaseHash)

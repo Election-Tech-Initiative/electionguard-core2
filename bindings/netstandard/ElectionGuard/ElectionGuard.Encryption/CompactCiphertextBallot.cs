@@ -14,13 +14,13 @@ namespace ElectionGuard
     /// </summary>
     public class CompactCiphertextBallot : DisposableBase
     {
-        internal unsafe NativeInterface.CompactCiphertextBallot.CompactCiphertextBallotHandle Handle;
+        internal NativeInterface.CompactCiphertextBallot.CompactCiphertextBallotHandle Handle;
 
         /// <Summary>
         /// A unique Ballot ID that is relevant to the external system and must be unique
         /// within the dataset of the election.
         /// </Summary>
-        public unsafe string ObjectId
+        public string ObjectId
         {
             get
             {
@@ -46,7 +46,7 @@ namespace ElectionGuard
             }
         }
 
-        internal unsafe CompactCiphertextBallot(NativeInterface.CompactCiphertextBallot.CompactCiphertextBallotHandle handle)
+        internal CompactCiphertextBallot(NativeInterface.CompactCiphertextBallot.CompactCiphertextBallotHandle handle)
         {
             Handle = handle;
         }
@@ -54,7 +54,7 @@ namespace ElectionGuard
         /// <Summary>
         /// Export the ballot representation as MsgPack
         /// </Summary>
-        public unsafe byte[] ToMsgPack()
+        public byte[] ToMsgPack()
         {
 
             var status = NativeInterface.CompactCiphertextBallot.ToMsgPack(
@@ -73,7 +73,7 @@ namespace ElectionGuard
         }
 
 #pragma warning disable CS1591 // Missing XML comment for publicly visible type or member
-        protected override unsafe void DisposeUnmanaged()
+        protected override void DisposeUnmanaged()
 #pragma warning restore CS1591 // Missing XML comment for publicly visible type or member
         {
             base.DisposeUnmanaged();

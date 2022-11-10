@@ -9,13 +9,13 @@ namespace ElectionGuard
     {
         internal const string DllName = "electionguard";
 
-        internal unsafe struct CharPtr { };
+        internal struct CharPtr { };
 
         #region Collections
 
-        internal static unsafe class LinkedList
+        internal static class LinkedList
         {
-            internal unsafe struct LinkedListType { };
+            internal struct LinkedListType { };
 
             internal class LinkedListHandle
                 : ElectionGuardSafeHandle<LinkedListType>
@@ -77,9 +77,9 @@ namespace ElectionGuard
 
         #region Group
 
-        internal static unsafe class ElementModP
+        internal static class ElementModP
         {
-            internal unsafe struct ElementModPType { };
+            internal struct ElementModPType { };
 
             internal class ElementModPHandle
                 : ElectionGuardSafeHandle<ElementModPType>
@@ -122,9 +122,9 @@ namespace ElectionGuard
                 ElementModPHandle handle, out IntPtr data);
         }
 
-        internal static unsafe class ElementModQ
+        internal static class ElementModQ
         {
-            internal unsafe struct ElementModQType { };
+            internal struct ElementModQType { };
 
             internal class ElementModQHandle
                 : ElectionGuardSafeHandle<ElementModQType>
@@ -183,7 +183,7 @@ namespace ElectionGuard
             internal static extern Status Random(out ElementModQHandle handle);
         }
 
-        internal static unsafe class Constants
+        internal static class Constants
         {
             [DllImport(DllName, EntryPoint = "eg_element_mod_p_constant_g",
                 CallingConvention = CallingConvention.Cdecl, SetLastError = true)]
@@ -235,9 +235,9 @@ namespace ElectionGuard
 
         #region Elgamal
 
-        internal static unsafe class ElGamalKeyPair
+        internal static class ElGamalKeyPair
         {
-            internal unsafe struct ElGamalKeyPairType { };
+            internal struct ElGamalKeyPairType { };
 
             internal class ElGamalKeyPairHandle
                 : ElectionGuardSafeHandle<ElGamalKeyPairType>
@@ -279,9 +279,9 @@ namespace ElectionGuard
 
         }
 
-        internal static unsafe class ElGamalCiphertext
+        internal static class ElGamalCiphertext
         {
-            internal unsafe struct ElGamalCiphertextType { };
+            internal struct ElGamalCiphertextType { };
 
             internal class ElGamalCiphertextHandle
                 : ElectionGuardSafeHandle<ElGamalCiphertextType>
@@ -330,7 +330,7 @@ namespace ElectionGuard
 
         }
 
-        internal static unsafe class ElGamal
+        internal static class ElGamal
         {
             [DllImport(DllName, EntryPoint = "eg_elgamal_encrypt",
                 CallingConvention = CallingConvention.Cdecl, SetLastError = true)]
@@ -346,9 +346,9 @@ namespace ElectionGuard
 
         #region ChaumPedersen
 
-        internal static unsafe class DisjunctiveChaumPedersenProof
+        internal static class DisjunctiveChaumPedersenProof
         {
-            internal unsafe struct DisjunctiveChaumPedersenProofType { };
+            internal struct DisjunctiveChaumPedersenProofType { };
 
             internal class DisjunctiveChaumPedersenProofHandle
                 : ElectionGuardSafeHandle<DisjunctiveChaumPedersenProofType>
@@ -455,9 +455,9 @@ namespace ElectionGuard
 
         }
 
-        internal static unsafe class ConstantChaumPedersenProof
+        internal static class ConstantChaumPedersenProof
         {
-            internal unsafe struct ConstantChaumPedersenProofType { };
+            internal struct ConstantChaumPedersenProofType { };
 
             internal class ConstantChaumPedersenProofHandle
                 : ElectionGuardSafeHandle<ConstantChaumPedersenProofType>
@@ -529,9 +529,9 @@ namespace ElectionGuard
 
         #region AnnotatedString
 
-        internal static unsafe class AnnotatedString
+        internal static class AnnotatedString
         {
-            internal unsafe struct AnnotatedStringType { };
+            internal struct AnnotatedStringType { };
 
             internal class AnnotatedStringHandle
                 : ElectionGuardSafeHandle<AnnotatedStringType>
@@ -582,9 +582,9 @@ namespace ElectionGuard
 
         #region Language
 
-        internal static unsafe class Language
+        internal static class Language
         {
-            internal unsafe struct LanguageType { };
+            internal struct LanguageType { };
 
             internal class LanguageHandle
                 : ElectionGuardSafeHandle<LanguageType>
@@ -636,9 +636,9 @@ namespace ElectionGuard
 
         // TODO: get the calling conventions correct
 
-        internal static unsafe class InternationalizedText
+        internal static class InternationalizedText
         {
-            internal unsafe struct InternationalizedTextType { };
+            internal struct InternationalizedTextType { };
 
             internal class InternationalizedTextHandle
                 : ElectionGuardSafeHandle<InternationalizedTextType>
@@ -691,9 +691,9 @@ namespace ElectionGuard
 
         #region ContactInformation
 
-        internal static unsafe class ContactInformation
+        internal static class ContactInformation
         {
-            internal unsafe struct ContactInformationType { };
+            internal struct ContactInformationType { };
 
             internal class ContactInformationHandle
                 : ElectionGuardSafeHandle<ContactInformationType>
@@ -775,9 +775,9 @@ namespace ElectionGuard
 
         #region GeopoliticalUnit
 
-        internal static unsafe class GeopoliticalUnit
+        internal static class GeopoliticalUnit
         {
-            internal unsafe struct GeopoliticalUnitType { };
+            internal struct GeopoliticalUnitType { };
 
             internal class GeopoliticalUnitHandle
                 : ElectionGuardSafeHandle<GeopoliticalUnitType>
@@ -842,9 +842,9 @@ namespace ElectionGuard
 
         #region BallotStyle
 
-        internal static unsafe class BallotStyle
+        internal static class BallotStyle
         {
-            internal unsafe struct BallotStyleType { };
+            internal struct BallotStyleType { };
 
             internal class BallotStyleHandle
                 : ElectionGuardSafeHandle<BallotStyleType>
@@ -921,9 +921,9 @@ namespace ElectionGuard
 
         #region Party
 
-        internal static unsafe class Party
+        internal static class Party
         {
-            internal unsafe struct PartyType { };
+            internal struct PartyType { };
 
             internal class PartyHandle
                 : ElectionGuardSafeHandle<PartyType>
@@ -997,9 +997,9 @@ namespace ElectionGuard
 
         #region Candidate
 
-        internal static unsafe class Candidate
+        internal static class Candidate
         {
-            internal unsafe struct CandidateType { };
+            internal struct CandidateType { };
 
             internal class CandidateHandle
                 : ElectionGuardSafeHandle<CandidateType>
@@ -1082,9 +1082,9 @@ namespace ElectionGuard
 
         #region SelectionDescription
 
-        internal static unsafe class SelectionDescription
+        internal static class SelectionDescription
         {
-            internal unsafe struct SelectionDescriptionType { };
+            internal struct SelectionDescriptionType { };
 
             internal class SelectionDescriptionHandle
                 : ElectionGuardSafeHandle<SelectionDescriptionType>
@@ -1140,9 +1140,9 @@ namespace ElectionGuard
 
         #region ContestDescription
 
-        internal static unsafe class ContestDescription
+        internal static class ContestDescription
         {
-            internal unsafe struct ContestDescriptionType { };
+            internal struct ContestDescriptionType { };
 
             internal class ContestDescriptionHandle
                 : ElectionGuardSafeHandle<ContestDescriptionType>
@@ -1302,9 +1302,9 @@ namespace ElectionGuard
 
         #region ContestDescriptionWithPlaceholders
 
-        internal static unsafe class ContestDescriptionWithPlaceholders
+        internal static class ContestDescriptionWithPlaceholders
         {
-            internal unsafe struct ContestDescriptionWithPlaceholdersType { };
+            internal struct ContestDescriptionWithPlaceholdersType { };
 
             internal class ContestDescriptionWithPlaceholdersHandle
                 : ElectionGuardSafeHandle<ContestDescriptionWithPlaceholdersType>
@@ -1515,9 +1515,9 @@ namespace ElectionGuard
 
         #region Manifest
 
-        internal static unsafe class Manifest
+        internal static class Manifest
         {
-            internal unsafe struct ManifestType { };
+            internal struct ManifestType { };
 
             internal class ManifestHandle
                 : ElectionGuardSafeHandle<ManifestType>
@@ -1727,9 +1727,9 @@ namespace ElectionGuard
 
         #region InternalManifest
 
-        internal static unsafe class InternalManifest
+        internal static class InternalManifest
         {
-            internal unsafe struct InternalManifestType { };
+            internal struct InternalManifestType { };
 
             internal class InternalManifestHandle
                 : ElectionGuardSafeHandle<InternalManifestType>
@@ -1837,9 +1837,9 @@ namespace ElectionGuard
         #endregion
 
         #region ContextConfiguration
-        internal static unsafe class ContextConfiguration
+        internal static class ContextConfiguration
         {
-            internal unsafe struct ContextConfigurationType { };
+            internal struct ContextConfigurationType { };
 
             internal class ContextConfigurationHandle
                 : ElectionGuardSafeHandle<ContextConfigurationType>
@@ -1891,9 +1891,9 @@ namespace ElectionGuard
 
         #region CiphertextElectionContext
 
-        internal static unsafe class CiphertextElectionContext
+        internal static class CiphertextElectionContext
         {
-            internal unsafe struct CiphertextElectionType { };
+            internal struct CiphertextElectionType { };
 
             internal class CiphertextElectionContextHandle
                 : ElectionGuardSafeHandle<CiphertextElectionType>
@@ -2056,9 +2056,9 @@ namespace ElectionGuard
 
         #region ExtendedData
 
-        internal static unsafe class ExtendedData
+        internal static class ExtendedData
         {
-            internal unsafe struct ExtendedDataType { };
+            internal struct ExtendedDataType { };
 
             internal class ExtendedDataHandle
                 : ElectionGuardSafeHandle<ExtendedDataType>
@@ -2102,7 +2102,7 @@ namespace ElectionGuard
 
         #region Ballot
 
-        internal static unsafe class PlaintextBallotSelection
+        internal static class PlaintextBallotSelection
         {
             [DllImport(DllName, EntryPoint = "eg_plaintext_ballot_selection_new",
                 CallingConvention = CallingConvention.Cdecl, SetLastError = true)]
@@ -2124,7 +2124,7 @@ namespace ElectionGuard
                 out ElectionGuard.PlaintextBallotSelection.External.PlaintextBallotSelectionHandle handle);
         }
 
-        internal static unsafe class CiphertextBallotSelection
+        internal static class CiphertextBallotSelection
         {
             [DllImport(DllName,
                 EntryPoint = "eg_ciphertext_ballot_selection_crypto_hash_with",
@@ -2145,7 +2145,7 @@ namespace ElectionGuard
 
         }
 
-        internal static unsafe class PlaintextBallotContest
+        internal static class PlaintextBallotContest
         {
             [DllImport(DllName, EntryPoint = "eg_plaintext_ballot_contest_new",
                 CallingConvention = CallingConvention.Cdecl, SetLastError = true)]
@@ -2164,7 +2164,7 @@ namespace ElectionGuard
                 out ElectionGuard.PlaintextBallotSelection.External.PlaintextBallotSelectionHandle selection);
         }
 
-        internal static unsafe class CiphertextBallotContest
+        internal static class CiphertextBallotContest
         {
             [DllImport(DllName,
                 EntryPoint = "eg_ciphertext_ballot_contest_get_selection_at_index",
@@ -2213,9 +2213,9 @@ namespace ElectionGuard
                 ElementModQ.ElementModQHandle crypto_extended_base_hash);
         }
 
-        internal static unsafe class PlaintextBallot
+        internal static class PlaintextBallot
         {
-            internal unsafe struct PlaintextBallotType { };
+            internal struct PlaintextBallotType { };
 
             [DllImport(DllName,
                 EntryPoint = "eg_plaintext_ballot_new",
@@ -2269,9 +2269,9 @@ namespace ElectionGuard
             // TODO: implement MsgPackFree
         }
 
-        internal static unsafe class CompactPlaintextBallot
+        internal static class CompactPlaintextBallot
         {
-            internal unsafe struct CompactPlaintextBallotType { };
+            internal struct CompactPlaintextBallotType { };
 
             internal class CompactPlaintextBallotHandle
                 : ElectionGuardSafeHandle<CompactPlaintextBallotType>
@@ -2309,9 +2309,9 @@ namespace ElectionGuard
             internal static extern Status MsgPackFree(IntPtr data);
         }
 
-        internal static unsafe class CiphertextBallot
+        internal static class CiphertextBallot
         {
-            internal unsafe struct CiphertextBallotType { };
+            internal struct CiphertextBallotType { };
 
             internal class CiphertextBallotHandle
                 : ElectionGuardSafeHandle<CiphertextBallotType>
@@ -2453,9 +2453,9 @@ namespace ElectionGuard
                 CiphertextBallotHandle handle, out IntPtr data, out ulong size);
         }
 
-        internal static unsafe class CompactCiphertextBallot
+        internal static class CompactCiphertextBallot
         {
-            internal unsafe struct CompactCiphertextBallotType { };
+            internal struct CompactCiphertextBallotType { };
 
             internal class CompactCiphertextBallotHandle
                 : ElectionGuardSafeHandle<CompactCiphertextBallotType>
@@ -2503,9 +2503,9 @@ namespace ElectionGuard
 
         #region SubmittedBallot
 
-        internal static unsafe class SubmittedBallot
+        internal static class SubmittedBallot
         {
-            internal unsafe struct SubmittedBallotType { };
+            internal struct SubmittedBallotType { };
 
             internal class SubmittedBallotHandle
                 : ElectionGuardSafeHandle<SubmittedBallotType>
@@ -2646,9 +2646,9 @@ namespace ElectionGuard
 
         #region Encrypt
 
-        internal static unsafe class EncryptionDevice
+        internal static class EncryptionDevice
         {
-            internal unsafe struct EncryptionDeviceType { };
+            internal struct EncryptionDeviceType { };
 
             internal class EncryptionDeviceHandle
                 : ElectionGuardSafeHandle<EncryptionDeviceType>
@@ -2703,9 +2703,9 @@ namespace ElectionGuard
 
         }
 
-        internal static unsafe class EncryptionMediator
+        internal static class EncryptionMediator
         {
-            internal unsafe struct EncryptionMediatorType { };
+            internal struct EncryptionMediatorType { };
 
             internal class EncryptionMediatorHandle
                 : ElectionGuardSafeHandle<EncryptionMediatorType>
@@ -2769,7 +2769,7 @@ namespace ElectionGuard
         }
 
 
-        internal static unsafe class Encrypt
+        internal static class Encrypt
         {
             [DllImport(DllName, EntryPoint = "eg_encrypt_selection",
                 CallingConvention = CallingConvention.Cdecl, SetLastError = true)]
@@ -2837,7 +2837,7 @@ namespace ElectionGuard
         }
 
         #region Precompute
-        internal static unsafe class PrecomputeBuffers
+        internal static class PrecomputeBuffers
         {
             [DllImport(DllName, EntryPoint = "eg_precompute_init",
                 CallingConvention = CallingConvention.Cdecl, SetLastError = true)]
@@ -2860,7 +2860,7 @@ namespace ElectionGuard
 
 
         #region Memory
-        internal static unsafe class Memory
+        internal static class Memory
         {
             [DllImport(DllName, EntryPoint = "eg_free_int_ptr",
                 CallingConvention = CallingConvention.Cdecl, SetLastError = true)]

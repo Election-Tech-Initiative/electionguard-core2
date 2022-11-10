@@ -20,7 +20,7 @@ namespace ElectionGuard
         /// Create a Plaintext Ballot
         /// </summary>
         /// <param name="json">json representation</param>
-        public unsafe PlaintextBallot(string json)
+        public PlaintextBallot(string json)
         {
             var status = NativeInterface.PlaintextBallot.FromJson(json, out Handle);
             status.ThrowIfError();
@@ -48,7 +48,7 @@ namespace ElectionGuard
         /// <param name="objectId"></param>
         /// <param name="styleId"></param>
         /// <param name="contests"></param>
-        public unsafe PlaintextBallot(
+        public PlaintextBallot(
             string objectId, string styleId, PlaintextBallotContest[] contests)
         {
             IntPtr[] contestPointers = new IntPtr[contests.Length];
@@ -68,7 +68,7 @@ namespace ElectionGuard
         /// </summary>
         /// <param name="index"></param>
         /// <returns></returns>
-        public unsafe PlaintextBallotContest GetContestAt(ulong index)
+        public PlaintextBallotContest GetContestAt(ulong index)
         {
             var status = NativeInterface.PlaintextBallot.GetContestAtIndex(
                 Handle, index, out PlaintextBallotContest.External.PlaintextBallotContestHandle value);
@@ -80,7 +80,7 @@ namespace ElectionGuard
         /// Export the ballot representation as JSON
         /// </Summary>
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Style", "IDE0059:Unnecessary assignment of a value", Justification = "<Pending>")]
-        public unsafe string ToJson()
+        public string ToJson()
         {
             var status = NativeInterface.PlaintextBallot.ToJson(
                 Handle, out IntPtr pointer, out _);
@@ -93,7 +93,7 @@ namespace ElectionGuard
         /// <Summary>
         /// Export the ballot representation as BSON
         /// </Summary>
-        public unsafe byte[] ToBson()
+        public byte[] ToBson()
         {
 
             var status = NativeInterface.PlaintextBallot.ToBson(
@@ -115,7 +115,7 @@ namespace ElectionGuard
         /// <Summary>
         /// Export the ballot representation as MsgPack
         /// </Summary>
-        public unsafe byte[] ToMsgPack()
+        public byte[] ToMsgPack()
         {
 
             var status = NativeInterface.PlaintextBallot.ToMsgPack(

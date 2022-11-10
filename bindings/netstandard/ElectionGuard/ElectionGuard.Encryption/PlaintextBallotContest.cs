@@ -16,7 +16,7 @@ namespace ElectionGuard
     /// </summary>
     public partial class PlaintextBallotContest : DisposableBase
     {
-        internal unsafe PlaintextBallotContest(
+        internal PlaintextBallotContest(
             External.PlaintextBallotContestHandle handle)
         {
             Handle = handle;
@@ -27,7 +27,7 @@ namespace ElectionGuard
         /// </summary>
         /// <param name="objectId"></param>
         /// <param name="selections"></param>
-        public unsafe PlaintextBallotContest(string objectId, PlaintextBallotSelection[] selections)
+        public PlaintextBallotContest(string objectId, PlaintextBallotSelection[] selections)
         {
             IntPtr[] selectionPointers = new IntPtr[selections.Length];
             for (var i = 0; i < selections.Length; i++)
@@ -44,7 +44,7 @@ namespace ElectionGuard
         /// <Summary>
         /// Get a selection at a specific index.
         /// </Summary>
-        public unsafe PlaintextBallotSelection GetSelectionAt(ulong index)
+        public PlaintextBallotSelection GetSelectionAt(ulong index)
         {
             var status = NativeInterface.PlaintextBallotContest.GetSelectionAtIndex(
                 Handle, index, out PlaintextBallotSelection.External.PlaintextBallotSelectionHandle value);

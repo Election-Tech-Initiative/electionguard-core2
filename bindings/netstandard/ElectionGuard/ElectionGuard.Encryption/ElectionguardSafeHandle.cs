@@ -17,14 +17,14 @@ namespace ElectionGuard
 
         // Objects constructed from a structure pointer
         // do not own the context
-        internal unsafe ElectionGuardSafeHandle(
+        internal ElectionGuardSafeHandle(
             IntPtr handle)
             : base(ownsHandle: false)
         {
             SetHandle(handle);
         }
 
-        internal unsafe ElectionGuardSafeHandle(
+        internal ElectionGuardSafeHandle(
             IntPtr handle, bool ownsHandle)
             : base(ownsHandle)
         {

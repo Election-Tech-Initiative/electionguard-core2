@@ -14,12 +14,12 @@ namespace ElectionGuard
     /// </summary>
     public class CiphertextBallot : DisposableBase
     {
-        internal unsafe NativeInterface.CiphertextBallot.CiphertextBallotHandle Handle;
+        internal NativeInterface.CiphertextBallot.CiphertextBallotHandle Handle;
 
         /// <summary>
         /// The unique ballot id that is meaningful to the consuming application.
         /// </summary>
-        public unsafe string ObjectId
+        public string ObjectId
         {
             get
             {
@@ -37,7 +37,7 @@ namespace ElectionGuard
         /// to determine which contests to expect on the ballot, to fill in missing values,
         /// and to validate that the ballot is well-formed
         /// </Summary>
-        public unsafe string StyleId
+        public string StyleId
         {
             get
             {
@@ -53,7 +53,7 @@ namespace ElectionGuard
         /// <summary>
         /// Hash of the complete Election Manifest to which this ballot belongs
         /// </summary>
-        public unsafe ElementModQ ManifestHash
+        public ElementModQ ManifestHash
         {
             get
             {
@@ -69,7 +69,7 @@ namespace ElectionGuard
         /// the hash of a previous ballot or the hash of some other value
         /// that is meaningful to the consuming application.
         /// </summary>
-        public unsafe ElementModQ BallotCodeSeed
+        public ElementModQ BallotCodeSeed
         {
             get
             {
@@ -83,7 +83,7 @@ namespace ElectionGuard
         /// <summary>
         /// Get the size of the contests collection
         /// </summary>
-        public unsafe ulong ContestsSize
+        public ulong ContestsSize
         {
             get
             {
@@ -96,7 +96,7 @@ namespace ElectionGuard
         /// The unique ballot code for this ballot that is derived from
         /// the ballot seed, the timestamp, and the hash of the encrypted values
         /// </summary>
-        public unsafe ElementModQ BallotCode
+        public ElementModQ BallotCode
         {
             get
             {
@@ -113,7 +113,7 @@ namespace ElectionGuard
         /// provide units as it is up to the host system to indicate the scale.
         /// Typically a host may use seconds since epoch or ticks since epoch
         /// </summary>
-        public unsafe ulong Timestamp
+        public ulong Timestamp
         {
             get
             {
@@ -127,7 +127,7 @@ namespace ElectionGuard
         /// <summary>
         /// The nonce value used to encrypt all values in the ballot
         /// </summary>
-        public unsafe ElementModQ Nonce
+        public ElementModQ Nonce
         {
             get
             {
@@ -142,7 +142,7 @@ namespace ElectionGuard
         /// Create a CiphertextBallot
         /// </summary>
         /// <param name="json"></param>
-        public unsafe CiphertextBallot(string json)
+        public CiphertextBallot(string json)
         {
             var status = NativeInterface.CiphertextBallot.FromJson(json, out Handle);
             status.ThrowIfError();
@@ -164,7 +164,7 @@ namespace ElectionGuard
             }
         }
 
-        internal unsafe CiphertextBallot(NativeInterface.CiphertextBallot.CiphertextBallotHandle handle)
+        internal CiphertextBallot(NativeInterface.CiphertextBallot.CiphertextBallotHandle handle)
         {
             Handle = handle;
         }
@@ -172,7 +172,7 @@ namespace ElectionGuard
         /// <summary>
         /// Get a contest at a specific index
         /// </summary>
-        public unsafe CiphertextBallotContest GetContestAt(ulong index)
+        public CiphertextBallotContest GetContestAt(ulong index)
         {
             var status = NativeInterface.CiphertextBallot.GetContestAtIndex(
                 Handle, 
@@ -192,7 +192,7 @@ namespace ElectionGuard
         /// Specifically, the seed in this context is the hash of the Election Manifest,
         /// or whatever `ElementModQ` was used to populate the `manifest_hash` field.
         /// </summary>
-        public unsafe bool IsValidEncryption(
+        public bool IsValidEncryption(
             ElementModQ manifestHash, ElementModP elGamalPublicKey, ElementModQ cryptoExtendedBaseHash)
         {
             return NativeInterface.CiphertextBallot.IsValidEncryption(
@@ -204,7 +204,7 @@ namespace ElectionGuard
         /// Export the ballot representation as JSON
         /// </Summary>
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Style", "IDE0059:Unnecessary assignment of a value", Justification = "<Pending>")]
-        public unsafe string ToJson(bool withNonces = false)
+        public string ToJson(bool withNonces = false)
         {
             var status = withNonces
                 ? NativeInterface.CiphertextBallot.ToJsonWithNonces(
@@ -220,7 +220,7 @@ namespace ElectionGuard
         /// <Summary>
         /// Export the ballot representation as BSON
         /// </Summary>
-        public unsafe byte[] ToBson(bool withNonces = false)
+        public byte[] ToBson(bool withNonces = false)
         {
 
             var status = withNonces
@@ -245,7 +245,7 @@ namespace ElectionGuard
         /// <Summary>
         /// Export the ballot representation as MsgPack
         /// </Summary>
-        public unsafe byte[] ToMsgPack(bool withNonces = false)
+        public byte[] ToMsgPack(bool withNonces = false)
         {
 
             var status = withNonces
@@ -267,7 +267,7 @@ namespace ElectionGuard
         }
 
 #pragma warning disable CS1591 // Missing XML comment for publicly visible type or member
-        protected override unsafe void DisposeUnmanaged()
+        protected override void DisposeUnmanaged()
 #pragma warning restore CS1591 // Missing XML comment for publicly visible type or member
         {
             base.DisposeUnmanaged();

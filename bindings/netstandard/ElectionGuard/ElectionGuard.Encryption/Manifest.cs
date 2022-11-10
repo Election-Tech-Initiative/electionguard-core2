@@ -77,7 +77,7 @@ namespace ElectionGuard
         /// a reporting unit that represents the geographical scope of the election,
         /// such as a state or city.
         /// </Summary>
-        public unsafe string ElectionScopeId
+        public string ElectionScopeId
         {
             get
             {
@@ -96,7 +96,7 @@ namespace ElectionGuard
         /// <Summary>
         /// Enumerated type of election, such as partisan-primary or open-primary.
         /// </Summary>
-        public unsafe ElectionType ElectionType
+        public ElectionType ElectionType
         {
             get
             {
@@ -108,7 +108,7 @@ namespace ElectionGuard
         /// <Summary>
         /// The start date/time of the election.
         /// </Summary>
-        public unsafe DateTime StartDate
+        public DateTime StartDate
         {
             get
             {
@@ -120,7 +120,7 @@ namespace ElectionGuard
         /// <Summary>
         /// The end date/time of the election.
         /// </Summary>
-        public unsafe DateTime EndDate
+        public DateTime EndDate
         {
             get
             {
@@ -132,7 +132,7 @@ namespace ElectionGuard
         /// <Summary>
         /// The size of the geopolitical units collection
         /// </Summary>
-        public unsafe ulong GeopoliticalUnitsSize
+        public ulong GeopoliticalUnitsSize
         {
             get
             {
@@ -144,7 +144,7 @@ namespace ElectionGuard
         /// <Summary>
         /// The size of the parties collection
         /// </Summary>
-        public unsafe ulong PartiesSize
+        public ulong PartiesSize
         {
             get
             {
@@ -156,7 +156,7 @@ namespace ElectionGuard
         /// <Summary>
         /// The size of the candidates collection
         /// </Summary>
-        public unsafe ulong CandidatesSize
+        public ulong CandidatesSize
         {
             get
             {
@@ -168,7 +168,7 @@ namespace ElectionGuard
         /// <Summary>
         /// The size of the contests collection
         /// </Summary>
-        public unsafe ulong ContestsSize
+        public ulong ContestsSize
         {
             get
             {
@@ -180,7 +180,7 @@ namespace ElectionGuard
         /// <Summary>
         /// The size of the ballot styles collection
         /// </Summary>
-        public unsafe ulong BallotStylesSize
+        public ulong BallotStylesSize
         {
             get
             {
@@ -192,7 +192,7 @@ namespace ElectionGuard
         /// <Summary>
         /// The friendly name of the election
         /// </Summary>
-        public unsafe InternationalizedText Name
+        public InternationalizedText Name
         {
             get
             {
@@ -209,7 +209,7 @@ namespace ElectionGuard
         /// <Summary>
         /// The contact information for the election
         /// </Summary>
-        public unsafe ContactInformation ContactInfo
+        public ContactInformation ContactInfo
         {
             get
             {
@@ -223,9 +223,9 @@ namespace ElectionGuard
             }
         }
 
-        internal unsafe NativeManifest Handle;
+        internal NativeManifest Handle;
 
-        internal unsafe Manifest(NativeManifest handle)
+        internal Manifest(NativeManifest handle)
         {
             Handle = handle;
         }
@@ -234,7 +234,7 @@ namespace ElectionGuard
         /// Creates a `Manifest` object
         /// </summary>
         /// <param name="json">string of json data describing the manifest</param>
-        public unsafe Manifest(string json)
+        public Manifest(string json)
         {
             var data = Language.EncodeNonAsciiCharacters(json);
             var status = NativeInterface.Manifest.FromJson(data, out Handle);
@@ -275,7 +275,7 @@ namespace ElectionGuard
         /// <param name="candidates">array of the `Candidate` for election</param>
         /// <param name="contests">array of the `ContestDescription` for election</param>
         /// <param name="ballotStyles">array of the `BallotStyle` for election</param>
-        public unsafe Manifest(
+        public Manifest(
             string electionScopeId, ElectionType electionType,
             DateTime startDate, DateTime endDate,
             GeopoliticalUnit[] gpUnits, Party[] parties,
@@ -347,7 +347,7 @@ namespace ElectionGuard
         /// <param name="ballotStyles">array of the `BallotStyle` for election</param>
         /// <param name="name">name of the election</param>
         /// <param name="contact">contact information for the election</param>
-        public unsafe Manifest(
+        public Manifest(
              string electionScopeId, ElectionType electionType,
              DateTime startDate, DateTime endDate,
              GeopoliticalUnit[] gpUnits, Party[] parties,
@@ -408,7 +408,7 @@ namespace ElectionGuard
         }
 
 #pragma warning disable CS1591 // Missing XML comment for publicly visible type or member
-        protected override unsafe void DisposeUnmanaged()
+        protected override void DisposeUnmanaged()
 #pragma warning restore CS1591 // Missing XML comment for publicly visible type or member
         {
             base.DisposeUnmanaged();
@@ -421,7 +421,7 @@ namespace ElectionGuard
         /// <Summary>
         /// Collection of geopolitical units for this election.
         /// </Summary>
-        public unsafe GeopoliticalUnit GetGeopoliticalUnitAtIndex(ulong index)
+        public GeopoliticalUnit GetGeopoliticalUnitAtIndex(ulong index)
         {
             var status = NativeInterface.Manifest.GetGeopoliticalUnitAtIndex(
                 Handle, index, out NativeGeopoliticalUnit value);
@@ -435,7 +435,7 @@ namespace ElectionGuard
         /// <Summary>
         /// Collection of parties for this election.
         /// </Summary>
-        public unsafe Party GetPartyAtIndex(ulong index)
+        public Party GetPartyAtIndex(ulong index)
         {
             var status = NativeInterface.Manifest.GetPartyAtIndex(
                 Handle, index, out NativeParty value);
@@ -449,7 +449,7 @@ namespace ElectionGuard
         /// <Summary>
         /// Collection of candidates for this election.
         /// </Summary>
-        public unsafe Candidate GetCandidateAtIndex(ulong index)
+        public Candidate GetCandidateAtIndex(ulong index)
         {
             var status = NativeInterface.Manifest.GetCandidateAtIndex(
                 Handle, index, out NativeCandidate value);
@@ -463,7 +463,7 @@ namespace ElectionGuard
         /// <Summary>
         /// Collection of contests for this election.
         /// </Summary>
-        public unsafe ContestDescription GetContestAtIndex(ulong index)
+        public ContestDescription GetContestAtIndex(ulong index)
         {
             var status = NativeInterface.Manifest.GetContestAtIndex(
                 Handle, index, out NativeContestDescription value);
@@ -477,7 +477,7 @@ namespace ElectionGuard
         /// <Summary>
         /// Collection of ballot styles for this election.
         /// </Summary>
-        public unsafe BallotStyle GetBallotStyleAtIndex(ulong index)
+        public BallotStyle GetBallotStyleAtIndex(ulong index)
         {
             var status = NativeInterface.Manifest.GetBallotStyleAtIndex(
                 Handle, index, out NativeBallotStyle value);
@@ -491,7 +491,7 @@ namespace ElectionGuard
         /// <Summary>
         /// A hash representation of the object
         /// </Summary>
-        public unsafe ElementModQ CryptoHash()
+        public ElementModQ CryptoHash()
         {
             var status = NativeInterface.Manifest.CryptoHash(
                     Handle, out NativeElementModQ value);
@@ -505,7 +505,7 @@ namespace ElectionGuard
         /// <Summary>
         /// Check whether the election manifest is valid and well-formed.
         /// </Summary>
-        public unsafe bool IsValid()
+        public bool IsValid()
         {
             var value = NativeInterface.Manifest.IsValid(Handle);
             return value;
@@ -514,7 +514,7 @@ namespace ElectionGuard
         /// <Summary>
         /// Export the ballot representation as JSON
         /// </Summary>
-        public unsafe string ToJson()
+        public string ToJson()
         {
             var status = NativeInterface.Manifest.ToJson(
                 Handle, out IntPtr pointer, out _);
@@ -530,7 +530,7 @@ namespace ElectionGuard
         /// <Summary>
         /// Export the ballot representation as ToBson
         /// </Summary>
-        public unsafe byte[] ToBson()
+        public byte[] ToBson()
         {
 
             var status = NativeInterface.Manifest.ToBson(
@@ -555,7 +555,7 @@ namespace ElectionGuard
         /// <Summary>
         /// Export the ballot representation as MsgPack
         /// </Summary>
-        public unsafe byte[] ToMsgPack()
+        public byte[] ToMsgPack()
         {
 
             var status = NativeInterface.Manifest.ToMsgPack(

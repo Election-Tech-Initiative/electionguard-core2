@@ -11,7 +11,7 @@
     /// </summary>
     public class EncryptionMediator : DisposableBase
     {
-        internal unsafe NativeInterface.EncryptionMediator.EncryptionMediatorHandle Handle;
+        internal NativeInterface.EncryptionMediator.EncryptionMediatorHandle Handle;
 
         /// <summary>
         /// Create an `EncryptionMediator` object
@@ -19,7 +19,7 @@
         /// <param name="manifest"></param>
         /// <param name="context"></param>
         /// <param name="device"></param>
-        public unsafe EncryptionMediator(
+        public EncryptionMediator(
             InternalManifest manifest,
             CiphertextElectionContext context,
             EncryptionDevice device)
@@ -37,7 +37,7 @@
         /// <summary>
         /// Encrypt the specified ballot using the cached election context.
         /// </summary>
-        public unsafe CiphertextBallot Encrypt(
+        public CiphertextBallot Encrypt(
             PlaintextBallot plaintext, bool verifyProofs = false)
         {
             if (verifyProofs)
@@ -60,7 +60,7 @@
         /// <summary>
         /// Encrypt the specified ballot into its compact form using the cached election context.
         /// </summary>
-        public unsafe CompactCiphertextBallot CompactEncrypt(
+        public CompactCiphertextBallot CompactEncrypt(
             PlaintextBallot plaintext, bool verifyProofs = false)
         {
             if (verifyProofs)
@@ -81,7 +81,7 @@
         }
 
 #pragma warning disable CS1591 // Missing XML comment for publicly visible type or member
-        protected override unsafe void DisposeUnmanaged()
+        protected override void DisposeUnmanaged()
 #pragma warning restore CS1591 // Missing XML comment for publicly visible type or member
         {
             base.DisposeUnmanaged();

@@ -20,7 +20,7 @@
         /// <Summary>
         /// a0 in the spec
         /// </Summary>
-        public unsafe ElementModP ZeroPad
+        public ElementModP ZeroPad
         {
             get
             {
@@ -34,7 +34,7 @@
         /// <Summary>
         /// b0 in the spec
         /// </Summary>
-        public unsafe ElementModP ZeroData
+        public ElementModP ZeroData
         {
             get
             {
@@ -48,7 +48,7 @@
         /// <Summary>
         /// a1 in the spec
         /// </Summary>
-        public unsafe ElementModP OnePad
+        public ElementModP OnePad
         {
             get
             {
@@ -62,7 +62,7 @@
         /// <Summary>
         /// b1 in the spec
         /// </Summary>
-        public unsafe ElementModP OneData
+        public ElementModP OneData
         {
             get
             {
@@ -76,7 +76,7 @@
         /// <Summary>
         /// c0 in the spec
         /// </Summary>
-        public unsafe ElementModQ ZeroChallenge
+        public ElementModQ ZeroChallenge
         {
             get
             {
@@ -90,7 +90,7 @@
         /// <Summary>
         /// c1 in the spec
         /// </Summary>
-        public unsafe ElementModQ OneChallenge
+        public ElementModQ OneChallenge
         {
             get
             {
@@ -104,7 +104,7 @@
         /// <Summary>
         /// c in the spec
         /// </Summary>
-        public unsafe ElementModQ Challenge
+        public ElementModQ Challenge
         {
             get
             {
@@ -118,7 +118,7 @@
         /// <Summary>
         /// v0 in the spec
         /// </Summary>
-        public unsafe ElementModQ ZeroResponse
+        public ElementModQ ZeroResponse
         {
             get
             {
@@ -132,7 +132,7 @@
         /// <Summary>
         /// v1 in the spec
         /// </Summary>
-        public unsafe ElementModQ OneResponse
+        public ElementModQ OneResponse
         {
             get
             {
@@ -143,9 +143,9 @@
             }
         }
 
-        internal unsafe NativeDisjunctiveChaumPedersenProof Handle;
+        internal NativeDisjunctiveChaumPedersenProof Handle;
 
-        internal unsafe DisjunctiveChaumPedersenProof(NativeDisjunctiveChaumPedersenProof handle)
+        internal DisjunctiveChaumPedersenProof(NativeDisjunctiveChaumPedersenProof handle)
         {
             Handle = handle;
         }
@@ -163,7 +163,7 @@
         /// <param name="plaintext">The constant value to prove, zero or one</param>
         /// <returns>A unique pointer</returns>
         /// </Summary>
-        public unsafe DisjunctiveChaumPedersenProof(
+        public DisjunctiveChaumPedersenProof(
             ElGamalCiphertext message,
             ElementModQ r,
             ElementModP k,
@@ -189,7 +189,7 @@
         /// <param name="plaintext">The constant value to prove, zero or one</param>
         /// <returns>A unique pointer</returns>
         /// </Summary>
-        public unsafe DisjunctiveChaumPedersenProof(
+        public DisjunctiveChaumPedersenProof(
             ElGamalCiphertext message,
             ElementModQ r,
             ElementModP k,
@@ -210,7 +210,7 @@
         /// <param name="q"> The extended base hash of the election</param>
         /// <returns> True if everything is consistent. False otherwise. </returns>
         /// </Summary>
-        public unsafe bool IsValid(ElGamalCiphertext message, ElementModP k, ElementModQ q)
+        public bool IsValid(ElGamalCiphertext message, ElementModP k, ElementModQ q)
         {
             return NativeInterface.DisjunctiveChaumPedersenProof.IsValid(
                 Handle, message.Handle, k.Handle, q.Handle
@@ -218,7 +218,7 @@
         }
 
 #pragma warning disable CS1591 // Missing XML comment for publicly visible type or member
-        protected override unsafe void DisposeUnmanaged()
+        protected override void DisposeUnmanaged()
 #pragma warning restore CS1591 // Missing XML comment for publicly visible type or member
         {
             base.DisposeUnmanaged();

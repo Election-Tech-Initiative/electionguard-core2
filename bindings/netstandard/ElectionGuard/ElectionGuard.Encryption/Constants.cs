@@ -14,7 +14,7 @@ namespace ElectionGuard
         /// <summary>
         /// G in Hacl_Bignum4096 format
         /// </summary>
-        public static unsafe ElementModP G
+        public static ElementModP G
         {
             get
             {
@@ -30,7 +30,7 @@ namespace ElectionGuard
         /// <summary>
         /// Max P value in Hacl_Bignum4096 format
         /// </summary>
-        public static unsafe ElementModP P
+        public static ElementModP P
         {
             get
             {
@@ -46,7 +46,7 @@ namespace ElectionGuard
         /// <summary>
         /// R value in Hacl_Bignum4096 format
         /// </summary>
-        public static unsafe ElementModP R
+        public static ElementModP R
         {
             get
             {
@@ -62,7 +62,7 @@ namespace ElectionGuard
         /// <summary>
         /// zero as data for `ElementModP`
         /// </summary>
-        public static unsafe ElementModP ZERO_MOD_P
+        public static ElementModP ZERO_MOD_P
         {
             get
             {
@@ -78,7 +78,7 @@ namespace ElectionGuard
         /// <summary>
         /// one as data for `ElementModP`
         /// </summary>
-        public static unsafe ElementModP ONE_MOD_P
+        public static ElementModP ONE_MOD_P
         {
             get
             {
@@ -94,7 +94,7 @@ namespace ElectionGuard
         /// <summary>
         /// two as data for `ElementModP`
         /// </summary>
-        public static unsafe ElementModP TWO_MOD_P
+        public static ElementModP TWO_MOD_P
         {
             get
             {
@@ -110,7 +110,7 @@ namespace ElectionGuard
         /// <summary>
         /// Max Q value in Hacl_Bignum256 format
         /// </summary>
-        public static unsafe ElementModQ Q
+        public static ElementModQ Q
         {
             get
             {
@@ -126,7 +126,7 @@ namespace ElectionGuard
         /// <summary>
         /// zero as data for `ElementModQ`
         /// </summary>
-        public static unsafe ElementModQ ZERO_MOD_Q
+        public static ElementModQ ZERO_MOD_Q
         {
             get
             {
@@ -142,7 +142,7 @@ namespace ElectionGuard
         /// <summary>
         /// one as data for `ElementModQ`
         /// </summary>
-        public static unsafe ElementModQ ONE_MOD_Q
+        public static ElementModQ ONE_MOD_Q
         {
             get
             {
@@ -158,7 +158,7 @@ namespace ElectionGuard
         /// <summary>
         /// two as data for `ElementModQ`
         /// </summary>
-        public static unsafe ElementModQ TWO_MOD_Q
+        public static ElementModQ TWO_MOD_Q
         {
             get
             {
@@ -175,7 +175,7 @@ namespace ElectionGuard
         /// Export the representation as JSON
         /// </Summary>
         [SuppressMessage("Style", "IDE0059:Unnecessary assignment of a value", Justification = "<Pending>")]
-        public static unsafe string ToJson()
+        public static string ToJson()
         {
             var status = NativeInterface.Constants.ToJson(
                 out IntPtr pointer, out _);

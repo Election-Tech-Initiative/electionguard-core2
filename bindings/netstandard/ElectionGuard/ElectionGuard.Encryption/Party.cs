@@ -15,7 +15,7 @@ namespace ElectionGuard
         /// <Summary>
         /// Unique internal identifier that's used by other elements to reference this element.
         /// </Summary>
-        public unsafe string ObjectId
+        public string ObjectId
         {
             get
             {
@@ -34,7 +34,7 @@ namespace ElectionGuard
         /// <Summary>
         /// Abbreviation of the party
         /// </Summary>
-        public unsafe string Abbreviation
+        public string Abbreviation
         {
             get
             {
@@ -53,7 +53,7 @@ namespace ElectionGuard
         /// <Summary>
         /// Name of the party
         /// </Summary>
-        public unsafe InternationalizedText Name
+        public InternationalizedText Name
         {
             get
             {
@@ -70,7 +70,7 @@ namespace ElectionGuard
         /// <Summary>
         /// An optional color in hex
         /// </Summary>
-        public unsafe string Color
+        public string Color
         {
             get
             {
@@ -89,7 +89,7 @@ namespace ElectionGuard
         /// <Summary>
         /// An optional logo uri
         /// </Summary>
-        public unsafe string LogoUri
+        public string LogoUri
         {
             get
             {
@@ -105,9 +105,9 @@ namespace ElectionGuard
             }
         }
 
-        internal unsafe NativeInterface.Party.PartyHandle Handle;
+        internal NativeInterface.Party.PartyHandle Handle;
 
-        internal unsafe Party(
+        internal Party(
             NativeInterface.Party.PartyHandle handle)
         {
             Handle = handle;
@@ -117,7 +117,7 @@ namespace ElectionGuard
         /// Create a `Party` object
         /// </summary>
         /// <param name="objectId">string to identify the object</param>
-        public unsafe Party(string objectId)
+        public Party(string objectId)
         {
             var status = NativeInterface.Party.New(objectId, out Handle);
             if (status != Status.ELECTIONGUARD_STATUS_SUCCESS)
@@ -134,7 +134,7 @@ namespace ElectionGuard
         /// <param name="abbreviation">abbreviation for the object</param>
         /// <param name="color">string for the name of the color used</param>
         /// <param name="logoUri">string for the uri for the logo</param>
-        public unsafe Party(
+        public Party(
             string objectId, InternationalizedText name,
             string abbreviation, string color, string logoUri)
         {
@@ -147,7 +147,7 @@ namespace ElectionGuard
         }
 
 #pragma warning disable CS1591 // Missing XML comment for publicly visible type or member
-        protected override unsafe void DisposeUnmanaged()
+        protected override void DisposeUnmanaged()
 #pragma warning restore CS1591 // Missing XML comment for publicly visible type or member
         {
             base.DisposeUnmanaged();
@@ -160,7 +160,7 @@ namespace ElectionGuard
         /// <Summary>
         /// A hash representation of the object
         /// </Summary>
-        public unsafe ElementModQ CryptoHash()
+        public ElementModQ CryptoHash()
         {
             var status = NativeInterface.Party.CryptoHash(
                 Handle, out NativeInterface.ElementModQ.ElementModQHandle value);

@@ -21,7 +21,7 @@ namespace ElectionGuard
             internal set => NewNative(value);
         }
 
-        internal unsafe NativeInterface.ElementModQ.ElementModQHandle Handle;
+        internal NativeInterface.ElementModQ.ElementModQHandle Handle;
 
         /// <summary>
         /// Create a `ElementModQ`
@@ -52,7 +52,7 @@ namespace ElectionGuard
             status.ThrowIfError();
         }
 
-        internal unsafe ElementModQ(NativeInterface.ElementModQ.ElementModQHandle handle)
+        internal ElementModQ(NativeInterface.ElementModQ.ElementModQHandle handle)
         {
             Handle = handle;
         }
@@ -60,7 +60,7 @@ namespace ElectionGuard
         /// <Summary>
         /// exports a hex representation of the integer value in Big Endian format
         /// </Summary>
-        public unsafe string ToHex()
+        public string ToHex()
         {
             var status = NativeInterface.ElementModQ.ToHex(Handle, out IntPtr pointer);
             if (status != Status.ELECTIONGUARD_STATUS_SUCCESS)
@@ -73,7 +73,7 @@ namespace ElectionGuard
         }
 
 #pragma warning disable CS1591 // Missing XML comment for publicly visible type or member
-        protected override unsafe void DisposeUnmanaged()
+        protected override void DisposeUnmanaged()
 #pragma warning restore CS1591 // Missing XML comment for publicly visible type or member
         {
             base.DisposeUnmanaged();

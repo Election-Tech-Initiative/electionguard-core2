@@ -18,7 +18,7 @@ namespace ElectionGuard
     /// </summary>
     public partial class PlaintextBallotSelection : DisposableBase
     {
-        internal unsafe PlaintextBallotSelection(External.PlaintextBallotSelectionHandle handle)
+        internal PlaintextBallotSelection(External.PlaintextBallotSelectionHandle handle)
         {
             Handle = handle;
         }
@@ -29,7 +29,7 @@ namespace ElectionGuard
         /// <param name="objectId"></param>
         /// <param name="vote"></param>
         /// <param name="isPlaceholder"></param>
-        public unsafe PlaintextBallotSelection(
+        public PlaintextBallotSelection(
             string objectId, ulong vote, bool isPlaceholder = false)
         {
             var status = NativeInterface.PlaintextBallotSelection.New(
@@ -44,7 +44,7 @@ namespace ElectionGuard
         /// <param name="vote"></param>
         /// <param name="isPlaceholder"></param>
         /// <param name="extendedData"></param>
-        public unsafe PlaintextBallotSelection(
+        public PlaintextBallotSelection(
             string objectId, ulong vote, bool isPlaceholder, string extendedData)
         {
             var status = NativeInterface.PlaintextBallotSelection.New(

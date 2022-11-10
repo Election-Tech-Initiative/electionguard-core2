@@ -22,7 +22,7 @@ namespace ElectionGuard
         /// <Summary>
         /// Unique internal identifier that's used by other elements to reference this element.
         /// </Summary>
-        public unsafe string ObjectId
+        public string ObjectId
         {
             get
             {
@@ -41,7 +41,7 @@ namespace ElectionGuard
         /// <Summary>
         /// the object id of the candidate
         /// </Summary>
-        public unsafe string CandidateId
+        public string CandidateId
         {
             get
             {
@@ -62,7 +62,7 @@ namespace ElectionGuard
         /// Note: this is specifically for programs to interpret and does not necessarily represent
         /// the order in which selections are presented to a user.
         /// </Summary>
-        public unsafe ulong SequenceOrder
+        public ulong SequenceOrder
         {
             get
             {
@@ -71,9 +71,9 @@ namespace ElectionGuard
             }
         }
 
-        internal unsafe NativeInterface.SelectionDescription.SelectionDescriptionHandle Handle;
+        internal NativeInterface.SelectionDescription.SelectionDescriptionHandle Handle;
 
-        internal unsafe SelectionDescription(
+        internal SelectionDescription(
             NativeInterface.SelectionDescription.SelectionDescriptionHandle handle)
         {
             Handle = handle;
@@ -85,7 +85,7 @@ namespace ElectionGuard
         /// <param name="objectId">string identifying the object</param>
         /// <param name="candidateId">string identifying the candidate</param>
         /// <param name="sequenceOrder">the number of the item for sequence order</param>
-        public unsafe SelectionDescription(
+        public SelectionDescription(
             string objectId, string candidateId, ulong sequenceOrder)
         {
             var status = NativeInterface.SelectionDescription.New(
@@ -97,7 +97,7 @@ namespace ElectionGuard
         }
 
 #pragma warning disable CS1591 // Missing XML comment for publicly visible type or member
-        protected override unsafe void DisposeUnmanaged()
+        protected override void DisposeUnmanaged()
 #pragma warning restore CS1591 // Missing XML comment for publicly visible type or member
         {
             base.DisposeUnmanaged();
@@ -110,7 +110,7 @@ namespace ElectionGuard
         /// <Summary>
         /// A hash representation of the object
         /// </Summary>
-        public unsafe ElementModQ CryptoHash()
+        public ElementModQ CryptoHash()
         {
             var status = NativeInterface.SelectionDescription.CryptoHash(
                 Handle, out NativeInterface.ElementModQ.ElementModQHandle value);

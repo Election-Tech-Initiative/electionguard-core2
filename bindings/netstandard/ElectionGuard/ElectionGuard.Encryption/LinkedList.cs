@@ -13,11 +13,11 @@ namespace ElectionGuard
         /// <Summary>
         /// Get the count of elements in the list.
         /// </Summary>
-        public unsafe ulong Count => NativeInterface.LinkedList.GetCount(Handle);
+        public ulong Count => NativeInterface.LinkedList.GetCount(Handle);
 
-        internal unsafe NativeLinkedList Handle;
+        internal NativeLinkedList Handle;
 
-        internal unsafe LinkedList(NativeLinkedList handle)
+        internal LinkedList(NativeLinkedList handle)
         {
             Handle = handle;
         }
@@ -25,7 +25,7 @@ namespace ElectionGuard
         /// <summary>
         /// Default constructor
         /// </summary>
-        public unsafe LinkedList()
+        public LinkedList()
         {
             var status = NativeInterface.LinkedList.New(out Handle);
             status.ThrowIfError();
@@ -34,7 +34,7 @@ namespace ElectionGuard
         /// <summary>
         /// Append the key value pair to the end of the linked list
         /// </summary>
-        public unsafe void Append(string key, string value)
+        public void Append(string key, string value)
         {
             var status = NativeInterface.LinkedList.Append(Handle, key, value);
             status.ThrowIfError();
@@ -43,7 +43,7 @@ namespace ElectionGuard
         /// <summary>
         /// Delete the last value in the list
         /// </summary>
-        public unsafe void DeleteLast()
+        public void DeleteLast()
         {
             var status = NativeInterface.LinkedList.DeleteLast(Handle);
             status.ThrowIfError();
@@ -52,7 +52,7 @@ namespace ElectionGuard
         /// <summary>
         /// Get the element at the designated position
         /// </summary>
-        public unsafe Tuple<string, string> GetElementAt(ulong position)
+        public Tuple<string, string> GetElementAt(ulong position)
         {
             var status = NativeInterface.LinkedList.GetElementAt(
                     Handle, position, out IntPtr key, out IntPtr value);
@@ -63,7 +63,7 @@ namespace ElectionGuard
         /// <summary>
         /// Get the value at the designated position
         /// </summary>
-        public unsafe string GetValueAt(ulong position)
+        public string GetValueAt(ulong position)
         {
             var status = NativeInterface.LinkedList.GetValueAt(
                     Handle, position, out IntPtr value);
@@ -75,7 +75,7 @@ namespace ElectionGuard
         /// <summary>
         /// Get the value using the designated key
         /// </summary>
-        public unsafe string this[string searchKey]
+        public string this[string searchKey]
         {
             get
             {
@@ -93,7 +93,7 @@ namespace ElectionGuard
         }
 
 #pragma warning disable CS1591 // Missing XML comment for publicly visible type or member
-        protected override unsafe void DisposeUnmanaged()
+        protected override void DisposeUnmanaged()
 #pragma warning restore CS1591 // Missing XML comment for publicly visible type or member
         {
             base.DisposeUnmanaged();
