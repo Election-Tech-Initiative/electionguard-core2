@@ -128,7 +128,7 @@ jobs:
       - name: Configure Environment
         run: make environment
       - name: Lint
-        if: (runner.lint)
+        if: (matrix.lint)
         run: make lint
       - name: Run Tests
         if: (runner.os == 'Linux' && matrix.os != 'ubuntu-20.04')
@@ -143,10 +143,10 @@ jobs:
         if: (runner.os == 'Windows' && matrix.compiler == 'msvc')
         run: make test-msvc TARGET=DEBUG
       - name: Run .Net Tests
-        if: (runner.runCsTests)
+        if: (matrix.runCsTests)
         run: make test-netstandard
       - name: Make Release Build
-        if: (runner.makeReleaseBuild && runner.os == 'Linux')
+        if: (matrix.makeReleaseBuild && runner.os == 'Linux')
         env:
           NDK_PATH: $$ANDROID_NDK_HOME
         run: |
@@ -155,7 +155,7 @@ jobs:
           #   make build-android
           # fi
       - name: Make Release Build
-        if: (runner.makeReleaseBuild && runner.os == 'macOS')
+        if: (matrix.makeReleaseBuild && runner.os == 'macOS')
         env:
           NDK_PATH: $$ANDROID_NDK_HOME
         run: |
