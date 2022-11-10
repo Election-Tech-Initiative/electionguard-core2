@@ -68,7 +68,13 @@ namespace ElectionGuard.Encryption.Tests
 
             var waitReturn = waitHandle.WaitOne(MaxCompleteDelay);
 
-            precompute.GetProgress(out var count, out var queueSize);
+            // ReSharper disable once InlineOutVariableDeclaration
+            // ReSharper disable once RedundantAssignment
+            var count = -1;
+            // ReSharper disable once InlineOutVariableDeclaration
+            // ReSharper disable once RedundantAssignment
+            var queueSize = -1;
+            precompute.GetProgress(out count, out queueSize);
             var status = precompute.GetStatus();
 
             Assert.AreEqual(DefaultBufferSize, queueSize);
