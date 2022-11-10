@@ -137,10 +137,10 @@ jobs:
         if: runner.os == 'macOS'
         run: make test
       - name: Run Tests
-        if: (runner.runCsTests && runner.os == 'Windows' && matrix.compiler != 'msvc')
+        if: (runner.os == 'Windows' && matrix.compiler != 'msvc')
         run: make test
       - name: Run MSVC Tests
-        if: (runner.runCsTests && runner.os == 'Windows' && matrix.compiler == 'msvc')
+        if: (runner.os == 'Windows' && matrix.compiler == 'msvc')
         run: make test-msvc TARGET=DEBUG
       - name: Run .Net Tests
         if: (runner.runCsTests)
