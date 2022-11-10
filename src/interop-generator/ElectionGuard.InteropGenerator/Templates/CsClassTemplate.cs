@@ -252,7 +252,7 @@ foreach (var p in method.Params) {
             
             #line default
             #line hidden
-            this.Write("Handle : ElectionguardSafeHandle<");
+            this.Write("Handle : ElectionGuardSafeHandle<");
             
             #line 88 "C:\dev\ElectionGuard\electionguard-core2\src\interop-generator\ElectionGuard.InteropGenerator\Templates\CsClassTemplate.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(className));

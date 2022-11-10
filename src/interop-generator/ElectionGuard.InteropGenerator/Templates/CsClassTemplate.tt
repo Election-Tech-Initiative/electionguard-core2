@@ -85,7 +85,7 @@ foreach (var p in method.Params) {
         internal unsafe static class External {
             internal unsafe struct <#= className #>Type { };
 
-            internal class <#= className #>Handle : ElectionguardSafeHandle<<#= className #>Type>
+            internal class <#= className #>Handle : ElectionGuardSafeHandle<<#= className #>Type>
             {
                 [ReliabilityContract(Consistency.WillNotCorruptState, Cer.MayFail)]
                 protected override bool Free()

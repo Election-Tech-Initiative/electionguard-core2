@@ -175,7 +175,9 @@ namespace ElectionGuard
         public unsafe CiphertextBallotContest GetContestAt(ulong index)
         {
             var status = NativeInterface.CiphertextBallot.GetContestAtIndex(
-                Handle, index, out NativeInterface.CiphertextBallotContest.CiphertextBallotContestHandle value);
+                Handle, 
+                index, 
+                out var value);
             status.ThrowIfError();
             return new CiphertextBallotContest(value);
         }
