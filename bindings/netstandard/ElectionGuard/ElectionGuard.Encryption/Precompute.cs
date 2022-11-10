@@ -1,5 +1,4 @@
-﻿using System;
-using System.Threading;
+﻿using System.Threading;
 // ReSharper disable RedundantAssignment
 // ReSharper disable InlineOutVariableDeclaration
 

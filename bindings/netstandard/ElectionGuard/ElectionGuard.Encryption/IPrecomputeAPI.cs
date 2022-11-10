@@ -1,7 +1,4 @@
-﻿using System;
-using System.Threading;
-
-namespace ElectionGuard
+﻿namespace ElectionGuard
 {
     /// <summary>
     /// Interface for the precompute API to start and stop the precompute calculations
