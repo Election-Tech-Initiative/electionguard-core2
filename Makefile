@@ -389,7 +389,7 @@ endif
 
 # Sample Data
 
-lint-cs:
+lint:
 	dotnet jb inspectcode -o="lint-results.xml" -f="Xml" --build --verbosity="WARN" -s="Warning" bindings/netstandard/ElectionGuard/ElectionGuard.sln
 	dotnet nvika parsereport "lint-results.xml" --treatwarningsaserrors
 
