@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading;
-using System.Threading.Tasks;
+﻿using System.Threading;
 using NUnit.Framework;
 
 namespace ElectionGuard.Encryption.Tests
@@ -11,10 +6,10 @@ namespace ElectionGuard.Encryption.Tests
     [TestFixture]
     class TestPrecompute
     {
-        readonly int MAX_COMPLETE_DELAY = 7000;
-        readonly int SMALL_BUFFER_SIZE = 10;
-        readonly int DEFAULT_BUFFER_SIZE = 5000;
-        readonly int LARGE_BUFFER_SIZE = 6000;
+        private const int MaxCompleteDelay = 7000;
+        private const int SmallBufferSize = 10;
+        private const int DefaultBufferSize = 5000;
+        private const int LargeBufferSize = 6000;
 
         [Test]
         public void Test_Precompute_Status_NoStarted()
@@ -34,25 +29,24 @@ namespace ElectionGuard.Encryption.Tests
             Precompute precompute = new Precompute();
             var keypair = ElGamalKeyPair.FromSecret(Constants.TWO_MOD_Q);
 
-            precompute.CompletedEvent += (PrecomputeStatus completedStatus) =>
+            precompute.CompletedEvent += completedStatus =>
             {
                 Assert.AreEqual(PrecomputeState.UserStopped, completedStatus.CurrentState);
                 waitHandle.Set();
             };
-            precompute.StartPrecomputeAsync(keypair.PublicKey, LARGE_BUFFER_SIZE);
+            precompute.StartPrecomputeAsync(keypair.PublicKey, LargeBufferSize);
             var runningStatus = precompute.GetStatus();
             precompute.StopPrecompute();
 
-            var waitReturn = waitHandle.WaitOne(MAX_COMPLETE_DELAY);
+            var waitReturn = waitHandle.WaitOne(MaxCompleteDelay);
 
-            int count = -1;
-            int queue_size = -1;
-            precompute.GetProgress(out count, out queue_size);
+            precompute.GetProgress(out _, out var queueSize);
             var status = precompute.GetStatus();
 
-            Assert.AreEqual(LARGE_BUFFER_SIZE, queue_size);
+            Assert.AreEqual(LargeBufferSize, queueSize);
             Assert.AreEqual(PrecomputeState.Running, runningStatus.CurrentState);
             Assert.AreEqual(true, waitReturn);
+            Assert.AreEqual(PrecomputeState.UserStopped, status.CurrentState);
         }
 
         [Test]
@@ -63,7 +57,7 @@ namespace ElectionGuard.Encryption.Tests
             Precompute precompute = new Precompute();
             var keypair = ElGamalKeyPair.FromSecret(Constants.TWO_MOD_Q);
 
-            precompute.CompletedEvent += (PrecomputeStatus completedStatus) =>
+            precompute.CompletedEvent += completedStatus =>
             {
                 Assert.AreEqual(PrecomputeState.UserStopped, completedStatus.CurrentState);
                 waitHandle.Set();
@@ -72,14 +66,12 @@ namespace ElectionGuard.Encryption.Tests
             var statusRunning = precompute.GetStatus();
             precompute.StopPrecompute();
 
-            var waitReturn = waitHandle.WaitOne(MAX_COMPLETE_DELAY);
+            var waitReturn = waitHandle.WaitOne(MaxCompleteDelay);
 
-            int count = -1;
-            int queue_size = -1;
-            precompute.GetProgress(out count, out queue_size);
+            precompute.GetProgress(out var count, out var queueSize);
             var status = precompute.GetStatus();
 
-            Assert.AreEqual(DEFAULT_BUFFER_SIZE, queue_size);
+            Assert.AreEqual(DefaultBufferSize, queueSize);
             Assert.AreNotEqual(-1, count);
 
             Assert.AreEqual(PrecomputeState.Running, statusRunning.CurrentState);
@@ -96,24 +88,22 @@ namespace ElectionGuard.Encryption.Tests
             Precompute precompute = new Precompute();
             var keypair = ElGamalKeyPair.FromSecret(Constants.TWO_MOD_Q);
 
-            precompute.CompletedEvent += (PrecomputeStatus completedStatus) =>
+            precompute.CompletedEvent += completedStatus =>
             {
-                Assert.AreEqual(SMALL_BUFFER_SIZE, completedStatus.CompletedExponentiationsCount);
+                Assert.AreEqual(SmallBufferSize, completedStatus.CompletedExponentiationsCount);
                 Assert.AreEqual(1.0, completedStatus.Percentage);
                 Assert.AreEqual(PrecomputeState.Completed, completedStatus.CurrentState);
                 waitHandle.Set();
             };
-            precompute.StartPrecomputeAsync(keypair.PublicKey, SMALL_BUFFER_SIZE);
+            precompute.StartPrecomputeAsync(keypair.PublicKey, SmallBufferSize);
 
-            var waitReturn = waitHandle.WaitOne(MAX_COMPLETE_DELAY);
+            var waitReturn = waitHandle.WaitOne(MaxCompleteDelay);
 
-            int count = -1;
-            int queue_size = -1;
-            precompute.GetProgress(out count, out queue_size);
+            precompute.GetProgress(out var count, out var queueSize);
             var status = precompute.GetStatus();
 
-            Assert.AreEqual(SMALL_BUFFER_SIZE, queue_size);
-            Assert.AreEqual(SMALL_BUFFER_SIZE, count);
+            Assert.AreEqual(SmallBufferSize, queueSize);
+            Assert.AreEqual(SmallBufferSize, count);
 
             Assert.AreEqual(PrecomputeState.Completed, status.CurrentState);
             Assert.AreEqual(true, waitReturn);

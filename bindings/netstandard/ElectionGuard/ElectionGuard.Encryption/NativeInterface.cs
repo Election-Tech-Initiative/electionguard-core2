@@ -2819,6 +2819,7 @@ namespace ElectionGuard
 
             [DllImport(DllName, EntryPoint = "eg_encryption_mediator_encrypt_ballot",
                 CallingConvention = CallingConvention.Cdecl, SetLastError = true)]
+            // ReSharper disable once MemberHidesStaticFromOuterClass
             internal static extern Status Encrypt(
                 EncryptionMediatorHandle handle,
                 ElectionGuard.PlaintextBallot.External.PlaintextBallotHandle plainutext,

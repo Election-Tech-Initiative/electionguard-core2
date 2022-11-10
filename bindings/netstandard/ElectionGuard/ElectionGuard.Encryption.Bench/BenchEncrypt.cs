@@ -7,7 +7,7 @@ namespace ElectionGuard.Encryption.Bench
 
     public class BenchEncrypt : Fixture
     {
-        readonly int MAX_COMPLETE_DELAY = 7000;
+        private const int MaxCompleteDelay = 7000;
         readonly ElementModQ _nonce;
         readonly ElGamalKeyPair _keypair;
         readonly InternalManifest _internalManifest;
@@ -88,7 +88,7 @@ namespace ElectionGuard.Encryption.Bench
                 waitHandle.Set();
             };
             precompute.StartPrecomputeAsync(_keypair.PublicKey, 1000);
-            waitHandle.WaitOne(MAX_COMPLETE_DELAY);
+            waitHandle.WaitOne(MaxCompleteDelay);
             Run(() =>
             {
                 precompute.StopPrecompute();
