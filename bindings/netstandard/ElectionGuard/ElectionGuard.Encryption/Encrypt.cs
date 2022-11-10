@@ -1,7 +1,7 @@
 ﻿namespace ElectionGuard
 {
     using NativeCiphertextBallot = NativeInterface.CiphertextBallot.CiphertextBallotHandle;
-    using NativeCiphertextBallotContest = NativeInterface.CiphertextBallotContest.CiphertextBallotContestHandle;
+    using NativeCiphertextBallotContest = CiphertextBallotContest.External.CiphertextBallotContestHandle;
     using NativeCiphertextBallotSelection = CiphertextBallotSelection.External.CiphertextBallotSelectionHandle;
     using NativeCompactCiphertextBallot = NativeInterface.CompactCiphertextBallot.CompactCiphertextBallotHandle;
 
@@ -71,9 +71,14 @@
         )
         {
             var status = NativeInterface.Encrypt.Contest(
-                    plaintext.Handle, description.Handle, elgamalPublicKey.Handle,
-                    cryptoExtendedBaseHash.Handle, nonceSeed.Handle, shouldVerifyProofs,
-                    out NativeCiphertextBallotContest ciphertext);
+                plaintext.Handle,
+                description.Handle,
+                elgamalPublicKey.Handle,
+                cryptoExtendedBaseHash.Handle,
+                nonceSeed.Handle,
+                shouldVerifyProofs,
+                out var ciphertext);
+
             status.ThrowIfError();
             return new CiphertextBallotContest(ciphertext);
         }

@@ -1,6 +1,3 @@
-using System;
-using System.Runtime.InteropServices;
-
 namespace ElectionGuard
 {
     /// <summary>
@@ -17,102 +14,9 @@ namespace ElectionGuard
     /// seed nonce, both values can be regenerated.  If the `nonce` for this contest is completely random,
     /// then it is required in order to regenerate the proof.
     /// </summary>
-    public class CiphertextBallotContest : DisposableBase
+    public partial class CiphertextBallotContest : DisposableBase
     {
-        /// <Summary>
-        /// Get the objectId of the contest, which is the unique id for
-        /// the contest in a specific ballot style described in the election manifest.
-        /// </Summary>
-        public unsafe string ObjectId
-        {
-            get
-            {
-                var status = NativeInterface.CiphertextBallotContest.GetObjectId(
-                    Handle, out IntPtr value);
-                status.ThrowIfError();
-                var data = Marshal.PtrToStringAnsi(value);
-                NativeInterface.Memory.FreeIntPtr(value);
-                return data;
-            }
-        }
-
-        /// <Summary>
-        /// Get the sequence order of the contest
-        /// </Summary>
-        public unsafe ulong SequenceOrder => NativeInterface.CiphertextBallotContest.GetSequenceOrder(Handle);
-
-        /// <summary>
-        /// The hash of the string representation of the Contest Description from the election manifest
-        /// </summary>
-        public unsafe ElementModQ DescriptionHash
-        {
-            get
-            {
-                var status = NativeInterface.CiphertextBallotContest.GetDescriptionHash(
-                    Handle, out NativeInterface.ElementModQ.ElementModQHandle value);
-                status.ThrowIfError();
-                return new ElementModQ(value);
-            }
-        }
-
-        /// <summary>
-        /// Get the Size of the selections collection
-        /// </summary>
-        public unsafe ulong SelectionsSize
-        {
-            get
-            {
-                var size = NativeInterface.CiphertextBallotContest.GetSelectionsSize(Handle);
-                return size;
-            }
-        }
-
-        /// <summary>
-        /// Hash of the encrypted values
-        /// </summary>
-        public unsafe ElementModQ CryptoHash
-        {
-            get
-            {
-                var status = NativeInterface.CiphertextBallotContest.GetCryptoHash(
-                    Handle, out NativeInterface.ElementModQ.ElementModQHandle value);
-                status.ThrowIfError();
-                return new ElementModQ(value);
-            }
-        }
-
-        /// <summary>
-        /// The nonce used to generate the encryption. Sensitive &amp; should be treated as a secret
-        /// </summary>
-        public unsafe ElementModQ Nonce
-        {
-            get
-            {
-                var status = NativeInterface.CiphertextBallotContest.GetNonce(
-                    Handle, out NativeInterface.ElementModQ.ElementModQHandle value);
-                status.ThrowIfError();
-                return new ElementModQ(value);
-            }
-        }
-
-        /// <summary>
-        /// The proof demonstrates the sum of the selections does not exceed the maximum
-        /// available selections for the contest, and that the proof was generated with the nonce
-        /// </summary>
-        public unsafe ConstantChaumPedersenProof Proof
-        {
-            get
-            {
-                var status = NativeInterface.CiphertextBallotContest.GetProof(
-                    Handle, out NativeInterface.ConstantChaumPedersenProof.ConstantChaumPedersenProofHandle value);
-                status.ThrowIfError();
-                return new ConstantChaumPedersenProof(value);
-            }
-        }
-
-        internal unsafe NativeInterface.CiphertextBallotContest.CiphertextBallotContestHandle Handle;
-
-        internal unsafe CiphertextBallotContest(NativeInterface.CiphertextBallotContest.CiphertextBallotContestHandle handle)
+        internal CiphertextBallotContest(External.CiphertextBallotContestHandle handle)
         {
             Handle = handle;
         }
@@ -120,7 +24,7 @@ namespace ElectionGuard
         /// <summary>
         /// Get a selection at a specific index.
         /// </summary>
-        public unsafe CiphertextBallotSelection GetSelectionAt(ulong index)
+        public CiphertextBallotSelection GetSelectionAt(ulong index)
         {
             var status = NativeInterface.CiphertextBallotContest.GetSelectionAtIndex(
                 Handle, index, out CiphertextBallotSelection.External.CiphertextBallotSelectionHandle value);
@@ -138,7 +42,7 @@ namespace ElectionGuard
         ///
         /// In most cases the encryption_seed should match the `description_hash`
         /// </summary>
-        public unsafe ElementModQ CryptoHashWith(ElementModQ encryptionSeed)
+        public ElementModQ CryptoHashWith(ElementModQ encryptionSeed)
         {
             var status = NativeInterface.CiphertextBallotContest.CryptoHashWith(
                 Handle, encryptionSeed.Handle, out NativeInterface.ElementModQ.ElementModQHandle value);
@@ -150,7 +54,7 @@ namespace ElectionGuard
         /// An aggregate nonce for the contest composed of the nonces of the selections.
         /// Used when constructing the proof of selection limit
         /// </summary>
-        public unsafe ElementModQ AggregateNonce()
+        public ElementModQ AggregateNonce()
         {
             var status = NativeInterface.CiphertextBallotContest.AggregateNonce(
                 Handle, out NativeInterface.ElementModQ.ElementModQHandle value);
@@ -162,7 +66,7 @@ namespace ElectionGuard
         /// Add the individual ballot_selections `message` fields together, suitable for use
         /// when constructing the proof of selection limit.
         /// </summary>
-        public unsafe ElGamalCiphertext ElGamalAccumulate()
+        public ElGamalCiphertext ElGamalAccumulate()
         {
             var status = NativeInterface.CiphertextBallotContest.ElGamalAccumulate(
                 Handle, out NativeInterface.ElGamalCiphertext.ElGamalCiphertextHandle value);
@@ -181,7 +85,7 @@ namespace ElectionGuard
         /// Specifically, the seed hash in this context is the hash of the ContestDescription,
         /// or whatever `ElementModQ` was used to populate the `description_hash` field.
         /// </summary>
-        public unsafe bool IsValidEncryption(
+        public bool IsValidEncryption(
             ElementModQ encryptionSeed,
             ElementModP elGamalPublicKey,
             ElementModQ cryptoExtendedBaseHash)
@@ -189,17 +93,6 @@ namespace ElectionGuard
             return NativeInterface.CiphertextBallotContest.IsValidEncryption(
                 Handle, encryptionSeed.Handle, elGamalPublicKey.Handle,
                 cryptoExtendedBaseHash.Handle);
-        }
-
-#pragma warning disable CS1591 // Missing XML comment for publicly visible type or member
-        protected override unsafe void DisposeUnmanaged()
-#pragma warning restore CS1591 // Missing XML comment for publicly visible type or member
-        {
-            base.DisposeUnmanaged();
-
-            if (Handle == null || Handle.IsInvalid) return;
-            Handle.Dispose();
-            Handle = null;
         }
     }
 }
