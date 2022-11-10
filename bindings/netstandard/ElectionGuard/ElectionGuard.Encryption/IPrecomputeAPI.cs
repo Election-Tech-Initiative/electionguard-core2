@@ -11,14 +11,6 @@ namespace ElectionGuard
         /// <summary>
         /// Starts the precompute process by creating a new thread to run the process
         /// </summary>
-        /// <param name="maxExp">The max exponentiation to be calculated</param>
-        /// <param name="token">CancellationToken that can be used to start the process</param>
-        [Obsolete]
-        void StartPrecomputeAsync(long maxExp, CancellationToken token);
-
-        /// <summary>
-        /// Starts the precompute process by creating a new thread to run the process
-        /// </summary>
         /// <param name="publicKey">The max exponentiation to be calculated</param>
         /// <param name="buffers">The maximum number of buffers to precompute</param>
         void StartPrecomputeAsync(ElementModP publicKey, int buffers);
