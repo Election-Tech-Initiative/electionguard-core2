@@ -180,7 +180,7 @@ namespace ElectionGuard
             this.Write("\r\n        /// </summary>\r\n        public ");
             
             #line 60 "C:\dev\ElectionGuard\electionguard-core2\src\interop-generator\ElectionGuard.InteropGenerator\Templates\CsClassTemplate.tt"
-            this.Write(this.ToStringHelper.ToStringWithCulture(method.ReturnTypeCs));
+            this.Write(this.ToStringHelper.ToStringWithCulture(method.ReturnType.TypeCs));
             
             #line default
             #line hidden
@@ -414,7 +414,7 @@ if (EgClass.NeverFree) {
                     "rue)]\r\n            internal static extern ");
             
             #line 145 "C:\dev\ElectionGuard\electionguard-core2\src\interop-generator\ElectionGuard.InteropGenerator\Templates\CsClassTemplate.tt"
-            this.Write(this.ToStringHelper.ToStringWithCulture(method.ReturnTypeCs));
+            this.Write(this.ToStringHelper.ToStringWithCulture(method.ReturnType.TypeCs));
             
             #line default
             #line hidden

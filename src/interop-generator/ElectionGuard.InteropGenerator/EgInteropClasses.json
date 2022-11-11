@@ -37,12 +37,14 @@
     "Methods": [
       {
         "Name": "IsValid",
-        "ReturnTypeCs": "bool",
+        "ReturnType": {
+          "TypeCs": "bool" 
+        } ,
         "Description": "Given a PlaintextBallotSelection validates that the object matches an expected object and that the plaintext value can resolve to a valid representation",
         "Params": [
           {
-            "TypeCs": "string",
-            "Name": "expectedObjectId"
+            "Name": "expectedObjectId",
+            "TypeCs": "string"
           }
         ]
       }
@@ -70,7 +72,9 @@
     "Methods": [
       {
         "Name": "IsValid",
-        "ReturnTypeCs": "bool",
+        "ReturnType": {
+          "TypeCs": "bool"
+        },
         "Description": "Given a PlaintextBallotContest returns true if the state is representative of the expected values.  Note: because this class supports partial representations, undervotes are considered a valid state.",
         "Params": [
           {

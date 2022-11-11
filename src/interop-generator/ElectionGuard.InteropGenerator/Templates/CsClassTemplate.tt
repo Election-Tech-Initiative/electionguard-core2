@@ -57,7 +57,7 @@ namespace ElectionGuard
         /// <summary>
         /// <#= method.Description #>
         /// </summary>
-        public <#= method.ReturnTypeCs #> <#= method.Name #>(
+        public <#= method.ReturnType.TypeCs #> <#= method.Name #>(
             <#= string.Join(", ", method.Params.Select(p => p.AsCsParam())) #>
         ) {
             return External.<#= method.Name #>(
@@ -142,7 +142,7 @@ if (EgClass.NeverFree) {
 #>
             [DllImport(NativeInterface.DllName, EntryPoint = "<#= entryPoint #>",
                 CallingConvention = CallingConvention.Cdecl, SetLastError = true)]
-            internal static extern <#= method.ReturnTypeCs #> <#= method.Name #>(
+            internal static extern <#= method.ReturnType.TypeCs #> <#= method.Name #>(
                 <#= className #>Handle handle<#
 foreach (var p in method.Params) { #>,
                 <#= p.AsCppInteropParam() #><# 
