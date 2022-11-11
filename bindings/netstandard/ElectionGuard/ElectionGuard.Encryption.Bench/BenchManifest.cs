@@ -21,8 +21,7 @@ namespace ElectionGuard.Encryption.Bench
                 var subject = new InternationalizedText(languages);
 
                 // Assert
-                // ReSharper disable once UnusedVariable
-                var actual = subject.GetTextAt(0);
+                subject.GetTextAt(0);
             });
         }
     }
