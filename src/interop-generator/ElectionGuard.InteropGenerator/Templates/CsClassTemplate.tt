@@ -19,7 +19,7 @@ namespace ElectionGuard
 {
     public partial class <#= className #>
     {
-        internal unsafe External.<#= className #>Handle Handle;
+        internal External.<#= className #>Handle Handle;
 
         #region Properties
 <# foreach (var egProperty in EgClass.Properties) { 
@@ -28,7 +28,7 @@ namespace ElectionGuard
         /// <Summary>
         /// <#= egProperty.Description #>
         /// </Summary>
-        public unsafe <#= egProperty.TypeCs #> <#= egProperty.Name #>
+        public <#= egProperty.TypeCs #> <#= egProperty.Name #>
         {
             get
             {
@@ -57,7 +57,7 @@ namespace ElectionGuard
         /// <summary>
         /// <#= method.Description #>
         /// </summary>
-        public unsafe <#= method.ReturnTypeCs #> <#= method.Name #>(
+        public <#= method.ReturnTypeCs #> <#= method.Name #>(
             <#= string.Join(", ", method.Params.Select(p => p.AsCsParam())) #>
         ) {
             return External.<#= method.Name #>(
@@ -70,7 +70,7 @@ foreach (var p in method.Params) {
 <# } // foreach method #>
 
 #pragma warning disable CS1591 // Missing XML comment for publicly visible type or member
-        protected override unsafe void DisposeUnmanaged()
+        protected override void DisposeUnmanaged()
 #pragma warning restore CS1591 // Missing XML comment for publicly visible type or member
         {
             base.DisposeUnmanaged();
@@ -82,8 +82,8 @@ foreach (var p in method.Params) {
         #endregion
 
         #region Extern
-        internal unsafe static class External {
-            internal unsafe struct <#= className #>Type { };
+        internal static unsafe class External {
+            internal struct <#= className #>Type { };
 
             internal class <#= className #>Handle : ElectionGuardSafeHandle<<#= className #>Type>
             {

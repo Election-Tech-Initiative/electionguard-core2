@@ -9,13 +9,13 @@ namespace ElectionGuard
 {
     public partial class PlaintextBallot
     {
-        internal unsafe External.PlaintextBallotHandle Handle;
+        internal External.PlaintextBallotHandle Handle;
 
         #region Properties
         /// <Summary>
         /// A unique Ballot ID that is relevant to the external system and must be unique within the dataset of the election.
         /// </Summary>
-        public unsafe string ObjectId
+        public string ObjectId
         {
             get
             {
@@ -30,7 +30,7 @@ namespace ElectionGuard
         /// <Summary>
         /// The Object Id of the ballot style in the election manifest.  This value is used to determine which contests to expect on the ballot, to fill in missing values, and to validate that the ballot is well-formed.
         /// </Summary>
-        public unsafe string StyleId
+        public string StyleId
         {
             get
             {
@@ -45,7 +45,7 @@ namespace ElectionGuard
         /// <Summary>
         /// The size of the Contests collection.
         /// </Summary>
-        public unsafe ulong ContestsSize
+        public ulong ContestsSize
         {
             get
             {
@@ -58,7 +58,7 @@ namespace ElectionGuard
         #region Methods
 
 #pragma warning disable CS1591 // Missing XML comment for publicly visible type or member
-        protected override unsafe void DisposeUnmanaged()
+        protected override void DisposeUnmanaged()
 #pragma warning restore CS1591 // Missing XML comment for publicly visible type or member
         {
             base.DisposeUnmanaged();
@@ -70,8 +70,8 @@ namespace ElectionGuard
         #endregion
 
         #region Extern
-        internal unsafe static class External {
-            internal unsafe struct PlaintextBallotType { };
+        internal static unsafe class External {
+            internal struct PlaintextBallotType { };
 
             internal class PlaintextBallotHandle : ElectionGuardSafeHandle<PlaintextBallotType>
             {
