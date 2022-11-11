@@ -50,6 +50,15 @@ namespace ElectionGuard
             return External.IsValid(
                 Handle, expectedObjectId, expectedNumSelections, expectedNumElected, votesAllowed);
         }
+        /// <summary>
+        /// Get a selection at a specific index.
+        /// </summary>
+        public PlaintextBallotSelection GetSelectionAt(
+            ulong index
+        ) {
+            return External.GetSelectionAt(
+                Handle, index);
+        }
 
 #pragma warning disable CS1591 // Missing XML comment for publicly visible type or member
         protected override void DisposeUnmanaged()
@@ -110,6 +119,12 @@ namespace ElectionGuard
                 ulong expectedNumSelections,
                 ulong expectedNumElected,
                 ulong votesAllowed
+                );
+            [DllImport(NativeInterface.DllName, EntryPoint = "eg_plaintext_ballot_contest_get_selection_at",
+                CallingConvention = CallingConvention.Cdecl, SetLastError = true)]
+            internal static extern PlaintextBallotSelection GetSelectionAt(
+                PlaintextBallotContestHandle handle,
+                ulong index
                 );
         }
         #endregion

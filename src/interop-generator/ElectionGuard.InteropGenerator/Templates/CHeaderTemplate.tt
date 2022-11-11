@@ -60,14 +60,21 @@ if (egProperty.IsReferenceType()) {
 
 <# } // foreach property #>
 <# foreach (var egMethod in EgClass.Methods) { 
-	var entryPoint = egMethod.GetEntryPoint(EgClass.ClassName); #>
+	var entryPoint = egMethod.GetEntryPoint(EgClass.ClassName); 
+	var returnType = egMethod.GetCReturnType();
+	#>
 /**
  * <#= egMethod.Description #>
  */
-EG_API <#= egMethod.ReturnTypeC #><#= entryPoint #>(
-	eg_plaintext_ballot_selection_t *handle<#
+EG_API <#= returnType #> <#= entryPoint #>(
+	eg_<#= EgClass.ClassName.ToSnakeCase() #>_t *handle<#
 foreach (var parameter in egMethod.Params) {
 	this.Write($",{Environment.NewLine}\t{parameter.TypeC}in_{parameter.Name.ToSnakeCase()}");
+}
+if (egMethod.ReturnType.IsReferenceType) {
+	var outVarReturnType = egMethod.ReturnType.OutVarCType;
+	var outParamName = "out_" + egMethod.Name.ToSnakeCase() + "_ref";
+	this.Write($",{Environment.NewLine}\t{outVarReturnType}{outParamName}");
 }
 #>
 

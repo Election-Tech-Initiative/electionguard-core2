@@ -8,10 +8,13 @@ public record EgMethod (
     string Description,
     EgParam[] Params)
 {
-    public string ReturnTypeC => TypeHelper.CsToC(ReturnType.TypeCs);
-    
     public string GetEntryPoint(string className)
     {
         return $"Eg{className}{Name}".ToSnakeCase();
+    }
+
+    public string GetCReturnType()
+    {
+        return ReturnType.GetCReturnType();
     }
 }
