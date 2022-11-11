@@ -8,12 +8,12 @@ namespace ElectionGuard.Encryption.Bench
     public class BenchEncrypt : Fixture
     {
         private const int MaxCompleteDelay = 7000;
-        readonly ElementModQ _nonce;
-        readonly ElGamalKeyPair _keypair;
-        readonly InternalManifest _internalManifest;
-        readonly CiphertextElectionContext _context;
-        readonly EncryptionDevice _device;
-        readonly PlaintextBallot _ballot;
+        private readonly ElementModQ _nonce;
+        private readonly ElGamalKeyPair _keypair;
+        private readonly InternalManifest _internalManifest;
+        private readonly CiphertextElectionContext _context;
+        private readonly EncryptionDevice _device;
+        private readonly PlaintextBallot _ballot;
 
         public BenchEncrypt()
         {
