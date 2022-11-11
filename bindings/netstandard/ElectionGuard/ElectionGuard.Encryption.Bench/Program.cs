@@ -3,9 +3,9 @@ using System.Collections.Generic;
 
 namespace ElectionGuard.Encryption.Bench
 {
-    class Program
+    public class Program
     {
-        static readonly List<Fixture> Fixtures =
+        private static readonly List<Fixture> Fixtures =
         new List<Fixture>{
             new BenchEncrypt(),
             new BenchManifest()

@@ -11,7 +11,7 @@ namespace ElectionGuard
         /// <summary>
         /// Number of 64-bit ints that make up the 256-bit prime
         /// </summary>
-        public static readonly ulong MaxSize = 4;
+        public const ulong MaxSize = 4;
 
         /// <Summary>
         /// Get the integer representation of the element
