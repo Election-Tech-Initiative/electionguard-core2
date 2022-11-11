@@ -53,10 +53,10 @@ namespace ElectionGuard
         /// <summary>
         /// Get a selection at a specific index.
         /// </summary>
-        public PlaintextBallotSelection GetSelectionAt(
+        public PlaintextBallotSelection GetSelectionAtIndex(
             ulong index
         ) {
-            var status = External.GetSelectionAt(
+            var status = External.GetSelectionAtIndex(
                 Handle,
                 index,
                 out PlaintextBallotSelection.External.PlaintextBallotSelectionHandle value);
@@ -125,9 +125,9 @@ namespace ElectionGuard
                 ulong votesAllowed
                 );
 
-            [DllImport(NativeInterface.DllName, EntryPoint = "eg_plaintext_ballot_contest_get_selection_at",
+            [DllImport(NativeInterface.DllName, EntryPoint = "eg_plaintext_ballot_contest_get_selection_at_index",
                 CallingConvention = CallingConvention.Cdecl, SetLastError = true)]
-            internal static extern Status GetSelectionAt(
+            internal static extern Status GetSelectionAtIndex(
                 PlaintextBallotContestHandle handle,
                 ulong index,
                 out PlaintextBallotSelection.External.PlaintextBallotSelectionHandle objectId

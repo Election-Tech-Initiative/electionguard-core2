@@ -107,7 +107,7 @@
         ]
       },
       {
-        "Name": "GetSelectionAt",
+        "Name": "GetSelectionAtIndex",
         "ReturnType": {
           "TypeCs": "PlaintextBallotSelection",
           "TypeC": "eg_plaintext_ballot_selection_t",

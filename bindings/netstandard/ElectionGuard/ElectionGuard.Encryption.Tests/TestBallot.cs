@@ -32,7 +32,7 @@ namespace ElectionGuard.Encryption.Tests
                 // iterate over the selections in the contest
                 for (ulong j = 0; j < contest.SelectionsSize; j++)
                 {
-                    var selection = contest.GetSelectionAt(j);
+                    var selection = contest.GetSelectionAtIndex(j);
 
                     // verify the selection property accessors
                     var selectionId = selection.ObjectId;
@@ -60,10 +60,10 @@ namespace ElectionGuard.Encryption.Tests
             var ballot = new PlaintextBallot("some-ballot-id", "some-ballot-style-id", contests);
 
             var contest = ballot.GetContestAt(0);
-            var selection1 = contest.GetSelectionAt(0);
+            var selection1 = contest.GetSelectionAtIndex(0);
             Assert.AreEqual(1, selection1.Vote);
 
-            var selection2 = contest.GetSelectionAt(1);
+            var selection2 = contest.GetSelectionAtIndex(1);
             Assert.AreEqual(0, selection2.Vote);
         }
 

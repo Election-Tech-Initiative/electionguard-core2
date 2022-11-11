@@ -191,17 +191,6 @@ EG_API eg_electionguard_status_t eg_plaintext_ballot_contest_new(
   char *object_id, eg_plaintext_ballot_selection_t *in_selections[],
   const uint64_t in_selections_size, eg_plaintext_ballot_contest_t **out_handle);
 
-/**
- * Get a selection at a specific index.
- * 
- * @param[in] in_index The index of the selection
- * @param[out] out_selection_ref An opaque pointer to the selection.  
- *                               The value is a reference and is not owned by the caller
- */
-EG_API eg_electionguard_status_t eg_plaintext_ballot_contest_get_selection_at_index(
-  eg_plaintext_ballot_contest_t *handle, uint64_t in_index,
-  eg_plaintext_ballot_selection_t **out_selection_ref);
-
 #endif
 
 #ifndef CiphertextBallotContest
