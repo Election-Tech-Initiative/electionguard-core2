@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace ElectionGuard.InteropGenerator.Helpers
+﻿namespace ElectionGuard.InteropGenerator.Helpers
 {
     internal static class TypeHelper
     {

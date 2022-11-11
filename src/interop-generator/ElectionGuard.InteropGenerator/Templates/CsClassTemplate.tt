@@ -23,21 +23,21 @@ namespace ElectionGuard
 
         #region Properties
 <# foreach (var egProperty in EgClass.Properties) { 
-        var isInternalType = egProperty.NativeHandleType != null;
+        var isElectionGuardType = egProperty.IsElectionGuardType;
         #>
         /// <Summary>
         /// <#= egProperty.Description #>
         /// </Summary>
-        public <#= egProperty.TypeCs #> <#= egProperty.Name #>
+        public <#= egProperty.Type.TypeCs #> <#= egProperty.Name #>
         {
             get
             {
-<# if (isInternalType) { #>
+<# if (isElectionGuardType) { #>
                 var status = External.Get<#= egProperty.Name #>(
-                    Handle, out <#= egProperty.NativeHandleType #> value);
+                    Handle, out <#= egProperty.Type.NativeHandleType #> value);
                 status.ThrowIfError();
-                return new <#= egProperty.TypeCs #>(value);
-<# } else if (egProperty.TypeCs == "string") { #>
+                return new <#= egProperty.Type.TypeCs #>(value);
+<# } else if (egProperty.Type.TypeCs == "string") { #>
                 var status = External.Get<#= egProperty.Name #>(Handle, out IntPtr value);
                 status.ThrowIfError();
                 var data = Marshal.PtrToStringAnsi(value);
@@ -118,8 +118,8 @@ if (EgClass.NeverFree) {
 
 <# foreach (var egProperty in EgClass.Properties) {
         var entryPoint = egProperty.GetEntryPoint(className);
-        var isInternalType = egProperty.NativeHandleType != null;
-        var isComplexType = egProperty.TypeCs == "string" || isInternalType;
+        var isElectionGuardType = egProperty.IsElectionGuardType;
+        var isReferenceType = egProperty.IsPassByReference;
 #>
             [DllImport(
                 NativeInterface.DllName,
@@ -127,13 +127,13 @@ if (EgClass.NeverFree) {
                 CallingConvention = CallingConvention.Cdecl, 
                 SetLastError = true
             )]
-            internal static extern <#= isComplexType ? "Status" : egProperty.TypeCs #> Get<#= egProperty.Name #>(
+            internal static extern <#= isReferenceType ? "Status" : egProperty.Type.TypeCs #> Get<#= egProperty.Name #>(
                 <#= className #>Handle handle
-<# if (isInternalType) { #>
-                , out <#= egProperty.NativeHandleType #> objectId
-<# } else if (egProperty.TypeCs == "string") { #>
+<# if (isElectionGuardType) { #>
+                , out <#= egProperty.Type.NativeHandleType #> objectId
+<# } else if (egProperty.Type.TypeCs == "string") { #>
                 , out IntPtr objectId
-<# } // end is internal type #>
+<# } // end is ElectionGuard type #>
             );
 
 <# } // end foreach property #>

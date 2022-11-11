@@ -4,9 +4,7 @@ namespace ElectionGuard.InteropGenerator.Models;
 
 public record EgProperty(
     string Name, 
-    string TypeCs, 
-    string? TypeC, 
-    string? NativeHandleType, 
+    EgType Type,
     string Description
     )
 {
@@ -28,18 +26,24 @@ public record EgProperty(
 
     public bool IsReferenceType()
     {
-        return !ValueTypes.Contains(TypeCs);
+        return !ValueTypes.Contains(Type.TypeCs);
     }
 
     public string GetCReturnType()
     {
-        ReturnTypes.TryGetValue(TypeCs, out var value);
+        ReturnTypes.TryGetValue(Type.TypeCs, out var value);
         return value ?? "eg_electionguard_status_t";
     }
 
     public string GetOutVarType()
     {
-        if (TypeCs == "string") return "char **";
-        return TypeC + " **";
+        if (Type.TypeCs == "string") return "char **";
+        return Type.TypeC + " **";
     }
+
+    public bool CallerShouldFree => Type.TypeCs == "string";
+
+    public bool IsElectionGuardType => Type.NativeHandleType != null;
+
+    public bool IsPassByReference => Type.TypeCs == "string" || IsElectionGuardType;
 }

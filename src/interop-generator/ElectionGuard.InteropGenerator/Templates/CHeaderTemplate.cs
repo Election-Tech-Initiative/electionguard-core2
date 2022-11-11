@@ -98,7 +98,7 @@ namespace ElectionGuard.InteropGenerator.Templates
             
             #line 36 "C:\dev\ElectionGuard\electionguard-core2\src\interop-generator\ElectionGuard.InteropGenerator\Templates\CHeaderTemplate.tt"
 
-if (egProperty.TypeCs == "string") {
+if (egProperty.CallerShouldFree) {
 	this.Write("The caller is responsible for freeing it.");
 } else {
 	this.Write("The value is a reference and is not owned by the caller.");
