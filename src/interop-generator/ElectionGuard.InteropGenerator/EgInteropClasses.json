@@ -38,13 +38,15 @@
       {
         "Name": "IsValid",
         "ReturnType": {
-          "TypeCs": "bool" 
-        } ,
+          "TypeCs": "bool"
+        },
         "Description": "Given a PlaintextBallotSelection validates that the object matches an expected object and that the plaintext value can resolve to a valid representation",
         "Params": [
           {
             "Name": "expectedObjectId",
-            "TypeCs": "string"
+            "Type": {
+              "TypeCs": "string"
+            }
           }
         ]
       }
@@ -79,19 +81,27 @@
         "Params": [
           {
             "Name": "expectedObjectId",
-            "TypeCs": "string"
+            "Type": {
+              "TypeCs": "string"
+            }
           },
           {
             "Name": "expectedNumSelections",
-            "TypeCs": "ulong"
+            "Type": {
+              "TypeCs": "ulong"
+            }
           },
           {
             "Name": "expectedNumElected",
-            "TypeCs": "ulong"
+            "Type": {
+              "TypeCs": "ulong"
+            }
           },
           {
             "Name": "votesAllowed",
-            "TypeCs": "ulong",
+            "Type": {
+              "TypeCs": "ulong"
+            },
             "DefaultValue": "0"
           }
         ]
