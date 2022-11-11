@@ -75,14 +75,14 @@ jobs:
             version: "11"
             makeReleaseBuild: false
             lint: false
-            runCsTests: true
+            runCsTests: false
           - name: windows-2022-msvc-latest
             os: windows-2022
             compiler: msvc
             version: "latest"
             makeReleaseBuild: false
             lint: false
-            runCsTests: false
+            runCsTests: true
           - name: ubuntu-22.04-linter
             os: ubuntu-22.04
             compiler: clang
