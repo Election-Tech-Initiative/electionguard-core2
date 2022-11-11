@@ -7,10 +7,10 @@ namespace ElectionGuard.Encryption.Utils.Generators
 {
     public class ManifestGenerator
     {
-        const string TEST_SPEC_VERSION = "1.0";
-        const string TEST_USE_SAMPLE = "hamilton-general";
+        const string TestSpecVersion = "1.0";
+        const string TestUseSample = "hamilton-general";
         // Test data was moved to the solution level and needed to be offset here
-        const string TEST_OFFSET = @"../../../../../../../..";
+        const string TestOffset = @"../../../../../../../..";
 
         /// <summary>
         /// A test manifest that is loaded from a json file
@@ -18,21 +18,21 @@ namespace ElectionGuard.Encryption.Utils.Generators
         public static Manifest GetJeffersonCountyManifest_FromFile()
         {
             var path = Path.Combine(
-                AppContext.BaseDirectory, TEST_OFFSET, "data", "election_manifest_jefferson_county.json");
+                AppContext.BaseDirectory, TestOffset, "data", "election_manifest_jefferson_county.json");
             var text = File.ReadAllText(path);
             return new Manifest(text);
         }
 
         public static Manifest GetManifestFromFile(
-            string version = TEST_SPEC_VERSION, string sample = TEST_USE_SAMPLE)
+            string version = TestSpecVersion, string sample = TestUseSample)
         {
             var path = Path.Combine(version, "sample", sample, "election_record", "manifest.json");
-            return GetManifestFromFile(path);
+            return GetManifestFromPath(path);
         }
 
-        public static Manifest GetManifestFromFile(string filepath)
+        private static Manifest GetManifestFromPath(string filepath)
         {
-            var path = Path.Combine(AppContext.BaseDirectory, TEST_OFFSET, "data", filepath);
+            var path = Path.Combine(AppContext.BaseDirectory, TestOffset, "data", filepath);
             var text = File.ReadAllText(path);
             return new Manifest(text);
         }
@@ -44,7 +44,7 @@ namespace ElectionGuard.Encryption.Utils.Generators
         {
             var gpUnits = new List<GeopoliticalUnit>
             {
-                new GeopoliticalUnit("jefferson-county", "Jefferson County", ReportingUnitType.county)
+                new GeopoliticalUnit("jefferson-county", "Jefferson County", ReportingUnitType.County)
             };
 
             var candidates = new List<Candidate>
@@ -60,7 +60,7 @@ namespace ElectionGuard.Encryption.Utils.Generators
                     objectId: "justice-supreme-court",
                     electoralDistrictId: gpUnits[0].ObjectId,
                     sequenceOrder: 0,
-                    VoteVariationType.n_of_m,
+                    VoteVariationType.NOfM,
                     numberElected: 1,
                     name: "Justice of the Supreme Court",
                     selections: new[]
@@ -84,7 +84,7 @@ namespace ElectionGuard.Encryption.Utils.Generators
 
             return new Manifest(
                 "jefferson-county-open-primary",
-                ElectionType.primary,
+                ElectionType.Primary,
                 startDate: DateTime.UtcNow,
                 endDate: DateTime.UtcNow.AddDays(1),
                 gpUnits.ToArray(),
@@ -106,9 +106,9 @@ namespace ElectionGuard.Encryption.Utils.Generators
         {
             var gpUnits = new List<GeopoliticalUnit>
             {
-                new GeopoliticalUnit("jefferson-county", "Jefferson County", ReportingUnitType.county),
+                new GeopoliticalUnit("jefferson-county", "Jefferson County", ReportingUnitType.County),
                 new GeopoliticalUnit(
-                    "jefferson-county-school-district-1", "Jefferson County School District 1", ReportingUnitType.school)
+                    "jefferson-county-school-district-1", "Jefferson County School District 1", ReportingUnitType.School)
             };
 
             var parties = new List<Party>
@@ -145,7 +145,7 @@ namespace ElectionGuard.Encryption.Utils.Generators
                     objectId: "justice-supreme-court",
                     electoralDistrictId: gpUnits[0].ObjectId,  // jefferson-county
                     sequenceOrder: 0,
-                    VoteVariationType.n_of_m,
+                    VoteVariationType.NOfM,
                     numberElected: 1,
                     name: "Justice of the Supreme Court",
                     selections: new[]
@@ -169,7 +169,7 @@ namespace ElectionGuard.Encryption.Utils.Generators
                     objectId: "referendum-pineapple",
                     electoralDistrictId: gpUnits[1].ObjectId, // jefferson-county-school-district-1 
                     sequenceOrder: 1,
-                    VoteVariationType.n_of_m,
+                    VoteVariationType.NOfM,
                     numberElected: 1,
                     votesAllowed: 1,
                     name: "The Pineapple Question",
@@ -215,7 +215,7 @@ namespace ElectionGuard.Encryption.Utils.Generators
 
             return new Manifest(
                 "jefferson-county-open-primary",
-                ElectionType.primary,
+                ElectionType.Primary,
                 startDate: DateTime.UtcNow,
                 endDate: DateTime.UtcNow.AddDays(1),
                 gpUnits.ToArray(),

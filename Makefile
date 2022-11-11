@@ -65,6 +65,7 @@ ifeq ($(OPERATING_SYSTEM),Windows)
 endif
 	wget -O cmake/CPM.cmake https://github.com/cpm-cmake/CPM.cmake/releases/download/v0.35.5/CPM.cmake
 	make fetch-sample-data
+	dotnet tool restore
 
 fetch-sample-data:
 	@echo ⬇️ FETCH Sample Data
@@ -387,6 +388,10 @@ endif
 	$(ELECTIONGUARD_BUILD_LIBS_DIR)/x86_64/$(TARGET)/test/ElectionGuardCTests
 
 # Sample Data
+
+lint:
+	dotnet jb inspectcode -o="lint-results.xml" -f="Xml" --build --verbosity="WARN" -s="Warning" bindings/netstandard/ElectionGuard/ElectionGuard.sln
+	dotnet nvika parsereport "lint-results.xml" --treatwarningsaserrors
 
 generate-sample-data:
 	@echo Generate Sample Data

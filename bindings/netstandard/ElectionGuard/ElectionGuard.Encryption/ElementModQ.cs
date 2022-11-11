@@ -11,13 +11,17 @@ namespace ElectionGuard
         /// <summary>
         /// Number of 64-bit ints that make up the 256-bit prime
         /// </summary>
-        public static readonly ulong MAX_SIZE = 4;
+        public const ulong MaxSize = 4;
 
         /// <Summary>
         /// Get the integer representation of the element
         /// </Summary>
-        public ulong[] Data { get { return GetNative(); } internal set { NewNative(value); } }
-        internal unsafe NativeInterface.ElementModQ.ElementModQHandle Handle;
+        public ulong[] Data { 
+            get => GetNative();
+            internal set => NewNative(value);
+        }
+
+        internal NativeInterface.ElementModQ.ElementModQHandle Handle;
 
         /// <summary>
         /// Create a `ElementModQ`
@@ -38,7 +42,7 @@ namespace ElectionGuard
         /// <summary>
         /// Create a `ElementModQ`
         /// </summary>
-        /// <param name="hex">string representing the hex bytes of the initializationd data</param>
+        /// <param name="hex">string representing the hex bytes of the initialized data</param>
         /// <param name="uncheckedInput">if data is checked or not</param>
         public ElementModQ(string hex, bool uncheckedInput = false)
         {
@@ -48,7 +52,7 @@ namespace ElectionGuard
             status.ThrowIfError();
         }
 
-        unsafe internal ElementModQ(NativeInterface.ElementModQ.ElementModQHandle handle)
+        internal ElementModQ(NativeInterface.ElementModQ.ElementModQHandle handle)
         {
             Handle = handle;
         }
@@ -56,7 +60,7 @@ namespace ElectionGuard
         /// <Summary>
         /// exports a hex representation of the integer value in Big Endian format
         /// </Summary>
-        public unsafe string ToHex()
+        public string ToHex()
         {
             var status = NativeInterface.ElementModQ.ToHex(Handle, out IntPtr pointer);
             if (status != Status.ELECTIONGUARD_STATUS_SUCCESS)
@@ -69,7 +73,7 @@ namespace ElectionGuard
         }
 
 #pragma warning disable CS1591 // Missing XML comment for publicly visible type or member
-        protected override unsafe void DisposeUnmanaged()
+        protected override void DisposeUnmanaged()
 #pragma warning restore CS1591 // Missing XML comment for publicly visible type or member
         {
             base.DisposeUnmanaged();
@@ -81,9 +85,9 @@ namespace ElectionGuard
 
         private unsafe void NewNative(ulong[] data)
         {
-            fixed (ulong* pointer = new ulong[MAX_SIZE])
+            fixed (ulong* pointer = new ulong[MaxSize])
             {
-                for (ulong i = 0; i < MAX_SIZE; i++)
+                for (ulong i = 0; i < MaxSize; i++)
                 {
                     pointer[i] = data[i];
                 }
@@ -103,13 +107,13 @@ namespace ElectionGuard
                 return null;
             }
 
-            var data = new ulong[MAX_SIZE];
-            fixed (ulong* element = new ulong[MAX_SIZE])
+            var data = new ulong[MaxSize];
+            fixed (ulong* element = new ulong[MaxSize])
             {
-                var status = NativeInterface.ElementModQ.GetData(Handle, &element, out ulong size);
-                if (size != MAX_SIZE)
+                NativeInterface.ElementModQ.GetData(Handle, &element, out ulong size);
+                if (size != MaxSize)
                 {
-                    throw new ElectionGuardException($"wrong size, expected: {MAX_SIZE}, actual: {size}");
+                    throw new ElectionGuardException($"wrong size, expected: {MaxSize}, actual: {size}");
                 }
 
                 if (element == null)
@@ -117,7 +121,7 @@ namespace ElectionGuard
                     throw new ElectionGuardException("element is null");
                 }
 
-                for (ulong i = 0; i < MAX_SIZE; i++)
+                for (ulong i = 0; i < MaxSize; i++)
                 {
                     data[i] = element[i];
                 }

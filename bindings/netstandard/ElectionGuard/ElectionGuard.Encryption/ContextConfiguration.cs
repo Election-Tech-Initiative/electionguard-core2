@@ -10,8 +10,8 @@ namespace ElectionGuard
     /// </summary>
     public class ContextConfiguration : DisposableBase
     {
-        internal unsafe NativeContextConfig Handle;
-        unsafe internal ContextConfiguration(NativeContextConfig handle)
+        internal NativeContextConfig Handle;
+        internal ContextConfiguration(NativeContextConfig handle)
         {
             Handle = handle;
         }
@@ -19,7 +19,7 @@ namespace ElectionGuard
         /// <summary>
         /// Determines if overvotes are allowed for the election.  This defaults to true
         /// </summary>
-        public unsafe bool AllowedOverVotes
+        public bool AllowedOverVotes
         {
             get
             {
@@ -33,7 +33,7 @@ namespace ElectionGuard
         /// <summary>
         /// Determines the maximum number of votes that an election can have, Defaults to 1000000
         /// </summary>
-        public unsafe UInt64 MaxBallots
+        public UInt64 MaxBallots
         {
             get
             {
@@ -50,7 +50,7 @@ namespace ElectionGuard
         /// </summary>
         /// <param name="allowOverVotes">if overvotes are allowed</param>
         /// <param name="maxVotes">maximum number of votes</param>
-        public unsafe ContextConfiguration(bool allowOverVotes, UInt64 maxVotes)
+        public ContextConfiguration(bool allowOverVotes, UInt64 maxVotes)
         {
             var status = NativeInterface.ContextConfiguration.Make(
                 allowOverVotes, maxVotes, out Handle);
@@ -59,7 +59,7 @@ namespace ElectionGuard
 
 
 #pragma warning disable CS1591 // Missing XML comment for publicly visible type or member
-        protected override unsafe void DisposeUnmanaged()
+        protected override void DisposeUnmanaged()
 #pragma warning restore CS1591 // Missing XML comment for publicly visible type or member
         {
             base.DisposeUnmanaged();

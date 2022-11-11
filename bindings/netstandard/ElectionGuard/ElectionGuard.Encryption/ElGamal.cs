@@ -1,5 +1,4 @@
-﻿using System;
-namespace ElectionGuard
+﻿namespace ElectionGuard
 {
     // Declare native types for convenience
     using NativeElGamalCiphertext = NativeInterface.ElGamalCiphertext.ElGamalCiphertextHandle;
@@ -7,7 +6,7 @@ namespace ElectionGuard
     /// <summary>
     /// ElGamal Functions
     /// </summary>
-    public static unsafe class Elgamal
+    public static class Elgamal
     {
         /// <summary>
         /// Encrypts a message with a given random nonce and an ElGamal public key.
@@ -17,7 +16,7 @@ namespace ElectionGuard
         /// <param name="publicKey"> ElGamal public key. </param>
         /// <returns>A ciphertext tuple.</returns>
         /// </summary>
-        unsafe public static ElGamalCiphertext Encrypt(
+        public static ElGamalCiphertext Encrypt(
             ulong plaintext, ElementModQ nonce, ElementModP publicKey)
         {
             var status = NativeInterface.ElGamal.Encrypt(

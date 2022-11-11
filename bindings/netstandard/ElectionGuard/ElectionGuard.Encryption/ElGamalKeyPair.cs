@@ -1,14 +1,14 @@
 ﻿namespace ElectionGuard
 {
     /// <summary>
-    /// An exponential ElGamal keypair
+    /// An exponential ElGamal key pair
     /// </summary>
     public class ElGamalKeyPair : DisposableBase
     {
         /// <Summary>
         /// The ElGamal Public Key.
         /// </Summary>
-        public unsafe ElementModP PublicKey
+        public ElementModP PublicKey
         {
             get
             {
@@ -22,7 +22,7 @@
         /// <Summary>
         /// The ElGamal Secret Key.
         /// </Summary>
-        public unsafe ElementModQ SecretKey
+        public ElementModQ SecretKey
         {
             get
             {
@@ -33,14 +33,14 @@
             }
         }
 
-        internal unsafe NativeInterface.ElGamalKeyPair.ElGamalKeyPairHandle Handle;
+        internal NativeInterface.ElGamalKeyPair.ElGamalKeyPairHandle Handle;
 
-        unsafe internal ElGamalKeyPair(NativeInterface.ElGamalKeyPair.ElGamalKeyPairHandle handle)
+        internal ElGamalKeyPair(NativeInterface.ElGamalKeyPair.ElGamalKeyPairHandle handle)
         {
             Handle = handle;
         }
 
-        unsafe internal ElGamalKeyPair(ElementModQ secretKey)
+        internal ElGamalKeyPair(ElementModQ secretKey)
         {
             var status = NativeInterface.ElGamalKeyPair.New(
                 secretKey.Handle, out Handle);
@@ -48,15 +48,15 @@
         }
 
         /// <Summary>
-        /// Make an elgamal keypair from a secret.
+        /// Make an elgamal key pair from a secret.
         /// </Summary>
-        unsafe static public ElGamalKeyPair FromSecret(ElementModQ secretKey)
+        public static ElGamalKeyPair FromSecret(ElementModQ secretKey)
         {
             return new ElGamalKeyPair(secretKey);
         }
 
 #pragma warning disable CS1591 // Missing XML comment for publicly visible type or member
-        protected override unsafe void DisposeUnmanaged()
+        protected override void DisposeUnmanaged()
 #pragma warning restore CS1591 // Missing XML comment for publicly visible type or member
         {
             base.DisposeUnmanaged();

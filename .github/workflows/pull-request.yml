@@ -31,40 +31,69 @@ jobs:
             "macos-12-xcode-14.1",
             "windows-2022-gcc-11",
             "windows-2022-msvc-latest",
+            "ubuntu-22.04-linter",
           ]
         include:
           - name: ubuntu-22.04-clang-14.0.0
             os: ubuntu-22.04
             compiler: clang
             version: "14"
+            makeReleaseBuild: false
+            lint: false
+            runCsTests: false
           - name: ubuntu-22.04-gcc-11.3.0
             os: ubuntu-22.04
             compiler: gcc
             version: "11"
+            makeReleaseBuild: false
+            lint: false
+            runCsTests: false
           - name: ubuntu-20.04-gcc-10.3.0
             os: ubuntu-20.04
             compiler: gcc
             version: "10"
+            makeReleaseBuild: false
+            lint: false
+            runCsTests: false
           - name: ubuntu-20.04-clang-12.0.0
             os: ubuntu-20.04
             compiler: clang
             version: "12"
+            makeReleaseBuild: false
+            lint: false
+            runCsTests: false
           - name: macOS-12-xcode-14.1
             os: macOS-12
             compiler: xcode
             version: "14.1"
+            makeReleaseBuild: false
+            lint: false
+            runCsTests: true
           - name: windows-2022-gcc-11
             os: windows-2022
             compiler: gcc
             version: "11"
+            makeReleaseBuild: false
+            lint: false
+            runCsTests: false
           - name: windows-2022-msvc-latest
             os: windows-2022
             compiler: msvc
             version: "latest"
+            makeReleaseBuild: false
+            lint: false
+            runCsTests: true
+          - name: ubuntu-22.04-linter
+            os: ubuntu-22.04
+            compiler: clang
+            version: "14"
+            makeReleaseBuild: false
+            lint: true
+            runCsTests: true
 
     steps:
       - name: Checkout Code
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
       - name: Change Directory
         run: cd ${{ github.workspace }}
       - name: Install .NET 6
@@ -98,6 +127,9 @@ jobs:
           install: mingw-w64-x86_64-gcc
       - name: Configure Environment
         run: make environment
+      - name: Lint
+        if: (matrix.lint)
+        run: make lint
       - name: Run Tests
         if: (runner.os == 'Linux' && matrix.os != 'ubuntu-20.04')
         run: make test
@@ -111,12 +143,10 @@ jobs:
         if: (runner.os == 'Windows' && matrix.compiler == 'msvc')
         run: make test-msvc TARGET=DEBUG
       - name: Run .Net Tests
+        if: (matrix.runCsTests)
         run: make test-netstandard
-      - name: Run Benchmarks
-        if: (runner.os == 'Linux' || runner.os == 'macOS')
-        run: make bench
       - name: Make Release Build
-        if: runner.os == 'Linux'
+        if: (matrix.makeReleaseBuild && runner.os == 'Linux')
         env:
           NDK_PATH: $$ANDROID_NDK_HOME
         run: |
@@ -125,7 +155,7 @@ jobs:
           #   make build-android
           # fi
       - name: Make Release Build
-        if: runner.os == 'macOS'
+        if: (matrix.makeReleaseBuild && runner.os == 'macOS')
         env:
           NDK_PATH: $$ANDROID_NDK_HOME
         run: |

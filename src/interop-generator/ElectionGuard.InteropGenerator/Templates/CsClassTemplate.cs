@@ -54,7 +54,7 @@ namespace ElectionGuard
             
             #line default
             #line hidden
-            this.Write("\r\n    {\r\n        internal unsafe External.");
+            this.Write("\r\n    {\r\n        internal External.");
             
             #line 22 "C:\dev\ElectionGuard\electionguard-core2\src\interop-generator\ElectionGuard.InteropGenerator\Templates\CsClassTemplate.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(className));
@@ -77,7 +77,7 @@ namespace ElectionGuard
             
             #line default
             #line hidden
-            this.Write("\r\n        /// </Summary>\r\n        public unsafe ");
+            this.Write("\r\n        /// </Summary>\r\n        public ");
             
             #line 31 "C:\dev\ElectionGuard\electionguard-core2\src\interop-generator\ElectionGuard.InteropGenerator\Templates\CsClassTemplate.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(egProperty.TypeCs));
@@ -177,7 +177,7 @@ namespace ElectionGuard
             
             #line default
             #line hidden
-            this.Write("\r\n        /// </summary>\r\n        public unsafe ");
+            this.Write("\r\n        /// </summary>\r\n        public ");
             
             #line 60 "C:\dev\ElectionGuard\electionguard-core2\src\interop-generator\ElectionGuard.InteropGenerator\Templates\CsClassTemplate.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(method.ReturnTypeCs));
@@ -225,7 +225,7 @@ foreach (var p in method.Params) {
             #line hidden
             this.Write(@"
 #pragma warning disable CS1591 // Missing XML comment for publicly visible type or member
-        protected override unsafe void DisposeUnmanaged()
+        protected override void DisposeUnmanaged()
 #pragma warning restore CS1591 // Missing XML comment for publicly visible type or member
         {
             base.DisposeUnmanaged();
@@ -237,8 +237,8 @@ foreach (var p in method.Params) {
         #endregion
 
         #region Extern
-        internal unsafe static class External {
-            internal unsafe struct ");
+        internal static unsafe class External {
+            internal struct ");
             
             #line 86 "C:\dev\ElectionGuard\electionguard-core2\src\interop-generator\ElectionGuard.InteropGenerator\Templates\CsClassTemplate.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(className));
@@ -252,7 +252,7 @@ foreach (var p in method.Params) {
             
             #line default
             #line hidden
-            this.Write("Handle : ElectionguardSafeHandle<");
+            this.Write("Handle : ElectionGuardSafeHandle<");
             
             #line 88 "C:\dev\ElectionGuard\electionguard-core2\src\interop-generator\ElectionGuard.InteropGenerator\Templates\CsClassTemplate.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(className));

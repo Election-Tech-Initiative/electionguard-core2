@@ -1,7 +1,4 @@
-﻿using System.Collections;
-using System.Globalization;
-
-namespace ElectionGuard.Encryption.Cli.Encrypt
+﻿namespace ElectionGuard.Encryption.Cli.Encrypt
 {
     internal class EncryptCommand
     {

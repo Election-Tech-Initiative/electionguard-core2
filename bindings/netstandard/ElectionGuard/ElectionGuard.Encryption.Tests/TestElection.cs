@@ -30,7 +30,7 @@ namespace ElectionGuard.Encryption.Tests
 
 
             var partyName = new Language("new years", "en");
-            var party = new ElectionGuard.Party(
+            var party = new Party(
                 "new-years-id",
                 new InternationalizedText(new[] { partyName }),
                 "ny",

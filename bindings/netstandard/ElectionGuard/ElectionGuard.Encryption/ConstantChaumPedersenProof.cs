@@ -16,7 +16,7 @@
         /// <Summary>
         /// a in the spec
         /// </Summary>
-        public unsafe ElementModP Pad
+        public ElementModP Pad
         {
             get
             {
@@ -30,7 +30,7 @@
         /// <Summary>
         /// b in the spec
         /// </Summary>
-        public unsafe ElementModP Data
+        public ElementModP Data
         {
             get
             {
@@ -44,7 +44,7 @@
         /// <Summary>
         /// c in the spec
         /// </Summary>
-        public unsafe ElementModQ Challenge
+        public ElementModQ Challenge
         {
             get
             {
@@ -58,7 +58,7 @@
         /// <Summary>
         /// v in the spec
         /// </Summary>
-        public unsafe ElementModQ Response
+        public ElementModQ Response
         {
             get
             {
@@ -69,9 +69,9 @@
             }
         }
 
-        internal unsafe NativeInterface.ConstantChaumPedersenProof.ConstantChaumPedersenProofHandle Handle;
+        internal NativeInterface.ConstantChaumPedersenProof.ConstantChaumPedersenProofHandle Handle;
 
-        unsafe internal ConstantChaumPedersenProof(NativeInterface.ConstantChaumPedersenProof.ConstantChaumPedersenProofHandle handle)
+        internal ConstantChaumPedersenProof(NativeInterface.ConstantChaumPedersenProof.ConstantChaumPedersenProofHandle handle)
         {
             Handle = handle;
         }
@@ -88,7 +88,7 @@
         /// <param name="constant">The constant value to prove</param>
         /// <returns>An instance</returns>
         /// </Summary>
-        unsafe public ConstantChaumPedersenProof(
+        public ConstantChaumPedersenProof(
             ElGamalCiphertext message,
             ElementModQ r,
             ElementModP k,
@@ -109,7 +109,7 @@
         /// <param name="q"> The extended base hash of the election</param>
         /// <returns> True if everything is consistent. False otherwise. </returns>
         /// </Summary>
-        public unsafe bool IsValid(ElGamalCiphertext message, ElementModP k, ElementModQ q)
+        public bool IsValid(ElGamalCiphertext message, ElementModP k, ElementModQ q)
         {
             return NativeInterface.ConstantChaumPedersenProof.IsValid(
                 Handle, message.Handle, k.Handle, q.Handle
@@ -117,7 +117,7 @@
         }
 
 #pragma warning disable CS1591 // Missing XML comment for publicly visible type or member
-        protected override unsafe void DisposeUnmanaged()
+        protected override void DisposeUnmanaged()
 #pragma warning restore CS1591 // Missing XML comment for publicly visible type or member
         {
             base.DisposeUnmanaged();

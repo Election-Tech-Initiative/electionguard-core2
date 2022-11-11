@@ -10,7 +10,7 @@
         /// <Summary>
         /// The pad value also referred to as A, a, 𝑎, or alpha in the spec.
         /// </Summary>
-        public unsafe ElementModP Pad
+        public ElementModP Pad
         {
             get
             {
@@ -24,7 +24,7 @@
         /// <Summary>
         /// The data value also referred to as B, b, 𝛽, or beta in the spec.
         /// </Summary>
-        public unsafe ElementModP Data
+        public ElementModP Data
         {
             get
             {
@@ -38,7 +38,7 @@
         /// <summary>
         /// Get the CryptoHash
         /// </summary>
-        public unsafe ElementModQ CryptoHash
+        public ElementModQ CryptoHash
         {
             get
             {
@@ -49,9 +49,9 @@
             }
         }
 
-        internal unsafe NativeInterface.ElGamalCiphertext.ElGamalCiphertextHandle Handle;
+        internal NativeInterface.ElGamalCiphertext.ElGamalCiphertextHandle Handle;
 
-        unsafe internal ElGamalCiphertext(NativeInterface.ElGamalCiphertext.ElGamalCiphertextHandle handle)
+        internal ElGamalCiphertext(NativeInterface.ElGamalCiphertext.ElGamalCiphertextHandle handle)
         {
             Handle = handle;
         }
@@ -62,7 +62,7 @@
         /// This is a convenience accessor useful for some use cases.
         /// This method should not be used by consumers operating in live secret ballot elections.
         /// </Summary>
-        unsafe public ulong? Decrypt(ElementModQ secretKey)
+        public ulong? Decrypt(ElementModQ secretKey)
         {
             ulong plaintext = 0;
             var status = NativeInterface.ElGamalCiphertext.DecryptWithSecret(
@@ -72,7 +72,7 @@
         }
 
 #pragma warning disable CS1591 // Missing XML comment for publicly visible type or member
-        protected override unsafe void DisposeUnmanaged()
+        protected override void DisposeUnmanaged()
 #pragma warning restore CS1591 // Missing XML comment for publicly visible type or member
         {
             base.DisposeUnmanaged();

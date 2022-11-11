@@ -14,7 +14,7 @@ namespace ElectionGuard
         /// <Summary>
         /// The value
         /// </Summary>
-        public unsafe string Value
+        public string Value
         {
             get
             {
@@ -33,7 +33,7 @@ namespace ElectionGuard
         /// <Summary>
         /// Identifies the language
         /// </Summary>
-        public unsafe string LanguageAbbreviation
+        public string LanguageAbbreviation
         {
             get
             {
@@ -49,9 +49,9 @@ namespace ElectionGuard
             }
         }
 
-        internal unsafe NativeInterface.Language.LanguageHandle Handle;
+        internal NativeInterface.Language.LanguageHandle Handle;
 
-        unsafe internal Language(
+        internal Language(
             NativeInterface.Language.LanguageHandle handle)
         {
             Handle = handle;
@@ -62,7 +62,7 @@ namespace ElectionGuard
         /// </summary>
         /// <param name="value">value to represent language</param>
         /// <param name="language">string with language info</param>
-        public unsafe Language(string value, string language)
+        public Language(string value, string language)
         {
             var data = EncodeNonAsciiCharacters(value);
             var status = NativeInterface.Language.New(data, language, out Handle);
@@ -97,7 +97,7 @@ namespace ElectionGuard
         }
 
 #pragma warning disable CS1591 // Missing XML comment for publicly visible type or member
-        protected override unsafe void DisposeUnmanaged()
+        protected override void DisposeUnmanaged()
 #pragma warning restore CS1591 // Missing XML comment for publicly visible type or member
         {
             base.DisposeUnmanaged();
@@ -110,7 +110,7 @@ namespace ElectionGuard
         /// <Summary>
         /// A hash representation of the object
         /// </Summary>
-        public unsafe ElementModQ CryptoHash()
+        public ElementModQ CryptoHash()
         {
             var status = NativeInterface.Language.CryptoHash(
                 Handle, out NativeInterface.ElementModQ.ElementModQHandle value);

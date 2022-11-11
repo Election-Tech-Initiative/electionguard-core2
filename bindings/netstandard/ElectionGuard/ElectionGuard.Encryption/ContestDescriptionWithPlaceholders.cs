@@ -14,7 +14,7 @@ namespace ElectionGuard
         /// <Summary>
         /// Unique internal identifier that's used by other elements to reference this element.
         /// </Summary>
-        public unsafe string ObjectId
+        public string ObjectId
         {
             get
             {
@@ -34,7 +34,7 @@ namespace ElectionGuard
         /// The object id of the geopolitical unit associated with this contest.
         /// Note: in concordance with the NIST standard, the name `ElectoralDistrictId` is kept
         /// </Summary>
-        public unsafe string ElectoralDistrictId
+        public string ElectoralDistrictId
         {
             get
             {
@@ -55,7 +55,7 @@ namespace ElectionGuard
         /// Note: this is specifically for programs to interpret and does not necessarily represent
         /// the order in which contests are presented to a user.
         /// </Summary>
-        public unsafe ulong SequenceOrder
+        public ulong SequenceOrder
         {
             get
             {
@@ -67,7 +67,7 @@ namespace ElectionGuard
         /// <Summary>
         /// The vote variation type.  Currently ElectionGuard supports one_of_m and n_of_m
         /// </Summary>
-        public unsafe VoteVariationType VoteVariationType
+        public VoteVariationType VoteVariationType
         {
             get
             {
@@ -79,7 +79,7 @@ namespace ElectionGuard
         /// <Summary>
         /// The number of candidates that are elected in the contest, which is the n of an n-of-m contest
         /// </Summary>
-        public unsafe ulong NumberElected
+        public ulong NumberElected
         {
             get
             {
@@ -91,7 +91,7 @@ namespace ElectionGuard
         /// <Summary>
         /// The maximum number of votes or write-ins allowed per voter in this contest.
         /// </Summary>
-        public unsafe ulong VotesAllowed
+        public ulong VotesAllowed
         {
             get
             {
@@ -104,7 +104,7 @@ namespace ElectionGuard
         /// Name of the contest as it's listed on the results report,
         /// not necessarily as it appears on the ballot.
         /// </Summary>
-        public unsafe string Name
+        public string Name
         {
             get
             {
@@ -123,7 +123,7 @@ namespace ElectionGuard
         /// <Summary>
         /// Title of the contest, which must match how it appears on the voters' ballots.
         /// </Summary>
-        public unsafe InternationalizedText BallotTitle
+        public InternationalizedText BallotTitle
         {
             get
             {
@@ -140,7 +140,7 @@ namespace ElectionGuard
         /// <Summary>
         /// Subtitle of the contest, which must match how it appears on the voters' ballots.
         /// </Summary>
-        public unsafe InternationalizedText BallotSubTitle
+        public InternationalizedText BallotSubTitle
         {
             get
             {
@@ -157,7 +157,7 @@ namespace ElectionGuard
         /// <Summary>
         /// The size of the selections collection
         /// </Summary>
-        public unsafe ulong SelectionsSize
+        public ulong SelectionsSize
         {
             get
             {
@@ -169,7 +169,7 @@ namespace ElectionGuard
         /// <Summary>
         /// The size of the placeholder collection
         /// </Summary>
-        public unsafe ulong PlaceholdersSize
+        public ulong PlaceholdersSize
         {
             get
             {
@@ -178,9 +178,9 @@ namespace ElectionGuard
             }
         }
 
-        internal unsafe NativeInterface.ContestDescriptionWithPlaceholders.ContestDescriptionWithPlaceholdersHandle Handle;
+        internal NativeInterface.ContestDescriptionWithPlaceholders.ContestDescriptionWithPlaceholdersHandle Handle;
 
-        unsafe internal ContestDescriptionWithPlaceholders(
+        internal ContestDescriptionWithPlaceholders(
             NativeInterface.ContestDescriptionWithPlaceholders.ContestDescriptionWithPlaceholdersHandle handle)
         {
             Handle = handle;
@@ -197,7 +197,7 @@ namespace ElectionGuard
         /// <param name="name">string for name of the contest</param>
         /// <param name="selections">array of `SelectionDescription`</param>
         /// <param name="placeholders">array of `SelectionDescription` to use as placeholders</param>
-        public unsafe ContestDescriptionWithPlaceholders(
+        public ContestDescriptionWithPlaceholders(
             string objectId, string electoralDistrictId, ulong sequenceOrder,
             VoteVariationType voteVariation, ulong numberElected, string name,
             SelectionDescription[] selections, SelectionDescription[] placeholders)
@@ -242,7 +242,7 @@ namespace ElectionGuard
         /// <param name="ballotSubtitle">international string for the ballot title</param>
         /// <param name="selections">array of `SelectionDescription`</param>
         /// <param name="placeholders">array of `SelectionDescription` to use as placeholders</param>
-        public unsafe ContestDescriptionWithPlaceholders(
+        public ContestDescriptionWithPlaceholders(
             string objectId, string electoralDistrictId, ulong sequenceOrder,
             VoteVariationType voteVariation, ulong numberElected, ulong votesAllowed,
             string name, InternationalizedText ballotTitle, InternationalizedText ballotSubtitle,
@@ -287,7 +287,7 @@ namespace ElectionGuard
         /// <param name="selections">array of `SelectionDescription`</param>
         /// <param name="primaryPartyIds">array of strings for `PartyIds`</param>
         /// <param name="placeholders">array of `SelectionDescription` to use as placeholders</param>
-        public unsafe ContestDescriptionWithPlaceholders(
+        public ContestDescriptionWithPlaceholders(
             string objectId, string electoralDistrictId, ulong sequenceOrder,
             VoteVariationType voteVariation, ulong numberElected, string name,
             SelectionDescription[] selections, string[] primaryPartyIds,
@@ -335,7 +335,7 @@ namespace ElectionGuard
         /// <param name="selections">array of `SelectionDescription`</param>
         /// <param name="primaryPartyIds">array of strings for `PartyIds`</param>
         /// <param name="placeholders">array of `SelectionDescription` to use as placeholders</param>
-        public unsafe ContestDescriptionWithPlaceholders(
+        public ContestDescriptionWithPlaceholders(
             string objectId, string electoralDistrictId, ulong sequenceOrder,
             VoteVariationType voteVariation, ulong numberElected, ulong votesAllowed,
             string name, InternationalizedText ballotTitle, InternationalizedText ballotSubtitle,
@@ -371,7 +371,7 @@ namespace ElectionGuard
         }
 
 #pragma warning disable CS1591 // Missing XML comment for publicly visible type or member
-        protected override unsafe void DisposeUnmanaged()
+        protected override void DisposeUnmanaged()
 #pragma warning restore CS1591 // Missing XML comment for publicly visible type or member
         {
             base.DisposeUnmanaged();
@@ -384,7 +384,7 @@ namespace ElectionGuard
         /// <Summary>
         /// The collection of selections in this contest.
         /// </Summary>
-        public unsafe SelectionDescription GetSelectionAtIndex(ulong index)
+        public SelectionDescription GetSelectionAtIndex(ulong index)
         {
             var status = NativeInterface.ContestDescriptionWithPlaceholders.GetSelectionAtIndex(
                 Handle, index, out NativeInterface.SelectionDescription.SelectionDescriptionHandle value);
@@ -398,7 +398,7 @@ namespace ElectionGuard
         /// <Summary>
         /// The collection of placeholders in this contest.
         /// </Summary>
-        public unsafe SelectionDescription GetPlaceholderAtIndex(ulong index)
+        public SelectionDescription GetPlaceholderAtIndex(ulong index)
         {
             var status = NativeInterface.ContestDescriptionWithPlaceholders.GetPlaceholderAtIndex(
                 Handle, index, out NativeInterface.SelectionDescription.SelectionDescriptionHandle value);
@@ -412,7 +412,7 @@ namespace ElectionGuard
         /// <Summary>
         /// A hash representation of the object
         /// </Summary>
-        public unsafe ElementModQ CryptoHash()
+        public ElementModQ CryptoHash()
         {
             var status = NativeInterface.ContestDescriptionWithPlaceholders.CryptoHash(
                 Handle, out NativeInterface.ElementModQ.ElementModQHandle value);

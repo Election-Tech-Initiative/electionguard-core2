@@ -1,16 +1,15 @@
 ﻿using System;
 using Microsoft.Win32.SafeHandles;
-using System.Runtime.ConstrainedExecution;
 
 namespace ElectionGuard
 {
-    internal abstract class ElectionguardSafeHandle<T>
+    internal abstract class ElectionGuardSafeHandle<T>
         : SafeHandleZeroOrMinusOneIsInvalid
         where T : unmanaged
     {
         // Objects constructed with the default constructor
         // own the context
-        internal ElectionguardSafeHandle()
+        internal ElectionGuardSafeHandle()
             : base(ownsHandle: true)
         {
 
@@ -18,28 +17,28 @@ namespace ElectionGuard
 
         // Objects constructed from a structure pointer
         // do not own the context
-        internal unsafe ElectionguardSafeHandle(
+        internal ElectionGuardSafeHandle(
             IntPtr handle)
             : base(ownsHandle: false)
         {
             SetHandle(handle);
         }
 
-        internal unsafe ElectionguardSafeHandle(
+        internal ElectionGuardSafeHandle(
             IntPtr handle, bool ownsHandle)
             : base(ownsHandle)
         {
             SetHandle(handle);
         }
 
-        internal unsafe ElectionguardSafeHandle(
+        internal unsafe ElectionGuardSafeHandle(
             T* handle)
             : base(ownsHandle: false)
         {
             SetHandle((IntPtr)handle);
         }
 
-        internal unsafe ElectionguardSafeHandle(
+        internal unsafe ElectionGuardSafeHandle(
             T* handle, bool ownsHandle)
             : base(ownsHandle)
         {

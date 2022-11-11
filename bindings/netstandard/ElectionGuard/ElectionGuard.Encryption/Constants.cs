@@ -1,5 +1,8 @@
 ﻿using System;
+using System.Diagnostics.CodeAnalysis;
 using System.Runtime.InteropServices;
+// ReSharper disable InconsistentNaming
+// ReSharper disable UnusedMember.Global
 
 namespace ElectionGuard
 {
@@ -11,7 +14,7 @@ namespace ElectionGuard
         /// <summary>
         /// G in Hacl_Bignum4096 format
         /// </summary>
-        public unsafe static ElementModP G
+        public static ElementModP G
         {
             get
             {
@@ -27,7 +30,7 @@ namespace ElectionGuard
         /// <summary>
         /// Max P value in Hacl_Bignum4096 format
         /// </summary>
-        public unsafe static ElementModP P
+        public static ElementModP P
         {
             get
             {
@@ -43,7 +46,7 @@ namespace ElectionGuard
         /// <summary>
         /// R value in Hacl_Bignum4096 format
         /// </summary>
-        public unsafe static ElementModP R
+        public static ElementModP R
         {
             get
             {
@@ -59,7 +62,7 @@ namespace ElectionGuard
         /// <summary>
         /// zero as data for `ElementModP`
         /// </summary>
-        public unsafe static ElementModP ZERO_MOD_P
+        public static ElementModP ZERO_MOD_P
         {
             get
             {
@@ -75,7 +78,7 @@ namespace ElectionGuard
         /// <summary>
         /// one as data for `ElementModP`
         /// </summary>
-        public unsafe static ElementModP ONE_MOD_P
+        public static ElementModP ONE_MOD_P
         {
             get
             {
@@ -91,7 +94,7 @@ namespace ElectionGuard
         /// <summary>
         /// two as data for `ElementModP`
         /// </summary>
-        public unsafe static ElementModP TWO_MOD_P
+        public static ElementModP TWO_MOD_P
         {
             get
             {
@@ -107,7 +110,7 @@ namespace ElectionGuard
         /// <summary>
         /// Max Q value in Hacl_Bignum256 format
         /// </summary>
-        public unsafe static ElementModQ Q
+        public static ElementModQ Q
         {
             get
             {
@@ -123,7 +126,7 @@ namespace ElectionGuard
         /// <summary>
         /// zero as data for `ElementModQ`
         /// </summary>
-        public unsafe static ElementModQ ZERO_MOD_Q
+        public static ElementModQ ZERO_MOD_Q
         {
             get
             {
@@ -139,7 +142,7 @@ namespace ElectionGuard
         /// <summary>
         /// one as data for `ElementModQ`
         /// </summary>
-        public unsafe static ElementModQ ONE_MOD_Q
+        public static ElementModQ ONE_MOD_Q
         {
             get
             {
@@ -155,7 +158,7 @@ namespace ElectionGuard
         /// <summary>
         /// two as data for `ElementModQ`
         /// </summary>
-        public unsafe static ElementModQ TWO_MOD_Q
+        public static ElementModQ TWO_MOD_Q
         {
             get
             {
@@ -171,11 +174,11 @@ namespace ElectionGuard
         /// <Summary>
         /// Export the representation as JSON
         /// </Summary>
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Style", "IDE0059:Unnecessary assignment of a value", Justification = "<Pending>")]
-        public unsafe static string ToJson()
+        [SuppressMessage("Style", "IDE0059:Unnecessary assignment of a value", Justification = "<Pending>")]
+        public static string ToJson()
         {
             var status = NativeInterface.Constants.ToJson(
-                out IntPtr pointer, out ulong size);
+                out IntPtr pointer, out _);
             status.ThrowIfError();
             var json = Marshal.PtrToStringAnsi(pointer);
             NativeInterface.Memory.FreeIntPtr(pointer);

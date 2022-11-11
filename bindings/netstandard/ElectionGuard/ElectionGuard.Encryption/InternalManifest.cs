@@ -13,7 +13,7 @@ namespace ElectionGuard
         /// <summary>
         /// The hash of the election manifest
         /// </summary>
-        public unsafe ElementModQ ManifestHash
+        public ElementModQ ManifestHash
         {
             get
             {
@@ -30,7 +30,7 @@ namespace ElectionGuard
         /// <Summary>
         /// The size of the geopolitical units collection
         /// </Summary>
-        public unsafe ulong GeopoliticalUnitsSize
+        public ulong GeopoliticalUnitsSize
         {
             get
             {
@@ -42,7 +42,7 @@ namespace ElectionGuard
         /// <Summary>
         /// The size of the contests collection
         /// </Summary>
-        public unsafe ulong ContestsSize
+        public ulong ContestsSize
         {
             get
             {
@@ -54,7 +54,7 @@ namespace ElectionGuard
         /// <Summary>
         /// The size of the ballot styles collection
         /// </Summary>
-        public unsafe ulong BallotStylesSize
+        public ulong BallotStylesSize
         {
             get
             {
@@ -63,13 +63,13 @@ namespace ElectionGuard
             }
         }
 
-        internal unsafe NativeInterface.InternalManifest.InternalManifestHandle Handle;
+        internal NativeInterface.InternalManifest.InternalManifestHandle Handle;
 
         /// <summary>
         /// Creates an `InternalManifest` object
         /// </summary>
         /// <param name="manifest">public manifest to copy</param>
-        public unsafe InternalManifest(Manifest manifest)
+        public InternalManifest(Manifest manifest)
         {
             var status = NativeInterface.InternalManifest.New(manifest.Handle, out Handle);
             if (status != Status.ELECTIONGUARD_STATUS_SUCCESS)
@@ -82,7 +82,7 @@ namespace ElectionGuard
         /// Creates an `InternalManifest` object
         /// </summary>
         /// <param name="json">string of json data describing the manifest</param>
-        public unsafe InternalManifest(string json)
+        public InternalManifest(string json)
         {
             var status = NativeInterface.InternalManifest.FromJson(json, out Handle);
             if (status != Status.ELECTIONGUARD_STATUS_SUCCESS)
@@ -111,7 +111,7 @@ namespace ElectionGuard
         }
 
 #pragma warning disable CS1591 // Missing XML comment for publicly visible type or member
-        protected override unsafe void DisposeUnmanaged()
+        protected override void DisposeUnmanaged()
 #pragma warning restore CS1591 // Missing XML comment for publicly visible type or member
         {
             base.DisposeUnmanaged();
@@ -124,7 +124,7 @@ namespace ElectionGuard
         /// <Summary>
         /// Collection of geopolitical units for this election.
         /// </Summary>
-        public unsafe GeopoliticalUnit GetGeopoliticalUnitAtIndex(ulong index)
+        public GeopoliticalUnit GetGeopoliticalUnitAtIndex(ulong index)
         {
             var status = NativeInterface.InternalManifest.GetGeopoliticalUnitAtIndex(
                 Handle, index, out NativeInterface.GeopoliticalUnit.GeopoliticalUnitHandle value);
@@ -138,7 +138,7 @@ namespace ElectionGuard
         /// <Summary>
         /// Collection of contests for this election.
         /// </Summary>
-        public unsafe ContestDescription GetContestAtIndex(ulong index)
+        public ContestDescription GetContestAtIndex(ulong index)
         {
             var status = NativeInterface.InternalManifest.GetContestAtIndex(
                 Handle, index, out NativeInterface.ContestDescription.ContestDescriptionHandle value);
@@ -152,7 +152,7 @@ namespace ElectionGuard
         /// <Summary>
         /// Collection of ballot styles for this election.
         /// </Summary>
-        public unsafe BallotStyle GetBallotStyleAtIndex(ulong index)
+        public BallotStyle GetBallotStyleAtIndex(ulong index)
         {
             var status = NativeInterface.InternalManifest.GetBallotStyleAtIndex(
                 Handle, index, out NativeInterface.BallotStyle.BallotStyleHandle value);
@@ -166,10 +166,10 @@ namespace ElectionGuard
         /// <Summary>
         /// Export the ballot representation as JSON
         /// </Summary>
-        public unsafe string ToJson()
+        public string ToJson()
         {
             var status = NativeInterface.InternalManifest.ToJson(
-                Handle, out IntPtr pointer, out ulong size);
+                Handle, out IntPtr pointer, out _);
             if (status != Status.ELECTIONGUARD_STATUS_SUCCESS)
             {
                 throw new ElectionGuardException($"ToJson Error Status: {status}");
@@ -182,7 +182,7 @@ namespace ElectionGuard
         /// <Summary>
         /// Export the ballot representation as MsgPack
         /// </Summary>
-        public unsafe byte[] ToBson()
+        public byte[] ToBson()
         {
 
             var status = NativeInterface.InternalManifest.ToBson(
@@ -207,7 +207,7 @@ namespace ElectionGuard
         /// <Summary>
         /// Export the ballot representation as MsgPack
         /// </Summary>
-        public unsafe byte[] ToMsgPack()
+        public byte[] ToMsgPack()
         {
 
             var status = NativeInterface.InternalManifest.ToMsgPack(

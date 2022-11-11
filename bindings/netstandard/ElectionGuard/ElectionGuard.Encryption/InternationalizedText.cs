@@ -11,7 +11,7 @@ namespace ElectionGuard
         /// <Summary>
         /// A string of possibly non-English text.
         /// </Summary>
-        public unsafe ulong TextSize
+        public ulong TextSize
         {
             get
             {
@@ -21,9 +21,9 @@ namespace ElectionGuard
             }
         }
 
-        internal unsafe NativeInterface.InternationalizedText.InternationalizedTextHandle Handle;
+        internal NativeInterface.InternationalizedText.InternationalizedTextHandle Handle;
 
-        unsafe internal InternationalizedText(
+        internal InternationalizedText(
             NativeInterface.InternationalizedText.InternationalizedTextHandle handle)
         {
             Handle = handle;
@@ -33,7 +33,7 @@ namespace ElectionGuard
         /// Create an `InternationalizedText` object
         /// </summary>
         /// <param name="text">array of text for languages</param>
-        public unsafe InternationalizedText(Language[] text)
+        public InternationalizedText(Language[] text)
         {
             IntPtr[] nativeText = new IntPtr[text.Length];
             for (var i = 0; i < text.Length; i++)
@@ -50,7 +50,7 @@ namespace ElectionGuard
         }
 
 #pragma warning disable CS1591 // Missing XML comment for publicly visible type or member
-        protected override unsafe void DisposeUnmanaged()
+        protected override void DisposeUnmanaged()
 #pragma warning restore CS1591 // Missing XML comment for publicly visible type or member
         {
             base.DisposeUnmanaged();
@@ -65,7 +65,7 @@ namespace ElectionGuard
         /// </summary>
         /// <param name="index">index to use to get `Language`</param>
         /// <returns>`Language` object</returns>
-        public unsafe Language GetTextAt(ulong index)
+        public Language GetTextAt(ulong index)
         {
             var status = NativeInterface.InternationalizedText.GetTextAtIndex(
                 Handle, index, out NativeInterface.Language.LanguageHandle value);
@@ -79,7 +79,7 @@ namespace ElectionGuard
         /// <Summary>
         /// A hash representation of the object
         /// </Summary>
-        public unsafe ElementModQ CryptoHash()
+        public ElementModQ CryptoHash()
         {
             var status = NativeInterface.InternationalizedText.CryptoHash(
                 Handle, out NativeInterface.ElementModQ.ElementModQHandle value);

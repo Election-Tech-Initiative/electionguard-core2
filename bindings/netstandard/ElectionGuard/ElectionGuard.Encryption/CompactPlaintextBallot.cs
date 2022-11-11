@@ -14,7 +14,7 @@ namespace ElectionGuard
     /// </summary>
     public class CompactPlaintextBallot : DisposableBase
     {
-        internal unsafe NativeInterface.CompactPlaintextBallot.CompactPlaintextBallotHandle Handle;
+        internal NativeInterface.CompactPlaintextBallot.CompactPlaintextBallotHandle Handle;
 
         /// <summary>
         /// Create a CompactPlaintextBallot
@@ -29,7 +29,7 @@ namespace ElectionGuard
             }
         }
 
-        internal unsafe CompactPlaintextBallot(NativeInterface.CompactPlaintextBallot.CompactPlaintextBallotHandle handle)
+        internal CompactPlaintextBallot(NativeInterface.CompactPlaintextBallot.CompactPlaintextBallotHandle handle)
         {
             Handle = handle;
         }
@@ -37,7 +37,7 @@ namespace ElectionGuard
         /// <Summary>
         /// Export the ballot representation as MsgPack
         /// </Summary>
-        public unsafe byte[] ToMsgPack()
+        public byte[] ToMsgPack()
         {
 
             var status = NativeInterface.CompactPlaintextBallot.ToMsgPack(
@@ -60,7 +60,7 @@ namespace ElectionGuard
         }
 
 #pragma warning disable CS1591 // Missing XML comment for publicly visible type or member
-        protected override unsafe void DisposeUnmanaged()
+        protected override void DisposeUnmanaged()
 #pragma warning restore CS1591 // Missing XML comment for publicly visible type or member
         {
             base.DisposeUnmanaged();

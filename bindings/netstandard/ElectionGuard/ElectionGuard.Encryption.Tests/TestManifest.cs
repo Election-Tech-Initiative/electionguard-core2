@@ -24,7 +24,7 @@ namespace ElectionGuard.Encryption.Tests
                 contestId, 
                 electoralDistrictId, 
                 sequenceOrder, 
-                VoteVariationType.n_of_m, 
+                VoteVariationType.NOfM, 
                 numberElected,
                 contestName, 
                 selections);
@@ -136,18 +136,18 @@ namespace ElectionGuard.Encryption.Tests
             List<ContestDescription> contests = new List<ContestDescription>();
             List<BallotStyle> ballotStyles = new List<BallotStyle>();
 
-            gpUnits.Add(new GeopoliticalUnit("mydistrict", "first unit", ReportingUnitType.city));
+            gpUnits.Add(new GeopoliticalUnit("mydistrict", "first unit", ReportingUnitType.City));
             parties.Add(new Party("myparty"));
             candidates.Add(new Candidate("mycandidate", false));
             List<SelectionDescription> selections = new List<SelectionDescription>();
             selections.Add(new SelectionDescription("selection1", "mycandidate", 1));
-            contests.Add(new ContestDescription("firstcontest", "mydistrict", 1, VoteVariationType.n_of_m, 1, "mrmayor", selections.ToArray()));
+            contests.Add(new ContestDescription("firstcontest", "mydistrict", 1, VoteVariationType.NOfM, 1, "mrmayor", selections.ToArray()));
             string[] gps = { "mydistrict" };
             ballotStyles.Add(new BallotStyle("style1", gps));
 
             var result = new Manifest(
                 "test-manifest",
-                ElectionType.general,
+                ElectionType.General,
                 DateTime.Now.AddDays(1),
                 DateTime.Now.AddDays(1).AddDays(1),
                 gpUnits.ToArray(),
@@ -182,7 +182,7 @@ namespace ElectionGuard.Encryption.Tests
 
             var result = new Manifest(
                 "test-manifest",
-                ElectionType.general,
+                ElectionType.General,
                 DateTime.Now,
                 DateTime.Now,
                 new GeopoliticalUnit[] { },

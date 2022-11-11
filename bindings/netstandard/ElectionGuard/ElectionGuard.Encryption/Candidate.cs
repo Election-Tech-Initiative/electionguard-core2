@@ -11,14 +11,14 @@ namespace ElectionGuard
     /// selections for any contest type are considered a "candidate".
     /// for instance, on a yes-no referendum contest, two `candidate` objects
     /// would be included in the model to represent the `affirmative` and `negative`
-    /// selections for the contest.  See the wiki, readme's, and tests in this repo for more info.
+    /// selections for the contest.  See the wiki, readme, and tests in this repo for more info.
     /// </Summary>
     public class Candidate : DisposableBase
     {
         /// <Summary>
         /// Unique internal identifier that's used by other elements to reference this element.
         /// </Summary>
-        public unsafe string ObjectId
+        public string ObjectId
         {
             get
             {
@@ -37,7 +37,7 @@ namespace ElectionGuard
         /// <Summary>
         /// A convenience accessor for getObjectId
         /// </Summary>
-        public unsafe string CandidateId
+        public string CandidateId
         {
             get
             {
@@ -56,7 +56,7 @@ namespace ElectionGuard
         /// <Summary>
         /// Name of the candidate
         /// </Summary>
-        public unsafe string Name
+        public string Name
         {
             get
             {
@@ -75,7 +75,7 @@ namespace ElectionGuard
         /// <Summary>
         /// Optional party id of the candidate
         /// </Summary>
-        public unsafe string PartyId
+        public string PartyId
         {
             get
             {
@@ -94,7 +94,7 @@ namespace ElectionGuard
         /// <Summary>
         /// Optional image uri for the candidate
         /// </Summary>
-        public unsafe string ImageUri
+        public string ImageUri
         {
             get
             {
@@ -110,9 +110,9 @@ namespace ElectionGuard
             }
         }
 
-        internal unsafe NativeInterface.Candidate.CandidateHandle Handle;
+        internal NativeInterface.Candidate.CandidateHandle Handle;
 
-        unsafe internal Candidate(
+        internal Candidate(
             NativeInterface.Candidate.CandidateHandle handle)
         {
             Handle = handle;
@@ -123,7 +123,7 @@ namespace ElectionGuard
         /// </summary>
         /// <param name="objectId">string for the identity of the object</param>
         /// <param name="isWriteIn">is the candidate a write in</param>
-        public unsafe Candidate(string objectId, bool isWriteIn)
+        public Candidate(string objectId, bool isWriteIn)
         {
             var status = NativeInterface.Candidate.New(objectId, isWriteIn, out Handle);
             if (status != Status.ELECTIONGUARD_STATUS_SUCCESS)
@@ -138,7 +138,7 @@ namespace ElectionGuard
         /// <param name="objectId">string for the identity of the object</param>
         /// <param name="partyId">string identifying the party for the candidate</param>
         /// <param name="isWriteIn">is the candidate a write in</param>
-        public unsafe Candidate(string objectId, string partyId, bool isWriteIn)
+        public Candidate(string objectId, string partyId, bool isWriteIn)
         {
             var status = NativeInterface.Candidate.New(
                 objectId, partyId, isWriteIn, out Handle);
@@ -156,7 +156,7 @@ namespace ElectionGuard
         /// <param name="partyId">string identifying the party for the candidate</param>
         /// <param name="imageUri">string for uir for image of candidate</param>
         /// <param name="isWriteIn">is the candidate a write in</param>
-        public unsafe Candidate(
+        public Candidate(
             string objectId, InternationalizedText name,
             string partyId, string imageUri, bool isWriteIn)
         {
@@ -169,7 +169,7 @@ namespace ElectionGuard
         }
 
 #pragma warning disable CS1591 // Missing XML comment for publicly visible type or member
-        protected override unsafe void DisposeUnmanaged()
+        protected override void DisposeUnmanaged()
 #pragma warning restore CS1591 // Missing XML comment for publicly visible type or member
         {
             base.DisposeUnmanaged();
@@ -182,7 +182,7 @@ namespace ElectionGuard
         /// <Summary>
         /// A hash representation of the object
         /// </Summary>
-        public unsafe ElementModQ CryptoHash()
+        public ElementModQ CryptoHash()
         {
             var status = NativeInterface.Candidate.CryptoHash(
                 Handle, out NativeInterface.ElementModQ.ElementModQHandle value);

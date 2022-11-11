@@ -9,13 +9,13 @@ namespace ElectionGuard
 {
     public partial class CiphertextBallotSelection
     {
-        internal unsafe External.CiphertextBallotSelectionHandle Handle;
+        internal External.CiphertextBallotSelectionHandle Handle;
 
         #region Properties
         /// <Summary>
         /// Get the objectId of the selection, which is the unique id for the selection in a specific contest described in the election manifest.
         /// </Summary>
-        public unsafe string ObjectId
+        public string ObjectId
         {
             get
             {
@@ -30,7 +30,7 @@ namespace ElectionGuard
         /// <Summary>
         /// Get the sequence order of the selection
         /// </Summary>
-        public unsafe ulong SequenceOrder
+        public ulong SequenceOrder
         {
             get
             {
@@ -41,7 +41,7 @@ namespace ElectionGuard
         /// <Summary>
         /// Determines if this is a placeholder selection
         /// </Summary>
-        public unsafe bool IsPlaceholder
+        public bool IsPlaceholder
         {
             get
             {
@@ -52,7 +52,7 @@ namespace ElectionGuard
         /// <Summary>
         /// The hash of the string representation of the Selection Description from the election manifest
         /// </Summary>
-        public unsafe ElementModQ DescriptionHash
+        public ElementModQ DescriptionHash
         {
             get
             {
@@ -66,7 +66,7 @@ namespace ElectionGuard
         /// <Summary>
         /// The encrypted representation of the vote field
         /// </Summary>
-        public unsafe ElGamalCiphertext Ciphertext
+        public ElGamalCiphertext Ciphertext
         {
             get
             {
@@ -80,7 +80,7 @@ namespace ElectionGuard
         /// <Summary>
         /// The hash of the encrypted values
         /// </Summary>
-        public unsafe ElementModQ CryptoHash
+        public ElementModQ CryptoHash
         {
             get
             {
@@ -94,7 +94,7 @@ namespace ElectionGuard
         /// <Summary>
         /// The nonce used to generate the encryption. Sensitive &amp; should be treated as a secret
         /// </Summary>
-        public unsafe ElementModQ Nonce
+        public ElementModQ Nonce
         {
             get
             {
@@ -108,7 +108,7 @@ namespace ElectionGuard
         /// <Summary>
         /// The proof that demonstrates the selection is an encryption of 0 or 1, and was encrypted using the `nonce`
         /// </Summary>
-        public unsafe DisjunctiveChaumPedersenProof Proof
+        public DisjunctiveChaumPedersenProof Proof
         {
             get
             {
@@ -124,7 +124,7 @@ namespace ElectionGuard
         #region Methods
 
 #pragma warning disable CS1591 // Missing XML comment for publicly visible type or member
-        protected override unsafe void DisposeUnmanaged()
+        protected override void DisposeUnmanaged()
 #pragma warning restore CS1591 // Missing XML comment for publicly visible type or member
         {
             base.DisposeUnmanaged();
@@ -136,10 +136,10 @@ namespace ElectionGuard
         #endregion
 
         #region Extern
-        internal unsafe static class External {
-            internal unsafe struct CiphertextBallotSelectionType { };
+        internal static unsafe class External {
+            internal struct CiphertextBallotSelectionType { };
 
-            internal class CiphertextBallotSelectionHandle : ElectionguardSafeHandle<CiphertextBallotSelectionType>
+            internal class CiphertextBallotSelectionHandle : ElectionGuardSafeHandle<CiphertextBallotSelectionType>
             {
                 [ReliabilityContract(Consistency.WillNotCorruptState, Cer.MayFail)]
                 protected override bool Free()

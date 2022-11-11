@@ -1,5 +1,7 @@
 using System;
+using System.Diagnostics.CodeAnalysis;
 using System.Runtime.InteropServices;
+// ReSharper disable UnusedMember.Global
 
 namespace ElectionGuard
 {
@@ -9,14 +11,14 @@ namespace ElectionGuard
     /// this object includes fields that are populated in the course of encrypting an election
     /// Specifically, `crypto_base_hash`, `crypto_extended_base_hash` and `elgamal_public_key`
     /// are populated with election-specific information necessary for encrypting the election.
-    /// Refer to the [Electionguard Specification](https://github.com/microsoft/electionguard) for more information.
+    /// Refer to the [ElectionGuard Specification](https://github.com/microsoft/electionguard) for more information.
     /// </summary>
     public class CiphertextElectionContext : DisposableBase
     {
         /// <summary>
         /// the `joint public key (K)` in the [ElectionGuard Spec](https://github.com/microsoft/electionguard/wiki)
         /// </summary>
-        public unsafe ElementModP ElGamalPublicKey
+        public ElementModP ElGamalPublicKey
         {
             get
             {
@@ -31,7 +33,7 @@ namespace ElectionGuard
         /// the `commitment hash H(K 1,0 , K 2,0 ... , K n,0 )` of the public commitments
         /// guardians make to each other in the [ElectionGuard Spec](https://github.com/microsoft/electionguard/wiki)
         /// </summary>
-        public unsafe ElementModQ CommitmentHash
+        public ElementModQ CommitmentHash
         {
             get
             {
@@ -45,7 +47,7 @@ namespace ElectionGuard
         /// <summary>
         /// The hash of the election manifest
         /// </summary>
-        public unsafe ElementModQ ManifestHash
+        public ElementModQ ManifestHash
         {
             get
             {
@@ -59,7 +61,7 @@ namespace ElectionGuard
         /// <summary>
         /// the `base hash code (𝑄)` in the [ElectionGuard Spec](https://github.com/microsoft/electionguard/wiki)
         /// </summary>
-        public unsafe ElementModQ CryptoBaseHash
+        public ElementModQ CryptoBaseHash
         {
             get
             {
@@ -73,7 +75,7 @@ namespace ElectionGuard
         /// <summary>
         /// the `extended base hash code (𝑄')` in the [ElectionGuard Spec](https://github.com/microsoft/electionguard/wiki)
         /// </summary>
-        public unsafe ElementModQ CryptoExtendedBaseHash
+        public ElementModQ CryptoExtendedBaseHash
         {
             get
             {
@@ -87,7 +89,7 @@ namespace ElectionGuard
         /// <summary>
         /// Get a linked list containing the extended data of the election.
         /// </summary>
-        public unsafe LinkedList ExtendedData
+        public LinkedList ExtendedData
         {
             get
             {
@@ -101,7 +103,7 @@ namespace ElectionGuard
         /// <summary>
         /// Get a linked list containing the extended data of the election.
         /// </summary>
-        public unsafe ContextConfiguration Configuration
+        public ContextConfiguration Configuration
         {
             get
             {
@@ -113,13 +115,13 @@ namespace ElectionGuard
         }
 
 
-        internal unsafe NativeInterface.CiphertextElectionContext.CiphertextElectionContextHandle Handle;
+        internal NativeInterface.CiphertextElectionContext.CiphertextElectionContextHandle Handle;
 
         /// <summary>
         /// Makes a CiphertextElectionContext object.
         /// </summary>
         /// <param name="json">json representation</param>
-        public unsafe CiphertextElectionContext(string json)
+        public CiphertextElectionContext(string json)
         {
             var status = NativeInterface.CiphertextElectionContext.FromJson(json, out Handle);
             status.ThrowIfError();
@@ -134,7 +136,7 @@ namespace ElectionGuard
         /// <param name="commitmentHash"> the hash of the commitments the guardians make to each other </param>
         /// <param name="manifestHash"> the hash of the election metadata </param>
         /// </summary>
-        public unsafe CiphertextElectionContext(ulong numberOfGuardians,
+        public CiphertextElectionContext(ulong numberOfGuardians,
             ulong quorum,
             ElementModP publicKey,
             ElementModQ commitmentHash,
@@ -156,7 +158,7 @@ namespace ElectionGuard
         /// <param name="manifestHash"> the hash of the election metadata </param>
         /// <param name="config"> the context configuration</param>
         /// </summary>
-        public unsafe CiphertextElectionContext(ulong numberOfGuardians,
+        public CiphertextElectionContext(ulong numberOfGuardians,
             ulong quorum,
             ElementModP publicKey,
             ElementModQ commitmentHash,
@@ -178,9 +180,9 @@ namespace ElectionGuard
         /// <param name="publicKey"> the public key of the election </param>
         /// <param name="commitmentHash"> the hash of the commitments the guardians make to each other </param>
         /// <param name="manifestHash"> the hash of the election metadata </param>
-        /// <param name="extendedData"> an unordered map of key value strings revelant to the consuming application </param>
+        /// <param name="extendedData"> an unordered map of key value strings relevant to the consuming application </param>
         /// </summary>
-        public unsafe CiphertextElectionContext(ulong numberOfGuardians,
+        public CiphertextElectionContext(ulong numberOfGuardians,
             ulong quorum,
             ElementModP publicKey,
             ElementModQ commitmentHash,
@@ -203,9 +205,9 @@ namespace ElectionGuard
         /// <param name="commitmentHash"> the hash of the commitments the guardians make to each other </param>
         /// <param name="manifestHash"> the hash of the election metadata </param>
         /// <param name="config"> the context configuration</param>
-        /// <param name="extendedData"> an unordered map of key value strings revelant to the consuming application </param>
+        /// <param name="extendedData"> an unordered map of key value strings relevant to the consuming application </param>
         /// </summary>
-        public unsafe CiphertextElectionContext(ulong numberOfGuardians,
+        public CiphertextElectionContext(ulong numberOfGuardians,
             ulong quorum,
             ElementModP publicKey,
             ElementModQ commitmentHash,
@@ -222,7 +224,7 @@ namespace ElectionGuard
 
 
 #pragma warning disable CS1591 // Missing XML comment for publicly visible type or member
-        protected override unsafe void DisposeUnmanaged()
+        protected override void DisposeUnmanaged()
 #pragma warning restore CS1591 // Missing XML comment for publicly visible type or member
         {
             base.DisposeUnmanaged();
@@ -236,11 +238,11 @@ namespace ElectionGuard
         /// <Summary>
         /// Export the representation as JSON
         /// </Summary>
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Style", "IDE0059:Unnecessary assignment of a value", Justification = "<Pending>")]
-        public unsafe string ToJson()
+        [SuppressMessage("Style", "IDE0059:Unnecessary assignment of a value", Justification = "<Pending>")]
+        public string ToJson()
         {
             var status = NativeInterface.CiphertextElectionContext.ToJson(
-                Handle, out IntPtr pointer, out ulong size);
+                Handle, out IntPtr pointer, out _);
             status.ThrowIfError();
             var json = Marshal.PtrToStringAnsi(pointer);
             NativeInterface.Memory.FreeIntPtr(pointer);

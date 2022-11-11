@@ -1,21 +1,10 @@
-﻿using System;
-using System.Threading;
-
-namespace ElectionGuard
+﻿namespace ElectionGuard
 {
     /// <summary>
     /// Interface for the precompute API to start and stop the precompute calculations
     /// </summary>
-    public interface IPrecomputeAPI
+    public interface IPrecomputeApi
     {
-        /// <summary>
-        /// Starts the precompute process by creating a new thread to run the process
-        /// </summary>
-        /// <param name="maxexp">The max exponentiation to be calculated</param>
-        /// <param name="token">CancelationToken that can be used to start the process</param>
-        [Obsolete]
-        void StartPrecomputeAsync(long maxexp, CancellationToken token);
-
         /// <summary>
         /// Starts the precompute process by creating a new thread to run the process
         /// </summary>

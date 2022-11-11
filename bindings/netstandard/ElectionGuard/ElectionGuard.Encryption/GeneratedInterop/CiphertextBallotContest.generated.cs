@@ -2,20 +2,20 @@
 // This file is generated via ElectionGuard.InteropGenerator at /src/interop-generator
 
 using System;
-using System.Runtime.ConstrainedExecution;
 using System.Runtime.InteropServices;
+using System.Runtime.ConstrainedExecution;
 
 namespace ElectionGuard
 {
     public partial class CiphertextBallotContest
     {
-        internal unsafe External.CiphertextBallotContestHandle Handle;
+        internal External.CiphertextBallotContestHandle Handle;
 
         #region Properties
         /// <Summary>
         /// Get the objectId of the contest, which is the unique id for the contest in a specific ballot described in the election manifest.
         /// </Summary>
-        public unsafe string ObjectId
+        public string ObjectId
         {
             get
             {
@@ -30,7 +30,7 @@ namespace ElectionGuard
         /// <Summary>
         /// Get the sequence order of the contest
         /// </Summary>
-        public unsafe ulong SequenceOrder
+        public ulong SequenceOrder
         {
             get
             {
@@ -41,7 +41,7 @@ namespace ElectionGuard
         /// <Summary>
         /// The hash of the string representation of the Contest Description from the election manifest
         /// </Summary>
-        public unsafe ElementModQ DescriptionHash
+        public ElementModQ DescriptionHash
         {
             get
             {
@@ -55,7 +55,7 @@ namespace ElectionGuard
         /// <Summary>
         /// Get the Size of the selections collection
         /// </Summary>
-        public unsafe ulong SelectionsSize
+        public ulong SelectionsSize
         {
             get
             {
@@ -66,7 +66,7 @@ namespace ElectionGuard
         /// <Summary>
         /// The hash of the encrypted values
         /// </Summary>
-        public unsafe ElementModQ CryptoHash
+        public ElementModQ CryptoHash
         {
             get
             {
@@ -80,7 +80,7 @@ namespace ElectionGuard
         /// <Summary>
         /// The nonce used to generate the encryption. Sensitive &amp; should be treated as a secret
         /// </Summary>
-        public unsafe ElementModQ Nonce
+        public ElementModQ Nonce
         {
             get
             {
@@ -94,7 +94,7 @@ namespace ElectionGuard
         /// <Summary>
         /// The proof demonstrates the sum of the selections does not exceed the maximum available selections for the contest, and that the proof was generated with the nonce
         /// </Summary>
-        public unsafe DisjunctiveChaumPedersenProof Proof
+        public DisjunctiveChaumPedersenProof Proof
         {
             get
             {
@@ -110,7 +110,7 @@ namespace ElectionGuard
         #region Methods
 
 #pragma warning disable CS1591 // Missing XML comment for publicly visible type or member
-        protected override unsafe void DisposeUnmanaged()
+        protected override void DisposeUnmanaged()
 #pragma warning restore CS1591 // Missing XML comment for publicly visible type or member
         {
             base.DisposeUnmanaged();
@@ -122,11 +122,10 @@ namespace ElectionGuard
         #endregion
 
         #region Extern
-        internal unsafe static class External
-        {
-            internal unsafe struct CiphertextBallotContestType { };
+        internal static unsafe class External {
+            internal struct CiphertextBallotContestType { };
 
-            internal class CiphertextBallotContestHandle : ElectionguardSafeHandle<CiphertextBallotContestType>
+            internal class CiphertextBallotContestHandle : ElectionGuardSafeHandle<CiphertextBallotContestType>
             {
                 [ReliabilityContract(Consistency.WillNotCorruptState, Cer.MayFail)]
                 protected override bool Free()
@@ -143,7 +142,7 @@ namespace ElectionGuard
             [DllImport(
                 NativeInterface.DllName,
                 EntryPoint = "eg_ciphertext_ballot_contest_get_object_id",
-                CallingConvention = CallingConvention.Cdecl,
+                CallingConvention = CallingConvention.Cdecl, 
                 SetLastError = true
             )]
             internal static extern Status GetObjectId(
@@ -154,7 +153,7 @@ namespace ElectionGuard
             [DllImport(
                 NativeInterface.DllName,
                 EntryPoint = "eg_ciphertext_ballot_contest_get_sequence_order",
-                CallingConvention = CallingConvention.Cdecl,
+                CallingConvention = CallingConvention.Cdecl, 
                 SetLastError = true
             )]
             internal static extern ulong GetSequenceOrder(
@@ -164,7 +163,7 @@ namespace ElectionGuard
             [DllImport(
                 NativeInterface.DllName,
                 EntryPoint = "eg_ciphertext_ballot_contest_get_description_hash",
-                CallingConvention = CallingConvention.Cdecl,
+                CallingConvention = CallingConvention.Cdecl, 
                 SetLastError = true
             )]
             internal static extern Status GetDescriptionHash(
@@ -175,7 +174,7 @@ namespace ElectionGuard
             [DllImport(
                 NativeInterface.DllName,
                 EntryPoint = "eg_ciphertext_ballot_contest_get_selections_size",
-                CallingConvention = CallingConvention.Cdecl,
+                CallingConvention = CallingConvention.Cdecl, 
                 SetLastError = true
             )]
             internal static extern ulong GetSelectionsSize(
@@ -185,7 +184,7 @@ namespace ElectionGuard
             [DllImport(
                 NativeInterface.DllName,
                 EntryPoint = "eg_ciphertext_ballot_contest_get_crypto_hash",
-                CallingConvention = CallingConvention.Cdecl,
+                CallingConvention = CallingConvention.Cdecl, 
                 SetLastError = true
             )]
             internal static extern Status GetCryptoHash(
@@ -196,7 +195,7 @@ namespace ElectionGuard
             [DllImport(
                 NativeInterface.DllName,
                 EntryPoint = "eg_ciphertext_ballot_contest_get_nonce",
-                CallingConvention = CallingConvention.Cdecl,
+                CallingConvention = CallingConvention.Cdecl, 
                 SetLastError = true
             )]
             internal static extern Status GetNonce(
@@ -207,7 +206,7 @@ namespace ElectionGuard
             [DllImport(
                 NativeInterface.DllName,
                 EntryPoint = "eg_ciphertext_ballot_contest_get_proof",
-                CallingConvention = CallingConvention.Cdecl,
+                CallingConvention = CallingConvention.Cdecl, 
                 SetLastError = true
             )]
             internal static extern Status GetProof(

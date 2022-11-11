@@ -13,7 +13,7 @@ jobs:
     runs-on: windows-2022
     steps:
       - name: Checkout Code
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
       - name: Install .NET 6
         uses: actions/setup-dotnet@v2
         with:
@@ -36,7 +36,7 @@ jobs:
       compiler_version: 14
     steps:
       - name: Checkout Code
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
       - name: Update Environment
         run: |
           sudo apt-get update
@@ -60,7 +60,7 @@ jobs:
       compiler_version: 14
     steps:
       - name: Checkout Code
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
       - name: Setup Compiler
         run: sudo xcode-select -switch /Applications/Xcode_${{ env.compiler_version }}.app
       - name: Configure Environment
@@ -79,7 +79,7 @@ jobs:
     runs-on: windows-latest
     steps:
       - name: Checkout Code
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
       - name: Get Windows x64 Build
         uses: actions/download-artifact@v2
         with:

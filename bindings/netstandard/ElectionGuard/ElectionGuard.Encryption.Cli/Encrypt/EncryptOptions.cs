@@ -34,7 +34,7 @@ internal class EncryptOptions
         if (string.IsNullOrEmpty(BallotsDir)) throw new ArgumentNullException(nameof(BallotsDir));
         if (string.IsNullOrEmpty(OutDir)) throw new ArgumentNullException(nameof(OutDir));
 
-        if (!Directory.Exists(BallotsDir)) throw new ArgumentException($"ballots directory does not exist"); ;
+        if (!Directory.Exists(BallotsDir)) throw new ArgumentException("ballots directory does not exist");
         if (!Directory.Exists(OutDir))
         {
             Directory.CreateDirectory(OutDir);

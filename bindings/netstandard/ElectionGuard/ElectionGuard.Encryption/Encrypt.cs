@@ -26,7 +26,7 @@
         ///                          Contest nonce, but no relationship is required</param>
         /// <param name="shouldVerifyProofs">specify if the proofs should be verified prior to returning (default True)</param>
         /// <returns>A `CiphertextBallotSelection`</returns>
-        public static unsafe CiphertextBallotSelection Selection(
+        public static CiphertextBallotSelection Selection(
             PlaintextBallotSelection plaintext,
             SelectionDescription description,
             ElementModP elgamalPublicKey,
@@ -61,7 +61,7 @@
         ///                          Ballot nonce, but no relationship is required</param>
         /// <param name="shouldVerifyProofs">specify if the proofs should be verified prior to returning (default True)</param>
         /// <returns>A `CiphertextBallotContest`</returns>
-        public static unsafe CiphertextBallotContest Contest(
+        public static CiphertextBallotContest Contest(
             PlaintextBallotContest plaintext,
             ContestDescription description,
             ElementModP elgamalPublicKey,
@@ -102,7 +102,7 @@
         ///                     if this value is not provided, the secret generating mechanism of the OS provides its own</param>
         /// <param name="shouldVerifyProofs">specify if the proofs should be verified prior to returning (default True)</param>
         /// <returns>A `CiphertextBallot`</returns>
-        public static unsafe CiphertextBallot Ballot(
+        public static CiphertextBallot Ballot(
             PlaintextBallot ballot,
             InternalManifest internalManifest,
             CiphertextElectionContext context,
@@ -152,7 +152,7 @@
         ///                     if this value is not provided, the secret generating mechanism of the OS provides its own</param>
         /// <param name="shouldVerifyProofs">specify if the proofs should be verified prior to returning (default True)</param>
         /// <returns>A `CiphertextBallot`</returns>
-        public static unsafe CompactCiphertextBallot CompactBallot(
+        public static CompactCiphertextBallot CompactBallot(
             PlaintextBallot ballot,
             InternalManifest internalManifest,
             CiphertextElectionContext context,

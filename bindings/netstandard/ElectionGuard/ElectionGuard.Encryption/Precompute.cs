@@ -1,37 +1,39 @@
-﻿using System;
-using System.Threading;
+﻿using System.Threading;
+// ReSharper disable RedundantAssignment
+// ReSharper disable InlineOutVariableDeclaration
 
 namespace ElectionGuard
 {
     /// <summary>
     /// Class that controls the precompute process
     /// </summary>
-    public class Precompute : IPrecomputeAPI
+    public class Precompute : IPrecomputeApi
     {
-        readonly static int DUMMY_BUFFER_SIZE = 100;   // set a buffer size that will be > 0 and < the default of 5000 for initialization
-        readonly int INIT_COUNT = -1;            // initializer for count to make sure we are getting a value back from the C++
-        readonly int INIT_QUEUE_SIZE = -2;       // initializer for the queue size to make sure that its diffrent than the count and being set
+        static readonly int DummyBufferSize = 100;   // set a buffer size that will be > 0 and < the default of 5000 for initialization
 
-        AutoResetEvent waitHandle;
+        readonly int _initCount = -1;            // initializer for count to make sure we are getting a value back from the C++
+        readonly int _initQueueSize = -2;       // initializer for the queue size to make sure that its different than the count and being set
+
+        AutoResetEvent _waitHandle;
 
         /// <summary>
         /// Default constructor to initialize buffers for testing
         /// </summary>
         public Precompute()
         {
-            NativeInterface.PrecomputeBuffers.Init(max_buffers);
+            NativeInterface.PrecomputeBuffers.Init(_maxBuffers);
         }
 
 
-        private PrecomputeStatus currentStatus = new PrecomputeStatus
+        private PrecomputeStatus _currentStatus = new PrecomputeStatus
         {
             Percentage = 0,
             CompletedExponentiationsCount = 0,
             CurrentState = PrecomputeState.NotStarted
         };
-        private Thread workerThread;
-        private int max_buffers = DUMMY_BUFFER_SIZE;
-        private ElementModP elgamalPublicKey;
+        private Thread _workerThread;
+        private int _maxBuffers = DummyBufferSize;
+        private ElementModP _elgamalPublicKey;
 
         /// <summary>
         /// Event handler that will give back progress to the calling code
@@ -48,7 +50,7 @@ namespace ElectionGuard
         /// </summary>
         private void OnCompletedEvent()
         {
-            CompletedEvent?.Invoke(currentStatus);
+            CompletedEvent?.Invoke(_currentStatus);
         }
 
         /// <summary>
@@ -56,7 +58,7 @@ namespace ElectionGuard
         /// </summary>
         private void OnProgressEvent()
         {
-            ProgressEvent?.Invoke(currentStatus);
+            ProgressEvent?.Invoke(_currentStatus);
         }
 
         /// <summary>
@@ -65,36 +67,25 @@ namespace ElectionGuard
         /// <returns><see cref="PrecomputeStatus">PrecomputeStatus</see> with all of the latest information</returns>
         public PrecomputeStatus GetStatus()
         {
-            int count = INIT_COUNT;
-            int queue_size = INIT_QUEUE_SIZE;
-            GetProgress(out count, out queue_size);
-            if (count == queue_size)
-                currentStatus.CurrentState = PrecomputeState.Completed;
-            currentStatus.Percentage = (double)count / queue_size;
-            currentStatus.CompletedExponentiationsCount = count;
+            int count = _initCount;
+            int queueSize = _initQueueSize;
+            GetProgress(out count, out queueSize);
+            if (count == queueSize)
+                _currentStatus.CurrentState = PrecomputeState.Completed;
+            _currentStatus.Percentage = (double)count / queueSize;
+            _currentStatus.CompletedExponentiationsCount = count;
 
-            return currentStatus;
+            return _currentStatus;
         }
 
         /// <summary>
         /// Gets the progress of the precompute
         /// </summary>
         /// <param name="count">count of the buffer entries</param>
-        /// <param name="queue_size">max size of the buffer queue</param>
-        public void GetProgress(out int count, out int queue_size)
+        /// <param name="queueSize">max size of the buffer queue</param>
+        public void GetProgress(out int count, out int queueSize)
         {
-            NativeInterface.PrecomputeBuffers.Status(out count, out queue_size);
-        }
-
-        /// <summary>
-        /// Starts the precompute process by creating a new thread to run the process
-        /// </summary>
-        /// <param name="maxexp">The max exponentiation to be calculated</param>
-        /// <param name="token">CancelationToken that can be used to start the process</param>
-        [Obsolete]
-        public void StartPrecomputeAsync(long maxexp, CancellationToken token)
-        {
-            currentStatus.CurrentState = PrecomputeState.Running;
+            NativeInterface.PrecomputeBuffers.Status(out count, out queueSize);
         }
 
         /// <summary>
@@ -104,16 +95,18 @@ namespace ElectionGuard
         /// <param name="buffers">The maximum number of buffers to precompute</param>
         public void StartPrecomputeAsync(ElementModP publicKey, int buffers = 0)
         {
-            currentStatus.CurrentState = PrecomputeState.Running;
-            max_buffers = buffers;
-            elgamalPublicKey = publicKey;
+            _currentStatus.CurrentState = PrecomputeState.Running;
+            _maxBuffers = buffers;
+            _elgamalPublicKey = publicKey;
 
-            waitHandle = new AutoResetEvent(false);
-            workerThread = new Thread(WorkerMethod);
-            workerThread.Name = "Precompute Worker Thread";
-            workerThread.Start();
+            _waitHandle = new AutoResetEvent(false);
+            _workerThread = new Thread(WorkerMethod)
+            {
+                Name = "Precompute Worker Thread"
+            };
+            _workerThread.Start();
 
-            waitHandle.WaitOne();   // make sure thread is created before returning
+            _waitHandle.WaitOne();   // make sure thread is created before returning
         }
 
         /// <summary>
@@ -121,9 +114,9 @@ namespace ElectionGuard
         /// </summary>
         public void StopPrecompute()
         {
-            if (currentStatus.CurrentState == PrecomputeState.Running)
+            if (_currentStatus.CurrentState == PrecomputeState.Running)
             {
-                currentStatus.CurrentState = PrecomputeState.UserStopped;
+                _currentStatus.CurrentState = PrecomputeState.UserStopped;
             }
             else
             {
@@ -138,9 +131,9 @@ namespace ElectionGuard
         /// </summary>
         private void WorkerMethod()
         {
-            NativeInterface.PrecomputeBuffers.Init(max_buffers);
-            waitHandle.Set();
-            NativeInterface.PrecomputeBuffers.Populate(elgamalPublicKey.Handle);
+            NativeInterface.PrecomputeBuffers.Init(_maxBuffers);
+            _waitHandle.Set();
+            NativeInterface.PrecomputeBuffers.Populate(_elgamalPublicKey.Handle);
 
             SendCompleted();
         }
@@ -148,12 +141,12 @@ namespace ElectionGuard
         private void SendCompleted()
         {
             int count = -1;
-            int queue_size = -2;
-            GetProgress(out count, out queue_size);
-            if (count == queue_size)
-                currentStatus.CurrentState = PrecomputeState.Completed;
-            currentStatus.Percentage = (double)count / queue_size;
-            currentStatus.CompletedExponentiationsCount = count;
+            int queueSize = -2;
+            GetProgress(out count, out queueSize);
+            if (count == queueSize)
+                _currentStatus.CurrentState = PrecomputeState.Completed;
+            _currentStatus.Percentage = (double)count / queueSize;
+            _currentStatus.CompletedExponentiationsCount = count;
 
             OnCompletedEvent();
         }

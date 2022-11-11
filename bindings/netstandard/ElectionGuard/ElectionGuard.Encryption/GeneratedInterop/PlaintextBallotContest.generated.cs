@@ -9,13 +9,13 @@ namespace ElectionGuard
 {
     public partial class PlaintextBallotContest
     {
-        internal unsafe External.PlaintextBallotContestHandle Handle;
+        internal External.PlaintextBallotContestHandle Handle;
 
         #region Properties
         /// <Summary>
         /// Get the objectId of the contest, which is the unique id for the contest in a specific ballot style described in the election manifest.
         /// </Summary>
-        public unsafe string ObjectId
+        public string ObjectId
         {
             get
             {
@@ -30,7 +30,7 @@ namespace ElectionGuard
         /// <Summary>
         /// Get the Size of the selections collection
         /// </Summary>
-        public unsafe ulong SelectionsSize
+        public ulong SelectionsSize
         {
             get
             {
@@ -44,7 +44,7 @@ namespace ElectionGuard
         /// <summary>
         /// Given a PlaintextBallotContest returns true if the state is representative of the expected values.  Note: because this class supports partial representations, undervotes are considered a valid state.
         /// </summary>
-        public unsafe bool IsValid(
+        public bool IsValid(
             string expectedObjectId, ulong expectedNumSelections, ulong expectedNumElected, ulong votesAllowed = 0
         ) {
             return External.IsValid(
@@ -52,7 +52,7 @@ namespace ElectionGuard
         }
 
 #pragma warning disable CS1591 // Missing XML comment for publicly visible type or member
-        protected override unsafe void DisposeUnmanaged()
+        protected override void DisposeUnmanaged()
 #pragma warning restore CS1591 // Missing XML comment for publicly visible type or member
         {
             base.DisposeUnmanaged();
@@ -64,10 +64,10 @@ namespace ElectionGuard
         #endregion
 
         #region Extern
-        internal unsafe static class External {
-            internal unsafe struct PlaintextBallotContestType { };
+        internal static unsafe class External {
+            internal struct PlaintextBallotContestType { };
 
-            internal class PlaintextBallotContestHandle : ElectionguardSafeHandle<PlaintextBallotContestType>
+            internal class PlaintextBallotContestHandle : ElectionGuardSafeHandle<PlaintextBallotContestType>
             {
                 [ReliabilityContract(Consistency.WillNotCorruptState, Cer.MayFail)]
                 protected override bool Free()

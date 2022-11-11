@@ -12,7 +12,7 @@ namespace ElectionGuard
         /// <Summary>
         /// An annotation of up to 16 characters that's associated with a character string.
         /// </Summary>
-        public unsafe string Annotation
+        public string Annotation
         {
             get
             {
@@ -31,7 +31,7 @@ namespace ElectionGuard
         /// <Summary>
         /// The character string
         /// </Summary>
-        public unsafe string Value
+        public string Value
         {
             get
             {
@@ -47,9 +47,9 @@ namespace ElectionGuard
             }
         }
 
-        internal unsafe NativeInterface.AnnotatedString.AnnotatedStringHandle Handle;
+        internal NativeInterface.AnnotatedString.AnnotatedStringHandle Handle;
 
-        unsafe internal AnnotatedString(
+        internal AnnotatedString(
             NativeInterface.AnnotatedString.AnnotatedStringHandle handle)
         {
             Handle = handle;
@@ -60,7 +60,7 @@ namespace ElectionGuard
         /// </summary>
         /// <param name="annotation">annotation for new string</param>
         /// <param name="value">string value</param>
-        public unsafe AnnotatedString(string annotation, string value)
+        public AnnotatedString(string annotation, string value)
         {
             var status = NativeInterface.AnnotatedString.New(annotation, value, out Handle);
             if (status != Status.ELECTIONGUARD_STATUS_SUCCESS)
@@ -70,7 +70,7 @@ namespace ElectionGuard
         }
 
 #pragma warning disable CS1591 // Missing XML comment for publicly visible type or member
-        protected override unsafe void DisposeUnmanaged()
+        protected override void DisposeUnmanaged()
 #pragma warning restore CS1591 // Missing XML comment for publicly visible type or member
         {
             base.DisposeUnmanaged();
@@ -83,7 +83,7 @@ namespace ElectionGuard
         /// <Summary>
         /// A hash representation of the object
         /// </Summary>
-        public unsafe ElementModQ CryptoHash()
+        public ElementModQ CryptoHash()
         {
             var status = NativeInterface.AnnotatedString.CryptoHash(
                 Handle, out NativeInterface.ElementModQ.ElementModQHandle value);

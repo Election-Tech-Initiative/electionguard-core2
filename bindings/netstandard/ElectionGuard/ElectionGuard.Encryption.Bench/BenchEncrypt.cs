@@ -1,11 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Diagnostics;
-using System.Linq;
-using System.Text;
 using System.Threading;
-using System.Threading.Tasks;
-using ElectionGuard.Encryption.Utils;
 using ElectionGuard.Encryption.Utils.Generators;
 
 namespace ElectionGuard.Encryption.Bench
@@ -13,29 +7,26 @@ namespace ElectionGuard.Encryption.Bench
 
     public class BenchEncrypt : Fixture
     {
-        readonly int MAX_COMPLETE_DELAY = 7000;
-        ElementModQ nonce;
-        ElGamalKeyPair keypair;
-        Manifest manifest;
-        InternalManifest internalManifest;
-        CiphertextElectionContext context;
-        EncryptionDevice device;
-        EncryptionMediator mediator;
-        PlaintextBallot ballot;
+        private const int MaxCompleteDelay = 7000;
+        private readonly ElementModQ _nonce;
+        private readonly ElGamalKeyPair _keypair;
+        private readonly InternalManifest _internalManifest;
+        private readonly CiphertextElectionContext _context;
+        private readonly EncryptionDevice _device;
+        private readonly PlaintextBallot _ballot;
 
         public BenchEncrypt()
         {
             var secret = new ElementModQ("A9FA69F9686810ED82DAF9020FE80DFE0FC0FDCBF7FA55B93C811F0BA2650101");
-            nonce = new ElementModQ("4BD3231DC17E9E84F5B0A5D2C4160C6A2299EDAE184C291E17709913B8F9CB40");
-            keypair = ElGamalKeyPair.FromSecret(secret);
-            manifest = ManifestGenerator.GetManifestFromFile();
-            internalManifest = new InternalManifest(manifest);
-            context = new CiphertextElectionContext(
-                1UL, 1UL, keypair.PublicKey, Constants.TWO_MOD_Q, internalManifest.ManifestHash);
-            device = new EncryptionDevice(12345UL, 23456UL, 34567UL, "Location");
-            mediator = new EncryptionMediator(internalManifest, context, device);
+            _nonce = new ElementModQ("4BD3231DC17E9E84F5B0A5D2C4160C6A2299EDAE184C291E17709913B8F9CB40");
+            _keypair = ElGamalKeyPair.FromSecret(secret);
+            var manifest = ManifestGenerator.GetManifestFromFile();
+            _internalManifest = new InternalManifest(manifest);
+            _context = new CiphertextElectionContext(
+                1UL, 1UL, _keypair.PublicKey, Constants.TWO_MOD_Q, _internalManifest.ManifestHash);
+            _device = new EncryptionDevice(12345UL, 23456UL, 34567UL, "Location");
 
-            ballot = BallotGenerator.GetFakeBallot(internalManifest);
+            _ballot = BallotGenerator.GetFakeBallot(_internalManifest);
             //Console.WriteLine(ballot.ToJson());
         }
 
@@ -55,7 +46,7 @@ namespace ElectionGuard.Encryption.Bench
             Console.WriteLine("Bench_Encrypt_BallotFull_NoProofCheck");
             Run(() =>
             {
-                var ciphertext = Encrypt.Ballot(ballot, internalManifest, context, device.GetHash(), nonce, false);
+                Encrypt.Ballot(_ballot, _internalManifest, _context, _device.GetHash(), _nonce, false);
             });
         }
 
@@ -64,7 +55,7 @@ namespace ElectionGuard.Encryption.Bench
             Console.WriteLine("Bench_Encrypt_BallotFull_WithProofCheck");
             Run(() =>
             {
-                var ciphertext = Encrypt.Ballot(ballot, internalManifest, context, device.GetHash(), nonce, true);
+                Encrypt.Ballot(_ballot, _internalManifest, _context, _device.GetHash(), _nonce);
             });
         }
 
@@ -73,7 +64,7 @@ namespace ElectionGuard.Encryption.Bench
             Console.WriteLine("Bench_Encrypt_Ballot_Compact_NoProofCheck");
             Run(() =>
             {
-                var ciphertext = Encrypt.CompactBallot(ballot, internalManifest, context, device.GetHash(), nonce, false);
+                Encrypt.CompactBallot(_ballot, _internalManifest, _context, _device.GetHash(), _nonce, false);
             });
         }
 
@@ -82,7 +73,7 @@ namespace ElectionGuard.Encryption.Bench
             Console.WriteLine("Bench_Encrypt_Ballot_Compact_WithProofCheck");
             Run(() =>
             {
-                var ciphertext = Encrypt.CompactBallot(ballot, internalManifest, context, device.GetHash(), nonce, true);
+                Encrypt.CompactBallot(_ballot, _internalManifest, _context, _device.GetHash(), _nonce);
             });
         }
 
@@ -91,13 +82,13 @@ namespace ElectionGuard.Encryption.Bench
             Console.WriteLine("Setup_Precompute_Buffers");
             var waitHandle = new AutoResetEvent(false);
 
-            Precompute precompute = new Precompute();
-            precompute.CompletedEvent += (PrecomputeStatus completedStatus) =>
+            var precompute = new Precompute();
+            precompute.CompletedEvent += _ =>
             {
                 waitHandle.Set();
             };
-            precompute.StartPrecomputeAsync(keypair.PublicKey, 1000);
-            var waitReturn = waitHandle.WaitOne(MAX_COMPLETE_DELAY);
+            precompute.StartPrecomputeAsync(_keypair.PublicKey, 1000);
+            waitHandle.WaitOne(MaxCompleteDelay);
             Run(() =>
             {
                 precompute.StopPrecompute();

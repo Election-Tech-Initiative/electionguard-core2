@@ -9,7 +9,7 @@ namespace ElectionGuard
     /// For ElectionGuard, each contest is associated with a specific geopolitical unit,
     /// and each ballot style is associated with at least one geopolitical unit.
     ///
-    /// It is up to the consuming application to determine how to interpreit the relationships
+    /// It is up to the consuming application to determine how to interpret the relationships
     /// between these entity types.
     /// </Summary>
     public class BallotStyle : DisposableBase
@@ -17,7 +17,7 @@ namespace ElectionGuard
         /// <Summary>
         /// Unique internal identifier that's used by other elements to reference this element.
         /// </Summary>
-        public unsafe string ObjectId
+        public string ObjectId
         {
             get
             {
@@ -36,7 +36,7 @@ namespace ElectionGuard
         /// <Summary>
         /// the size of the geopolitical unit id collection
         /// </Summary>
-        public unsafe ulong GeopoliticalUnitIdsSize
+        public ulong GeopoliticalUnitIdsSize
         {
             get
             {
@@ -49,7 +49,7 @@ namespace ElectionGuard
         /// <Summary>
         /// the size of the party id collection
         /// </Summary>
-        public unsafe ulong PartyIdsSize
+        public ulong PartyIdsSize
         {
             get
             {
@@ -59,9 +59,9 @@ namespace ElectionGuard
             }
         }
 
-        internal unsafe NativeInterface.BallotStyle.BallotStyleHandle Handle;
+        internal NativeInterface.BallotStyle.BallotStyleHandle Handle;
 
-        unsafe internal BallotStyle(
+        internal BallotStyle(
             NativeInterface.BallotStyle.BallotStyleHandle handle)
         {
             Handle = handle;
@@ -72,7 +72,7 @@ namespace ElectionGuard
         /// </summary>
         /// <param name="objectId">string to identify the `BallotStyle`</param>
         /// <param name="gpUnitIds">array of objectIds for the `GeopoliticalUnit` for this `BallotStyle`</param>
-        public unsafe BallotStyle(string objectId, string[] gpUnitIds)
+        public BallotStyle(string objectId, string[] gpUnitIds)
         {
             var status = NativeInterface.BallotStyle.New(objectId, gpUnitIds, (ulong)gpUnitIds.Length, out Handle);
             if (status != Status.ELECTIONGUARD_STATUS_SUCCESS)
@@ -82,7 +82,7 @@ namespace ElectionGuard
         }
 
 #pragma warning disable CS1591 // Missing XML comment for publicly visible type or member
-        protected override unsafe void DisposeUnmanaged()
+        protected override void DisposeUnmanaged()
 #pragma warning restore CS1591 // Missing XML comment for publicly visible type or member
         {
             base.DisposeUnmanaged();
@@ -95,7 +95,7 @@ namespace ElectionGuard
         /// <Summary>
         /// the Geopolitical Unit Id or id's that correlate to this ballot style
         /// </Summary>
-        public unsafe String GetGeopoliticalUnitIdAt(ulong index)
+        public String GetGeopoliticalUnitIdAt(ulong index)
         {
             var status = NativeInterface.BallotStyle.GetGeopoliticalInitIdAtIndex(
                 Handle, index, out IntPtr value);
@@ -111,7 +111,7 @@ namespace ElectionGuard
         /// <Summary>
         /// the Party Id or Id's (if any) for this ballot style
         /// </Summary>
-        public unsafe String GetPartyIdAt(ulong index)
+        public String GetPartyIdAt(ulong index)
         {
             var status = NativeInterface.BallotStyle.GetPartyIdAtIndex(
                 Handle, index, out IntPtr value);
@@ -127,7 +127,7 @@ namespace ElectionGuard
         /// <Summary>
         /// A hash representation of the object
         /// </Summary>
-        public unsafe ElementModQ CryptoHash()
+        public ElementModQ CryptoHash()
         {
             var status = NativeInterface.BallotStyle.CryptoHash(
                 Handle, out NativeInterface.ElementModQ.ElementModQHandle value);

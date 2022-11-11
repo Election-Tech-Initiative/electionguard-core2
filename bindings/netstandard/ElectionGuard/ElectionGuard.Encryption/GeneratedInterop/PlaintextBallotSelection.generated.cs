@@ -9,13 +9,13 @@ namespace ElectionGuard
 {
     public partial class PlaintextBallotSelection
     {
-        internal unsafe External.PlaintextBallotSelectionHandle Handle;
+        internal External.PlaintextBallotSelectionHandle Handle;
 
         #region Properties
         /// <Summary>
         /// Get the objectId of the selection which is the unique id for the selection in a specific contest described in the election manifest.
         /// </Summary>
-        public unsafe string ObjectId
+        public string ObjectId
         {
             get
             {
@@ -30,7 +30,7 @@ namespace ElectionGuard
         /// <Summary>
         /// Determines if this is a placeholder selection
         /// </Summary>
-        public unsafe bool IsPlaceholder
+        public bool IsPlaceholder
         {
             get
             {
@@ -41,7 +41,7 @@ namespace ElectionGuard
         /// <Summary>
         /// Get the plaintext vote
         /// </Summary>
-        public unsafe ulong Vote
+        public ulong Vote
         {
             get
             {
@@ -52,7 +52,7 @@ namespace ElectionGuard
         /// <Summary>
         /// An optional field of arbitrary data, such as the value of a write-in candidate
         /// </Summary>
-        public unsafe ExtendedData ExtendedData
+        public ExtendedData ExtendedData
         {
             get
             {
@@ -69,7 +69,7 @@ namespace ElectionGuard
         /// <summary>
         /// Given a PlaintextBallotSelection validates that the object matches an expected object and that the plaintext value can resolve to a valid representation
         /// </summary>
-        public unsafe bool IsValid(
+        public bool IsValid(
             string expectedObjectId
         ) {
             return External.IsValid(
@@ -77,7 +77,7 @@ namespace ElectionGuard
         }
 
 #pragma warning disable CS1591 // Missing XML comment for publicly visible type or member
-        protected override unsafe void DisposeUnmanaged()
+        protected override void DisposeUnmanaged()
 #pragma warning restore CS1591 // Missing XML comment for publicly visible type or member
         {
             base.DisposeUnmanaged();
@@ -89,10 +89,10 @@ namespace ElectionGuard
         #endregion
 
         #region Extern
-        internal unsafe static class External {
-            internal unsafe struct PlaintextBallotSelectionType { };
+        internal static unsafe class External {
+            internal struct PlaintextBallotSelectionType { };
 
-            internal class PlaintextBallotSelectionHandle : ElectionguardSafeHandle<PlaintextBallotSelectionType>
+            internal class PlaintextBallotSelectionHandle : ElectionGuardSafeHandle<PlaintextBallotSelectionType>
             {
                 [ReliabilityContract(Consistency.WillNotCorruptState, Cer.MayFail)]
                 protected override bool Free()

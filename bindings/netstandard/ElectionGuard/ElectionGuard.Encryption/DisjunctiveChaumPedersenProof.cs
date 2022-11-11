@@ -1,10 +1,8 @@
-﻿using System;
-namespace ElectionGuard
+﻿namespace ElectionGuard
 {
     // Declare native types for convenience
     using NativeElementModP = NativeInterface.ElementModP.ElementModPHandle;
     using NativeElementModQ = NativeInterface.ElementModQ.ElementModQHandle;
-    using NativeElGamalCiphertext = NativeInterface.ElGamalCiphertext.ElGamalCiphertextHandle;
     using NativeDisjunctiveChaumPedersenProof = NativeInterface.DisjunctiveChaumPedersenProof.DisjunctiveChaumPedersenProofHandle;
 
     /// <Summary>
@@ -22,7 +20,7 @@ namespace ElectionGuard
         /// <Summary>
         /// a0 in the spec
         /// </Summary>
-        public unsafe ElementModP ZeroPad
+        public ElementModP ZeroPad
         {
             get
             {
@@ -36,7 +34,7 @@ namespace ElectionGuard
         /// <Summary>
         /// b0 in the spec
         /// </Summary>
-        public unsafe ElementModP ZeroData
+        public ElementModP ZeroData
         {
             get
             {
@@ -50,7 +48,7 @@ namespace ElectionGuard
         /// <Summary>
         /// a1 in the spec
         /// </Summary>
-        public unsafe ElementModP OnePad
+        public ElementModP OnePad
         {
             get
             {
@@ -64,7 +62,7 @@ namespace ElectionGuard
         /// <Summary>
         /// b1 in the spec
         /// </Summary>
-        public unsafe ElementModP OneData
+        public ElementModP OneData
         {
             get
             {
@@ -78,7 +76,7 @@ namespace ElectionGuard
         /// <Summary>
         /// c0 in the spec
         /// </Summary>
-        public unsafe ElementModQ ZeroChallenge
+        public ElementModQ ZeroChallenge
         {
             get
             {
@@ -92,7 +90,7 @@ namespace ElectionGuard
         /// <Summary>
         /// c1 in the spec
         /// </Summary>
-        public unsafe ElementModQ OneChallenge
+        public ElementModQ OneChallenge
         {
             get
             {
@@ -106,7 +104,7 @@ namespace ElectionGuard
         /// <Summary>
         /// c in the spec
         /// </Summary>
-        public unsafe ElementModQ Challenge
+        public ElementModQ Challenge
         {
             get
             {
@@ -120,7 +118,7 @@ namespace ElectionGuard
         /// <Summary>
         /// v0 in the spec
         /// </Summary>
-        public unsafe ElementModQ ZeroResponse
+        public ElementModQ ZeroResponse
         {
             get
             {
@@ -134,7 +132,7 @@ namespace ElectionGuard
         /// <Summary>
         /// v1 in the spec
         /// </Summary>
-        public unsafe ElementModQ OneResponse
+        public ElementModQ OneResponse
         {
             get
             {
@@ -145,9 +143,9 @@ namespace ElectionGuard
             }
         }
 
-        internal unsafe NativeDisjunctiveChaumPedersenProof Handle;
+        internal NativeDisjunctiveChaumPedersenProof Handle;
 
-        unsafe internal DisjunctiveChaumPedersenProof(NativeDisjunctiveChaumPedersenProof handle)
+        internal DisjunctiveChaumPedersenProof(NativeDisjunctiveChaumPedersenProof handle)
         {
             Handle = handle;
         }
@@ -165,7 +163,7 @@ namespace ElectionGuard
         /// <param name="plaintext">The constant value to prove, zero or one</param>
         /// <returns>A unique pointer</returns>
         /// </Summary>
-        unsafe public DisjunctiveChaumPedersenProof(
+        public DisjunctiveChaumPedersenProof(
             ElGamalCiphertext message,
             ElementModQ r,
             ElementModP k,
@@ -181,7 +179,7 @@ namespace ElectionGuard
         /// make function for a `DisjunctiveChaumPedersenProof`
         ///
         /// This overload accepts a seed value and calculates
-        /// proofs deterministically based on the seed. (slower, but reproduceable proofs)
+        /// proofs deterministically based on the seed. (slower, but reproducible proofs)
         /// <param name="message"> The ciphertext message</param>
         /// <param name="r"> The nonce used creating the ElGamal ciphertext</param>
         /// <param name="k"> The public key of the election</param>
@@ -191,7 +189,7 @@ namespace ElectionGuard
         /// <param name="plaintext">The constant value to prove, zero or one</param>
         /// <returns>A unique pointer</returns>
         /// </Summary>
-        unsafe public DisjunctiveChaumPedersenProof(
+        public DisjunctiveChaumPedersenProof(
             ElGamalCiphertext message,
             ElementModQ r,
             ElementModP k,
@@ -212,7 +210,7 @@ namespace ElectionGuard
         /// <param name="q"> The extended base hash of the election</param>
         /// <returns> True if everything is consistent. False otherwise. </returns>
         /// </Summary>
-        public unsafe bool IsValid(ElGamalCiphertext message, ElementModP k, ElementModQ q)
+        public bool IsValid(ElGamalCiphertext message, ElementModP k, ElementModQ q)
         {
             return NativeInterface.DisjunctiveChaumPedersenProof.IsValid(
                 Handle, message.Handle, k.Handle, q.Handle
@@ -220,7 +218,7 @@ namespace ElectionGuard
         }
 
 #pragma warning disable CS1591 // Missing XML comment for publicly visible type or member
-        protected override unsafe void DisposeUnmanaged()
+        protected override void DisposeUnmanaged()
 #pragma warning restore CS1591 // Missing XML comment for publicly visible type or member
         {
             base.DisposeUnmanaged();
