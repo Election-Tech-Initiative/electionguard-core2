@@ -40,7 +40,8 @@ namespace ElectionGuard
         /// </summary>
         public ElementModQ GetHash()
         {
-            NativeInterface.EncryptionDevice.GetHash(Handle, out NativeInterface.ElementModQ.ElementModQHandle value);
+            var status = NativeInterface.EncryptionDevice.GetHash(Handle, out NativeInterface.ElementModQ.ElementModQHandle value);
+            status.ThrowIfError();
             return new ElementModQ(value);
         }
 
