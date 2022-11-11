@@ -53,19 +53,32 @@ namespace ElectionGuard
         #endregion
 
         #region Methods
-<# foreach (var method in EgClass.Methods) { #>
+<# foreach (var method in EgClass.Methods) { 
+    var isElectionGuardType = method.ReturnType.IsElectionGuardType;
+    #>
         /// <summary>
         /// <#= method.Description #>
         /// </summary>
         public <#= method.ReturnType.TypeCs #> <#= method.Name #>(
             <#= string.Join(", ", method.Params.Select(p => p.AsCsParam())) #>
         ) {
+<# if (isElectionGuardType) { #>
+            var status = External.<#= method.Name #>(
+                Handle,
+<# foreach (var p in method.Params) { #>
+                <#= p.Name #>,
+<# } // for each param #>
+                out <#= method.ReturnType.NativeHandleType #> value);
+            status.ThrowIfError();
+            return new <#= method.ReturnType.TypeCs #>(value);
+<# } else { #>
             return External.<#= method.Name #>(
                 Handle<# 
 foreach (var p in method.Params) {
     this.Write($", {p.Name}");
 }
                 #>);
+<# } #>
         }
 <# } // foreach method #>
 
@@ -139,16 +152,23 @@ if (EgClass.NeverFree) {
 <# } // end foreach property #>
 <# foreach (var method in EgClass.Methods) {
     var entryPoint = method.GetEntryPoint(className);
+    var isElectionGuardType = method.ReturnType.IsElectionGuardType;
+    var isReturnTypeReferenceType = method.ReturnType.IsPassByReference;
 #>
             [DllImport(NativeInterface.DllName, EntryPoint = "<#= entryPoint #>",
                 CallingConvention = CallingConvention.Cdecl, SetLastError = true)]
-            internal static extern <#= method.ReturnType.TypeCs #> <#= method.Name #>(
+            internal static extern <#= isReturnTypeReferenceType ? "Status" : method.ReturnType.TypeCs #> <#= method.Name #>(
                 <#= className #>Handle handle<#
 foreach (var p in method.Params) { #>,
                 <#= p.AsCppInteropParam() #><# 
 } // end foreach param #>
+<# if (isElectionGuardType) { #>
+,
+                out <#= method.ReturnType.NativeHandleType #> objectId<#
+} // if isElectionGuardType #>
 
                 );
+
 <# } #>
         }
         #endregion

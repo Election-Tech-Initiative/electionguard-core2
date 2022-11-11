@@ -27,7 +27,7 @@ public record EgProperty(
 
     public bool CallerShouldFree => Type.TypeCs == "string";
 
-    public bool IsElectionGuardType => Type.NativeHandleType != null;
+    public bool IsElectionGuardType => Type.IsElectionGuardType;
 
-    public bool IsPassByReference => Type.TypeCs == "string" || IsElectionGuardType;
+    public bool IsPassByReference => Type.IsPassByReference;
 }

@@ -2155,13 +2155,6 @@ namespace ElectionGuard
                 [MarshalAs(UnmanagedType.LPArray)] IntPtr[] selections,
                 ulong selectionsSize,
                 out ElectionGuard.PlaintextBallotContest.External.PlaintextBallotContestHandle handle);
-
-            [DllImport(DllName, EntryPoint = "eg_plaintext_ballot_contest_get_selection_at_index",
-                CallingConvention = CallingConvention.Cdecl, SetLastError = true)]
-            internal static extern Status GetSelectionAtIndex(
-                ElectionGuard.PlaintextBallotContest.External.PlaintextBallotContestHandle handle,
-                ulong index,
-                out ElectionGuard.PlaintextBallotSelection.External.PlaintextBallotSelectionHandle selection);
         }
 
         internal static class CiphertextBallotContest

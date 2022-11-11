@@ -28,6 +28,10 @@ public record EgType(
         }
     }
 
+    public bool IsElectionGuardType => NativeHandleType != null;
+
+    public bool IsPassByReference => TypeCs == "string" || IsElectionGuardType;
+
     public string GetCReturnType()
     {
         ReturnTypes.TryGetValue(TypeCs, out var value);

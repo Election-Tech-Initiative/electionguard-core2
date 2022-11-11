@@ -154,6 +154,7 @@ namespace ElectionGuard
                 PlaintextBallotSelectionHandle handle,
                 [MarshalAs(UnmanagedType.LPStr)] string expectedObjectId
                 );
+
         }
         #endregion
     }

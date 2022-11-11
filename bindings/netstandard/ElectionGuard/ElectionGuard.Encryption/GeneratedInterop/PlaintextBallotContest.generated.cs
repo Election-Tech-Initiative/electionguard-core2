@@ -56,8 +56,12 @@ namespace ElectionGuard
         public PlaintextBallotSelection GetSelectionAt(
             ulong index
         ) {
-            return External.GetSelectionAt(
-                Handle, index);
+            var status = External.GetSelectionAt(
+                Handle,
+                index,
+                out PlaintextBallotSelection.External.PlaintextBallotSelectionHandle value);
+            status.ThrowIfError();
+            return new PlaintextBallotSelection(value);
         }
 
 #pragma warning disable CS1591 // Missing XML comment for publicly visible type or member
@@ -120,12 +124,15 @@ namespace ElectionGuard
                 ulong expectedNumElected,
                 ulong votesAllowed
                 );
+
             [DllImport(NativeInterface.DllName, EntryPoint = "eg_plaintext_ballot_contest_get_selection_at",
                 CallingConvention = CallingConvention.Cdecl, SetLastError = true)]
-            internal static extern PlaintextBallotSelection GetSelectionAt(
+            internal static extern Status GetSelectionAt(
                 PlaintextBallotContestHandle handle,
-                ulong index
+                ulong index,
+                out PlaintextBallotSelection.External.PlaintextBallotSelectionHandle objectId
                 );
+
         }
         #endregion
     }
