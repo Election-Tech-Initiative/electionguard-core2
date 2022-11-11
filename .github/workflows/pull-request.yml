@@ -93,7 +93,7 @@ jobs:
 
     steps:
       - name: Checkout Code
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
       - name: Change Directory
         run: cd ${{ github.workspace }}
       - name: Install .NET 6
