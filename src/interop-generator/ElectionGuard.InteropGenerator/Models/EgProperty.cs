@@ -23,10 +23,7 @@ public record EgProperty(
         return Type.GetCReturnType();
     }
 
-    public string GetOutVarType()
-    {
-        return Type.OutVarCType;
-    }
+    public string OutVarType => Type.OutVarCType;
 
     public bool CallerShouldFree => Type.TypeCs == "string";
 

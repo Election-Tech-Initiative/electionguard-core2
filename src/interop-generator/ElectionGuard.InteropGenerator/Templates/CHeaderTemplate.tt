@@ -51,7 +51,7 @@ EG_API <#= returnType #> <#= entryPoint #>(
 	<#= classHandle #> *handle<#
 if (egProperty.IsReferenceType()) {
 #>,
-	<#= egProperty.GetOutVarType() #><#= outParamName #>
+	<#= egProperty.OutVarType #><#= outParamName #>
 	);
 <# } else { #>
 

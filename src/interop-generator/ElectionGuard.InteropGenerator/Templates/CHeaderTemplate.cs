@@ -156,7 +156,7 @@ if (egProperty.IsReferenceType()) {
             this.Write(",\r\n\t");
             
             #line 54 "C:\dev\ElectionGuard\electionguard-core2\src\interop-generator\ElectionGuard.InteropGenerator\Templates\CHeaderTemplate.tt"
-            this.Write(this.ToStringHelper.ToStringWithCulture(egProperty.GetOutVarType()));
+            this.Write(this.ToStringHelper.ToStringWithCulture(egProperty.OutVarType));
             
             #line default
             #line hidden
