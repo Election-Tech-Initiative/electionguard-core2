@@ -59,8 +59,7 @@ namespace ElectionGuard
         /// <summary>
         /// Get the contest at the specified index.
         /// </summary>
-        /// <param name="index"></param>
-        /// <returns></returns>
+        /// <param name="index">The index of the contest</param>
         public PlaintextBallotContest GetContestAtIndex(
             ulong index
         ) {

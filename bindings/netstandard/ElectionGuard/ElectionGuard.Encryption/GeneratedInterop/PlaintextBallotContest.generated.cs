@@ -53,6 +53,7 @@ namespace ElectionGuard
         /// <summary>
         /// Get a selection at a specific index.
         /// </summary>
+        /// <param name="index">The index of the selection</param>
         public PlaintextBallotSelection GetSelectionAtIndex(
             ulong index
         ) {

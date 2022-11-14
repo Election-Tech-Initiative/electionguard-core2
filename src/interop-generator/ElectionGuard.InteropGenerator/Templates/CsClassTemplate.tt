@@ -59,6 +59,9 @@ namespace ElectionGuard
         /// <summary>
         /// <#= method.Description #>
         /// </summary>
+<# foreach (var p in method.Params.Where(p => p.Description != null)) { #>
+        /// <param name="<#= p.Name #>"><#= p.Description #></param>
+<# } // for each param #>
         public <#= method.ReturnType.TypeCs #> <#= method.Name #>(
             <#= string.Join(", ", method.Params.Select(p => p.AsCsParam())) #>
         ) {
