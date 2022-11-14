@@ -4,11 +4,11 @@ namespace ElectionGuard.InteropGenerator.Models;
 
 public record EgMethod (
     string Name,
-    string ReturnTypeCs,
+    EgType ReturnType,
     string Description,
     EgParam[] Params)
 {
-    public string ReturnTypeC => TypeHelper.CsToC(ReturnTypeCs);
+    public string ReturnTypeC => TypeHelper.CsToC(ReturnType.TypeCs);
     
     public string GetEntryPoint(string className)
     {

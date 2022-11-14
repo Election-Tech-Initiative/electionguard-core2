@@ -65,7 +65,7 @@ namespace ElectionGuard
             
             #line 25 "C:\dev\ElectionGuard\electionguard-core2\src\interop-generator\ElectionGuard.InteropGenerator\Templates\CsClassTemplate.tt"
  foreach (var egProperty in EgClass.Properties) { 
-        var isInternalType = egProperty.NativeHandleType != null;
+        var isElectionGuardType = egProperty.IsElectionGuardType;
         
             
             #line default
@@ -80,7 +80,7 @@ namespace ElectionGuard
             this.Write("\r\n        /// </Summary>\r\n        public ");
             
             #line 31 "C:\dev\ElectionGuard\electionguard-core2\src\interop-generator\ElectionGuard.InteropGenerator\Templates\CsClassTemplate.tt"
-            this.Write(this.ToStringHelper.ToStringWithCulture(egProperty.TypeCs));
+            this.Write(this.ToStringHelper.ToStringWithCulture(egProperty.Type.TypeCs));
             
             #line default
             #line hidden
@@ -94,7 +94,7 @@ namespace ElectionGuard
             this.Write("\r\n        {\r\n            get\r\n            {\r\n");
             
             #line 35 "C:\dev\ElectionGuard\electionguard-core2\src\interop-generator\ElectionGuard.InteropGenerator\Templates\CsClassTemplate.tt"
- if (isInternalType) { 
+ if (isElectionGuardType) { 
             
             #line default
             #line hidden
@@ -108,21 +108,21 @@ namespace ElectionGuard
             this.Write("(\r\n                    Handle, out ");
             
             #line 37 "C:\dev\ElectionGuard\electionguard-core2\src\interop-generator\ElectionGuard.InteropGenerator\Templates\CsClassTemplate.tt"
-            this.Write(this.ToStringHelper.ToStringWithCulture(egProperty.NativeHandleType));
+            this.Write(this.ToStringHelper.ToStringWithCulture(egProperty.Type.NativeHandleType));
             
             #line default
             #line hidden
             this.Write(" value);\r\n                status.ThrowIfError();\r\n                return new ");
             
             #line 39 "C:\dev\ElectionGuard\electionguard-core2\src\interop-generator\ElectionGuard.InteropGenerator\Templates\CsClassTemplate.tt"
-            this.Write(this.ToStringHelper.ToStringWithCulture(egProperty.TypeCs));
+            this.Write(this.ToStringHelper.ToStringWithCulture(egProperty.Type.TypeCs));
             
             #line default
             #line hidden
             this.Write("(value);\r\n");
             
             #line 40 "C:\dev\ElectionGuard\electionguard-core2\src\interop-generator\ElectionGuard.InteropGenerator\Templates\CsClassTemplate.tt"
- } else if (egProperty.TypeCs == "string") { 
+ } else if (egProperty.Type.TypeCs == "string") { 
             
             #line default
             #line hidden
@@ -180,7 +180,7 @@ namespace ElectionGuard
             this.Write("\r\n        /// </summary>\r\n        public ");
             
             #line 60 "C:\dev\ElectionGuard\electionguard-core2\src\interop-generator\ElectionGuard.InteropGenerator\Templates\CsClassTemplate.tt"
-            this.Write(this.ToStringHelper.ToStringWithCulture(method.ReturnTypeCs));
+            this.Write(this.ToStringHelper.ToStringWithCulture(method.ReturnType.TypeCs));
             
             #line default
             #line hidden
@@ -324,8 +324,8 @@ if (EgClass.NeverFree) {
             #line 119 "C:\dev\ElectionGuard\electionguard-core2\src\interop-generator\ElectionGuard.InteropGenerator\Templates\CsClassTemplate.tt"
  foreach (var egProperty in EgClass.Properties) {
         var entryPoint = egProperty.GetEntryPoint(className);
-        var isInternalType = egProperty.NativeHandleType != null;
-        var isComplexType = egProperty.TypeCs == "string" || isInternalType;
+        var isElectionGuardType = egProperty.IsElectionGuardType;
+        var isReferenceType = egProperty.IsPassByReference;
 
             
             #line default
@@ -342,7 +342,7 @@ if (EgClass.NeverFree) {
                     "  SetLastError = true\r\n            )]\r\n            internal static extern ");
             
             #line 130 "C:\dev\ElectionGuard\electionguard-core2\src\interop-generator\ElectionGuard.InteropGenerator\Templates\CsClassTemplate.tt"
-            this.Write(this.ToStringHelper.ToStringWithCulture(isComplexType ? "Status" : egProperty.TypeCs));
+            this.Write(this.ToStringHelper.ToStringWithCulture(isReferenceType ? "Status" : egProperty.Type.TypeCs));
             
             #line default
             #line hidden
@@ -363,28 +363,28 @@ if (EgClass.NeverFree) {
             this.Write("Handle handle\r\n");
             
             #line 132 "C:\dev\ElectionGuard\electionguard-core2\src\interop-generator\ElectionGuard.InteropGenerator\Templates\CsClassTemplate.tt"
- if (isInternalType) { 
+ if (isElectionGuardType) { 
             
             #line default
             #line hidden
             this.Write("                , out ");
             
             #line 133 "C:\dev\ElectionGuard\electionguard-core2\src\interop-generator\ElectionGuard.InteropGenerator\Templates\CsClassTemplate.tt"
-            this.Write(this.ToStringHelper.ToStringWithCulture(egProperty.NativeHandleType));
+            this.Write(this.ToStringHelper.ToStringWithCulture(egProperty.Type.NativeHandleType));
             
             #line default
             #line hidden
             this.Write(" objectId\r\n");
             
             #line 134 "C:\dev\ElectionGuard\electionguard-core2\src\interop-generator\ElectionGuard.InteropGenerator\Templates\CsClassTemplate.tt"
- } else if (egProperty.TypeCs == "string") { 
+ } else if (egProperty.Type.TypeCs == "string") { 
             
             #line default
             #line hidden
             this.Write("                , out IntPtr objectId\r\n");
             
             #line 136 "C:\dev\ElectionGuard\electionguard-core2\src\interop-generator\ElectionGuard.InteropGenerator\Templates\CsClassTemplate.tt"
- } // end is internal type 
+ } // end is ElectionGuard type 
             
             #line default
             #line hidden
@@ -414,7 +414,7 @@ if (EgClass.NeverFree) {
                     "rue)]\r\n            internal static extern ");
             
             #line 145 "C:\dev\ElectionGuard\electionguard-core2\src\interop-generator\ElectionGuard.InteropGenerator\Templates\CsClassTemplate.tt"
-            this.Write(this.ToStringHelper.ToStringWithCulture(method.ReturnTypeCs));
+            this.Write(this.ToStringHelper.ToStringWithCulture(method.ReturnType.TypeCs));
             
             #line default
             #line hidden
