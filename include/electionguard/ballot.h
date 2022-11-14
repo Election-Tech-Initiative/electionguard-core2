@@ -332,12 +332,6 @@ EG_API eg_electionguard_status_t eg_plaintext_ballot_from_msgpack(
   uint8_t *in_data, uint64_t in_length, eg_plaintext_ballot_t **out_handle);
 
 /**
- * Export the ballot representation as JSON
- */
-EG_API eg_electionguard_status_t eg_plaintext_ballot_to_json(eg_plaintext_ballot_t *handle,
-                                                             char **out_data, uint64_t *out_size);
-
-/**
  * Export the ballot representation as BSON
  */
 EG_API eg_electionguard_status_t eg_plaintext_ballot_to_bson(eg_plaintext_ballot_t *handle,

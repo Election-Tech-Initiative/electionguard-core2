@@ -68,7 +68,7 @@ if (egProperty.IsReferenceType()) {
 <# foreach (var parameter in egMethod.Params.Where(p => p.Description != null)) { #>
  * @param[in] <#= parameter.CName #> <#= parameter.Description #>
 <# } // foreach parameter #>
-<# if (egMethod.ReturnType.IsReferenceType) { #>
+<# if (egMethod.ReturnType.IsElectionGuardType) { #>
  * @param[out] <#= egMethod.ReturnTypeCName #> An opaque pointer to the <#= egMethod.ReturnType.TypeCs #>
  *                               The value is a reference and is not owned by the caller
 <# } // end if method is reference type #>
@@ -79,10 +79,15 @@ foreach (var parameter in egMethod.Params) {
 	var parameterCName = parameter.CName;
 	this.Write($",{Environment.NewLine}\t{parameter.TypeC}{parameterCName}");
 }
-if (egMethod.ReturnType.IsReferenceType) {
+if (egMethod.ReturnType.IsElectionGuardType) {
 	var outVarReturnType = egMethod.ReturnType.OutVarCType;
 	var outParamName = egMethod.ReturnTypeCName;
 	this.Write($",{Environment.NewLine}\t{outVarReturnType}{outParamName}");
+}
+if (egMethod.ReturnType.TypeCs == "string") {
+#>,
+	char **out_data,
+	uint64_t *out_size<#
 }
 #>
 

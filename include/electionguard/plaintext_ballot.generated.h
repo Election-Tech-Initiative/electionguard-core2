@@ -62,6 +62,15 @@ EG_API eg_electionguard_status_t eg_plaintext_ballot_get_contest_at_index(
 	);
 
 /**
+ * Export the ballot representation as JSON
+ */
+EG_API eg_electionguard_status_t eg_plaintext_ballot_to_json(
+	eg_plaintext_ballot_t *handle,
+	char **out_data,
+	uint64_t *out_size
+	);
+
+/**
  * Frees the memory held by the PlaintextBallot
  */
 EG_API eg_electionguard_status_t eg_plaintext_ballot_free(eg_plaintext_ballot_t *handle);
