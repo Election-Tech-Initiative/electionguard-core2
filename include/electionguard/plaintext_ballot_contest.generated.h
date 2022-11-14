@@ -50,7 +50,7 @@ EG_API bool eg_plaintext_ballot_contest_is_valid(
 /**
  * Get a selection at a specific index.
  * @param[in] in_index The index of the selection
- * @param[out] out_selection_ref An opaque pointer to the selection.  
+ * @param[out] out_get_selection_at_index_ref An opaque pointer to the PlaintextBallotSelection
  *                               The value is a reference and is not owned by the caller
  */
 EG_API eg_electionguard_status_t eg_plaintext_ballot_contest_get_selection_at_index(

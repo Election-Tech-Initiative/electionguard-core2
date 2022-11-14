@@ -65,15 +65,23 @@ if (egProperty.IsReferenceType()) {
 	#>
 /**
  * <#= egMethod.Description #>
+<# foreach (var parameter in egMethod.Params.Where(p => p.Description != null)) { #>
+ * @param[in] <#= parameter.CName #> <#= parameter.Description #>
+<# } // foreach parameter #>
+<# if (egMethod.ReturnType.IsReferenceType) { #>
+ * @param[out] <#= egMethod.ReturnTypeCName #> An opaque pointer to the <#= egMethod.ReturnType.TypeCs #>
+ *                               The value is a reference and is not owned by the caller
+<# } // end if method is reference type #>
  */
 EG_API <#= returnType #> <#= entryPoint #>(
 	eg_<#= EgClass.ClassName.ToSnakeCase() #>_t *handle<#
 foreach (var parameter in egMethod.Params) {
-	this.Write($",{Environment.NewLine}\t{parameter.TypeC}in_{parameter.Name.ToSnakeCase()}");
+	var parameterCName = parameter.CName;
+	this.Write($",{Environment.NewLine}\t{parameter.TypeC}{parameterCName}");
 }
 if (egMethod.ReturnType.IsReferenceType) {
 	var outVarReturnType = egMethod.ReturnType.OutVarCType;
-	var outParamName = "out_" + egMethod.Name.ToSnakeCase() + "_ref";
+	var outParamName = egMethod.ReturnTypeCName;
 	this.Write($",{Environment.NewLine}\t{outVarReturnType}{outParamName}");
 }
 #>

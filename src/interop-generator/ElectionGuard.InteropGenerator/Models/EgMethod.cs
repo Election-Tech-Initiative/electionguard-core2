@@ -17,4 +17,6 @@ public record EgMethod (
     {
         return ReturnType.GetCReturnType();
     }
+
+    public string ReturnTypeCName => "out_" + Name.ToSnakeCase() + "_ref";
 }

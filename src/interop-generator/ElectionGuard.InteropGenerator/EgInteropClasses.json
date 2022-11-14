@@ -117,11 +117,12 @@
         "Params": [
           {
             "Name": "index",
+            "Description": "The index of the selection",
             "Type": {
               "TypeCs": "ulong"
-            } 
+            }
           }
-        ] 
+        ]
       }
     ]
   },
