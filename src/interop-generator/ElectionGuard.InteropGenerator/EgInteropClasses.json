@@ -151,7 +151,26 @@
         "Description": "The size of the Contests collection."
       }
     ],
-    "Methods": []
+    "Methods": [
+      {
+        "Name": "GetContestAtIndex",
+        "ReturnType": {
+          "TypeCs": "PlaintextBallotContest",
+          "TypeC": "eg_plaintext_ballot_contest_t",
+          "NativeHandleType": "PlaintextBallotContest.External.PlaintextBallotContestHandle"
+        },
+        "Description": "Get the contest at the specified index.",
+        "Params": [
+          {
+            "Name": "index",
+            "Description": "The index of the contest",
+            "Type": {
+              "TypeCs": "ulong"
+            }
+          }
+        ]
+      }
+    ]
   },
   {
     "ClassName": "CiphertextBallotSelection",

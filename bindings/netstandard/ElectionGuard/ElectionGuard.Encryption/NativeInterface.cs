@@ -2221,13 +2221,6 @@ namespace ElectionGuard
                 ulong contestsSize,
                 out ElectionGuard.PlaintextBallot.External.PlaintextBallotHandle handle);
 
-            [DllImport(DllName, EntryPoint = "eg_plaintext_ballot_get_contest_at_index",
-                CallingConvention = CallingConvention.Cdecl, SetLastError = true)]
-            internal static extern Status GetContestAtIndex(
-                ElectionGuard.PlaintextBallot.External.PlaintextBallotHandle handle,
-                ulong index,
-                out ElectionGuard.PlaintextBallotContest.External.PlaintextBallotContestHandle contest);
-
             [DllImport(DllName, EntryPoint = "eg_plaintext_ballot_from_json",
                 CallingConvention = CallingConvention.Cdecl, SetLastError = true)]
             internal static extern Status FromJson(

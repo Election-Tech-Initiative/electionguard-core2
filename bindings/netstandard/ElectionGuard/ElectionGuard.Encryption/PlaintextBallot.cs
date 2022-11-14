@@ -63,19 +63,6 @@ namespace ElectionGuard
             status.ThrowIfError();
         }
 
-        /// <summary>
-        /// Get the contest at the specified index
-        /// </summary>
-        /// <param name="index"></param>
-        /// <returns></returns>
-        public PlaintextBallotContest GetContestAt(ulong index)
-        {
-            var status = NativeInterface.PlaintextBallot.GetContestAtIndex(
-                Handle, index, out PlaintextBallotContest.External.PlaintextBallotContestHandle value);
-            status.ThrowIfError();
-            return new PlaintextBallotContest(value);
-        }
-
         /// <Summary>
         /// Export the ballot representation as JSON
         /// </Summary>

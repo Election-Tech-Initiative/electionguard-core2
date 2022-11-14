@@ -314,17 +314,6 @@ EG_API eg_electionguard_status_t eg_plaintext_ballot_new(
   const uint64_t in_contests_size, eg_plaintext_ballot_t **out_handle);
 
 /**
- * Get a contest at a specific index.
- * 
- * @param[in] in_index The index of the contest
- * @param[out] out_contest_ref An opaque pointer to the contest.  
- *                               The value is a reference and is not owned by the caller
- */
-EG_API eg_electionguard_status_t
-eg_plaintext_ballot_get_contest_at_index(eg_plaintext_ballot_t *handle, uint64_t in_index,
-                                         eg_plaintext_ballot_contest_t **out_contest_ref);
-
-/**
  * Import the ballot representation from JSON
  */
 EG_API eg_electionguard_status_t eg_plaintext_ballot_from_json(char *in_data,
