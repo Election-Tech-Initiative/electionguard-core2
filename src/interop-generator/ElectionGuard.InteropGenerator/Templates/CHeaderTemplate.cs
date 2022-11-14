@@ -304,23 +304,30 @@ if (egMethod.ReturnType.IsReferenceType) {
             
             #line default
             #line hidden
-            this.Write("EG_API eg_electionguard_status_t eg_");
+            this.Write("/**\r\n * Frees the memory held by the ");
             
-            #line 92 "C:\dev\ElectionGuard\electionguard-core2\src\interop-generator\ElectionGuard.InteropGenerator\Templates\CHeaderTemplate.tt"
+            #line 93 "C:\dev\ElectionGuard\electionguard-core2\src\interop-generator\ElectionGuard.InteropGenerator\Templates\CHeaderTemplate.tt"
+            this.Write(this.ToStringHelper.ToStringWithCulture(EgClass.ClassName));
+            
+            #line default
+            #line hidden
+            this.Write("\r\n */\r\nEG_API eg_electionguard_status_t eg_");
+            
+            #line 95 "C:\dev\ElectionGuard\electionguard-core2\src\interop-generator\ElectionGuard.InteropGenerator\Templates\CHeaderTemplate.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(classNameSnakeCase));
             
             #line default
             #line hidden
             this.Write("_free(eg_");
             
-            #line 92 "C:\dev\ElectionGuard\electionguard-core2\src\interop-generator\ElectionGuard.InteropGenerator\Templates\CHeaderTemplate.tt"
+            #line 95 "C:\dev\ElectionGuard\electionguard-core2\src\interop-generator\ElectionGuard.InteropGenerator\Templates\CHeaderTemplate.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(classNameSnakeCase));
             
             #line default
             #line hidden
             this.Write("_t *handle);\r\n\r\n#endif // ifndef ");
             
-            #line 94 "C:\dev\ElectionGuard\electionguard-core2\src\interop-generator\ElectionGuard.InteropGenerator\Templates\CHeaderTemplate.tt"
+            #line 97 "C:\dev\ElectionGuard\electionguard-core2\src\interop-generator\ElectionGuard.InteropGenerator\Templates\CHeaderTemplate.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(EgClass.ClassName));
             
             #line default

@@ -89,6 +89,9 @@ if (egMethod.ReturnType.IsReferenceType) {
 	);
 
 <# } // foreach method #>
+/**
+ * Frees the memory held by the <#= EgClass.ClassName #>
+ */
 EG_API eg_electionguard_status_t eg_<#= classNameSnakeCase #>_free(eg_<#= classNameSnakeCase #>_t *handle);
 
 #endif // ifndef <#= EgClass.ClassName #>

@@ -59,6 +59,9 @@ EG_API eg_electionguard_status_t eg_plaintext_ballot_contest_get_selection_at_in
 	eg_plaintext_ballot_selection_t **out_get_selection_at_index_ref
 	);
 
+/**
+ * Frees the memory held by the PlaintextBallotContest
+ */
 EG_API eg_electionguard_status_t eg_plaintext_ballot_contest_free(eg_plaintext_ballot_contest_t *handle);
 
 #endif // ifndef PlaintextBallotContest
