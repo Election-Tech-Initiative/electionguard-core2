@@ -64,25 +64,10 @@ namespace ElectionGuard
         }
 
         /// <Summary>
-        /// Export the ballot representation as JSON
-        /// </Summary>
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Style", "IDE0059:Unnecessary assignment of a value", Justification = "<Pending>")]
-        public string ToJson()
-        {
-            var status = NativeInterface.PlaintextBallot.ToJson(
-                Handle, out IntPtr pointer, out _);
-            status.ThrowIfError();
-            var json = Marshal.PtrToStringAnsi(pointer);
-            NativeInterface.Memory.FreeIntPtr(pointer);
-            return json;
-        }
-
-        /// <Summary>
         /// Export the ballot representation as BSON
         /// </Summary>
         public byte[] ToBson()
         {
-
             var status = NativeInterface.PlaintextBallot.ToBson(
                 Handle, out IntPtr data, out ulong size);
             status.ThrowIfError();

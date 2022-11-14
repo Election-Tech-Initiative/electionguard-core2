@@ -74,14 +74,27 @@ namespace ElectionGuard
                 out <#= method.ReturnType.NativeHandleType #> value);
             status.ThrowIfError();
             return new <#= method.ReturnType.TypeCs #>(value);
-<# } else { #>
+<# } else if (method.ReturnType.TypeCs == "string") { #>
+            var status = External.<#= method.Name #>(
+                Handle,
+<# foreach (var p in method.Params) { #>
+                <#= p.Name #>,
+<# } // for each param #>
+                out IntPtr pointer, 
+                out _
+                );
+            status.ThrowIfError();
+            var json = Marshal.PtrToStringAnsi(pointer);
+            NativeInterface.Memory.FreeIntPtr(pointer);
+            return json;
+<# } else /* if method return type is a value type */ { #>
             return External.<#= method.Name #>(
                 Handle<# 
 foreach (var p in method.Params) {
     this.Write($", {p.Name}");
 }
                 #>);
-<# } #>
+<# } // end method return type switch #>
         }
 <# } // foreach method #>
 
@@ -169,6 +182,11 @@ foreach (var p in method.Params) { #>,
 ,
                 out <#= method.ReturnType.NativeHandleType #> objectId<#
 } // if isElectionGuardType #>
+<# if (method.ReturnType.TypeCs == "string") { #>
+,
+                out IntPtr data,
+                out ulong size<#
+} // if is string #>
 
                 );
 

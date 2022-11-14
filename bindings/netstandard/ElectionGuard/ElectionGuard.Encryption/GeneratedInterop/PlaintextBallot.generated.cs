@@ -70,6 +70,22 @@ namespace ElectionGuard
             status.ThrowIfError();
             return new PlaintextBallotContest(value);
         }
+        /// <summary>
+        /// Export the ballot representation as JSON
+        /// </summary>
+        public string ToJson(
+            
+        ) {
+            var status = External.ToJson(
+                Handle,
+                out IntPtr pointer, 
+                out _
+                );
+            status.ThrowIfError();
+            var json = Marshal.PtrToStringAnsi(pointer);
+            NativeInterface.Memory.FreeIntPtr(pointer);
+            return json;
+        }
 
 #pragma warning disable CS1591 // Missing XML comment for publicly visible type or member
         protected override void DisposeUnmanaged()
@@ -145,6 +161,14 @@ namespace ElectionGuard
                 PlaintextBallotHandle handle,
                 ulong index,
                 out PlaintextBallotContest.External.PlaintextBallotContestHandle objectId
+                );
+
+            [DllImport(NativeInterface.DllName, EntryPoint = "eg_plaintext_ballot_to_json",
+                CallingConvention = CallingConvention.Cdecl, SetLastError = true)]
+            internal static extern Status ToJson(
+                PlaintextBallotHandle handle,
+                out IntPtr data,
+                out ulong size
                 );
 
         }

@@ -2237,11 +2237,6 @@ namespace ElectionGuard
             internal static extern Status FromMsgPack(
                 byte* data, ulong length, out ElectionGuard.PlaintextBallot.External.PlaintextBallotHandle handle);
 
-            [DllImport(DllName, EntryPoint = "eg_plaintext_ballot_to_json",
-                CallingConvention = CallingConvention.Cdecl, SetLastError = true)]
-            internal static extern Status ToJson(
-                ElectionGuard.PlaintextBallot.External.PlaintextBallotHandle handle, out IntPtr data, out ulong size);
-
             [DllImport(DllName, EntryPoint = "eg_plaintext_ballot_to_bson",
                 CallingConvention = CallingConvention.Cdecl, SetLastError = true)]
             internal static extern Status ToBson(
