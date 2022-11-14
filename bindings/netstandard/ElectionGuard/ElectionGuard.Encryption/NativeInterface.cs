@@ -2303,10 +2303,6 @@ namespace ElectionGuard
                 CallingConvention = CallingConvention.Cdecl, SetLastError = true)]
             internal static extern Status ToMsgPack(
                 CompactPlaintextBallotHandle handle, out IntPtr data, out ulong size);
-
-            [DllImport(DllName, EntryPoint = "eg_compact_plaintext_ballot_msgpack_free",
-                CallingConvention = CallingConvention.Cdecl, SetLastError = true)]
-            internal static extern Status MsgPackFree(IntPtr data);
         }
 
         internal static class CiphertextBallot
@@ -2492,10 +2488,6 @@ namespace ElectionGuard
                 CallingConvention = CallingConvention.Cdecl, SetLastError = true)]
             internal static extern Status ToMsgPack(
                 CompactCiphertextBallotHandle handle, out IntPtr data, out ulong size);
-
-            [DllImport(DllName, EntryPoint = "eg_compact_ciphertext_ballot_msgpack_free",
-                CallingConvention = CallingConvention.Cdecl, SetLastError = true)]
-            internal static extern Status MsgPackFree(IntPtr data);
 
         }
 
