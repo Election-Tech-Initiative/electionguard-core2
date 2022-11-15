@@ -12,6 +12,7 @@ namespace ElectionGuard
         internal External.PlaintextBallotHandle Handle;
 
         #region Properties
+
         /// <Summary>
         /// A unique Ballot ID that is relevant to the external system and must be unique within the dataset of the election.
         /// </Summary>
@@ -56,6 +57,7 @@ namespace ElectionGuard
         #endregion
 
         #region Methods
+
         /// <summary>
         /// Get the contest at the specified index.
         /// </summary>
@@ -70,6 +72,7 @@ namespace ElectionGuard
             status.ThrowIfError();
             return new PlaintextBallotContest(value);
         }
+
         /// <summary>
         /// Export the ballot representation as JSON
         /// </summary>
@@ -86,6 +89,7 @@ namespace ElectionGuard
             NativeInterface.Memory.FreeIntPtr(pointer);
             return json;
         }
+
         /// <summary>
         /// Export the ballot representation as BSON
         /// </summary>
@@ -110,6 +114,7 @@ namespace ElectionGuard
             return byteArray;
         }
 
+
 #pragma warning disable CS1591 // Missing XML comment for publicly visible type or member
         protected override void DisposeUnmanaged()
 #pragma warning restore CS1591 // Missing XML comment for publicly visible type or member
@@ -123,6 +128,7 @@ namespace ElectionGuard
         #endregion
 
         #region Extern
+
         internal static unsafe class External {
             internal struct PlaintextBallotType { };
 
@@ -149,53 +155,59 @@ namespace ElectionGuard
             [DllImport(
                 NativeInterface.DllName,
                 EntryPoint = "eg_plaintext_ballot_get_object_id",
-                CallingConvention = CallingConvention.Cdecl, 
-                SetLastError = true
-            )]
+                CallingConvention = CallingConvention.Cdecl,
+                SetLastError = true)]
             internal static extern Status GetObjectId(
-                PlaintextBallotHandle handle
-                , out IntPtr objectId
-            );
+                PlaintextBallotHandle handle,
+                out IntPtr objectId
+                );
 
             [DllImport(
                 NativeInterface.DllName,
                 EntryPoint = "eg_plaintext_ballot_get_style_id",
-                CallingConvention = CallingConvention.Cdecl, 
-                SetLastError = true
-            )]
+                CallingConvention = CallingConvention.Cdecl,
+                SetLastError = true)]
             internal static extern Status GetStyleId(
-                PlaintextBallotHandle handle
-                , out IntPtr objectId
-            );
+                PlaintextBallotHandle handle,
+                out IntPtr objectId
+                );
 
             [DllImport(
                 NativeInterface.DllName,
                 EntryPoint = "eg_plaintext_ballot_get_contests_size",
-                CallingConvention = CallingConvention.Cdecl, 
-                SetLastError = true
-            )]
+                CallingConvention = CallingConvention.Cdecl,
+                SetLastError = true)]
             internal static extern ulong GetContestsSize(
                 PlaintextBallotHandle handle
-            );
+                );
 
-            [DllImport(NativeInterface.DllName, EntryPoint = "eg_plaintext_ballot_get_contest_at_index",
-                CallingConvention = CallingConvention.Cdecl, SetLastError = true)]
+            [DllImport(
+                NativeInterface.DllName,
+                EntryPoint = "eg_plaintext_ballot_get_contest_at_index",
+                CallingConvention = CallingConvention.Cdecl,
+                SetLastError = true)]
             internal static extern Status GetContestAtIndex(
                 PlaintextBallotHandle handle,
                 ulong index,
                 out PlaintextBallotContest.External.PlaintextBallotContestHandle objectId
                 );
 
-            [DllImport(NativeInterface.DllName, EntryPoint = "eg_plaintext_ballot_to_json",
-                CallingConvention = CallingConvention.Cdecl, SetLastError = true)]
+            [DllImport(
+                NativeInterface.DllName,
+                EntryPoint = "eg_plaintext_ballot_to_json",
+                CallingConvention = CallingConvention.Cdecl,
+                SetLastError = true)]
             internal static extern Status ToJson(
                 PlaintextBallotHandle handle,
                 out IntPtr data,
                 out ulong size
                 );
 
-            [DllImport(NativeInterface.DllName, EntryPoint = "eg_plaintext_ballot_to_bson",
-                CallingConvention = CallingConvention.Cdecl, SetLastError = true)]
+            [DllImport(
+                NativeInterface.DllName,
+                EntryPoint = "eg_plaintext_ballot_to_bson",
+                CallingConvention = CallingConvention.Cdecl,
+                SetLastError = true)]
             internal static extern Status ToBson(
                 PlaintextBallotHandle handle,
                 out IntPtr data,

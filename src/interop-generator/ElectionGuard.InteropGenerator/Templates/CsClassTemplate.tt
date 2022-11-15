@@ -22,6 +22,7 @@ namespace ElectionGuard
         internal External.<#= className #>Handle Handle;
 
         #region Properties
+
 <# foreach (var egProperty in EgClass.Properties) { 
         var isElectionGuardType = egProperty.IsElectionGuardType;
         #>
@@ -53,6 +54,7 @@ namespace ElectionGuard
         #endregion
 
         #region Methods
+
 <# foreach (var method in EgClass.Methods) { 
     var isElectionGuardType = method.ReturnType.IsElectionGuardType;
     #>
@@ -116,6 +118,7 @@ foreach (var p in method.Params) {
                 #>);
 <# } // end method return type switch #>
         }
+
 <# } // foreach method #>
 
 #pragma warning disable CS1591 // Missing XML comment for publicly visible type or member
@@ -131,6 +134,7 @@ foreach (var p in method.Params) {
         #endregion
 
         #region Extern
+
         internal static unsafe class External {
             internal struct <#= className #>Type { };
 
@@ -173,17 +177,19 @@ if (EgClass.NeverFree) {
             [DllImport(
                 NativeInterface.DllName,
                 EntryPoint = "<#= entryPoint #>",
-                CallingConvention = CallingConvention.Cdecl, 
-                SetLastError = true
-            )]
+                CallingConvention = CallingConvention.Cdecl,
+                SetLastError = true)]
             internal static extern <#= isReferenceType ? "Status" : egProperty.Type.TypeCs #> Get<#= egProperty.Name #>(
-                <#= className #>Handle handle
-<# if (isElectionGuardType) { #>
-                , out <#= egProperty.Type.NativeHandleType #> objectId
-<# } else if (egProperty.Type.TypeCs == "string") { #>
-                , out IntPtr objectId
-<# } // end is ElectionGuard type #>
-            );
+                <#= className #>Handle handle<# 
+if (isElectionGuardType) { #>
+,
+                out <#= egProperty.Type.NativeHandleType #> objectId<# 
+} else if (egProperty.Type.TypeCs == "string") { #>
+,
+                out IntPtr objectId<# 
+} // end is ElectionGuard type #>
+
+                );
 
 <# } // end foreach property #>
 <# foreach (var method in EgClass.Methods) {
@@ -191,8 +197,11 @@ if (EgClass.NeverFree) {
     var isElectionGuardType = method.ReturnType.IsElectionGuardType;
     var isReturnTypeReferenceType = method.ReturnType.IsPassByReference;
 #>
-            [DllImport(NativeInterface.DllName, EntryPoint = "<#= entryPoint #>",
-                CallingConvention = CallingConvention.Cdecl, SetLastError = true)]
+            [DllImport(
+                NativeInterface.DllName,
+                EntryPoint = "<#= entryPoint #>",
+                CallingConvention = CallingConvention.Cdecl,
+                SetLastError = true)]
             internal static extern <#= isReturnTypeReferenceType ? "Status" : method.ReturnType.TypeCs #> <#= method.Name #>(
                 <#= className #>Handle handle<#
 foreach (var p in method.Params) { #>,
