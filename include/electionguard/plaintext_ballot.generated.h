@@ -49,6 +49,30 @@ EG_API uint64_t eg_plaintext_ballot_get_contests_size(
 	eg_plaintext_ballot_t *handle
 	);
 
+/**
+ * Get the contest at the specified index.
+ * @param[in] in_index The index of the contest
+ * @param[out] out_get_contest_at_index_ref An opaque pointer to the PlaintextBallotContest
+ *                               The value is a reference and is not owned by the caller
+ */
+EG_API eg_electionguard_status_t eg_plaintext_ballot_get_contest_at_index(
+	eg_plaintext_ballot_t *handle,
+	uint64_t in_index,
+	eg_plaintext_ballot_contest_t **out_get_contest_at_index_ref
+	);
+
+/**
+ * Export the ballot representation as JSON
+ */
+EG_API eg_electionguard_status_t eg_plaintext_ballot_to_json(
+	eg_plaintext_ballot_t *handle,
+	char **out_data,
+	uint64_t *out_size
+	);
+
+/**
+ * Frees the memory held by the PlaintextBallot
+ */
 EG_API eg_electionguard_status_t eg_plaintext_ballot_free(eg_plaintext_ballot_t *handle);
 
 #endif // ifndef PlaintextBallot

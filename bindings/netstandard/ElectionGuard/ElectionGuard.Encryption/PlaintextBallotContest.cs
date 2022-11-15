@@ -40,16 +40,5 @@ namespace ElectionGuard
                 objectId, selectionPointers, (ulong)selectionPointers.LongLength, out Handle);
             status.ThrowIfError();
         }
-
-        /// <Summary>
-        /// Get a selection at a specific index.
-        /// </Summary>
-        public PlaintextBallotSelection GetSelectionAt(ulong index)
-        {
-            var status = NativeInterface.PlaintextBallotContest.GetSelectionAtIndex(
-                Handle, index, out PlaintextBallotSelection.External.PlaintextBallotSelectionHandle value);
-            status.ThrowIfError();
-            return new PlaintextBallotSelection(value);
-        }
     }
 }

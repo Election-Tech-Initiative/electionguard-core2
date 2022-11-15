@@ -105,6 +105,24 @@
             "DefaultValue": "0"
           }
         ]
+      },
+      {
+        "Name": "GetSelectionAtIndex",
+        "ReturnType": {
+          "TypeCs": "PlaintextBallotSelection",
+          "TypeC": "eg_plaintext_ballot_selection_t",
+          "NativeHandleType": "PlaintextBallotSelection.External.PlaintextBallotSelectionHandle"
+        },
+        "Description": "Get a selection at a specific index.",
+        "Params": [
+          {
+            "Name": "index",
+            "Description": "The index of the selection",
+            "Type": {
+              "TypeCs": "ulong"
+            }
+          }
+        ]
       }
     ]
   },
@@ -133,7 +151,35 @@
         "Description": "The size of the Contests collection."
       }
     ],
-    "Methods": []
+    "Methods": [
+      {
+        "Name": "GetContestAtIndex",
+        "ReturnType": {
+          "TypeCs": "PlaintextBallotContest",
+          "TypeC": "eg_plaintext_ballot_contest_t",
+          "NativeHandleType": "PlaintextBallotContest.External.PlaintextBallotContestHandle"
+        },
+        "Description": "Get the contest at the specified index.",
+        "Params": [
+          {
+            "Name": "index",
+            "Description": "The index of the contest",
+            "Type": {
+              "TypeCs": "ulong"
+            }
+          }
+        ]
+      },
+      {
+        "Name": "ToJson",
+        "ReturnType": {
+          "TypeCs": "string"
+        },
+        "Description": "Export the ballot representation as JSON",
+        "Params": [
+        ] 
+      }
+    ]
   },
   {
     "ClassName": "CiphertextBallotSelection",

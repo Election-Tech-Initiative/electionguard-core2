@@ -8,17 +8,6 @@ public record EgProperty(
     string Description
     )
 {
-    private static readonly Dictionary<string, string> ReturnTypes = new()
-    {
-        { "string", "eg_electionguard_status_t" },
-        { "bool", "bool" },
-        { "ulong", "uint64_t" },
-    };
-
-    private static readonly string[] ValueTypes = {
-        "bool", "ulong"
-    };
-
     public string GetEntryPoint(string className)
     {
         return $"Eg{className}Get{Name}".ToSnakeCase();
@@ -26,24 +15,19 @@ public record EgProperty(
 
     public bool IsReferenceType()
     {
-        return !ValueTypes.Contains(Type.TypeCs);
+        return Type.IsReferenceType;
     }
 
     public string GetCReturnType()
     {
-        ReturnTypes.TryGetValue(Type.TypeCs, out var value);
-        return value ?? "eg_electionguard_status_t";
+        return Type.GetCReturnType();
     }
 
-    public string GetOutVarType()
-    {
-        if (Type.TypeCs == "string") return "char **";
-        return Type.TypeC + " **";
-    }
+    public string OutVarType => Type.OutVarCType;
 
     public bool CallerShouldFree => Type.TypeCs == "string";
 
-    public bool IsElectionGuardType => Type.NativeHandleType != null;
+    public bool IsElectionGuardType => Type.IsElectionGuardType;
 
-    public bool IsPassByReference => Type.TypeCs == "string" || IsElectionGuardType;
+    public bool IsPassByReference => Type.IsPassByReference;
 }

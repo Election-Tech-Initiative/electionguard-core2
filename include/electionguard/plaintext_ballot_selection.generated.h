@@ -66,6 +66,9 @@ EG_API bool eg_plaintext_ballot_selection_is_valid(
 	char *in_expected_object_id
 	);
 
+/**
+ * Frees the memory held by the PlaintextBallotSelection
+ */
 EG_API eg_electionguard_status_t eg_plaintext_ballot_selection_free(eg_plaintext_ballot_selection_t *handle);
 
 #endif // ifndef PlaintextBallotSelection

@@ -191,17 +191,6 @@ EG_API eg_electionguard_status_t eg_plaintext_ballot_contest_new(
   char *object_id, eg_plaintext_ballot_selection_t *in_selections[],
   const uint64_t in_selections_size, eg_plaintext_ballot_contest_t **out_handle);
 
-/**
- * Get a selection at a specific index.
- * 
- * @param[in] in_index The index of the selection
- * @param[out] out_selection_ref An opaque pointer to the selection.  
- *                               The value is a reference and is not owned by the caller
- */
-EG_API eg_electionguard_status_t eg_plaintext_ballot_contest_get_selection_at_index(
-  eg_plaintext_ballot_contest_t *handle, uint64_t in_index,
-  eg_plaintext_ballot_selection_t **out_selection_ref);
-
 #endif
 
 #ifndef CiphertextBallotContest
@@ -325,17 +314,6 @@ EG_API eg_electionguard_status_t eg_plaintext_ballot_new(
   const uint64_t in_contests_size, eg_plaintext_ballot_t **out_handle);
 
 /**
- * Get a contest at a specific index.
- * 
- * @param[in] in_index The index of the contest
- * @param[out] out_contest_ref An opaque pointer to the contest.  
- *                               The value is a reference and is not owned by the caller
- */
-EG_API eg_electionguard_status_t
-eg_plaintext_ballot_get_contest_at_index(eg_plaintext_ballot_t *handle, uint64_t in_index,
-                                         eg_plaintext_ballot_contest_t **out_contest_ref);
-
-/**
  * Import the ballot representation from JSON
  */
 EG_API eg_electionguard_status_t eg_plaintext_ballot_from_json(char *in_data,
@@ -352,12 +330,6 @@ EG_API eg_electionguard_status_t eg_plaintext_ballot_from_bson(uint8_t *in_data,
  */
 EG_API eg_electionguard_status_t eg_plaintext_ballot_from_msgpack(
   uint8_t *in_data, uint64_t in_length, eg_plaintext_ballot_t **out_handle);
-
-/**
- * Export the ballot representation as JSON
- */
-EG_API eg_electionguard_status_t eg_plaintext_ballot_to_json(eg_plaintext_ballot_t *handle,
-                                                             char **out_data, uint64_t *out_size);
 
 /**
  * Export the ballot representation as BSON
