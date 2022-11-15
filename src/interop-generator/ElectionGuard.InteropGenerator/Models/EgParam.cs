@@ -1,11 +1,13 @@
 ﻿using ElectionGuard.InteropGenerator.Helpers;
+using System.Reflection.Metadata;
 
 namespace ElectionGuard.InteropGenerator.Models;
 
 public record EgParam(
     string Name, 
     EgType Type,
-    string? DefaultValue
+    string? DefaultValue,
+    string? Description
 )
 {
     public string TypeC => TypeHelper.CsToC(Type.TypeCs);
@@ -32,4 +34,6 @@ public record EgParam(
         var marshallAsAttribute = marshallAs == null ? "" : $"[MarshalAs({marshallAs})] ";
         return $"{marshallAsAttribute}{Type.TypeCs} {Name}";
     }
+
+    public string CName => $"in_{Name.ToSnakeCase()}";
 }

@@ -97,6 +97,9 @@ EG_API eg_electionguard_status_t eg_ciphertext_ballot_contest_get_proof(
 	eg_disjunctive_chaum_pedersen_proof_t **out_proof
 	);
 
+/**
+ * Frees the memory held by the CiphertextBallotContest
+ */
 EG_API eg_electionguard_status_t eg_ciphertext_ballot_contest_free(eg_ciphertext_ballot_contest_t *handle);
 
 #endif // ifndef CiphertextBallotContest

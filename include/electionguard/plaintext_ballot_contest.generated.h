@@ -40,13 +40,28 @@ EG_API uint64_t eg_plaintext_ballot_contest_get_selections_size(
  * Given a PlaintextBallotContest returns true if the state is representative of the expected values.  Note: because this class supports partial representations, undervotes are considered a valid state.
  */
 EG_API bool eg_plaintext_ballot_contest_is_valid(
-	eg_plaintext_ballot_selection_t *handle,
+	eg_plaintext_ballot_contest_t *handle,
 	char *in_expected_object_id,
 	uint64_t in_expected_num_selections,
 	uint64_t in_expected_num_elected,
 	uint64_t in_votes_allowed
 	);
 
+/**
+ * Get a selection at a specific index.
+ * @param[in] in_index The index of the selection
+ * @param[out] out_get_selection_at_index_ref An opaque pointer to the PlaintextBallotSelection
+ *                               The value is a reference and is not owned by the caller
+ */
+EG_API eg_electionguard_status_t eg_plaintext_ballot_contest_get_selection_at_index(
+	eg_plaintext_ballot_contest_t *handle,
+	uint64_t in_index,
+	eg_plaintext_ballot_selection_t **out_get_selection_at_index_ref
+	);
+
+/**
+ * Frees the memory held by the PlaintextBallotContest
+ */
 EG_API eg_electionguard_status_t eg_plaintext_ballot_contest_free(eg_plaintext_ballot_contest_t *handle);
 
 #endif // ifndef PlaintextBallotContest

@@ -2155,13 +2155,6 @@ namespace ElectionGuard
                 [MarshalAs(UnmanagedType.LPArray)] IntPtr[] selections,
                 ulong selectionsSize,
                 out ElectionGuard.PlaintextBallotContest.External.PlaintextBallotContestHandle handle);
-
-            [DllImport(DllName, EntryPoint = "eg_plaintext_ballot_contest_get_selection_at_index",
-                CallingConvention = CallingConvention.Cdecl, SetLastError = true)]
-            internal static extern Status GetSelectionAtIndex(
-                ElectionGuard.PlaintextBallotContest.External.PlaintextBallotContestHandle handle,
-                ulong index,
-                out ElectionGuard.PlaintextBallotSelection.External.PlaintextBallotSelectionHandle selection);
         }
 
         internal static class CiphertextBallotContest
@@ -2228,13 +2221,6 @@ namespace ElectionGuard
                 ulong contestsSize,
                 out ElectionGuard.PlaintextBallot.External.PlaintextBallotHandle handle);
 
-            [DllImport(DllName, EntryPoint = "eg_plaintext_ballot_get_contest_at_index",
-                CallingConvention = CallingConvention.Cdecl, SetLastError = true)]
-            internal static extern Status GetContestAtIndex(
-                ElectionGuard.PlaintextBallot.External.PlaintextBallotHandle handle,
-                ulong index,
-                out ElectionGuard.PlaintextBallotContest.External.PlaintextBallotContestHandle contest);
-
             [DllImport(DllName, EntryPoint = "eg_plaintext_ballot_from_json",
                 CallingConvention = CallingConvention.Cdecl, SetLastError = true)]
             internal static extern Status FromJson(
@@ -2250,11 +2236,6 @@ namespace ElectionGuard
                 CallingConvention = CallingConvention.Cdecl, SetLastError = true)]
             internal static extern Status FromMsgPack(
                 byte* data, ulong length, out ElectionGuard.PlaintextBallot.External.PlaintextBallotHandle handle);
-
-            [DllImport(DllName, EntryPoint = "eg_plaintext_ballot_to_json",
-                CallingConvention = CallingConvention.Cdecl, SetLastError = true)]
-            internal static extern Status ToJson(
-                ElectionGuard.PlaintextBallot.External.PlaintextBallotHandle handle, out IntPtr data, out ulong size);
 
             [DllImport(DllName, EntryPoint = "eg_plaintext_ballot_to_bson",
                 CallingConvention = CallingConvention.Cdecl, SetLastError = true)]

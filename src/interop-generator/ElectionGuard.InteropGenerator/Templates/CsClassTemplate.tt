@@ -53,19 +53,48 @@ namespace ElectionGuard
         #endregion
 
         #region Methods
-<# foreach (var method in EgClass.Methods) { #>
+<# foreach (var method in EgClass.Methods) { 
+    var isElectionGuardType = method.ReturnType.IsElectionGuardType;
+    #>
         /// <summary>
         /// <#= method.Description #>
         /// </summary>
+<# foreach (var p in method.Params.Where(p => p.Description != null)) { #>
+        /// <param name="<#= p.Name #>"><#= p.Description #></param>
+<# } // for each param #>
         public <#= method.ReturnType.TypeCs #> <#= method.Name #>(
             <#= string.Join(", ", method.Params.Select(p => p.AsCsParam())) #>
         ) {
+<# if (isElectionGuardType) { #>
+            var status = External.<#= method.Name #>(
+                Handle,
+<# foreach (var p in method.Params) { #>
+                <#= p.Name #>,
+<# } // for each param #>
+                out <#= method.ReturnType.NativeHandleType #> value);
+            status.ThrowIfError();
+            return new <#= method.ReturnType.TypeCs #>(value);
+<# } else if (method.ReturnType.TypeCs == "string") { #>
+            var status = External.<#= method.Name #>(
+                Handle,
+<# foreach (var p in method.Params) { #>
+                <#= p.Name #>,
+<# } // for each param #>
+                out IntPtr pointer, 
+                out _
+                );
+            status.ThrowIfError();
+            var json = Marshal.PtrToStringAnsi(pointer);
+            NativeInterface.Memory.FreeIntPtr(pointer);
+            return json;
+<# } else /* if method return type is a value type */ { #>
             return External.<#= method.Name #>(
                 Handle<# 
 foreach (var p in method.Params) {
     this.Write($", {p.Name}");
 }
                 #>);
+<# } // end method return type switch #>
         }
 <# } // foreach method #>
 
@@ -139,16 +168,28 @@ if (EgClass.NeverFree) {
 <# } // end foreach property #>
 <# foreach (var method in EgClass.Methods) {
     var entryPoint = method.GetEntryPoint(className);
+    var isElectionGuardType = method.ReturnType.IsElectionGuardType;
+    var isReturnTypeReferenceType = method.ReturnType.IsPassByReference;
 #>
             [DllImport(NativeInterface.DllName, EntryPoint = "<#= entryPoint #>",
                 CallingConvention = CallingConvention.Cdecl, SetLastError = true)]
-            internal static extern <#= method.ReturnType.TypeCs #> <#= method.Name #>(
+            internal static extern <#= isReturnTypeReferenceType ? "Status" : method.ReturnType.TypeCs #> <#= method.Name #>(
                 <#= className #>Handle handle<#
 foreach (var p in method.Params) { #>,
                 <#= p.AsCppInteropParam() #><# 
 } // end foreach param #>
+<# if (isElectionGuardType) { #>
+,
+                out <#= method.ReturnType.NativeHandleType #> objectId<#
+} // if isElectionGuardType #>
+<# if (method.ReturnType.TypeCs == "string") { #>
+,
+                out IntPtr data,
+                out ulong size<#
+} // if is string #>
 
                 );
+
 <# } #>
         }
         #endregion

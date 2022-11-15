@@ -156,7 +156,7 @@ if (egProperty.IsReferenceType()) {
             this.Write(",\r\n\t");
             
             #line 54 "C:\dev\ElectionGuard\electionguard-core2\src\interop-generator\ElectionGuard.InteropGenerator\Templates\CHeaderTemplate.tt"
-            this.Write(this.ToStringHelper.ToStringWithCulture(egProperty.GetOutVarType()));
+            this.Write(this.ToStringHelper.ToStringWithCulture(egProperty.OutVarType));
             
             #line default
             #line hidden
@@ -191,35 +191,117 @@ if (egProperty.IsReferenceType()) {
             #line 62 "C:\dev\ElectionGuard\electionguard-core2\src\interop-generator\ElectionGuard.InteropGenerator\Templates\CHeaderTemplate.tt"
  foreach (var egMethod in EgClass.Methods) { 
 	var entryPoint = egMethod.GetEntryPoint(EgClass.ClassName); 
+	var returnType = egMethod.GetCReturnType();
+	
             
             #line default
             #line hidden
             this.Write("/**\r\n * ");
             
-            #line 65 "C:\dev\ElectionGuard\electionguard-core2\src\interop-generator\ElectionGuard.InteropGenerator\Templates\CHeaderTemplate.tt"
+            #line 67 "C:\dev\ElectionGuard\electionguard-core2\src\interop-generator\ElectionGuard.InteropGenerator\Templates\CHeaderTemplate.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(egMethod.Description));
             
             #line default
             #line hidden
-            this.Write("\r\n */\r\nEG_API ");
+            this.Write("\r\n");
             
-            #line 67 "C:\dev\ElectionGuard\electionguard-core2\src\interop-generator\ElectionGuard.InteropGenerator\Templates\CHeaderTemplate.tt"
-            this.Write(this.ToStringHelper.ToStringWithCulture(egMethod.ReturnTypeC));
+            #line 68 "C:\dev\ElectionGuard\electionguard-core2\src\interop-generator\ElectionGuard.InteropGenerator\Templates\CHeaderTemplate.tt"
+ foreach (var parameter in egMethod.Params.Where(p => p.Description != null)) { 
+            
+            #line default
+            #line hidden
+            this.Write(" * @param[in] ");
+            
+            #line 69 "C:\dev\ElectionGuard\electionguard-core2\src\interop-generator\ElectionGuard.InteropGenerator\Templates\CHeaderTemplate.tt"
+            this.Write(this.ToStringHelper.ToStringWithCulture(parameter.CName));
+            
+            #line default
+            #line hidden
+            this.Write(" ");
+            
+            #line 69 "C:\dev\ElectionGuard\electionguard-core2\src\interop-generator\ElectionGuard.InteropGenerator\Templates\CHeaderTemplate.tt"
+            this.Write(this.ToStringHelper.ToStringWithCulture(parameter.Description));
+            
+            #line default
+            #line hidden
+            this.Write("\r\n");
+            
+            #line 70 "C:\dev\ElectionGuard\electionguard-core2\src\interop-generator\ElectionGuard.InteropGenerator\Templates\CHeaderTemplate.tt"
+ } // foreach parameter 
             
             #line default
             #line hidden
             
-            #line 67 "C:\dev\ElectionGuard\electionguard-core2\src\interop-generator\ElectionGuard.InteropGenerator\Templates\CHeaderTemplate.tt"
+            #line 71 "C:\dev\ElectionGuard\electionguard-core2\src\interop-generator\ElectionGuard.InteropGenerator\Templates\CHeaderTemplate.tt"
+ if (egMethod.ReturnType.IsElectionGuardType) { 
+            
+            #line default
+            #line hidden
+            this.Write(" * @param[out] ");
+            
+            #line 72 "C:\dev\ElectionGuard\electionguard-core2\src\interop-generator\ElectionGuard.InteropGenerator\Templates\CHeaderTemplate.tt"
+            this.Write(this.ToStringHelper.ToStringWithCulture(egMethod.ReturnTypeCName));
+            
+            #line default
+            #line hidden
+            this.Write(" An opaque pointer to the ");
+            
+            #line 72 "C:\dev\ElectionGuard\electionguard-core2\src\interop-generator\ElectionGuard.InteropGenerator\Templates\CHeaderTemplate.tt"
+            this.Write(this.ToStringHelper.ToStringWithCulture(egMethod.ReturnType.TypeCs));
+            
+            #line default
+            #line hidden
+            this.Write("\r\n *                               The value is a reference and is not owned by t" +
+                    "he caller\r\n");
+            
+            #line 74 "C:\dev\ElectionGuard\electionguard-core2\src\interop-generator\ElectionGuard.InteropGenerator\Templates\CHeaderTemplate.tt"
+ } // end if method is reference type 
+            
+            #line default
+            #line hidden
+            this.Write(" */\r\nEG_API ");
+            
+            #line 76 "C:\dev\ElectionGuard\electionguard-core2\src\interop-generator\ElectionGuard.InteropGenerator\Templates\CHeaderTemplate.tt"
+            this.Write(this.ToStringHelper.ToStringWithCulture(returnType));
+            
+            #line default
+            #line hidden
+            this.Write(" ");
+            
+            #line 76 "C:\dev\ElectionGuard\electionguard-core2\src\interop-generator\ElectionGuard.InteropGenerator\Templates\CHeaderTemplate.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(entryPoint));
             
             #line default
             #line hidden
-            this.Write("(\r\n\teg_plaintext_ballot_selection_t *handle");
+            this.Write("(\r\n\teg_");
             
-            #line 68 "C:\dev\ElectionGuard\electionguard-core2\src\interop-generator\ElectionGuard.InteropGenerator\Templates\CHeaderTemplate.tt"
+            #line 77 "C:\dev\ElectionGuard\electionguard-core2\src\interop-generator\ElectionGuard.InteropGenerator\Templates\CHeaderTemplate.tt"
+            this.Write(this.ToStringHelper.ToStringWithCulture(EgClass.ClassName.ToSnakeCase()));
+            
+            #line default
+            #line hidden
+            this.Write("_t *handle");
+            
+            #line 77 "C:\dev\ElectionGuard\electionguard-core2\src\interop-generator\ElectionGuard.InteropGenerator\Templates\CHeaderTemplate.tt"
 
 foreach (var parameter in egMethod.Params) {
-	this.Write($",{Environment.NewLine}\t{parameter.TypeC}in_{parameter.Name.ToSnakeCase()}");
+	var parameterCName = parameter.CName;
+	this.Write($",{Environment.NewLine}\t{parameter.TypeC}{parameterCName}");
+}
+if (egMethod.ReturnType.IsElectionGuardType) {
+	var outVarReturnType = egMethod.ReturnType.OutVarCType;
+	var outParamName = egMethod.ReturnTypeCName;
+	this.Write($",{Environment.NewLine}\t{outVarReturnType}{outParamName}");
+}
+if (egMethod.ReturnType.TypeCs == "string") {
+
+            
+            #line default
+            #line hidden
+            this.Write(",\r\n\tchar **out_data,\r\n\tuint64_t *out_size");
+            
+            #line 90 "C:\dev\ElectionGuard\electionguard-core2\src\interop-generator\ElectionGuard.InteropGenerator\Templates\CHeaderTemplate.tt"
+
 }
 
             
@@ -227,28 +309,35 @@ foreach (var parameter in egMethod.Params) {
             #line hidden
             this.Write("\r\n\t);\r\n\r\n");
             
-            #line 76 "C:\dev\ElectionGuard\electionguard-core2\src\interop-generator\ElectionGuard.InteropGenerator\Templates\CHeaderTemplate.tt"
+            #line 96 "C:\dev\ElectionGuard\electionguard-core2\src\interop-generator\ElectionGuard.InteropGenerator\Templates\CHeaderTemplate.tt"
  } // foreach method 
             
             #line default
             #line hidden
-            this.Write("EG_API eg_electionguard_status_t eg_");
+            this.Write("/**\r\n * Frees the memory held by the ");
             
-            #line 77 "C:\dev\ElectionGuard\electionguard-core2\src\interop-generator\ElectionGuard.InteropGenerator\Templates\CHeaderTemplate.tt"
+            #line 98 "C:\dev\ElectionGuard\electionguard-core2\src\interop-generator\ElectionGuard.InteropGenerator\Templates\CHeaderTemplate.tt"
+            this.Write(this.ToStringHelper.ToStringWithCulture(EgClass.ClassName));
+            
+            #line default
+            #line hidden
+            this.Write("\r\n */\r\nEG_API eg_electionguard_status_t eg_");
+            
+            #line 100 "C:\dev\ElectionGuard\electionguard-core2\src\interop-generator\ElectionGuard.InteropGenerator\Templates\CHeaderTemplate.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(classNameSnakeCase));
             
             #line default
             #line hidden
             this.Write("_free(eg_");
             
-            #line 77 "C:\dev\ElectionGuard\electionguard-core2\src\interop-generator\ElectionGuard.InteropGenerator\Templates\CHeaderTemplate.tt"
+            #line 100 "C:\dev\ElectionGuard\electionguard-core2\src\interop-generator\ElectionGuard.InteropGenerator\Templates\CHeaderTemplate.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(classNameSnakeCase));
             
             #line default
             #line hidden
             this.Write("_t *handle);\r\n\r\n#endif // ifndef ");
             
-            #line 79 "C:\dev\ElectionGuard\electionguard-core2\src\interop-generator\ElectionGuard.InteropGenerator\Templates\CHeaderTemplate.tt"
+            #line 102 "C:\dev\ElectionGuard\electionguard-core2\src\interop-generator\ElectionGuard.InteropGenerator\Templates\CHeaderTemplate.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(EgClass.ClassName));
             
             #line default

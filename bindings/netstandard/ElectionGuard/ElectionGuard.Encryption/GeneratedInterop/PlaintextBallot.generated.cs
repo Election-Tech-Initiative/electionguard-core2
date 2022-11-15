@@ -56,6 +56,36 @@ namespace ElectionGuard
         #endregion
 
         #region Methods
+        /// <summary>
+        /// Get the contest at the specified index.
+        /// </summary>
+        /// <param name="index">The index of the contest</param>
+        public PlaintextBallotContest GetContestAtIndex(
+            ulong index
+        ) {
+            var status = External.GetContestAtIndex(
+                Handle,
+                index,
+                out PlaintextBallotContest.External.PlaintextBallotContestHandle value);
+            status.ThrowIfError();
+            return new PlaintextBallotContest(value);
+        }
+        /// <summary>
+        /// Export the ballot representation as JSON
+        /// </summary>
+        public string ToJson(
+            
+        ) {
+            var status = External.ToJson(
+                Handle,
+                out IntPtr pointer, 
+                out _
+                );
+            status.ThrowIfError();
+            var json = Marshal.PtrToStringAnsi(pointer);
+            NativeInterface.Memory.FreeIntPtr(pointer);
+            return json;
+        }
 
 #pragma warning disable CS1591 // Missing XML comment for publicly visible type or member
         protected override void DisposeUnmanaged()
@@ -124,6 +154,22 @@ namespace ElectionGuard
             internal static extern ulong GetContestsSize(
                 PlaintextBallotHandle handle
             );
+
+            [DllImport(NativeInterface.DllName, EntryPoint = "eg_plaintext_ballot_get_contest_at_index",
+                CallingConvention = CallingConvention.Cdecl, SetLastError = true)]
+            internal static extern Status GetContestAtIndex(
+                PlaintextBallotHandle handle,
+                ulong index,
+                out PlaintextBallotContest.External.PlaintextBallotContestHandle objectId
+                );
+
+            [DllImport(NativeInterface.DllName, EntryPoint = "eg_plaintext_ballot_to_json",
+                CallingConvention = CallingConvention.Cdecl, SetLastError = true)]
+            internal static extern Status ToJson(
+                PlaintextBallotHandle handle,
+                out IntPtr data,
+                out ulong size
+                );
 
         }
         #endregion
