@@ -45,8 +45,6 @@ EG_API eg_electionguard_status_t eg_compact_plaintext_ballot_from_msgpack(
 EG_API eg_electionguard_status_t eg_compact_plaintext_ballot_to_msgpack(
   eg_compact_plaintext_ballot_t *handle, uint8_t **out_data, uint64_t *out_size);
 
-EG_API eg_electionguard_status_t eg_compact_plaintext_ballot_msgpack_free(uint8_t *in_data);
-
 #endif
 
 #ifndef CompactCiphertextBallot
@@ -79,8 +77,6 @@ EG_API eg_electionguard_status_t eg_compact_ciphertext_ballot_from_msgpack(
 
 EG_API eg_electionguard_status_t eg_compact_ciphertext_ballot_to_msgpack(
   eg_compact_ciphertext_ballot_t *handle, uint8_t **out_data, uint64_t *out_size);
-
-EG_API eg_electionguard_status_t eg_compact_ciphertext_ballot_msgpack_free(uint8_t *in_data);
 
 #endif
 

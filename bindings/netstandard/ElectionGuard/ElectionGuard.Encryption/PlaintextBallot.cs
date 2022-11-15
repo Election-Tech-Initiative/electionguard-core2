@@ -79,8 +79,7 @@ namespace ElectionGuard
 
             var byteArray = new byte[(int)size];
             Marshal.Copy(data, byteArray, 0, (int)size);
-            // TODO: use PlaintextBallot.MsgPackFree
-            NativeInterface.CompactCiphertextBallot.MsgPackFree(data);
+            NativeInterface.Memory.DeleteIntPtr(data);
             return byteArray;
         }
 
@@ -101,7 +100,7 @@ namespace ElectionGuard
 
             var byteArray = new byte[(int)size];
             Marshal.Copy(data, byteArray, 0, (int)size);
-            NativeInterface.CompactCiphertextBallot.MsgPackFree(data);
+            NativeInterface.Memory.DeleteIntPtr(data);
             return byteArray;
         }
 

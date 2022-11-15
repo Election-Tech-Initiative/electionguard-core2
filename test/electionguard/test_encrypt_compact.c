@@ -7,6 +7,7 @@
 #include <electionguard/encrypt.h>
 #include <electionguard/ciphertext_ballot_selection.generated.h>
 #include <electionguard/plaintext_ballot.generated.h>
+#include <electionguard/ballot_compact.h>
 #include <stdlib.h>
 
 bool strings_are_equal(char *expected, char *actual);
@@ -126,7 +127,7 @@ bool test_encrypt_ballot_compact_simple_succeeds(void)
     // Clean Up
     free(compact_deserialized_object_id);
     free(compact_object_id);
-    eg_compact_ciphertext_ballot_msgpack_free(compact_data);
+    eg_delete_int_ptr(compact_data);
     eg_compact_ciphertext_ballot_free(compact_deserialized);
     eg_compact_ciphertext_ballot_free(compact);
     eg_ciphertext_ballot_free(ciphertext);

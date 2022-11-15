@@ -68,16 +68,6 @@ eg_compact_plaintext_ballot_to_msgpack(eg_compact_plaintext_ballot_t *handle, ui
     }
 }
 
-eg_electionguard_status_t eg_compact_plaintext_ballot_msgpack_free(uint8_t *in_data)
-{
-    if (in_data == nullptr) {
-        return ELECTIONGUARD_STATUS_ERROR_INVALID_ARGUMENT;
-    }
-
-    delete[] in_data; // NOLINT(cppcoreguidelines-owning-memory)
-    return ELECTIONGUARD_STATUS_SUCCESS;
-}
-
 #pragma endregion
 
 #pragma region CompactCiphertextBallot
@@ -141,16 +131,6 @@ eg_compact_ciphertext_ballot_to_msgpack(eg_compact_ciphertext_ballot_t *handle, 
         Log::error(":eg_compact_ciphertext_ballot_to_msgpack", e);
         return ELECTIONGUARD_STATUS_ERROR_BAD_ALLOC;
     }
-}
-
-eg_electionguard_status_t eg_compact_ciphertext_ballot_msgpack_free(uint8_t *in_data)
-{
-    if (in_data == nullptr) {
-        return ELECTIONGUARD_STATUS_ERROR_INVALID_ARGUMENT;
-    }
-
-    delete[] in_data; // NOLINT(cppcoreguidelines-owning-memory)
-    return ELECTIONGUARD_STATUS_SUCCESS;
 }
 
 #pragma endregion
