@@ -114,6 +114,30 @@ namespace ElectionGuard
             return byteArray;
         }
 
+        /// <summary>
+        /// Export the ballot representation as MsgPack
+        /// </summary>
+        public byte[] ToMsgPack(
+            
+        ) {
+            var status = External.ToMsgPack(
+                Handle,
+                out IntPtr data, 
+                out ulong size
+                );
+            status.ThrowIfError();
+
+            if (size > int.MaxValue)
+            {
+                throw new ElectionGuardException("PlaintextBallot Error ToMsgPack: size is too big");
+            }
+
+            var byteArray = new byte[(int)size];
+            Marshal.Copy(data, byteArray, 0, (int)size);
+            NativeInterface.Memory.DeleteIntPtr(data);
+            return byteArray;
+        }
+
 
 #pragma warning disable CS1591 // Missing XML comment for publicly visible type or member
         protected override void DisposeUnmanaged()
@@ -209,6 +233,17 @@ namespace ElectionGuard
                 CallingConvention = CallingConvention.Cdecl,
                 SetLastError = true)]
             internal static extern Status ToBson(
+                PlaintextBallotHandle handle,
+                out IntPtr data,
+                out ulong size
+                );
+
+            [DllImport(
+                NativeInterface.DllName,
+                EntryPoint = "eg_plaintext_ballot_to_msg_pack",
+                CallingConvention = CallingConvention.Cdecl,
+                SetLastError = true)]
+            internal static extern Status ToMsgPack(
                 PlaintextBallotHandle handle,
                 out IntPtr data,
                 out ulong size

@@ -363,10 +363,16 @@ namespace ElectionGuard
             
             #line default
             #line hidden
-            this.Write(" Error ToBson: size is too big\");\r\n            }\r\n\r\n            var byteArray = n" +
-                    "ew byte[(int)size];\r\n            Marshal.Copy(data, byteArray, 0, (int)size);\r\n " +
-                    "           NativeInterface.Memory.DeleteIntPtr(data);\r\n            return byteAr" +
-                    "ray;\r\n");
+            this.Write(" Error ");
+            
+            #line 105 "C:\dev\ElectionGuard\electionguard-core2\src\interop-generator\ElectionGuard.InteropGenerator\Templates\CsClassTemplate.tt"
+            this.Write(this.ToStringHelper.ToStringWithCulture(method.Name));
+            
+            #line default
+            #line hidden
+            this.Write(": size is too big\");\r\n            }\r\n\r\n            var byteArray = new byte[(int)" +
+                    "size];\r\n            Marshal.Copy(data, byteArray, 0, (int)size);\r\n            Na" +
+                    "tiveInterface.Memory.DeleteIntPtr(data);\r\n            return byteArray;\r\n");
             
             #line 112 "C:\dev\ElectionGuard\electionguard-core2\src\interop-generator\ElectionGuard.InteropGenerator\Templates\CsClassTemplate.tt"
  } else /* if method return type is a value type */ { 

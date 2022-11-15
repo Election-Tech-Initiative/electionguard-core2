@@ -102,7 +102,7 @@ namespace ElectionGuard
 
             if (size > int.MaxValue)
             {
-                throw new ElectionGuardException("<#= className #> Error ToBson: size is too big");
+                throw new ElectionGuardException("<#= className #> Error <#= method.Name #>: size is too big");
             }
 
             var byteArray = new byte[(int)size];

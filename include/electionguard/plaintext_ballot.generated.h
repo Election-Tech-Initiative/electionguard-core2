@@ -80,6 +80,15 @@ EG_API eg_electionguard_status_t eg_plaintext_ballot_to_bson(
 	);
 
 /**
+ * Export the ballot representation as MsgPack
+ */
+EG_API eg_electionguard_status_t eg_plaintext_ballot_to_msg_pack(
+	eg_plaintext_ballot_t *handle,
+	uint8_t **out_data,
+	uint64_t *out_size
+	);
+
+/**
  * Frees the memory held by the PlaintextBallot
  */
 EG_API eg_electionguard_status_t eg_plaintext_ballot_free(eg_plaintext_ballot_t *handle);
