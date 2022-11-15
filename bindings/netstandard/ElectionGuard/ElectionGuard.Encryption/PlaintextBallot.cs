@@ -64,26 +64,6 @@ namespace ElectionGuard
         }
 
         /// <Summary>
-        /// Export the ballot representation as BSON
-        /// </Summary>
-        public byte[] ToBson()
-        {
-            var status = NativeInterface.PlaintextBallot.ToBson(
-                Handle, out IntPtr data, out ulong size);
-            status.ThrowIfError();
-
-            if (size > int.MaxValue)
-            {
-                throw new ElectionGuardException("PlaintextBallot Error ToBson: size is too big");
-            }
-
-            var byteArray = new byte[(int)size];
-            Marshal.Copy(data, byteArray, 0, (int)size);
-            NativeInterface.Memory.DeleteIntPtr(data);
-            return byteArray;
-        }
-
-        /// <Summary>
         /// Export the ballot representation as MsgPack
         /// </Summary>
         public byte[] ToMsgPack()

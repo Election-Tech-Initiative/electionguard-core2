@@ -87,6 +87,26 @@ namespace ElectionGuard
             var json = Marshal.PtrToStringAnsi(pointer);
             NativeInterface.Memory.FreeIntPtr(pointer);
             return json;
+<# } else if (method.ReturnType.TypeCs == "byte[]") { #>
+            var status = External.<#= method.Name #>(
+                Handle,
+<# foreach (var p in method.Params) { #>
+                <#= p.Name #>,
+<# } // for each param #>
+                out IntPtr data, 
+                out ulong size
+                );
+            status.ThrowIfError();
+
+            if (size > int.MaxValue)
+            {
+                throw new ElectionGuardException("<#= className #> Error ToBson: size is too big");
+            }
+
+            var byteArray = new byte[(int)size];
+            Marshal.Copy(data, byteArray, 0, (int)size);
+            NativeInterface.Memory.DeleteIntPtr(data);
+            return byteArray;
 <# } else /* if method return type is a value type */ { #>
             return External.<#= method.Name #>(
                 Handle<# 
@@ -182,11 +202,11 @@ foreach (var p in method.Params) { #>,
 ,
                 out <#= method.ReturnType.NativeHandleType #> objectId<#
 } // if isElectionGuardType #>
-<# if (method.ReturnType.TypeCs == "string") { #>
+<# if (method.ReturnType.TypeCs == "string" || method.ReturnType.TypeCs == "byte[]") { #>
 ,
                 out IntPtr data,
                 out ulong size<#
-} // if is string #>
+} // if is string or byte[] #>
 
                 );
 

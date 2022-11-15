@@ -30,7 +30,7 @@ public record EgType(
 
     public bool IsElectionGuardType => NativeHandleType != null;
 
-    public bool IsPassByReference => TypeCs == "string" || IsElectionGuardType;
+    public bool IsPassByReference => TypeCs == "string" || TypeCs == "byte[]" || IsElectionGuardType;
 
     public string GetCReturnType()
     {

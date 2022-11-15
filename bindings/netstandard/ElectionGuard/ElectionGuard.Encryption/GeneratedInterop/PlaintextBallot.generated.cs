@@ -86,6 +86,29 @@ namespace ElectionGuard
             NativeInterface.Memory.FreeIntPtr(pointer);
             return json;
         }
+        /// <summary>
+        /// Export the ballot representation as BSON
+        /// </summary>
+        public byte[] ToBson(
+            
+        ) {
+            var status = External.ToBson(
+                Handle,
+                out IntPtr data, 
+                out ulong size
+                );
+            status.ThrowIfError();
+
+            if (size > int.MaxValue)
+            {
+                throw new ElectionGuardException("PlaintextBallot Error ToBson: size is too big");
+            }
+
+            var byteArray = new byte[(int)size];
+            Marshal.Copy(data, byteArray, 0, (int)size);
+            NativeInterface.Memory.DeleteIntPtr(data);
+            return byteArray;
+        }
 
 #pragma warning disable CS1591 // Missing XML comment for publicly visible type or member
         protected override void DisposeUnmanaged()
@@ -166,6 +189,14 @@ namespace ElectionGuard
             [DllImport(NativeInterface.DllName, EntryPoint = "eg_plaintext_ballot_to_json",
                 CallingConvention = CallingConvention.Cdecl, SetLastError = true)]
             internal static extern Status ToJson(
+                PlaintextBallotHandle handle,
+                out IntPtr data,
+                out ulong size
+                );
+
+            [DllImport(NativeInterface.DllName, EntryPoint = "eg_plaintext_ballot_to_bson",
+                CallingConvention = CallingConvention.Cdecl, SetLastError = true)]
+            internal static extern Status ToBson(
                 PlaintextBallotHandle handle,
                 out IntPtr data,
                 out ulong size
