@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Runtime.ConstrainedExecution;
 using System.Runtime.InteropServices;
 // ReSharper disable InconsistentNaming
@@ -1411,7 +1411,7 @@ namespace ElectionGuard
             #region ContestDescription Methods
 
             // Since the underlying c++ class inherits from ContestDescription
-            // these functions call those methods subsituting the 
+            // these functions call those methods substituting the 
             // ContestDescriptionWithPlaceholdersHandle opaque pointer type
 
             [DllImport(DllName, EntryPoint = "eg_contest_description_get_object_id",
@@ -2144,7 +2144,7 @@ namespace ElectionGuard
             internal static extern Status GetSelectionAtIndex(
                 ElectionGuard.CiphertextBallotContest.External.CiphertextBallotContestHandle handle,
                 ulong index,
-                out ElectionGuard.CiphertextBallotSelection.External.CiphertextBallotSelectionHandle selection);
+                out CiphertextBallotSelection.External.CiphertextBallotSelectionHandle selection);
 
             [DllImport(DllName,
                 EntryPoint = "eg_ciphertext_ballot_contest_get_ciphertext_accumulation",
@@ -2640,7 +2640,7 @@ namespace ElectionGuard
                 ElementModQ.ElementModQHandle crypto_extended_base_hash,
                 ElementModQ.ElementModQHandle nonceSeed,
                 bool shouldVerifyProofs,
-                out ElectionGuard.CiphertextBallotSelection.External.CiphertextBallotSelectionHandle handle);
+                out CiphertextBallotSelection.External.CiphertextBallotSelectionHandle handle);
 
             [DllImport(DllName, EntryPoint = "eg_encrypt_contest",
                 CallingConvention = CallingConvention.Cdecl, SetLastError = true)]
