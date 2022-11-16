@@ -125,22 +125,6 @@ typedef struct eg_ciphertext_ballot_selection_s eg_ciphertext_ballot_selection_t
 
 // TODO: add eg_ciphertext_ballot_selection_make
 
-/**
-* Given an encrypted BallotSelection, validates the encryption state against a specific seed hash and public key.
-* Calling this function expects that the object is in a well-formed encrypted state
-* with the elgamal encrypted `message` field populated along with
-* the DisjunctiveChaumPedersenProof`proof` populated.
-* the ElementModQ `description_hash` and the ElementModQ `crypto_hash` are also checked.
-*
-* @param[in] encryption_seed The hash of the SelectionDescription, or
-*                      whatever `ElementModQ` was used to populate the `description_hash` field.
-* @param[in] in_public_key The election public key
-* @param[in] in_crypto_extended_base_hash The extended base hash of the election
-*/
-EG_API bool eg_ciphertext_ballot_selection_is_valid_encryption(
-  eg_ciphertext_ballot_selection_t *handle, eg_element_mod_q_t *in_encryption_seed,
-  eg_element_mod_p_t *in_public_key, eg_element_mod_q_t *in_crypto_extended_base_hash);
-
 // CiphertextBallotSelection::crypto_hash_with not provided
 // static CiphertextBallotSelection::make not provided, use eg_encrypt_selection
 

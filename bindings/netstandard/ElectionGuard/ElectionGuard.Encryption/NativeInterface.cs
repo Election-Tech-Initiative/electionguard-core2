@@ -2124,19 +2124,6 @@ namespace ElectionGuard
                 out ElectionGuard.PlaintextBallotSelection.External.PlaintextBallotSelectionHandle handle);
         }
 
-        internal static class CiphertextBallotSelection
-        {
-            [DllImport(DllName,
-                EntryPoint = "eg_ciphertext_ballot_selection_is_valid_encryption",
-                CallingConvention = CallingConvention.Cdecl, SetLastError = true)]
-            internal static extern bool IsValidEncryption(
-                ElectionGuard.CiphertextBallotSelection.External.CiphertextBallotSelectionHandle handle,
-                ElementModQ.ElementModQHandle encryption_seed,
-                ElementModP.ElementModPHandle public_key,
-                ElementModQ.ElementModQHandle crypto_extended_base_hash);
-
-        }
-
         internal static class PlaintextBallotContest
         {
             [DllImport(DllName, EntryPoint = "eg_plaintext_ballot_contest_new",

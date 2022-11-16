@@ -29,27 +29,5 @@ namespace ElectionGuard
         {
             Handle = handle;
         }
-
-        /// <summary>
-        /// Given an encrypted BallotSelection, validates the encryption state against a specific seed hash and public key.
-        /// Calling this function expects that the object is in a well-formed encrypted state
-        /// with the elgamal encrypted `message` field populated along with
-        /// the DisjunctiveChaumPedersenProof`proof` populated.
-        /// the ElementModQ `description_hash` and the ElementModQ `crypto_hash` are also checked.
-        ///
-        /// <param name="encryptionSeed">The hash of the SelectionDescription, or
-        ///                         whatever `ElementModQ` was used to populate the `description_hash` field. </param>
-        /// <param name="elGamalPublicKey">The election public key</param>
-        /// <param name="cryptoExtendedBaseHash">The extended base hash of the election</param>
-        /// </summary>
-        public bool IsValidEncryption(
-            ElementModQ encryptionSeed,
-            ElementModP elGamalPublicKey,
-            ElementModQ cryptoExtendedBaseHash)
-        {
-            return NativeInterface.CiphertextBallotSelection.IsValidEncryption(
-                Handle, encryptionSeed.Handle,
-                elGamalPublicKey.Handle, cryptoExtendedBaseHash.Handle);
-        }
     }
 }

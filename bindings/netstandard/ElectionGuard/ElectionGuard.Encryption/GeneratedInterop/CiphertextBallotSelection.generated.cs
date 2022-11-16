@@ -139,6 +139,19 @@ namespace ElectionGuard
             return new ElementModQ(value);
         }
 
+        /// <summary>
+        /// Given an encrypted BallotSelection, validates the encryption state against a specific seed hash and public key. Calling this function expects that the object is in a well-formed encrypted state with the elgamal encrypted `message` field populated along with the DisjunctiveChaumPedersenProof`proof` populated. the ElementModQ `description_hash` and the ElementModQ `crypto_hash` are also checked.
+        /// </summary>
+        /// <param name="encryptionSeed">The hash of the SelectionDescription, or whatever `ElementModQ` was used to populate the `description_hash` field.</param>
+        /// <param name="elGamalPublicKey">The election public key.</param>
+        /// <param name="cryptoExtendedBaseHash">The extended base hash of the election.</param>
+        public bool IsValidEncryption(
+            ElementModQ encryptionSeed, ElementModP elGamalPublicKey, ElementModQ cryptoExtendedBaseHash
+        ) {
+            return External.IsValidEncryption(
+                Handle, encryptionSeed.Handle, elGamalPublicKey.Handle, cryptoExtendedBaseHash.Handle);
+        }
+
 
 #pragma warning disable CS1591 // Missing XML comment for publicly visible type or member
         protected override void DisposeUnmanaged()
@@ -258,6 +271,18 @@ namespace ElectionGuard
                 CiphertextBallotSelectionHandle handle,
                 NativeInterface.ElementModQ.ElementModQHandle encryptionSeed,
                 out NativeInterface.ElementModQ.ElementModQHandle objectId
+                );
+
+            [DllImport(
+                NativeInterface.DllName,
+                EntryPoint = "eg_ciphertext_ballot_selection_is_valid_encryption",
+                CallingConvention = CallingConvention.Cdecl,
+                SetLastError = true)]
+            internal static extern bool IsValidEncryption(
+                CiphertextBallotSelectionHandle handle,
+                NativeInterface.ElementModQ.ElementModQHandle encryptionSeed,
+                NativeInterface.ElementModP.ElementModPHandle elGamalPublicKey,
+                NativeInterface.ElementModQ.ElementModQHandle cryptoExtendedBaseHash
                 );
 
         }

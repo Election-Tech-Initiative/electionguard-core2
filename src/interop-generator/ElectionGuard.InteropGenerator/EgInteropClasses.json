@@ -293,6 +293,42 @@
             }
           }
         ]
+      },
+      {
+        "Name": "IsValidEncryption",
+        "ReturnType": {
+          "TypeCs": "bool"
+        },
+        "Description": "Given an encrypted BallotSelection, validates the encryption state against a specific seed hash and public key. Calling this function expects that the object is in a well-formed encrypted state with the elgamal encrypted `message` field populated along with the DisjunctiveChaumPedersenProof`proof` populated. the ElementModQ `description_hash` and the ElementModQ `crypto_hash` are also checked.",
+        "Params": [
+          {
+            "Name": "encryptionSeed",
+            "Description": "The hash of the SelectionDescription, or whatever `ElementModQ` was used to populate the `description_hash` field.",
+            "Type": {
+              "TypeCs": "ElementModQ",
+              "NativeHandleType": "NativeInterface.ElementModQ.ElementModQHandle",
+              "TypeC": "eg_element_mod_q_t"
+            }
+          },
+          {
+            "Name": "elGamalPublicKey",
+            "Description": "The election public key.",
+            "Type": {
+              "TypeCs": "ElementModP",
+              "NativeHandleType": "NativeInterface.ElementModP.ElementModPHandle",
+              "TypeC": "eg_element_mod_p_t"
+            }
+          },
+          {
+            "Name": "cryptoExtendedBaseHash",
+            "Description": "The extended base hash of the election.",
+            "Type": {
+              "TypeCs": "ElementModQ",
+              "NativeHandleType": "NativeInterface.ElementModQ.ElementModQHandle",
+              "TypeC": "eg_element_mod_q_t"
+            }
+          }
+        ]
       }
     ]
   },
