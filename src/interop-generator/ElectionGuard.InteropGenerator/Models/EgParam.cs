@@ -1,5 +1,4 @@
 ﻿using ElectionGuard.InteropGenerator.Helpers;
-using System.Reflection.Metadata;
 
 namespace ElectionGuard.InteropGenerator.Models;
 
@@ -10,7 +9,7 @@ public record EgParam(
     string? Description
 )
 {
-    public string TypeC => TypeHelper.CsToC(Type.TypeCs);
+    public string TypeC => Type.InVarCType;
 
     public string? MarshallAs()
     {
@@ -18,7 +17,7 @@ public record EgParam(
         {
             "string" => "UnmanagedType.LPStr",
             "ulong" => null,
-            _ => throw new NotImplementedException("Unsupported marshall type " + Type.TypeCs)
+            _ => null
         };
     }
 
@@ -32,8 +31,10 @@ public record EgParam(
     {
         var marshallAs = MarshallAs();
         var marshallAsAttribute = marshallAs == null ? "" : $"[MarshalAs({marshallAs})] ";
-        return $"{marshallAsAttribute}{Type.TypeCs} {Name}";
+        return $"{marshallAsAttribute}{Type.NativeHandleType ?? Type.TypeCs} {Name}";
     }
 
     public string CName => $"in_{Name.ToSnakeCase()}";
+
+    public bool IsElectionGuardType => Type.IsElectionGuardType;
 }

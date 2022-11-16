@@ -125,6 +125,31 @@ namespace ElectionGuard
 
         #region Methods
 
+        /// <summary>
+        /// Get a contest at a specific index
+        /// </summary>
+        /// <param name="index">The index of the contest</param>
+        public CiphertextBallotContest GetContestAtIndex(
+            ulong index
+        ) {
+            var status = External.GetContestAtIndex(
+                Handle,
+                index,
+                out CiphertextBallotContest.External.CiphertextBallotContestHandle value);
+            status.ThrowIfError();
+            return new CiphertextBallotContest(value);
+        }
+
+        /// <summary>
+        /// Given an encrypted Ballot, validates the encryption state against a specific ballot seed and public key by verifying the states of this ballot's members (BallotContest's and BallotSelection's). Calling this function expects that the object is in a well-formed encrypted state with the `contests` populated with valid encrypted ballot selections, and the ElementModQ `manifest_hash` also populated. Specifically, the seed in this context is the hash of the Election Manifest, or whatever `ElementModQ` was used to populate the `manifest_hash` field.
+        /// </summary>
+        public bool IsValidEncryption(
+            ElementModQ manifestHash, ElementModP elGamalPublicKey, ElementModQ cryptoExtendedBaseHash
+        ) {
+            return External.IsValidEncryption(
+                Handle, manifestHash.Handle, elGamalPublicKey.Handle, cryptoExtendedBaseHash.Handle);
+        }
+
 
 #pragma warning disable CS1591 // Missing XML comment for publicly visible type or member
         protected override void DisposeUnmanaged()
@@ -239,6 +264,29 @@ namespace ElectionGuard
             internal static extern Status GetNonce(
                 CiphertextBallotHandle handle,
                 out NativeInterface.ElementModQ.ElementModQHandle objectId
+                );
+
+            [DllImport(
+                NativeInterface.DllName,
+                EntryPoint = "eg_ciphertext_ballot_get_contest_at_index",
+                CallingConvention = CallingConvention.Cdecl,
+                SetLastError = true)]
+            internal static extern Status GetContestAtIndex(
+                CiphertextBallotHandle handle,
+                ulong index,
+                out CiphertextBallotContest.External.CiphertextBallotContestHandle objectId
+                );
+
+            [DllImport(
+                NativeInterface.DllName,
+                EntryPoint = "eg_ciphertext_ballot_is_valid_encryption",
+                CallingConvention = CallingConvention.Cdecl,
+                SetLastError = true)]
+            internal static extern bool IsValidEncryption(
+                CiphertextBallotHandle handle,
+                NativeInterface.ElementModQ.ElementModQHandle manifestHash,
+                NativeInterface.ElementModP.ElementModPHandle elGamalPublicKey,
+                NativeInterface.ElementModQ.ElementModQHandle cryptoExtendedBaseHash
                 );
 
         }

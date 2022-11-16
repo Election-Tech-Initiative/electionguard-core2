@@ -351,17 +351,6 @@ typedef struct eg_ciphertext_ballot_s eg_ciphertext_ballot_t;
 // no constructors defined.  use `eg_encrypt_ballot` in encrypt.h
 
 /**
- * Get a contest at a specific index.
- * 
- * @param[in] in_index The index of the contest
- * @param[out] out_contest_ref An opaque pointer to the contest.  
- *                             The value is a reference and is not owned by the caller
- */
-EG_API eg_electionguard_status_t
-eg_ciphertext_ballot_get_contest_at_index(eg_ciphertext_ballot_t *handle, uint64_t in_index,
-                                          eg_ciphertext_ballot_contest_t **out_contest_ref);
-
-/**
  * The hash of the encrypted values on this ballot in sequence order
  * 
  * @param[out] out_hash_ref An opaque pointer to the crypto hash.  
@@ -387,10 +376,6 @@ EG_API eg_electionguard_status_t eg_ciphertext_ballot_crypto_hash_with(
   eg_element_mod_q_t **out_crypto_hash);
 
 // TODO: eg_ciphertext_ballot_make
-
-EG_API bool eg_ciphertext_ballot_is_valid_encryption(
-  eg_ciphertext_ballot_t *handle, eg_element_mod_q_t *in_manifest_hash,
-  eg_element_mod_p_t *in_public_key, eg_element_mod_q_t *in_crypto_extended_base_hash);
 
 /**
  * Import the ballot representation from JSON

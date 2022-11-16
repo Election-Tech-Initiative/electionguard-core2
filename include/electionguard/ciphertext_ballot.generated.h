@@ -111,6 +111,28 @@ EG_API eg_electionguard_status_t eg_ciphertext_ballot_get_nonce(
 	);
 
 /**
+ * Get a contest at a specific index
+ * @param[in] in_index The index of the contest
+ * @param[out] out_get_contest_at_index_ref An opaque pointer to the CiphertextBallotContest
+ *                               The value is a reference and is not owned by the caller
+ */
+EG_API eg_electionguard_status_t eg_ciphertext_ballot_get_contest_at_index(
+	eg_ciphertext_ballot_t *handle,
+	uint64_t in_index,
+	eg_ciphertext_ballot_contest_t **out_get_contest_at_index_ref
+	);
+
+/**
+ * Given an encrypted Ballot, validates the encryption state against a specific ballot seed and public key by verifying the states of this ballot's members (BallotContest's and BallotSelection's). Calling this function expects that the object is in a well-formed encrypted state with the `contests` populated with valid encrypted ballot selections, and the ElementModQ `manifest_hash` also populated. Specifically, the seed in this context is the hash of the Election Manifest, or whatever `ElementModQ` was used to populate the `manifest_hash` field.
+ */
+EG_API bool eg_ciphertext_ballot_is_valid_encryption(
+	eg_ciphertext_ballot_t *handle,
+	eg_element_mod_q_t *in_manifest_hash,
+	eg_element_mod_p_t *in_el_gamal_public_key,
+	eg_element_mod_q_t *in_crypto_extended_base_hash
+	);
+
+/**
  * Frees the memory held by the CiphertextBallot
  */
 EG_API eg_electionguard_status_t eg_ciphertext_ballot_free(eg_ciphertext_ballot_t *handle);

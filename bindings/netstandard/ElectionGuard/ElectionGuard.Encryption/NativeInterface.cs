@@ -2278,13 +2278,6 @@ namespace ElectionGuard
 
         internal static class CiphertextBallot
         {
-            [DllImport(DllName, EntryPoint = "eg_ciphertext_ballot_get_contest_at_index",
-                CallingConvention = CallingConvention.Cdecl, SetLastError = true)]
-            internal static extern Status GetContestAtIndex(
-                ElectionGuard.CiphertextBallot.External.CiphertextBallotHandle handle,
-                ulong index,
-                out ElectionGuard.CiphertextBallotContest.External.CiphertextBallotContestHandle contest_ref);
-
             [DllImport(DllName, EntryPoint = "eg_ciphertext_ballot_get_crypto_hash",
                 CallingConvention = CallingConvention.Cdecl, SetLastError = true)]
             internal static extern Status GetCryptoHash(
@@ -2297,14 +2290,6 @@ namespace ElectionGuard
                 ElectionGuard.CiphertextBallot.External.CiphertextBallotHandle handle,
                 ElementModQ.ElementModQHandle manifest_hash,
                 out ElementModQ.ElementModQHandle crypto_hash);
-
-            [DllImport(DllName, EntryPoint = "eg_ciphertext_ballot_is_valid_encryption",
-                CallingConvention = CallingConvention.Cdecl, SetLastError = true)]
-            internal static extern bool IsValidEncryption(
-                ElectionGuard.CiphertextBallot.External.CiphertextBallotHandle handle,
-                ElementModQ.ElementModQHandle manifest_hash,
-                ElementModP.ElementModPHandle public_key,
-                ElementModQ.ElementModQHandle crypto_extended_base_hash);
 
             [DllImport(DllName, EntryPoint = "eg_ciphertext_ballot_from_json",
                 CallingConvention = CallingConvention.Cdecl, SetLastError = true)]

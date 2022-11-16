@@ -45,37 +45,6 @@ namespace ElectionGuard
             Handle = handle;
         }
 
-        /// <summary>
-        /// Get a contest at a specific index
-        /// </summary>
-        public CiphertextBallotContest GetContestAt(ulong index)
-        {
-            var status = NativeInterface.CiphertextBallot.GetContestAtIndex(
-                Handle, 
-                index, 
-                out var value);
-            status.ThrowIfError();
-            return new CiphertextBallotContest(value);
-        }
-
-        /// <summary>
-        /// Given an encrypted Ballot, validates the encryption state
-        /// against a specific ballot seed and public key
-        /// by verifying the states of this ballot's members (BallotContest's and BallotSelection's).
-        /// Calling this function expects that the object is in a well-formed encrypted state
-        /// with the `contests` populated with valid encrypted ballot selections,
-        /// and the ElementModQ `manifest_hash` also populated.
-        /// Specifically, the seed in this context is the hash of the Election Manifest,
-        /// or whatever `ElementModQ` was used to populate the `manifest_hash` field.
-        /// </summary>
-        public bool IsValidEncryption(
-            ElementModQ manifestHash, ElementModP elGamalPublicKey, ElementModQ cryptoExtendedBaseHash)
-        {
-            return NativeInterface.CiphertextBallot.IsValidEncryption(
-                Handle, manifestHash.Handle, elGamalPublicKey.Handle, cryptoExtendedBaseHash.Handle);
-        }
-
-
         /// <Summary>
         /// Export the ballot representation as JSON
         /// </Summary>

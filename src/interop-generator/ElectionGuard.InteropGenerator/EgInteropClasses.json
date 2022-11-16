@@ -404,6 +404,58 @@
         }
       }
     ],
-    "Methods": []
+    "Methods": [
+      {
+        "Name": "GetContestAtIndex",
+        "ReturnType": {
+          "TypeCs": "CiphertextBallotContest",
+          "TypeC": "eg_ciphertext_ballot_contest_t",
+          "NativeHandleType": "CiphertextBallotContest.External.CiphertextBallotContestHandle"
+        },
+        "Description": "Get a contest at a specific index",
+        "Params": [
+          {
+            "Name": "index",
+            "Description": "The index of the contest",
+            "Type": {
+              "TypeCs": "ulong"
+            }
+          }
+        ]
+      },
+      {
+        "Name": "IsValidEncryption",
+        "ReturnType": {
+          "TypeCs": "bool"
+        },
+        "Description": "Given an encrypted Ballot, validates the encryption state against a specific ballot seed and public key by verifying the states of this ballot's members (BallotContest's and BallotSelection's). Calling this function expects that the object is in a well-formed encrypted state with the `contests` populated with valid encrypted ballot selections, and the ElementModQ `manifest_hash` also populated. Specifically, the seed in this context is the hash of the Election Manifest, or whatever `ElementModQ` was used to populate the `manifest_hash` field.",
+        "Params": [
+          {
+            "Name": "manifestHash",
+            "Type": {
+              "TypeCs": "ElementModQ",
+              "NativeHandleType": "NativeInterface.ElementModQ.ElementModQHandle",
+              "TypeC": "eg_element_mod_q_t"
+            }
+          },
+          {
+            "Name": "elGamalPublicKey",
+            "Type": {
+              "TypeCs": "ElementModP",
+              "NativeHandleType": "NativeInterface.ElementModP.ElementModPHandle",
+              "TypeC": "eg_element_mod_p_t"
+            }
+          },
+          {
+            "Name": "cryptoExtendedBaseHash",
+            "Type": {
+              "TypeCs": "ElementModQ",
+              "NativeHandleType": "NativeInterface.ElementModQ.ElementModQHandle",
+              "TypeC": "eg_element_mod_q_t"
+            }
+          }
+        ]
+      }
+    ]
   }
 ]
