@@ -1524,7 +1524,7 @@ namespace ElectionGuard
             {
                 protected override bool Free()
                 {
-                    if (IsClosed) return true;
+                    if (IsFreed) return true;
 
                     var status = Manifest.Free(TypedPtr);
                     if (status != Status.ELECTIONGUARD_STATUS_SUCCESS)
