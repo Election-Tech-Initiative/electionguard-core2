@@ -12,6 +12,7 @@ namespace ElectionGuard
         internal External.PlaintextBallotSelectionHandle Handle;
 
         #region Properties
+
         /// <Summary>
         /// Get the objectId of the selection which is the unique id for the selection in a specific contest described in the election manifest.
         /// </Summary>
@@ -66,6 +67,7 @@ namespace ElectionGuard
         #endregion
 
         #region Methods
+
         /// <summary>
         /// Given a PlaintextBallotSelection validates that the object matches an expected object and that the plaintext value can resolve to a valid representation
         /// </summary>
@@ -75,6 +77,7 @@ namespace ElectionGuard
             return External.IsValid(
                 Handle, expectedObjectId);
         }
+
 
 #pragma warning disable CS1591 // Missing XML comment for publicly visible type or member
         protected override void DisposeUnmanaged()
@@ -89,6 +92,7 @@ namespace ElectionGuard
         #endregion
 
         #region Extern
+
         internal static unsafe class External {
             internal struct PlaintextBallotSelectionType { };
 
@@ -109,47 +113,46 @@ namespace ElectionGuard
             [DllImport(
                 NativeInterface.DllName,
                 EntryPoint = "eg_plaintext_ballot_selection_get_object_id",
-                CallingConvention = CallingConvention.Cdecl, 
-                SetLastError = true
-            )]
+                CallingConvention = CallingConvention.Cdecl,
+                SetLastError = true)]
             internal static extern Status GetObjectId(
-                PlaintextBallotSelectionHandle handle
-                , out IntPtr objectId
-            );
+                PlaintextBallotSelectionHandle handle,
+                out IntPtr objectId
+                );
 
             [DllImport(
                 NativeInterface.DllName,
                 EntryPoint = "eg_plaintext_ballot_selection_get_is_placeholder",
-                CallingConvention = CallingConvention.Cdecl, 
-                SetLastError = true
-            )]
+                CallingConvention = CallingConvention.Cdecl,
+                SetLastError = true)]
             internal static extern bool GetIsPlaceholder(
                 PlaintextBallotSelectionHandle handle
-            );
+                );
 
             [DllImport(
                 NativeInterface.DllName,
                 EntryPoint = "eg_plaintext_ballot_selection_get_vote",
-                CallingConvention = CallingConvention.Cdecl, 
-                SetLastError = true
-            )]
+                CallingConvention = CallingConvention.Cdecl,
+                SetLastError = true)]
             internal static extern ulong GetVote(
                 PlaintextBallotSelectionHandle handle
-            );
+                );
 
             [DllImport(
                 NativeInterface.DllName,
                 EntryPoint = "eg_plaintext_ballot_selection_get_extended_data",
-                CallingConvention = CallingConvention.Cdecl, 
-                SetLastError = true
-            )]
+                CallingConvention = CallingConvention.Cdecl,
+                SetLastError = true)]
             internal static extern Status GetExtendedData(
-                PlaintextBallotSelectionHandle handle
-                , out NativeInterface.ExtendedData.ExtendedDataHandle objectId
-            );
+                PlaintextBallotSelectionHandle handle,
+                out NativeInterface.ExtendedData.ExtendedDataHandle objectId
+                );
 
-            [DllImport(NativeInterface.DllName, EntryPoint = "eg_plaintext_ballot_selection_is_valid",
-                CallingConvention = CallingConvention.Cdecl, SetLastError = true)]
+            [DllImport(
+                NativeInterface.DllName,
+                EntryPoint = "eg_plaintext_ballot_selection_is_valid",
+                CallingConvention = CallingConvention.Cdecl,
+                SetLastError = true)]
             internal static extern bool IsValid(
                 PlaintextBallotSelectionHandle handle,
                 [MarshalAs(UnmanagedType.LPStr)] string expectedObjectId

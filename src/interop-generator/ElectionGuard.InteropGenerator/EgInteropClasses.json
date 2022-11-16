@@ -177,7 +177,25 @@
         },
         "Description": "Export the ballot representation as JSON",
         "Params": [
+        ]
+      },
+      {
+        "Name": "ToBson",
+        "ReturnType": {
+          "TypeCs": "byte[]"
+        },
+        "Description": "Export the ballot representation as BSON",
+        "Params": [
         ] 
+      },
+      {
+        "Name": "ToMsgPack",
+        "ReturnType": {
+          "TypeCs": "byte[]"
+        },
+        "Description": "Export the ballot representation as MsgPack",
+        "Params": [
+        ]
       }
     ]
   },

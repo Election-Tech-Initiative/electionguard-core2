@@ -806,7 +806,7 @@ eg_electionguard_status_t eg_plaintext_ballot_to_bson(eg_plaintext_ballot_t *han
     }
 }
 
-eg_electionguard_status_t eg_plaintext_ballot_to_msgpack(eg_plaintext_ballot_t *handle,
+eg_electionguard_status_t eg_plaintext_ballot_to_msg_pack(eg_plaintext_ballot_t *handle,
                                                          uint8_t **out_data, uint64_t *out_size)
 {
     try {
@@ -819,7 +819,7 @@ eg_electionguard_status_t eg_plaintext_ballot_to_msgpack(eg_plaintext_ballot_t *
 
         return ELECTIONGUARD_STATUS_SUCCESS;
     } catch (const exception &e) {
-        Log::error("eg_plaintext_ballot_to_msgpack", e);
+        Log::error("eg_plaintext_ballot_to_msg_pack", e);
         return ELECTIONGUARD_STATUS_ERROR_BAD_ALLOC;
     }
 }
