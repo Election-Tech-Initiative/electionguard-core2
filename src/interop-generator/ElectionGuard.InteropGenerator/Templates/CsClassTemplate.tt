@@ -71,7 +71,7 @@ namespace ElectionGuard
             var status = External.<#= method.Name #>(
                 Handle,
 <# foreach (var p in method.Params) { #>
-                <#= p.Name #><#= p.IsElectionGuardType ? ".Handle" : "" #>,
+                <#= p.ToCsArgument() #>,
 <# } // for each param #>
                 out <#= method.ReturnType.NativeHandleType #> value);
             status.ThrowIfError();
@@ -80,7 +80,7 @@ namespace ElectionGuard
             var status = External.<#= method.Name #>(
                 Handle,
 <# foreach (var p in method.Params) { #>
-                <#= p.Name #><#= p.IsElectionGuardType ? ".Handle" : "" #>,
+                <#= p.ToCsArgument() #>,
 <# } // for each param #>
                 out IntPtr pointer, 
                 out _
@@ -93,7 +93,7 @@ namespace ElectionGuard
             var status = External.<#= method.Name #>(
                 Handle,
 <# foreach (var p in method.Params) { #>
-                <#= p.Name #><#= p.IsElectionGuardType ? ".Handle" : "" #>,
+                <#= p.ToCsArgument() #>,
 <# } // for each param #>
                 out IntPtr data, 
                 out ulong size
@@ -113,10 +113,7 @@ namespace ElectionGuard
             return External.<#= method.Name #>(
                 Handle<# 
 foreach (var p in method.Params) {
-    this.Write($", {p.Name}");
-    if (p.IsElectionGuardType) {
-        this.Write(".Handle");
-    }
+    this.Write($", {p.ToCsArgument()}");
 }
                 #>);
 <# } // end method return type switch #>

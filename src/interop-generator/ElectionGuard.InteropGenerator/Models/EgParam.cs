@@ -37,4 +37,9 @@ public record EgParam(
     public string CName => $"in_{Name.ToSnakeCase()}";
 
     public bool IsElectionGuardType => Type.IsElectionGuardType;
+
+    public string ToCsArgument()
+    {
+        return IsElectionGuardType ? $"{Name}.Handle" : Name;
+    }
 }
