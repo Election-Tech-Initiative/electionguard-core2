@@ -13,6 +13,114 @@ namespace ElectionGuard
 
         #region Properties
 
+        /// <Summary>
+        /// The unique ballot id that is meaningful to the consuming application.
+        /// </Summary>
+        public string ObjectId
+        {
+            get
+            {
+                var status = External.GetObjectId(Handle, out IntPtr value);
+                status.ThrowIfError();
+                var data = Marshal.PtrToStringAnsi(value);
+                NativeInterface.Memory.FreeIntPtr(value);
+                return data;
+            }
+        }
+
+        /// <Summary>
+        /// The Object Id of the ballot style in the election manifest.  This value is used to determine which contests to expect on the ballot, to fill in missing values, and to validate that the ballot is well-formed
+        /// </Summary>
+        public string StyleId
+        {
+            get
+            {
+                var status = External.GetStyleId(Handle, out IntPtr value);
+                status.ThrowIfError();
+                var data = Marshal.PtrToStringAnsi(value);
+                NativeInterface.Memory.FreeIntPtr(value);
+                return data;
+            }
+        }
+
+        /// <Summary>
+        /// Hash of the complete Election Manifest to which this ballot belongs
+        /// </Summary>
+        public ElementModQ ManifestHash
+        {
+            get
+            {
+                var status = External.GetManifestHash(
+                    Handle, out NativeInterface.ElementModQ.ElementModQHandle value);
+                status.ThrowIfError();
+                return new ElementModQ(value);
+            }
+        }
+
+        /// <Summary>
+        /// The seed hash for the ballot.  It may be the encryption device hash, the hash of a previous ballot or the hash of some other value that is meaningful to the consuming application.
+        /// </Summary>
+        public ElementModQ BallotCodeSeed
+        {
+            get
+            {
+                var status = External.GetBallotCodeSeed(
+                    Handle, out NativeInterface.ElementModQ.ElementModQHandle value);
+                status.ThrowIfError();
+                return new ElementModQ(value);
+            }
+        }
+
+        /// <Summary>
+        /// Get the size of the contests collection
+        /// </Summary>
+        public ulong ContestsSize
+        {
+            get
+            {
+                return External.GetContestsSize(Handle);
+            }
+        }
+
+        /// <Summary>
+        /// The unique ballot code for this ballot that is derived from the ballot seed, the timestamp, and the hash of the encrypted values
+        /// </Summary>
+        public ElementModQ BallotCode
+        {
+            get
+            {
+                var status = External.GetBallotCode(
+                    Handle, out NativeInterface.ElementModQ.ElementModQHandle value);
+                status.ThrowIfError();
+                return new ElementModQ(value);
+            }
+        }
+
+        /// <Summary>
+        /// The timestamp indicating when the ballot was encrypted as measured by the encryption device.  This value does not provide units as it is up to the host system to indicate the scale. Typically a host may use seconds since epoch or ticks since epoch.
+        /// </Summary>
+        public ulong Timestamp
+        {
+            get
+            {
+                return External.GetTimestamp(Handle);
+            }
+        }
+
+        /// <Summary>
+        /// The nonce value used to encrypt all values in the ballot
+        /// </Summary>
+        public ElementModQ Nonce
+        {
+            get
+            {
+                var status = External.GetNonce(
+                    Handle, out NativeInterface.ElementModQ.ElementModQHandle value);
+                status.ThrowIfError();
+                return new ElementModQ(value);
+            }
+        }
+
         #endregion
 
         #region Methods
@@ -54,6 +162,84 @@ namespace ElectionGuard
             [DllImport(NativeInterface.DllName, EntryPoint = "eg_ciphertext_ballot_free",
                 CallingConvention = CallingConvention.Cdecl, SetLastError = true)]
             internal static extern Status Free(CiphertextBallotType* handle);
+
+            [DllImport(
+                NativeInterface.DllName,
+                EntryPoint = "eg_ciphertext_ballot_get_object_id",
+                CallingConvention = CallingConvention.Cdecl,
+                SetLastError = true)]
+            internal static extern Status GetObjectId(
+                CiphertextBallotHandle handle,
+                out IntPtr objectId
+                );
+
+            [DllImport(
+                NativeInterface.DllName,
+                EntryPoint = "eg_ciphertext_ballot_get_style_id",
+                CallingConvention = CallingConvention.Cdecl,
+                SetLastError = true)]
+            internal static extern Status GetStyleId(
+                CiphertextBallotHandle handle,
+                out IntPtr objectId
+                );
+
+            [DllImport(
+                NativeInterface.DllName,
+                EntryPoint = "eg_ciphertext_ballot_get_manifest_hash",
+                CallingConvention = CallingConvention.Cdecl,
+                SetLastError = true)]
+            internal static extern Status GetManifestHash(
+                CiphertextBallotHandle handle,
+                out NativeInterface.ElementModQ.ElementModQHandle objectId
+                );
+
+            [DllImport(
+                NativeInterface.DllName,
+                EntryPoint = "eg_ciphertext_ballot_get_ballot_code_seed",
+                CallingConvention = CallingConvention.Cdecl,
+                SetLastError = true)]
+            internal static extern Status GetBallotCodeSeed(
+                CiphertextBallotHandle handle,
+                out NativeInterface.ElementModQ.ElementModQHandle objectId
+                );
+
+            [DllImport(
+                NativeInterface.DllName,
+                EntryPoint = "eg_ciphertext_ballot_get_contests_size",
+                CallingConvention = CallingConvention.Cdecl,
+                SetLastError = true)]
+            internal static extern ulong GetContestsSize(
+                CiphertextBallotHandle handle
+                );
+
+            [DllImport(
+                NativeInterface.DllName,
+                EntryPoint = "eg_ciphertext_ballot_get_ballot_code",
+                CallingConvention = CallingConvention.Cdecl,
+                SetLastError = true)]
+            internal static extern Status GetBallotCode(
+                CiphertextBallotHandle handle,
+                out NativeInterface.ElementModQ.ElementModQHandle objectId
+                );
+
+            [DllImport(
+                NativeInterface.DllName,
+                EntryPoint = "eg_ciphertext_ballot_get_timestamp",
+                CallingConvention = CallingConvention.Cdecl,
+                SetLastError = true)]
+            internal static extern ulong GetTimestamp(
+                CiphertextBallotHandle handle
+                );
+
+            [DllImport(
+                NativeInterface.DllName,
+                EntryPoint = "eg_ciphertext_ballot_get_nonce",
+                CallingConvention = CallingConvention.Cdecl,
+                SetLastError = true)]
+            internal static extern Status GetNonce(
+                CiphertextBallotHandle handle,
+                out NativeInterface.ElementModQ.ElementModQHandle objectId
+                );
 
         }
         #endregion

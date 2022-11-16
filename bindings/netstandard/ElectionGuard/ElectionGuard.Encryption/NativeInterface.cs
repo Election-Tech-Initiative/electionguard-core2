@@ -2278,56 +2278,12 @@ namespace ElectionGuard
 
         internal static class CiphertextBallot
         {
-            [DllImport(DllName, EntryPoint = "eg_ciphertext_ballot_get_object_id",
-                CallingConvention = CallingConvention.Cdecl, SetLastError = true)]
-            internal static extern Status GetObjectId(
-                ElectionGuard.CiphertextBallot.External.CiphertextBallotHandle handle, out IntPtr object_id);
-
-            [DllImport(DllName, EntryPoint = "eg_ciphertext_ballot_get_style_id",
-                CallingConvention = CallingConvention.Cdecl, SetLastError = true)]
-            internal static extern Status GetStyleId(
-                ElectionGuard.CiphertextBallot.External.CiphertextBallotHandle handle, out IntPtr style_id);
-
-            [DllImport(DllName, EntryPoint = "eg_ciphertext_ballot_get_manifest_hash",
-                CallingConvention = CallingConvention.Cdecl, SetLastError = true)]
-            internal static extern Status GetManifestHash(
-                ElectionGuard.CiphertextBallot.External.CiphertextBallotHandle handle,
-                out ElementModQ.ElementModQHandle manifest_hash_ref);
-
-            [DllImport(DllName, EntryPoint = "eg_ciphertext_ballot_get_ballot_code_seed",
-                CallingConvention = CallingConvention.Cdecl, SetLastError = true)]
-            internal static extern Status GetBallotCodeSeed(
-                ElectionGuard.CiphertextBallot.External.CiphertextBallotHandle handle,
-                out ElementModQ.ElementModQHandle ballot_code_seed_ref);
-
-            [DllImport(DllName, EntryPoint = "eg_ciphertext_ballot_get_contests_size",
-                CallingConvention = CallingConvention.Cdecl, SetLastError = true)]
-            internal static extern ulong GetContestsSize(ElectionGuard.CiphertextBallot.External.CiphertextBallotHandle handle);
-
             [DllImport(DllName, EntryPoint = "eg_ciphertext_ballot_get_contest_at_index",
                 CallingConvention = CallingConvention.Cdecl, SetLastError = true)]
             internal static extern Status GetContestAtIndex(
                 ElectionGuard.CiphertextBallot.External.CiphertextBallotHandle handle,
                 ulong index,
                 out ElectionGuard.CiphertextBallotContest.External.CiphertextBallotContestHandle contest_ref);
-
-            [DllImport(DllName, EntryPoint = "eg_ciphertext_ballot_get_ballot_code",
-                CallingConvention = CallingConvention.Cdecl, SetLastError = true)]
-            internal static extern Status GetBallotCode(
-                ElectionGuard.CiphertextBallot.External.CiphertextBallotHandle handle,
-                out ElementModQ.ElementModQHandle ballot_code_ref);
-
-            [DllImport(DllName, EntryPoint = "eg_ciphertext_ballot_get_timestamp",
-                CallingConvention = CallingConvention.Cdecl, SetLastError = true)]
-            internal static extern Status GetTimestamp(
-                ElectionGuard.CiphertextBallot.External.CiphertextBallotHandle handle,
-                out ulong timestamp);
-
-            [DllImport(DllName, EntryPoint = "eg_ciphertext_ballot_get_nonce",
-                CallingConvention = CallingConvention.Cdecl, SetLastError = true)]
-            internal static extern Status GetNonce(
-                ElectionGuard.CiphertextBallot.External.CiphertextBallotHandle handle,
-                out ElementModQ.ElementModQHandle nonce_ref);
 
             [DllImport(DllName, EntryPoint = "eg_ciphertext_ballot_get_crypto_hash",
                 CallingConvention = CallingConvention.Cdecl, SetLastError = true)]

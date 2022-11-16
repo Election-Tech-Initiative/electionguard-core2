@@ -338,7 +338,72 @@
   },
   {
     "ClassName": "CiphertextBallot",
-    "Properties": [],
+    "Properties": [
+      {
+        "Name": "ObjectId",
+        "Description": "The unique ballot id that is meaningful to the consuming application.",
+        "Type": {
+          "TypeCs": "string"
+        }
+      },
+      {
+        "Name": "StyleId",
+        "Description": "The Object Id of the ballot style in the election manifest.  This value is used to determine which contests to expect on the ballot, to fill in missing values, and to validate that the ballot is well-formed",
+        "Type": {
+          "TypeCs": "string"
+        }
+      },
+      {
+        "Name": "ManifestHash",
+        "Description": "Hash of the complete Election Manifest to which this ballot belongs",
+        "Type": {
+          "TypeCs": "ElementModQ",
+          "NativeHandleType": "NativeInterface.ElementModQ.ElementModQHandle",
+          "TypeC": "eg_element_mod_q_t"
+        }
+      },
+      {
+        "Name": "BallotCodeSeed",
+        "Description": "The seed hash for the ballot.  It may be the encryption device hash, the hash of a previous ballot or the hash of some other value that is meaningful to the consuming application.",
+        "Type": {
+          "TypeCs": "ElementModQ",
+          "NativeHandleType": "NativeInterface.ElementModQ.ElementModQHandle",
+          "TypeC": "eg_element_mod_q_t"
+        }
+      },
+      {
+        "Name": "ContestsSize",
+        "Description": "Get the size of the contests collection",
+        "Type": {
+          "TypeCs": "ulong"
+        }
+      },
+      {
+        "Name": "BallotCode",
+        "Description": "The unique ballot code for this ballot that is derived from the ballot seed, the timestamp, and the hash of the encrypted values",
+        "Type": {
+          "TypeCs": "ElementModQ",
+          "NativeHandleType": "NativeInterface.ElementModQ.ElementModQHandle",
+          "TypeC": "eg_element_mod_q_t"
+        }
+      },
+      {
+        "Name": "Timestamp",
+        "Description": "The timestamp indicating when the ballot was encrypted as measured by the encryption device.  This value does not provide units as it is up to the host system to indicate the scale. Typically a host may use seconds since epoch or ticks since epoch.",
+        "Type": {
+          "TypeCs": "ulong"
+        }
+      },
+      {
+        "Name": "Nonce",
+        "Description": "The nonce value used to encrypt all values in the ballot",
+        "Type": {
+          "TypeCs": "ElementModQ",
+          "NativeHandleType": "NativeInterface.ElementModQ.ElementModQHandle",
+          "TypeC": "eg_element_mod_q_t"
+        }
+      }
+    ],
     "Methods": []
   }
 ]
