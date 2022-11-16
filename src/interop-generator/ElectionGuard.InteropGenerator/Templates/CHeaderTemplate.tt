@@ -70,7 +70,14 @@ if (egProperty.IsReferenceType()) {
 <# } // foreach parameter #>
 <# if (egMethod.ReturnType.IsElectionGuardType) { #>
  * @param[out] <#= egMethod.ReturnTypeCName #> An opaque pointer to the <#= egMethod.ReturnType.TypeCs #>
+<# 
+if (egMethod.CallerShouldFree == null) {
+	throw new InvalidOperationException($"{egMethod.Name} must define CallerShouldFree because it is a reference type"); 
+} else if (egMethod.CallerShouldFree.Value == true) { #>
+ *                               The caller is responsible for freeing it.
+<# } else if (egMethod.CallerShouldFree.Value == false) { #>
  *                               The value is a reference and is not owned by the caller
+<# } // end CallerShouldFree #>
 <# } // end if method is reference type #>
  */
 EG_API <#= returnType #> <#= entryPoint #>(

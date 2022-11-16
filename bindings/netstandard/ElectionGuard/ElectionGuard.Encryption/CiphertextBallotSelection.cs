@@ -31,24 +31,6 @@ namespace ElectionGuard
         }
 
         /// <summary>
-        /// Given an encrypted BallotSelection, generates a hash, suitable for rolling up
-        /// into a hash / tracking code for an entire ballot. Of note, this particular hash examines
-        /// the `encryptionSeed` and `message`, but not the proof.
-        /// This is deliberate, allowing for the possibility of ElectionGuard variants running on
-        /// much more limited hardware, wherein the Disjunctive Chaum-Pedersen proofs might be computed
-        /// later on.
-        ///
-        /// In most cases the encryption_seed should match the `description_hash`
-        /// </summary>
-        public ElementModQ CryptoHashWith(ElementModQ encryptionSeed)
-        {
-            var status = NativeInterface.CiphertextBallotSelection.CryptoHashWith(
-                Handle, encryptionSeed.Handle, out NativeInterface.ElementModQ.ElementModQHandle cryptoHash);
-            status.ThrowIfError();
-            return new ElementModQ(cryptoHash);
-        }
-
-        /// <summary>
         /// Given an encrypted BallotSelection, validates the encryption state against a specific seed hash and public key.
         /// Calling this function expects that the object is in a well-formed encrypted state
         /// with the elgamal encrypted `message` field populated along with

@@ -108,12 +108,13 @@
       },
       {
         "Name": "GetSelectionAtIndex",
+        "Description": "Get a selection at a specific index.",
+        "CallerShouldFree": false,
         "ReturnType": {
           "TypeCs": "PlaintextBallotSelection",
           "TypeC": "eg_plaintext_ballot_selection_t",
           "NativeHandleType": "PlaintextBallotSelection.External.PlaintextBallotSelectionHandle"
         },
-        "Description": "Get a selection at a specific index.",
         "Params": [
           {
             "Name": "index",
@@ -154,12 +155,13 @@
     "Methods": [
       {
         "Name": "GetContestAtIndex",
+        "Description": "Get the contest at the specified index.",
+        "CallerShouldFree": false,
         "ReturnType": {
           "TypeCs": "PlaintextBallotContest",
           "TypeC": "eg_plaintext_ballot_contest_t",
           "NativeHandleType": "PlaintextBallotContest.External.PlaintextBallotContestHandle"
         },
-        "Description": "Get the contest at the specified index.",
         "Params": [
           {
             "Name": "index",
@@ -270,7 +272,29 @@
         }
       }
     ],
-    "Methods": []
+    "Methods": [
+      {
+        "Name": "CryptoHashWith",
+        "Description": "Given an encrypted BallotSelection, generates a hash, suitable for rolling up into a hash / tracking code for an entire ballot. Of note, this particular hash examines the `encryptionSeed` and `message`, but not the proof. This is deliberate, allowing for the possibility of ElectionGuard variants running on much more limited hardware, wherein the Disjunctive Chaum-Pedersen proofs might be computed later on. In most cases the encryption_seed should match the `description_hash`.",
+        "CallerShouldFree": true,
+        "ReturnType": {
+          "TypeCs": "ElementModQ",
+          "NativeHandleType": "NativeInterface.ElementModQ.ElementModQHandle",
+          "TypeC": "eg_element_mod_q_t"
+        },
+        "Params": [
+          {
+            "Name": "encryptionSeed",
+            "Description": "In most cases the encryption_seed should match the `description_hash`",
+            "Type": {
+              "TypeCs": "ElementModQ",
+              "NativeHandleType": "NativeInterface.ElementModQ.ElementModQHandle",
+              "TypeC": "eg_element_mod_q_t"
+            }
+          }
+        ]
+      }
+    ]
   },
   {
     "ClassName": "CiphertextBallotContest",
@@ -407,12 +431,13 @@
     "Methods": [
       {
         "Name": "GetContestAtIndex",
+        "CallerShouldFree": false,
+        "Description": "Get a contest at a specific index",
         "ReturnType": {
           "TypeCs": "CiphertextBallotContest",
           "TypeC": "eg_ciphertext_ballot_contest_t",
           "NativeHandleType": "CiphertextBallotContest.External.CiphertextBallotContestHandle"
         },
-        "Description": "Get a contest at a specific index",
         "Params": [
           {
             "Name": "index",

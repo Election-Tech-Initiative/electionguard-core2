@@ -90,13 +90,6 @@ EG_API eg_electionguard_status_t eg_plaintext_ballot_selection_new_with_extended
   const char *in_extended_data_value, uint64_t in_extended_data_length,
   eg_plaintext_ballot_selection_t **out_handle);
 
-/**
- * Given a PlaintextBallotSelection validates that the object matches an expected object
- * and that the plaintext value can resolve to a valid representation
- */
-EG_API bool eg_plaintext_ballot_selection_is_valid(eg_plaintext_ballot_selection_t *handle,
-                                                   char *in_object_id);
-
 #endif
 
 #ifndef CiphertextBallotSelection
@@ -129,22 +122,6 @@ struct eg_ciphertext_ballot_selection_s;
 typedef struct eg_ciphertext_ballot_selection_s eg_ciphertext_ballot_selection_t;
 
 // no constructors defined.  use `eg_encrypt_selection` in encrypt.h
-
-/**
- * Given an encrypted BallotSelection, generates a hash, suitable for rolling up
- * into a hash / tracking code for an entire ballot. Of note, this particular hash examines
- * the `encryptionSeed` and `message`, but not the proof.
- * This is deliberate, allowing for the possibility of ElectionGuard variants running on
- * much more limited hardware, wherein the Disjunctive Chaum-Pedersen proofs might be computed
- * later on.
- * 
- * @param[in] in_encryption_seed In most cases the encryption_seed should match the `description_hash`
- * @param[out] out_crypto_hash An opaque pointer to the nonce.  
- *                             The caller is responsible for lifecycle.
- */
-EG_API eg_electionguard_status_t eg_ciphertext_ballot_selection_crypto_hash_with(
-  eg_ciphertext_ballot_selection_t *handle, eg_element_mod_q_t *in_encryption_seed,
-  eg_element_mod_q_t **out_crypto_hash);
 
 // TODO: add eg_ciphertext_ballot_selection_make
 

@@ -124,6 +124,21 @@ namespace ElectionGuard
 
         #region Methods
 
+        /// <summary>
+        /// Given an encrypted BallotSelection, generates a hash, suitable for rolling up into a hash / tracking code for an entire ballot. Of note, this particular hash examines the `encryptionSeed` and `message`, but not the proof. This is deliberate, allowing for the possibility of ElectionGuard variants running on much more limited hardware, wherein the Disjunctive Chaum-Pedersen proofs might be computed later on. In most cases the encryption_seed should match the `description_hash`.
+        /// </summary>
+        /// <param name="encryptionSeed">In most cases the encryption_seed should match the `description_hash`</param>
+        public ElementModQ CryptoHashWith(
+            ElementModQ encryptionSeed
+        ) {
+            var status = External.CryptoHashWith(
+                Handle,
+                encryptionSeed.Handle,
+                out NativeInterface.ElementModQ.ElementModQHandle value);
+            status.ThrowIfError();
+            return new ElementModQ(value);
+        }
+
 
 #pragma warning disable CS1591 // Missing XML comment for publicly visible type or member
         protected override void DisposeUnmanaged()
@@ -232,6 +247,17 @@ namespace ElectionGuard
             internal static extern Status GetProof(
                 CiphertextBallotSelectionHandle handle,
                 out NativeInterface.DisjunctiveChaumPedersenProof.DisjunctiveChaumPedersenProofHandle objectId
+                );
+
+            [DllImport(
+                NativeInterface.DllName,
+                EntryPoint = "eg_ciphertext_ballot_selection_crypto_hash_with",
+                CallingConvention = CallingConvention.Cdecl,
+                SetLastError = true)]
+            internal static extern Status CryptoHashWith(
+                CiphertextBallotSelectionHandle handle,
+                NativeInterface.ElementModQ.ElementModQHandle encryptionSeed,
+                out NativeInterface.ElementModQ.ElementModQHandle objectId
                 );
 
         }

@@ -111,6 +111,18 @@ EG_API eg_electionguard_status_t eg_ciphertext_ballot_selection_get_proof(
 	);
 
 /**
+ * Given an encrypted BallotSelection, generates a hash, suitable for rolling up into a hash / tracking code for an entire ballot. Of note, this particular hash examines the `encryptionSeed` and `message`, but not the proof. This is deliberate, allowing for the possibility of ElectionGuard variants running on much more limited hardware, wherein the Disjunctive Chaum-Pedersen proofs might be computed later on. In most cases the encryption_seed should match the `description_hash`.
+ * @param[in] in_encryption_seed In most cases the encryption_seed should match the `description_hash`
+ * @param[out] out_crypto_hash_with_ref An opaque pointer to the ElementModQ
+ *                               The caller is responsible for freeing it.
+ */
+EG_API eg_electionguard_status_t eg_ciphertext_ballot_selection_crypto_hash_with(
+	eg_ciphertext_ballot_selection_t *handle,
+	eg_element_mod_q_t *in_encryption_seed,
+	eg_element_mod_q_t **out_crypto_hash_with_ref
+	);
+
+/**
  * Frees the memory held by the CiphertextBallotSelection
  */
 EG_API eg_electionguard_status_t eg_ciphertext_ballot_selection_free(eg_ciphertext_ballot_selection_t *handle);
