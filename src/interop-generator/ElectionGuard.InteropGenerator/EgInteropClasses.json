@@ -186,7 +186,7 @@
         },
         "Description": "Export the ballot representation as BSON",
         "Params": [
-        ] 
+        ]
       },
       {
         "Name": "ToMsgPack",
@@ -334,6 +334,11 @@
         }
       }
     ],
+    "Methods": []
+  },
+  {
+    "ClassName": "CiphertextBallot",
+    "Properties": [],
     "Methods": []
   }
 ]

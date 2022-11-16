@@ -350,8 +350,6 @@ typedef struct eg_ciphertext_ballot_s eg_ciphertext_ballot_t;
 
 // no constructors defined.  use `eg_encrypt_ballot` in encrypt.h
 
-EG_API eg_electionguard_status_t eg_ciphertext_ballot_free(eg_ciphertext_ballot_t *handle);
-
 /**
  * The unique ballot id that is meaningful to the consuming application.
  */

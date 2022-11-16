@@ -43,14 +43,14 @@
             if (verifyProofs)
             {
                 var status = NativeInterface.EncryptionMediator.EncryptAndVerify(
-                    Handle, plaintext.Handle, out NativeInterface.CiphertextBallot.CiphertextBallotHandle ciphertext);
+                    Handle, plaintext.Handle, out CiphertextBallot.External.CiphertextBallotHandle ciphertext);
                 status.ThrowIfError();
                 return new CiphertextBallot(ciphertext);
             }
             else
             {
                 var status = NativeInterface.EncryptionMediator.Encrypt(
-                    Handle, plaintext.Handle, out NativeInterface.CiphertextBallot.CiphertextBallotHandle ciphertext);
+                    Handle, plaintext.Handle, out CiphertextBallot.External.CiphertextBallotHandle ciphertext);
                 status.ThrowIfError();
                 return new CiphertextBallot(ciphertext);
             }

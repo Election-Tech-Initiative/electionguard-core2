@@ -5,6 +5,7 @@
 
 #include <assert.h>
 #include <electionguard/encrypt.h>
+#include <electionguard/ciphertext_ballot.generated.h>
 #include <electionguard/ciphertext_ballot_selection.generated.h>
 #include <electionguard/plaintext_ballot_selection.generated.h>
 #include <electionguard/plaintext_ballot.generated.h>

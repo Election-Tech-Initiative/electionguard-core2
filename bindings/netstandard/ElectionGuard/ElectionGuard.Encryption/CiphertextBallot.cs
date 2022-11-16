@@ -12,10 +12,8 @@ namespace ElectionGuard
     ///
     /// Don't make this directly. Use `make_ciphertext_ballot` instead.
     /// </summary>
-    public class CiphertextBallot : DisposableBase
+    public partial class CiphertextBallot : DisposableBase
     {
-        internal NativeInterface.CiphertextBallot.CiphertextBallotHandle Handle;
-
         /// <summary>
         /// The unique ballot id that is meaningful to the consuming application.
         /// </summary>
@@ -164,7 +162,7 @@ namespace ElectionGuard
             }
         }
 
-        internal CiphertextBallot(NativeInterface.CiphertextBallot.CiphertextBallotHandle handle)
+        internal CiphertextBallot(External.CiphertextBallotHandle handle)
         {
             Handle = handle;
         }
@@ -264,17 +262,6 @@ namespace ElectionGuard
             Marshal.Copy(data, byteArray, 0, (int)size);
             NativeInterface.Memory.DeleteIntPtr(data);
             return byteArray;
-        }
-
-#pragma warning disable CS1591 // Missing XML comment for publicly visible type or member
-        protected override void DisposeUnmanaged()
-#pragma warning restore CS1591 // Missing XML comment for publicly visible type or member
-        {
-            base.DisposeUnmanaged();
-
-            if (Handle == null) return;
-            Handle.Dispose();
-            Handle = null;
         }
     }
 }
