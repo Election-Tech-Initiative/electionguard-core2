@@ -1517,24 +1517,6 @@ namespace ElectionGuard
 
         internal static class Manifest
         {
-            internal struct ManifestType { };
-
-            internal class ManifestHandle
-                : ElectionGuardSafeHandle<ManifestType>
-            {
-                protected override bool Free()
-                {
-                    if (IsClosed) return true;
-
-                    var status = Manifest.Free(TypedPtr);
-                    if (status != Status.ELECTIONGUARD_STATUS_SUCCESS)
-                    {
-                        throw new ElectionGuardException($"Manifest Error Free: {status}", status);
-                    }
-                    return true;
-                }
-            }
-
             [DllImport(DllName, EntryPoint = "eg_election_manifest_new",
                 CallingConvention = CallingConvention.Cdecl, SetLastError = true)]
             internal static extern Status New(
@@ -1557,7 +1539,7 @@ namespace ElectionGuard
                 // TODO ISSUE #212: type safety
                 [MarshalAs(UnmanagedType.LPArray)] IntPtr[] ballotStyles,
                 ulong ballotStylesSize,
-                out ManifestHandle handle);
+                out ElectionGuard.Manifest.External.ManifestHandle handle);
 
             [DllImport(DllName, EntryPoint = "eg_election_manifest_new_with_contact",
                 CallingConvention = CallingConvention.Cdecl, SetLastError = true)]
@@ -1583,144 +1565,88 @@ namespace ElectionGuard
                 ulong ballotStylesSize,
                 InternationalizedText.InternationalizedTextHandle name,
                 ContactInformation.ContactInformationHandle contact,
-                out ManifestHandle handle);
-
-            [DllImport(DllName, EntryPoint = "eg_election_manifest_free",
-                CallingConvention = CallingConvention.Cdecl, SetLastError = true)]
-            internal static extern Status Free(ManifestType* handle);
-
-            [DllImport(DllName, EntryPoint = "eg_election_manifest_get_election_scope_id",
-                CallingConvention = CallingConvention.Cdecl, SetLastError = true)]
-            internal static extern Status GetElectionScopeId(
-                ManifestHandle handle, out IntPtr election_scope_id);
-
-            [DllImport(DllName, EntryPoint = "eg_election_manifest_get_type",
-                CallingConvention = CallingConvention.Cdecl, SetLastError = true)]
-            internal static extern ElectionType GetElectionType(
-                ManifestHandle handle);
+                out ElectionGuard.Manifest.External.ManifestHandle handle);
 
             [DllImport(DllName, EntryPoint = "eg_election_manifest_get_start_date",
                 CallingConvention = CallingConvention.Cdecl, SetLastError = true)]
             internal static extern ulong GetStartDate(
-                ManifestHandle handle);
-
-            [DllImport(DllName, EntryPoint = "eg_election_manifest_get_end_date",
-                CallingConvention = CallingConvention.Cdecl, SetLastError = true)]
-            internal static extern ulong GetEndDate(
-                ManifestHandle handle);
-
-            [DllImport(DllName, EntryPoint = "eg_election_manifest_get_geopolitical_units_size",
-                CallingConvention = CallingConvention.Cdecl, SetLastError = true)]
-            internal static extern ulong GetGeopoliticalUnitsSize(
-                ManifestHandle handle);
+                ElectionGuard.Manifest.External.ManifestHandle handle);
 
             [DllImport(DllName, EntryPoint = "eg_election_manifest_get_geopolitical_unit_at_index",
                 CallingConvention = CallingConvention.Cdecl, SetLastError = true)]
             internal static extern Status GetGeopoliticalUnitAtIndex(
-                ManifestHandle handle,
+                ElectionGuard.Manifest.External.ManifestHandle handle,
                 ulong index,
                 out GeopoliticalUnit.GeopoliticalUnitHandle gpUnit);
-
-            [DllImport(DllName, EntryPoint = "eg_election_manifest_get_parties_size",
-                CallingConvention = CallingConvention.Cdecl, SetLastError = true)]
-            internal static extern ulong GetPartiesSize(
-                ManifestHandle handle);
 
             [DllImport(DllName, EntryPoint = "eg_election_manifest_get_party_at_index",
                 CallingConvention = CallingConvention.Cdecl, SetLastError = true)]
             internal static extern Status GetPartyAtIndex(
-                ManifestHandle handle,
+                ElectionGuard.Manifest.External.ManifestHandle handle,
                 ulong index,
                 out Party.PartyHandle party);
-
-            [DllImport(DllName, EntryPoint = "eg_election_manifest_get_candidates_size",
-                CallingConvention = CallingConvention.Cdecl, SetLastError = true)]
-            internal static extern ulong GetCandidatesSize(
-                ManifestHandle handle);
 
             [DllImport(DllName, EntryPoint = "eg_election_manifest_get_candidate_at_index",
                 CallingConvention = CallingConvention.Cdecl, SetLastError = true)]
             internal static extern Status GetCandidateAtIndex(
-                ManifestHandle handle,
+                ElectionGuard.Manifest.External.ManifestHandle handle,
                 ulong index,
                 out Candidate.CandidateHandle candidate);
-
-            [DllImport(DllName, EntryPoint = "eg_election_manifest_get_contests_size",
-                CallingConvention = CallingConvention.Cdecl, SetLastError = true)]
-            internal static extern ulong GetContestsSize(
-                ManifestHandle handle);
 
             [DllImport(DllName, EntryPoint = "eg_election_manifest_get_contest_at_index",
                 CallingConvention = CallingConvention.Cdecl, SetLastError = true)]
             internal static extern Status GetContestAtIndex(
-                ManifestHandle handle,
+                ElectionGuard.Manifest.External.ManifestHandle handle,
                 ulong index,
                 out ContestDescription.ContestDescriptionHandle contest);
-
-            [DllImport(DllName, EntryPoint = "eg_election_manifest_get_ballot_styles_size",
-                CallingConvention = CallingConvention.Cdecl, SetLastError = true)]
-            internal static extern ulong GetBallotStylesSize(
-                ManifestHandle handle);
 
             [DllImport(DllName, EntryPoint = "eg_election_manifest_get_ballot_style_at_index",
                 CallingConvention = CallingConvention.Cdecl, SetLastError = true)]
             internal static extern Status GetBallotStyleAtIndex(
-                ManifestHandle handle,
+                ElectionGuard.Manifest.External.ManifestHandle handle,
                 ulong index,
                 out BallotStyle.BallotStyleHandle ballotStyle);
-
-            [DllImport(DllName, EntryPoint = "eg_election_manifest_get_name",
-                CallingConvention = CallingConvention.Cdecl, SetLastError = true)]
-            internal static extern Status GetName(
-                ManifestHandle handle,
-                out InternationalizedText.InternationalizedTextHandle name);
-
-            [DllImport(DllName, EntryPoint = "eg_election_manifest_get_contact_info",
-                CallingConvention = CallingConvention.Cdecl, SetLastError = true)]
-            internal static extern Status GetContactInfo(
-                ManifestHandle handle,
-                out ContactInformation.ContactInformationHandle contactInfo);
 
             [DllImport(DllName, EntryPoint = "eg_election_manifest_crypto_hash",
                 CallingConvention = CallingConvention.Cdecl, SetLastError = true)]
             internal static extern Status CryptoHash(
-                ManifestHandle handle,
+                ElectionGuard.Manifest.External.ManifestHandle handle,
                 out ElementModQ.ElementModQHandle crypto_hash);
 
             [DllImport(DllName, EntryPoint = "eg_election_manifest_is_valid",
                 CallingConvention = CallingConvention.Cdecl, SetLastError = true)]
-            internal static extern bool IsValid(ManifestHandle handle);
+            internal static extern bool IsValid(ElectionGuard.Manifest.External.ManifestHandle handle);
 
             [DllImport(DllName, EntryPoint = "eg_election_manifest_from_json",
                 CallingConvention = CallingConvention.Cdecl, SetLastError = true)]
             internal static extern Status FromJson(
                 [MarshalAs(UnmanagedType.LPStr)] string data,
-                out ManifestHandle handle);
+                out ElectionGuard.Manifest.External.ManifestHandle handle);
 
             [DllImport(DllName, EntryPoint = "eg_election_manifest_from_bson",
                 CallingConvention = CallingConvention.Cdecl, SetLastError = true)]
             internal static extern Status FromBson(
-                byte* data, ulong length, out ManifestHandle handle);
+                byte* data, ulong length, out ElectionGuard.Manifest.External.ManifestHandle handle);
 
             [DllImport(DllName, EntryPoint = "eg_election_manifest_from_msgpack",
                 CallingConvention = CallingConvention.Cdecl, SetLastError = true)]
             internal static extern Status FromMsgPack(
-                byte* data, ulong length, out ManifestHandle handle);
+                byte* data, ulong length, out ElectionGuard.Manifest.External.ManifestHandle handle);
 
             [DllImport(DllName, EntryPoint = "eg_election_manifest_to_json",
                 CallingConvention = CallingConvention.Cdecl, SetLastError = true)]
             internal static extern Status ToJson(
-                ManifestHandle handle, out IntPtr data, out ulong size);
+                ElectionGuard.Manifest.External.ManifestHandle handle, out IntPtr data, out ulong size);
 
             [DllImport(DllName, EntryPoint = "eg_election_manifest_to_bson",
                 CallingConvention = CallingConvention.Cdecl, SetLastError = true)]
             internal static extern Status ToBson(
-                ManifestHandle handle, out IntPtr data, out ulong size);
+                ElectionGuard.Manifest.External.ManifestHandle handle, out IntPtr data, out ulong size);
 
             [DllImport(DllName, EntryPoint = "eg_election_manifest_to_msgpack",
                 CallingConvention = CallingConvention.Cdecl, SetLastError = true)]
             internal static extern Status ToMsgPack(
-                ManifestHandle handle, out IntPtr data, out ulong size);
+                ElectionGuard.Manifest.External.ManifestHandle handle, out IntPtr data, out ulong size);
         }
 
         #endregion
@@ -1750,7 +1676,7 @@ namespace ElectionGuard
             [DllImport(DllName, EntryPoint = "eg_internal_manifest_new",
                 CallingConvention = CallingConvention.Cdecl, SetLastError = true)]
             internal static extern Status New(
-                Manifest.ManifestHandle manifest,
+                ElectionGuard.Manifest.External.ManifestHandle manifest,
                 out InternalManifestHandle handle);
 
             [DllImport(DllName, EntryPoint = "eg_internal_manifest_free",
