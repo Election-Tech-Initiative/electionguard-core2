@@ -594,6 +594,24 @@
         "Type": {
           "TypeCs": "ulong"
         }
+      },
+      {
+        "Name": "Name",
+        "Description": "The friendly name of the election",
+        "Type": {
+          "TypeCs": "InternationalizedText",
+          "NativeHandleType": "NativeInterface.InternationalizedText.InternationalizedTextHandle",
+          "TypeC": "eg_internationalized_text_t"
+        }
+      },
+      {
+        "Name": "ContactInfo",
+        "Description": "The contact information for the election",
+        "Type": {
+          "TypeCs": "ContactInformation",
+          "NativeHandleType": "NativeInterface.ContactInformation.ContactInformationHandle",
+          "TypeC": "eg_contact_information_t"
+        }
       }
     ],
     "Methods": []

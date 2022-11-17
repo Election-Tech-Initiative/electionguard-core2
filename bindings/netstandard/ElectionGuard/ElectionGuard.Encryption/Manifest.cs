@@ -70,40 +70,6 @@ namespace ElectionGuard
     /// </summary>
     public partial class Manifest : DisposableBase
     {
-        /// <Summary>
-        /// The friendly name of the election
-        /// </Summary>
-        public InternationalizedText Name
-        {
-            get
-            {
-                var status = NativeInterface.Manifest.GetName(
-                    Handle, out NativeInternationalizedText value);
-                if (status != Status.ELECTIONGUARD_STATUS_SUCCESS)
-                {
-                    throw new ElectionGuardException($"Manifest Error ObjectId: {status}");
-                }
-                return new InternationalizedText(value);
-            }
-        }
-
-        /// <Summary>
-        /// The contact information for the election
-        /// </Summary>
-        public ContactInformation ContactInfo
-        {
-            get
-            {
-                var status = NativeInterface.Manifest.GetContactInfo(
-                    Handle, out NativeContactInformation value);
-                if (status != Status.ELECTIONGUARD_STATUS_SUCCESS)
-                {
-                    throw new ElectionGuardException($"Manifest Error ObjectId: {status}");
-                }
-                return new ContactInformation(value);
-            }
-        }
-
         /// <summary>
         /// Creates a `Manifest` object
         /// </summary>

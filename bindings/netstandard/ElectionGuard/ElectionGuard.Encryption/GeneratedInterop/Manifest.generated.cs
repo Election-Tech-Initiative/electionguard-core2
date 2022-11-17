@@ -118,6 +118,34 @@ namespace ElectionGuard
             }
         }
 
+        /// <Summary>
+        /// The friendly name of the election
+        /// </Summary>
+        public InternationalizedText Name
+        {
+            get
+            {
+                var status = External.GetName(
+                    Handle, out NativeInterface.InternationalizedText.InternationalizedTextHandle value);
+                status.ThrowIfError();
+                return new InternationalizedText(value);
+            }
+        }
+
+        /// <Summary>
+        /// The contact information for the election
+        /// </Summary>
+        public ContactInformation ContactInfo
+        {
+            get
+            {
+                var status = External.GetContactInfo(
+                    Handle, out NativeInterface.ContactInformation.ContactInformationHandle value);
+                status.ThrowIfError();
+                return new ContactInformation(value);
+            }
+        }
+
         #endregion
 
         #region Methods
@@ -243,6 +271,26 @@ namespace ElectionGuard
                 SetLastError = true)]
             internal static extern ulong GetBallotStylesSize(
                 ManifestHandle handle
+                );
+
+            [DllImport(
+                NativeInterface.DllName,
+                EntryPoint = "eg_election_manifest_get_name",
+                CallingConvention = CallingConvention.Cdecl,
+                SetLastError = true)]
+            internal static extern Status GetName(
+                ManifestHandle handle,
+                out NativeInterface.InternationalizedText.InternationalizedTextHandle objectId
+                );
+
+            [DllImport(
+                NativeInterface.DllName,
+                EntryPoint = "eg_election_manifest_get_contact_info",
+                CallingConvention = CallingConvention.Cdecl,
+                SetLastError = true)]
+            internal static extern Status GetContactInfo(
+                ManifestHandle handle,
+                out NativeInterface.ContactInformation.ContactInformationHandle objectId
                 );
 
         }

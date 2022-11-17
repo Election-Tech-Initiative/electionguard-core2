@@ -1607,18 +1607,6 @@ namespace ElectionGuard
                 ulong index,
                 out BallotStyle.BallotStyleHandle ballotStyle);
 
-            [DllImport(DllName, EntryPoint = "eg_election_manifest_get_name",
-                CallingConvention = CallingConvention.Cdecl, SetLastError = true)]
-            internal static extern Status GetName(
-                ElectionGuard.Manifest.External.ManifestHandle handle,
-                out InternationalizedText.InternationalizedTextHandle name);
-
-            [DllImport(DllName, EntryPoint = "eg_election_manifest_get_contact_info",
-                CallingConvention = CallingConvention.Cdecl, SetLastError = true)]
-            internal static extern Status GetContactInfo(
-                ElectionGuard.Manifest.External.ManifestHandle handle,
-                out ContactInformation.ContactInformationHandle contactInfo);
-
             [DllImport(DllName, EntryPoint = "eg_election_manifest_crypto_hash",
                 CallingConvention = CallingConvention.Cdecl, SetLastError = true)]
             internal static extern Status CryptoHash(

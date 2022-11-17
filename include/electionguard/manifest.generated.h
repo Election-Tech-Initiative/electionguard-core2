@@ -100,6 +100,32 @@ EG_API uint64_t eg_election_manifest_get_ballot_styles_size(
 	);
 
 /**
+ * @brief The friendly name of the election
+ * @param[in] handle A pointer to the `eg_plaintext_ballot_selection_t` opaque instance
+ * @param[out] out_name A pointer to the output Name.  The value is a reference and is not owned by the caller.
+ * @return eg_electionguard_status_t indicating success or failure
+ * @retval ELECTIONGUARD_STATUS_SUCCESS The function was successfully executed
+ * @retval ELECTIONGUARD_STATUS_ERROR_BAD_ALLOC The function was unable to allocate memory
+ */
+EG_API eg_electionguard_status_t eg_election_manifest_get_name(
+	eg_election_manifest_t *handle,
+	eg_internationalized_text_t **out_name
+	);
+
+/**
+ * @brief The contact information for the election
+ * @param[in] handle A pointer to the `eg_plaintext_ballot_selection_t` opaque instance
+ * @param[out] out_contact_info A pointer to the output ContactInfo.  The value is a reference and is not owned by the caller.
+ * @return eg_electionguard_status_t indicating success or failure
+ * @retval ELECTIONGUARD_STATUS_SUCCESS The function was successfully executed
+ * @retval ELECTIONGUARD_STATUS_ERROR_BAD_ALLOC The function was unable to allocate memory
+ */
+EG_API eg_electionguard_status_t eg_election_manifest_get_contact_info(
+	eg_election_manifest_t *handle,
+	eg_contact_information_t **out_contact_info
+	);
+
+/**
  * Frees the memory held by the Manifest
  */
 EG_API eg_electionguard_status_t eg_election_manifest_free(eg_election_manifest_t *handle);

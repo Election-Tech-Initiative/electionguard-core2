@@ -789,12 +789,6 @@ EG_API eg_electionguard_status_t eg_election_manifest_get_contest_at_index(
 EG_API eg_electionguard_status_t eg_election_manifest_get_ballot_style_at_index(
   eg_election_manifest_t *handle, uint64_t in_index, eg_ballot_style_t **out_ballot_style_ref);
 
-EG_API eg_electionguard_status_t eg_election_manifest_get_name(
-  eg_election_manifest_t *handle, eg_internationalized_text_t **out_name_ref);
-
-EG_API eg_electionguard_status_t eg_election_manifest_get_contact_info(
-  eg_election_manifest_t *handle, eg_contact_information_t **out_contact_info_ref);
-
 /**
  * Get a hash of the metadata components of the `Manifest`
  * 
