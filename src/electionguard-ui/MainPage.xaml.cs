@@ -1,12 +1,16 @@
-﻿namespace ElectionGuard.UI;
+﻿using ElectionGuard.UI.ViewModels;
+using System.Globalization;
+
+namespace ElectionGuard.UI;
 
 public partial class MainPage : ContentPage
 {
 	int count = 0;
 
-	public MainPage()
+	public MainPage(MainViewModel vm)
 	{
 		InitializeComponent();
+		BindingContext = vm;
 	}
 
 	private void OnCounterClicked(object sender, EventArgs e)
@@ -20,5 +24,14 @@ public partial class MainPage : ContentPage
 
 		SemanticScreenReader.Announce(CounterBtn.Text);
 	}
+
+    private void Button_Clicked(object sender, EventArgs e)
+    {
+        LocalizationResourceManager.Current.CurrentCulture = new CultureInfo("es");
+    }
+    private void Button_Clicked_1(object sender, EventArgs e)
+    {
+        LocalizationResourceManager.Current.CurrentCulture = new CultureInfo("en");
+    }
 }
 
