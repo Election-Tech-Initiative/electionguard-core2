@@ -96,11 +96,11 @@ endif
 
 build-ui:
 	@echo 🧱 BUILD UI
-	dotnet build --configuration $(TARGET) ./src/electionguard-ui/ElectionGuard.UI.sln
+ifeq ($(OPERATING_SYSTEM),Windows)
+	dotnet publish -f net7.0-windows10.0.19041.0 -c $(TARGET) /p:RuntimeIdentifierOverride=win10-x64 ./src/electionguard-ui/ElectionGuard.UI.sln 
+endif
 ifeq ($(OPERATING_SYSTEM),Darwin)
-	@echo 🍎 set mode to 755 for MacOS
-	chmod +x ./src/electionguard-ui/bin/$(TARGET)/net7.0-maccatalyst/ElectionGuard.UI.app/Contents/MacOS/ElectionGuard.UI
-	ls -al ./src/electionguard-ui/bin/$(TARGET)/net7.0-maccatalyst/ElectionGuard.UI.app/Contents/MacOS
+		dotnet build -c $(TARGET) /p:CreatePackage=true ./src/electionguard-ui/ElectionGuard.UI.sln 
 endif
 
 generate-interop:
