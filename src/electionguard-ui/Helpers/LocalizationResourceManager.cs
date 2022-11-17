@@ -30,7 +30,7 @@ public class LocalizationResourceManager : ObservableObject
         if (resourceManager == null)
             throw new InvalidOperationException($"Must call {nameof(LocalizationResourceManager)}.{nameof(Init)} first");
 
-        return resourceManager.GetString(text, CurrentCulture) ?? throw new NullReferenceException($"{nameof(text)}: {text} not found");
+        return resourceManager.GetString(text, CurrentCulture) ?? $"*** {text} not found ***";
     }
 
     public string this[string text] => GetValue(text);
