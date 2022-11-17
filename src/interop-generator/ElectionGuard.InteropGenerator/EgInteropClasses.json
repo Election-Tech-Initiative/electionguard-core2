@@ -545,6 +545,13 @@
           "NativeHandleType": null,
           "TypeC": "eg_election_type_t"
         }
+      },
+      {
+        "Name": "StartDate",
+        "Description": "The start date/time of the election.",
+        "Type": {
+          "TypeCs": "DateTime"
+        }
       }
     ],
     "Methods": []

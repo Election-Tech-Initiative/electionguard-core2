@@ -39,6 +39,18 @@ namespace ElectionGuard
             }
         }
 
+        /// <Summary>
+        /// The start date/time of the election.
+        /// </Summary>
+        public DateTime StartDate
+        {
+            get
+            {
+                var value = External.GetStartDate(Handle);
+                return DateTimeOffset.FromUnixTimeMilliseconds((long)value).DateTime;
+            }
+        }
+
         #endregion
 
         #region Methods
@@ -100,6 +112,15 @@ namespace ElectionGuard
                 CallingConvention = CallingConvention.Cdecl,
                 SetLastError = true)]
             internal static extern ElectionType GetElectionType(
+                ManifestHandle handle
+                );
+
+            [DllImport(
+                NativeInterface.DllName,
+                EntryPoint = "eg_election_manifest_get_start_date",
+                CallingConvention = CallingConvention.Cdecl,
+                SetLastError = true)]
+            internal static extern ulong GetStartDate(
                 ManifestHandle handle
                 );
 

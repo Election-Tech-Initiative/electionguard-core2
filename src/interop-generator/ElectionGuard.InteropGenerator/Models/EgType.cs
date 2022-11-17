@@ -11,6 +11,7 @@ public record EgType(
         { "string", "eg_electionguard_status_t" },
         { "bool", "bool" },
         { "ulong", "uint64_t" },
+        { "DateTime", "uint64_t" },
     };
 
     /// <summary>

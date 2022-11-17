@@ -44,6 +44,9 @@ namespace ElectionGuard
                 var data = Marshal.PtrToStringAnsi(value);
                 NativeInterface.Memory.FreeIntPtr(value);
                 return data;
+<# } else if (egProperty.Type.TypeCs == "DateTime") { #>
+                var value = External.Get<#= egProperty.Name #>(Handle);
+                return DateTimeOffset.FromUnixTimeMilliseconds((long)value).DateTime;
 <# } else { #>
                 return External.Get<#= egProperty.Name #>(Handle);
 <# } #>
@@ -182,7 +185,7 @@ if (EgClass.NeverFree) {
                 EntryPoint = "<#= entryPoint #>",
                 CallingConvention = CallingConvention.Cdecl,
                 SetLastError = true)]
-            internal static extern <#= isReferenceType ? "Status" : egProperty.Type.TypeCs #> Get<#= egProperty.Name #>(
+            internal static extern <#= egProperty.GetExternalReturnType() #> Get<#= egProperty.Name #>(
                 <#= className #>Handle handle<# 
 if (isElectionGuardType) { #>
 ,

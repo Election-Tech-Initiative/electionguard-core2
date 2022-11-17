@@ -71,18 +71,6 @@ namespace ElectionGuard
     public partial class Manifest : DisposableBase
     {
         /// <Summary>
-        /// The start date/time of the election.
-        /// </Summary>
-        public DateTime StartDate
-        {
-            get
-            {
-                var value = NativeInterface.Manifest.GetStartDate(Handle);
-                return DateTimeOffset.FromUnixTimeMilliseconds((long)value).DateTime;
-            }
-        }
-
-        /// <Summary>
         /// The end date/time of the election.
         /// </Summary>
         public DateTime EndDate
