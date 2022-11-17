@@ -20,7 +20,7 @@ public class LocalizedString : ObservableObject
         this.generator = generator;
 
         // This instance will be unsubscribed and GCed if no one references it
-        // since LocalizationResourceManager uses WeekEventManger
+        // since LocalizationResourceManager uses WeakEventManger
         localizationManager.PropertyChanged += (sender, e) => OnPropertyChanged((string?)null);
     }
 
