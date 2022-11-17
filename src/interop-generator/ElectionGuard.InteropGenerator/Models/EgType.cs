@@ -6,18 +6,13 @@ public record EgType(
     string? NativeHandleType
 )
 {
-    private static readonly string[] ValueTypes = {
-        "bool", "ulong"
-    };
-
     private static readonly Dictionary<string, string> ReturnTypes = new()
     {
         { "string", "eg_electionguard_status_t" },
         { "bool", "bool" },
         { "ulong", "uint64_t" },
+        { "DateTime", "uint64_t" },
     };
-
-    public bool IsReferenceType => !ValueTypes.Contains(TypeCs);
 
     /// <summary>
     /// Returns the type of a variable in C assuming a caller will return the value (it will be an out parameter)
@@ -57,7 +52,10 @@ public record EgType(
 
     public string GetCReturnType()
     {
-        ReturnTypes.TryGetValue(TypeCs, out var value);
-        return value ?? "eg_electionguard_status_t";
+        if (IsPassByReference) return "eg_electionguard_status_t";
+        if (ReturnTypes.TryGetValue(TypeCs, out var value)) return value;
+        if (TypeC != null) return TypeC;
+        throw new NotSupportedException(
+            $"{TypeCs} appears to be a value type that not yet supported.  Specify a TypeC or add a mapping to EgType.ReturnTypes.");
     }
 }

@@ -9,9 +9,9 @@ public record EgMethod (
     EgParam[] Params,
     bool? CallerShouldFree)
 {
-    public string GetEntryPoint(string className)
+    public string GetEntryPoint(EgClass egClass)
     {
-        return $"Eg{className}{Name}".ToSnakeCase();
+        return $"eg_{egClass.CFunctionPrefix}{Name}".ToSnakeCase();
     }
 
     public string GetCReturnType()
