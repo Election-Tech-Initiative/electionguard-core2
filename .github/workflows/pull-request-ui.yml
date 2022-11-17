@@ -4,6 +4,7 @@ on:
   workflow_dispatch:
   pull_request:
     paths:
+      - ".github/pull-request-ui.yml"
       - "src/electionguard-ui/**"
     branches: [main]
 
@@ -57,4 +58,3 @@ jobs:
           path: |
             src/electionguard-ui/bin/${{ env.TARGET }}/net**/*.pkg
             src/electionguard-ui/bin/${{ env.TARGET }}/net**/*.msix
-          if-no-files-found: error
