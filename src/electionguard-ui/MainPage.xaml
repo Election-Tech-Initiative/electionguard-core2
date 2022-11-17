@@ -10,7 +10,7 @@
             VerticalOptions="Center">
 
             <Image
-                Source="logo"
+                Source="logo.png"
                 SemanticProperties.Description="ElectionGuard Logo"
                 HeightRequest="400"
                 HorizontalOptions="Center" />
