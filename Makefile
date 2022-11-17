@@ -90,6 +90,10 @@ else
 endif
 	cmake --build $(ELECTIONGUARD_BUILD_LIBS_DIR)/x86_64/$(TARGET)
 
+build-ui:
+	@echo 🧱 BUILD UI
+	dotnet build --configuration $(TARGET) ./src/electionguard-ui/ElectionGuard.UI.sln
+
 generate-interop:
 	cd ./src/interop-generator/ElectionGuard.InteropGenerator && \
 		dotnet run -- ./EgInteropClasses.json ../../../ && \
@@ -200,6 +204,10 @@ clean-netstandard:
 	@echo 🗑️ CLEAN NETSTANDARD
 	dotnet clean ./bindings/netstandard/ElectionGuard/ElectionGuard.sln
 
+clean-ui:
+	@echo 🗑️ CLEAN UI
+	dotnet clean ./src/electionguard-ui/ElectionGuard.UI.sln
+
 format: build
 	cd $(ELECTIONGUARD_BUILD_LIBS_DIR)/x86_64 && $(MAKE) format
 
@@ -212,6 +220,8 @@ else
 endif
 
 rebuild: clean build
+
+rebuild-ui: clean-ui build-ui
 
 sanitize: sanitize-asan sanitize-tsan
 
@@ -359,6 +369,10 @@ endif
 test-netstandard: build-netstandard
 	@echo 🧪 TEST NETSTANDARD
 	dotnet test --configuration $(TARGET) ./bindings/netstandard/ElectionGuard/ElectionGuard.sln
+
+test-ui:
+	@echo 🧪 TEST UI
+	dotnet test --configuration $(TARGET) ./src/electionguard-ui/ElectionGuard.UI.sln 
 
 coverage:
 	@echo ✅ CHECK COVERAGE

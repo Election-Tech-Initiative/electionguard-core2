@@ -9,6 +9,7 @@ on:
       - "bindings/**"
       - "include/**"
       - "src/**"
+      - "!src/electionguard-ui/**"
       - "test/**"
     branches: [main]
 
