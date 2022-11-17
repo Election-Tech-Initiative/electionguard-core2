@@ -97,6 +97,10 @@ endif
 build-ui:
 	@echo 🧱 BUILD UI
 	dotnet build --configuration $(TARGET) ./src/electionguard-ui/ElectionGuard.UI.sln
+	@echo 🍎 set mode to 755 for MacOS
+	ifeq ($(OPERATING_SYSTEM), Darwin)
+		chmod +x ./src/electionguard-ui/bin/$(TARGET)/net7.0-maccatalyst/ElectionGuard.UI.app/Contents/MacOS/ElectionGuard.UI
+	endif
 
 generate-interop:
 	cd ./src/interop-generator/ElectionGuard.InteropGenerator && \
