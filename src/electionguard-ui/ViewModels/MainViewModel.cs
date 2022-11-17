@@ -16,12 +16,14 @@ public partial class MainViewModel : ObservableObject
     [RelayCommand]
     void Spanish()
     {
+        Preferences.Set("CurrentLanguage", "es");
         LocalizationResourceManager.Current.CurrentCulture = new CultureInfo("es");
     }
 
     [RelayCommand]
     void English()
     {
+        Preferences.Set("CurrentLanguage", "en");
         LocalizationResourceManager.Current.CurrentCulture = new CultureInfo("en");
     }
 
