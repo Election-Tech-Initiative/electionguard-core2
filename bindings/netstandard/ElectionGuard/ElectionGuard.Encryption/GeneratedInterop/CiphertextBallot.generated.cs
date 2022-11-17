@@ -184,8 +184,11 @@ namespace ElectionGuard
                 }
             }
 
-            [DllImport(NativeInterface.DllName, EntryPoint = "eg_ciphertext_ballot_free",
-                CallingConvention = CallingConvention.Cdecl, SetLastError = true)]
+            [DllImport(
+                NativeInterface.DllName, 
+                EntryPoint = "eg_ciphertext_ballot_free",
+                CallingConvention = CallingConvention.Cdecl, 
+                SetLastError = true)]
             internal static extern Status Free(CiphertextBallotType* handle);
 
             [DllImport(

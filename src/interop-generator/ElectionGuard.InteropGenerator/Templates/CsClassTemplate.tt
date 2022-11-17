@@ -165,8 +165,11 @@ if (EgClass.NeverFree) {
                 }
             }
 
-            [DllImport(NativeInterface.DllName, EntryPoint = "eg_<#= EgClass.CFunctionPrefix #>_free",
-                CallingConvention = CallingConvention.Cdecl, SetLastError = true)]
+            [DllImport(
+                NativeInterface.DllName, 
+                EntryPoint = "eg_<#= EgClass.CFunctionPrefix #>_free",
+                CallingConvention = CallingConvention.Cdecl, 
+                SetLastError = true)]
             internal static extern Status Free(<#= className #>Type* handle);
 
 <# foreach (var egProperty in EgClass.Properties) {
