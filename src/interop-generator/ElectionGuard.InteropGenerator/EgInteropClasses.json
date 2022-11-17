@@ -2,6 +2,7 @@
   {
     "ClassName": "PlaintextBallotSelection",
     "NeverFree": true,
+    "CInclude": "ballot.h",
     "Properties": [
       {
         "Name": "ObjectId",
@@ -55,6 +56,7 @@
   {
     "ClassName": "PlaintextBallotContest",
     "NeverFree": true,
+    "CInclude": "ballot.h",
     "Properties": [
       {
         "Name": "ObjectId",
@@ -129,6 +131,7 @@
   },
   {
     "ClassName": "PlaintextBallot",
+    "CInclude": "ballot.h",
     "Properties": [
       {
         "Name": "ObjectId",
@@ -204,6 +207,7 @@
   {
     "ClassName": "CiphertextBallotSelection",
     "NeverFree": true,
+    "CInclude": "ballot.h",
     "Properties": [
       {
         "Name": "ObjectId",
@@ -335,6 +339,7 @@
   {
     "ClassName": "CiphertextBallotContest",
     "NeverFree": true,
+    "CInclude": "ballot.h",
     "Properties": [
       {
         "Name": "ObjectId",
@@ -398,6 +403,7 @@
   },
   {
     "ClassName": "CiphertextBallot",
+    "CInclude": "ballot.h",
     "Properties": [
       {
         "Name": "ObjectId",
@@ -518,5 +524,96 @@
         ]
       }
     ]
+  },
+  {
+    "ClassName": "Manifest",
+    "CustomCName": "election_manifest",
+    "CInclude": "manifest.h",
+    "Properties": [
+      {
+        "Name": "ElectionScopeId",
+        "Description": "Unique identifier for a GpUnit element. Associates the election with a reporting unit that represents the geographical scope of the election, such as a state or city.",
+        "Type": {
+          "TypeCs": "string"
+        }
+      },
+      {
+        "Name": "ElectionType",
+        "Description": "Enumerated type of election, such as partisan-primary or open-primary.",
+        "Type": {
+          "TypeCs": "ElectionType",
+          "NativeHandleType": null,
+          "TypeC": "eg_election_type_t"
+        }
+      },
+      {
+        "Name": "StartDate",
+        "Description": "The start date/time of the election.",
+        "Type": {
+          "TypeCs": "DateTime"
+        }
+      },
+      {
+        "Name": "EndDate",
+        "Description": "The end date/time of the election.",
+        "Type": {
+          "TypeCs": "DateTime"
+        }
+      },
+      {
+        "Name": "GeopoliticalUnitsSize",
+        "Description": "The size of the geopolitical units collection",
+        "Type": {
+          "TypeCs": "ulong"
+        }
+      },
+      {
+        "Name": "PartiesSize",
+        "Description": "The size of the parties collection",
+        "Type": {
+          "TypeCs": "ulong"
+        }
+      },
+      {
+        "Name": "CandidatesSize",
+        "Description": "The size of the candidates collection",
+        "Type": {
+          "TypeCs": "ulong"
+        }
+      },
+      {
+        "Name": "ContestsSize",
+        "Description": "The size of the contests collection",
+        "Type": {
+          "TypeCs": "ulong"
+        }
+      },
+      {
+        "Name": "BallotStylesSize",
+        "Description": "The size of the ballot styles collection",
+        "Type": {
+          "TypeCs": "ulong"
+        }
+      },
+      {
+        "Name": "Name",
+        "Description": "The friendly name of the election",
+        "Type": {
+          "TypeCs": "InternationalizedText",
+          "NativeHandleType": "NativeInterface.InternationalizedText.InternationalizedTextHandle",
+          "TypeC": "eg_internationalized_text_t"
+        }
+      },
+      {
+        "Name": "ContactInfo",
+        "Description": "The contact information for the election",
+        "Type": {
+          "TypeCs": "ContactInformation",
+          "NativeHandleType": "NativeInterface.ContactInformation.ContactInformationHandle",
+          "TypeC": "eg_contact_information_t"
+        }
+      }
+    ],
+    "Methods": []
   }
 ]

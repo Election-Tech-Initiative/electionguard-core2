@@ -44,6 +44,9 @@ namespace ElectionGuard
                 var data = Marshal.PtrToStringAnsi(value);
                 NativeInterface.Memory.FreeIntPtr(value);
                 return data;
+<# } else if (egProperty.Type.TypeCs == "DateTime") { #>
+                var value = External.Get<#= egProperty.Name #>(Handle);
+                return DateTimeOffset.FromUnixTimeMilliseconds((long)value).DateTime;
 <# } else { #>
                 return External.Get<#= egProperty.Name #>(Handle);
 <# } #>
@@ -165,12 +168,15 @@ if (EgClass.NeverFree) {
                 }
             }
 
-            [DllImport(NativeInterface.DllName, EntryPoint = "eg_<#= className.ToSnakeCase() #>_free",
-                CallingConvention = CallingConvention.Cdecl, SetLastError = true)]
+            [DllImport(
+                NativeInterface.DllName, 
+                EntryPoint = "eg_<#= EgClass.CFunctionPrefix #>_free",
+                CallingConvention = CallingConvention.Cdecl, 
+                SetLastError = true)]
             internal static extern Status Free(<#= className #>Type* handle);
 
 <# foreach (var egProperty in EgClass.Properties) {
-        var entryPoint = egProperty.GetEntryPoint(className);
+        var entryPoint = egProperty.GetEntryPoint(EgClass);
         var isElectionGuardType = egProperty.IsElectionGuardType;
         var isReferenceType = egProperty.IsPassByReference;
 #>
@@ -179,7 +185,7 @@ if (EgClass.NeverFree) {
                 EntryPoint = "<#= entryPoint #>",
                 CallingConvention = CallingConvention.Cdecl,
                 SetLastError = true)]
-            internal static extern <#= isReferenceType ? "Status" : egProperty.Type.TypeCs #> Get<#= egProperty.Name #>(
+            internal static extern <#= egProperty.GetExternalReturnType() #> Get<#= egProperty.Name #>(
                 <#= className #>Handle handle<# 
 if (isElectionGuardType) { #>
 ,
@@ -193,7 +199,7 @@ if (isElectionGuardType) { #>
 
 <# } // end foreach property #>
 <# foreach (var method in EgClass.Methods) {
-    var entryPoint = method.GetEntryPoint(className);
+    var entryPoint = method.GetEntryPoint(EgClass);
     var returnsElectionGuardType = method.ReturnType.IsElectionGuardType;
     var isReturnTypeReferenceType = method.ReturnType.IsPassByReference;
 #>

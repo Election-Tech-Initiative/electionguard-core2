@@ -10,8 +10,6 @@ namespace ElectionGuard
     using NativeParty = NativeInterface.Party.PartyHandle;
     using NativeCandidate = NativeInterface.Candidate.CandidateHandle;
     using NativeContestDescription = NativeInterface.ContestDescription.ContestDescriptionHandle;
-    using NativeManifest = NativeInterface.Manifest.ManifestHandle;
-    using NativeElementModP = NativeInterface.ElementModP.ElementModPHandle;
     using NativeElementModQ = NativeInterface.ElementModQ.ElementModQHandle;
 
     #region AnnotatedString
@@ -70,166 +68,8 @@ namespace ElectionGuard
     ///
     /// See: https://developers.google.com/elections-data/reference/election
     /// </summary>
-    public class Manifest : DisposableBase
+    public partial class Manifest : DisposableBase
     {
-        /// <Summary>
-        /// Unique identifier for a GpUnit element. Associates the election with
-        /// a reporting unit that represents the geographical scope of the election,
-        /// such as a state or city.
-        /// </Summary>
-        public string ElectionScopeId
-        {
-            get
-            {
-                var status = NativeInterface.Manifest.GetElectionScopeId(
-                    Handle, out IntPtr value);
-                if (status != Status.ELECTIONGUARD_STATUS_SUCCESS)
-                {
-                    throw new ElectionGuardException($"Manifest Error ObjectId: {status}");
-                }
-                var data = Marshal.PtrToStringAnsi(value);
-                NativeInterface.Memory.FreeIntPtr(value);
-                return data;
-            }
-        }
-
-        /// <Summary>
-        /// Enumerated type of election, such as partisan-primary or open-primary.
-        /// </Summary>
-        public ElectionType ElectionType
-        {
-            get
-            {
-                var value = NativeInterface.Manifest.GetElectionType(Handle);
-                return value;
-            }
-        }
-
-        /// <Summary>
-        /// The start date/time of the election.
-        /// </Summary>
-        public DateTime StartDate
-        {
-            get
-            {
-                var value = NativeInterface.Manifest.GetStartDate(Handle);
-                return DateTimeOffset.FromUnixTimeMilliseconds((long)value).DateTime;
-            }
-        }
-
-        /// <Summary>
-        /// The end date/time of the election.
-        /// </Summary>
-        public DateTime EndDate
-        {
-            get
-            {
-                var value = NativeInterface.Manifest.GetEndDate(Handle);
-                return DateTimeOffset.FromUnixTimeMilliseconds((long)value).DateTime;
-            }
-        }
-
-        /// <Summary>
-        /// The size of the geopolitical units collection
-        /// </Summary>
-        public ulong GeopoliticalUnitsSize
-        {
-            get
-            {
-                var value = NativeInterface.Manifest.GetGeopoliticalUnitsSize(Handle);
-                return value;
-            }
-        }
-
-        /// <Summary>
-        /// The size of the parties collection
-        /// </Summary>
-        public ulong PartiesSize
-        {
-            get
-            {
-                var value = NativeInterface.Manifest.GetPartiesSize(Handle);
-                return value;
-            }
-        }
-
-        /// <Summary>
-        /// The size of the candidates collection
-        /// </Summary>
-        public ulong CandidatesSize
-        {
-            get
-            {
-                var value = NativeInterface.Manifest.GetCandidatesSize(Handle);
-                return value;
-            }
-        }
-
-        /// <Summary>
-        /// The size of the contests collection
-        /// </Summary>
-        public ulong ContestsSize
-        {
-            get
-            {
-                var value = NativeInterface.Manifest.GetContestsSize(Handle);
-                return value;
-            }
-        }
-
-        /// <Summary>
-        /// The size of the ballot styles collection
-        /// </Summary>
-        public ulong BallotStylesSize
-        {
-            get
-            {
-                var value = NativeInterface.Manifest.GetBallotStylesSize(Handle);
-                return value;
-            }
-        }
-
-        /// <Summary>
-        /// The friendly name of the election
-        /// </Summary>
-        public InternationalizedText Name
-        {
-            get
-            {
-                var status = NativeInterface.Manifest.GetName(
-                    Handle, out NativeInternationalizedText value);
-                if (status != Status.ELECTIONGUARD_STATUS_SUCCESS)
-                {
-                    throw new ElectionGuardException($"Manifest Error ObjectId: {status}");
-                }
-                return new InternationalizedText(value);
-            }
-        }
-
-        /// <Summary>
-        /// The contact information for the election
-        /// </Summary>
-        public ContactInformation ContactInfo
-        {
-            get
-            {
-                var status = NativeInterface.Manifest.GetContactInfo(
-                    Handle, out NativeContactInformation value);
-                if (status != Status.ELECTIONGUARD_STATUS_SUCCESS)
-                {
-                    throw new ElectionGuardException($"Manifest Error ObjectId: {status}");
-                }
-                return new ContactInformation(value);
-            }
-        }
-
-        internal NativeManifest Handle;
-
-        internal Manifest(NativeManifest handle)
-        {
-            Handle = handle;
-        }
-
         /// <summary>
         /// Creates a `Manifest` object
         /// </summary>
@@ -405,17 +245,6 @@ namespace ElectionGuard
             {
                 throw new ElectionGuardException($"Manifest Error Status: {status}");
             }
-        }
-
-#pragma warning disable CS1591 // Missing XML comment for publicly visible type or member
-        protected override void DisposeUnmanaged()
-#pragma warning restore CS1591 // Missing XML comment for publicly visible type or member
-        {
-            base.DisposeUnmanaged();
-
-            if (Handle == null || Handle.IsInvalid) return;
-            Handle.Dispose();
-            Handle = null;
         }
 
         /// <Summary>
