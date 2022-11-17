@@ -68,5 +68,14 @@ namespace ElectionGuard.UI.Resx {
                 return ResourceManager.GetString("HelloWorld", resourceCulture);
             }
         }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to ElectionGuard Election Manager.
+        /// </summary>
+        internal static string WindowTitle {
+            get {
+                return ResourceManager.GetString("WindowTitle", resourceCulture);
+            }
+        }
     }
 }

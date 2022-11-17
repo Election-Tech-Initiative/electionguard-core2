@@ -31,6 +31,5 @@ public partial class App : Application
         return window;
     }
 
-    // Hack: get this from a resource
-    private string GetWindowTitle() => "ElectionGuard Election Manager";
+    private string GetWindowTitle() => AppResources.WindowTitle;
 }
