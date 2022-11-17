@@ -24,14 +24,5 @@ public partial class MainPage : ContentPage
 
 		SemanticScreenReader.Announce(CounterBtn.Text);
 	}
-
-    private void Button_Clicked(object sender, EventArgs e)
-    {
-        LocalizationResourceManager.Current.CurrentCulture = new CultureInfo("es");
-    }
-    private void Button_Clicked_1(object sender, EventArgs e)
-    {
-        LocalizationResourceManager.Current.CurrentCulture = new CultureInfo("en");
-    }
 }
 

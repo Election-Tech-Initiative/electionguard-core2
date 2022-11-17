@@ -2,7 +2,9 @@
 <ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              xmlns:helper="clr-namespace:ElectionGuard.UI.Helpers"
-             x:Class="ElectionGuard.UI.MainPage">
+             xmlns:vm="clr-namespace:ElectionGuard.UI.ViewModels"
+             x:Class="ElectionGuard.UI.MainPage"
+             x:DataType="vm:MainViewModel">
 
     <ScrollView>
         <VerticalStackLayout
@@ -39,12 +41,12 @@
                 <Button
                     Text="Spanish"
                     SemanticProperties.Hint="Counts the number of times you click"
-                    Clicked="Button_Clicked"
+                    Command="{Binding SpanishCommand}"
                     HorizontalOptions="Center" />
                 <Button
                     Text="English"
                     SemanticProperties.Hint="Counts the number of times you click"
-                    Clicked="Button_Clicked_1"
+                    Command="{Binding EnglishCommand}"
                     HorizontalOptions="Center" />
             </HorizontalStackLayout>
         </VerticalStackLayout>
