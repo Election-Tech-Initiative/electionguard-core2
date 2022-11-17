@@ -28,6 +28,17 @@ namespace ElectionGuard
             }
         }
 
+        /// <Summary>
+        /// Enumerated type of election, such as partisan-primary or open-primary.
+        /// </Summary>
+        public ElectionType ElectionType
+        {
+            get
+            {
+                return External.GetElectionType(Handle);
+            }
+        }
+
         #endregion
 
         #region Methods
@@ -81,6 +92,15 @@ namespace ElectionGuard
             internal static extern Status GetElectionScopeId(
                 ManifestHandle handle,
                 out IntPtr objectId
+                );
+
+            [DllImport(
+                NativeInterface.DllName,
+                EntryPoint = "eg_election_manifest_get_election_type",
+                CallingConvention = CallingConvention.Cdecl,
+                SetLastError = true)]
+            internal static extern ElectionType GetElectionType(
+                ManifestHandle handle
                 );
 
         }

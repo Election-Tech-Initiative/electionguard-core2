@@ -536,6 +536,15 @@
         "Type": {
           "TypeCs": "string"
         }
+      },
+      {
+        "Name": "ElectionType",
+        "Description": "Enumerated type of election, such as partisan-primary or open-primary.",
+        "Type": {
+          "TypeCs": "ElectionType",
+          "NativeHandleType": null,
+          "TypeC": "eg_election_type_t"
+        }
       }
     ],
     "Methods": []

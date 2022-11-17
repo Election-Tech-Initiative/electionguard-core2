@@ -1567,11 +1567,6 @@ namespace ElectionGuard
                 ContactInformation.ContactInformationHandle contact,
                 out ElectionGuard.Manifest.External.ManifestHandle handle);
 
-            [DllImport(DllName, EntryPoint = "eg_election_manifest_get_type",
-                CallingConvention = CallingConvention.Cdecl, SetLastError = true)]
-            internal static extern ElectionType GetElectionType(
-                ElectionGuard.Manifest.External.ManifestHandle handle);
-
             [DllImport(DllName, EntryPoint = "eg_election_manifest_get_start_date",
                 CallingConvention = CallingConvention.Cdecl, SetLastError = true)]
             internal static extern ulong GetStartDate(

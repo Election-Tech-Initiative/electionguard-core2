@@ -13,11 +13,6 @@ public record EgProperty(
         return $"eg_{egClass.CFunctionPrefix}Get{Name}".ToSnakeCase();
     }
 
-    public bool IsReferenceType()
-    {
-        return Type.IsReferenceType;
-    }
-
     public string GetCReturnType()
     {
         return Type.GetCReturnType();

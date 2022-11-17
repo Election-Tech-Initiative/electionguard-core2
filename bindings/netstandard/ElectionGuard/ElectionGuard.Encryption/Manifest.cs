@@ -71,18 +71,6 @@ namespace ElectionGuard
     public partial class Manifest : DisposableBase
     {
         /// <Summary>
-        /// Enumerated type of election, such as partisan-primary or open-primary.
-        /// </Summary>
-        public ElectionType ElectionType
-        {
-            get
-            {
-                var value = NativeInterface.Manifest.GetElectionType(Handle);
-                return value;
-            }
-        }
-
-        /// <Summary>
         /// The start date/time of the election.
         /// </Summary>
         public DateTime StartDate

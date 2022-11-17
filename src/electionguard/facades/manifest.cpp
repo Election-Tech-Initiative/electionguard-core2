@@ -1788,7 +1788,7 @@ eg_electionguard_status_t eg_election_manifest_get_election_scope_id(eg_election
     }
 }
 
-eg_election_type_t eg_election_manifest_get_type(eg_election_manifest_t *handle)
+eg_election_type_t eg_election_manifest_get_election_type(eg_election_manifest_t *handle)
 {
     return (eg_election_type_t)AS_TYPE(Manifest, handle)->getElectionType();
 }

@@ -30,11 +30,12 @@ extern "C" {
 	var entryPoint = egProperty.GetEntryPoint(EgClass);
 	var returnType = egProperty.GetCReturnType();
 	var outParamName = "out_" + egProperty.Name.ToSnakeCase();
+	var isReferenceType = egProperty.IsPassByReference;
 #>
 /**
  * @brief <#= egProperty.Description #>
  * @param[in] handle A pointer to the `eg_plaintext_ballot_selection_t` opaque instance
-<# if (egProperty.IsReferenceType()) { #>
+<# if (isReferenceType) { #>
  * @param[out] <#= outParamName #> A pointer to the output <#= egProperty.Name #>.  <#
 if (egProperty.CallerShouldFree) {
 	this.Write("The caller is responsible for freeing it.");
@@ -45,13 +46,13 @@ if (egProperty.CallerShouldFree) {
  * @return eg_electionguard_status_t indicating success or failure
  * @retval ELECTIONGUARD_STATUS_SUCCESS The function was successfully executed
  * @retval ELECTIONGUARD_STATUS_ERROR_BAD_ALLOC The function was unable to allocate memory
-<# } else { #>
+<# } else /* if value type */ { #>
  * @return The value of the property
 <# } // end is reference type #>
  */
 EG_API <#= returnType #> <#= entryPoint #>(
 	<#= classHandle #> *handle<#
-if (egProperty.IsReferenceType()) {
+if (isReferenceType) {
 #>,
 	<#= egProperty.OutVarType #><#= outParamName #>
 	);
