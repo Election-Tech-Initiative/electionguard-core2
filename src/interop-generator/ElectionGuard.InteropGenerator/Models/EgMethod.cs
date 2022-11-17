@@ -6,7 +6,8 @@ public record EgMethod (
     string Name,
     EgType ReturnType,
     string Description,
-    EgParam[] Params)
+    EgParam[] Params,
+    bool? CallerShouldFree)
 {
     public string GetEntryPoint(string className)
     {

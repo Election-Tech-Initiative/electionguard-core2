@@ -56,7 +56,7 @@ namespace ElectionGuard
         #region Methods
 
 <# foreach (var method in EgClass.Methods) { 
-    var isElectionGuardType = method.ReturnType.IsElectionGuardType;
+    var returnsElectionGuardType = method.ReturnType.IsElectionGuardType;
     #>
         /// <summary>
         /// <#= method.Description #>
@@ -67,11 +67,11 @@ namespace ElectionGuard
         public <#= method.ReturnType.TypeCs #> <#= method.Name #>(
             <#= string.Join(", ", method.Params.Select(p => p.AsCsParam())) #>
         ) {
-<# if (isElectionGuardType) { #>
+<# if (returnsElectionGuardType) { #>
             var status = External.<#= method.Name #>(
                 Handle,
 <# foreach (var p in method.Params) { #>
-                <#= p.Name #>,
+                <#= p.ToCsArgument() #>,
 <# } // for each param #>
                 out <#= method.ReturnType.NativeHandleType #> value);
             status.ThrowIfError();
@@ -80,7 +80,7 @@ namespace ElectionGuard
             var status = External.<#= method.Name #>(
                 Handle,
 <# foreach (var p in method.Params) { #>
-                <#= p.Name #>,
+                <#= p.ToCsArgument() #>,
 <# } // for each param #>
                 out IntPtr pointer, 
                 out _
@@ -93,7 +93,7 @@ namespace ElectionGuard
             var status = External.<#= method.Name #>(
                 Handle,
 <# foreach (var p in method.Params) { #>
-                <#= p.Name #>,
+                <#= p.ToCsArgument() #>,
 <# } // for each param #>
                 out IntPtr data, 
                 out ulong size
@@ -113,7 +113,7 @@ namespace ElectionGuard
             return External.<#= method.Name #>(
                 Handle<# 
 foreach (var p in method.Params) {
-    this.Write($", {p.Name}");
+    this.Write($", {p.ToCsArgument()}");
 }
                 #>);
 <# } // end method return type switch #>
@@ -194,7 +194,7 @@ if (isElectionGuardType) { #>
 <# } // end foreach property #>
 <# foreach (var method in EgClass.Methods) {
     var entryPoint = method.GetEntryPoint(className);
-    var isElectionGuardType = method.ReturnType.IsElectionGuardType;
+    var returnsElectionGuardType = method.ReturnType.IsElectionGuardType;
     var isReturnTypeReferenceType = method.ReturnType.IsPassByReference;
 #>
             [DllImport(
@@ -207,10 +207,10 @@ if (isElectionGuardType) { #>
 foreach (var p in method.Params) { #>,
                 <#= p.AsCppInteropParam() #><# 
 } // end foreach param #>
-<# if (isElectionGuardType) { #>
+<# if (returnsElectionGuardType) { #>
 ,
                 out <#= method.ReturnType.NativeHandleType #> objectId<#
-} // if isElectionGuardType #>
+} // if returnsElectionGuardType #>
 <# if (method.ReturnType.TypeCs == "string" || method.ReturnType.TypeCs == "byte[]") { #>
 ,
                 out IntPtr data,

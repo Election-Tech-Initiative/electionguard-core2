@@ -111,6 +111,31 @@ EG_API eg_electionguard_status_t eg_ciphertext_ballot_selection_get_proof(
 	);
 
 /**
+ * Given an encrypted BallotSelection, generates a hash, suitable for rolling up into a hash / tracking code for an entire ballot. Of note, this particular hash examines the `encryptionSeed` and `message`, but not the proof. This is deliberate, allowing for the possibility of ElectionGuard variants running on much more limited hardware, wherein the Disjunctive Chaum-Pedersen proofs might be computed later on. In most cases the encryption_seed should match the `description_hash`.
+ * @param[in] in_encryption_seed In most cases the encryption_seed should match the `description_hash`
+ * @param[out] out_crypto_hash_with_ref An opaque pointer to the ElementModQ
+ *                               The caller is responsible for freeing it.
+ */
+EG_API eg_electionguard_status_t eg_ciphertext_ballot_selection_crypto_hash_with(
+	eg_ciphertext_ballot_selection_t *handle,
+	eg_element_mod_q_t *in_encryption_seed,
+	eg_element_mod_q_t **out_crypto_hash_with_ref
+	);
+
+/**
+ * Given an encrypted BallotSelection, validates the encryption state against a specific seed hash and public key. Calling this function expects that the object is in a well-formed encrypted state with the elgamal encrypted `message` field populated along with the DisjunctiveChaumPedersenProof`proof` populated. the ElementModQ `description_hash` and the ElementModQ `crypto_hash` are also checked.
+ * @param[in] in_encryption_seed The hash of the SelectionDescription, or whatever `ElementModQ` was used to populate the `description_hash` field.
+ * @param[in] in_el_gamal_public_key The election public key.
+ * @param[in] in_crypto_extended_base_hash The extended base hash of the election.
+ */
+EG_API bool eg_ciphertext_ballot_selection_is_valid_encryption(
+	eg_ciphertext_ballot_selection_t *handle,
+	eg_element_mod_q_t *in_encryption_seed,
+	eg_element_mod_p_t *in_el_gamal_public_key,
+	eg_element_mod_q_t *in_crypto_extended_base_hash
+	);
+
+/**
  * Frees the memory held by the CiphertextBallotSelection
  */
 EG_API eg_electionguard_status_t eg_ciphertext_ballot_selection_free(eg_ciphertext_ballot_selection_t *handle);
