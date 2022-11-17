@@ -51,6 +51,73 @@ namespace ElectionGuard
             }
         }
 
+        /// <Summary>
+        /// The end date/time of the election.
+        /// </Summary>
+        public DateTime EndDate
+        {
+            get
+            {
+                var value = External.GetEndDate(Handle);
+                return DateTimeOffset.FromUnixTimeMilliseconds((long)value).DateTime;
+            }
+        }
+
+        /// <Summary>
+        /// The size of the geopolitical units collection
+        /// </Summary>
+        public ulong GeopoliticalUnitsSize
+        {
+            get
+            {
+                return External.GetGeopoliticalUnitsSize(Handle);
+            }
+        }
+
+        /// <Summary>
+        /// The size of the parties collection
+        /// </Summary>
+        public ulong PartiesSize
+        {
+            get
+            {
+                return External.GetPartiesSize(Handle);
+            }
+        }
+
+        /// <Summary>
+        /// The size of the candidates collection
+        /// </Summary>
+        public ulong CandidatesSize
+        {
+            get
+            {
+                return External.GetCandidatesSize(Handle);
+            }
+        }
+
+        /// <Summary>
+        /// The size of the contests collection
+        /// </Summary>
+        public ulong ContestsSize
+        {
+            get
+            {
+                return External.GetContestsSize(Handle);
+            }
+        }
+
+        /// <Summary>
+        /// The size of the ballot styles collection
+        /// </Summary>
+        public ulong BallotStylesSize
+        {
+            get
+            {
+                return External.GetBallotStylesSize(Handle);
+            }
+        }
+
         #endregion
 
         #region Methods
@@ -121,6 +188,60 @@ namespace ElectionGuard
                 CallingConvention = CallingConvention.Cdecl,
                 SetLastError = true)]
             internal static extern ulong GetStartDate(
+                ManifestHandle handle
+                );
+
+            [DllImport(
+                NativeInterface.DllName,
+                EntryPoint = "eg_election_manifest_get_end_date",
+                CallingConvention = CallingConvention.Cdecl,
+                SetLastError = true)]
+            internal static extern ulong GetEndDate(
+                ManifestHandle handle
+                );
+
+            [DllImport(
+                NativeInterface.DllName,
+                EntryPoint = "eg_election_manifest_get_geopolitical_units_size",
+                CallingConvention = CallingConvention.Cdecl,
+                SetLastError = true)]
+            internal static extern ulong GetGeopoliticalUnitsSize(
+                ManifestHandle handle
+                );
+
+            [DllImport(
+                NativeInterface.DllName,
+                EntryPoint = "eg_election_manifest_get_parties_size",
+                CallingConvention = CallingConvention.Cdecl,
+                SetLastError = true)]
+            internal static extern ulong GetPartiesSize(
+                ManifestHandle handle
+                );
+
+            [DllImport(
+                NativeInterface.DllName,
+                EntryPoint = "eg_election_manifest_get_candidates_size",
+                CallingConvention = CallingConvention.Cdecl,
+                SetLastError = true)]
+            internal static extern ulong GetCandidatesSize(
+                ManifestHandle handle
+                );
+
+            [DllImport(
+                NativeInterface.DllName,
+                EntryPoint = "eg_election_manifest_get_contests_size",
+                CallingConvention = CallingConvention.Cdecl,
+                SetLastError = true)]
+            internal static extern ulong GetContestsSize(
+                ManifestHandle handle
+                );
+
+            [DllImport(
+                NativeInterface.DllName,
+                EntryPoint = "eg_election_manifest_get_ballot_styles_size",
+                CallingConvention = CallingConvention.Cdecl,
+                SetLastError = true)]
+            internal static extern ulong GetBallotStylesSize(
                 ManifestHandle handle
                 );
 

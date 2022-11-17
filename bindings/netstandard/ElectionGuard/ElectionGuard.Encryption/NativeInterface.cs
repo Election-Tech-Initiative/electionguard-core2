@@ -1572,27 +1572,12 @@ namespace ElectionGuard
             internal static extern ulong GetStartDate(
                 ElectionGuard.Manifest.External.ManifestHandle handle);
 
-            [DllImport(DllName, EntryPoint = "eg_election_manifest_get_end_date",
-                CallingConvention = CallingConvention.Cdecl, SetLastError = true)]
-            internal static extern ulong GetEndDate(
-                ElectionGuard.Manifest.External.ManifestHandle handle);
-
-            [DllImport(DllName, EntryPoint = "eg_election_manifest_get_geopolitical_units_size",
-                CallingConvention = CallingConvention.Cdecl, SetLastError = true)]
-            internal static extern ulong GetGeopoliticalUnitsSize(
-                ElectionGuard.Manifest.External.ManifestHandle handle);
-
             [DllImport(DllName, EntryPoint = "eg_election_manifest_get_geopolitical_unit_at_index",
                 CallingConvention = CallingConvention.Cdecl, SetLastError = true)]
             internal static extern Status GetGeopoliticalUnitAtIndex(
                 ElectionGuard.Manifest.External.ManifestHandle handle,
                 ulong index,
                 out GeopoliticalUnit.GeopoliticalUnitHandle gpUnit);
-
-            [DllImport(DllName, EntryPoint = "eg_election_manifest_get_parties_size",
-                CallingConvention = CallingConvention.Cdecl, SetLastError = true)]
-            internal static extern ulong GetPartiesSize(
-                ElectionGuard.Manifest.External.ManifestHandle handle);
 
             [DllImport(DllName, EntryPoint = "eg_election_manifest_get_party_at_index",
                 CallingConvention = CallingConvention.Cdecl, SetLastError = true)]
@@ -1601,11 +1586,6 @@ namespace ElectionGuard
                 ulong index,
                 out Party.PartyHandle party);
 
-            [DllImport(DllName, EntryPoint = "eg_election_manifest_get_candidates_size",
-                CallingConvention = CallingConvention.Cdecl, SetLastError = true)]
-            internal static extern ulong GetCandidatesSize(
-                ElectionGuard.Manifest.External.ManifestHandle handle);
-
             [DllImport(DllName, EntryPoint = "eg_election_manifest_get_candidate_at_index",
                 CallingConvention = CallingConvention.Cdecl, SetLastError = true)]
             internal static extern Status GetCandidateAtIndex(
@@ -1613,22 +1593,12 @@ namespace ElectionGuard
                 ulong index,
                 out Candidate.CandidateHandle candidate);
 
-            [DllImport(DllName, EntryPoint = "eg_election_manifest_get_contests_size",
-                CallingConvention = CallingConvention.Cdecl, SetLastError = true)]
-            internal static extern ulong GetContestsSize(
-                ElectionGuard.Manifest.External.ManifestHandle handle);
-
             [DllImport(DllName, EntryPoint = "eg_election_manifest_get_contest_at_index",
                 CallingConvention = CallingConvention.Cdecl, SetLastError = true)]
             internal static extern Status GetContestAtIndex(
                 ElectionGuard.Manifest.External.ManifestHandle handle,
                 ulong index,
                 out ContestDescription.ContestDescriptionHandle contest);
-
-            [DllImport(DllName, EntryPoint = "eg_election_manifest_get_ballot_styles_size",
-                CallingConvention = CallingConvention.Cdecl, SetLastError = true)]
-            internal static extern ulong GetBallotStylesSize(
-                ElectionGuard.Manifest.External.ManifestHandle handle);
 
             [DllImport(DllName, EntryPoint = "eg_election_manifest_get_ballot_style_at_index",
                 CallingConvention = CallingConvention.Cdecl, SetLastError = true)]

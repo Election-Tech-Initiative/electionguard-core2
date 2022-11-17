@@ -552,6 +552,48 @@
         "Type": {
           "TypeCs": "DateTime"
         }
+      },
+      {
+        "Name": "EndDate",
+        "Description": "The end date/time of the election.",
+        "Type": {
+          "TypeCs": "DateTime"
+        }
+      },
+      {
+        "Name": "GeopoliticalUnitsSize",
+        "Description": "The size of the geopolitical units collection",
+        "Type": {
+          "TypeCs": "ulong"
+        }
+      },
+      {
+        "Name": "PartiesSize",
+        "Description": "The size of the parties collection",
+        "Type": {
+          "TypeCs": "ulong"
+        }
+      },
+      {
+        "Name": "CandidatesSize",
+        "Description": "The size of the candidates collection",
+        "Type": {
+          "TypeCs": "ulong"
+        }
+      },
+      {
+        "Name": "ContestsSize",
+        "Description": "The size of the contests collection",
+        "Type": {
+          "TypeCs": "ulong"
+        }
+      },
+      {
+        "Name": "BallotStylesSize",
+        "Description": "The size of the ballot styles collection",
+        "Type": {
+          "TypeCs": "ulong"
+        }
       }
     ],
     "Methods": []

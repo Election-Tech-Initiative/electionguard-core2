@@ -46,6 +46,60 @@ EG_API uint64_t eg_election_manifest_get_start_date(
 	);
 
 /**
+ * @brief The end date/time of the election.
+ * @param[in] handle A pointer to the `eg_plaintext_ballot_selection_t` opaque instance
+ * @return The value of the property
+ */
+EG_API uint64_t eg_election_manifest_get_end_date(
+	eg_election_manifest_t *handle
+	);
+
+/**
+ * @brief The size of the geopolitical units collection
+ * @param[in] handle A pointer to the `eg_plaintext_ballot_selection_t` opaque instance
+ * @return The value of the property
+ */
+EG_API uint64_t eg_election_manifest_get_geopolitical_units_size(
+	eg_election_manifest_t *handle
+	);
+
+/**
+ * @brief The size of the parties collection
+ * @param[in] handle A pointer to the `eg_plaintext_ballot_selection_t` opaque instance
+ * @return The value of the property
+ */
+EG_API uint64_t eg_election_manifest_get_parties_size(
+	eg_election_manifest_t *handle
+	);
+
+/**
+ * @brief The size of the candidates collection
+ * @param[in] handle A pointer to the `eg_plaintext_ballot_selection_t` opaque instance
+ * @return The value of the property
+ */
+EG_API uint64_t eg_election_manifest_get_candidates_size(
+	eg_election_manifest_t *handle
+	);
+
+/**
+ * @brief The size of the contests collection
+ * @param[in] handle A pointer to the `eg_plaintext_ballot_selection_t` opaque instance
+ * @return The value of the property
+ */
+EG_API uint64_t eg_election_manifest_get_contests_size(
+	eg_election_manifest_t *handle
+	);
+
+/**
+ * @brief The size of the ballot styles collection
+ * @param[in] handle A pointer to the `eg_plaintext_ballot_selection_t` opaque instance
+ * @return The value of the property
+ */
+EG_API uint64_t eg_election_manifest_get_ballot_styles_size(
+	eg_election_manifest_t *handle
+	);
+
+/**
  * Frees the memory held by the Manifest
  */
 EG_API eg_electionguard_status_t eg_election_manifest_free(eg_election_manifest_t *handle);

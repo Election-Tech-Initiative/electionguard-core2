@@ -774,29 +774,17 @@ EG_API eg_electionguard_status_t eg_election_manifest_new_with_contact(
   eg_internationalized_text_t *in_name, eg_contact_information_t *in_contact_info,
   eg_election_manifest_t **out_handle);
 
-EG_API uint64_t eg_election_manifest_get_end_date(eg_election_manifest_t *handle);
-
-EG_API uint64_t eg_election_manifest_get_geopolitical_units_size(eg_election_manifest_t *handle);
-
 EG_API eg_electionguard_status_t eg_election_manifest_get_geopolitical_unit_at_index(
   eg_election_manifest_t *handle, uint64_t in_index, eg_geopolitical_unit_t **out_gp_unit_ref);
-
-EG_API uint64_t eg_election_manifest_get_parties_size(eg_election_manifest_t *handle);
 
 EG_API eg_electionguard_status_t eg_election_manifest_get_party_at_index(
   eg_election_manifest_t *handle, uint64_t in_index, eg_party_t **out_party_ref);
 
-EG_API uint64_t eg_election_manifest_get_candidates_size(eg_election_manifest_t *handle);
-
 EG_API eg_electionguard_status_t eg_election_manifest_get_candidate_at_index(
   eg_election_manifest_t *handle, uint64_t in_index, eg_candidate_t **out_candidate_ref);
 
-EG_API uint64_t eg_election_manifest_get_contests_size(eg_election_manifest_t *handle);
-
 EG_API eg_electionguard_status_t eg_election_manifest_get_contest_at_index(
   eg_election_manifest_t *handle, uint64_t in_index, eg_contest_description_t **out_contest_ref);
-
-EG_API uint64_t eg_election_manifest_get_ballot_styles_size(eg_election_manifest_t *handle);
 
 EG_API eg_electionguard_status_t eg_election_manifest_get_ballot_style_at_index(
   eg_election_manifest_t *handle, uint64_t in_index, eg_ballot_style_t **out_ballot_style_ref);
