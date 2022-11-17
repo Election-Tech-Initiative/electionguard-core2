@@ -11,7 +11,7 @@
 		<ImplicitUsings>enable</ImplicitUsings>
 
 		<!-- Display name -->
-		<ApplicationTitle>ElectionGuard.UI</ApplicationTitle>
+		<ApplicationTitle>ElectionGuard Election Manager</ApplicationTitle>
 
 		<!-- App Identifier -->
 		<ApplicationId>com.microsoft.electionguard.ui</ApplicationId>
