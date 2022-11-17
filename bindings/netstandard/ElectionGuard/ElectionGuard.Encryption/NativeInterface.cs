@@ -1567,15 +1567,6 @@ namespace ElectionGuard
                 ContactInformation.ContactInformationHandle contact,
                 out ElectionGuard.Manifest.External.ManifestHandle handle);
 
-            [DllImport(DllName, EntryPoint = "eg_election_manifest_free",
-                CallingConvention = CallingConvention.Cdecl, SetLastError = true)]
-            internal static extern Status Free(ElectionGuard.Manifest.External.ManifestType* handle);
-
-            [DllImport(DllName, EntryPoint = "eg_election_manifest_get_election_scope_id",
-                CallingConvention = CallingConvention.Cdecl, SetLastError = true)]
-            internal static extern Status GetElectionScopeId(
-                ElectionGuard.Manifest.External.ManifestHandle handle, out IntPtr election_scope_id);
-
             [DllImport(DllName, EntryPoint = "eg_election_manifest_get_type",
                 CallingConvention = CallingConvention.Cdecl, SetLastError = true)]
             internal static extern ElectionType GetElectionType(

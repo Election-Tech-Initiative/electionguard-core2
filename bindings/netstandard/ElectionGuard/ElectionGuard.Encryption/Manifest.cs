@@ -71,27 +71,6 @@ namespace ElectionGuard
     public partial class Manifest : DisposableBase
     {
         /// <Summary>
-        /// Unique identifier for a GpUnit element. Associates the election with
-        /// a reporting unit that represents the geographical scope of the election,
-        /// such as a state or city.
-        /// </Summary>
-        public string ElectionScopeId
-        {
-            get
-            {
-                var status = NativeInterface.Manifest.GetElectionScopeId(
-                    Handle, out IntPtr value);
-                if (status != Status.ELECTIONGUARD_STATUS_SUCCESS)
-                {
-                    throw new ElectionGuardException($"Manifest Error ObjectId: {status}");
-                }
-                var data = Marshal.PtrToStringAnsi(value);
-                NativeInterface.Memory.FreeIntPtr(value);
-                return data;
-            }
-        }
-
-        /// <Summary>
         /// Enumerated type of election, such as partisan-primary or open-primary.
         /// </Summary>
         public ElectionType ElectionType

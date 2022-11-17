@@ -529,7 +529,15 @@
     "ClassName": "Manifest",
     "CustomCName": "election_manifest",
     "CInclude": "manifest.h",
-    "Properties": [],
+    "Properties": [
+      {
+        "Name": "ElectionScopeId",
+        "Description": "Unique identifier for a GpUnit element. Associates the election with a reporting unit that represents the geographical scope of the election, such as a state or city.",
+        "Type": {
+          "TypeCs": "string"
+        }
+      }
+    ],
     "Methods": []
   }
 ]

@@ -13,6 +13,21 @@ namespace ElectionGuard
 
         #region Properties
 
+        /// <Summary>
+        /// Unique identifier for a GpUnit element. Associates the election with a reporting unit that represents the geographical scope of the election, such as a state or city.
+        /// </Summary>
+        public string ElectionScopeId
+        {
+            get
+            {
+                var status = External.GetElectionScopeId(Handle, out IntPtr value);
+                status.ThrowIfError();
+                var data = Marshal.PtrToStringAnsi(value);
+                NativeInterface.Memory.FreeIntPtr(value);
+                return data;
+            }
+        }
+
         #endregion
 
         #region Methods
@@ -57,6 +72,16 @@ namespace ElectionGuard
                 CallingConvention = CallingConvention.Cdecl, 
                 SetLastError = true)]
             internal static extern Status Free(ManifestType* handle);
+
+            [DllImport(
+                NativeInterface.DllName,
+                EntryPoint = "eg_election_manifest_get_election_scope_id",
+                CallingConvention = CallingConvention.Cdecl,
+                SetLastError = true)]
+            internal static extern Status GetElectionScopeId(
+                ManifestHandle handle,
+                out IntPtr objectId
+                );
 
         }
         #endregion
