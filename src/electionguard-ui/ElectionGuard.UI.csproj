@@ -31,18 +31,11 @@
 
 	<ItemGroup>
 		<!-- App Icon -->
-		<MauiIcon Include="Resources\AppIcon\appicon.svg" ForegroundFile="Resources\AppIcon\logo.svg" Color="#512BD4" />
-
-		<!-- Splash Screen -->
-		<MauiSplashScreen Include="Resources\Splash\splash.svg" Color="#512BD4" BaseSize="128,128" />
-		<None Include="Resources\AppIcon\logo.svg">
-		  <BaseSize>168,208</BaseSize>
-		</None>
-		<MauiImage Include="Resources\AppIcon\logo.png" />
+		<MauiIcon Include="Resources\AppIcon\appicon.svg" ForegroundFile="Resources\AppIcon\logo.svg" />
 
 		<!-- Images -->
 		<MauiImage Include="Resources\Images\*" />
-		<MauiImage Update="Resources\Images\election_guard_logo.svg" BaseSize="168,208" />
+		<MauiImage Include="Resources\AppIcon\logo.svg" Name="logo" />
 
 		<!-- Custom Fonts -->
 		<MauiFont Include="Resources\Fonts\*" />

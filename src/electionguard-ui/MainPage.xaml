@@ -10,9 +10,9 @@
             VerticalOptions="Center">
 
             <Image
-                Source="electionguard.png"
+                Source="logo"
                 SemanticProperties.Description="ElectionGuard Logo"
-                HeightRequest="200"
+                HeightRequest="400"
                 HorizontalOptions="Center" />
 
             <Label
