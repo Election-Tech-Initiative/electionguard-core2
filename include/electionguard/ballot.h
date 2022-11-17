@@ -90,13 +90,6 @@ EG_API eg_electionguard_status_t eg_plaintext_ballot_selection_new_with_extended
   const char *in_extended_data_value, uint64_t in_extended_data_length,
   eg_plaintext_ballot_selection_t **out_handle);
 
-/**
- * Given a PlaintextBallotSelection validates that the object matches an expected object
- * and that the plaintext value can resolve to a valid representation
- */
-EG_API bool eg_plaintext_ballot_selection_is_valid(eg_plaintext_ballot_selection_t *handle,
-                                                   char *in_object_id);
-
 #endif
 
 #ifndef CiphertextBallotSelection
@@ -130,39 +123,7 @@ typedef struct eg_ciphertext_ballot_selection_s eg_ciphertext_ballot_selection_t
 
 // no constructors defined.  use `eg_encrypt_selection` in encrypt.h
 
-/**
- * Given an encrypted BallotSelection, generates a hash, suitable for rolling up
- * into a hash / tracking code for an entire ballot. Of note, this particular hash examines
- * the `encryptionSeed` and `message`, but not the proof.
- * This is deliberate, allowing for the possibility of ElectionGuard variants running on
- * much more limited hardware, wherein the Disjunctive Chaum-Pedersen proofs might be computed
- * later on.
- * 
- * @param[in] in_encryption_seed In most cases the encryption_seed should match the `description_hash`
- * @param[out] out_crypto_hash An opaque pointer to the nonce.  
- *                             The caller is responsible for lifecycle.
- */
-EG_API eg_electionguard_status_t eg_ciphertext_ballot_selection_crypto_hash_with(
-  eg_ciphertext_ballot_selection_t *handle, eg_element_mod_q_t *in_encryption_seed,
-  eg_element_mod_q_t **out_crypto_hash);
-
 // TODO: add eg_ciphertext_ballot_selection_make
-
-/**
-* Given an encrypted BallotSelection, validates the encryption state against a specific seed hash and public key.
-* Calling this function expects that the object is in a well-formed encrypted state
-* with the elgamal encrypted `message` field populated along with
-* the DisjunctiveChaumPedersenProof`proof` populated.
-* the ElementModQ `description_hash` and the ElementModQ `crypto_hash` are also checked.
-*
-* @param[in] encryption_seed The hash of the SelectionDescription, or
-*                      whatever `ElementModQ` was used to populate the `description_hash` field.
-* @param[in] in_public_key The election public key
-* @param[in] in_crypto_extended_base_hash The extended base hash of the election
-*/
-EG_API bool eg_ciphertext_ballot_selection_is_valid_encryption(
-  eg_ciphertext_ballot_selection_t *handle, eg_element_mod_q_t *in_encryption_seed,
-  eg_element_mod_p_t *in_public_key, eg_element_mod_q_t *in_crypto_extended_base_hash);
 
 // CiphertextBallotSelection::crypto_hash_with not provided
 // static CiphertextBallotSelection::make not provided, use eg_encrypt_selection
@@ -350,85 +311,6 @@ typedef struct eg_ciphertext_ballot_s eg_ciphertext_ballot_t;
 
 // no constructors defined.  use `eg_encrypt_ballot` in encrypt.h
 
-EG_API eg_electionguard_status_t eg_ciphertext_ballot_free(eg_ciphertext_ballot_t *handle);
-
-/**
- * The unique ballot id that is meaningful to the consuming application.
- */
-EG_API eg_electionguard_status_t eg_ciphertext_ballot_get_object_id(eg_ciphertext_ballot_t *handle,
-                                                                    char **out_object_id);
-
-/**
- * The Object Id of the ballot style in the election manifest.  This value is used
- * to determine which contests to expect on the ballot, to fill in missing values,
- * and to validate that the ballot is well-formed
- */
-EG_API eg_electionguard_status_t eg_ciphertext_ballot_get_style_id(eg_ciphertext_ballot_t *handle,
-                                                                   char **out_style_id);
-
-/**
- * Hash of the complete Election Manifest to which this ballot belongs
- * 
- * @param[out] out_manifest_hash_ref An opaque pointer to the description hash.  
- *                          The value is a reference and is not owned by the caller
- */
-EG_API eg_electionguard_status_t eg_ciphertext_ballot_get_manifest_hash(
-  eg_ciphertext_ballot_t *handle, eg_element_mod_q_t **out_manifest_hash_ref);
-
-/**
- * The seed hash for the ballot.  It may be the encryption device hash,
- * the hash of a previous ballot or the hash of some other value
- * that is meaningful to the consuming application.
- * 
- * @param[out] out_ballot_code_seed_ref An opaque pointer to the previous tracking or seed hash.  
- *                          The value is a reference and is not owned by the caller
- */
-EG_API eg_electionguard_status_t eg_ciphertext_ballot_get_ballot_code_seed(
-  eg_ciphertext_ballot_t *handle, eg_element_mod_q_t **out_ballot_code_seed_ref);
-
-/**
- * Get the size of the contests collection
- */
-EG_API uint64_t eg_ciphertext_ballot_get_contests_size(eg_ciphertext_ballot_t *handle);
-
-/**
- * Get a contest at a specific index.
- * 
- * @param[in] in_index The index of the contest
- * @param[out] out_contest_ref An opaque pointer to the contest.  
- *                             The value is a reference and is not owned by the caller
- */
-EG_API eg_electionguard_status_t
-eg_ciphertext_ballot_get_contest_at_index(eg_ciphertext_ballot_t *handle, uint64_t in_index,
-                                          eg_ciphertext_ballot_contest_t **out_contest_ref);
-
-/**
- * Unique ballot tracking code for this ballot
- * 
- * @param[out] out_ballot_code_ref An opaque pointer to the ballot code.  
- *                                   The value is a reference and is not owned by the caller
- */
-EG_API eg_electionguard_status_t eg_ciphertext_ballot_get_ballot_code(
-  eg_ciphertext_ballot_t *handle, eg_element_mod_q_t **out_ballot_code_ref);
-
-/**
- * The timestamp indicating when the ballot was encrypted
- * as measured by the encryption device.  This value does not
- * provide units as it is up to the consuming system to indicate the scale.
- * Typically a consumer may use seconds since epoch or ticks since epoch
- */
-EG_API eg_electionguard_status_t eg_ciphertext_ballot_get_timestamp(eg_ciphertext_ballot_t *handle,
-                                                                    uint64_t *out_timestamp);
-
-/**
- * The nonce used to encrypt this ballot. Sensitive & should be treated as a secret
- * 
- * @param[out] out_nonce_ref An opaque pointer to the seed ballot nonce.  
- *                           The value is a reference and is not owned by the caller
- */
-EG_API eg_electionguard_status_t eg_ciphertext_ballot_get_nonce(eg_ciphertext_ballot_t *handle,
-                                                                eg_element_mod_q_t **out_nonce_ref);
-
 /**
  * The hash of the encrypted values on this ballot in sequence order
  * 
@@ -455,10 +337,6 @@ EG_API eg_electionguard_status_t eg_ciphertext_ballot_crypto_hash_with(
   eg_element_mod_q_t **out_crypto_hash);
 
 // TODO: eg_ciphertext_ballot_make
-
-EG_API bool eg_ciphertext_ballot_is_valid_encryption(
-  eg_ciphertext_ballot_t *handle, eg_element_mod_q_t *in_manifest_hash,
-  eg_element_mod_p_t *in_public_key, eg_element_mod_q_t *in_crypto_extended_base_hash);
 
 /**
  * Import the ballot representation from JSON

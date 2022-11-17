@@ -237,7 +237,7 @@ namespace ElectionGuard.Encryption.Tests
             var contestSize = (int)ballot.ContestsSize;
             for (int i = 0; i < contestSize; i++)
             {
-                var contest = ballot.GetContestAt((ulong)i);
+                var contest = ballot.GetContestAtIndex((ulong)i);
                 if (func(contest))
                 {
                     return contest;

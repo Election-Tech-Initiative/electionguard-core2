@@ -108,12 +108,13 @@
       },
       {
         "Name": "GetSelectionAtIndex",
+        "Description": "Get a selection at a specific index.",
+        "CallerShouldFree": false,
         "ReturnType": {
           "TypeCs": "PlaintextBallotSelection",
           "TypeC": "eg_plaintext_ballot_selection_t",
           "NativeHandleType": "PlaintextBallotSelection.External.PlaintextBallotSelectionHandle"
         },
-        "Description": "Get a selection at a specific index.",
         "Params": [
           {
             "Name": "index",
@@ -154,12 +155,13 @@
     "Methods": [
       {
         "Name": "GetContestAtIndex",
+        "Description": "Get the contest at the specified index.",
+        "CallerShouldFree": false,
         "ReturnType": {
           "TypeCs": "PlaintextBallotContest",
           "TypeC": "eg_plaintext_ballot_contest_t",
           "NativeHandleType": "PlaintextBallotContest.External.PlaintextBallotContestHandle"
         },
-        "Description": "Get the contest at the specified index.",
         "Params": [
           {
             "Name": "index",
@@ -186,7 +188,7 @@
         },
         "Description": "Export the ballot representation as BSON",
         "Params": [
-        ] 
+        ]
       },
       {
         "Name": "ToMsgPack",
@@ -270,7 +272,65 @@
         }
       }
     ],
-    "Methods": []
+    "Methods": [
+      {
+        "Name": "CryptoHashWith",
+        "Description": "Given an encrypted BallotSelection, generates a hash, suitable for rolling up into a hash / tracking code for an entire ballot. Of note, this particular hash examines the `encryptionSeed` and `message`, but not the proof. This is deliberate, allowing for the possibility of ElectionGuard variants running on much more limited hardware, wherein the Disjunctive Chaum-Pedersen proofs might be computed later on. In most cases the encryption_seed should match the `description_hash`.",
+        "CallerShouldFree": true,
+        "ReturnType": {
+          "TypeCs": "ElementModQ",
+          "NativeHandleType": "NativeInterface.ElementModQ.ElementModQHandle",
+          "TypeC": "eg_element_mod_q_t"
+        },
+        "Params": [
+          {
+            "Name": "encryptionSeed",
+            "Description": "In most cases the encryption_seed should match the `description_hash`",
+            "Type": {
+              "TypeCs": "ElementModQ",
+              "NativeHandleType": "NativeInterface.ElementModQ.ElementModQHandle",
+              "TypeC": "eg_element_mod_q_t"
+            }
+          }
+        ]
+      },
+      {
+        "Name": "IsValidEncryption",
+        "ReturnType": {
+          "TypeCs": "bool"
+        },
+        "Description": "Given an encrypted BallotSelection, validates the encryption state against a specific seed hash and public key. Calling this function expects that the object is in a well-formed encrypted state with the elgamal encrypted `message` field populated along with the DisjunctiveChaumPedersenProof`proof` populated. the ElementModQ `description_hash` and the ElementModQ `crypto_hash` are also checked.",
+        "Params": [
+          {
+            "Name": "encryptionSeed",
+            "Description": "The hash of the SelectionDescription, or whatever `ElementModQ` was used to populate the `description_hash` field.",
+            "Type": {
+              "TypeCs": "ElementModQ",
+              "NativeHandleType": "NativeInterface.ElementModQ.ElementModQHandle",
+              "TypeC": "eg_element_mod_q_t"
+            }
+          },
+          {
+            "Name": "elGamalPublicKey",
+            "Description": "The election public key.",
+            "Type": {
+              "TypeCs": "ElementModP",
+              "NativeHandleType": "NativeInterface.ElementModP.ElementModPHandle",
+              "TypeC": "eg_element_mod_p_t"
+            }
+          },
+          {
+            "Name": "cryptoExtendedBaseHash",
+            "Description": "The extended base hash of the election.",
+            "Type": {
+              "TypeCs": "ElementModQ",
+              "NativeHandleType": "NativeInterface.ElementModQ.ElementModQHandle",
+              "TypeC": "eg_element_mod_q_t"
+            }
+          }
+        ]
+      }
+    ]
   },
   {
     "ClassName": "CiphertextBallotContest",
@@ -335,5 +395,128 @@
       }
     ],
     "Methods": []
+  },
+  {
+    "ClassName": "CiphertextBallot",
+    "Properties": [
+      {
+        "Name": "ObjectId",
+        "Description": "The unique ballot id that is meaningful to the consuming application.",
+        "Type": {
+          "TypeCs": "string"
+        }
+      },
+      {
+        "Name": "StyleId",
+        "Description": "The Object Id of the ballot style in the election manifest.  This value is used to determine which contests to expect on the ballot, to fill in missing values, and to validate that the ballot is well-formed",
+        "Type": {
+          "TypeCs": "string"
+        }
+      },
+      {
+        "Name": "ManifestHash",
+        "Description": "Hash of the complete Election Manifest to which this ballot belongs",
+        "Type": {
+          "TypeCs": "ElementModQ",
+          "NativeHandleType": "NativeInterface.ElementModQ.ElementModQHandle",
+          "TypeC": "eg_element_mod_q_t"
+        }
+      },
+      {
+        "Name": "BallotCodeSeed",
+        "Description": "The seed hash for the ballot.  It may be the encryption device hash, the hash of a previous ballot or the hash of some other value that is meaningful to the consuming application.",
+        "Type": {
+          "TypeCs": "ElementModQ",
+          "NativeHandleType": "NativeInterface.ElementModQ.ElementModQHandle",
+          "TypeC": "eg_element_mod_q_t"
+        }
+      },
+      {
+        "Name": "ContestsSize",
+        "Description": "Get the size of the contests collection",
+        "Type": {
+          "TypeCs": "ulong"
+        }
+      },
+      {
+        "Name": "BallotCode",
+        "Description": "The unique ballot code for this ballot that is derived from the ballot seed, the timestamp, and the hash of the encrypted values",
+        "Type": {
+          "TypeCs": "ElementModQ",
+          "NativeHandleType": "NativeInterface.ElementModQ.ElementModQHandle",
+          "TypeC": "eg_element_mod_q_t"
+        }
+      },
+      {
+        "Name": "Timestamp",
+        "Description": "The timestamp indicating when the ballot was encrypted as measured by the encryption device.  This value does not provide units as it is up to the host system to indicate the scale. Typically a host may use seconds since epoch or ticks since epoch.",
+        "Type": {
+          "TypeCs": "ulong"
+        }
+      },
+      {
+        "Name": "Nonce",
+        "Description": "The nonce value used to encrypt all values in the ballot",
+        "Type": {
+          "TypeCs": "ElementModQ",
+          "NativeHandleType": "NativeInterface.ElementModQ.ElementModQHandle",
+          "TypeC": "eg_element_mod_q_t"
+        }
+      }
+    ],
+    "Methods": [
+      {
+        "Name": "GetContestAtIndex",
+        "CallerShouldFree": false,
+        "Description": "Get a contest at a specific index",
+        "ReturnType": {
+          "TypeCs": "CiphertextBallotContest",
+          "TypeC": "eg_ciphertext_ballot_contest_t",
+          "NativeHandleType": "CiphertextBallotContest.External.CiphertextBallotContestHandle"
+        },
+        "Params": [
+          {
+            "Name": "index",
+            "Description": "The index of the contest",
+            "Type": {
+              "TypeCs": "ulong"
+            }
+          }
+        ]
+      },
+      {
+        "Name": "IsValidEncryption",
+        "ReturnType": {
+          "TypeCs": "bool"
+        },
+        "Description": "Given an encrypted Ballot, validates the encryption state against a specific ballot seed and public key by verifying the states of this ballot's members (BallotContest's and BallotSelection's). Calling this function expects that the object is in a well-formed encrypted state with the `contests` populated with valid encrypted ballot selections, and the ElementModQ `manifest_hash` also populated. Specifically, the seed in this context is the hash of the Election Manifest, or whatever `ElementModQ` was used to populate the `manifest_hash` field.",
+        "Params": [
+          {
+            "Name": "manifestHash",
+            "Type": {
+              "TypeCs": "ElementModQ",
+              "NativeHandleType": "NativeInterface.ElementModQ.ElementModQHandle",
+              "TypeC": "eg_element_mod_q_t"
+            }
+          },
+          {
+            "Name": "elGamalPublicKey",
+            "Type": {
+              "TypeCs": "ElementModP",
+              "NativeHandleType": "NativeInterface.ElementModP.ElementModPHandle",
+              "TypeC": "eg_element_mod_p_t"
+            }
+          },
+          {
+            "Name": "cryptoExtendedBaseHash",
+            "Type": {
+              "TypeCs": "ElementModQ",
+              "NativeHandleType": "NativeInterface.ElementModQ.ElementModQHandle",
+              "TypeC": "eg_element_mod_q_t"
+            }
+          }
+        ]
+      }
+    ]
   }
 ]

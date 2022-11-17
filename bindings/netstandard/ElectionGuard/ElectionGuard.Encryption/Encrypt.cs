@@ -1,7 +1,6 @@
 ﻿namespace ElectionGuard
 {
-    using NativeCiphertextBallot = NativeInterface.CiphertextBallot.CiphertextBallotHandle;
-    using NativeCiphertextBallotContest = CiphertextBallotContest.External.CiphertextBallotContestHandle;
+    using NativeCiphertextBallot = CiphertextBallot.External.CiphertextBallotHandle;
     using NativeCiphertextBallotSelection = CiphertextBallotSelection.External.CiphertextBallotSelectionHandle;
     using NativeCompactCiphertextBallot = NativeInterface.CompactCiphertextBallot.CompactCiphertextBallotHandle;
 
