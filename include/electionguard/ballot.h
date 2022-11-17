@@ -331,20 +331,6 @@ EG_API eg_electionguard_status_t eg_plaintext_ballot_from_bson(uint8_t *in_data,
 EG_API eg_electionguard_status_t eg_plaintext_ballot_from_msgpack(
   uint8_t *in_data, uint64_t in_length, eg_plaintext_ballot_t **out_handle);
 
-/**
- * Export the ballot representation as BSON
- */
-EG_API eg_electionguard_status_t eg_plaintext_ballot_to_bson(eg_plaintext_ballot_t *handle,
-                                                             uint8_t **out_data,
-                                                             uint64_t *out_size);
-
-/**
- * Export the ballot representation as MsgPack
- */
-EG_API eg_electionguard_status_t eg_plaintext_ballot_to_msgpack(eg_plaintext_ballot_t *handle,
-                                                                uint8_t **out_data,
-                                                                uint64_t *out_size);
-
 #endif
 
 #ifndef CiphertextBallot

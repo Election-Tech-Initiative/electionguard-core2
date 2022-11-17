@@ -12,6 +12,7 @@ namespace ElectionGuard
         internal External.CiphertextBallotContestHandle Handle;
 
         #region Properties
+
         /// <Summary>
         /// Get the objectId of the contest, which is the unique id for the contest in a specific ballot described in the election manifest.
         /// </Summary>
@@ -109,6 +110,7 @@ namespace ElectionGuard
 
         #region Methods
 
+
 #pragma warning disable CS1591 // Missing XML comment for publicly visible type or member
         protected override void DisposeUnmanaged()
 #pragma warning restore CS1591 // Missing XML comment for publicly visible type or member
@@ -122,6 +124,7 @@ namespace ElectionGuard
         #endregion
 
         #region Extern
+
         internal static unsafe class External {
             internal struct CiphertextBallotContestType { };
 
@@ -142,77 +145,70 @@ namespace ElectionGuard
             [DllImport(
                 NativeInterface.DllName,
                 EntryPoint = "eg_ciphertext_ballot_contest_get_object_id",
-                CallingConvention = CallingConvention.Cdecl, 
-                SetLastError = true
-            )]
+                CallingConvention = CallingConvention.Cdecl,
+                SetLastError = true)]
             internal static extern Status GetObjectId(
-                CiphertextBallotContestHandle handle
-                , out IntPtr objectId
-            );
+                CiphertextBallotContestHandle handle,
+                out IntPtr objectId
+                );
 
             [DllImport(
                 NativeInterface.DllName,
                 EntryPoint = "eg_ciphertext_ballot_contest_get_sequence_order",
-                CallingConvention = CallingConvention.Cdecl, 
-                SetLastError = true
-            )]
+                CallingConvention = CallingConvention.Cdecl,
+                SetLastError = true)]
             internal static extern ulong GetSequenceOrder(
                 CiphertextBallotContestHandle handle
-            );
+                );
 
             [DllImport(
                 NativeInterface.DllName,
                 EntryPoint = "eg_ciphertext_ballot_contest_get_description_hash",
-                CallingConvention = CallingConvention.Cdecl, 
-                SetLastError = true
-            )]
+                CallingConvention = CallingConvention.Cdecl,
+                SetLastError = true)]
             internal static extern Status GetDescriptionHash(
-                CiphertextBallotContestHandle handle
-                , out NativeInterface.ElementModQ.ElementModQHandle objectId
-            );
+                CiphertextBallotContestHandle handle,
+                out NativeInterface.ElementModQ.ElementModQHandle objectId
+                );
 
             [DllImport(
                 NativeInterface.DllName,
                 EntryPoint = "eg_ciphertext_ballot_contest_get_selections_size",
-                CallingConvention = CallingConvention.Cdecl, 
-                SetLastError = true
-            )]
+                CallingConvention = CallingConvention.Cdecl,
+                SetLastError = true)]
             internal static extern ulong GetSelectionsSize(
                 CiphertextBallotContestHandle handle
-            );
+                );
 
             [DllImport(
                 NativeInterface.DllName,
                 EntryPoint = "eg_ciphertext_ballot_contest_get_crypto_hash",
-                CallingConvention = CallingConvention.Cdecl, 
-                SetLastError = true
-            )]
+                CallingConvention = CallingConvention.Cdecl,
+                SetLastError = true)]
             internal static extern Status GetCryptoHash(
-                CiphertextBallotContestHandle handle
-                , out NativeInterface.ElementModQ.ElementModQHandle objectId
-            );
+                CiphertextBallotContestHandle handle,
+                out NativeInterface.ElementModQ.ElementModQHandle objectId
+                );
 
             [DllImport(
                 NativeInterface.DllName,
                 EntryPoint = "eg_ciphertext_ballot_contest_get_nonce",
-                CallingConvention = CallingConvention.Cdecl, 
-                SetLastError = true
-            )]
+                CallingConvention = CallingConvention.Cdecl,
+                SetLastError = true)]
             internal static extern Status GetNonce(
-                CiphertextBallotContestHandle handle
-                , out NativeInterface.ElementModQ.ElementModQHandle objectId
-            );
+                CiphertextBallotContestHandle handle,
+                out NativeInterface.ElementModQ.ElementModQHandle objectId
+                );
 
             [DllImport(
                 NativeInterface.DllName,
                 EntryPoint = "eg_ciphertext_ballot_contest_get_proof",
-                CallingConvention = CallingConvention.Cdecl, 
-                SetLastError = true
-            )]
+                CallingConvention = CallingConvention.Cdecl,
+                SetLastError = true)]
             internal static extern Status GetProof(
-                CiphertextBallotContestHandle handle
-                , out NativeInterface.DisjunctiveChaumPedersenProof.DisjunctiveChaumPedersenProofHandle objectId
-            );
+                CiphertextBallotContestHandle handle,
+                out NativeInterface.DisjunctiveChaumPedersenProof.DisjunctiveChaumPedersenProofHandle objectId
+                );
 
         }
         #endregion

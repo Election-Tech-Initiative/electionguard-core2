@@ -89,6 +89,11 @@ if (egMethod.ReturnType.TypeCs == "string") {
 	char **out_data,
 	uint64_t *out_size<#
 }
+if (egMethod.ReturnType.TypeCs == "byte[]") {
+#>,
+	uint8_t **out_data,
+	uint64_t *out_size<#
+}
 #>
 
 	);
