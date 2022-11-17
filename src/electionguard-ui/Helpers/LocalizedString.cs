@@ -21,7 +21,7 @@ public class LocalizedString : ObservableObject
 
         // This instance will be unsubscribed and GCed if no one references it
         // since LocalizationResourceManager uses WeekEventManger
-        localizationManager.PropertyChanged += (sender, e) => OnPropertyChanged((string)null);
+        localizationManager.PropertyChanged += (sender, e) => OnPropertyChanged((string?)null);
     }
 
     public string Localized => generator();
