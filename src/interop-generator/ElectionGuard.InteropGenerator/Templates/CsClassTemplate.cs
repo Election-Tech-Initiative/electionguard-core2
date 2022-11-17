@@ -496,7 +496,7 @@ if (EgClass.NeverFree) {
                     "e, EntryPoint = \"eg_");
             
             #line 168 "C:\dev\ElectionGuard\electionguard-core2\src\interop-generator\ElectionGuard.InteropGenerator\Templates\CsClassTemplate.tt"
-            this.Write(this.ToStringHelper.ToStringWithCulture(className.ToSnakeCase()));
+            this.Write(this.ToStringHelper.ToStringWithCulture(EgClass.CFunctionPrefix));
             
             #line default
             #line hidden
@@ -512,7 +512,7 @@ if (EgClass.NeverFree) {
             
             #line 172 "C:\dev\ElectionGuard\electionguard-core2\src\interop-generator\ElectionGuard.InteropGenerator\Templates\CsClassTemplate.tt"
  foreach (var egProperty in EgClass.Properties) {
-        var entryPoint = egProperty.GetEntryPoint(className);
+        var entryPoint = egProperty.GetEntryPoint(EgClass);
         var isElectionGuardType = egProperty.IsElectionGuardType;
         var isReferenceType = egProperty.IsPassByReference;
 
@@ -590,7 +590,7 @@ if (isElectionGuardType) {
             
             #line 195 "C:\dev\ElectionGuard\electionguard-core2\src\interop-generator\ElectionGuard.InteropGenerator\Templates\CsClassTemplate.tt"
  foreach (var method in EgClass.Methods) {
-    var entryPoint = method.GetEntryPoint(className);
+    var entryPoint = method.GetEntryPoint(EgClass);
     var returnsElectionGuardType = method.ReturnType.IsElectionGuardType;
     var isReturnTypeReferenceType = method.ReturnType.IsPassByReference;
 

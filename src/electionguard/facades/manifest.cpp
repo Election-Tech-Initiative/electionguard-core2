@@ -13,6 +13,7 @@
 extern "C" {
 
 #include "electionguard/manifest.h"
+#include "electionguard/manifest.generated.h"
 }
 
 using electionguard::AnnotatedString;

@@ -8,9 +8,9 @@ public record EgProperty(
     string Description
     )
 {
-    public string GetEntryPoint(string className)
+    public string GetEntryPoint(EgClass egClass)
     {
-        return $"Eg{className}Get{Name}".ToSnakeCase();
+        return $"eg_{egClass.CFunctionPrefix}Get{Name}".ToSnakeCase();
     }
 
     public bool IsReferenceType()

@@ -5,7 +5,7 @@
 <#@ import namespace="System.Collections.Generic" #>
 <#@ import namespace="ElectionGuard.InteropGenerator.Helpers" #>
 <#
-	var classNameSnakeCase = EgClass.ClassName.ToSnakeCase();
+	var classNameSnakeCase = EgClass.CFunctionPrefix;
 	var classHandle = $"eg_{classNameSnakeCase}_t";
 #>
 /// @file <#= classNameSnakeCase.ToLower() #>.generated.h
@@ -16,7 +16,9 @@
 #include "export.h"
 #include "group.h"
 #include "status.h"
-#include "ballot.h"
+<# if (EgClass.CInclude != null) { #>
+#include "<#= EgClass.CInclude #>"
+<# } #>
 
 #ifdef __cplusplus
 extern "C" {
@@ -25,7 +27,7 @@ extern "C" {
 #ifndef <#= EgClass.ClassName #>
 
 <# foreach (var egProperty in EgClass.Properties) { 
-	var entryPoint = egProperty.GetEntryPoint(EgClass.ClassName);
+	var entryPoint = egProperty.GetEntryPoint(EgClass);
 	var returnType = egProperty.GetCReturnType();
 	var outParamName = "out_" + egProperty.Name.ToSnakeCase();
 #>
@@ -60,7 +62,7 @@ if (egProperty.IsReferenceType()) {
 
 <# } // foreach property #>
 <# foreach (var egMethod in EgClass.Methods) { 
-	var entryPoint = egMethod.GetEntryPoint(EgClass.ClassName); 
+	var entryPoint = egMethod.GetEntryPoint(EgClass); 
 	var returnType = egMethod.GetCReturnType();
 	#>
 /**
@@ -109,7 +111,7 @@ if (egMethod.ReturnType.TypeCs == "byte[]") {
 /**
  * Frees the memory held by the <#= EgClass.ClassName #>
  */
-EG_API eg_electionguard_status_t eg_<#= classNameSnakeCase #>_free(eg_<#= classNameSnakeCase #>_t *handle);
+EG_API eg_electionguard_status_t eg_<#= EgClass.CFunctionPrefix #>_free(<#= classHandle #> *handle);
 
 #endif // ifndef <#= EgClass.ClassName #>
 

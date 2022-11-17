@@ -774,8 +774,6 @@ EG_API eg_electionguard_status_t eg_election_manifest_new_with_contact(
   eg_internationalized_text_t *in_name, eg_contact_information_t *in_contact_info,
   eg_election_manifest_t **out_handle);
 
-EG_API eg_electionguard_status_t eg_election_manifest_free(eg_election_manifest_t *handle);
-
 EG_API eg_electionguard_status_t eg_election_manifest_get_election_scope_id(
   eg_election_manifest_t *handle, char **out_election_scope_id);
 

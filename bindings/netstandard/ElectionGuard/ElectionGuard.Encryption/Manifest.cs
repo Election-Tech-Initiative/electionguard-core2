@@ -10,8 +10,6 @@ namespace ElectionGuard
     using NativeParty = NativeInterface.Party.PartyHandle;
     using NativeCandidate = NativeInterface.Candidate.CandidateHandle;
     using NativeContestDescription = NativeInterface.ContestDescription.ContestDescriptionHandle;
-    using NativeManifest = NativeInterface.Manifest.ManifestHandle;
-    using NativeElementModP = NativeInterface.ElementModP.ElementModPHandle;
     using NativeElementModQ = NativeInterface.ElementModQ.ElementModQHandle;
 
     #region AnnotatedString
@@ -70,7 +68,7 @@ namespace ElectionGuard
     ///
     /// See: https://developers.google.com/elections-data/reference/election
     /// </summary>
-    public class Manifest : DisposableBase
+    public partial class Manifest : DisposableBase
     {
         /// <Summary>
         /// Unique identifier for a GpUnit element. Associates the election with
@@ -221,13 +219,6 @@ namespace ElectionGuard
                 }
                 return new ContactInformation(value);
             }
-        }
-
-        internal NativeManifest Handle;
-
-        internal Manifest(NativeManifest handle)
-        {
-            Handle = handle;
         }
 
         /// <summary>
@@ -405,17 +396,6 @@ namespace ElectionGuard
             {
                 throw new ElectionGuardException($"Manifest Error Status: {status}");
             }
-        }
-
-#pragma warning disable CS1591 // Missing XML comment for publicly visible type or member
-        protected override void DisposeUnmanaged()
-#pragma warning restore CS1591 // Missing XML comment for publicly visible type or member
-        {
-            base.DisposeUnmanaged();
-
-            if (Handle == null || Handle.IsInvalid) return;
-            Handle.Dispose();
-            Handle = null;
         }
 
         /// <Summary>

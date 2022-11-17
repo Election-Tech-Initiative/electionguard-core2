@@ -4,6 +4,7 @@
 
 #include <electionguard/export.h>
 #include <electionguard/manifest.h>
+#include <electionguard/manifest.generated.h>
 
 #ifdef __cplusplus
 extern "C" {

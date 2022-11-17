@@ -2,6 +2,7 @@
   {
     "ClassName": "PlaintextBallotSelection",
     "NeverFree": true,
+    "CInclude": "ballot.h",
     "Properties": [
       {
         "Name": "ObjectId",
@@ -55,6 +56,7 @@
   {
     "ClassName": "PlaintextBallotContest",
     "NeverFree": true,
+    "CInclude": "ballot.h",
     "Properties": [
       {
         "Name": "ObjectId",
@@ -129,6 +131,7 @@
   },
   {
     "ClassName": "PlaintextBallot",
+    "CInclude": "ballot.h",
     "Properties": [
       {
         "Name": "ObjectId",
@@ -204,6 +207,7 @@
   {
     "ClassName": "CiphertextBallotSelection",
     "NeverFree": true,
+    "CInclude": "ballot.h",
     "Properties": [
       {
         "Name": "ObjectId",
@@ -335,6 +339,7 @@
   {
     "ClassName": "CiphertextBallotContest",
     "NeverFree": true,
+    "CInclude": "ballot.h",
     "Properties": [
       {
         "Name": "ObjectId",
@@ -398,6 +403,7 @@
   },
   {
     "ClassName": "CiphertextBallot",
+    "CInclude": "ballot.h",
     "Properties": [
       {
         "Name": "ObjectId",
@@ -518,5 +524,12 @@
         ]
       }
     ]
+  },
+  {
+    "ClassName": "Manifest",
+    "CustomCName": "election_manifest",
+    "CInclude": "manifest.h",
+    "Properties": [],
+    "Methods": []
   }
 ]
