@@ -56,5 +56,5 @@ jobs:
           name: electionguard-ui-${{ matrix.name }}
           retention-days: 7
           path: |
-            src/electionguard-ui/bin/${{ env.TARGET }}/**/*.{pkg,msix}
-          if-no-files-found: error
+            ~/**/src/electionguard-ui/bin/${{ env.TARGET }}/**/*.pkg
+            ~/**/src/electionguard-ui/bin/${{ env.TARGET }}/**/*.msix
