@@ -4,11 +4,12 @@ on:
   workflow_dispatch:
   pull_request:
     paths:
-      - ".github/**"
+      - ".github/pull-request.yml"
       - "apps/**"
       - "bindings/**"
       - "include/**"
       - "src/**"
+      - "!src/electionguard-ui/**"
       - "test/**"
     branches: [main]
 

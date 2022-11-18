@@ -19,6 +19,9 @@ else
 	OPERATING_SYSTEM := $(shell uname 2>/dev/null || echo Unknown)
 endif
 
+# Default build number
+BUILD := 1
+
 # Debug or Release (capitalized)
 TARGET?=Release
 
@@ -62,10 +65,14 @@ ifeq ($(OPERATING_SYSTEM),Windows)
 	choco upgrade wget -y
 	choco upgrade unzip -y
 	choco upgrade cmake -y
+	dotnet workload restore ./src/electionguard-ui/ElectionGuard.UI.sln
+else
+	sudo dotnet workload restore ./src/electionguard-ui/ElectionGuard.UI.sln
 endif
 	wget -O cmake/CPM.cmake https://github.com/cpm-cmake/CPM.cmake/releases/download/v0.35.5/CPM.cmake
 	make fetch-sample-data
 	dotnet tool restore
+
 
 fetch-sample-data:
 	@echo ⬇️ FETCH Sample Data
@@ -89,6 +96,15 @@ else
 		-DCPM_SOURCE_CACHE=$(CPM_SOURCE_CACHE)
 endif
 	cmake --build $(ELECTIONGUARD_BUILD_LIBS_DIR)/x86_64/$(TARGET)
+
+build-ui:
+	@echo 🧱 BUILD UI
+ifeq ($(OPERATING_SYSTEM),Windows)
+	dotnet publish -f net7.0-windows10.0.19041.0 -c $(TARGET) /p:ApplicationVersion=$(BUILD) /p:RuntimeIdentifierOverride=win10-x64 ./src/electionguard-ui/ElectionGuard.UI.sln 
+endif
+ifeq ($(OPERATING_SYSTEM),Darwin)
+		dotnet build -c $(TARGET) /p:CreatePackage=true /p:ApplicationVersion=$(BUILD) ./src/electionguard-ui/ElectionGuard.UI.sln 
+endif
 
 generate-interop:
 	cd ./src/interop-generator/ElectionGuard.InteropGenerator && \
@@ -200,6 +216,10 @@ clean-netstandard:
 	@echo 🗑️ CLEAN NETSTANDARD
 	dotnet clean ./bindings/netstandard/ElectionGuard/ElectionGuard.sln
 
+clean-ui:
+	@echo 🗑️ CLEAN UI
+	dotnet clean ./src/electionguard-ui/ElectionGuard.UI.sln
+
 format: build
 	cd $(ELECTIONGUARD_BUILD_LIBS_DIR)/x86_64 && $(MAKE) format
 
@@ -212,6 +232,8 @@ else
 endif
 
 rebuild: clean build
+
+rebuild-ui: clean-ui build-ui
 
 sanitize: sanitize-asan sanitize-tsan
 
@@ -359,6 +381,10 @@ endif
 test-netstandard: build-netstandard
 	@echo 🧪 TEST NETSTANDARD
 	dotnet test --configuration $(TARGET) ./bindings/netstandard/ElectionGuard/ElectionGuard.sln
+
+test-ui:
+	@echo 🧪 TEST UI
+	dotnet test --configuration $(TARGET) ./src/electionguard-ui/ElectionGuard.UI.sln 
 
 coverage:
 	@echo ✅ CHECK COVERAGE
