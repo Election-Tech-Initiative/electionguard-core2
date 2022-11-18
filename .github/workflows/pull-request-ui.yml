@@ -58,4 +58,4 @@ jobs:
           retention-days: 7
           path: |
             ${{ github.workspace}}/src/electionguard-ui/bin/${{ env.TARGET }}/**/*.pkg
-            ${{ github.workspace}}/src/electionguard-ui/bin/${{ env.TARGET }}/**/*.msix
+            ${{ github.workspace}}/src/electionguard-ui/bin/${{ env.TARGET }}/**/ElectionGuard.UI*.msix
