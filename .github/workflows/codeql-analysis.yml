@@ -7,7 +7,7 @@ name: "CodeQL"
 
 on:
   workflow_dispatch:
-  push:
+  pull_request:
     paths:
       - "apps/**"
       - "bindings/**"
@@ -15,8 +15,6 @@ on:
       - "src/**"
       - "!src/electionguard-ui/**"
       - "test/**"
-    branches: [main]
-  pull_request:
     branches: [main]
   schedule:
     - cron: "0 7 * * 4"
