@@ -19,6 +19,9 @@ else
 	OPERATING_SYSTEM := $(shell uname 2>/dev/null || echo Unknown)
 endif
 
+# Default build number
+BUILD := 1
+
 # Debug or Release (capitalized)
 TARGET?=Release
 
@@ -97,10 +100,10 @@ endif
 build-ui:
 	@echo 🧱 BUILD UI
 ifeq ($(OPERATING_SYSTEM),Windows)
-	dotnet publish -f net7.0-windows10.0.19041.0 -c $(TARGET) /p:RuntimeIdentifierOverride=win10-x64 ./src/electionguard-ui/ElectionGuard.UI.sln 
+	dotnet publish -f net7.0-windows10.0.19041.0 -c $(TARGET) /p:ApplicationVersion=$(RUN) /p:RuntimeIdentifierOverride=win10-x64 ./src/electionguard-ui/ElectionGuard.UI.sln 
 endif
 ifeq ($(OPERATING_SYSTEM),Darwin)
-		dotnet build -c $(TARGET) /p:CreatePackage=true ./src/electionguard-ui/ElectionGuard.UI.sln 
+		dotnet build -c $(TARGET) /p:CreatePackage=true /p:ApplicationVersion=$(RUN) ./src/electionguard-ui/ElectionGuard.UI.sln 
 endif
 
 generate-interop:

@@ -46,8 +46,10 @@ jobs:
           sudo xcode-select -switch /Applications/Xcode_${{ matrix.version }}.app
       - name: Configure Environment
         run: make environment
-      - name: Rebuild
-        run: make rebuild-ui
+      - name: Clean UI
+        run: make clean-ui
+      - name: Build UI
+        run: make build-ui BUILD=${{ github.run_number }}
       - name: Test
         run: make test-ui
       - name: save build artifacts
