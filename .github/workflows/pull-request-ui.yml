@@ -52,9 +52,10 @@ jobs:
         run: make test-ui
       - name: save build artifacts
         uses: actions/upload-artifact@v3
+
         with:
           name: electionguard-ui-${{ matrix.name }}
           retention-days: 7
           path: |
-            ~/**/src/electionguard-ui/bin/${{ env.TARGET }}/**/*.pkg
-            ~/**/src/electionguard-ui/bin/${{ env.TARGET }}/**/*.msix
+            ${{ github.workspace}}/src/electionguard-ui/bin/${{ env.TARGET }}/**/*.pkg
+            ${{ github.workspace}}/src/electionguard-ui/bin/${{ env.TARGET }}/**/*.msix
