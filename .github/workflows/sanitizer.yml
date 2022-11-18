@@ -9,6 +9,7 @@ on:
       - "bindings/**"
       - "include/**"
       - "src/**"
+      - "!src/electionguard-ui/**"
       - "test/**"
 #  schedule:
 #    - cron: '0 0 * * 2-6' Daily at 00:00 UTC Tuesday-saturday
