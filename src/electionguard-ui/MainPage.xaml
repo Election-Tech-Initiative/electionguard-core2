@@ -1,7 +1,10 @@
 ﻿<?xml version="1.0" encoding="utf-8" ?>
 <ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
-             x:Class="ElectionGuard.UI.MainPage">
+             xmlns:helper="clr-namespace:ElectionGuard.UI.Helpers"
+             xmlns:vm="clr-namespace:ElectionGuard.UI.ViewModels"
+             x:Class="ElectionGuard.UI.MainPage"
+             x:DataType="vm:MainViewModel">
 
     <ScrollView>
         <VerticalStackLayout
@@ -16,7 +19,7 @@
                 HorizontalOptions="Center" />
 
             <Label
-                Text="Hello, World!"
+                Text="{helper:Translate HelloWorld}"
                 SemanticProperties.HeadingLevel="Level1"
                 FontSize="32"
                 HorizontalOptions="Center" />
@@ -34,7 +37,18 @@
                 SemanticProperties.Hint="Counts the number of times you click"
                 Clicked="OnCounterClicked"
                 HorizontalOptions="Center" />
-
+            <HorizontalStackLayout HorizontalOptions="Center">
+                <Button
+                    Text="Spanish"
+                    SemanticProperties.Hint="Counts the number of times you click"
+                    Command="{Binding SpanishCommand}"
+                    HorizontalOptions="Center" />
+                <Button
+                    Text="English"
+                    SemanticProperties.Hint="Counts the number of times you click"
+                    Command="{Binding EnglishCommand}"
+                    HorizontalOptions="Center" />
+            </HorizontalStackLayout>
         </VerticalStackLayout>
     </ScrollView>
 
