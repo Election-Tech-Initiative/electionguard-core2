@@ -298,6 +298,16 @@ else
 	$(ELECTIONGUARD_BUILD_LIBS_DIR)/x86_64/Debug/test/ElectionGuardCTests
 endif
 
+start-db:
+ifeq "${EG_DB_PASSWORD}" ""
+	@echo "Set the EG_DB_PASSWORD environment variable"
+	exit 1
+endif
+	docker compose --env-file ./.env -f src/electionguard-db/docker-compose.db.yml up -d
+
+stop-db:
+	docker compose --env-file ./.env -f src/electionguard-db/docker-compose.db.yml down
+
 bench:
 	@echo 🧪 BENCHMARK
 ifeq ($(OPERATING_SYSTEM),Windows)
