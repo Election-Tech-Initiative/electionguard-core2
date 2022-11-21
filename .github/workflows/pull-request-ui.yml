@@ -45,7 +45,7 @@ jobs:
           ls -ls $ANDROID_SDK_ROOT/ndk
           sudo xcode-select -switch /Applications/Xcode_${{ matrix.version }}.app
       - name: Configure Environment
-        run: make environment
+        run: make environment-ui
       - name: Clean UI
         run: make clean-ui
       - name: Test

@@ -46,7 +46,6 @@ ifeq ($(OPERATING_SYSTEM),Darwin)
 	brew install include-what-you-use
 	brew install llvm
 	test -f /usr/local/bin/clang-tidy || sudo ln -s "$(shell brew --prefix llvm)/bin/clang-tidy" "/usr/local/bin/clang-tidy"
-	sudo dotnet workload restore ./src/electionguard-ui/ElectionGuard.UI.sln
 endif
 ifeq ($(OPERATING_SYSTEM),Linux)
 	@echo 🐧 LINUX INSTALL
@@ -66,11 +65,18 @@ ifeq ($(OPERATING_SYSTEM),Windows)
 	choco upgrade wget -y
 	choco upgrade unzip -y
 	choco upgrade cmake -y
-	dotnet workload restore ./src/electionguard-ui/ElectionGuard.UI.sln
 endif
 	wget -O cmake/CPM.cmake https://github.com/cpm-cmake/CPM.cmake/releases/download/v0.35.5/CPM.cmake
 	make fetch-sample-data
 	dotnet tool restore
+
+
+environment-ui: environment
+ifeq ($(OPERATING_SYSTEM),Windows)
+	dotnet workload restore ./src/electionguard-ui/ElectionGuard.UI.sln
+else
+	sudo dotnet workload restore ./src/electionguard-ui/ElectionGuard.UI.sln
+endif
 
 
 fetch-sample-data:
