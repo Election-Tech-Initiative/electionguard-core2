@@ -48,10 +48,10 @@ jobs:
         run: make environment
       - name: Clean UI
         run: make clean-ui
-      - name: Build UI
-        run: make build-ui BUILD=${{ github.run_number }}
       - name: Test
         run: make test-ui
+      - name: Build UI
+        run: make build-ui BUILD=${{ github.run_number }}
       - name: save build artifacts
         uses: actions/upload-artifact@v3
 
