@@ -102,7 +102,7 @@ else
 endif
 	cmake --build $(ELECTIONGUARD_BUILD_LIBS_DIR)/x86_64/$(TARGET)
 
-build-ui:
+publish-ui:
 	@echo 🧱 BUILD UI
 ifeq ($(OPERATING_SYSTEM),Windows)
 	dotnet publish -f net7.0-windows10.0.19041.0 -c $(TARGET) /p:ApplicationVersion=$(BUILD) /p:RuntimeIdentifierOverride=win10-x64 src\electionguard-ui\ElectionGuard.UI.Lib\ElectionGuard.UI.Lib.csproj

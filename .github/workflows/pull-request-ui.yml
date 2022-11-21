@@ -50,8 +50,8 @@ jobs:
         run: make clean-ui
       - name: Test
         run: make test-ui
-      - name: Build UI
-        run: make build-ui BUILD=${{ github.run_number }}
+      - name: Publish UI
+        run: make publish-ui BUILD=${{ github.run_number }}
       - name: save build artifacts
         uses: actions/upload-artifact@v3
 
