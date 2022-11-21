@@ -4,6 +4,7 @@
     {
         public bool IsDbAvailable()
         {
+            // todo: implement
             return true;
         }
     }
