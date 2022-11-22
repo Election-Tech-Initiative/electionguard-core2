@@ -35,7 +35,7 @@ jobs:
       - name: Change Directory
         run: cd ${{ github.workspace }}
       - name: Install .NET 7.0
-        uses: actions/setup-dotnet@v2
+        uses: actions/setup-dotnet@v3
         with:
           dotnet-version: 7.0.x
       - name: Update Mac Environment
@@ -45,13 +45,13 @@ jobs:
           ls -ls $ANDROID_SDK_ROOT/ndk
           sudo xcode-select -switch /Applications/Xcode_${{ matrix.version }}.app
       - name: Configure Environment
-        run: make environment
+        run: make environment-ui
       - name: Clean UI
         run: make clean-ui
-      - name: Build UI
-        run: make build-ui BUILD=${{ github.run_number }}
       - name: Test
         run: make test-ui
+      - name: Publish UI
+        run: make publish-ui BUILD=${{ github.run_number }}
       - name: save build artifacts
         uses: actions/upload-artifact@v3
 

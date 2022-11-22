@@ -65,13 +65,18 @@ ifeq ($(OPERATING_SYSTEM),Windows)
 	choco upgrade wget -y
 	choco upgrade unzip -y
 	choco upgrade cmake -y
-	dotnet workload restore ./src/electionguard-ui/ElectionGuard.UI.sln
-else
-	sudo dotnet workload restore ./src/electionguard-ui/ElectionGuard.UI.sln
 endif
 	wget -O cmake/CPM.cmake https://github.com/cpm-cmake/CPM.cmake/releases/download/v0.35.5/CPM.cmake
 	make fetch-sample-data
 	dotnet tool restore
+
+
+environment-ui: environment
+ifeq ($(OPERATING_SYSTEM),Windows)
+	dotnet workload restore ./src/electionguard-ui/ElectionGuard.UI.sln
+else
+	sudo dotnet workload restore ./src/electionguard-ui/ElectionGuard.UI.sln
+endif
 
 
 fetch-sample-data:
@@ -97,13 +102,13 @@ else
 endif
 	cmake --build $(ELECTIONGUARD_BUILD_LIBS_DIR)/x86_64/$(TARGET)
 
-build-ui:
+publish-ui:
 	@echo 🧱 BUILD UI
 ifeq ($(OPERATING_SYSTEM),Windows)
-	dotnet publish -f net7.0-windows10.0.19041.0 -c $(TARGET) /p:ApplicationVersion=$(BUILD) /p:RuntimeIdentifierOverride=win10-x64 ./src/electionguard-ui/ElectionGuard.UI.sln 
+	dotnet publish -f net7.0-windows10.0.19041.0 -c $(TARGET) /p:ApplicationVersion=$(BUILD) /p:RuntimeIdentifierOverride=win10-x64 src\electionguard-ui\ElectionGuard.UI.Lib\ElectionGuard.UI.Lib.csproj
 endif
 ifeq ($(OPERATING_SYSTEM),Darwin)
-		dotnet build -c $(TARGET) /p:CreatePackage=true /p:ApplicationVersion=$(BUILD) ./src/electionguard-ui/ElectionGuard.UI.sln 
+	dotnet build -c $(TARGET) /p:CreatePackage=true /p:ApplicationVersion=$(BUILD) src/electionguard-ui/ElectionGuard.UI.Lib/ElectionGuard.UI.Lib.csproj
 endif
 
 generate-interop:
@@ -297,6 +302,16 @@ else
 	$(ELECTIONGUARD_BUILD_LIBS_DIR)/x86_64/Debug/test/ElectionGuardTests
 	$(ELECTIONGUARD_BUILD_LIBS_DIR)/x86_64/Debug/test/ElectionGuardCTests
 endif
+
+start-db:
+ifeq "${EG_DB_PASSWORD}" ""
+	@echo "Set the EG_DB_PASSWORD environment variable"
+	exit 1
+endif
+	docker compose --env-file ./.env -f src/electionguard-db/docker-compose.db.yml up -d
+
+stop-db:
+	docker compose --env-file ./.env -f src/electionguard-db/docker-compose.db.yml down
 
 bench:
 	@echo 🧪 BENCHMARK
