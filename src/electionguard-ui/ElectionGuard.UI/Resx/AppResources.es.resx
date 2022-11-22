@@ -186,9 +186,6 @@
   <data name="ManifestText" xml:space="preserve">
     <value>manifiesto</value>
   </data>
-  <data name="QuorunText" xml:space="preserve">
-    <value>Quórum.</value>
-  </data>
   <data name="ElectionChecklist" xml:space="preserve">
     <value>¡Lista de verificación de elecciones!</value>
   </data>
