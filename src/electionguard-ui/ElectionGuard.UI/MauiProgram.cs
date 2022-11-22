@@ -1,4 +1,4 @@
-﻿using ElectionGuard.UI.ViewModels;
+using CommunityToolkit.Maui;
 using Microsoft.Extensions.Logging;
 
 namespace ElectionGuard.UI;
@@ -10,6 +10,7 @@ public static class MauiProgram
         var builder = MauiApp.CreateBuilder();
         builder
             .UseMauiApp<App>()
+            .UseMauiCommunityToolkit()
             .SetupFonts()
             .SetupServices()
             .SetupLogging();
@@ -40,10 +41,16 @@ public static class MauiProgram
     public static MauiAppBuilder SetupServices(this MauiAppBuilder builder)
     {
         // setup viewmodels
-        builder.Services.AddSingleton<MainViewModel>();
+        builder.Services.AddSingleton<LoginViewModel>();
+        builder.Services.AddSingleton<GuardianHomeViewModel>();
+        builder.Services.AddSingleton<AdminHomeViewModel>();
+        builder.Services.AddSingleton<ElectionViewModel>();
 
         // setup views
-        builder.Services.AddSingleton<MainPage>();
+        builder.Services.AddSingleton<LoginPage>();
+        builder.Services.AddSingleton<GuardianHomePage>();
+        builder.Services.AddSingleton<AdminHomePage>();
+        builder.Services.AddSingleton<ElectionPage>();
 
         return builder;
     }

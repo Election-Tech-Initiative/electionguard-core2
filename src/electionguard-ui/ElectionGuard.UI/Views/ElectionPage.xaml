@@ -1,0 +1,132 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="ElectionGuard.UI.Views.ElectionPage"
+             xmlns:helper="clr-namespace:ElectionGuard.UI.Helpers"
+             xmlns:model="clr-namespace:ElectionGuard.UI.Lib.Models;assembly=ElectionGuard.UI.Lib"
+             Title="{helper:Translate ElectionDetails}"
+             xmlns:vm="clr-namespace:ElectionGuard.UI.ViewModels"
+             x:DataType="vm:ElectionViewModel"
+             ControlTemplate="{StaticResource PageTemplate}">
+    <Grid ColumnDefinitions="2*, *, *" Margin="20">
+        <VerticalStackLayout Grid.Column="0">
+            <Label 
+                Text="{Binding CurrentElection.Name}"
+                FontSize="Header" 
+                FontAttributes="Bold"
+                VerticalOptions="Center" 
+                HorizontalOptions="Start" />
+            <Grid ColumnDefinitions="*, *">
+                <Label Grid.Column="0"
+                    Text="{helper:Translate GuardiansText}"
+                    FontSize="Subtitle"
+                    FontAttributes="Bold"
+                    VerticalOptions="Center" 
+                    HorizontalOptions="Start" />
+                <Label Grid.Column="1"
+                    Text="{helper:Translate QuorumText}"
+                    FontSize="Subtitle"
+                    FontAttributes="Bold"
+                    VerticalOptions="Center" 
+                    HorizontalOptions="Start" />
+            </Grid>
+            <Label
+                    Text="{helper:Translate ElectionUrl}"
+                    FontSize="Subtitle"
+                    FontAttributes="Bold"
+                    VerticalOptions="Center" 
+                    HorizontalOptions="Start" />
+            <Label
+                    Text="{helper:Translate CreatedText}"
+                    FontSize="Subtitle"
+                    FontAttributes="Bold"
+                    VerticalOptions="Center" 
+                    HorizontalOptions="Start" />
+            <Grid>
+                <Label Grid.Column="0"
+                        Text="{helper:Translate BallotsText}"
+                        FontSize="Title"
+                        FontAttributes="Bold"
+                        VerticalOptions="Center" 
+                        HorizontalOptions="Start" />
+                <Button Text="{helper:Translate AddBallots}"
+                        Margin="50,0,0,0"
+                        VerticalOptions="Center"
+                        HorizontalOptions="Center"/>
+            </Grid>
+            <CollectionView />
+            <Grid>
+                <Label Grid.Column="0"
+                    Text="{helper:Translate TalliesText}"
+                    FontSize="Title"
+                    FontAttributes="Bold"
+                    VerticalOptions="Center" 
+                    HorizontalOptions="Start" />
+                <Button Text="{helper:Translate CreateTally}"
+                        Margin="50,0,0,0"
+                        VerticalOptions="Center"
+                        HorizontalOptions="Center"/>
+            </Grid>
+            <CollectionView />
+
+        </VerticalStackLayout>
+        <VerticalStackLayout Grid.Column="1">
+            <Label 
+                Text="{helper:Translate ManifestText}"
+                FontSize="Header"
+                FontAttributes="Bold"
+                VerticalOptions="Center" 
+                HorizontalOptions="Start" />
+            <Label 
+                Text="location"
+                FontSize="Body"
+                FontAttributes="Bold"
+                VerticalOptions="Center" 
+                HorizontalOptions="Start" />
+            <Grid ColumnDefinitions="*, *">
+                <Label Grid.Column="0"
+                    Text="{helper:Translate PartiesText}"
+                    FontSize="Subtitle"
+                    FontAttributes="Bold"
+                    VerticalOptions="Center" 
+                    HorizontalOptions="Start" />
+                <Label Grid.Column="1"
+                    Text="{helper:Translate CandidatesText}"
+                    FontSize="Subtitle"
+                    FontAttributes="Bold"
+                    VerticalOptions="Center" 
+                    HorizontalOptions="Start" />
+            </Grid>
+            <Grid ColumnDefinitions="*, *">
+                <Label Grid.Column="0"
+                    Text="{helper:Translate ContestsText}"
+                    FontSize="Subtitle"
+                    FontAttributes="Bold"
+                    VerticalOptions="Center" 
+                    HorizontalOptions="Start" />
+                <Label Grid.Column="1"
+                    Text="{helper:Translate BallotStylesText}"
+                    FontSize="Subtitle"
+                    FontAttributes="Bold"
+                    VerticalOptions="Center" 
+                    HorizontalOptions="Start" />
+            </Grid>
+            <Grid ColumnDefinitions="*, *">
+                <Label Grid.Column="0"
+                    Text="{helper:Translate GeopoliticalUnitsText}"
+                    FontSize="Subtitle"
+                    FontAttributes="Bold"
+                    VerticalOptions="Center" 
+                    HorizontalOptions="Start" />
+            </Grid>
+        </VerticalStackLayout>
+        <VerticalStackLayout Grid.Column="2">
+            <Label 
+                Text="{helper:Translate ElectionChecklist}"
+                FontSize="Large"
+                FontAttributes="Bold"
+                VerticalOptions="Center" 
+                HorizontalOptions="Center" />
+        </VerticalStackLayout>
+    </Grid>
+</ContentPage>

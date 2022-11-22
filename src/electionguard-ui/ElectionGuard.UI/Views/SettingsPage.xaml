@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<toolkit:Popup xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:toolkit="http://schemas.microsoft.com/dotnet/2022/maui/toolkit"
+             xmlns:helper="clr-namespace:ElectionGuard.UI.Helpers"
+             x:Class="ElectionGuard.UI.Views.SettingsPage">
+    <Grid>
+        <Label 
+            Text="{helper:Translate Settings}" FontSize="Header"
+            VerticalOptions="Start" 
+            HorizontalOptions="Center" />
+        <ImageButton Source="world.png" 
+                     HorizontalOptions="End"
+                     VerticalOptions="End"
+                     Margin="10"
+                     ToolTipProperties.Text="{helper:Translate SwitchLanguages}" 
+                     HeightRequest="40" 
+                     Command="{Binding ChangeLanguageCommand}" 
+                     BorderWidth="0" 
+                     BackgroundColor="Transparent" />
+
+    </Grid>
+</toolkit:Popup>

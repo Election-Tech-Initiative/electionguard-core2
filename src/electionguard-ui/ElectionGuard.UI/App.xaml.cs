@@ -1,22 +1,38 @@
-﻿using ElectionGuard.UI.Resx;
+using ElectionGuard.UI.Resx;
 using System.Globalization;
 
 namespace ElectionGuard.UI;
 
 public partial class App : Application
 {
+    public static User CurrentUser { get; set; } = new User();
+
     public App()
     {
         InitializeComponent();
+        this.UserAppTheme = AppTheme.Light;
 
-        LocalizationResourceManager.Current.PropertyChanged += (_, _) => AppResources.Culture = LocalizationResourceManager.Current.CurrentCulture;
+        SetupLanguageSupport();
+
+        MainPage = new AppShell();
+    }
+
+    void SetupLanguageSupport()
+    {
+        LocalizationResourceManager.Current.PropertyChanged += CurrentLanguage_Changed;
         LocalizationResourceManager.Current.Init(AppResources.ResourceManager);
 
         string? currentLanguage = Preferences.Get("CurrentLanguage", null);
         LocalizationResourceManager.Current.CurrentCulture = currentLanguage is null ? CultureInfo.CurrentCulture : new CultureInfo(currentLanguage);
+    }
 
+    private void CurrentLanguage_Changed(object? sender, System.ComponentModel.PropertyChangedEventArgs e)
+    {
+        AppResources.Culture = LocalizationResourceManager.Current.CurrentCulture;
 
-        MainPage = new AppShell();
+        // change the first windows title to the new language
+        if (Windows.Count > 0)
+            Windows[0].Title = GetWindowTitle();
     }
 
     protected override Window CreateWindow(IActivationState? activationState)

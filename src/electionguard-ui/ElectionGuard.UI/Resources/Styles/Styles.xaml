@@ -1,8 +1,10 @@
-﻿<?xml version="1.0" encoding="UTF-8" ?>
+<?xml version="1.0" encoding="UTF-8" ?>
 <?xaml-comp compile="true" ?>
 <ResourceDictionary 
     xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
-    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml">
+    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+    xmlns:helper="clr-namespace:ElectionGuard.UI.Helpers"
+    xmlns:app="clr-namespace:ElectionGuard.UI">
 
     <Style TargetType="ActivityIndicator">
         <Setter Property="Color" Value="{AppThemeBinding Light={StaticResource Primary}, Dark={StaticResource White}}" />
@@ -24,14 +26,15 @@
     </Style>
 
     <Style TargetType="Button">
-        <Setter Property="TextColor" Value="{AppThemeBinding Light={StaticResource White}, Dark={StaticResource Primary}}" />
-        <Setter Property="BackgroundColor" Value="{AppThemeBinding Light={StaticResource Primary}, Dark={StaticResource White}}" />
+        <Setter Property="TextColor" Value="{StaticResource White}" />
+        <Setter Property="BackgroundColor" Value="{StaticResource HeaderColor}" />
         <Setter Property="FontFamily" Value="OpenSansRegular"/>
         <Setter Property="FontSize" Value="14"/>
         <Setter Property="CornerRadius" Value="8"/>
         <Setter Property="Padding" Value="14,10"/>
         <Setter Property="MinimumHeightRequest" Value="44"/>
         <Setter Property="MinimumWidthRequest" Value="44"/>
+        <Setter Property="WidthRequest" Value="150"/>
         <Setter Property="VisualStateManager.VisualStateGroups">
             <VisualStateGroupList>
                 <VisualStateGroup x:Name="CommonStates">
@@ -402,4 +405,42 @@
         <Setter Property="SelectedTabColor" Value="{AppThemeBinding Light={StaticResource Gray950}, Dark={StaticResource Gray200}}" />
     </Style>
 
+    <ControlTemplate x:Key="PageTemplate">
+        <Grid RowDefinitions="auto, *, auto" BindingContext="{Binding BindingContext, Source={RelativeSource TemplatedParent}}">
+            <Grid BackgroundColor="{StaticResource HeaderColor}" Padding="10" Grid.Row="0">
+                <VerticalStackLayout>
+                    <Grid>
+                        <HorizontalStackLayout HorizontalOptions="StartAndExpand">
+                            <Image Source="logo.png" HeightRequest="48" VerticalOptions="Center" >
+                                <Image.GestureRecognizers>
+                                    <TapGestureRecognizer Command="{Binding HomeCommand}" />
+                                </Image.GestureRecognizers>
+                            </Image>
+                            <Label Text="{helper:Translate ElectionGuardTitle}" FontSize="24" TextColor="White" VerticalOptions="Center" Margin=" 10,0,0,0">
+                                <Label.GestureRecognizers>
+                                    <TapGestureRecognizer Command="{Binding HomeCommand}" />
+                                </Label.GestureRecognizers>
+                            </Label>
+                            <Label Text=" / " FontSize="24" TextColor="White" VerticalOptions="Center" Margin=" 10,0,10,0" />
+                            <Label Text="{Binding Page.Title}" FontSize="24" TextColor="White" VerticalOptions="Center" />
+                        </HorizontalStackLayout>
+                        <Label Text="{Binding UserName}" VerticalOptions="Center" HorizontalOptions="EndAndExpand" FontSize="24" TextColor="White">
+                        <Label.GestureRecognizers>
+                            <TapGestureRecognizer Command="{Binding LogoutCommand}" />
+                        </Label.GestureRecognizers>
+                    </Label>
+                    </Grid>
+                </VerticalStackLayout>
+            </Grid>
+            <ContentPresenter Grid.Row="1" />
+            <Grid BackgroundColor="{StaticResource FooterColor}" Padding="10" Grid.Row="2">
+                <HorizontalStackLayout HorizontalOptions="Start">
+                    <ImageButton Source="gear.png" ToolTipProperties.Text="{helper:Translate Settings}" Margin="10,0,10,0" HeightRequest="40" Command="{Binding SettingsCommand}" BorderWidth="0" BackgroundColor="Transparent" />
+                    <ImageButton Source="world.png" ToolTipProperties.Text="{helper:Translate SwitchLanguages}" HeightRequest="40" Command="{Binding ChangeLanguageCommand}" BorderWidth="0" BackgroundColor="Transparent" />
+                </HorizontalStackLayout>
+                <Label Text="{Binding Version}" TextColor="{StaticResource FooterTextColor}" FontSize="24" HorizontalOptions="End" />
+            </Grid>
+        </Grid>
+    </ControlTemplate>
+    
 </ResourceDictionary>
