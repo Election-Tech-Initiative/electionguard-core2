@@ -37,7 +37,7 @@ namespace ElectionGuard.UI.ViewModels
         [RelayCommand]
         async Task Logout()
         {
-            App.CurrentUser.Name = string.Empty;
+            App.CurrentUser.Name = null;
             await Shell.Current.GoToAsync($"//{nameof(LoginPage)}");
         }
 
