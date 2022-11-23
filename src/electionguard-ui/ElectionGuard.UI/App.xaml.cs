@@ -17,7 +17,7 @@ public partial class App : Application
         MainPage = new AppShell();
     }
 
-    void SetupLanguageSupport()
+    private void SetupLanguageSupport()
     {
         LocalizationResourceManager.Current.PropertyChanged += CurrentLanguage_Changed;
         LocalizationResourceManager.Current.Init(AppResources.ResourceManager);
