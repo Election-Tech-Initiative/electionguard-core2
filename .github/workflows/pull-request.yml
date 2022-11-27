@@ -8,8 +8,8 @@ on:
       - "apps/**"
       - "bindings/**"
       - "include/**"
-      - "src/**"
       - "!src/electionguard-ui/**"
+      - "src/**"
       - "test/**"
     branches: [main]
 
