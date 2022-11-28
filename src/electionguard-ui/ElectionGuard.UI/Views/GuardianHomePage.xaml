@@ -6,64 +6,38 @@
              xmlns:model="clr-namespace:ElectionGuard.UI.Lib.Models;assembly=ElectionGuard.UI.Lib"
              Title="{helper:Translate GuardianHome}"
              xmlns:vm="clr-namespace:ElectionGuard.UI.ViewModels"
+             xmlns:views="using:ElectionGuard.UI.Views"
              x:DataType="vm:GuardianHomeViewModel"
              ControlTemplate="{StaticResource PageTemplate}">
-    <VerticalStackLayout Padding="100,20,100,0">
+    <VerticalStackLayout Style="{StaticResource FullWidthPage}">
         <Grid ColumnDefinitions="*,*">
             <VerticalStackLayout Grid.Column="0" >
-                <CollectionView Margin="5" HeightRequest="400"
-                    ItemsSource="{Binding KeyCeremonies}" 
-                    SelectedItem="{Binding CurrentKeyCeremony}"
-                    SelectionMode="Single">
-                    <CollectionView.Header>
-                        <Grid BackgroundColor="{StaticResource FooterColor}">
-                            <Label Margin="5" FontSize="48" FontAttributes="Bold"
-                                Text="{helper:Translate ElectionsText}"
-                                VerticalOptions="Center" 
-                                HorizontalOptions="Start" />
-                        </Grid>
-                    </CollectionView.Header>
+                <Label Style="{StaticResource H1}" Text="{helper:Translate ElectionsText}" />
+                <CollectionView ItemsSource="{Binding KeyCeremonies}" 
+                                SelectedItem="{Binding CurrentKeyCeremony}"
+                                SelectionMode="Single">
                     <CollectionView.EmptyView>
-                        <ContentView>
-                            <StackLayout HorizontalOptions="CenterAndExpand"
-                             VerticalOptions="CenterAndExpand">
-                                <Label Text="{helper:Translate NoKeyCeremonies}"
-                                   Margin="10,25,10,10"
-                                   FontAttributes="Bold"
-                                   FontSize="18" TextColor="Black"
-                                   HorizontalOptions="Fill"
-                                   HorizontalTextAlignment="Center" />
-                            </StackLayout>
-                        </ContentView>
+                        <views:NoContentView Text="{helper:Translate NoKeyCeremonies}"></views:NoContentView>
                     </CollectionView.EmptyView>
                     <CollectionView.ItemTemplate>
                         <DataTemplate x:DataType="model:KeyCeremony">
-                            <Frame BackgroundColor="{StaticResource HeaderColor}">
-                                <Label FontSize="Medium" TextColor="White" HorizontalOptions="Fill" VerticalOptions="Center" VerticalTextAlignment="Center" Text="{Binding Name}" />
-                            </Frame>
+                            <Button Text="{Binding Name}" />
                         </DataTemplate>
                     </CollectionView.ItemTemplate>
                 </CollectionView>
             </VerticalStackLayout>
             <VerticalStackLayout Grid.Column="1" >
-                <CollectionView Margin="5"  
+                <Label Style="{StaticResource H1}"  Text="{helper:Translate TalliesText}" />
+                <CollectionView 
                     ItemsSource="{Binding Tallies}" 
                     SelectedItem="{Binding CurrentTally}"
-                    EmptyView="{helper:Translate NoTallies}"
                     SelectionMode="Single">
-                    <CollectionView.Header>
-                        <Grid BackgroundColor="{StaticResource FooterColor}">
-                            <Label Margin="5" FontSize="48" FontAttributes="Bold"
-                                Text="{helper:Translate TalliesText}"
-                                VerticalOptions="Center" 
-                                HorizontalOptions="Start" />
-                        </Grid>
-                    </CollectionView.Header>
+                    <CollectionView.EmptyView>
+                        <views:NoContentView Text="{helper:Translate NoTallies}"></views:NoContentView>
+                    </CollectionView.EmptyView>
                     <CollectionView.ItemTemplate>
                         <DataTemplate x:DataType="model:Tally">
-                            <Frame BackgroundColor="{StaticResource HeaderColor}">
-                                <Label FontSize="Medium" TextColor="White" HorizontalOptions="Fill" VerticalOptions="Center" VerticalTextAlignment="Center" Text="{Binding Name}" />
-                            </Frame>
+                            <Button Text="{Binding Name}" />
                         </DataTemplate>
                     </CollectionView.ItemTemplate>
                 </CollectionView>

@@ -20,11 +20,19 @@
         <Setter Property="Padding">0,20,0,0</Setter>
     </Style>
 
+    <Style x:Key="FullWidthPage" TargetType="VerticalStackLayout">
+        <Setter Property="Padding">10,5,10,0</Setter>
+    </Style>
+
     <Style x:Key="FullWidth" TargetType="Button">
         <Setter Property="HorizontalOptions">Fill</Setter>
     </Style>
 
     <Style x:Key="FormLabel" TargetType="Label">
         <Setter Property="FontSize">14</Setter>
+    </Style>
+
+    <Style x:Key="NoContentFound" TargetType="Label">
+        <Setter Property="FontSize">18</Setter>
     </Style>
 </ResourceDictionary>
