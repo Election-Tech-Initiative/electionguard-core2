@@ -1,6 +1,6 @@
 namespace ElectionGuard.UI.Views;
 
-public partial class AdminHomePage : ContentPage
+public partial class AdminHomePage
 {
 	public AdminHomePage(AdminHomeViewModel vm)
 	{
