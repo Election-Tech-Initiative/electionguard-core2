@@ -10,7 +10,7 @@
     </Style>
 
     <Style x:Key="H2" TargetType="Label">
-        <Setter Property="FontSize">24</Setter>
+        <Setter Property="FontSize">28</Setter>
         <Setter Property="Margin">0,10,0,15</Setter>
     </Style>
 
@@ -33,6 +33,6 @@
     </Style>
 
     <Style x:Key="NoContentFound" TargetType="Label">
-        <Setter Property="FontSize">18</Setter>
+        <Setter Property="FontSize">16</Setter>
     </Style>
 </ResourceDictionary>

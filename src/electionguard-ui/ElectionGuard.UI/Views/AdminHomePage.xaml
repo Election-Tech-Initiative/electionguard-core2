@@ -6,6 +6,7 @@
              xmlns:model="clr-namespace:ElectionGuard.UI.Lib.Models;assembly=ElectionGuard.UI.Lib"
              Title="{helper:Translate AdminHome}"
              xmlns:vm="clr-namespace:ElectionGuard.UI.ViewModels"
+             xmlns:views="using:ElectionGuard.UI.Views"
              x:DataType="vm:AdminHomeViewModel"
              ControlTemplate="{StaticResource PageTemplate}">
     <VerticalStackLayout Style="{StaticResource NarrowCenteredPage}">
@@ -16,17 +17,7 @@
                     SelectedItem="{Binding CurrentElection}" SelectionChangedCommand="{Binding SelectionChangedCommand}"
                     SelectionMode="Single">
             <CollectionView.EmptyView>
-                <ContentView>
-                    <StackLayout HorizontalOptions="CenterAndExpand"
-                             VerticalOptions="CenterAndExpand">
-                        <Label Text="{helper:Translate NoElections}"
-                                   Margin="10,25,10,10"
-                                   FontAttributes="Bold"
-                                   FontSize="18" TextColor="Black"
-                                   HorizontalOptions="Fill"
-                                   HorizontalTextAlignment="Center" />
-                    </StackLayout>
-                </ContentView>
+                <views:NoContentView Text="{helper:Translate NoElections}"></views:NoContentView>
             </CollectionView.EmptyView>
             <CollectionView.ItemTemplate>
                 <DataTemplate x:DataType="model:Election">
