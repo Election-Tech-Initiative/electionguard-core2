@@ -12,9 +12,7 @@ on:
       - "apps/**"
       - "bindings/**"
       - "include/**"
-      - "src/electionguard/**"
-      - "src/interop-generator/**"
-      - "src/karamel/**"
+      - "src/**"
       - "!src/electionguard-ui/**"
       - "test/**"
     branches: [main]
