@@ -399,7 +399,7 @@ test-netstandard: build-netstandard
 
 test-ui:
 	@echo 🧪 TEST UI
-	dotnet test --configuration $(TARGET) ./src/electionguard-ui/ElectionGuard.UI.sln 
+	dotnet test --no-build --configuration $(TARGET) ./src/electionguard-ui/ElectionGuard.UI.sln 
 
 coverage:
 	@echo ✅ CHECK COVERAGE

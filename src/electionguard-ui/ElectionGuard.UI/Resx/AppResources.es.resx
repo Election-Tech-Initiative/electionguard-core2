@@ -123,4 +123,115 @@
   <data name="WindowTitle" xml:space="preserve">
     <value>¡Gerente de Elecciones de ElectionGuard!</value>
   </data>
+  <data name="UserID" xml:space="preserve">
+    <value>ID de usuario</value>
+  </data>
+  <data name="UserLogin" xml:space="preserve">
+    <value>Iniciar sesión</value>
+  </data>
+  <data name="UserSetup" xml:space="preserve">
+    <value>Configuración de usuario</value>
+  </data>
+  <data name="LoginPlaceholder" xml:space="preserve">
+    <value>¡Introduzca su nombre u otro identificador!</value>
+  </data>
+  <data name="LoginText" xml:space="preserve">
+    <value>Sesión Iniciada</value>
+  </data>
+  <data name="GuardianHome" xml:space="preserve">
+    <value>Tutor</value>
+  </data>
+  <data name="KeyCeremoniesText" xml:space="preserve">
+    <value>Ceremonia</value>
+  </data>
+  <data name="NoKeyCeremonies" xml:space="preserve">
+    <value>¡No se han encontrado ceremonias clave!</value>
+  </data>
+  <data name="NoTallies" xml:space="preserve">
+    <value>¡No se han encontrado cuentas!</value>
+  </data>
+  <data name="TalliesText" xml:space="preserve">
+    <value>¡Tallies!</value>
+  </data>
+  <data name="AdminHome" xml:space="preserve">
+    <value>Inicio de Administrador</value>
+  </data>
+  <data name="CreateElection" xml:space="preserve">
+    <value>¡Crear elección!</value>
+  </data>
+  <data name="ElectionGuardTitle" xml:space="preserve">
+    <value>¡ElectionGuard!</value>
+  </data>
+  <data name="ElectionsText" xml:space="preserve">
+    <value>Elecciones</value>
+  </data>
+  <data name="NoElections" xml:space="preserve">
+    <value>No se han encontrado elecciones</value>
+  </data>
+  <data name="Version" xml:space="preserve">
+    <value>¡ElectionGuard versión 2.0!</value>
+  </data>
+  <data name="SwitchLanguages" xml:space="preserve">
+    <value>¡Cambia de idioma!</value>
+  </data>
+  <data name="Settings" xml:space="preserve">
+    <value>Configuración</value>
+  </data>
+  <data name="ElectionDetails" xml:space="preserve">
+    <value>¡Detalles de la elección!</value>
+  </data>
+  <data name="GuardiansText" xml:space="preserve">
+    <value>Tutores</value>
+  </data>
+  <data name="ManifestText" xml:space="preserve">
+    <value>manifiesto</value>
+  </data>
+  <data name="ElectionChecklist" xml:space="preserve">
+    <value>¡Lista de verificación de elecciones!</value>
+  </data>
+  <data name="QuorumText" xml:space="preserve">
+    <value>Quórum.</value>
+  </data>
+  <data name="AddBallots" xml:space="preserve">
+    <value>Papeletas</value>
+  </data>
+  <data name="BallotCountText" xml:space="preserve">
+    <value>¡Recuento de papeletas!</value>
+  </data>
+  <data name="BallotStylesText" xml:space="preserve">
+    <value>¡Estilos de papeleta!</value>
+  </data>
+  <data name="CandidatesText" xml:space="preserve">
+    <value>Candidatos</value>
+  </data>
+  <data name="ContestsText" xml:space="preserve">
+    <value>COMPETENCIAS</value>
+  </data>
+  <data name="CreatedText" xml:space="preserve">
+    <value>¡Creado!</value>
+  </data>
+  <data name="CreateTally" xml:space="preserve">
+    <value>¡Crear recuento!</value>
+  </data>
+  <data name="ElectionUrl" xml:space="preserve">
+    <value>¡URL de la elección!</value>
+  </data>
+  <data name="GeopoliticalUnitsText" xml:space="preserve">
+    <value>¡Unidades geopolíticas!</value>
+  </data>
+  <data name="LocationText" xml:space="preserve">
+    <value>¡Ubicación¡</value>
+  </data>
+  <data name="NameText" xml:space="preserve">
+    <value>Nombre</value>
+  </data>
+  <data name="PartiesText" xml:space="preserve">
+    <value>Las Partes</value>
+  </data>
+  <data name="UploadedText" xml:space="preserve">
+    <value>¡Cargado!</value>
+  </data>
+  <data name="BallotsText" xml:space="preserve">
+    <value>Papeletas</value>
+  </data>
 </root>

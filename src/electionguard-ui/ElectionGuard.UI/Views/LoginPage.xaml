@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:helper="clr-namespace:ElectionGuard.UI.Helpers"
+             x:Class="ElectionGuard.UI.Views.LoginPage"
+             Title="{helper:Translate UserLogin}"
+             xmlns:vm="clr-namespace:ElectionGuard.UI.ViewModels"
+             x:DataType="vm:LoginViewModel"
+             ControlTemplate="{StaticResource PageTemplate}">
+    <VerticalStackLayout Padding="100,20,100,0">
+        <Label Margin="5" FontSize="Title"
+            Text="{helper:Translate UserSetup}"
+            VerticalOptions="Center" 
+            HorizontalOptions="Start" />
+        <Label Margin="5"
+            Text="{helper:Translate UserID}"
+            VerticalOptions="Center" 
+            HorizontalOptions="Start" />
+        <Entry x:Name="entryField" Margin="5" Placeholder="{helper:Translate LoginPlaceholder}" Text="{Binding Name}" />
+        <Button Margin="5" Text="{helper:Translate LoginText}" HorizontalOptions="Start" Command="{Binding LoginCommand}" />
+    </VerticalStackLayout>
+</ContentPage>
