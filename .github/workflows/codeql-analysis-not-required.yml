@@ -28,7 +28,3 @@ jobs:
 
     steps:
       - run: 'echo "No analysis required"'
-  skip:
-    runs-on: ubuntu-latest
-    steps:
-      - run: 'echo "No analysis required"'
