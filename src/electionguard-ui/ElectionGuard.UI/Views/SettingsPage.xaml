@@ -5,10 +5,7 @@
              xmlns:helper="clr-namespace:ElectionGuard.UI.Helpers"
              x:Class="ElectionGuard.UI.Views.SettingsPage">
     <Grid>
-        <Label 
-            Text="{helper:Translate Settings}" FontSize="Header"
-            VerticalOptions="Start" 
-            HorizontalOptions="Center" />
+        <Label Style="{StaticResource H1}" Text="{helper:Translate Settings}"  />
         <ImageButton Source="world.png" 
                      HorizontalOptions="End"
                      VerticalOptions="End"
