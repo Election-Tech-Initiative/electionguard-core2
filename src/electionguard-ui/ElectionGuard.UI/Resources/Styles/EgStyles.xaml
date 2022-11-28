@@ -28,6 +28,10 @@
         <Setter Property="HorizontalOptions">Fill</Setter>
     </Style>
 
+    <Style x:Key="NarrowWidth" TargetType="Button">
+        <Setter Property="HorizontalOptions">Start</Setter>
+    </Style>
+
     <Style x:Key="ButtonishFrame" TargetType="Frame">
         <Setter Property="CornerRadius" Value="8"/>
         <Setter Property="BackgroundColor" Value="{StaticResource HeaderColor}" />
@@ -43,10 +47,20 @@
     </Style>
 
     <Style x:Key="FormLabel" TargetType="Label">
-        <Setter Property="FontSize">14</Setter>
+        <Setter Property="FontSize">16</Setter>
+        <Setter Property="FontAttributes">Bold</Setter>
+    </Style>
+
+    <Style x:Key="FormValue" TargetType="Label">
+        <Setter Property="FontSize">16</Setter>
     </Style>
 
     <Style x:Key="NoContentFound" TargetType="Label">
         <Setter Property="FontSize">16</Setter>
+    </Style>
+
+    <Style x:Key="FormControl" TargetType="StackLayout">
+        <Setter Property="Orientation" Value="Vertical" />
+        <Setter Property="Margin">0,0,0,10</Setter>
     </Style>
 </ResourceDictionary>
