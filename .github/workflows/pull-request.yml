@@ -9,7 +9,9 @@ on:
       - "bindings/**"
       - "include/**"
       - "!src/electionguard-ui/**"
-      - "src/**"
+      - "src/electionguard/**"
+      - "src/interop-generator/**"
+      - "src/karamel/**"
       - "test/**"
     branches: [main]
 
