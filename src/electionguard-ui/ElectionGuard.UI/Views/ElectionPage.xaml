@@ -3,7 +3,6 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              x:Class="ElectionGuard.UI.Views.ElectionPage"
              xmlns:helper="clr-namespace:ElectionGuard.UI.Helpers"
-             xmlns:model="clr-namespace:ElectionGuard.UI.Lib.Models;assembly=ElectionGuard.UI.Lib"
              Title="{helper:Translate ElectionDetails}"
              xmlns:vm="clr-namespace:ElectionGuard.UI.ViewModels"
              x:DataType="vm:ElectionViewModel"
