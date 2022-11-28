@@ -394,7 +394,7 @@ namespace ElectionGuard.UI.Resx {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to ElectionGuard version 2.0.
+        ///   Looks up a localized string similar to v.
         /// </summary>
         internal static string Version {
             get {
