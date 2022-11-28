@@ -1,11 +1,4 @@
 ﻿using CommunityToolkit.Mvvm.Input;
-using ElectionGuard.UI.Views;
-using System;
-using System.Collections.Generic;
-using System.Globalization;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace ElectionGuard.UI.ViewModels
 {
@@ -13,11 +6,12 @@ namespace ElectionGuard.UI.ViewModels
     {
         [ObservableProperty]
         [NotifyCanExecuteChangedFor(nameof(LoginCommand))]
-        private string name = string.Empty;
+        private string _name = string.Empty;
 
         [RelayCommand(CanExecute = nameof(CanLogin))]
         async Task Login()
         {
+            await Task.Delay(10);
             App.CurrentUser.Name = Name;
             if (Name.ToLower().Contains("admin"))
             {

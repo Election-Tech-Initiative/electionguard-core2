@@ -1,14 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace ElectionGuard.UI.Helpers;
+﻿namespace ElectionGuard.UI.Helpers;
 
 public class LocalizedString : ObservableObject
 {
-    readonly Func<string> generator;
+    readonly Func<string> _generator;
 
     public LocalizedString(Func<string> generator)
         : this(LocalizationResourceManager.Current, generator)
@@ -17,14 +11,14 @@ public class LocalizedString : ObservableObject
 
     public LocalizedString(LocalizationResourceManager localizationManager, Func<string> generator)
     {
-        this.generator = generator;
+        this._generator = generator;
 
         // This instance will be unsubscribed and GCed if no one references it
         // since LocalizationResourceManager uses WeakEventManger
-        localizationManager.PropertyChanged += (sender, e) => OnPropertyChanged((string?)null);
+        localizationManager.PropertyChanged += (_, _) => OnPropertyChanged((string?)null);
     }
 
-    public string Localized => generator();
+    public string Localized => _generator();
 
-    public static implicit operator LocalizedString(Func<string> func) => new LocalizedString(func);
+    public static implicit operator LocalizedString(Func<string> func) => new(func);
 }
