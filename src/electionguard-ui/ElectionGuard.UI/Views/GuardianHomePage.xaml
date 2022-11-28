@@ -37,7 +37,9 @@
                     </CollectionView.EmptyView>
                     <CollectionView.ItemTemplate>
                         <DataTemplate x:DataType="model:Tally">
-                            <Button Text="{Binding Name}" />
+                            <Frame Style="{StaticResource ButtonishFrame}">
+                                <Label x:Name="Bob" Style="{StaticResource ButtonishLabel}" Text="{Binding Name}"/>
+                            </Frame>
                         </DataTemplate>
                     </CollectionView.ItemTemplate>
                 </CollectionView>
