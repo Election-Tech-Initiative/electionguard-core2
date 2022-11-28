@@ -12,10 +12,10 @@ on:
       - "apps/**"
       - "bindings/**"
       - "include/**"
-      - "!src/electionguard-ui/**"
       - "src/electionguard/**"
       - "src/interop-generator/**"
       - "src/karamel/**"
+      - "!src/electionguard-ui/**"
       - "test/**"
     branches: [main]
   schedule:
