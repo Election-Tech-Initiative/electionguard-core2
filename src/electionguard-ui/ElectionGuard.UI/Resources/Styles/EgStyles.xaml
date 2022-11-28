@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<?xaml-comp compile="true" ?>
+<ResourceDictionary 
+    xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml">
+
+    <Style x:Key="H1" TargetType="Label">
+        <Setter Property="FontSize">36</Setter>
+        <Setter Property="Margin">0,5,0,20</Setter>
+    </Style>
+
+    <Style x:Key="H2" TargetType="Label">
+        <Setter Property="FontSize">24</Setter>
+        <Setter Property="Margin">0,10,0,15</Setter>
+    </Style>
+
+    <Style x:Key="NarrowCenteredPage" TargetType="VerticalStackLayout">
+        <Setter Property="HorizontalOptions">Center</Setter>
+        <Setter Property="WidthRequest">500</Setter>
+        <Setter Property="Padding">0,20,0,0</Setter>
+    </Style>
+
+    <Style x:Key="FullWidth" TargetType="Button">
+        <Setter Property="HorizontalOptions">Fill</Setter>
+    </Style>
+</ResourceDictionary>

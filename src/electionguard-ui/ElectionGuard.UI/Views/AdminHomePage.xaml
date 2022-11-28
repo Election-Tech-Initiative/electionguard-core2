@@ -8,20 +8,13 @@
              xmlns:vm="clr-namespace:ElectionGuard.UI.ViewModels"
              x:DataType="vm:AdminHomeViewModel"
              ControlTemplate="{StaticResource PageTemplate}">
-    <VerticalStackLayout Padding="100,20,100,0">
-        <Button WidthRequest="200" Text="{helper:Translate CreateElection}" Command="{Binding CreateElectionCommand}" />
-        <CollectionView Margin="5" WidthRequest="400" HorizontalOptions="Center"
-                    ItemsSource="{Binding Elections}" 
+    <VerticalStackLayout Style="{StaticResource NarrowCenteredPage}">
+        <Label Style="{StaticResource H1}">Admin Home</Label>
+        <Button Style="{StaticResource FullWidth}" Text="{helper:Translate CreateElection}" Command="{Binding CreateElectionCommand}" />
+        <Label Style="{StaticResource H2}" Text="{helper:Translate ElectionsText}" />
+        <CollectionView ItemsSource="{Binding Elections}" 
                     SelectedItem="{Binding CurrentElection}" SelectionChangedCommand="{Binding SelectionChangedCommand}"
                     SelectionMode="Single">
-            <CollectionView.Header>
-                <Grid BackgroundColor="{StaticResource FooterColor}">
-                    <Label Margin="5" FontSize="48" FontAttributes="Bold"
-                                Text="{helper:Translate ElectionsText}"
-                                VerticalOptions="Center" 
-                                HorizontalOptions="Start" />
-                </Grid>
-            </CollectionView.Header>
             <CollectionView.EmptyView>
                 <ContentView>
                     <StackLayout HorizontalOptions="CenterAndExpand"
@@ -37,9 +30,7 @@
             </CollectionView.EmptyView>
             <CollectionView.ItemTemplate>
                 <DataTemplate x:DataType="model:Election">
-                    <Frame BackgroundColor="{StaticResource HeaderColor}">
-                        <Label FontSize="Medium" TextColor="White" HorizontalOptions="Fill" VerticalOptions="Center" VerticalTextAlignment="Center" Text="{Binding Name}" />
-                    </Frame>
+                    <Button Style="{StaticResource FullWidth}" Text="{Binding Name}" />
                 </DataTemplate>
             </CollectionView.ItemTemplate>
         </CollectionView>

@@ -17,6 +17,6 @@
             VerticalOptions="Center" 
             HorizontalOptions="Start" />
         <Entry Margin="5" Placeholder="{helper:Translate LoginPlaceholder}" Text="{Binding Name}" />
-        <Button Margin="5" Text="{helper:Translate LoginText}" HorizontalOptions="Start" Command="{Binding LoginCommand}" />
+        <Button Margin="5" Text="{helper:Translate LoginText}" Command="{Binding LoginCommand}" />
     </VerticalStackLayout>
 </ContentPage>

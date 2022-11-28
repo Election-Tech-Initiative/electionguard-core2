@@ -87,6 +87,9 @@
 	</ItemGroup>
 
 	<ItemGroup>
+	  <MauiXaml Update="Resources\Styles\EgStyles.xaml">
+	    <Generator>MSBuild:Compile</Generator>
+	  </MauiXaml>
 	  <MauiXaml Update="Views\AdminHomePage.xaml">
 	    <Generator>MSBuild:Compile</Generator>
 	  </MauiXaml>
