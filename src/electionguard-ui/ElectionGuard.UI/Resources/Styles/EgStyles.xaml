@@ -23,4 +23,8 @@
     <Style x:Key="FullWidth" TargetType="Button">
         <Setter Property="HorizontalOptions">Fill</Setter>
     </Style>
+
+    <Style x:Key="FormLabel" TargetType="Label">
+        <Setter Property="FontSize">14</Setter>
+    </Style>
 </ResourceDictionary>
