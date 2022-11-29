@@ -1,12 +1,11 @@
 namespace ElectionGuard.UI.Views;
 
-public partial class LoginPage : ContentPage
+public partial class LoginPage
 {
-	public LoginPage(LoginViewModel vm)
-	{
-		InitializeComponent();
-		BindingContext = vm;
-		vm.Page = this;
-	}
-
+    public LoginPage(LoginViewModel vm)
+    {
+        InitializeComponent();
+        BindingContext = vm;
+        vm.Page = this;
+    }
 }

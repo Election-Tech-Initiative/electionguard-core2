@@ -3,8 +3,7 @@
 <ResourceDictionary 
     xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
     xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
-    xmlns:helper="clr-namespace:ElectionGuard.UI.Helpers"
-    xmlns:app="clr-namespace:ElectionGuard.UI">
+    xmlns:helper="clr-namespace:ElectionGuard.UI.Helpers">
 
     <Style TargetType="ActivityIndicator">
         <Setter Property="Color" Value="{AppThemeBinding Light={StaticResource Primary}, Dark={StaticResource White}}" />
@@ -32,9 +31,6 @@
         <Setter Property="FontSize" Value="14"/>
         <Setter Property="CornerRadius" Value="8"/>
         <Setter Property="Padding" Value="14,10"/>
-        <Setter Property="MinimumHeightRequest" Value="44"/>
-        <Setter Property="MinimumWidthRequest" Value="44"/>
-        <Setter Property="WidthRequest" Value="150"/>
         <Setter Property="VisualStateManager.VisualStateGroups">
             <VisualStateGroupList>
                 <VisualStateGroup x:Name="CommonStates">
@@ -112,25 +108,9 @@
     </Style>
 
     <Style TargetType="Entry">
-        <Setter Property="TextColor" Value="{AppThemeBinding Light={StaticResource Black}, Dark={StaticResource White}}" />
-        <Setter Property="BackgroundColor" Value="Transparent" />
         <Setter Property="FontFamily" Value="OpenSansRegular"/>
-        <Setter Property="FontSize" Value="14" />
-        <Setter Property="PlaceholderColor" Value="{AppThemeBinding Light={StaticResource Gray200}, Dark={StaticResource Gray500}}" />
-        <Setter Property="MinimumHeightRequest" Value="44"/>
-        <Setter Property="MinimumWidthRequest" Value="44"/>
-        <Setter Property="VisualStateManager.VisualStateGroups">
-            <VisualStateGroupList>
-                <VisualStateGroup x:Name="CommonStates">
-                    <VisualState x:Name="Normal" />
-                    <VisualState x:Name="Disabled">
-                        <VisualState.Setters>
-                            <Setter Property="TextColor" Value="{AppThemeBinding Light={StaticResource Gray300}, Dark={StaticResource Gray600}}" />
-                        </VisualState.Setters>
-                    </VisualState>
-                </VisualStateGroup>
-            </VisualStateGroupList>
-        </Setter>
+        <Setter Property="FontSize" Value="20" />
+        <Setter Property="Margin">0,5,0,10</Setter>
     </Style>
 
     <Style TargetType="Frame">
@@ -144,8 +124,6 @@
         <Setter Property="BorderColor" Value="Transparent"/>
         <Setter Property="BorderWidth" Value="0"/>
         <Setter Property="CornerRadius" Value="0"/>
-        <Setter Property="MinimumHeightRequest" Value="44"/>
-        <Setter Property="MinimumWidthRequest" Value="44"/>
         <Setter Property="VisualStateManager.VisualStateGroups">
             <VisualStateGroupList>
                 <VisualStateGroup x:Name="CommonStates">
@@ -380,16 +358,16 @@
     </Style>
 
     <Style TargetType="Shell" ApplyToDerivedTypes="True">
-        <Setter Property="Shell.BackgroundColor" Value="{AppThemeBinding Light={StaticResource Primary}, Dark={StaticResource Gray950}}" />
-        <Setter Property="Shell.ForegroundColor" Value="{OnPlatform WinUI={StaticResource Primary}, Default={StaticResource White}}" />
-        <Setter Property="Shell.TitleColor" Value="{AppThemeBinding Light={StaticResource White}, Dark={StaticResource White}}" />
-        <Setter Property="Shell.DisabledColor" Value="{AppThemeBinding Light={StaticResource Gray200}, Dark={StaticResource Gray950}}" />
-        <Setter Property="Shell.UnselectedColor" Value="{AppThemeBinding Light={StaticResource Gray200}, Dark={StaticResource Gray200}}" />
-        <Setter Property="Shell.NavBarHasShadow" Value="False" />
-        <Setter Property="Shell.TabBarBackgroundColor" Value="{AppThemeBinding Light={StaticResource White}, Dark={StaticResource Black}}" />
-        <Setter Property="Shell.TabBarForegroundColor" Value="{AppThemeBinding Light={StaticResource Primary}, Dark={StaticResource White}}" />
-        <Setter Property="Shell.TabBarTitleColor" Value="{AppThemeBinding Light={StaticResource Primary}, Dark={StaticResource White}}" />
-        <Setter Property="Shell.TabBarUnselectedColor" Value="{AppThemeBinding Light={StaticResource Gray900}, Dark={StaticResource Gray200}}" />
+        <Setter Property="BackgroundColor" Value="{AppThemeBinding Light={StaticResource Primary}, Dark={StaticResource Gray950}}" />
+        <Setter Property="ForegroundColor" Value="{OnPlatform WinUI={StaticResource Primary}, Default={StaticResource White}}" />
+        <Setter Property="TitleColor" Value="{AppThemeBinding Light={StaticResource White}, Dark={StaticResource White}}" />
+        <Setter Property="DisabledColor" Value="{AppThemeBinding Light={StaticResource Gray200}, Dark={StaticResource Gray950}}" />
+        <Setter Property="UnselectedColor" Value="{AppThemeBinding Light={StaticResource Gray200}, Dark={StaticResource Gray200}}" />
+        <Setter Property="NavBarHasShadow" Value="False" />
+        <Setter Property="TabBarBackgroundColor" Value="{AppThemeBinding Light={StaticResource White}, Dark={StaticResource Black}}" />
+        <Setter Property="TabBarForegroundColor" Value="{AppThemeBinding Light={StaticResource Primary}, Dark={StaticResource White}}" />
+        <Setter Property="TabBarTitleColor" Value="{AppThemeBinding Light={StaticResource Primary}, Dark={StaticResource White}}" />
+        <Setter Property="TabBarUnselectedColor" Value="{AppThemeBinding Light={StaticResource Gray900}, Dark={StaticResource Gray200}}" />
     </Style>
 
     <Style TargetType="NavigationPage">
@@ -404,43 +382,4 @@
         <Setter Property="UnselectedTabColor" Value="{AppThemeBinding Light={StaticResource Gray200}, Dark={StaticResource Gray950}}" />
         <Setter Property="SelectedTabColor" Value="{AppThemeBinding Light={StaticResource Gray950}, Dark={StaticResource Gray200}}" />
     </Style>
-
-    <ControlTemplate x:Key="PageTemplate">
-        <Grid RowDefinitions="auto, *, auto" BindingContext="{Binding BindingContext, Source={RelativeSource TemplatedParent}}">
-            <Grid BackgroundColor="{StaticResource HeaderColor}" Padding="10" Grid.Row="0">
-                <VerticalStackLayout>
-                    <Grid>
-                        <HorizontalStackLayout HorizontalOptions="StartAndExpand">
-                            <Image Source="logo.png" HeightRequest="48" VerticalOptions="Center" >
-                                <Image.GestureRecognizers>
-                                    <TapGestureRecognizer Command="{Binding HomeCommand}" />
-                                </Image.GestureRecognizers>
-                            </Image>
-                            <Label Text="{helper:Translate ElectionGuardTitle}" FontSize="24" TextColor="White" VerticalOptions="Center" Margin=" 10,0,0,0">
-                                <Label.GestureRecognizers>
-                                    <TapGestureRecognizer Command="{Binding HomeCommand}" />
-                                </Label.GestureRecognizers>
-                            </Label>
-                            <Label Text=" / " FontSize="24" TextColor="White" VerticalOptions="Center" Margin=" 10,0,10,0" />
-                            <Label Text="{Binding Page.Title}" FontSize="24" TextColor="White" VerticalOptions="Center" />
-                        </HorizontalStackLayout>
-                        <Label Text="{Binding UserName}" VerticalOptions="Center" HorizontalOptions="EndAndExpand" FontSize="24" TextColor="White">
-                        <Label.GestureRecognizers>
-                            <TapGestureRecognizer Command="{Binding LogoutCommand}" />
-                        </Label.GestureRecognizers>
-                    </Label>
-                    </Grid>
-                </VerticalStackLayout>
-            </Grid>
-            <ContentPresenter Grid.Row="1" />
-            <Grid BackgroundColor="{StaticResource FooterColor}" Padding="10" Grid.Row="2">
-                <HorizontalStackLayout HorizontalOptions="Start">
-                    <ImageButton Source="gear.png" ToolTipProperties.Text="{helper:Translate Settings}" Margin="10,0,10,0" HeightRequest="40" Command="{Binding SettingsCommand}" BorderWidth="0" BackgroundColor="Transparent" />
-                    <ImageButton Source="world.png" ToolTipProperties.Text="{helper:Translate SwitchLanguages}" HeightRequest="40" Command="{Binding ChangeLanguageCommand}" BorderWidth="0" BackgroundColor="Transparent" />
-                </HorizontalStackLayout>
-                <Label Text="{Binding Version}" TextColor="{StaticResource FooterTextColor}" FontSize="24" HorizontalOptions="End" />
-            </Grid>
-        </Grid>
-    </ControlTemplate>
-    
 </ResourceDictionary>

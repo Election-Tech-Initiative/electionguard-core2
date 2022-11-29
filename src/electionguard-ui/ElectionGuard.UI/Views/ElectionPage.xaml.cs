@@ -1,6 +1,6 @@
 namespace ElectionGuard.UI.Views;
 
-public partial class ElectionPage : ContentPage
+public partial class ElectionPage
 {
 	public ElectionPage(ElectionViewModel vm)
 	{

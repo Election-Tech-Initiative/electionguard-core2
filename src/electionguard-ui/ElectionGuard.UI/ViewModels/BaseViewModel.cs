@@ -1,26 +1,19 @@
 ﻿using CommunityToolkit.Maui.Views;
-using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
-using System;
-using System.Collections.Generic;
 using System.Globalization;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Xml.Linq;
 
 namespace ElectionGuard.UI.ViewModels
 {
     public partial class BaseViewModel : ObservableObject
     {
         [ObservableProperty]
-        private string? userName;
+        private string? _userName;
 
         [ObservableProperty]
         [NotifyCanExecuteChangedFor(nameof(SettingsCommand))]
-        private ContentPage? page;
+        private ContentPage? _page;
 
-        public string Version => AppResources.Version + VersionTracking.CurrentVersion;
+        public string Version => $"v{VersionTracking.CurrentVersion}";
 
         public BaseViewModel()
         {
@@ -44,9 +37,7 @@ namespace ElectionGuard.UI.ViewModels
         [RelayCommand]
         void ChangeLanguage()
         {
-            string? currentLanguage = Preferences.Get("CurrentLanguage", null);
-            if (currentLanguage == null)
-                currentLanguage = "en";
+            var currentLanguage = Preferences.Get("CurrentLanguage", null) ?? "en";
             if(currentLanguage == "en")
             {
                 Preferences.Set("CurrentLanguage", "es");

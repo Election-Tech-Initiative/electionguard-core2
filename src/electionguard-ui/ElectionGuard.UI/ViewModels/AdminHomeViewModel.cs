@@ -1,27 +1,26 @@
 ﻿using CommunityToolkit.Mvvm.Input;
-using Microsoft.Extensions.DependencyInjection;
 
 namespace ElectionGuard.UI.ViewModels
 {
     public partial class AdminHomeViewModel : BaseViewModel
     {
         [ObservableProperty]
-        private ObservableCollection<Election> elections = new();
+        private ObservableCollection<Election> _elections = new();
 
         [ObservableProperty]
-        private Election? currentElection;
+        private Election? _currentElection;
 
         [RelayCommand]
         private void CreateElection()
         {
         }
 
-        ElectionViewModel electionVm;
+        private readonly ElectionViewModel _electionVm;
 
         public AdminHomeViewModel(ElectionViewModel vm)
         {
-            electionVm = vm;
-            elections.Add(new Election { Name = "Pilot Election" });
+            _electionVm = vm;
+            _elections.Add(new Election { Name = "Pilot Election" });
         }
 
         [RelayCommand]
@@ -29,7 +28,7 @@ namespace ElectionGuard.UI.ViewModels
         {
             if (CurrentElection is not null)
             {
-                electionVm.CurrentElection = CurrentElection;
+                _electionVm.CurrentElection = CurrentElection;
                 await Shell.Current.GoToAsync($"{nameof(ElectionPage)}");
                 CurrentElection = null;
             }
