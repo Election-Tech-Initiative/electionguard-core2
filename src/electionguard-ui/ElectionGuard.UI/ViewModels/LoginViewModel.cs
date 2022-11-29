@@ -1,4 +1,5 @@
 ﻿using CommunityToolkit.Mvvm.Input;
+using ElectionGuard.UI.Lib.Services;
 using ElectionGuard.UI.Views;
 using System;
 using System.Collections.Generic;
@@ -22,11 +23,13 @@ namespace ElectionGuard.UI.ViewModels
             if (Name.ToLower().Contains("admin"))
             {
                 App.CurrentUser.IsAdmin = true; // code that is not needed once we have roles in place
+                App.CurrentUser.Save();
                 await Shell.Current.GoToAsync($"//{nameof(AdminHomePage)}");
             }
             else
             {
                 App.CurrentUser.IsAdmin = false; // code that is not needed once we have roles in place
+                App.CurrentUser.Save();
                 await Shell.Current.GoToAsync($"//{nameof(GuardianHomePage)}");
             }
             Name = string.Empty;                // reset the UI name field

@@ -1,4 +1,5 @@
 using CommunityToolkit.Maui;
+using ElectionGuard.UI.Lib.Services;
 using Microsoft.Extensions.Logging;
 
 namespace ElectionGuard.UI;
@@ -7,6 +8,7 @@ public static class MauiProgram
 {
     public static MauiApp CreateMauiApp()
     {
+        DbService.Init("locahost", "testing");
         var builder = MauiApp.CreateBuilder();
         builder
             .UseMauiApp<App>()

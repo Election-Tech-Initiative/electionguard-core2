@@ -1,3 +1,14 @@
 db.createCollection("key_ceremonies");
+db.createCollection("users");
+db.createCollection("elections");
+db.createCollection("ballot_uploads");
+db.createCollection("decryptions");
+db.createCollection("db_deltas", { capped: true, size: 100000 });
+db.db_deltas.insert({ type: "init" });
+db.ballot_uploads.createIndex({ election_id: 1 });
+db.ballot_uploads.createIndex({ election_id: 1, object_id: 1 });
+db.decryptions.createIndex({ decryption_name: 1 });
+db.decryptions.createIndex({ election_id: 1 });
+db.decryptions.createIndex({ completed_at: 1 });
 db.key_ceremonies.createIndex({ completed_at: 1 });
 db.key_ceremonies.createIndex({ key_ceremony_name: 1 });
