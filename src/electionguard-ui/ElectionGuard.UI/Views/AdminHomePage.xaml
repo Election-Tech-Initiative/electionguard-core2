@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8" ?>
+﻿<?xml version="1.0" encoding="utf-8" ?>
 <ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              x:Class="ElectionGuard.UI.Views.AdminHomePage"
@@ -7,17 +7,19 @@
              Title="{helper:Translate AdminHome}"
              xmlns:vm="clr-namespace:ElectionGuard.UI.ViewModels"
              xmlns:controls="using:ElectionGuard.UI.Controls"
+             xmlns:controls1="clr-namespace:ElectionGuard.UI.Controls"
              x:DataType="vm:AdminHomeViewModel"
              ControlTemplate="{StaticResource PageTemplate}">
     <VerticalStackLayout Style="{StaticResource NarrowCenteredPage}">
         <Label Style="{StaticResource H1}">What Do You Want To Do?</Label>
         <Button Style="{StaticResource FullWidth}" Text="{helper:Translate CreateElection}" Command="{Binding CreateElectionCommand}" />
+        <Button Style="{StaticResource FullWidth}" Text="{helper:Translate CreateKeyCeremony}" Command="{Binding GoKeyCeremonyCommand}" />
         <Label Style="{StaticResource H2}" Text="{helper:Translate ElectionsText}" />
 
         <CollectionView ItemsSource="{Binding Elections}" SelectedItem="{Binding CurrentElection}" 
                         SelectionChangedCommand="{Binding SelectionChangedCommand}" SelectionMode="Single">
             <CollectionView.EmptyView>
-                <controls:NoContentView Text="{helper:Translate NoElections}" />
+                <controls1:NoContentView Text="{helper:Translate NoElections}" />
             </CollectionView.EmptyView>
             <CollectionView.ItemTemplate>
                 <DataTemplate x:DataType="model:Election">
