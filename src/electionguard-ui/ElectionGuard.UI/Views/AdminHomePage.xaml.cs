@@ -2,10 +2,9 @@ namespace ElectionGuard.UI.Views;
 
 public partial class AdminHomePage
 {
-	public AdminHomePage(AdminHomeViewModel vm)
+	public AdminHomePage(AdminHomeViewModel adminHomeViewModel)
 	{
 		InitializeComponent();
-        BindingContext = vm;
-        vm.Page = this;
+        BindingContext = adminHomeViewModel;
     }
 }

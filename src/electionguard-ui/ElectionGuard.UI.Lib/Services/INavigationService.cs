@@ -1,13 +1,10 @@
-﻿using System;
-using ElectionGuard.UI.ViewModels;
-
-namespace ElectionGuard.UI.Lib.Services
+﻿namespace ElectionGuard.UI.Lib.Services
 {
 	public interface INavigationService
 	{
-		Task GotoPage(Type type);
-		Task GotoModal(Type type);
-        BaseViewModel GetCurrentViewModel();
+		Task GoToPage(Type type);
+		Task GoToModal(Type type);
+        Type GetCurrentViewModel();
         Task GoHome();
 
 		bool CanGoHome();

@@ -6,6 +6,5 @@ public partial class ElectionPage
 	{
 		InitializeComponent();
 		BindingContext = vm;
-		vm.Page = this;
 	}
 }

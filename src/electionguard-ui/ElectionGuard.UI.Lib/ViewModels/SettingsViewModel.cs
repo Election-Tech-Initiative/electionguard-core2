@@ -1,6 +1,12 @@
-﻿namespace ElectionGuard.UI.ViewModels
+﻿namespace ElectionGuard.UI.Lib.ViewModels
 {
-    public partial class SettingsViewModel : BaseViewModel
+    public class SettingsViewModel : BaseViewModel
     {
+        public SettingsViewModel(
+            ILocalizationService localizationService,
+            INavigationService navigationService,
+            IConfigurationService configurationService) : base(localizationService, navigationService, configurationService)
+        {
+        }
     }
 }

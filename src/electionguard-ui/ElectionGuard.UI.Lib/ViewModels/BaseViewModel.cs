@@ -1,62 +1,42 @@
-﻿using CommunityToolkit.Maui.Views;
-using CommunityToolkit.Mvvm.Input;
-using ElectionGuard.UI.Lib.Models;
-using ElectionGuard.UI.Lib.Services;
-using System.Globalization;
+﻿using CommunityToolkit.Mvvm.Input;
 
-namespace ElectionGuard.UI.ViewModels
+namespace ElectionGuard.UI.Lib.ViewModels
 {
     public partial class BaseViewModel : ObservableObject
     {
+        public IConfigurationService ConfigurationService { get; }
+
+        protected readonly ILocalizationService  LocalizationService;
+        
+        protected readonly INavigationService NavigationServiceService;
+
         [ObservableProperty]
         private string? _userName;
 
-        [ObservableProperty]
-        [NotifyCanExecuteChangedFor(nameof(SettingsCommand))]
-        private ContentPage? _page;
-        private ILocalizationService _localizationService;
-        private INavigationService _navigationService;
+        public string Version => ConfigurationService.GetVersion();
 
-        public string Version => $"v{VersionTracking.CurrentVersion}";
-
-        public BaseViewModel(ILocalizationService localization, INavigationService navigation)
+        public BaseViewModel(ILocalizationService localization, INavigationService navigation, IConfigurationService configurationService)
         {
-            _localizationService = localization;
-            _navigationService = navigation;
+            ConfigurationService = configurationService;
+            LocalizationService = localization;
+            NavigationServiceService = navigation;
         }
 
+        [RelayCommand]
+        async Task Logout() => await NavigationServiceService.GoToPage(typeof(LoginViewModel));
 
         [RelayCommand]
-        async Task Logout() => await _navigationService.GotoPage(typeof(LoginViewModel));
-
-        [RelayCommand]
-        void ChangeLanguage() => _localizationService.Set();
+        void ChangeLanguage() => LocalizationService.Set();
 
         [RelayCommand(CanExecute = nameof(CanChangeSettings))]
-        private void Settings() => _navigationService.GotoModal(typeof(SettingsViewModel));
+        private void Settings() => NavigationServiceService.GoToModal(typeof(SettingsViewModel));
 
-        private bool CanChangeSettings() => _navigationService.GetCurrentViewModel() is LoginViewModel;
+        private bool CanChangeSettings() => NavigationServiceService.GetCurrentViewModel() == typeof(LoginViewModel);
 
         [RelayCommand(CanExecute = nameof(CanGoHome))]
-        private async Task Home() => await _navigationService.GoHome();
-        //{
-        //    if(App.CurrentUser.IsAdmin)
-        //    {
-        //        await Shell.Current.GoToAsync($"//{nameof(AdminHomePage)}");
-        //    }
-        //    else
-        //    {
-        //        await Shell.Current.GoToAsync($"//{nameof(GuardianHomePage)}");
-        //    }
-        //}
+        private async Task Home() => await NavigationServiceService.GoHome();
 
-        private bool CanGoHome() => _navigationService.CanGoHome();
-        //{
-        //    return (Page is not null) && 
-        //        (Page is not LoginPage) && 
-        //        (Page is not AdminHomePage) && 
-        //        (Page is not GuardianHomePage);
-        //}
+        private bool CanGoHome() => NavigationServiceService.CanGoHome();
 
     }
 }

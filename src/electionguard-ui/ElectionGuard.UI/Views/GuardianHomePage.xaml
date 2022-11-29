@@ -5,10 +5,9 @@
              xmlns:helper="clr-namespace:ElectionGuard.UI.Helpers"
              xmlns:model="clr-namespace:ElectionGuard.UI.Lib.Models;assembly=ElectionGuard.UI.Lib"
              Title="{helper:Translate GuardianHome}"
-             xmlns:vm="clr-namespace:ElectionGuard.UI.ViewModels"
-             xmlns:views="using:ElectionGuard.UI.Views"
-             xmlns:controls="using:ElectionGuard.UI.Controls"
-             x:DataType="vm:GuardianHomeViewModel"
+             xmlns:viewModels="clr-namespace:ElectionGuard.UI.Lib.ViewModels;assembly=ElectionGuard.UI.Lib"
+             xmlns:controls1="clr-namespace:ElectionGuard.UI.Controls"
+             x:DataType="viewModels:GuardianHomeViewModel"
              ControlTemplate="{StaticResource PageTemplate}">
     <VerticalStackLayout Style="{StaticResource FullWidthPage}">
         <Grid ColumnDefinitions="*,*">
@@ -18,7 +17,7 @@
                                 SelectedItem="{Binding CurrentKeyCeremony}"
                                 SelectionMode="Single">
                     <CollectionView.EmptyView>
-                        <controls:NoContentView Text="{helper:Translate NoKeyCeremonies}"></controls:NoContentView>
+                        <controls1:NoContentView Text="{helper:Translate NoKeyCeremonies}"></controls1:NoContentView>
                     </CollectionView.EmptyView>
                     <CollectionView.ItemTemplate>
                         <DataTemplate x:DataType="model:KeyCeremony">
@@ -36,7 +35,7 @@
                     SelectedItem="{Binding CurrentTally}"
                     SelectionMode="Single">
                     <CollectionView.EmptyView>
-                        <controls:NoContentView Text="{helper:Translate NoTallies}"></controls:NoContentView>
+                        <controls1:NoContentView Text="{helper:Translate NoTallies}"></controls1:NoContentView>
                     </CollectionView.EmptyView>
                     <CollectionView.ItemTemplate>
                         <DataTemplate x:DataType="model:Tally">

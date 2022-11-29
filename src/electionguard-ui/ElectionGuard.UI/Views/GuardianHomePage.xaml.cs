@@ -6,6 +6,5 @@ public partial class GuardianHomePage
 	{
 		InitializeComponent();
         BindingContext = vm;
-        vm.Page = this;
     }
 }

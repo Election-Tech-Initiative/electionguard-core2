@@ -65,10 +65,10 @@
 	</ItemGroup>
 
 	<ItemGroup>
-		<PackageReference Include="CommunityToolkit.Maui" />
-		<PackageReference Include="CommunityToolkit.Mvvm" />
 		<PackageReference Include="ElectionGuard.Encryption" />
 		<PackageReference Include="Microsoft.Extensions.Logging.Debug" />
+		<PackageReference Include="CommunityToolkit.Maui" />
+		<PackageReference Include="CommunityToolkit.Mvvm" />
 	</ItemGroup>
 
 	<ItemGroup>
@@ -94,8 +94,5 @@
 	</ItemGroup>
 	<ItemGroup>
 	  <None Remove="Services\" />
-	</ItemGroup>
-	<ItemGroup>
-	  <Folder Include="Services\" />
 	</ItemGroup>
 </Project>

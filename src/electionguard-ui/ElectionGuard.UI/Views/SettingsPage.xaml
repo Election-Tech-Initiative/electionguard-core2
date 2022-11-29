@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="utf-8" ?>
-<toolkit:Popup xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+<views:Popup xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
-             xmlns:toolkit="http://schemas.microsoft.com/dotnet/2022/maui/toolkit"
              xmlns:helper="clr-namespace:ElectionGuard.UI.Helpers"
+             xmlns:views="http://schemas.microsoft.com/dotnet/2022/maui/toolkit"
              x:Class="ElectionGuard.UI.Views.SettingsPage">
     <Grid Style="{StaticResource PopupView}">
         <Label Style="{StaticResource H1}" Text="{helper:Translate Settings}"  />
@@ -17,4 +17,4 @@
                      BackgroundColor="Transparent" />
 
     </Grid>
-</toolkit:Popup>
+</views:Popup>

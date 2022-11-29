@@ -40,7 +40,7 @@ public static class MauiProgram
 
     public static MauiAppBuilder SetupServices(this MauiAppBuilder builder)
     {
-        // setup viewmodels
+        // setup view models
         builder.Services.AddSingleton<LoginViewModel>();
         builder.Services.AddSingleton<GuardianHomeViewModel>();
         builder.Services.AddSingleton<AdminHomeViewModel>();

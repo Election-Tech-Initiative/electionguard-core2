@@ -5,10 +5,9 @@
              xmlns:helper="clr-namespace:ElectionGuard.UI.Helpers"
              xmlns:model="clr-namespace:ElectionGuard.UI.Lib.Models;assembly=ElectionGuard.UI.Lib"
              Title="{helper:Translate AdminHome}"
-             xmlns:vm="clr-namespace:ElectionGuard.UI.ViewModels"
-             xmlns:controls="using:ElectionGuard.UI.Controls"
-             xmlns:controls1="clr-namespace:ElectionGuard.UI.Controls"
-             x:DataType="vm:AdminHomeViewModel"
+             xmlns:controls="clr-namespace:ElectionGuard.UI.Controls"
+             xmlns:viewModels="clr-namespace:ElectionGuard.UI.Lib.ViewModels;assembly=ElectionGuard.UI.Lib"
+             x:DataType="viewModels:AdminHomeViewModel"
              ControlTemplate="{StaticResource PageTemplate}">
     <VerticalStackLayout Style="{StaticResource NarrowCenteredPage}">
         <Label Style="{StaticResource H1}">What Do You Want To Do?</Label>
@@ -19,7 +18,7 @@
         <CollectionView ItemsSource="{Binding Elections}" SelectedItem="{Binding CurrentElection}" 
                         SelectionChangedCommand="{Binding SelectionChangedCommand}" SelectionMode="Single">
             <CollectionView.EmptyView>
-                <controls1:NoContentView Text="{helper:Translate NoElections}" />
+                <controls:NoContentView Text="{helper:Translate NoElections}" />
             </CollectionView.EmptyView>
             <CollectionView.ItemTemplate>
                 <DataTemplate x:DataType="model:Election">

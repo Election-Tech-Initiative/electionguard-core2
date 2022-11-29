@@ -1,11 +1,20 @@
 ﻿using CommunityToolkit.Mvvm.Input;
 using ElectionGuard.UI.Lib.Models;
 
-
-namespace ElectionGuard.UI.ViewModels
+namespace ElectionGuard.UI.Lib.ViewModels
 {
     public partial class AdminHomeViewModel : BaseViewModel
     {
+        public AdminHomeViewModel(
+            ILocalizationService localizationService, 
+            INavigationService navigationService,
+            IConfigurationService configurationService,
+            ElectionViewModel electionViewModel) : base(localizationService, navigationService, configurationService)
+        {
+            _electionVm = electionViewModel;
+            _elections.Add(new Election { Name = "Pilot Election" });
+        }
+
         [ObservableProperty]
         private ObservableCollection<Election> _elections = new();
 
@@ -15,7 +24,7 @@ namespace ElectionGuard.UI.ViewModels
         [RelayCommand]
         public async Task GoKeyCeremony()
         {
-            await Shell.Current.GoToAsync($"//{nameof(AdminHomePage)}");
+            await NavigationServiceService.GoToPage(typeof(AdminHomeViewModel));
         }
 
         [RelayCommand]
@@ -25,19 +34,14 @@ namespace ElectionGuard.UI.ViewModels
 
         private readonly ElectionViewModel _electionVm;
 
-        public AdminHomeViewModel(ElectionViewModel vm)
-        {
-            _electionVm = vm;
-            _elections.Add(new Election { Name = "Pilot Election" });
-        }
-
         [RelayCommand]
         private async Task SelectionChanged()
         {
             if (CurrentElection is not null)
             {
+                // todo pass parameter don't depend on singletons
                 _electionVm.CurrentElection = CurrentElection;
-                await Shell.Current.GoToAsync($"{nameof(ElectionPage)}");
+                await NavigationServiceService.GoToPage(typeof(ElectionViewModel));
                 CurrentElection = null;
             }
         }

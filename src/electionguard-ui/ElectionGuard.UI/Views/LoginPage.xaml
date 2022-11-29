@@ -4,8 +4,8 @@
              xmlns:helper="clr-namespace:ElectionGuard.UI.Helpers"
              x:Class="ElectionGuard.UI.Views.LoginPage"
              Title="{helper:Translate UserLogin}"
-             xmlns:vm="clr-namespace:ElectionGuard.UI.ViewModels"
-             x:DataType="vm:LoginViewModel"
+             xmlns:viewModels="clr-namespace:ElectionGuard.UI.Lib.ViewModels;assembly=ElectionGuard.UI.Lib"
+             x:DataType="viewModels:LoginViewModel"
              ControlTemplate="{StaticResource PageTemplate}">
     <VerticalStackLayout Style="{StaticResource NarrowCenteredPage}" Margin="0,100,0,0">
         <Label Style="{StaticResource FormLabel}"

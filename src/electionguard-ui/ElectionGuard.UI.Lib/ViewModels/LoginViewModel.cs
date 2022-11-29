@@ -1,28 +1,30 @@
 ﻿using CommunityToolkit.Mvvm.Input;
 
-namespace ElectionGuard.UI.ViewModels
+namespace ElectionGuard.UI.Lib.ViewModels
 {
     public partial class LoginViewModel : BaseViewModel
     {
+        private readonly IAuthenticationService _authenticationService;
+
+        public LoginViewModel(
+            ILocalizationService localizationService,
+            INavigationService navigationService,
+            IConfigurationService configurationService,
+            IAuthenticationService authenticationService) : base(localizationService, navigationService, configurationService)
+        {
+            _authenticationService = authenticationService;
+        }
+
         [ObservableProperty]
-        [NotifyCanExecuteChangedFor(nameof(LoginCommand))]
+        [NotifyCanExecuteChangedFor(nameof(LoginViewModel.LoginCommand))]
         private string _name = string.Empty;
 
         [RelayCommand(CanExecute = nameof(CanLogin))]
-        async Task Login()
+        public async Task Login()
         {
-            App.CurrentUser.Name = Name;
-            if (Name.ToLower().Contains("admin"))
-            {
-                App.CurrentUser.IsAdmin = true; // code that is not needed once we have roles in place
-                await Shell.Current.GoToAsync($"//{nameof(AdminHomePage)}");
-            }
-            else
-            {
-                App.CurrentUser.IsAdmin = false; // code that is not needed once we have roles in place
-                await Shell.Current.GoToAsync($"//{nameof(GuardianHomePage)}");
-            }
-            Name = string.Empty;                // reset the UI name field
+            await _authenticationService.Login(Name);
+            // reset the UI name field
+            Name = string.Empty;
         }
 
         bool CanLogin()
