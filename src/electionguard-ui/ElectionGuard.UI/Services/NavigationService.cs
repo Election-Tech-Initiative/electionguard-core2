@@ -60,12 +60,12 @@ namespace ElectionGuard.UI.Services
             return instance;
         }
 
-        public async Task GoToPage(Type viewModel)
+        public async Task GoToPage(Type viewModel, Dictionary<string, object>? pageParams = null)
         {
             _currentViewModel = viewModel;
             var contentPage = GetPage(viewModel);
             _currentPage = contentPage;
-            await Shell.Current.GoToAsync($"//{_currentPage}");
+            await Shell.Current.GoToAsync($"//{_currentPage}", pageParams);
         }
 
         private Type GetPage(Type viewModel)

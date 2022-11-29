@@ -13,4 +13,6 @@ public partial class ElectionViewModel : BaseViewModel
 
     [ObservableProperty]
     private Election? _currentElection;
+
+    public const string CurrentElectionParam = "CurrentElection";
 }
