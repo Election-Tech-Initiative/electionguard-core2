@@ -79,6 +79,28 @@ fetch-sample-data:
 	wget -O sample-data-1-0.zip https://github.com/microsoft/electionguard/releases/download/v1.0/sample-data.zip
 	unzip -o sample-data-1-0.zip
 
+# generate self-signed cert
+# at ./cert/electionguard-self-signed-cert.crt
+generate-cert:
+	@echo Generating self-signed cert
+	@mkdir -p ./cert
+	@rm -Rf ./cert/*
+	@LC_ALL=C tr -dc 'A-Za-z0-9!"#$%&'\''()*+,-./:;<=>?@[\]^_`{|}~' </dev/urandom \
+		| head -c 20 > ./cert/cert.pass
+	@openssl genrsa -aes256 \
+		-out ./cert/root.key 4096 -passout file:./cert/cert.pass
+	@openssl req -x509 -new -nodes -sha256 -days 1825 \
+		-key ./cert/root.key -out ./cert/myCA.pem -config ./.cert/selfsign-ca.cnf -passin file:./cert/cert.pass
+	@openssl req -new -newkey rsa:4096 -sha256 -nodes \
+		-keyout ./cert/eg.key -out ./cert/eg.csr -config ./.cert/selfsign-csr.cnf
+	@openssl x509 -req -CAcreateserial -days 825 -sha256 \
+		-in ./cert/eg.csr -CA ./cert/myCA.pem -CAkey ./cert/root.key \
+		-out ./cert/eg.crt -extfile ./.cert/csr.cnf -passin file:./cert/cert.pass
+	openssl pkcs12 -export -out ./cert/electionguard.pfx \
+		-inkey ./cert/eg.key -passin pass: \
+		 -in ./cert/eg.crt -certfile ./cert/myCA.pem \
+		 -passout pass: \
+		 -info
 
 build:
 	@echo 🧱 BUILD $(TARGET)

@@ -157,3 +157,5 @@ bindings/netstandard/ElectionGuard/*.user
 *.ncrunchsolution
 
 lint-results.xml
+.srl
+cert

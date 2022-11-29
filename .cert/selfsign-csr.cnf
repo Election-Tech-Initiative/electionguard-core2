@@ -1,7 +1,7 @@
 # Code-signing certificate request
 
 [ req ]
-default_bits            = 2048                  # RSA key size
+default_bits            = 4096                  # RSA key size
 encrypt_key             = yes                   # Protect private key
 default_md              = sha1                  # MD to use
 utf8                    = yes                   # Input is UTF-8
@@ -15,7 +15,7 @@ countryName             = "US"
 stateOrProvinceName     = "Washington"
 localityName            = "Redmond"
 organizationName        = "Microsoft Corporation"
-commonName              = "Microsoft Corporation"
+commonName              = "electionguard.vote"
 
 [ codesign_reqext ]
 keyUsage                = critical,digitalSignature

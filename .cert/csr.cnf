@@ -1,0 +1,13 @@
+[req]
+encrypt_key = yes
+prompt = no
+utf8 = yes
+string_mask = utf8only
+distinguished_name = dn
+req_extensions = v3_req
+
+[v3_req]
+subjectKeyIdentifier = hash
+keyUsage = critical, digitalSignature
+msCodeCom = Microsoft Commercial Code Signing
+extendedKeyUsage = critical, codeSigning, msCodeInd
