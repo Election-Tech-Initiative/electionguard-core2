@@ -2,7 +2,7 @@
 
 public class LocalizedString : ObservableObject
 {
-    readonly Func<string> _generator;
+    private readonly Func<string> _generator;
 
     public LocalizedString(Func<string> generator)
         : this(LocalizationResourceManager.Current, generator)
@@ -11,7 +11,7 @@ public class LocalizedString : ObservableObject
 
     public LocalizedString(LocalizationResourceManager localizationManager, Func<string> generator)
     {
-        this._generator = generator;
+        _generator = generator;
 
         // This instance will be unsubscribed and GCed if no one references it
         // since LocalizationResourceManager uses WeakEventManger

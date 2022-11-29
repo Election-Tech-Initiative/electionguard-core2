@@ -394,15 +394,6 @@ namespace ElectionGuard.UI.Resx {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to v.
-        /// </summary>
-        internal static string Version {
-            get {
-                return ResourceManager.GetString("Version", resourceCulture);
-            }
-        }
-        
-        /// <summary>
         ///   Looks up a localized string similar to ElectionGuard Election Manager.
         /// </summary>
         internal static string WindowTitle {

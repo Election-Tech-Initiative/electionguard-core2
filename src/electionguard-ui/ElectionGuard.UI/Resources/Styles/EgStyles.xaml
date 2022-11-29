@@ -2,34 +2,37 @@
 <?xaml-comp compile="true" ?>
 <ResourceDictionary 
     xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
-    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml">
+    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+    xmlns:helpers="using:ElectionGuard.UI.Helpers">
+
+    <x:Int32 x:Key="MainFontSize">16</x:Int32>
 
     <Style x:Key="H1" TargetType="Label">
-        <Setter Property="FontSize">36</Setter>
-        <Setter Property="Margin">0,5,0,20</Setter>
+        <Setter Property="FontSize" Value="36" />
+        <Setter Property="Margin" Value="0,5,0,20" />
     </Style>
 
     <Style x:Key="H2" TargetType="Label">
-        <Setter Property="FontSize">28</Setter>
-        <Setter Property="Margin">0,10,0,15</Setter>
+        <Setter Property="FontSize" Value="28"></Setter>
+        <Setter Property="Margin" Value="0,10,0,15" />
     </Style>
 
     <Style x:Key="NarrowCenteredPage" TargetType="VerticalStackLayout">
-        <Setter Property="HorizontalOptions">Center</Setter>
-        <Setter Property="WidthRequest">500</Setter>
-        <Setter Property="Padding">0,20,0,0</Setter>
+        <Setter Property="HorizontalOptions" Value="Center" />
+        <Setter Property="WidthRequest" Value="500" />
+        <Setter Property="Padding" Value="0,20,0,0" />
     </Style>
 
     <Style x:Key="FullWidthPage" TargetType="VerticalStackLayout">
-        <Setter Property="Padding">10,5,10,0</Setter>
+        <Setter Property="Padding" Value="10,5,10,0" />
     </Style>
 
     <Style x:Key="FullWidth" TargetType="Button">
-        <Setter Property="HorizontalOptions">Fill</Setter>
+        <Setter Property="HorizontalOptions" Value="Fill" />
     </Style>
 
     <Style x:Key="NarrowWidth" TargetType="Button">
-        <Setter Property="HorizontalOptions">Start</Setter>
+        <Setter Property="HorizontalOptions" Value="Start" />
     </Style>
 
     <Style x:Key="ButtonishFrame" TargetType="Frame">
@@ -47,20 +50,66 @@
     </Style>
 
     <Style x:Key="FormLabel" TargetType="Label">
-        <Setter Property="FontSize">16</Setter>
-        <Setter Property="FontAttributes">Bold</Setter>
+        <Setter Property="FontSize" Value="{StaticResource MainFontSize}" />
+        <Setter Property="FontAttributes" Value="Bold" />
     </Style>
 
     <Style x:Key="FormValue" TargetType="Label">
-        <Setter Property="FontSize">16</Setter>
+        <Setter Property="FontSize" Value="{StaticResource MainFontSize}" />
     </Style>
 
     <Style x:Key="NoContentFound" TargetType="Label">
-        <Setter Property="FontSize">16</Setter>
+        <Setter Property="FontSize" Value="{StaticResource MainFontSize}" />
     </Style>
 
     <Style x:Key="FormControl" TargetType="StackLayout">
         <Setter Property="Orientation" Value="Vertical" />
-        <Setter Property="Margin">0,0,0,10</Setter>
+        <Setter Property="Margin" Value="0,0,0,10" />
     </Style>
+
+    <Style x:Key="PopupView" TargetType="Grid">
+        <Setter Property="Padding" Value="20" />
+    </Style>
+
+    <ControlTemplate x:Key="PageTemplate">
+        <Grid RowDefinitions="auto, *, auto" BindingContext="{Binding BindingContext, Source={RelativeSource TemplatedParent}}">
+            <Grid BackgroundColor="{StaticResource HeaderColor}" Padding="2" Grid.Row="0">
+                <VerticalStackLayout>
+                    <Grid Padding="10,0">
+                        <HorizontalStackLayout HorizontalOptions="StartAndExpand" VerticalOptions="Center">
+                            <Image Source="logo.png" HeightRequest="48" VerticalOptions="Center" Margin="0,10,0,0">
+                                <Image.GestureRecognizers>
+                                    <TapGestureRecognizer Command="{Binding HomeCommand}" />
+                                </Image.GestureRecognizers>
+                            </Image>
+                            <Label Text="{helpers:Translate ElectionGuardTitle}" FontSize="20" TextColor="White" VerticalOptions="Center" Margin=" 10,0,0,0">
+                                <Label.GestureRecognizers>
+                                    <TapGestureRecognizer Command="{Binding HomeCommand}" />
+                                </Label.GestureRecognizers>
+                            </Label>
+                            <Label Text=" / " FontSize="20" TextColor="White" VerticalOptions="Center" Margin=" 10,0,10,0" />
+                            <Label Text="{Binding Page.Title}" FontSize="20" TextColor="White" VerticalOptions="Center" />
+                        </HorizontalStackLayout>
+                        <Label Text="{Binding UserName}" VerticalOptions="Center" HorizontalOptions="EndAndExpand" FontSize="18" TextColor="White">
+                            <Label.GestureRecognizers>
+                                <TapGestureRecognizer Command="{Binding LogoutCommand}" />
+                            </Label.GestureRecognizers>
+                        </Label>
+                    </Grid>
+                </VerticalStackLayout>
+            </Grid>
+            <ContentPresenter Grid.Row="1" />
+            <Grid BackgroundColor="{StaticResource FooterColor}" Padding="10" Grid.Row="2">
+                <HorizontalStackLayout HorizontalOptions="Start">
+                    <ImageButton Source="gear.png" ToolTipProperties.Text="{helpers:Translate Settings}" 
+                                 Margin="10,0" HeightRequest="25" Command="{Binding SettingsCommand}" 
+                                 BorderWidth="0" />
+                    <ImageButton Source="world.png" ToolTipProperties.Text="{helpers:Translate SwitchLanguages}" 
+                                 Command="{Binding ChangeLanguageCommand}" BorderWidth="0" HeightRequest="25"
+                                 />
+                </HorizontalStackLayout>
+                <Label Text="{Binding Version}" TextColor="{StaticResource FooterTextColor}" FontSize="18" HorizontalOptions="End" />
+            </Grid>
+        </Grid>
+    </ControlTemplate>
 </ResourceDictionary>

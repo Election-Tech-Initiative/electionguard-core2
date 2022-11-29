@@ -13,7 +13,7 @@ namespace ElectionGuard.UI.ViewModels
         [NotifyCanExecuteChangedFor(nameof(SettingsCommand))]
         private ContentPage? _page;
 
-        public string Version => AppResources.Version + VersionTracking.CurrentVersion;
+        public string Version => $"v{VersionTracking.CurrentVersion}";
 
         public BaseViewModel()
         {

@@ -1,10 +1,10 @@
-namespace ElectionGuard.UI.Views;
+namespace ElectionGuard.UI.Controls;
 
 public partial class NoContentView
 {
-	public NoContentView()
-	{
-		InitializeComponent();
+    public NoContentView()
+    {
+        InitializeComponent();
         BindingContext = this;
 	}
 

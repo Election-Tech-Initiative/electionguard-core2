@@ -11,7 +11,6 @@ namespace ElectionGuard.UI.ViewModels
         [RelayCommand(CanExecute = nameof(CanLogin))]
         async Task Login()
         {
-            await Task.Delay(10);
             App.CurrentUser.Name = Name;
             if (Name.ToLower().Contains("admin"))
             {

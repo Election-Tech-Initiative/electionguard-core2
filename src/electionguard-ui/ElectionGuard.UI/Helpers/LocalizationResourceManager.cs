@@ -5,12 +5,13 @@ namespace ElectionGuard.UI.Helpers;
 
 public class LocalizationResourceManager : ObservableObject
 {
-    static readonly Lazy<LocalizationResourceManager> CurrentHolder = new(() => new LocalizationResourceManager());
-
     public static LocalizationResourceManager Current => CurrentHolder.Value;
 
+    private static readonly Lazy<LocalizationResourceManager> CurrentHolder = new(() => new LocalizationResourceManager());
+
     private ResourceManager? _resourceManager;
-    CultureInfo _currentCulture = Thread.CurrentThread.CurrentUICulture;
+
+    private CultureInfo _currentCulture = Thread.CurrentThread.CurrentUICulture;
 
     LocalizationResourceManager()
     {

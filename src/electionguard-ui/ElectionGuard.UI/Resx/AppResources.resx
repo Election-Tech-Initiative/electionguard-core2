@@ -265,10 +265,6 @@
     <value>User Setup</value>
     <comment/>
   </data>
-  <data name="Version" xml:space="preserve">
-    <value>v</value>
-    <comment/>
-  </data>
   <data name="WindowTitle" xml:space="preserve">
     <value>ElectionGuard Election Manager</value>
     <comment/>
