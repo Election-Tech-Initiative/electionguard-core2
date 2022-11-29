@@ -18,11 +18,16 @@ public class AdminHomeViewModelTest
     }
 
     [Test]
-    public void Given_WhenKeyCeremonyButtonClicked_ThenNavToCeremony()
+    public async Task Given_WhenKeyCeremonyButtonClicked_ThenNavToCeremony()
     {
+        // ARRANGE
         var adminHomeViewModel = new AdminHomeViewModel(_localizationService, _navigationService, _configurationService);
-        
-        Assert.NotNull(adminHomeViewModel);
+
+        // ACT
+        await adminHomeViewModel.GoKeyCeremonyCommand.ExecuteAsync(null);
+
+        // ASSERT
+        await _navigationService.Received().GoToPage(typeof(AdminHomeViewModel));
     }
 }
 
