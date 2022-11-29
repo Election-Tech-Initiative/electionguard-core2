@@ -1,10 +1,9 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
 	<PropertyGroup>
-		<TargetFrameworks Condition="$([MSBuild]::IsOSPlatform('OSX'))">net7.0;net7.0-maccatalyst</TargetFrameworks>
-		<TargetFrameworks Condition="$([MSBuild]::IsOSPlatform('windows'))">net7.0;net7.0-windows10.0.19041.0</TargetFrameworks>
-		<OutputType Condition="'$(TargetFramework)' != 'net7.0'">Exe</OutputType>
-		<OutputType Condition="'$(TargetFramework)' == 'net7.0'">Library</OutputType>
+		<TargetFrameworks Condition="$([MSBuild]::IsOSPlatform('OSX'))">net7.0-maccatalyst</TargetFrameworks>
+		<TargetFrameworks Condition="$([MSBuild]::IsOSPlatform('windows'))">$(TargetFrameworks);net7.0-windows10.0.19041.0</TargetFrameworks>
+		<OutputType>Exe</OutputType>
 		<ManagePackageVersionsCentrally>true</ManagePackageVersionsCentrally>
 		<UseMaui>true</UseMaui>
 		<SingleProject>true</SingleProject>
