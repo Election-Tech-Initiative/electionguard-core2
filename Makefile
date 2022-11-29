@@ -105,10 +105,10 @@ endif
 publish-ui:
 	@echo 🧱 BUILD UI
 ifeq ($(OPERATING_SYSTEM),Windows)
-	dotnet publish -f net7.0-windows10.0.19041.0 -c $(TARGET) /p:ApplicationVersion=$(BUILD) /p:RuntimeIdentifierOverride=win10-x64 src\electionguard-ui\ElectionGuard.UI.Lib\ElectionGuard.UI.Lib.csproj
+	dotnet publish -f net7.0-windows10.0.19041.0 -c $(TARGET) /p:ApplicationVersion=$(BUILD) /p:RuntimeIdentifierOverride=win10-x64 src/electionguard-ui/ElectionGuard.UI/ElectionGuard.UI.csproj
 endif
 ifeq ($(OPERATING_SYSTEM),Darwin)
-	dotnet build -c $(TARGET) /p:CreatePackage=true /p:ApplicationVersion=$(BUILD) src/electionguard-ui/ElectionGuard.UI.Lib/ElectionGuard.UI.Lib.csproj
+	dotnet build -c $(TARGET) /p:CreatePackage=true /p:ApplicationVersion=$(BUILD) src/electionguard-ui/ElectionGuard.UI/ElectionGuard.UI.csproj
 endif
 
 generate-interop:
