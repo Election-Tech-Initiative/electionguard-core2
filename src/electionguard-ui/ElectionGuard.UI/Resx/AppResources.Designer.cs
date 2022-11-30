@@ -79,6 +79,15 @@ namespace ElectionGuard.UI.Resx {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to What Do You Want To Do?.
+        /// </summary>
+        internal static string AdminHomePageTitle {
+            get {
+                return ResourceManager.GetString("AdminHomePageTitle", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Ballot Count.
         /// </summary>
         internal static string BallotCountText {

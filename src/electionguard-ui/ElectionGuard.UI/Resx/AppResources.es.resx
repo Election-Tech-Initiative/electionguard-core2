@@ -234,4 +234,7 @@
   <data name="BallotsText" xml:space="preserve">
     <value>Papeletas</value>
   </data>
+  <data name="AdminHomePageTitle" xml:space="preserve">
+    <value>¿Qué quieres hacer?</value>
+  </data>
 </root>

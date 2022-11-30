@@ -9,7 +9,7 @@
              x:DataType="viewModels:AdminHomeViewModel"
              ControlTemplate="{StaticResource PageTemplate}">
     <VerticalStackLayout Style="{StaticResource NarrowCenteredPage}">
-        <Label Style="{StaticResource H1}">What Do You Want To Do?</Label>
+        <Label Style="{StaticResource H1}" Text="{helper:Translate AdminHomePageTitle}" />
         <Button Style="{StaticResource FullWidth}" Text="{helper:Translate CreateElection}" Command="{Binding CreateElectionCommand}" />
         <Button Style="{StaticResource FullWidth}" Text="{helper:Translate CreateKeyCeremony}" Command="{Binding GoKeyCeremonyCommand}" />
         <Label Style="{StaticResource H2}" Text="{helper:Translate ElectionsText}" />
