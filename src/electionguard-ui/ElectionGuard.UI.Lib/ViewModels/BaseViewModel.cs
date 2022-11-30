@@ -14,6 +14,18 @@ namespace ElectionGuard.UI.Lib.ViewModels
         [ObservableProperty]
         private string _pageTitle = "";
 
+        [RelayCommand]
+        private async Task Logout() => await NavigationService.GoToPage(typeof(LoginViewModel));
+
+        [RelayCommand]
+        private void ChangeLanguage() => LocalizationService.ToggleLanguage();
+
+        [RelayCommand(CanExecute = nameof(CanChangeSettings))]
+        private void Settings() => NavigationService.GoToModal(typeof(SettingsViewModel));
+
+        [RelayCommand(CanExecute = nameof(CanGoHome))]
+        private async Task Home() => await NavigationService.GoHome();
+
         public BaseViewModel(
             string? pageTitleLocalizationId,
             IServiceProvider serviceProvider)
@@ -31,6 +43,12 @@ namespace ElectionGuard.UI.Lib.ViewModels
             LocalizationService.OnLanguageChanged += OnLanguageChanged;
         }
 
+        public virtual void Dispose()
+        {
+            LocalizationService.OnLanguageChanged -= OnLanguageChanged;
+			GC.SuppressFinalize(this);
+        }
+
         protected void SetPageTitle()
         {
             if (_pageTitleLocalizationId != null)
@@ -39,38 +57,20 @@ namespace ElectionGuard.UI.Lib.ViewModels
             }
         }
 
-        protected IConfigurationService ConfigurationService { get; }
+        protected readonly IConfigurationService ConfigurationService;
 
-        protected ILocalizationService LocalizationService { get; }
+        protected readonly ILocalizationService  LocalizationService;
 
-        protected INavigationService NavigationService { get; }
+        protected readonly INavigationService NavigationService;
 
-        protected IAuthenticationService AuthenticationService { get; }
-
-        private readonly string? _pageTitleLocalizationId;
-
-        [RelayCommand]
-        public async Task Logout() => await NavigationService.GoToPage(typeof(LoginViewModel));
-
-        [RelayCommand]
-        public void ChangeLanguage() => LocalizationService.ToggleLanguage();
+        protected readonly IAuthenticationService AuthenticationService;
 
         protected virtual void OnLanguageChanged(object? sender, EventArgs eventArgs) => SetPageTitle();
 
-        [RelayCommand(CanExecute = nameof(CanChangeSettings))]
-        private void Settings() => NavigationService.GoToModal(typeof(SettingsViewModel));
+        private readonly string? _pageTitleLocalizationId;
 
         private bool CanChangeSettings() => NavigationService.GetCurrentViewModel() == typeof(LoginViewModel);
 
-        [RelayCommand(CanExecute = nameof(CanGoHome))]
-        private async Task Home() => await NavigationService.GoHome();
-
         private bool CanGoHome() => NavigationService.CanGoHome();
-
-        public virtual void Dispose()
-        {
-            LocalizationService.OnLanguageChanged -= OnLanguageChanged;
-            GC.SuppressFinalize(this);
-        }
     }
 }
