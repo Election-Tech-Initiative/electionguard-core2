@@ -1,4 +1,4 @@
-﻿using CommunityToolkit.Mvvm.Input;
+using CommunityToolkit.Mvvm.Input;
 using ElectionGuard.UI.Lib.Extensions;
 
 namespace ElectionGuard.UI.Lib.ViewModels
@@ -57,13 +57,13 @@ namespace ElectionGuard.UI.Lib.ViewModels
             }
         }
 
-        protected readonly IConfigurationService ConfigurationService;
+        protected IConfigurationService  ConfigurationService { get; }
 
-        protected readonly ILocalizationService  LocalizationService;
+        protected ILocalizationService LocalizationService { get; }
 
-        protected readonly INavigationService NavigationService;
+        protected INavigationService NavigationService { get; }
 
-        protected readonly IAuthenticationService AuthenticationService;
+        protected IAuthenticationService AuthenticationService { get; }
 
         protected virtual void OnLanguageChanged(object? sender, EventArgs eventArgs) => SetPageTitle();
 
