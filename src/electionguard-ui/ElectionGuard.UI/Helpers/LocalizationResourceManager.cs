@@ -22,7 +22,7 @@ public class LocalizationResourceManager : ObservableObject
     public void Init(ResourceManager resource, CultureInfo initialCulture)
     {
         CurrentCulture = initialCulture;
-        Init(resource, CurrentCulture);
+        Init(resource);
     }
 
     public string GetValue(string text)
