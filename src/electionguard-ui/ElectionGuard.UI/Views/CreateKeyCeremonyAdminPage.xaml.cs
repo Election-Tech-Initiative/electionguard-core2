@@ -5,5 +5,6 @@ public partial class CreateKeyCeremonyAdminPage : ContentPage
     public CreateKeyCeremonyAdminPage(CreateKeyCeremonyAdminViewModel vm)
     {
         InitializeComponent();
+        BindingContext = vm;
     }
 }
