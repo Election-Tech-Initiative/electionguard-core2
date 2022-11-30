@@ -5,11 +5,7 @@ namespace ElectionGuard.UI.Lib.ViewModels
 {
     public partial class AdminHomeViewModel : BaseViewModel
     {
-        public AdminHomeViewModel(
-            ILocalizationService localizationService, 
-            INavigationService navigationService,
-            IConfigurationService configurationService) 
-            : base(null, localizationService, navigationService, configurationService)
+        public AdminHomeViewModel(IServiceProvider serviceProvider) : base("AdminHome", serviceProvider)
         {
             _elections.Add(new Election { Name = "Pilot Election" });
         }

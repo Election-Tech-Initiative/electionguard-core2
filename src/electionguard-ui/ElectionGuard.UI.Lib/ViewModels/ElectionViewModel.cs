@@ -4,11 +4,7 @@ namespace ElectionGuard.UI.Lib.ViewModels;
 
 public partial class ElectionViewModel : BaseViewModel
 {
-    public ElectionViewModel(
-        ILocalizationService localizationService,
-        INavigationService navigationService,
-        IConfigurationService configurationService) 
-        : base(null, localizationService, navigationService, configurationService)
+    public ElectionViewModel(IServiceProvider serviceProvider) : base(null, serviceProvider)
     {
         PropertyChanged += ElectionViewModel_PropertyChanged;
     }

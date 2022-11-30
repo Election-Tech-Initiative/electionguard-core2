@@ -55,7 +55,7 @@ namespace ElectionGuard.UI.Services
 
         private Popup GetPopupInstance(Type type)
         {
-            var popup = ServiceProvider.Current.GetService(type);
+            var popup = EgServiceProvider.Current.GetService(type);
             if (popup != null) return (Popup)popup;
             throw new ArgumentException(
                 $"The type {type} isn't registered in the service collection, set it in MauiProgram.cs");

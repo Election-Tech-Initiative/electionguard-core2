@@ -4,11 +4,7 @@ namespace ElectionGuard.UI.Lib.ViewModels
 {
     public partial class GuardianHomeViewModel : BaseViewModel
     {
-        public GuardianHomeViewModel(
-            ILocalizationService localizationService,
-            INavigationService navigationService,
-            IConfigurationService configurationService) 
-            : base("GuardianHome", localizationService, navigationService, configurationService)
+        public GuardianHomeViewModel(IServiceProvider serviceProvider) : base("GuardianHome", serviceProvider)
         {
             // create some fake tallies to add to the list
             _tallies.Add(new Tally { Name = "Election Test Tally #1" });

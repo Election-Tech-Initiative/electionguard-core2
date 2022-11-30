@@ -3,4 +3,5 @@
 public interface IAuthenticationService
 {
     Task Login(string name);
+    string? UserName { get; }
 }

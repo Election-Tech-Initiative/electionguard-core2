@@ -4,52 +4,63 @@ namespace ElectionGuard.UI.Lib.ViewModels
 {
     public partial class BaseViewModel : ObservableObject, IDisposable
     {
+        public string Version => ConfigurationService.GetVersion();
+
+        public string? UserName => AuthenticationService.UserName;
+
         [ObservableProperty]
         private string _pageTitle = "";
 
-        public IConfigurationService ConfigurationService { get; }
-
-        private readonly string? _pageTitleLocalizationId;
-        protected readonly ILocalizationService  LocalizationService;
-        
-        protected readonly INavigationService NavigationServiceService;
-
-        [ObservableProperty]
-        private string? _userName;
-
-        public string Version => ConfigurationService.GetVersion();
+        private T GetService<T>(IServiceProvider serviceProvider)
+        {
+            var service = serviceProvider.GetService(typeof(T));
+            if (service == null)
+            {
+                throw new ArgumentNullException($"{nameof(T)} is not registered with DI");
+            }
+            return (T)service;
+        }
 
         public BaseViewModel(
             string? pageTitleLocalizationId,
-            ILocalizationService localization, 
-            INavigationService navigation, 
-            IConfigurationService configurationService)
+            IServiceProvider serviceProvider)
         {
-            ConfigurationService = configurationService;
             _pageTitleLocalizationId = pageTitleLocalizationId;
-            LocalizationService = localization;
-            NavigationServiceService = navigation;
-            if (_pageTitleLocalizationId != null)
-            {
-                PageTitle = LocalizationService.GetValue(_pageTitleLocalizationId);
-            }
+            ConfigurationService = GetService<IConfigurationService>(serviceProvider);
+            LocalizationService = GetService<ILocalizationService>(serviceProvider);
+            NavigationServiceService = GetService<INavigationService>(serviceProvider);
+            AuthenticationService = GetService<IAuthenticationService>(serviceProvider);
+
+            SetPageTitle();
 
             LocalizationService.OnLanguageChanged += OnLanguageChanged;
         }
 
-        [RelayCommand]
-        async Task Logout() => await NavigationServiceService.GoToPage(typeof(LoginViewModel));
-
-        [RelayCommand]
-        void ChangeLanguage() => LocalizationService.ToggleLanguage();
-
-        protected virtual void OnLanguageChanged(object? sender, EventArgs eventArgs)
+        protected void SetPageTitle()
         {
             if (_pageTitleLocalizationId != null)
             {
                 PageTitle = LocalizationService.GetValue(_pageTitleLocalizationId);
             }
         }
+
+        protected IConfigurationService ConfigurationService { get; }
+
+        protected readonly ILocalizationService  LocalizationService;
+
+        protected readonly INavigationService NavigationServiceService;
+
+        protected IAuthenticationService AuthenticationService { get; set; }
+
+        private readonly string? _pageTitleLocalizationId;
+
+        [RelayCommand]
+        public async Task Logout() => await NavigationServiceService.GoToPage(typeof(LoginViewModel));
+
+        [RelayCommand]
+        public void ChangeLanguage() => LocalizationService.ToggleLanguage();
+
+        protected virtual void OnLanguageChanged(object? sender, EventArgs eventArgs) => SetPageTitle();
 
         [RelayCommand(CanExecute = nameof(CanChangeSettings))]
         private void Settings() => NavigationServiceService.GoToModal(typeof(SettingsViewModel));

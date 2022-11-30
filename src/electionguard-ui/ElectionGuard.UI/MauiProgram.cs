@@ -42,7 +42,7 @@ public static class MauiProgram
 
     public static MauiAppBuilder SetupServices(this MauiAppBuilder builder)
     {
-        // services
+        builder.Services.AddSingleton<IServiceProvider>((_) => EgServiceProvider.Current);
         builder.Services.AddSingleton<IAuthenticationService, AuthenticationService>();
         builder.Services.AddSingleton<IConfigurationService, ConfigurationService>();
         builder.Services.AddSingleton<ILocalizationService, LocalizationService>();

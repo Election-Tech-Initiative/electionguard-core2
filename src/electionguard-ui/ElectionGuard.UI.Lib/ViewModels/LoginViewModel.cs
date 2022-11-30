@@ -4,16 +4,8 @@ namespace ElectionGuard.UI.Lib.ViewModels
 {
     public partial class LoginViewModel : BaseViewModel
     {
-        private readonly IAuthenticationService _authenticationService;
-
-        public LoginViewModel(
-            ILocalizationService localizationService,
-            INavigationService navigationService,
-            IConfigurationService configurationService,
-            IAuthenticationService authenticationService) 
-            : base("UserLogin", localizationService, navigationService, configurationService)
+        public LoginViewModel(IServiceProvider serviceProvider) : base("UserLogin", serviceProvider)
         {
-            _authenticationService = authenticationService;
         }
 
         [ObservableProperty]
@@ -23,7 +15,7 @@ namespace ElectionGuard.UI.Lib.ViewModels
         [RelayCommand(CanExecute = nameof(CanLogin))]
         public async Task Login()
         {
-            await _authenticationService.Login(Name);
+            await AuthenticationService.Login(Name);
             // reset the UI name field
             Name = string.Empty;
         }

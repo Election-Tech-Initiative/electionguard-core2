@@ -18,5 +18,7 @@ namespace ElectionGuard.UI.Services
                 await Shell.Current.GoToAsync($"//{nameof(GuardianHomePage)}");
             }
         }
+
+        public string? UserName => App.CurrentUser.Name;
     }
 }
