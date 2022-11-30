@@ -52,8 +52,8 @@ namespace ElectionGuard.UI.Services
         private static Type GetHomePage()
         {
             if (App.CurrentUser.IsAdmin)
-                return typeof(AdminHomePage);
-            return typeof(GuardianHomePage);
+                return typeof(AdminHomeViewModel);
+            return typeof(GuardianHomeViewModel);
         }
 
         public async Task GoToModal(Type viewModel)
