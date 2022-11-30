@@ -14,7 +14,7 @@ namespace ElectionGuard.UI.Services
         private static readonly List<PageType> PageTypes = new()
         {
             new PageType(typeof(LoginViewModel), typeof(LoginPage), true),
-            new PageType(typeof(SettingsViewModel), typeof(SettingsViewModel), true),
+            new PageType(typeof(SettingsViewModel), typeof(SettingsPage), true),
             new PageType(typeof(AdminHomeViewModel), typeof(AdminHomePage), true),
             new PageType(typeof(GuardianHomeViewModel), typeof(GuardianHomePage), true),
             new PageType(typeof(ElectionViewModel), typeof(ElectionPage), false)
@@ -77,7 +77,7 @@ namespace ElectionGuard.UI.Services
             var contentPage = GetPage(viewModel);
             _currentPage = contentPage.Page;
             var url = contentPage.IsGlobal ? $"//{_currentPage.Name}" : _currentPage.Name;
-            await Shell.Current.GoToAsync(url, pageParams);
+            await Shell.Current.GoToAsync(url, pageParams ?? new Dictionary<string, object>());
         }
 
         private PageType GetPage(Type viewModel)

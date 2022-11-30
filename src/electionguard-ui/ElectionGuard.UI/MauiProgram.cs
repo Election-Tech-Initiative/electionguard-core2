@@ -42,27 +42,29 @@ public static class MauiProgram
 
     public static MauiAppBuilder SetupServices(this MauiAppBuilder builder)
     {
-        builder.Services.AddSingleton<IServiceProvider>((_) => EgServiceProvider.Current);
-        builder.Services.AddSingleton<IAuthenticationService, AuthenticationService>();
-        builder.Services.AddSingleton<IConfigurationService, ConfigurationService>();
+        builder.Services.AddSingleton((_) => EgServiceProvider.Current);
+        builder.Services.AddTransient<IAuthenticationService, AuthenticationService>();
+        builder.Services.AddTransient<IConfigurationService, ConfigurationService>();
+        // LocalizationService has to be singleton because it uses events to propagate changes to language changed
         builder.Services.AddSingleton<ILocalizationService, LocalizationService>();
+        // NavigationService has to be singleton because it stores the current page and vm
         builder.Services.AddSingleton<INavigationService, NavigationService>();
 
         // setup view models
-        builder.Services.AddSingleton<LoginViewModel>();
-        builder.Services.AddSingleton<GuardianHomeViewModel>();
-        builder.Services.AddSingleton<AdminHomeViewModel>();
-        builder.Services.AddSingleton<ElectionViewModel>();
-        builder.Services.AddSingleton<SettingsViewModel>();
+        builder.Services.AddTransient<LoginViewModel>();
+        builder.Services.AddTransient<GuardianHomeViewModel>();
+        builder.Services.AddTransient<AdminHomeViewModel>();
+        builder.Services.AddTransient<ElectionViewModel>();
+        builder.Services.AddTransient<SettingsViewModel>();
 
         // setup views
-        builder.Services.AddSingleton<LoginPage>();
-        builder.Services.AddSingleton<GuardianHomePage>();
-        builder.Services.AddSingleton<AdminHomePage>();
-        builder.Services.AddSingleton<ElectionPage>();
+        builder.Services.AddTransient<LoginPage>();
+        builder.Services.AddTransient<GuardianHomePage>();
+        builder.Services.AddTransient<AdminHomePage>();
+        builder.Services.AddTransient<ElectionPage>();
 
         // popup pages
-        builder.Services.AddSingleton<SettingsPage>();
+        builder.Services.AddTransient<SettingsPage>();
 
         return builder;
     }
