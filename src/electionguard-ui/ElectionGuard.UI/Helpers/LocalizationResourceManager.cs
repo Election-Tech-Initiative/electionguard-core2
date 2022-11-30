@@ -1,5 +1,5 @@
-﻿using System.Resources;
-using System.Globalization;
+﻿using System.Globalization;
+using System.Resources;
 
 namespace ElectionGuard.UI.Helpers;
 
@@ -22,7 +22,7 @@ public class LocalizationResourceManager : ObservableObject
     public void Init(ResourceManager resource, CultureInfo initialCulture)
     {
         CurrentCulture = initialCulture;
-        Init(resource);
+        Init(resource, CurrentCulture);
     }
 
     public string GetValue(string text)

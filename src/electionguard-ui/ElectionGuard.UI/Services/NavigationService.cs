@@ -8,7 +8,7 @@ namespace ElectionGuard.UI.Services
         Type Page,
         bool IsGlobal
     );
-    
+
     public class NavigationService : INavigationService
     {
         private static readonly List<PageType> PageTypes = new()
@@ -63,7 +63,7 @@ namespace ElectionGuard.UI.Services
             await Shell.Current.CurrentPage.ShowPopupAsync(pageInstance);
         }
 
-        private Popup GetPopupInstance(Type type)
+        private static Popup GetPopupInstance(Type type)
         {
             var popup = EgServiceProvider.Current.GetService(type);
             if (popup != null) return (Popup)popup;
@@ -80,7 +80,7 @@ namespace ElectionGuard.UI.Services
             await Shell.Current.GoToAsync(url, pageParams ?? new Dictionary<string, object>());
         }
 
-        private PageType GetPage(Type viewModel)
+        private static PageType GetPage(Type viewModel)
         {
             var pageType = PageTypes.FirstOrDefault(i => i.ViewModel == viewModel);
             if (pageType != null)

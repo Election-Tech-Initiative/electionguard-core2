@@ -1,4 +1,5 @@
-﻿using ElectionGuard.UI.Lib.Services;
+﻿using System.Globalization;
+using ElectionGuard.UI.Lib.Services;
 
 namespace ElectionGuard.UI.Services
 {
@@ -7,7 +8,7 @@ namespace ElectionGuard.UI.Services
         public async Task Login(string username)
         {
             App.CurrentUser.Name = username;
-            if (username.ToLower().Contains("admin"))
+            if (username.ToLower(CultureInfo.CurrentCulture).Contains("admin"))
             {
                 App.CurrentUser.IsAdmin = true; // code that is not needed once we have roles in place
                 await Shell.Current.GoToAsync($"//{nameof(AdminHomePage)}");

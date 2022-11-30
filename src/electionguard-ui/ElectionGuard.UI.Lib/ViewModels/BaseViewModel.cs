@@ -37,11 +37,11 @@ namespace ElectionGuard.UI.Lib.ViewModels
 
         protected IConfigurationService ConfigurationService { get; }
 
-        protected readonly ILocalizationService  LocalizationService;
+        protected ILocalizationService LocalizationService { get; }
 
-        protected readonly INavigationService NavigationService;
+        protected INavigationService NavigationService { get; }
 
-        protected IAuthenticationService AuthenticationService { get; set; }
+        protected IAuthenticationService AuthenticationService { get; }
 
         private readonly string? _pageTitleLocalizationId;
 
@@ -66,6 +66,7 @@ namespace ElectionGuard.UI.Lib.ViewModels
         public virtual void Dispose()
         {
             LocalizationService.OnLanguageChanged -= OnLanguageChanged;
+            GC.SuppressFinalize(this);
         }
     }
 }

@@ -26,5 +26,6 @@ public partial class ElectionViewModel : BaseViewModel
     {
         base.Dispose();
         PropertyChanged -= ElectionViewModel_PropertyChanged;
+        GC.SuppressFinalize(this);
     }
 }

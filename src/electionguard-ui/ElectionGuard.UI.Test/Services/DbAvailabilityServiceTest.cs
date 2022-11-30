@@ -12,7 +12,7 @@
             var isDbAvailable = dbAvailabilityService.IsDbAvailable();
 
             // ASSERT
-            Assert.IsTrue(isDbAvailable);
+            Assert.That(isDbAvailable, Is.True);
         }
     }
 }

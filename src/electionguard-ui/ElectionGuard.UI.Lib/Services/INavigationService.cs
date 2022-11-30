@@ -2,8 +2,8 @@
 {
     public interface INavigationService
     {
-        Task GoToPage(Type type, Dictionary<string, object>? pageParams = null);
-        Task GoToModal(Type type);
+        Task GoToPage(Type viewModel, Dictionary<string, object>? pageParams = null);
+        Task GoToModal(Type viewModel);
         Type GetCurrentViewModel();
         Task GoHome();
 

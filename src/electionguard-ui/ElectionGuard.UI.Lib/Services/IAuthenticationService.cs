@@ -2,6 +2,6 @@
 
 public interface IAuthenticationService
 {
-    Task Login(string name);
+    Task Login(string username);
     string? UserName { get; }
 }

@@ -22,10 +22,12 @@ namespace ElectionGuard.UI.Lib.ViewModels
             await NavigationService.GoToPage(typeof(AdminHomeViewModel));
         }
 
+#pragma warning disable CA1822 // This is a stub for future use
         [RelayCommand]
         private void CreateElection()
         {
         }
+#pragma warning restore CA1822
 
         [RelayCommand]
         private async Task SelectionChanged()

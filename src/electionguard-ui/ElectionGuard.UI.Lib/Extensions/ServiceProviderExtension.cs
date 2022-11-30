@@ -7,7 +7,7 @@
             var instance = serviceProvider.GetService(typeof(T));
             if (instance == null)
             {
-                throw new ArgumentNullException($"{nameof(T)} is not registered with DI");
+                throw new ArgumentException($"{nameof(T)} is not registered with DI");
             }
             return (T)instance;
         }
