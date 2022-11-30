@@ -5,16 +5,12 @@ namespace ElectionGuard.UI.Services
 {
     public class NavigationService : INavigationService
     {
-        public NavigationService(SettingsPage settingsPage)
-        {
-            _modals.Add(settingsPage);
-        }
-
         private static readonly Dictionary<Type, Type> ViewModelMappings = new()
         {
             { typeof(LoginViewModel), typeof(LoginPage) },
             { typeof(SettingsViewModel), typeof(SettingsPage) },
-            { typeof(AdminHomeViewModel), typeof(AdminHomePage) }
+            { typeof(AdminHomeViewModel), typeof(AdminHomePage) },
+            { typeof(ElectionViewModel), typeof(ElectionPage) }
         };
 
         private Type _currentPage = typeof(LoginPage);
@@ -54,10 +50,10 @@ namespace ElectionGuard.UI.Services
 
         private Popup GetPopupInstance(Type type)
         {
-            var instance = _modals.FirstOrDefault(i => i.GetType() == type);
-            if (instance == null)
-                throw new ArgumentException($"Modal type {type} not found, add it to NavigationService._modals");
-            return instance;
+            var popup = ServiceProvider.Current.GetService(type);
+            if (popup != null) return (Popup)popup;
+            throw new ArgumentException(
+                $"The type {type} isn't registered in the service collection, set it in MauiProgram.cs");
         }
 
         public async Task GoToPage(Type viewModel, Dictionary<string, object>? pageParams = null)

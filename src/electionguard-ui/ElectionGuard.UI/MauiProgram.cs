@@ -53,12 +53,16 @@ public static class MauiProgram
         builder.Services.AddSingleton<GuardianHomeViewModel>();
         builder.Services.AddSingleton<AdminHomeViewModel>();
         builder.Services.AddSingleton<ElectionViewModel>();
+        builder.Services.AddSingleton<SettingsViewModel>();
 
         // setup views
         builder.Services.AddSingleton<LoginPage>();
         builder.Services.AddSingleton<GuardianHomePage>();
         builder.Services.AddSingleton<AdminHomePage>();
         builder.Services.AddSingleton<ElectionPage>();
+
+        // popup pages
+        builder.Services.AddSingleton<SettingsPage>();
 
         return builder;
     }
