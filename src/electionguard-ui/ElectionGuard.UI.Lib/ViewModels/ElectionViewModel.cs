@@ -7,7 +7,8 @@ public partial class ElectionViewModel : BaseViewModel
     public ElectionViewModel(
         ILocalizationService localizationService,
         INavigationService navigationService,
-        IConfigurationService configurationService) : base(localizationService, navigationService, configurationService)
+        IConfigurationService configurationService) 
+        : base(null, localizationService, navigationService, configurationService)
     {
         PropertyChanged += ElectionViewModel_PropertyChanged;
     }

@@ -9,6 +9,7 @@ namespace ElectionGuard.UI.Lib.ViewModels
 
         public IConfigurationService ConfigurationService { get; }
 
+        private readonly string? _pageTitleLocalizationId;
         protected readonly ILocalizationService  LocalizationService;
         
         protected readonly INavigationService NavigationServiceService;
@@ -18,11 +19,20 @@ namespace ElectionGuard.UI.Lib.ViewModels
 
         public string Version => ConfigurationService.GetVersion();
 
-        public BaseViewModel(ILocalizationService localization, INavigationService navigation, IConfigurationService configurationService)
+        public BaseViewModel(
+            string? pageTitleLocalizationId,
+            ILocalizationService localization, 
+            INavigationService navigation, 
+            IConfigurationService configurationService)
         {
             ConfigurationService = configurationService;
+            _pageTitleLocalizationId = pageTitleLocalizationId;
             LocalizationService = localization;
             NavigationServiceService = navigation;
+            if (_pageTitleLocalizationId != null)
+            {
+                PageTitle = LocalizationService.GetValue(_pageTitleLocalizationId);
+            }
 
             LocalizationService.OnLanguageChanged += OnLanguageChanged;
         }
@@ -33,7 +43,13 @@ namespace ElectionGuard.UI.Lib.ViewModels
         [RelayCommand]
         void ChangeLanguage() => LocalizationService.ToggleLanguage();
 
-        protected virtual void OnLanguageChanged(object? sender, EventArgs eventArgs) { }
+        protected virtual void OnLanguageChanged(object? sender, EventArgs eventArgs)
+        {
+            if (_pageTitleLocalizationId != null)
+            {
+                PageTitle = LocalizationService.GetValue(_pageTitleLocalizationId);
+            }
+        }
 
         [RelayCommand(CanExecute = nameof(CanChangeSettings))]
         private void Settings() => NavigationServiceService.GoToModal(typeof(SettingsViewModel));

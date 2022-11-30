@@ -5,7 +5,8 @@
         public SettingsViewModel(
             ILocalizationService localizationService,
             INavigationService navigationService,
-            IConfigurationService configurationService) : base(localizationService, navigationService, configurationService)
+            IConfigurationService configurationService) 
+            : base(null, localizationService, navigationService, configurationService)
         {
         }
     }

@@ -10,7 +10,8 @@ namespace ElectionGuard.UI.Lib.ViewModels
             ILocalizationService localizationService,
             INavigationService navigationService,
             IConfigurationService configurationService,
-            IAuthenticationService authenticationService) : base(localizationService, navigationService, configurationService)
+            IAuthenticationService authenticationService) 
+            : base("UserLogin", localizationService, navigationService, configurationService)
         {
             _authenticationService = authenticationService;
         }

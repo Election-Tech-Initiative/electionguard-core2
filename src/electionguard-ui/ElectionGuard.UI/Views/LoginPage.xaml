@@ -3,7 +3,6 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              xmlns:helper="clr-namespace:ElectionGuard.UI.Helpers"
              x:Class="ElectionGuard.UI.Views.LoginPage"
-             Title="{helper:Translate UserLogin}"
              xmlns:viewModels="clr-namespace:ElectionGuard.UI.Lib.ViewModels;assembly=ElectionGuard.UI.Lib"
              x:DataType="viewModels:LoginViewModel"
              ControlTemplate="{StaticResource PageTemplate}">
