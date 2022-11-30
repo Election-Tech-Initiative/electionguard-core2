@@ -23,7 +23,7 @@ public static class MauiProgram
     public static MauiAppBuilder SetupLogging(this MauiAppBuilder builder)
     {
 #if DEBUG
-		builder.Logging.AddDebug();
+        builder.Logging.AddDebug();
 #endif
         return builder;
     }

@@ -6,7 +6,7 @@ public partial class NoContentView
     {
         InitializeComponent();
         BindingContext = this;
-	}
+    }
 
     public static readonly BindableProperty TextProperty = BindableProperty.Create(nameof(Text), typeof(string), typeof(NoContentView));
 

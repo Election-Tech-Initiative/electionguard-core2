@@ -8,7 +8,7 @@ public partial class ElectionPage : IQueryAttributable
     {
         _electionViewModel = electionViewModel;
         InitializeComponent();
-		BindingContext = electionViewModel;
+        BindingContext = electionViewModel;
     }
 
     public void ApplyQueryAttributes(IDictionary<string, object> query)

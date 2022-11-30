@@ -2,8 +2,8 @@
 
 public partial class KeyCeremonyPage : ContentPage
 {
-	public KeyCeremonyPage()
-	{
-		InitializeComponent();
-	}
+    public KeyCeremonyPage()
+    {
+        InitializeComponent();
+    }
 }

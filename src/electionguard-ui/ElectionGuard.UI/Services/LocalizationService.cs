@@ -3,8 +3,8 @@ using ElectionGuard.UI.Lib.Services;
 
 namespace ElectionGuard.UI.Services
 {
-	public class LocalizationService : ILocalizationService
-	{
+    public class LocalizationService : ILocalizationService
+    {
         public string GetValue(string key)
         {
             return LocalizationResourceManager.Current.GetValue(key);
