@@ -5,7 +5,7 @@
              x:DataType="viewModels:CreateKeyCeremonyAdminViewModel"
              x:Class="ElectionGuard.UI.Views.CreateKeyCeremonyAdminPage"
              ControlTemplate="{StaticResource PageTemplate}">
-    <VerticalStackLayout>
+    <VerticalStackLayout Style="{StaticResource NarrowCenteredPage}">
         <Label Text="Hello from CreateKeyCeremonyAdminPage" />
         <Label Text="{Binding Test}" />
     </VerticalStackLayout>
