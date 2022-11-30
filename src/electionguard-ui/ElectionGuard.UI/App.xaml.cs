@@ -9,7 +9,7 @@ public partial class App
     public App()
     {
         InitializeComponent();
-        this.UserAppTheme = AppTheme.Light;
+        UserAppTheme = AppTheme.Light;
 
         SetupLanguageSupport();
 
