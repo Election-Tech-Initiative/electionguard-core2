@@ -1,7 +1,7 @@
 ﻿using System;
 namespace ElectionGuard.UI.Lib.ViewModels
 {
-	public class CreateKeyCeremonyAdminViewModel : BaseViewModel
+	public partial class CreateKeyCeremonyAdminViewModel : BaseViewModel
 	{
 		private const string _pageName = "CreateKeyCeremony";
 
@@ -9,6 +9,8 @@ namespace ElectionGuard.UI.Lib.ViewModels
 		{
 		}
 
+		[ObservableProperty]
+		private string _test = "Test";
 
 	}
 }
