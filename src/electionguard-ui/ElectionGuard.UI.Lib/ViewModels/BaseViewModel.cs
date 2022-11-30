@@ -19,7 +19,7 @@ namespace ElectionGuard.UI.Lib.ViewModels
             _pageTitleLocalizationId = pageTitleLocalizationId;
             ConfigurationService = serviceProvider.GetInstance<IConfigurationService>();
             LocalizationService = serviceProvider.GetInstance<ILocalizationService>();
-            NavigationServiceService = serviceProvider.GetInstance<INavigationService>();
+            NavigationService = serviceProvider.GetInstance<INavigationService>();
             AuthenticationService = serviceProvider.GetInstance<IAuthenticationService>();
 
             SetPageTitle();
@@ -39,14 +39,14 @@ namespace ElectionGuard.UI.Lib.ViewModels
 
         protected readonly ILocalizationService  LocalizationService;
 
-        protected readonly INavigationService NavigationServiceService;
+        protected readonly INavigationService NavigationService;
 
         protected IAuthenticationService AuthenticationService { get; set; }
 
         private readonly string? _pageTitleLocalizationId;
 
         [RelayCommand]
-        public async Task Logout() => await NavigationServiceService.GoToPage(typeof(LoginViewModel));
+        public async Task Logout() => await NavigationService.GoToPage(typeof(LoginViewModel));
 
         [RelayCommand]
         public void ChangeLanguage() => LocalizationService.ToggleLanguage();
@@ -54,14 +54,14 @@ namespace ElectionGuard.UI.Lib.ViewModels
         protected virtual void OnLanguageChanged(object? sender, EventArgs eventArgs) => SetPageTitle();
 
         [RelayCommand(CanExecute = nameof(CanChangeSettings))]
-        private void Settings() => NavigationServiceService.GoToModal(typeof(SettingsViewModel));
+        private void Settings() => NavigationService.GoToModal(typeof(SettingsViewModel));
 
-        private bool CanChangeSettings() => NavigationServiceService.GetCurrentViewModel() == typeof(LoginViewModel);
+        private bool CanChangeSettings() => NavigationService.GetCurrentViewModel() == typeof(LoginViewModel);
 
         [RelayCommand(CanExecute = nameof(CanGoHome))]
-        private async Task Home() => await NavigationServiceService.GoHome();
+        private async Task Home() => await NavigationService.GoHome();
 
-        private bool CanGoHome() => NavigationServiceService.CanGoHome();
+        private bool CanGoHome() => NavigationService.CanGoHome();
 
         public virtual void Dispose()
         {

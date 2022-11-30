@@ -19,7 +19,7 @@ namespace ElectionGuard.UI.Lib.ViewModels
         [RelayCommand]
         public async Task GoKeyCeremony()
         {
-            await NavigationServiceService.GoToPage(typeof(AdminHomeViewModel));
+            await NavigationService.GoToPage(typeof(AdminHomeViewModel));
         }
 
         [RelayCommand]
@@ -36,7 +36,7 @@ namespace ElectionGuard.UI.Lib.ViewModels
                 {
                     { ElectionViewModel.CurrentElectionParam, CurrentElection }
                 };
-                await NavigationServiceService.GoToPage(typeof(ElectionViewModel), pageParams);
+                await NavigationService.GoToPage(typeof(ElectionViewModel), pageParams);
                 CurrentElection = null;
             }
         }
