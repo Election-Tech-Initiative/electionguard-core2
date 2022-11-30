@@ -1,21 +1,24 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
+using System.Text.Json.Serialization;
 
 namespace ElectionGuard.UI.Lib.Models;
 
-public partial class User : ObservableObject
+public partial class User : BaseModel
 {
     [ObservableProperty]
-    private string? id;
+    private string? _name;
 
     [ObservableProperty]
-    private string? name;
+    private bool _isAdmin = false;
 
     [ObservableProperty]
-    private bool isAdmin = false;
+    private string? _email = string.Empty;
 
     [ObservableProperty]
-    private string? email = string.Empty;
+    private string? _mobile = string.Empty;
 
-    [ObservableProperty]
-    private string? mobile = string.Empty;
+    static User()
+    {
+        table = "user";
+    }
 }

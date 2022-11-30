@@ -19,34 +19,36 @@ namespace ElectionGuard.UI.Lib.Services
 
         private static string DbHost = string.Empty;
         private static string DbPassword = string.Empty;
-        private static MongoClient? client;
+        private static MongoClient client = new();
 
         public static void Init(string host, string password)
         {
             DbHost = host;
             DbPassword = password;
 
-            var credential = MongoCredential.CreateCredential(DefaultDatabase, DefaultUsername, DbPassword);
+            var credential = MongoCredential.CreatePlainCredential(DefaultDatabase, DefaultUsername, DbPassword);
             var settings = new MongoClientSettings
             {
                 ApplicationName = ApplicationName,
-                Credential = credential,
+                
                 Server = new MongoServerAddress(DbHost, DefaultPort)
             };
 
-            client = new MongoClient(settings);
+//            client = new MongoClient(settings);
+            client = new MongoClient($"mongodb://{DefaultUsername}:{DbPassword}@{DbHost}:{DefaultPort}/{DefaultDatabase}?authSource=admin&keepAlive=true&poolSize=30&autoReconnect=true&socketTimeoutMS=360000&connectTimeoutMS=360000");
 
+        
         }
 
-        public static IMongoDatabase? GetDb()
+        public static IMongoDatabase GetDb()
         {
-            return client?.GetDatabase(DefaultDatabase);
+            return client.GetDatabase(DefaultDatabase);
         }
 
         public static bool Verify()
         {
             var db = GetDb();
-            return db?.ListCollectionNames().ToList().Count > 0;
+            return db.ListCollectionNames().ToList().Count > 0;
         }
     }
 }

@@ -5,5 +5,5 @@ namespace ElectionGuard.UI.Lib.Models;
 public partial class KeyCeremony : ObservableObject
 {
     [ObservableProperty]
-    private string? name;
+    private string? _name;
 }

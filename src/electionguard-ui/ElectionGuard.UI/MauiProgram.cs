@@ -8,7 +8,7 @@ public static class MauiProgram
 {
     public static MauiApp CreateMauiApp()
     {
-        DbService.Init("locahost", "testing");
+        DbService.Init("127.0.0.1", "testing");
         var builder = MauiApp.CreateBuilder();
         builder
             .UseMauiApp<App>()
