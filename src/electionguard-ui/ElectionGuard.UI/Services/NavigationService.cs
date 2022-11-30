@@ -3,19 +3,24 @@ using ElectionGuard.UI.Lib.Services;
 
 namespace ElectionGuard.UI.Services
 {
+    public record PageType(
+        Type ViewModel,
+        Type Page,
+        bool IsGlobal
+    );
+    
     public class NavigationService : INavigationService
     {
-        private static readonly Dictionary<Type, Type> ViewModelMappings = new()
+        private static readonly List<PageType> ViewModelMappings = new()
         {
-            { typeof(LoginViewModel), typeof(LoginPage) },
-            { typeof(SettingsViewModel), typeof(SettingsPage) },
-            { typeof(AdminHomeViewModel), typeof(AdminHomePage) },
-            { typeof(ElectionViewModel), typeof(ElectionPage) }
+            new PageType(typeof(LoginViewModel), typeof(LoginPage), true),
+            new PageType(typeof(SettingsViewModel), typeof(SettingsViewModel), true),
+            new PageType(typeof(AdminHomeViewModel), typeof(AdminHomePage), true),
+            new PageType(typeof(ElectionViewModel), typeof(ElectionPage), false)
         };
 
         private Type _currentPage = typeof(LoginPage);
         private Type _currentViewModel = typeof(LoginViewModel);
-        private readonly List<Popup> _modals = new();
 
         public bool CanGoHome()
         {
@@ -43,8 +48,8 @@ namespace ElectionGuard.UI.Services
 
         public async Task GoToModal(Type viewModel)
         {
-            var page = GetPage(viewModel);
-            var pageInstance = GetPopupInstance(page);
+            var pageType = GetPage(viewModel);
+            var pageInstance = GetPopupInstance(pageType.Page);
             await Shell.Current.CurrentPage.ShowPopupAsync(pageInstance);
         }
 
@@ -60,14 +65,16 @@ namespace ElectionGuard.UI.Services
         {
             _currentViewModel = viewModel;
             var contentPage = GetPage(viewModel);
-            _currentPage = contentPage;
-            await Shell.Current.GoToAsync($"//{_currentPage}", pageParams);
+            _currentPage = contentPage.Page;
+            var url = contentPage.IsGlobal ? $"//{_currentPage.Name}" : _currentPage.Name;
+            await Shell.Current.GoToAsync(url, pageParams);
         }
 
-        private Type GetPage(Type viewModel)
+        private PageType GetPage(Type viewModel)
         {
-            if (ViewModelMappings.TryGetValue(viewModel, out var page))
-                return page;
+            var pageType = ViewModelMappings.FirstOrDefault(i => i.ViewModel == viewModel);
+            if (pageType != null)
+                return pageType;
 
             throw new ArgumentException($"ViewModel mapping not found, add {viewModel} to NavigationService.ViewModelMappings");
         }
