@@ -4,6 +4,9 @@ namespace ElectionGuard.UI.Lib.ViewModels
 {
     public partial class BaseViewModel : ObservableObject
     {
+        [ObservableProperty]
+        private string _pageTitle = "";
+
         public IConfigurationService ConfigurationService { get; }
 
         protected readonly ILocalizationService  LocalizationService;

@@ -88,7 +88,7 @@
                                 </Label.GestureRecognizers>
                             </Label>
                             <Label Text=" / " FontSize="20" TextColor="White" VerticalOptions="Center" Margin=" 10,0,10,0" />
-                            <Label Text="{Binding Page.Title}" FontSize="20" TextColor="White" VerticalOptions="Center" />
+                            <Label Text="{Binding PageTitle}" FontSize="20" TextColor="White" VerticalOptions="Center" />
                         </HorizontalStackLayout>
                         <Label Text="{Binding UserName}" VerticalOptions="Center" HorizontalOptions="EndAndExpand" FontSize="18" TextColor="White">
                             <Label.GestureRecognizers>
