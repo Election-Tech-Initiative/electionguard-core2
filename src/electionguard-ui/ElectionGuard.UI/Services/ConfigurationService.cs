@@ -1,12 +1,11 @@
-﻿using ElectionGuard.UI.Lib.Services;
+using ElectionGuard.UI.Lib.Services;
 
-namespace ElectionGuard.UI.Services
+namespace ElectionGuard.UI.Services;
+
+public class ConfigurationService : IConfigurationService
 {
-    public class ConfigurationService : IConfigurationService
+    public string GetVersion()
     {
-        public string GetVersion()
-        {
-            return $"v1{VersionTracking.CurrentVersion}";
-        }
+        return $"v1{VersionTracking.CurrentVersion}";
     }
 }
