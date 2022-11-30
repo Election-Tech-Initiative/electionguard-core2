@@ -2,7 +2,7 @@
 
 namespace ElectionGuard.UI.Lib.ViewModels;
 
-public partial class ElectionViewModel : BaseViewModel, IDisposable
+public partial class ElectionViewModel : BaseViewModel
 {
     public ElectionViewModel(
         ILocalizationService localizationService,
@@ -25,8 +25,9 @@ public partial class ElectionViewModel : BaseViewModel, IDisposable
 
     public const string CurrentElectionParam = "CurrentElection";
 
-    public void Dispose()
+    public override void Dispose()
     {
+        base.Dispose();
         PropertyChanged -= ElectionViewModel_PropertyChanged;
     }
 }

@@ -4,7 +4,6 @@
              x:Class="ElectionGuard.UI.Views.AdminHomePage"
              xmlns:helper="clr-namespace:ElectionGuard.UI.Helpers"
              xmlns:model="clr-namespace:ElectionGuard.UI.Lib.Models;assembly=ElectionGuard.UI.Lib"
-             Title="{helper:Translate AdminHome}"
              xmlns:controls="clr-namespace:ElectionGuard.UI.Controls"
              xmlns:viewModels="clr-namespace:ElectionGuard.UI.Lib.ViewModels;assembly=ElectionGuard.UI.Lib"
              x:DataType="viewModels:AdminHomeViewModel"

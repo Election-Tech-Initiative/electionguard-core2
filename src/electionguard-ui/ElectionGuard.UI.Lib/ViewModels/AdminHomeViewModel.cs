@@ -11,6 +11,12 @@ namespace ElectionGuard.UI.Lib.ViewModels
             IConfigurationService configurationService) : base(localizationService, navigationService, configurationService)
         {
             _elections.Add(new Election { Name = "Pilot Election" });
+            PageTitle = localizationService.GetValue("AdminHome");
+        }
+
+        protected override void OnLanguageChanged(object? sender, EventArgs eventArgs)
+        {
+            PageTitle = LocalizationService.GetValue("AdminHome");
         }
 
         [ObservableProperty]

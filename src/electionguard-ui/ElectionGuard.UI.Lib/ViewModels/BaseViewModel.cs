@@ -2,7 +2,7 @@
 
 namespace ElectionGuard.UI.Lib.ViewModels
 {
-    public partial class BaseViewModel : ObservableObject
+    public partial class BaseViewModel : ObservableObject, IDisposable
     {
         [ObservableProperty]
         private string _pageTitle = "";
@@ -23,13 +23,17 @@ namespace ElectionGuard.UI.Lib.ViewModels
             ConfigurationService = configurationService;
             LocalizationService = localization;
             NavigationServiceService = navigation;
+
+            LocalizationService.OnLanguageChanged += OnLanguageChanged;
         }
 
         [RelayCommand]
         async Task Logout() => await NavigationServiceService.GoToPage(typeof(LoginViewModel));
 
         [RelayCommand]
-        void ChangeLanguage() => LocalizationService.Set();
+        void ChangeLanguage() => LocalizationService.ToggleLanguage();
+
+        protected virtual void OnLanguageChanged(object? sender, EventArgs eventArgs) { }
 
         [RelayCommand(CanExecute = nameof(CanChangeSettings))]
         private void Settings() => NavigationServiceService.GoToModal(typeof(SettingsViewModel));
@@ -41,5 +45,9 @@ namespace ElectionGuard.UI.Lib.ViewModels
 
         private bool CanGoHome() => NavigationServiceService.CanGoHome();
 
+        public virtual void Dispose()
+        {
+            LocalizationService.OnLanguageChanged -= OnLanguageChanged;
+        }
     }
 }
