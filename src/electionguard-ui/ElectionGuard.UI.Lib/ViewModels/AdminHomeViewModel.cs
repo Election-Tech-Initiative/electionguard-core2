@@ -19,7 +19,7 @@ namespace ElectionGuard.UI.Lib.ViewModels
         [RelayCommand]
         public async Task GoKeyCeremony()
         {
-            await NavigationService.GoToPage(typeof(AdminHomeViewModel));
+            await NavigationService.GoToPage(typeof(CreateKeyCeremonyAdminViewModel));
         }
 
 #pragma warning disable CA1822 // This is a stub for future use

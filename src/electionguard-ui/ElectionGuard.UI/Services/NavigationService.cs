@@ -17,7 +17,8 @@ public class NavigationService : INavigationService
         new PageType(typeof(SettingsViewModel), typeof(SettingsPage), true),
         new PageType(typeof(AdminHomeViewModel), typeof(AdminHomePage), true),
         new PageType(typeof(GuardianHomeViewModel), typeof(GuardianHomePage), true),
-        new PageType(typeof(ElectionViewModel), typeof(ElectionPage), false)
+        new PageType(typeof(ElectionViewModel), typeof(ElectionPage), false),
+        new PageType(typeof(CreateKeyCeremonyAdminViewModel), typeof(CreateKeyCeremonyAdminPage), false),
     };
 
     private Type _currentPage = typeof(LoginPage);

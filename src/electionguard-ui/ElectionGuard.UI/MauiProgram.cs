@@ -56,12 +56,14 @@ public static class MauiProgram
         builder.Services.AddTransient<AdminHomeViewModel>();
         builder.Services.AddTransient<ElectionViewModel>();
         builder.Services.AddTransient<SettingsViewModel>();
+        builder.Services.AddTransient<CreateKeyCeremonyAdminViewModel>();
 
         // setup views
         builder.Services.AddTransient<LoginPage>();
         builder.Services.AddTransient<GuardianHomePage>();
         builder.Services.AddTransient<AdminHomePage>();
         builder.Services.AddTransient<ElectionPage>();
+        builder.Services.AddTransient<CreateKeyCeremonyAdminPage>();
 
         // popup pages
         builder.Services.AddTransient<SettingsPage>();
