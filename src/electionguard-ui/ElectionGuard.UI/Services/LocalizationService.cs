@@ -12,16 +12,9 @@ public class LocalizationService : ILocalizationService
     public void ToggleLanguage()
     {
         var currentLanguage = GetLanguage();
-        if (currentLanguage == "en")
-        {
-            Preferences.Set("CurrentLanguage", "es");
-            LocalizationResourceManager.Current.CurrentCulture = new CultureInfo("es");
-        }
-        else
-        {
-            Preferences.Set("CurrentLanguage", "en");
-            LocalizationResourceManager.Current.CurrentCulture = new CultureInfo("en");
-        }
+        var newLanguage = currentLanguage == "es" ? "en" : "es";
+        Preferences.Set("CurrentLanguage", newLanguage);
+        LocalizationResourceManager.Current.CurrentCulture = new CultureInfo(newLanguage);
 
         OnLanguageChanged?.Invoke(this, EventArgs.Empty);
     }
