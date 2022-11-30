@@ -1,0 +1,16 @@
+﻿namespace ElectionGuard.UI.Lib.Extensions
+{
+    public static class ServiceProviderExtension
+    {
+        public static T GetInstance<T>(this IServiceProvider serviceProvider)
+        {
+            var instance = serviceProvider.GetService(typeof(T));
+            if (instance == null)
+            {
+                throw new ArgumentNullException($"{nameof(T)} is not registered with DI");
+            }
+            return (T)instance;
+        }
+
+    }
+}

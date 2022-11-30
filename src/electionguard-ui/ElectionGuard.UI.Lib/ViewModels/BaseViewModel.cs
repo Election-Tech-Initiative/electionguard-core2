@@ -1,4 +1,5 @@
 ﻿using CommunityToolkit.Mvvm.Input;
+using ElectionGuard.UI.Lib.Extensions;
 
 namespace ElectionGuard.UI.Lib.ViewModels
 {
@@ -11,25 +12,15 @@ namespace ElectionGuard.UI.Lib.ViewModels
         [ObservableProperty]
         private string _pageTitle = "";
 
-        private T GetService<T>(IServiceProvider serviceProvider)
-        {
-            var service = serviceProvider.GetService(typeof(T));
-            if (service == null)
-            {
-                throw new ArgumentNullException($"{nameof(T)} is not registered with DI");
-            }
-            return (T)service;
-        }
-
         public BaseViewModel(
             string? pageTitleLocalizationId,
             IServiceProvider serviceProvider)
         {
             _pageTitleLocalizationId = pageTitleLocalizationId;
-            ConfigurationService = GetService<IConfigurationService>(serviceProvider);
-            LocalizationService = GetService<ILocalizationService>(serviceProvider);
-            NavigationServiceService = GetService<INavigationService>(serviceProvider);
-            AuthenticationService = GetService<IAuthenticationService>(serviceProvider);
+            ConfigurationService = serviceProvider.GetInstance<IConfigurationService>();
+            LocalizationService = serviceProvider.GetInstance<ILocalizationService>();
+            NavigationServiceService = serviceProvider.GetInstance<INavigationService>();
+            AuthenticationService = serviceProvider.GetInstance<IAuthenticationService>();
 
             SetPageTitle();
 

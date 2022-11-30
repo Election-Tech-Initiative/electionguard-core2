@@ -1,3 +1,7 @@
+using ElectionGuard.UI.Lib.Services;
+using ElectionGuard.UI.Services;
+using ElectionGuard.UI.Lib.Extensions;
+
 namespace ElectionGuard.UI;
 
 public partial class AppShell
@@ -5,10 +9,8 @@ public partial class AppShell
     public AppShell()
     {
         InitializeComponent();
-
-        Routing.RegisterRoute(nameof(LoginPage), typeof(LoginPage));
-        Routing.RegisterRoute(nameof(GuardianHomePage), typeof(GuardianHomePage));
-        Routing.RegisterRoute(nameof(AdminHomePage), typeof(AdminHomePage));
-        Routing.RegisterRoute(nameof(ElectionPage), typeof(ElectionPage));
+        
+        var navigationService = EgServiceProvider.Current.GetInstance<INavigationService>();
+        navigationService.RegisterRoutes();
     }
 }

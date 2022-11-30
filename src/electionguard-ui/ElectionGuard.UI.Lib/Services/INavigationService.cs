@@ -8,6 +8,7 @@
         Task GoHome();
 
 		bool CanGoHome();
+        void RegisterRoutes();
     }
 }
 

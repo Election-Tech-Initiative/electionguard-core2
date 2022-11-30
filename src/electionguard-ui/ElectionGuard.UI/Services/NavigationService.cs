@@ -11,11 +11,12 @@ namespace ElectionGuard.UI.Services
     
     public class NavigationService : INavigationService
     {
-        private static readonly List<PageType> ViewModelMappings = new()
+        private static readonly List<PageType> PageTypes = new()
         {
             new PageType(typeof(LoginViewModel), typeof(LoginPage), true),
             new PageType(typeof(SettingsViewModel), typeof(SettingsViewModel), true),
             new PageType(typeof(AdminHomeViewModel), typeof(AdminHomePage), true),
+            new PageType(typeof(GuardianHomeViewModel), typeof(GuardianHomePage), true),
             new PageType(typeof(ElectionViewModel), typeof(ElectionPage), false)
         };
 
@@ -29,6 +30,14 @@ namespace ElectionGuard.UI.Services
                    !_currentPage.IsAssignableFrom(typeof(GuardianHomePage));
         }
 
+        public void RegisterRoutes()
+        {
+            foreach (var pageType in PageTypes)
+            {
+                Routing.RegisterRoute(pageType.Page.Name, pageType.Page);
+            }
+        }
+
         public Type GetCurrentViewModel()
         {
             return _currentViewModel;
@@ -36,14 +45,15 @@ namespace ElectionGuard.UI.Services
 
         public async Task GoHome()
         {
+            var page = GetHomePage();
+            await GoToPage(page);
+        }
+
+        private static Type GetHomePage()
+        {
             if (App.CurrentUser.IsAdmin)
-            {
-                await GoToPage(typeof(AdminHomePage));
-            }
-            else
-            {
-                await Shell.Current.GoToAsync($"//{nameof(GuardianHomePage)}");
-            }
+                return typeof(AdminHomePage);
+            return typeof(GuardianHomePage);
         }
 
         public async Task GoToModal(Type viewModel)
@@ -72,7 +82,7 @@ namespace ElectionGuard.UI.Services
 
         private PageType GetPage(Type viewModel)
         {
-            var pageType = ViewModelMappings.FirstOrDefault(i => i.ViewModel == viewModel);
+            var pageType = PageTypes.FirstOrDefault(i => i.ViewModel == viewModel);
             if (pageType != null)
                 return pageType;
 
