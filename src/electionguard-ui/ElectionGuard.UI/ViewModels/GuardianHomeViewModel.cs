@@ -1,32 +1,26 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace ElectionGuard.UI.ViewModels
+﻿namespace ElectionGuard.UI.ViewModels
 {
     public partial class GuardianHomeViewModel : BaseViewModel
     {
         [ObservableProperty]
-        private ObservableCollection<KeyCeremony> keyCeremonies = new();
+        private ObservableCollection<KeyCeremony> _keyCeremonies = new();
 
         [ObservableProperty]
-        private ObservableCollection<Tally> tallies = new();
+        private ObservableCollection<Tally> _tallies = new();
 
         [ObservableProperty]
-        private KeyCeremony? currentKeyCeremony;
+        private KeyCeremony? _currentKeyCeremony;
 
         [ObservableProperty]
-        private Tally? currentTally;
+        private Tally? _currentTally;
 
         public GuardianHomeViewModel()
         {
             // create some fake tallies to add to the list
-            tallies.Add(new Tally { Name = "Election Test Tally #1" });
-            tallies.Add(new Tally { Name = "Election Test Tally #2" });
-            tallies.Add(new Tally { Name = "Real Election Tally" });
-            keyCeremonies.Add(new KeyCeremony { Name="my key" });
+            _tallies.Add(new Tally { Name = "Election Test Tally #1" });
+            _tallies.Add(new Tally { Name = "Election Test Tally #2" });
+            _tallies.Add(new Tally { Name = "Real Election Tally" });
+            _keyCeremonies.Add(new KeyCeremony { Name="my key" });
         }
 
     }

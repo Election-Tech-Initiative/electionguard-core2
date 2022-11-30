@@ -1,14 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿namespace ElectionGuard.UI.ViewModels;
 
-namespace ElectionGuard.UI.ViewModels
+public partial class ElectionViewModel : BaseViewModel
 {
-    public partial class ElectionViewModel : BaseViewModel
-    {
-        [ObservableProperty]
-        private Election? currentElection;
-    }
+    [ObservableProperty]
+    private Election? _currentElection;
 }

@@ -1,11 +1,10 @@
-using ElectionGuard.UI.Resx;
 using System.Globalization;
 
 namespace ElectionGuard.UI;
 
-public partial class App : Application
+public partial class App
 {
-    public static User CurrentUser { get; set; } = new User();
+    public static User CurrentUser { get; set; } = new();
 
     public App()
     {
