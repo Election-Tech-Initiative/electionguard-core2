@@ -36,7 +36,7 @@ public partial class IntegerValidationBehavior : Behavior<Entry>
 
     private static void OnEntryTextChanged(object? sender, TextChangedEventArgs args)
     {
-        if (sender == null || string.IsNullOrWhiteSpace(args.NewTextValue))
+        if (sender == null || string.IsNullOrEmpty(args.NewTextValue))
         {
             return;
         }
