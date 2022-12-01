@@ -255,4 +255,7 @@
 	<data name="ViewKeyCeremony">
 		<value>View Key Ceremony</value>
 	</data>
+	<data name="Join">
+		<value>Join</value>
+	</data>
 </root>

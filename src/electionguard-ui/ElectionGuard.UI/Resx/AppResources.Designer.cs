@@ -259,6 +259,15 @@ namespace ElectionGuard.UI.Resx {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Join.
+        /// </summary>
+        internal static string Join {
+            get {
+                return ResourceManager.GetString("Join", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Key Ceremonies.
         /// </summary>
         internal static string KeyCeremoniesText {

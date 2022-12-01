@@ -19,5 +19,6 @@
             <Label Style="{StaticResource FormLabel}" Text="{helper:Translate Quorum}" />
             <Label Style="{StaticResource FormValue}" Text="{Binding KeyCeremony.Quorum, FallbackValue=''}" />
         </StackLayout>
+        <Button Text="{helper:Translate Join}" Command="{Binding JoinCommand}" />
     </VerticalStackLayout>
 </ContentPage>

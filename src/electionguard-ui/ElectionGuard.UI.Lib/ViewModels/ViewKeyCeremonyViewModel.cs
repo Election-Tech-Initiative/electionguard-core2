@@ -1,5 +1,5 @@
 ﻿using CommunityToolkit.Mvvm.Input;
-using ElectionGuard.UI.Lib.Models;
+using ElectionGuard.ElectionSetup;
 
 namespace ElectionGuard.UI.Lib.ViewModels
 {
@@ -14,12 +14,20 @@ namespace ElectionGuard.UI.Lib.ViewModels
         }
 
         [ObservableProperty]
-        private KeyCeremony? _keyCeremony;
+        private Models.KeyCeremony? _keyCeremony;
 
         [RelayCommand]
         public async Task RetrieveKeyCeremony(int keyCeremonyId)
         {
             KeyCeremony = await _keyCeremonyService.Get(keyCeremonyId);
+        }
+
+        [RelayCommand]
+        public void Join()
+        {
+            if (KeyCeremony == null) throw new ArgumentNullException(nameof(KeyCeremony));
+            var currentGuardianUserName = AuthenticationService.UserName;
+            var guardian = Guardian.FromNonce(currentGuardianUserName, 0, KeyCeremony.NumberOfGuardians, KeyCeremony.Quorum);
         }
 
         private readonly IKeyCeremonyService _keyCeremonyService;
