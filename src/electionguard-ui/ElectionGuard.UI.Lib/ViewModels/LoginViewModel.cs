@@ -9,7 +9,7 @@ namespace ElectionGuard.UI.Lib.ViewModels
         }
 
         [ObservableProperty]
-        [NotifyCanExecuteChangedFor(nameof(LoginViewModel.LoginCommand))]
+        [NotifyCanExecuteChangedFor(nameof(LoginCommand))]
         private string _name = string.Empty;
 
         [RelayCommand(CanExecute = nameof(CanLogin))]
@@ -20,7 +20,7 @@ namespace ElectionGuard.UI.Lib.ViewModels
             Name = string.Empty;
         }
 
-        bool CanLogin()
+        private bool CanLogin()
         {
             return Name.Trim().Length > 0;
         }

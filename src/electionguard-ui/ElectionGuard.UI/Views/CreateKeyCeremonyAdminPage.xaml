@@ -2,11 +2,27 @@
 <ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              xmlns:viewModels="clr-namespace:ElectionGuard.UI.Lib.ViewModels;assembly=ElectionGuard.UI.Lib"
+             xmlns:helper="clr-namespace:ElectionGuard.UI.Helpers"
              x:DataType="viewModels:CreateKeyCeremonyAdminViewModel"
              x:Class="ElectionGuard.UI.Views.CreateKeyCeremonyAdminPage"
              ControlTemplate="{StaticResource PageTemplate}">
     <VerticalStackLayout Style="{StaticResource NarrowCenteredPage}">
-        <Label Text="Hello from CreateKeyCeremonyAdminPage" />
-        <Label Text="{Binding Test}" />
+        <Grid ColumnDefinitions="*, *" RowDefinitions="auto, auto, auto">
+            <StackLayout Style="{StaticResource FormControl}" Grid.Row="0" Grid.ColumnSpan="2">
+                <Label Style="{StaticResource FormLabel}" Text="{helper:Translate KeyCeremonyName}"></Label>
+                <Entry Text="{Binding KeyCeremonyName}" Keyboard="Numeric" />
+            </StackLayout>
+            <StackLayout Style="{StaticResource FormControl}" Grid.Row="1" Grid.Column="0">
+                <Label Style="{StaticResource FormLabel}" Text="{helper:Translate NumberOfGuardians}"></Label>
+                <Entry Text="{Binding NumberOfGuardians}" Keyboard="Numeric" />
+            </StackLayout>
+            <StackLayout Style="{StaticResource FormControl}" Grid.Row="1" Grid.Column="1">
+                <Label Style="{StaticResource FormLabel}" Text="{helper:Translate Quorum}"></Label>
+                <Entry Text="{Binding Quorum}"></Entry>
+            </StackLayout>
+            <Button Grid.Row="2" Grid.ColumnSpan="2" 
+                    Text="{helper:Translate StartCeremony}" 
+                    Command="{Binding CreateKeyCeremonyCommand}"></Button>
+        </Grid>
     </VerticalStackLayout>
 </ContentPage>

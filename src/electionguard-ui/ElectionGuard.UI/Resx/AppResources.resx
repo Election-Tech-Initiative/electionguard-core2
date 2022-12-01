@@ -238,6 +238,18 @@
 		<value>Go To Key Ceremony</value>
 	</data>
 	<data name="CreateKeyCeremony">
-		<value>Key Ceremony</value>
+		<value>Create Key Ceremony</value>
+	</data>
+	<data name="Quorum">
+		<value>Quorum</value>
+	</data>
+	<data name="NumberOfGuardians">
+		<value>Number of Guardians</value>
+	</data>
+	<data name="KeyCeremonyName">
+		<value>Key Ceremony Name</value>
+	</data>
+	<data name="StartCeremony">
+		<value>Start Ceremony</value>
 	</data>
 </root>

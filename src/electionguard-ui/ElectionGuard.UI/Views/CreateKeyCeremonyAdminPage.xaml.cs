@@ -1,6 +1,6 @@
 ﻿namespace ElectionGuard.UI.Views;
 
-public partial class CreateKeyCeremonyAdminPage : ContentPage
+public partial class CreateKeyCeremonyAdminPage
 {
     public CreateKeyCeremonyAdminPage(CreateKeyCeremonyAdminViewModel vm)
     {
