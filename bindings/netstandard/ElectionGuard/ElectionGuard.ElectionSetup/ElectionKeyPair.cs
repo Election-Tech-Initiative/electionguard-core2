@@ -50,7 +50,7 @@
             var privateKey = polynomial.Coefficients[0].Value;
             var publicKey = polynomial.Coefficients[0].Commitment;
             // todo: add the publicKey into the ElGamalKeyPair constructor and set into C++
-            var keyPair = new ElGamalKeyPair(privateKey);
+            var keyPair = ElGamalKeyPair.FromSecret(privateKey);
             return new ElectionKeyPair(guardianId, sequenceOrder, keyPair, polynomial);
         }
     }

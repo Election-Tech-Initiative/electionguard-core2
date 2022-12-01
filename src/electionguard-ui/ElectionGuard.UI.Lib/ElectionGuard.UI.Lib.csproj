@@ -25,7 +25,7 @@
 		<Folder Include="ViewModels\" />
 	</ItemGroup>
 	<ItemGroup>
+	  <ProjectReference Include="..\..\..\bindings\netstandard\ElectionGuard\ElectionGuard.ElectionSetup\ElectionGuard.ElectionSetup.csproj" />
 	  <ProjectReference Include="..\..\..\bindings\netstandard\ElectionGuard\ElectionGuard.Encryption\ElectionGuard.Encryption.csproj" />
-	  <ProjectReference Include="..\..\..\bindings\netstandard\ElectionGuard\ElectionGuard.KeyCeremony\ElectionGuard.ElectionSetup.csproj" />
 	</ItemGroup>
 </Project>
