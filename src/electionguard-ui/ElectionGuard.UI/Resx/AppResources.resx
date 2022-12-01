@@ -235,7 +235,7 @@
     <value>ElectionGuard Election Manager</value>
   </data>
 	<data name="GoToCreateKeyCeremonyAdmin">
-		<value>Go To Key Ceremony</value>
+		<value>Create Key Ceremony</value>
 	</data>
 	<data name="CreateKeyCeremony">
 		<value>Create Key Ceremony</value>
@@ -251,5 +251,8 @@
 	</data>
 	<data name="StartCeremony">
 		<value>Start Ceremony</value>
+	</data>
+	<data name="ViewKeyCeremony">
+		<value>View Key Ceremony</value>
 	</data>
 </root>

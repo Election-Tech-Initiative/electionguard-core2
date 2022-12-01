@@ -9,11 +9,10 @@ namespace ElectionGuard.UI.Lib.ViewModels
 		public CreateKeyCeremonyAdminViewModel(IServiceProvider serviceProvider) : base(PageName, serviceProvider)
 		{
 		}
-        
+
         [ObservableProperty]
         [NotifyCanExecuteChangedFor(nameof(CreateKeyCeremonyCommand))]
         private string _keyCeremonyName = string.Empty;
-
 
         [ObservableProperty]
         [NotifyCanExecuteChangedFor(nameof(CreateKeyCeremonyCommand))]
@@ -26,12 +25,19 @@ namespace ElectionGuard.UI.Lib.ViewModels
         [RelayCommand(CanExecute = nameof(CanCreate))]
         public async Task CreateKeyCeremony()
         {
-            await Task.Yield();
+            // todo: check for duplicates
+            // todo: save to database
+            // todo: redirect to key ceremony detail page
+            // var keyCeremonyId = KeyCeremonyService.Create();
+            await NavigationService.GoToPage(typeof(ViewKeyCeremonyViewModel), new Dictionary<string, object>
+            {
+                { "KeyCeremonyId", 22 }
+            });
         }
 
         private bool CanCreate()
         {
-            // todo: validation
+            // todo: validate quorum isn't greater than # of guardians
             return true;
         }
     }

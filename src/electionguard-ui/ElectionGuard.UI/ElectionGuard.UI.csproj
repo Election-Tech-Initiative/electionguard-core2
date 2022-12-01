@@ -81,6 +81,9 @@
 	    <AutoGen>True</AutoGen>
 	    <DependentUpon>AppResources.resx</DependentUpon>
 	  </Compile>
+	  <Compile Update="Views\ViewKeyCeremonyPage.xaml.cs">
+	    <DependentUpon>ViewKeyCeremonyPage.xaml</DependentUpon>
+	  </Compile>
 	</ItemGroup>
 
 	<ItemGroup>

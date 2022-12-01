@@ -223,7 +223,7 @@ namespace ElectionGuard.UI.Resx {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Go To Key Ceremony.
+        ///   Looks up a localized string similar to Create Key Ceremony.
         /// </summary>
         internal static string GoToCreateKeyCeremonyAdmin {
             get {
@@ -453,6 +453,15 @@ namespace ElectionGuard.UI.Resx {
         internal static string UserSetup {
             get {
                 return ResourceManager.GetString("UserSetup", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to View Key Ceremony.
+        /// </summary>
+        internal static string ViewKeyCeremony {
+            get {
+                return ResourceManager.GetString("ViewKeyCeremony", resourceCulture);
             }
         }
         
