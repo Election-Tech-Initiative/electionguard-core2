@@ -46,7 +46,7 @@ namespace ElectionGuard.UI.Lib.ViewModels
         public virtual void Dispose()
         {
             LocalizationService.OnLanguageChanged -= OnLanguageChanged;
-			GC.SuppressFinalize(this);
+            GC.SuppressFinalize(this);
         }
 
         protected void SetPageTitle()

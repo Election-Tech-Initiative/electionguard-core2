@@ -5,7 +5,7 @@ public partial class ViewKeyCeremonyPage : IQueryAttributable
     private readonly ViewKeyCeremonyViewModel _viewKeyCeremonyViewModel;
 
     public ViewKeyCeremonyPage(ViewKeyCeremonyViewModel viewKeyCeremonyViewModel)
-	{
+    {
         _viewKeyCeremonyViewModel = viewKeyCeremonyViewModel;
         InitializeComponent();
         BindingContext = viewKeyCeremonyViewModel;

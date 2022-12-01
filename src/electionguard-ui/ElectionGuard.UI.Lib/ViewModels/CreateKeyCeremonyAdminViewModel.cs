@@ -3,12 +3,12 @@ using ElectionGuard.UI.Lib.Models;
 
 namespace ElectionGuard.UI.Lib.ViewModels
 {
-	public partial class CreateKeyCeremonyAdminViewModel : BaseViewModel
-	{
+    public partial class CreateKeyCeremonyAdminViewModel : BaseViewModel
+    {
         private readonly IKeyCeremonyService _keyCeremonyService;
         private const string PageName = "CreateKeyCeremony";
 
-		public CreateKeyCeremonyAdminViewModel(IServiceProvider serviceProvider, IKeyCeremonyService keyCeremonyService) : base(PageName, serviceProvider)
+        public CreateKeyCeremonyAdminViewModel(IServiceProvider serviceProvider, IKeyCeremonyService keyCeremonyService) : base(PageName, serviceProvider)
         {
             _keyCeremonyService = keyCeremonyService;
         }
@@ -19,11 +19,11 @@ namespace ElectionGuard.UI.Lib.ViewModels
 
         [ObservableProperty]
         [NotifyCanExecuteChangedFor(nameof(CreateKeyCeremonyCommand))]
-		private int _numberOfGuardians = 3;
+        private int _numberOfGuardians = 3;
 
         [ObservableProperty]
         [NotifyCanExecuteChangedFor(nameof(CreateKeyCeremonyCommand))]
-		private int _quorum = 3;
+        private int _quorum = 3;
 
         [RelayCommand(CanExecute = nameof(CanCreate))]
         public async Task CreateKeyCeremony()
