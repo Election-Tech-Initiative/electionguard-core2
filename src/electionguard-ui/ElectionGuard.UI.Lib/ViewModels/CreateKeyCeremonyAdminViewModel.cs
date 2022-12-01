@@ -29,9 +29,6 @@ namespace ElectionGuard.UI.Lib.ViewModels
         public async Task CreateKeyCeremony()
         {
             // todo: check for duplicates
-            // todo: save to database
-            // todo: redirect to key ceremony detail page
-            // var keyCeremonyId = KeyCeremonyService.Create();
 
             var keyCeremony = new KeyCeremony(KeyCeremonyName, Quorum, NumberOfGuardians);
             var keyCeremonyId = _keyCeremonyService.Create(keyCeremony);
