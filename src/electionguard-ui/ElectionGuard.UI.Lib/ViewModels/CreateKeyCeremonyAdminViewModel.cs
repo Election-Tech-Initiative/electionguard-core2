@@ -1,14 +1,17 @@
 ﻿using CommunityToolkit.Mvvm.Input;
+using ElectionGuard.UI.Lib.Models;
 
 namespace ElectionGuard.UI.Lib.ViewModels
 {
 	public partial class CreateKeyCeremonyAdminViewModel : BaseViewModel
 	{
-		private const string PageName = "CreateKeyCeremony";
+        private readonly IKeyCeremonyService _keyCeremonyService;
+        private const string PageName = "CreateKeyCeremony";
 
-		public CreateKeyCeremonyAdminViewModel(IServiceProvider serviceProvider) : base(PageName, serviceProvider)
-		{
-		}
+		public CreateKeyCeremonyAdminViewModel(IServiceProvider serviceProvider, IKeyCeremonyService keyCeremonyService) : base(PageName, serviceProvider)
+        {
+            _keyCeremonyService = keyCeremonyService;
+        }
 
         [ObservableProperty]
         [NotifyCanExecuteChangedFor(nameof(CreateKeyCeremonyCommand))]
@@ -29,6 +32,9 @@ namespace ElectionGuard.UI.Lib.ViewModels
             // todo: save to database
             // todo: redirect to key ceremony detail page
             // var keyCeremonyId = KeyCeremonyService.Create();
+
+            var keyCeremony = new KeyCeremony(KeyCeremonyName, Quorum, NumberOfGuardians);
+            _keyCeremonyService.Create(keyCeremony);
             await NavigationService.GoToPage(typeof(ViewKeyCeremonyViewModel), new Dictionary<string, object>
             {
                 { "KeyCeremonyId", 22 }

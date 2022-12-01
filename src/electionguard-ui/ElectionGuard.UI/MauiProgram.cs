@@ -42,6 +42,7 @@ public static class MauiProgram
 
     public static MauiAppBuilder SetupServices(this MauiAppBuilder builder)
     {
+        // setup services
         builder.Services.AddSingleton((_) => EgServiceProvider.Current);
         builder.Services.AddTransient<IAuthenticationService, AuthenticationService>();
         builder.Services.AddTransient<IConfigurationService, ConfigurationService>();
@@ -49,6 +50,7 @@ public static class MauiProgram
         builder.Services.AddSingleton<ILocalizationService, LocalizationService>();
         // NavigationService has to be singleton because it stores the current page and vm
         builder.Services.AddSingleton<INavigationService, NavigationService>();
+        builder.Services.AddTransient<IKeyCeremonyService, KeyCeremonyService>();
 
         // setup view models
         builder.Services.AddTransient<LoginViewModel>();
