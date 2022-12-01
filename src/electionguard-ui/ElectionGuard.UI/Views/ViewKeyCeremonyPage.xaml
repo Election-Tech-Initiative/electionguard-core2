@@ -3,22 +3,35 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              xmlns:viewModels="clr-namespace:ElectionGuard.UI.Lib.ViewModels;assembly=ElectionGuard.UI.Lib"
              xmlns:helper="clr-namespace:ElectionGuard.UI.Helpers"
+             xmlns:toolkit="http://schemas.microsoft.com/dotnet/2022/maui/toolkit"
              x:DataType="viewModels:ViewKeyCeremonyViewModel"
              x:Class="ElectionGuard.UI.Views.ViewKeyCeremonyPage"
              ControlTemplate="{StaticResource PageTemplate}">
+
+    <ContentPage.Resources>
+        <ResourceDictionary>
+            <toolkit:BoolToObjectConverter x:Key="BoolToObjectConverter" />
+        </ResourceDictionary>
+    </ContentPage.Resources>
+
     <VerticalStackLayout Style="{StaticResource NarrowCenteredPage}">
-        <StackLayout Style="{StaticResource FormControl}">
-            <Label Style="{StaticResource FormLabel}" Text="{helper:Translate KeyCeremonyName}" />
-            <Label Style="{StaticResource FormValue}" Text="{Binding KeyCeremony.Name, FallbackValue=''}" />
-        </StackLayout>
-        <StackLayout Style="{StaticResource FormControl}">
-            <Label Style="{StaticResource FormLabel}" Text="{helper:Translate NumberOfGuardians}" />
-            <Label Style="{StaticResource FormValue}" Text="{Binding KeyCeremony.NumberOfGuardians, FallbackValue=''}" />
-        </StackLayout>
-        <StackLayout Style="{StaticResource FormControl}">
-            <Label Style="{StaticResource FormLabel}" Text="{helper:Translate Quorum}" />
-            <Label Style="{StaticResource FormValue}" Text="{Binding KeyCeremony.Quorum, FallbackValue=''}" />
-        </StackLayout>
-        <Button Text="{helper:Translate Join}" Command="{Binding JoinCommand}" />
+        <Grid ColumnDefinitions="*, *" RowDefinitions="auto, auto, auto">
+            <StackLayout Style="{StaticResource FormControl}" Grid.Row="0" Grid.ColumnSpan="2">
+                <Label Style="{StaticResource FormLabel}" Text="{helper:Translate KeyCeremonyName}" />
+                <Label Style="{StaticResource FormValue}" Text="{Binding KeyCeremony.Name, FallbackValue=''}" />
+            </StackLayout>
+            <Grid></Grid>
+            <StackLayout Style="{StaticResource FormControl}" Grid.Row="1" Grid.Column="0">
+                <Label Style="{StaticResource FormLabel}" Text="{helper:Translate NumberOfGuardians}" />
+                <Label Style="{StaticResource FormValue}" Text="{Binding KeyCeremony.NumberOfGuardians, FallbackValue=''}" />
+            </StackLayout>
+            <StackLayout Style="{StaticResource FormControl}" Grid.Row="1" Grid.Column="1">
+                <Label Style="{StaticResource FormLabel}" Text="{helper:Translate Quorum}" />
+                <Label Style="{StaticResource FormValue}" Text="{Binding KeyCeremony.Quorum, FallbackValue=''}" />
+            </StackLayout>
+            <Button Grid.Row="2" Grid.ColumnSpan="2" 
+                    Text="{helper:Translate Join}" Command="{Binding JoinCommand}" 
+                    IsVisible="{Binding IsJoinVisible, Converter={StaticResource BoolToObjectConverter}}" />
+        </Grid>
     </VerticalStackLayout>
 </ContentPage>

@@ -11,10 +11,14 @@ namespace ElectionGuard.UI.Lib.ViewModels
             base("ViewKeyCeremony", serviceProvider)
         {
             _keyCeremonyService = keyCeremonyService;
+            IsJoinVisible = !AuthenticationService.IsAdmin;
         }
 
         [ObservableProperty]
         private Models.KeyCeremony? _keyCeremony;
+
+        [ObservableProperty] 
+        private bool _isJoinVisible;
 
         [RelayCommand]
         public async Task RetrieveKeyCeremony(int keyCeremonyId)
