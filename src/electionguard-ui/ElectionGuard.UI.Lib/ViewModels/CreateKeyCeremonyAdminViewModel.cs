@@ -40,8 +40,7 @@ namespace ElectionGuard.UI.Lib.ViewModels
 
         private bool CanCreate()
         {
-            // todo: validate quorum isn't greater than # of guardians
-            return true;
+            return Quorum <= NumberOfGuardians;
         }
     }
 }

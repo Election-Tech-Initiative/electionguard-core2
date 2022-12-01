@@ -1,6 +1,7 @@
 ﻿using ElectionGuard.UI.Lib.Models;
 using ElectionGuard.UI.Lib.ViewModels;
 using NSubstitute;
+using Shouldly;
 
 namespace ElectionGuard.UI.Test.ViewModels
 {
@@ -27,6 +28,36 @@ namespace ElectionGuard.UI.Test.ViewModels
             await NavigationService.Received().GoToPage(
                 typeof(ViewKeyCeremonyViewModel), 
                 Arg.Is<Dictionary<string, object>>(dict => (int)dict["KeyCeremonyId"] == 42));
+        }
+
+        [Test]
+        public void GivenQuorumIsGreaterThanNumGuardians_WhenTryToCreate_ThenCantCreate()
+        {
+            // ARRANGE
+            var createKeyCeremonyAdminViewModel = new CreateKeyCeremonyAdminViewModel(ServiceProvider, _keyCeremonyService);
+            createKeyCeremonyAdminViewModel.Quorum = 3;
+            createKeyCeremonyAdminViewModel.NumberOfGuardians = 2;
+
+            // ACT
+            var canExecute = createKeyCeremonyAdminViewModel.CreateKeyCeremonyCommand.CanExecute(null);
+            
+            // ASSERT
+            canExecute.ShouldBeFalse();
+        }
+
+        [Test]
+        public void GivenQuorumIsEqualToNumGuardians_WhenTryToCreate_ThenCanCreate()
+        {
+            // ARRANGE
+            var createKeyCeremonyAdminViewModel = new CreateKeyCeremonyAdminViewModel(ServiceProvider, _keyCeremonyService);
+            createKeyCeremonyAdminViewModel.Quorum = 3;
+            createKeyCeremonyAdminViewModel.NumberOfGuardians = 3;
+
+            // ACT
+            var canExecute = createKeyCeremonyAdminViewModel.CreateKeyCeremonyCommand.CanExecute(null);
+            
+            // ASSERT
+            canExecute.ShouldBeTrue();
         }
     }
 }
