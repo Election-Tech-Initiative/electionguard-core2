@@ -25,7 +25,7 @@ namespace ElectionGuard.UI.Test.ViewModels
 
             // ASSERT
             Assert.That(isJoinVisible, Is.False);
-            isJoinVisible.ShouldBe(false);
+            isJoinVisible.ShouldBeFalse();
         }
 
         [Test]
@@ -39,7 +39,7 @@ namespace ElectionGuard.UI.Test.ViewModels
             var isJoinVisible = viewKeyCeremonyViewModel.IsJoinVisible;
 
             // ASSERT
-            isJoinVisible.ShouldBe(true);
+            isJoinVisible.ShouldBeTrue();
         }
     }
 }

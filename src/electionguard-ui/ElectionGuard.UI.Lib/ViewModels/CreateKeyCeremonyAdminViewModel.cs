@@ -40,7 +40,8 @@ namespace ElectionGuard.UI.Lib.ViewModels
 
         private bool CanCreate()
         {
-            return Quorum <= NumberOfGuardians;
+            return KeyCeremonyName.Trim().Length > 0 &&
+                Quorum <= NumberOfGuardians;
         }
     }
 }

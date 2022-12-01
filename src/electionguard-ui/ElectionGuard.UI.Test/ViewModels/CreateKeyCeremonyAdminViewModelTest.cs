@@ -31,10 +31,11 @@ namespace ElectionGuard.UI.Test.ViewModels
         }
 
         [Test]
-        public void GivenQuorumIsGreaterThanNumGuardians_WhenTryToCreate_ThenCantCreate()
+        public void GivenQuorumIsGreaterThanNumGuardians_WhenTryToCreate_ThenCanNotCreate()
         {
             // ARRANGE
             var createKeyCeremonyAdminViewModel = new CreateKeyCeremonyAdminViewModel(ServiceProvider, _keyCeremonyService);
+            createKeyCeremonyAdminViewModel.KeyCeremonyName = "A";
             createKeyCeremonyAdminViewModel.Quorum = 3;
             createKeyCeremonyAdminViewModel.NumberOfGuardians = 2;
 
@@ -50,8 +51,37 @@ namespace ElectionGuard.UI.Test.ViewModels
         {
             // ARRANGE
             var createKeyCeremonyAdminViewModel = new CreateKeyCeremonyAdminViewModel(ServiceProvider, _keyCeremonyService);
+            createKeyCeremonyAdminViewModel.KeyCeremonyName = "A";
             createKeyCeremonyAdminViewModel.Quorum = 3;
             createKeyCeremonyAdminViewModel.NumberOfGuardians = 3;
+
+            // ACT
+            var canExecute = createKeyCeremonyAdminViewModel.CreateKeyCeremonyCommand.CanExecute(null);
+            
+            // ASSERT
+            canExecute.ShouldBeTrue();
+        }
+
+        [Test]
+        public void GivenNameIsSpaces_WhenTryToCreate_ThenCanNotCreate()
+        {
+            // ARRANGE
+            var createKeyCeremonyAdminViewModel = new CreateKeyCeremonyAdminViewModel(ServiceProvider, _keyCeremonyService);
+            createKeyCeremonyAdminViewModel.KeyCeremonyName = " ";
+
+            // ACT
+            var canExecute = createKeyCeremonyAdminViewModel.CreateKeyCeremonyCommand.CanExecute(null);
+            
+            // ASSERT
+            canExecute.ShouldBeFalse();
+        }
+
+        [Test]
+        public void GivenNameIsNonEmpty_WhenTryToCreate_ThenCanCreate()
+        {
+            // ARRANGE
+            var createKeyCeremonyAdminViewModel = new CreateKeyCeremonyAdminViewModel(ServiceProvider, _keyCeremonyService);
+            createKeyCeremonyAdminViewModel.KeyCeremonyName = "A";
 
             // ACT
             var canExecute = createKeyCeremonyAdminViewModel.CreateKeyCeremonyCommand.CanExecute(null);
