@@ -34,10 +34,10 @@ namespace ElectionGuard.UI.Lib.ViewModels
             // var keyCeremonyId = KeyCeremonyService.Create();
 
             var keyCeremony = new KeyCeremony(KeyCeremonyName, Quorum, NumberOfGuardians);
-            _keyCeremonyService.Create(keyCeremony);
+            var keyCeremonyId = _keyCeremonyService.Create(keyCeremony);
             await NavigationService.GoToPage(typeof(ViewKeyCeremonyViewModel), new Dictionary<string, object>
             {
-                { "KeyCeremonyId", 22 }
+                { "KeyCeremonyId", keyCeremonyId }
             });
         }
 

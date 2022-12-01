@@ -9,6 +9,9 @@ public partial class KeyCeremony : ObservableObject
         _quorum = quorum;
     }
 
+    [ObservableProperty] 
+    private int _id;
+
     [ObservableProperty]
     private string _name;
 

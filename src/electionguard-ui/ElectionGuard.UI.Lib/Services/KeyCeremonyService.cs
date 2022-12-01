@@ -16,6 +16,7 @@ namespace ElectionGuard.UI.Lib.Services
 
         public int Create(KeyCeremony keyCeremony)
         {
+            keyCeremony.Id = KeyCeremonies.Count;
             KeyCeremonies.Add(keyCeremony);
             // todo: get a unique id from the database
             var keyCeremonyId = KeyCeremonies.Count - 1;

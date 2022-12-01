@@ -1,4 +1,5 @@
-﻿using ElectionGuard.UI.Lib.Models;
+﻿using CommunityToolkit.Mvvm.Input;
+using ElectionGuard.UI.Lib.Models;
 
 namespace ElectionGuard.UI.Lib.ViewModels
 {
@@ -27,5 +28,16 @@ namespace ElectionGuard.UI.Lib.ViewModels
 
         [ObservableProperty]
         private Tally? _currentTally;
+
+        [RelayCommand]
+        public async Task KeyCeremonySelectionChanged()
+        {
+            if (CurrentKeyCeremony == null) return;
+            await NavigationService.GoToPage(typeof(ViewKeyCeremonyViewModel), new Dictionary<string, object>
+            {
+                { "KeyCeremonyId", CurrentKeyCeremony.Id }
+            });
+        }
     }
 }
+ 
