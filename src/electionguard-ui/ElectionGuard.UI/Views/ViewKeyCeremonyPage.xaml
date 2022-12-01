@@ -10,7 +10,7 @@
 
     <ContentPage.Resources>
         <ResourceDictionary>
-            <toolkit:BoolToObjectConverter x:Key="BoolToObjectConverter" />
+            <toolkit:BoolToObjectConverter x:Key="BoolToObjectConverter" FalseObject="false" TrueObject="true" />
         </ResourceDictionary>
     </ContentPage.Resources>
 
