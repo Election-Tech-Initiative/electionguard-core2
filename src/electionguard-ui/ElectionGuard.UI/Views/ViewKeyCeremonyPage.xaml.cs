@@ -1,10 +1,21 @@
 namespace ElectionGuard.UI.Views;
 
-public partial class ViewKeyCeremonyPage
+public partial class ViewKeyCeremonyPage : IQueryAttributable
 {
-	public ViewKeyCeremonyPage(ViewKeyCeremonyViewModel vm)
+    private readonly ViewKeyCeremonyViewModel _viewKeyCeremonyViewModel;
+
+    public ViewKeyCeremonyPage(ViewKeyCeremonyViewModel viewKeyCeremonyViewModel)
 	{
-		InitializeComponent();
-        BindingContext = vm;
+        _viewKeyCeremonyViewModel = viewKeyCeremonyViewModel;
+        InitializeComponent();
+        BindingContext = viewKeyCeremonyViewModel;
+    }
+
+    public void ApplyQueryAttributes(IDictionary<string, object> query)
+    {
+        var keyCeremonyId = query[ViewKeyCeremonyViewModel.CurrentKeyCeremonyParam] as int?;
+        if (keyCeremonyId == null)
+            throw new ArgumentException("Need a keyCeremonyId to navigate to the view key ceremony page");
+        _viewKeyCeremonyViewModel.RetrieveKeyCeremonyCommand.Execute(keyCeremonyId.Value);
     }
 }

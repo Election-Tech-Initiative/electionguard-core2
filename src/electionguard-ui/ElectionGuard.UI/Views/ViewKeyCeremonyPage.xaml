@@ -6,10 +6,18 @@
              x:DataType="viewModels:ViewKeyCeremonyViewModel"
              x:Class="ElectionGuard.UI.Views.ViewKeyCeremonyPage"
              ControlTemplate="{StaticResource PageTemplate}">
-    <VerticalStackLayout>
-        <Label 
-            Text="Welcome to .NET MAUI!"
-            VerticalOptions="Center" 
-            HorizontalOptions="Center" />
+    <VerticalStackLayout Style="{StaticResource NarrowCenteredPage}">
+        <StackLayout Style="{StaticResource FormControl}">
+            <Label Style="{StaticResource FormLabel}" Text="{helper:Translate KeyCeremonyName}" />
+            <Label Style="{StaticResource FormValue}" Text="{Binding KeyCeremony.Name, FallbackValue=''}" />
+        </StackLayout>
+        <StackLayout Style="{StaticResource FormControl}">
+            <Label Style="{StaticResource FormLabel}" Text="{helper:Translate NumberOfGuardians}" />
+            <Label Style="{StaticResource FormValue}" Text="{Binding KeyCeremony.NumberOfGuardians, FallbackValue=''}" />
+        </StackLayout>
+        <StackLayout Style="{StaticResource FormControl}">
+            <Label Style="{StaticResource FormLabel}" Text="{helper:Translate Quorum}" />
+            <Label Style="{StaticResource FormValue}" Text="{Binding KeyCeremony.Quorum, FallbackValue=''}" />
+        </StackLayout>
     </VerticalStackLayout>
 </ContentPage>

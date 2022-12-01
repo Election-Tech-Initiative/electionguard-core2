@@ -5,7 +5,7 @@ namespace ElectionGuard.UI.Lib.Services
     public interface IKeyCeremonyService
     {
         int Create(KeyCeremony keyCeremony);
-        KeyCeremony Get(int id);
+        Task<KeyCeremony> Get(int id);
         List<KeyCeremony> List();
     }
 
@@ -23,8 +23,9 @@ namespace ElectionGuard.UI.Lib.Services
             return keyCeremonyId;
         }
 
-        public KeyCeremony Get(int id)
+        public async Task<KeyCeremony> Get(int id)
         {
+            await Task.Yield();
             return KeyCeremonies[id];
         }
 

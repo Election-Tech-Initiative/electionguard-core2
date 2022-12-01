@@ -37,7 +37,7 @@ namespace ElectionGuard.UI.Lib.ViewModels
             var keyCeremonyId = _keyCeremonyService.Create(keyCeremony);
             await NavigationService.GoToPage(typeof(ViewKeyCeremonyViewModel), new Dictionary<string, object>
             {
-                { "KeyCeremonyId", keyCeremonyId }
+                { ViewKeyCeremonyViewModel.CurrentKeyCeremonyParam, keyCeremonyId }
             });
         }
 
