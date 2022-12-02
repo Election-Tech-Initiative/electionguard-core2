@@ -1,12 +1,13 @@
 ﻿<?xml version="1.0" encoding="utf-8" ?>
-<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
-             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
-             xmlns:viewModels="clr-namespace:ElectionGuard.UI.Lib.ViewModels;assembly=ElectionGuard.UI.Lib"
-             xmlns:helper="clr-namespace:ElectionGuard.UI.Helpers"
-             xmlns:toolkit="http://schemas.microsoft.com/dotnet/2022/maui/toolkit"
-             x:DataType="viewModels:CreateKeyCeremonyAdminViewModel"
-             x:Class="ElectionGuard.UI.Views.CreateKeyCeremonyAdminPage"
-             ControlTemplate="{StaticResource PageTemplate}">
+<views:ContentPageBase x:TypeArguments="viewModels:CreateKeyCeremonyAdminViewModel" xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+                       xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+                       xmlns:viewModels="clr-namespace:ElectionGuard.UI.Lib.ViewModels;assembly=ElectionGuard.UI.Lib"
+                       xmlns:helper="clr-namespace:ElectionGuard.UI.Helpers"
+                       xmlns:toolkit="http://schemas.microsoft.com/dotnet/2022/maui/toolkit"
+                       xmlns:views="using:ElectionGuard.UI.Views"
+                       x:DataType="viewModels:CreateKeyCeremonyAdminViewModel"
+                       x:Class="ElectionGuard.UI.Views.CreateKeyCeremonyAdminPage"
+                       ControlTemplate="{StaticResource PageTemplate}">
     <ContentPage.Resources>
         <toolkit:IsNotNullConverter x:Key="IsNotNullConverter"></toolkit:IsNotNullConverter>
     </ContentPage.Resources>
@@ -31,4 +32,4 @@
                     Command="{Binding CreateKeyCeremonyCommand}"></Button>
         </Grid>
     </VerticalStackLayout>
-</ContentPage>
+</views:ContentPageBase>

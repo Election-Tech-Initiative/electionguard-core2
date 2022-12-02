@@ -5,20 +5,25 @@ namespace ElectionGuard.UI.Lib.ViewModels
 {
     public partial class GuardianHomeViewModel : BaseViewModel
     {
+        private readonly IKeyCeremonyService _keyCeremonyService;
+
         public GuardianHomeViewModel(IServiceProvider serviceProvider, IKeyCeremonyService keyCeremonyService) : base("GuardianHome", serviceProvider)
         {
+            _keyCeremonyService = keyCeremonyService;
             // create some fake tallies to add to the list
             _tallies.Add(new Tally { Name = "Election Test Tally #1" });
             _tallies.Add(new Tally { Name = "Election Test Tally #2" });
             _tallies.Add(new Tally { Name = "Real Election Tally" });
+        }
 
-            // todo: database access should not occur in a constructor, create a common async Task lifecycle event in BaseViewModel and override and move this logic there
-            var keyCeremonies = keyCeremonyService.List();
-            _keyCeremonies = new ObservableCollection<KeyCeremony>(keyCeremonies);
+        public override async Task Appearing()
+        {
+            var keyCeremonies = await _keyCeremonyService.List();
+            KeyCeremonies = new ObservableCollection<KeyCeremony>(keyCeremonies);
         }
 
         [ObservableProperty]
-        private ObservableCollection<KeyCeremony> _keyCeremonies;
+        private ObservableCollection<KeyCeremony> _keyCeremonies = new ();
 
         [ObservableProperty]
         private ObservableCollection<Tally> _tallies = new();

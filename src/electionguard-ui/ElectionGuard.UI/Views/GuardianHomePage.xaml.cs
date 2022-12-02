@@ -2,9 +2,8 @@ namespace ElectionGuard.UI.Views;
 
 public partial class GuardianHomePage
 {
-    public GuardianHomePage(GuardianHomeViewModel vm)
+    public GuardianHomePage(GuardianHomeViewModel viewModel) : base(viewModel)
     {
         InitializeComponent();
-        BindingContext = vm;
     }
 }
