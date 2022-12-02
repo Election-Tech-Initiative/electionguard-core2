@@ -1,7 +1,4 @@
-﻿using SecretCoefficient=ElectionGuard.ElementModQ;
-using PublicCommitment=ElectionGuard.ElementModP;
-
-namespace ElectionGuard.ElectionSetup
+﻿namespace ElectionGuard.ElectionSetup
 {
     /// <summary>
     /// A coefficient of an Election Polynomial

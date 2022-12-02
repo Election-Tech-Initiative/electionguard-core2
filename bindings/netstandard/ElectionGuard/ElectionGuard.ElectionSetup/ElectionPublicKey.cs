@@ -1,6 +1,4 @@
 ﻿using System.Collections.Generic;
-using ElGamalPublicKey=ElectionGuard.ElementModP;
-using PublicCommitment = ElectionGuard.ElementModP;
 
 namespace ElectionGuard.ElectionSetup
 {

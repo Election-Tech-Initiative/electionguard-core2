@@ -1,6 +1,4 @@
-﻿using ElGamalPublicKey = ElectionGuard.ElementModP;
-
-namespace ElectionGuard.ElectionSetup
+﻿namespace ElectionGuard.ElectionSetup
 {
     /// <summary>
     /// Representation of a Schnorr proof
