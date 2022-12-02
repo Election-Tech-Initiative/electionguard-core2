@@ -18,7 +18,7 @@ namespace ElectionGuard.UI.Test.ViewModels
         public async Task GivenKeyCeremonyReturnsId_WhenUserCreatesKeyCeremony_ThenUserNavigatesToViewPageWithId()
         {
             // ARRANGE
-            var createKeyCeremonyAdminViewModel = new CreateKeyCeremonyAdminViewModel(ServiceProvider, _keyCeremonyService);
+            var createKeyCeremonyAdminViewModel = CreateKeyCeremonyAdminViewModel();
             _keyCeremonyService.Create(Arg.Any<KeyCeremony>()).Returns(42);
 
             // ACT
@@ -34,7 +34,7 @@ namespace ElectionGuard.UI.Test.ViewModels
         public void GivenQuorumIsGreaterThanNumGuardians_WhenTryToCreate_ThenCanNotCreate()
         {
             // ARRANGE
-            var createKeyCeremonyAdminViewModel = new CreateKeyCeremonyAdminViewModel(ServiceProvider, _keyCeremonyService);
+            var createKeyCeremonyAdminViewModel = CreateKeyCeremonyAdminViewModel();
             createKeyCeremonyAdminViewModel.KeyCeremonyName = "A";
             createKeyCeremonyAdminViewModel.Quorum = 3;
             createKeyCeremonyAdminViewModel.NumberOfGuardians = 2;
@@ -50,7 +50,7 @@ namespace ElectionGuard.UI.Test.ViewModels
         public void GivenQuorumIsEqualToNumGuardians_WhenTryToCreate_ThenCanCreate()
         {
             // ARRANGE
-            var createKeyCeremonyAdminViewModel = new CreateKeyCeremonyAdminViewModel(ServiceProvider, _keyCeremonyService);
+            var createKeyCeremonyAdminViewModel = CreateKeyCeremonyAdminViewModel();
             createKeyCeremonyAdminViewModel.KeyCeremonyName = "A";
             createKeyCeremonyAdminViewModel.Quorum = 3;
             createKeyCeremonyAdminViewModel.NumberOfGuardians = 3;
@@ -66,7 +66,7 @@ namespace ElectionGuard.UI.Test.ViewModels
         public void GivenNameIsSpaces_WhenTryToCreate_ThenCanNotCreate()
         {
             // ARRANGE
-            var createKeyCeremonyAdminViewModel = new CreateKeyCeremonyAdminViewModel(ServiceProvider, _keyCeremonyService);
+            var createKeyCeremonyAdminViewModel = CreateKeyCeremonyAdminViewModel();
             createKeyCeremonyAdminViewModel.KeyCeremonyName = " ";
 
             // ACT
@@ -80,7 +80,7 @@ namespace ElectionGuard.UI.Test.ViewModels
         public void GivenNameIsNonEmpty_WhenTryToCreate_ThenCanCreate()
         {
             // ARRANGE
-            var createKeyCeremonyAdminViewModel = new CreateKeyCeremonyAdminViewModel(ServiceProvider, _keyCeremonyService);
+            var createKeyCeremonyAdminViewModel = CreateKeyCeremonyAdminViewModel();
             createKeyCeremonyAdminViewModel.KeyCeremonyName = "A";
 
             // ACT
@@ -88,6 +88,26 @@ namespace ElectionGuard.UI.Test.ViewModels
             
             // ASSERT
             canExecute.ShouldBeTrue();
+        }
+
+        [Test]
+        public async Task GivenExistingKeyCeremony_WhenCreating_ThenErrorMessageIsSet()
+        {
+            // ARRANGE
+            var createKeyCeremonyAdminViewModel = CreateKeyCeremonyAdminViewModel();
+            createKeyCeremonyAdminViewModel.KeyCeremonyName = "kc1";
+            _keyCeremonyService.FindByName("kc1").Returns(new KeyCeremony("kc1", 1, 1));
+
+            // ACT
+            await createKeyCeremonyAdminViewModel.CreateKeyCeremonyCommand.ExecuteAsync(null);
+
+            // ASSERT
+            createKeyCeremonyAdminViewModel.ErrorMessage.ShouldNotBeNull();
+        }
+
+        private CreateKeyCeremonyAdminViewModel CreateKeyCeremonyAdminViewModel()
+        {
+            return new CreateKeyCeremonyAdminViewModel(ServiceProvider, _keyCeremonyService);
         }
     }
 }

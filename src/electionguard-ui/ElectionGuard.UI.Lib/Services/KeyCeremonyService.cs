@@ -7,12 +7,13 @@ namespace ElectionGuard.UI.Lib.Services
         int Create(KeyCeremony keyCeremony);
         Task<KeyCeremony> Get(int id);
         List<KeyCeremony> List();
+        Task<KeyCeremony?> FindByName(string keyCeremonyName);
     }
 
     public class KeyCeremonyService : IKeyCeremonyService
     {
         // todo: replace with database
-        public static List<KeyCeremony> KeyCeremonies = new();
+        private static readonly List<KeyCeremony> KeyCeremonies = new();
 
         public int Create(KeyCeremony keyCeremony)
         {
@@ -32,6 +33,12 @@ namespace ElectionGuard.UI.Lib.Services
         public List<KeyCeremony> List()
         {
             return KeyCeremonies;
+        }
+
+        public async Task<KeyCeremony?> FindByName(string keyCeremonyName)
+        {
+            await Task.Yield();
+            return KeyCeremonies.FirstOrDefault(i => i.Name == keyCeremonyName);
         }
     }
 }

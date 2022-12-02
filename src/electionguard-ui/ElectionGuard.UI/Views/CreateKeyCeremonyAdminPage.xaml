@@ -3,10 +3,16 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              xmlns:viewModels="clr-namespace:ElectionGuard.UI.Lib.ViewModels;assembly=ElectionGuard.UI.Lib"
              xmlns:helper="clr-namespace:ElectionGuard.UI.Helpers"
+             xmlns:toolkit="http://schemas.microsoft.com/dotnet/2022/maui/toolkit"
              x:DataType="viewModels:CreateKeyCeremonyAdminViewModel"
              x:Class="ElectionGuard.UI.Views.CreateKeyCeremonyAdminPage"
              ControlTemplate="{StaticResource PageTemplate}">
+    <ContentPage.Resources>
+        <toolkit:IsNotNullConverter x:Key="IsNotNullConverter"></toolkit:IsNotNullConverter>
+    </ContentPage.Resources>
+
     <VerticalStackLayout Style="{StaticResource NarrowCenteredPage}">
+        <Label Style="{StaticResource Error}" IsVisible="{Binding ErrorMessage, Converter={StaticResource IsNotNullConverter}}" Text="{Binding ErrorMessage}"></Label>
         <Grid ColumnDefinitions="*, *" RowDefinitions="auto, auto, auto">
             <StackLayout Style="{StaticResource FormControl}" Grid.Row="0" Grid.ColumnSpan="2">
                 <Label Style="{StaticResource FormLabel}" Text="{helper:Translate KeyCeremonyName}"></Label>

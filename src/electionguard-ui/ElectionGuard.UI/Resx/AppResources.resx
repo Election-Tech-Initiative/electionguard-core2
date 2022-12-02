@@ -258,4 +258,7 @@
 	<data name="Join">
 		<value>Join</value>
 	</data>
+	<data name="AlreadyExists">
+		<value>already exists.  Try a different name.</value>
+	</data>
 </root>

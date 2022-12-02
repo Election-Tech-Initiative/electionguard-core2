@@ -14,6 +14,9 @@ namespace ElectionGuard.UI.Lib.ViewModels
         }
 
         [ObservableProperty]
+        private string? _errorMessage;
+
+        [ObservableProperty]
         [NotifyCanExecuteChangedFor(nameof(CreateKeyCeremonyCommand))]
         private string _keyCeremonyName = string.Empty;
 
@@ -25,10 +28,17 @@ namespace ElectionGuard.UI.Lib.ViewModels
         [NotifyCanExecuteChangedFor(nameof(CreateKeyCeremonyCommand))]
         private int _quorum = 3;
 
-        [RelayCommand(CanExecute = nameof(CanCreate))]
+        [RelayCommand(CanExecute = nameof(CanCreate), AllowConcurrentExecutions = true)]
         public async Task CreateKeyCeremony()
         {
-            // todo: check for duplicates
+            var existingKeyCeremony = await _keyCeremonyService.FindByName(_keyCeremonyName);
+            if (existingKeyCeremony != null)
+            {
+                var alreadyExists = LocalizationService.GetValue("AlreadyExists");
+                ErrorMessage = $"{KeyCeremonyName} {alreadyExists}";
+                CreateKeyCeremonyCommand.NotifyCanExecuteChanged();
+                return;
+            }
 
             var keyCeremony = new KeyCeremony(KeyCeremonyName, Quorum, NumberOfGuardians);
             var keyCeremonyId = _keyCeremonyService.Create(keyCeremony);

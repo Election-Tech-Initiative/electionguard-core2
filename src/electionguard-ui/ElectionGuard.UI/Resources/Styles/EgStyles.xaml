@@ -72,6 +72,11 @@
         <Setter Property="Padding" Value="20" />
     </Style>
 
+    <Style x:Key="Error" TargetType="Label">
+        <Setter Property="TextColor" Value="Red" />
+        <Setter Property="Margin" Value="0,0,0,20"></Setter>
+    </Style>
+
     <ControlTemplate x:Key="PageTemplate">
         <Grid RowDefinitions="auto, *, auto" BindingContext="{Binding BindingContext, Source={RelativeSource TemplatedParent}}">
             <Grid BackgroundColor="{StaticResource HeaderColor}" Padding="2" Grid.Row="0">
