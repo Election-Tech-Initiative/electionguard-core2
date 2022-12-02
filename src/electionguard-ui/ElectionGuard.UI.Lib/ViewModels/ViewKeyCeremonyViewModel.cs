@@ -3,6 +3,7 @@ using ElectionGuard.ElectionSetup;
 
 namespace ElectionGuard.UI.Lib.ViewModels
 {
+    [QueryProperty(CurrentKeyCeremonyParam, "KeyCeremonyId")]
     public partial class ViewKeyCeremonyViewModel : BaseViewModel
     {
         public const string CurrentKeyCeremonyParam = "KeyCeremonyId";
@@ -20,10 +21,12 @@ namespace ElectionGuard.UI.Lib.ViewModels
         [ObservableProperty] 
         private bool _isJoinVisible;
 
-        [RelayCommand]
-        public async Task RetrieveKeyCeremony(int keyCeremonyId)
+        [ObservableProperty] 
+        private int _keyCeremonyId;
+
+        public override async Task Appearing()
         {
-            KeyCeremony = await _keyCeremonyService.Get(keyCeremonyId);
+            KeyCeremony = await _keyCeremonyService.Get(KeyCeremonyId);
         }
 
         [RelayCommand]
