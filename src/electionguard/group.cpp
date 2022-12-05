@@ -757,8 +757,7 @@ namespace electionguard
     {
         // multiply b * c and the result will be twice Q in size
         uint64_t bc[MAX_Q_LEN_DOUBLE] = {};
-        Bignum256::mul(const_cast<ElementModQ &>(b).get(), const_cast<ElementModQ &>(c).get(),
-                       bc);
+        Bignum256::mul(const_cast<ElementModQ &>(b).get(), const_cast<ElementModQ &>(c).get(), bc);
 
         // perform the mod operation on bc
         uint64_t bc_mod_q[MAX_Q_LEN] = {};

@@ -11,7 +11,7 @@
         public void TestEndToEndElection()
         {
             Step0ConfigureElection();
-            Step1KeyCeremony();
+            //            Step1KeyCeremony();
         }
 
         private void Step1KeyCeremony()
