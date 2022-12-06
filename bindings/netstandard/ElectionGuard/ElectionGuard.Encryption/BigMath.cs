@@ -117,6 +117,19 @@ namespace ElectionGuard
             return new ElementModP(value);
         }
 
+        /// <summary>
+        /// Hash together the ElementModP values
+        /// </summary>
+        /// <param name="publickey">first value for the hash</param>
+        /// <param name="commitment">second value for the hash</param>
+        public static ElementModQ HashElems(ElementModP publickey, ElementModP commitment)
+        {
+            var status = External.HashElems(publickey.Handle, commitment.Handle,
+                out NativeInterface.ElementModQ.ElementModQHandle value);
+            status.ThrowIfError();
+            return new ElementModQ(value);
+        }
+
         internal static class External
         {
             [DllImport(
@@ -192,6 +205,18 @@ namespace ElectionGuard
                 NativeInterface.ElementModP.ElementModPHandle e,
                 out NativeInterface.ElementModP.ElementModPHandle handle
                 );
+
+            [DllImport(
+                NativeInterface.DllName,
+                EntryPoint = "eg_hash_elems",
+                CallingConvention = CallingConvention.Cdecl,
+                SetLastError = true)]
+            internal static extern Status HashElems(
+                NativeInterface.ElementModP.ElementModPHandle publickey,
+                NativeInterface.ElementModP.ElementModPHandle commitment,
+                out NativeInterface.ElementModQ.ElementModQHandle handle
+                );
+
 
 
         }

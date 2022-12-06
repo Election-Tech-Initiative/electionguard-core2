@@ -106,5 +106,22 @@ namespace ElectionGuard.Encryption.Tests
             Assert.AreEqual(eight.ToHex(), result.ToHex());
         }
 
+        [Test]
+        public void HashElems()
+        {
+            // Arrange
+            var two = new ElementModP(2);
+            var three = new ElementModP(3);
+
+            // Act
+            var result1 = BigMath.HashElems(two, three);
+            var result2 = BigMath.HashElems(three, two);
+            var result3 = BigMath.HashElems(two, three);
+
+            // Assert
+            Assert.AreNotEqual(result1.ToHex(), result2.ToHex());
+            Assert.AreEqual(result1.ToHex(), result3.ToHex());
+        }
+
     }
 }

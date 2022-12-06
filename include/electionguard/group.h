@@ -133,6 +133,9 @@ EG_API eg_electionguard_status_t eg_element_mod_p_pow_mod_p(eg_element_mod_p_t *
                                                             eg_element_mod_p_t *e,
                                                             eg_element_mod_p_t **out_handle);
 
+EG_API eg_electionguard_status_t eg_hash_elems(eg_element_mod_p_t *publickey,
+                                               eg_element_mod_p_t *commitment,
+                                               eg_element_mod_q_t **out_handle);
 #endif
 
 #ifdef __cplusplus

@@ -2,6 +2,7 @@
 
 #include "../log.hpp"
 #include "convert.hpp"
+#include "electionguard/hash.hpp"
 #include "variant_cast.hpp"
 
 extern "C" {
@@ -15,6 +16,7 @@ using electionguard::dynamicCopy;
 using electionguard::ElementModP;
 using electionguard::ElementModQ;
 using electionguard::G;
+using electionguard::hash_elems;
 using electionguard::Log;
 using electionguard::ONE_MOD_P;
 using electionguard::ONE_MOD_Q;
@@ -448,6 +450,23 @@ EG_API eg_electionguard_status_t eg_element_mod_p_pow_mod_p(eg_element_mod_p_t *
         return ELECTIONGUARD_STATUS_SUCCESS;
     } catch (const exception &e) {
         Log::error(": eg_element_mod_q_add_mod_q", e);
+        return ELECTIONGUARD_STATUS_ERROR_BAD_ALLOC;
+    }
+}
+
+EG_API eg_electionguard_status_t eg_hash_elems(eg_element_mod_p_t *publickey,
+                                               eg_element_mod_p_t *commitment,
+                                               eg_element_mod_q_t **out_handle)
+{
+    try {
+        auto *p = AS_TYPE(ElementModP, publickey);
+        auto *c = AS_TYPE(ElementModP, commitment);
+        auto result = hash_elems({p, c});
+
+        *out_handle = AS_TYPE(eg_element_mod_q_t, result.release());
+        return ELECTIONGUARD_STATUS_SUCCESS;
+    } catch (const exception &e) {
+        Log::error(": eg_element_hash_elems", e);
         return ELECTIONGUARD_STATUS_ERROR_BAD_ALLOC;
     }
 }
