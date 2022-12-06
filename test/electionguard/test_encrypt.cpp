@@ -1289,7 +1289,6 @@ TEST_CASE("Submit multiple ballots")
     // Act
     auto ciphertext = encryptBallot(*ballot, *internal, *context, *device->getHash());
     for (size_t i = 0; i < 10000; i++) {
-        //Log::debug("%d test", i);
         auto submitted = SubmittedBallot::from(*ciphertext, BallotBoxState::cast);
     }
 
