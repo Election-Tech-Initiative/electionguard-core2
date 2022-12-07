@@ -4,8 +4,5 @@ namespace ElectionGuard.UI.Services;
 
 public class ConfigurationService : IConfigurationService
 {
-    public string GetVersion()
-    {
-        return $"v{VersionTracking.CurrentVersion}";
-    }
+    public string GetVersion() => $"v{VersionTracking.CurrentVersion}";
 }

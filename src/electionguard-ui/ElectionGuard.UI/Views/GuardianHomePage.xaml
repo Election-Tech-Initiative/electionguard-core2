@@ -19,7 +19,7 @@
                                 SelectionMode="Single"
                                 SelectionChangedCommand="{Binding KeyCeremonySelectionChangedCommand}" >
                     <CollectionView.EmptyView>
-                        <controls1:NoContentView Text="{helper:Translate NoKeyCeremonies}"></controls1:NoContentView>
+                        <controls:NoContentView Text="{helper:Translate NoKeyCeremonies}"></controls:NoContentView>
                     </CollectionView.EmptyView>
                     <CollectionView.ItemTemplate>
                         <DataTemplate x:DataType="model:KeyCeremony">
@@ -37,7 +37,7 @@
                     SelectedItem="{Binding CurrentTally}"
                     SelectionMode="Single">
                     <CollectionView.EmptyView>
-                        <controls1:NoContentView Text="{helper:Translate NoTallies}"></controls1:NoContentView>
+                        <controls:NoContentView Text="{helper:Translate NoTallies}"></controls:NoContentView>
                     </CollectionView.EmptyView>
                     <CollectionView.ItemTemplate>
                         <DataTemplate x:DataType="model:Tally">
