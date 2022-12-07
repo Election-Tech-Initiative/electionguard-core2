@@ -61,6 +61,21 @@ EG_API eg_electionguard_status_t eg_element_mod_q_from_hex(char *in_hex,
 EG_API eg_electionguard_status_t
 eg_element_mod_q_from_hex_unchecked(char *in_hex, eg_element_mod_q_t **out_handle);
 
+EG_API eg_electionguard_status_t
+eg_element_mod_q_from_hex_unchecked(char *in_hex, eg_element_mod_q_t **out_handle);
+
+EG_API eg_electionguard_status_t eg_element_mod_q_from_uint64(uint64_t in_uint64,
+                                                              eg_element_mod_q_t **out_handle);
+
+EG_API eg_electionguard_status_t
+eg_element_mod_q_from_uint64_unchecked(uint64_t in_uint64, eg_element_mod_q_t **out_handle);
+
+EG_API eg_electionguard_status_t eg_element_mod_p_from_uint64(uint64_t in_uint64,
+                                                              eg_element_mod_p_t **out_handle);
+
+EG_API eg_electionguard_status_t
+eg_element_mod_p_from_uint64_unchecked(uint64_t in_uint64, eg_element_mod_p_t **out_handle);
+
 // TODO: ISSUE #129: finish implementation
 
 #endif
@@ -98,6 +113,29 @@ EG_API eg_electionguard_status_t eg_element_mod_q_pow_mod_p(eg_element_mod_p_t *
 
 EG_API eg_electionguard_status_t eg_element_mod_q_rand_q_new(eg_element_mod_q_t **out_handle);
 
+EG_API eg_electionguard_status_t eg_element_mod_q_add_mod_q(eg_element_mod_q_t *lhs,
+                                                            eg_element_mod_q_t *rhs,
+                                                            eg_element_mod_q_t **out_handle);
+
+EG_API eg_electionguard_status_t eg_element_mod_p_add_mod_p(eg_element_mod_p_t *lhs,
+                                                            eg_element_mod_p_t *rhs,
+                                                            eg_element_mod_p_t **out_handle);
+
+EG_API eg_electionguard_status_t
+eg_element_mod_q_a_plus_b_mul_c_mod_q(eg_element_mod_q_t *a, eg_element_mod_q_t *b,
+                                      eg_element_mod_q_t *c, eg_element_mod_q_t **out_handle);
+
+EG_API eg_electionguard_status_t eg_element_mod_p_mult_mod_p(eg_element_mod_p_t *lhs,
+                                                             eg_element_mod_p_t *rhs,
+                                                             eg_element_mod_p_t **out_handle);
+
+EG_API eg_electionguard_status_t eg_element_mod_p_pow_mod_p(eg_element_mod_p_t *b,
+                                                            eg_element_mod_p_t *e,
+                                                            eg_element_mod_p_t **out_handle);
+
+EG_API eg_electionguard_status_t eg_hash_elems(eg_element_mod_p_t *publickey,
+                                               eg_element_mod_p_t *commitment,
+                                               eg_element_mod_q_t **out_handle);
 #endif
 
 #ifdef __cplusplus

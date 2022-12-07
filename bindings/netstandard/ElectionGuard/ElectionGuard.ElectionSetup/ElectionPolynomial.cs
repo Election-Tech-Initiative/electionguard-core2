@@ -2,6 +2,8 @@
 using System.Collections.Generic;
 using System.Linq;
 
+using ElectionGuard;
+
 namespace ElectionGuard.ElectionSetup
 {
     /// <summary>
@@ -49,25 +51,23 @@ namespace ElectionGuard.ElectionSetup
         {
             List<Coefficient> coefficients = new List<Coefficient>();
 
-            for (int i = 0; i < numberOfCoefficients; i++)
+            for (ulong i = 0; i < (ulong)numberOfCoefficients; i++)
             {
-                // todo: the hard stuff in C++ goes here
-                throw new NotImplementedException();
-
                 //    // Note: the nonce value is not safe. It is designed for testing only.
                 //    // This method should be called without the nonce in production.
-                //    ElementModQ value;
-                //    if (nonce != null)
-                //        value = add_q(nonce, i);
-                //    else
-                //        value = rand_q();
+                ElementModQ value;
+                if (nonce != null)
+                    value = BigMath.AddModQ(nonce, i);
+                else
+                    value = BigMath.RandQ();
 
-                //    var commitment = g_pow_p(value)
+                var commitment = BigMath.GPowP(value);
+                //                var keypair = new ElGamalKeyPair(value, commitment);
                 //    var proof = make_schnorr_proof(
                 //        ElGamalKeyPair(value, commitment), rand_q()
                 //    )  # TODO Alternate schnoor proof method that doesn't need KeyPair
-                //    var coefficient = new Coefficient(value, commitment, proof)
-                //    coefficients.append(coefficient)
+                // var coefficient = new Coefficient(value, commitment, null);
+                // coefficients.append(coefficient);
             }
 
             return new ElectionPolynomial(coefficients);
