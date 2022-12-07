@@ -49,7 +49,7 @@ eg_electionguard_status_t eg_element_mod_p_new(const uint64_t in_data[MAX_P_LEN]
 
         return ELECTIONGUARD_STATUS_SUCCESS;
     } catch (const exception &e) {
-        Log::error(": eg_element_mod_p_new", e);
+        Log::error(__func__, e);
         return ELECTIONGUARD_STATUS_ERROR_BAD_ALLOC;
     }
 }
@@ -66,7 +66,7 @@ eg_electionguard_status_t eg_element_mod_p_new_unchecked(const uint64_t in_data[
 
         return ELECTIONGUARD_STATUS_SUCCESS;
     } catch (const exception &e) {
-        Log::error(": eg_element_mod_p_new_unchecked", e);
+        Log::error(__func__, e);
         return ELECTIONGUARD_STATUS_ERROR_BAD_ALLOC;
     }
 }
@@ -104,7 +104,7 @@ eg_electionguard_status_t eg_element_mod_p_to_hex(eg_element_mod_p_t *handle, ch
 
         return ELECTIONGUARD_STATUS_SUCCESS;
     } catch (const exception &e) {
-        Log::error(": eg_element_mod_p_to_hex", e);
+        Log::error(__func__, e);
         return ELECTIONGUARD_STATUS_ERROR_BAD_ALLOC;
     }
 }
@@ -125,7 +125,7 @@ eg_electionguard_status_t eg_element_mod_q_new(const uint64_t in_data[MAX_Q_LEN]
 
         return ELECTIONGUARD_STATUS_SUCCESS;
     } catch (const exception &e) {
-        Log::error(": eg_element_mod_q_new", e);
+        Log::error(__func__, e);
         return ELECTIONGUARD_STATUS_ERROR_BAD_ALLOC;
     }
 }
@@ -142,7 +142,7 @@ eg_electionguard_status_t eg_element_mod_q_new_unchecked(const uint64_t in_data[
 
         return ELECTIONGUARD_STATUS_SUCCESS;
     } catch (const exception &e) {
-        Log::error(": eg_element_mod_q_new_unchecked", e);
+        Log::error(__func__, e);
         return ELECTIONGUARD_STATUS_ERROR_BAD_ALLOC;
     }
 }
@@ -180,7 +180,7 @@ eg_electionguard_status_t eg_element_mod_q_to_hex(eg_element_mod_q_t *handle, ch
 
         return ELECTIONGUARD_STATUS_SUCCESS;
     } catch (const exception &e) {
-        Log::error(": eg_element_mod_q_to_hex", e);
+        Log::error(__func__, e);
         return ELECTIONGUARD_STATUS_ERROR_BAD_ALLOC;
     }
 }
@@ -194,7 +194,7 @@ EG_API eg_electionguard_status_t eg_element_mod_q_from_hex(char *in_hex,
 
         return ELECTIONGUARD_STATUS_SUCCESS;
     } catch (const exception &e) {
-        Log::error(": eg_element_mod_q_from_hex", e);
+        Log::error(__func__, e);
         return ELECTIONGUARD_STATUS_ERROR_BAD_ALLOC;
     }
 }
@@ -208,7 +208,7 @@ eg_element_mod_q_from_hex_unchecked(char *in_hex, eg_element_mod_q_t **out_handl
 
         return ELECTIONGUARD_STATUS_SUCCESS;
     } catch (const exception &e) {
-        Log::error(": eg_element_mod_q_from_hex_unchecked", e);
+        Log::error(__func__, e);
         return ELECTIONGUARD_STATUS_ERROR_BAD_ALLOC;
     }
 }
@@ -222,7 +222,7 @@ EG_API eg_electionguard_status_t eg_element_mod_q_from_uint64(uint64_t in_uint64
 
         return ELECTIONGUARD_STATUS_SUCCESS;
     } catch (const exception &e) {
-        Log::error(": eg_element_mod_q_from_uint64", e);
+        Log::error(__func__, e);
         return ELECTIONGUARD_STATUS_ERROR_BAD_ALLOC;
     }
 }
@@ -236,7 +236,7 @@ eg_element_mod_q_from_uint64_unchecked(uint64_t in_uint64, eg_element_mod_q_t **
 
         return ELECTIONGUARD_STATUS_SUCCESS;
     } catch (const exception &e) {
-        Log::error(": eg_element_mod_q_from_uint64_unchecked", e);
+        Log::error(__func__, e);
         return ELECTIONGUARD_STATUS_ERROR_BAD_ALLOC;
     }
 }
@@ -250,7 +250,7 @@ EG_API eg_electionguard_status_t eg_element_mod_p_from_uint64(uint64_t in_uint64
 
         return ELECTIONGUARD_STATUS_SUCCESS;
     } catch (const exception &e) {
-        Log::error(": eg_element_mod_p_from_uint64", e);
+        Log::error(__func__, e);
         return ELECTIONGUARD_STATUS_ERROR_BAD_ALLOC;
     }
 }
@@ -264,7 +264,7 @@ eg_element_mod_p_from_uint64_unchecked(uint64_t in_uint64, eg_element_mod_p_t **
 
         return ELECTIONGUARD_STATUS_SUCCESS;
     } catch (const exception &e) {
-        Log::error(": eg_element_mod_p_from_uint64_unchecked", e);
+        Log::error(__func__, e);
         return ELECTIONGUARD_STATUS_ERROR_BAD_ALLOC;
     }
 }
@@ -351,7 +351,7 @@ eg_electionguard_status_t eg_element_mod_q_pow_mod_p(eg_element_mod_p_t *base,
         *out_handle = AS_TYPE(eg_element_mod_p_t, result.release());
         return ELECTIONGUARD_STATUS_SUCCESS;
     } catch (const exception &e) {
-        Log::error(": eg_element_mod_q_pow_mod_p", e);
+        Log::error(__func__, e);
         return ELECTIONGUARD_STATUS_ERROR_BAD_ALLOC;
     }
 }
@@ -363,7 +363,7 @@ eg_electionguard_status_t eg_element_mod_q_rand_q_new(eg_element_mod_q_t **out_h
         *out_handle = AS_TYPE(eg_element_mod_q_t, random.release());
         return ELECTIONGUARD_STATUS_SUCCESS;
     } catch (const exception &e) {
-        Log::error(": eg_element_mod_q_rand_q_new", e);
+        Log::error(__func__, e);
         return ELECTIONGUARD_STATUS_ERROR_BAD_ALLOC;
     }
 }
@@ -380,7 +380,7 @@ EG_API eg_electionguard_status_t eg_element_mod_q_add_mod_q(eg_element_mod_q_t *
         *out_handle = AS_TYPE(eg_element_mod_q_t, result.release());
         return ELECTIONGUARD_STATUS_SUCCESS;
     } catch (const exception &e) {
-        Log::error(": eg_element_mod_q_add_mod_q", e);
+        Log::error(__func__, e);
         return ELECTIONGUARD_STATUS_ERROR_BAD_ALLOC;
     }
 }
@@ -397,7 +397,7 @@ EG_API eg_electionguard_status_t eg_element_mod_p_add_mod_p(eg_element_mod_p_t *
         *out_handle = AS_TYPE(eg_element_mod_p_t, result.release());
         return ELECTIONGUARD_STATUS_SUCCESS;
     } catch (const exception &e) {
-        Log::error(": eg_element_mod_q_add_mod_q", e);
+        Log::error(__func__, e);
         return ELECTIONGUARD_STATUS_ERROR_BAD_ALLOC;
     }
 }
@@ -415,7 +415,7 @@ eg_element_mod_q_a_plus_b_mul_c_mod_q(eg_element_mod_q_t *a, eg_element_mod_q_t 
         *out_handle = AS_TYPE(eg_element_mod_q_t, result.release());
         return ELECTIONGUARD_STATUS_SUCCESS;
     } catch (const exception &e) {
-        Log::error(": eg_element_mod_q_a_plus_b_mul_c_mod_q", e);
+        Log::error(__func__, e);
         return ELECTIONGUARD_STATUS_ERROR_BAD_ALLOC;
     }
 }
@@ -432,7 +432,7 @@ EG_API eg_electionguard_status_t eg_element_mod_p_mult_mod_p(eg_element_mod_p_t 
         *out_handle = AS_TYPE(eg_element_mod_p_t, result.release());
         return ELECTIONGUARD_STATUS_SUCCESS;
     } catch (const exception &e) {
-        Log::error(": eg_element_mod_q_add_mod_q", e);
+        Log::error(__func__, e);
         return ELECTIONGUARD_STATUS_ERROR_BAD_ALLOC;
     }
 }
@@ -449,7 +449,7 @@ EG_API eg_electionguard_status_t eg_element_mod_p_pow_mod_p(eg_element_mod_p_t *
         *out_handle = AS_TYPE(eg_element_mod_p_t, result.release());
         return ELECTIONGUARD_STATUS_SUCCESS;
     } catch (const exception &e) {
-        Log::error(": eg_element_mod_q_add_mod_q", e);
+        Log::error(__func__, e);
         return ELECTIONGUARD_STATUS_ERROR_BAD_ALLOC;
     }
 }
@@ -466,7 +466,7 @@ EG_API eg_electionguard_status_t eg_hash_elems(eg_element_mod_p_t *publickey,
         *out_handle = AS_TYPE(eg_element_mod_q_t, result.release());
         return ELECTIONGUARD_STATUS_SUCCESS;
     } catch (const exception &e) {
-        Log::error(": eg_element_hash_elems", e);
+        Log::error(__func__, e);
         return ELECTIONGUARD_STATUS_ERROR_BAD_ALLOC;
     }
 }
@@ -486,7 +486,7 @@ eg_electionguard_status_t eg_constant_to_json(char **out_data, uint64_t *out_siz
 
         return ELECTIONGUARD_STATUS_SUCCESS;
     } catch (const exception &e) {
-        Log::error(":eg_constant_to_json", e);
+        Log::error(__func__, e);
         return ELECTIONGUARD_STATUS_ERROR_BAD_ALLOC;
     }
 }
