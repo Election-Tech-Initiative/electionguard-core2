@@ -21,4 +21,5 @@ public class AuthenticationService : IAuthenticationService
     }
 
     public string? UserName => App.CurrentUser.Name;
+    public bool IsAdmin => App.CurrentUser.IsAdmin;
 }

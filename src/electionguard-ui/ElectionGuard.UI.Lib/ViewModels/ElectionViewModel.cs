@@ -2,6 +2,7 @@
 
 namespace ElectionGuard.UI.Lib.ViewModels;
 
+[QueryProperty(CurrentElectionParam, nameof(CurrentElection))]
 public partial class ElectionViewModel : BaseViewModel
 {
     public ElectionViewModel(IServiceProvider serviceProvider) : base(null, serviceProvider)

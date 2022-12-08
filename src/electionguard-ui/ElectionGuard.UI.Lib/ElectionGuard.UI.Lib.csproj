@@ -1,5 +1,6 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 	<PropertyGroup>
+		<UseMaui>true</UseMaui>
 		<TargetFrameworks Condition="$([MSBuild]::IsOSPlatform('OSX'))">net7.0;net7.0-maccatalyst</TargetFrameworks>
 		<TargetFrameworks Condition="$([MSBuild]::IsOSPlatform('windows'))">net7.0;$(TargetFrameworks);net7.0-windows10.0.19041.0</TargetFrameworks>
 		<ManagePackageVersionsCentrally>true</ManagePackageVersionsCentrally>
@@ -23,5 +24,9 @@
 	</ItemGroup>
 	<ItemGroup>
 		<Folder Include="ViewModels\" />
+	</ItemGroup>
+	<ItemGroup>
+	  <ProjectReference Include="..\..\..\bindings\netstandard\ElectionGuard\ElectionGuard.ElectionSetup\ElectionGuard.ElectionSetup.csproj" />
+	  <ProjectReference Include="..\..\..\bindings\netstandard\ElectionGuard\ElectionGuard.Encryption\ElectionGuard.Encryption.csproj" />
 	</ItemGroup>
 </Project>

@@ -15,7 +15,7 @@ public class AdminHomeViewModelTest : TestBase
         await adminHomeViewModel.GoKeyCeremonyCommand.ExecuteAsync(null);
 
         // ASSERT
-        await NavigationService.Received().GoToPage(typeof(AdminHomeViewModel));
+        await NavigationService.Received().GoToPage(typeof(CreateKeyCeremonyAdminViewModel));
     }
 }
 

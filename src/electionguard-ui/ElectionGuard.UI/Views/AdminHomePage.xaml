@@ -1,16 +1,18 @@
 ﻿<?xml version="1.0" encoding="utf-8" ?>
-<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
-             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
-             x:Class="ElectionGuard.UI.Views.AdminHomePage"
-             xmlns:helper="clr-namespace:ElectionGuard.UI.Helpers"
-             xmlns:model="clr-namespace:ElectionGuard.UI.Lib.Models;assembly=ElectionGuard.UI.Lib"
-             xmlns:controls="clr-namespace:ElectionGuard.UI.Controls"
-             xmlns:viewModels="clr-namespace:ElectionGuard.UI.Lib.ViewModels;assembly=ElectionGuard.UI.Lib"
-             x:DataType="viewModels:AdminHomeViewModel"
-             ControlTemplate="{StaticResource PageTemplate}">
+<views:ContentPageBase x:TypeArguments="viewModels:AdminHomeViewModel" xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+                       xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+                       x:Class="ElectionGuard.UI.Views.AdminHomePage"
+                       xmlns:helper="clr-namespace:ElectionGuard.UI.Helpers"
+                       xmlns:model="clr-namespace:ElectionGuard.UI.Lib.Models;assembly=ElectionGuard.UI.Lib"
+                       xmlns:controls="clr-namespace:ElectionGuard.UI.Controls"
+                       xmlns:viewModels="clr-namespace:ElectionGuard.UI.Lib.ViewModels;assembly=ElectionGuard.UI.Lib"
+                       xmlns:views="using:ElectionGuard.UI.Views"
+                       x:DataType="viewModels:AdminHomeViewModel"
+                       ControlTemplate="{StaticResource PageTemplate}">
     <VerticalStackLayout Style="{StaticResource NarrowCenteredPage}">
         <Label Style="{StaticResource H1}" Text="{helper:Translate AdminHomePageTitle}" />
         <Button Style="{StaticResource FullWidth}" Text="{helper:Translate CreateElection}" Command="{Binding CreateElectionCommand}" />
+        <Button Style="{StaticResource FullWidth}" Text="{helper:Translate GoToCreateKeyCeremonyAdmin}" Command="{Binding GoKeyCeremonyCommand}" />
         <Label Style="{StaticResource H2}" Text="{helper:Translate ElectionsText}" />
 
         <CollectionView ItemsSource="{Binding Elections}" SelectedItem="{Binding CurrentElection}" 
@@ -28,4 +30,4 @@
         </CollectionView>
 
     </VerticalStackLayout>
-</ContentPage>
+</views:ContentPageBase>

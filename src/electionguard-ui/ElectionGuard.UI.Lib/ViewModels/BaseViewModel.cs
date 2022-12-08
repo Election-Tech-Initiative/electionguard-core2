@@ -5,6 +5,12 @@ namespace ElectionGuard.UI.Lib.ViewModels
 {
     public partial class BaseViewModel : ObservableObject, IDisposable
     {
+        [RelayCommand]
+        public virtual async Task Appearing()
+        {
+            await Task.Yield();
+        }
+
         [ObservableProperty]
         private string _version;
 
@@ -46,7 +52,7 @@ namespace ElectionGuard.UI.Lib.ViewModels
         public virtual void Dispose()
         {
             LocalizationService.OnLanguageChanged -= OnLanguageChanged;
-			GC.SuppressFinalize(this);
+            GC.SuppressFinalize(this);
         }
 
         protected void SetPageTitle()

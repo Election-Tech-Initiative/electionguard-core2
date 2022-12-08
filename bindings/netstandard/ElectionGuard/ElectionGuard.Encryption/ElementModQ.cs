@@ -16,7 +16,8 @@ namespace ElectionGuard
         /// <Summary>
         /// Get the integer representation of the element
         /// </Summary>
-        public ulong[] Data { 
+        public ulong[] Data
+        {
             get => GetNative();
             internal set => NewNative(value);
         }
@@ -49,6 +50,19 @@ namespace ElectionGuard
             var status = uncheckedInput ?
                 NativeInterface.ElementModQ.FromHexUnchecked(hex, out Handle)
                 : NativeInterface.ElementModQ.FromHex(hex, out Handle);
+            status.ThrowIfError();
+        }
+
+        /// <summary>
+        /// Create a `ElementModQ`
+        /// </summary>
+        /// <param name="data">integer representing the value of the initialized data</param>
+        /// <param name="uncheckedInput">if data is checked or not</param>
+        public ElementModQ(ulong data, bool uncheckedInput = false)
+        {
+            var status = uncheckedInput ?
+                NativeInterface.ElementModQ.FromUint64Unchecked(data, out Handle)
+                : NativeInterface.ElementModQ.FromUint64(data, out Handle);
             status.ThrowIfError();
         }
 

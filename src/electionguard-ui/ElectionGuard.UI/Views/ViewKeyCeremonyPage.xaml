@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<views:ContentPageBase x:TypeArguments="viewModels:ViewKeyCeremonyViewModel" xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+                       xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+                       xmlns:viewModels="clr-namespace:ElectionGuard.UI.Lib.ViewModels;assembly=ElectionGuard.UI.Lib"
+                       xmlns:helper="clr-namespace:ElectionGuard.UI.Helpers"
+                       xmlns:toolkit="http://schemas.microsoft.com/dotnet/2022/maui/toolkit"
+                       xmlns:views="using:ElectionGuard.UI.Views"
+                       x:DataType="viewModels:ViewKeyCeremonyViewModel"
+                       x:Class="ElectionGuard.UI.Views.ViewKeyCeremonyPage"
+                       ControlTemplate="{StaticResource PageTemplate}">
+
+    <ContentPage.Resources>
+        <ResourceDictionary>
+            <toolkit:BoolToObjectConverter x:Key="BoolToObjectConverter" FalseObject="false" TrueObject="true" />
+        </ResourceDictionary>
+    </ContentPage.Resources>
+
+    <VerticalStackLayout Style="{StaticResource NarrowCenteredPage}">
+        <Grid ColumnDefinitions="*, *" RowDefinitions="auto, auto, auto">
+            <StackLayout Style="{StaticResource FormControl}" Grid.Row="0" Grid.ColumnSpan="2">
+                <Label Style="{StaticResource FormLabel}" Text="{helper:Translate KeyCeremonyName}" />
+                <Label Style="{StaticResource FormValue}" Text="{Binding KeyCeremony.Name, FallbackValue=''}" />
+            </StackLayout>
+            <Grid></Grid>
+            <StackLayout Style="{StaticResource FormControl}" Grid.Row="1" Grid.Column="0">
+                <Label Style="{StaticResource FormLabel}" Text="{helper:Translate NumberOfGuardians}" />
+                <Label Style="{StaticResource FormValue}" Text="{Binding KeyCeremony.NumberOfGuardians, FallbackValue=''}" />
+            </StackLayout>
+            <StackLayout Style="{StaticResource FormControl}" Grid.Row="1" Grid.Column="1">
+                <Label Style="{StaticResource FormLabel}" Text="{helper:Translate Quorum}" />
+                <Label Style="{StaticResource FormValue}" Text="{Binding KeyCeremony.Quorum, FallbackValue=''}" />
+            </StackLayout>
+            <Button Grid.Row="2" Grid.ColumnSpan="2" 
+                    Text="{helper:Translate Join}" Command="{Binding JoinCommand}" 
+                    IsVisible="{Binding IsJoinVisible, Converter={StaticResource BoolToObjectConverter}}" />
+        </Grid>
+    </VerticalStackLayout>
+</views:ContentPageBase>
