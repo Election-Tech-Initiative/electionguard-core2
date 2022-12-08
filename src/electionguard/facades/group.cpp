@@ -420,6 +420,40 @@ eg_element_mod_q_a_plus_b_mul_c_mod_q(eg_element_mod_q_t *a, eg_element_mod_q_t 
     }
 }
 
+EG_API eg_electionguard_status_t eg_element_mod_q_mult_mod_q(eg_element_mod_q_t *lhs,
+                                                             eg_element_mod_q_t *rhs,
+                                                             eg_element_mod_q_t **out_handle)
+{
+    try {
+        auto *l = AS_TYPE(ElementModQ, lhs);
+        auto *r = AS_TYPE(ElementModQ, rhs);
+        auto result = mul_mod_q(*l, *r);
+
+        *out_handle = AS_TYPE(eg_element_mod_q_t, result.release());
+        return ELECTIONGUARD_STATUS_SUCCESS;
+    } catch (const exception &e) {
+        Log::error(__func__, e);
+        return ELECTIONGUARD_STATUS_ERROR_BAD_ALLOC;
+    }
+}
+
+EG_API eg_electionguard_status_t eg_element_mod_q_pow_mod_q(eg_element_mod_q_t *base,
+                                                            eg_element_mod_q_t *exponent,
+                                                            eg_element_mod_q_t **out_handle)
+{
+    try {
+        auto *b = AS_TYPE(ElementModQ, base);
+        auto *e = AS_TYPE(ElementModQ, exponent);
+        auto result = pow_mod_q(*b, *e);
+
+        *out_handle = AS_TYPE(eg_element_mod_q_t, result.release());
+        return ELECTIONGUARD_STATUS_SUCCESS;
+    } catch (const exception &e) {
+        Log::error(__func__, e);
+        return ELECTIONGUARD_STATUS_ERROR_BAD_ALLOC;
+    }
+}
+
 EG_API eg_electionguard_status_t eg_element_mod_p_mult_mod_p(eg_element_mod_p_t *lhs,
                                                              eg_element_mod_p_t *rhs,
                                                              eg_element_mod_p_t **out_handle)

@@ -1,30 +1,54 @@
-﻿namespace ElectionGuard.ElectionSetup
+﻿namespace ElectionGuard.ElectionSetup;
+
+/// <summary>
+/// Representation of a Schnorr proof
+/// </summary>
+public class SchnorrProof
 {
     /// <summary>
-    /// Representation of a Schnorr proof
+    /// k in the spec
     /// </summary>
-    public class SchnorrProof
+    public ElementModP PublicKey { get; set; }
+
+    /// <summary>
+    /// h in the spec
+    /// </summary>
+    public ElementModP Commitment { get; set; }
+
+    /// <summary>
+    /// c in the spec
+    /// </summary>
+    public ElementModQ Challenge { get; set; }
+
+    /// <summary>
+    /// u in the spec
+    /// </summary>
+    public ElementModQ Response { get; set; }
+
+    public ProofUsage Usage = ProofUsage.SecretValue;
+
+    public bool IsValid()
     {
-        /// <summary>
-        /// k in the spec
-        /// </summary>
-        public ElGamalPublicKey PublicKey { get; set; }
+        // TODO: implement
+        return true;
+    }
 
-        /// <summary>
-        /// h in the spec
-        /// </summary>
-        public ElementModP Commitment { get; set; }
+    public SchnorrProof(ElGamalKeyPair keyPair) : this(keyPair, BigMath.RandQ()) { }
 
-        /// <summary>
-        /// c in the spec
-        /// </summary>
-        public ElementModQ Challenge { get; set; }
-
-        /// <summary>
-        /// u in the spec
-        /// </summary>
-        public ElementModQ Response { get; set; }
-
-        public ProofUsage Usage = ProofUsage.SecretValue;
+    /// <summary>
+    /// Create a new instance of a Schnorr proof.
+    /// </summary>
+    /// <remarks>
+    ///   Do not use this constructor directly, unless unit testing. The nonce should never be known to the caller.
+    ///   Use the <see cref="SchnorrProof(ElGamalKeyPair)"/> constructor instead.
+    /// </remarks>
+    /// <param name="keyPair"></param>
+    /// <param name="randomSeed"></param>
+    public SchnorrProof(ElGamalKeyPair keyPair, ElementModQ randomSeed)
+    {
+        PublicKey = keyPair.PublicKey;
+        Commitment = BigMath.GPowP(randomSeed);
+        Challenge = BigMath.HashElems(PublicKey, Commitment);
+        Response = BigMath.APlusBMulCModQ(randomSeed, keyPair.SecretKey, Challenge);
     }
 }

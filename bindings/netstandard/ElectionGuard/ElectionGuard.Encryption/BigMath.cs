@@ -117,6 +117,19 @@ namespace ElectionGuard
         }
 
         /// <summary>
+        /// Raise a ElementModQ value to an ElementModQ exponent
+        /// </summary>
+        /// <param name="b">base value for the calculation</param>
+        /// <param name="e">exponent to raise the base by</param>
+        public static ElementModQ PowModQ(ElementModQ b, ElementModQ e)
+        {
+            var status = External.PowModQ(b.Handle, e.Handle,
+                out NativeInterface.ElementModQ.ElementModQHandle value);
+            status.ThrowIfError();
+            return new ElementModQ(value);
+        }
+
+        /// <summary>
         /// Hash together the ElementModP values
         /// </summary>
         /// <param name="publickey">first value for the hash</param>
@@ -124,6 +137,19 @@ namespace ElectionGuard
         public static ElementModQ HashElems(ElementModP publickey, ElementModP commitment)
         {
             var status = External.HashElems(publickey.Handle, commitment.Handle,
+                out NativeInterface.ElementModQ.ElementModQHandle value);
+            status.ThrowIfError();
+            return new ElementModQ(value);
+        }
+
+        /// <summary>
+        /// Multiple two ElementModQ values
+        /// </summary>
+        /// <param name="lhs">left hand side for the multiply</param>
+        /// <param name="rhs">right hand side for the multiply</param>
+        public static ElementModQ MultModQ(ElementModQ lhs, ElementModQ rhs)
+        {
+            var status = External.MultModQ(lhs.Handle, rhs.Handle,
                 out NativeInterface.ElementModQ.ElementModQHandle value);
             status.ThrowIfError();
             return new ElementModQ(value);
@@ -216,7 +242,27 @@ namespace ElectionGuard
                 out NativeInterface.ElementModQ.ElementModQHandle handle
                 );
 
+            [DllImport(
+                NativeInterface.DllName,
+                EntryPoint = "eg_element_mod_q_mult_mod_q",
+                CallingConvention = CallingConvention.Cdecl,
+                SetLastError = true)]
+            internal static extern Status MultModQ(
+                NativeInterface.ElementModQ.ElementModQHandle lhs,
+                NativeInterface.ElementModQ.ElementModQHandle rhs,
+                out NativeInterface.ElementModQ.ElementModQHandle handle
+                );
 
+            [DllImport(
+                NativeInterface.DllName,
+                EntryPoint = "eg_element_mod_q_pow_mod_q",
+                CallingConvention = CallingConvention.Cdecl,
+                SetLastError = true)]
+            internal static extern Status PowModQ(
+                NativeInterface.ElementModQ.ElementModQHandle b,
+                NativeInterface.ElementModQ.ElementModQHandle e,
+                out NativeInterface.ElementModQ.ElementModQHandle handle
+                );
 
         }
     }

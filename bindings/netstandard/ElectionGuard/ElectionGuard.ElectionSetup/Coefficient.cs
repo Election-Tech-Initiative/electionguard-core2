@@ -1,23 +1,33 @@
-﻿namespace ElectionGuard.ElectionSetup
+﻿namespace ElectionGuard.ElectionSetup;
+/// <summary>
+/// A coefficient of an Election Polynomial
+/// </summary>
+public class Coefficient
 {
     /// <summary>
-    /// A coefficient of an Election Polynomial
+    /// The key pair associated with the coefficient
     /// </summary>
-    public class Coefficient
+    /// <value></value>
+    public ElGamalKeyPair KeyPair { get; private set; }
+
+    /// <summary>
+    /// The secret coefficient `a_ij` 
+    /// </summary>
+    public ElementModQ Value => KeyPair.SecretKey;
+
+    /// <summary>
+    /// The public key `K_ij` generated from secret coefficient
+    /// </summary>
+    public ElementModP Commitment => KeyPair.PublicKey;
+
+    /// <summary>
+    /// A proof of possession of the private key for the secret coefficient
+    /// </summary>
+    public SchnorrProof Proof { get; private set; }
+
+    public Coefficient(ElGamalKeyPair keyPair, SchnorrProof proof)
     {
-        /// <summary>
-        /// The secret coefficient `a_ij` 
-        /// </summary>
-        public SecretCoefficient Value { get; set; } 
-
-        /// <summary>
-        /// The public key `K_ij` generated from secret coefficient
-        /// </summary>
-        public PublicCommitment Commitment { get; set; }
-
-        /// <summary>
-        /// A proof of possession of the private key for the secret coefficient
-        /// </summary>
-        public SchnorrProof Proof { get; set; }
+        KeyPair = keyPair;
+        Proof = proof;
     }
 }

@@ -125,13 +125,21 @@ EG_API eg_electionguard_status_t
 eg_element_mod_q_a_plus_b_mul_c_mod_q(eg_element_mod_q_t *a, eg_element_mod_q_t *b,
                                       eg_element_mod_q_t *c, eg_element_mod_q_t **out_handle);
 
-EG_API eg_electionguard_status_t eg_element_mod_p_mult_mod_p(eg_element_mod_p_t *lhs,
+EG_API eg_electionguard_status_t eg_element_mod_p_mult_mod_q(eg_element_mod_p_t *lhs,
                                                              eg_element_mod_p_t *rhs,
                                                              eg_element_mod_p_t **out_handle);
 
 EG_API eg_electionguard_status_t eg_element_mod_p_pow_mod_p(eg_element_mod_p_t *b,
                                                             eg_element_mod_p_t *e,
                                                             eg_element_mod_p_t **out_handle);
+
+EG_API eg_electionguard_status_t eg_element_mod_q_pow_mod_q(eg_element_mod_q_t *lhs,
+                                                            eg_element_mod_q_t *rhs,
+                                                            eg_element_mod_q_t **out_handle);
+
+EG_API eg_electionguard_status_t eg_element_mod_q_mult_mod_q(eg_element_mod_q_t *lhs,
+                                                             eg_element_mod_q_t *rhs,
+                                                             eg_element_mod_q_t **out_handle);
 
 EG_API eg_electionguard_status_t eg_hash_elems(eg_element_mod_p_t *publickey,
                                                eg_element_mod_p_t *commitment,
