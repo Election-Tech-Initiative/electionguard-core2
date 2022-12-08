@@ -1,76 +1,91 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using System.Linq;
 
 using ElectionGuard;
 
-namespace ElectionGuard.ElectionSetup
+namespace ElectionGuard.ElectionSetup;
+
+/// <summary>
+/// A polynomial defined by coefficients
+///
+/// The 0-index coefficient is used for a secret key which can be
+/// discovered by a quorum of n guardians corresponding to n coefficients.
+/// </summary>
+public class ElectionPolynomial
 {
-    /// <summary>
-    /// A polynomial defined by coefficients
-    ///
-    /// The 0-index coefficient is used for a secret key which can be
-    /// discovered by a quorum of n guardians corresponding to n coefficients.
-    /// </summary>
-    public class ElectionPolynomial
+    public ElectionPolynomial(List<Coefficient> coefficients)
     {
-        public ElectionPolynomial(List<Coefficient> coefficients)
+        Coefficients = coefficients;
+    }
+
+    public List<Coefficient> Coefficients;
+
+    /// <summary>
+    /// Access the list of public keys generated from secret coefficient
+    /// </summary>
+    public List<ElementModP> GetCommitments()
+    {
+        return Coefficients
+            .Select(i => i.Commitment)
+            .ToList();
+    }
+
+    /// <summary>
+    /// Access the list of proof of possession of the private key for the secret coefficient
+    /// </summary>
+    public List<SchnorrProof> GetProofs()
+    {
+        return Coefficients
+            .Select(i => i.Proof)
+            .ToList();
+    }
+
+    /// <summary>
+    /// Generates a polynomial for sharing election keys
+    /// </summary>
+    /// <param name="numberOfCoefficients">Number of coefficients of polynomial</param>
+    /// <param name="nonce">An optional nonce parameter that may be provided (useful for testing).</param>
+    /// <returns>Polynomial used to share election keys</returns>
+    /// <remarks>
+    /// What is a coefficient?
+    /// </remarks>
+    public static ElectionPolynomial GeneratePolynomial(
+        [Range(1, int.MaxValue)] int numberOfCoefficients,
+        ElementModQ nonce = null)
+    {
+        List<Coefficient> coefficients = new();
+
+        for (var i = 0; i < numberOfCoefficients; i++)
         {
-            Coefficients = coefficients;
+            coefficients.Add(GenerateCoefficient(nonce, i));
         }
 
-        public List<Coefficient> Coefficients;
+        return new(coefficients);
+    }
 
-        /// <summary>
-        /// Access the list of public keys generated from secret coefficient
-        /// </summary>
-        public List<PublicCommitment> GetCommitments()
+    private static Coefficient GenerateCoefficient(ElementModQ nonce, int i)
+    {
+        var keypair = ElGamalKeyPair.FromSecret(
+            GenerateSecretKey(nonce, i));
+
+        SchnorrProof proof = new(keypair);
+
+        return new(keypair, proof);
+    }
+
+    /// <summary>
+    /// Force a random value to be generated for production purposes.
+    /// In a production environment, nonce should be null and a random value will be generated.
+    /// </summary>
+    private static ElementModQ GenerateSecretKey(ElementModQ nonce, int index)
+    {
+        if (nonce == null)
         {
-            return Coefficients
-                .Select(i => i.Commitment)
-                .ToList();
+            return BigMath.RandQ();
         }
 
-        /// <summary>
-        /// Access the list of proof of possession of the private key for the secret coefficient
-        /// </summary>
-        public List<SchnorrProof> GetProofs()
-        {
-            return Coefficients
-                .Select(i => i.Proof)
-                .ToList();
-        }
-
-        /// <summary>
-        /// Generates a polynomial for sharing election keys
-        /// </summary>
-        /// <param name="numberOfCoefficients">Number of coefficients of polynomial</param>
-        /// <param name="nonce">An optional nonce parameter that may be provided (useful for testing)</param>
-        /// <returns>Polynomial used to share election keys</returns>
-        public static ElectionPolynomial GeneratePolynomial(int numberOfCoefficients, ElementModQ nonce)
-        {
-            List<Coefficient> coefficients = new List<Coefficient>();
-
-            for (ulong i = 0; i < (ulong)numberOfCoefficients; i++)
-            {
-                //    // Note: the nonce value is not safe. It is designed for testing only.
-                //    // This method should be called without the nonce in production.
-                ElementModQ value;
-                if (nonce != null)
-                    value = BigMath.AddModQ(nonce, i);
-                else
-                    value = BigMath.RandQ();
-
-                var commitment = BigMath.GPowP(value);
-                //                var keypair = new ElGamalKeyPair(value, commitment);
-                //    var proof = make_schnorr_proof(
-                //        ElGamalKeyPair(value, commitment), rand_q()
-                //    )  # TODO Alternate schnoor proof method that doesn't need KeyPair
-                // var coefficient = new Coefficient(value, commitment, null);
-                // coefficients.append(coefficient);
-            }
-
-            return new ElectionPolynomial(coefficients);
-        }
+        return BigMath.AddModQ(nonce, (ulong)index);
     }
 }
