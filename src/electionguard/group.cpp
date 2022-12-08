@@ -781,6 +781,31 @@ namespace electionguard
         return make_unique<ElementModQ>(res, true);
     }
 
+    // (lhs * rhs) mod q
+    unique_ptr<ElementModQ> mul_mod_q(const ElementModQ &lhs, const ElementModQ &rhs)
+    {
+        const auto &p = Q();
+        uint64_t mulResult[MAX_Q_LEN_DOUBLE] = {};
+        Bignum256::mul(const_cast<ElementModQ &>(lhs).get(), const_cast<ElementModQ &>(rhs).get(),
+                       static_cast<uint64_t *>(mulResult));
+        uint64_t modResult[MAX_Q_LEN] = {};
+        CONTEXT_Q().mod(static_cast<uint64_t *>(mulResult), static_cast<uint64_t *>(modResult));
+        return make_unique<ElementModQ>(modResult, true);
+    }
+
+    // (b^e) mod q
+    unique_ptr<ElementModQ> pow_mod_q(const ElementModQ &base, const ElementModQ &exponent)
+    {
+        // HACL's input constraints require the exponent to be greater than zero
+        if (const_cast<ElementModQ &>(exponent) == ZERO_MOD_Q()) {
+            return ElementModQ::fromUint64(1UL);
+        }
+
+        uint64_t result[MAX_Q_LEN] = {};
+        CONTEXT_Q().modExp(base.get(), MAX_Q_SIZE, exponent.get(), static_cast<uint64_t *>(result));
+        return make_unique<ElementModQ>(result, true);
+    }
+
     unique_ptr<ElementModQ> sub_from_q(const ElementModQ &a)
     {
         uint64_t result[MAX_Q_LEN] = {};

@@ -269,6 +269,17 @@ namespace electionguard
                                                         const ElementModQ &c);
 
     /// <summary>
+    /// Computes (a * b) mod q.
+    /// </summary>
+    EG_API std::unique_ptr<ElementModQ> mul_mod_q(const ElementModQ &lhs, const ElementModQ &rhs);
+
+    /// <summary>
+    /// Computes b^e mod q.
+    /// </summary>
+    EG_API std::unique_ptr<ElementModQ> pow_mod_q(const ElementModQ &base,
+                                                  const ElementModQ &exponent);
+
+    /// <summary>
     /// Computes (Q - a) mod q.
     /// </summary>
     EG_API std::unique_ptr<ElementModQ> sub_from_q(const ElementModQ &a);
