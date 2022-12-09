@@ -6,7 +6,7 @@
                                                         xmlns:helper="clr-namespace:ElectionGuard.UI.Helpers"
                                                         xmlns:model="clr-namespace:ElectionGuard.UI.Lib.Models;assembly=ElectionGuard.UI.Lib"
                                                         xmlns:viewModels="clr-namespace:ElectionGuard.UI.Lib.ViewModels;assembly=ElectionGuard.UI.Lib"
-                                                        xmlns:controls1="clr-namespace:ElectionGuard.UI.Controls"
+                                                        xmlns:controls="clr-namespace:ElectionGuard.UI.Controls"
                                                         xmlns:views="using:ElectionGuard.UI.Views"
                                                         x:DataType="viewModels:GuardianHomeViewModel"
                                                         ControlTemplate="{StaticResource PageTemplate}">
