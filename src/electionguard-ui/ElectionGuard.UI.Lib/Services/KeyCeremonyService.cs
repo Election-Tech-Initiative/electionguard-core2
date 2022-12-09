@@ -40,11 +40,13 @@ public class KeyCeremonyService : IKeyCeremonyService
     {
         // Get all guardian public keys.
         // Exclude current user's public key
-        // 
+        //
+        return new();
     }
 
     public object ExportData()
     {
+        return new();
     }
 
 
