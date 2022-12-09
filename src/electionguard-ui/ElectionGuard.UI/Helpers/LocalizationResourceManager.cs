@@ -1,5 +1,5 @@
-﻿using System.Resources;
-using System.Globalization;
+﻿using System.Globalization;
+using System.Resources;
 
 namespace ElectionGuard.UI.Helpers;
 

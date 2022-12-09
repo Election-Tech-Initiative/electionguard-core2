@@ -9,7 +9,7 @@ public partial class App
     public App()
     {
         InitializeComponent();
-        this.UserAppTheme = AppTheme.Light;
+        UserAppTheme = AppTheme.Light;
 
         SetupLanguageSupport();
 
@@ -19,7 +19,7 @@ public partial class App
     private void SetupLanguageSupport()
     {
         LocalizationResourceManager.Current.PropertyChanged += CurrentLanguage_Changed;
-        LocalizationResourceManager.Current.Init(AppResources.ResourceManager);
+        LocalizationResourceManager.Current.Init(AppResources.ResourceManager, CultureInfo.CurrentCulture);
 
         string? currentLanguage = Preferences.Get("CurrentLanguage", null);
         LocalizationResourceManager.Current.CurrentCulture = currentLanguage is null ? CultureInfo.CurrentCulture : new CultureInfo(currentLanguage);
@@ -46,5 +46,5 @@ public partial class App
         return window;
     }
 
-    private string GetWindowTitle() => AppResources.WindowTitle;
+    private static string GetWindowTitle() => AppResources.WindowTitle;
 }

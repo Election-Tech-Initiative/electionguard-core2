@@ -29,6 +29,7 @@
 
 	<PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Debug|net7.0-maccatalyst|AnyCPU'">
 	  <TreatWarningsAsErrors>True</TreatWarningsAsErrors>
+	  <CreatePackage>false</CreatePackage>
 	</PropertyGroup>
 
 	<PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Release|net7.0-maccatalyst|AnyCPU'">
@@ -64,10 +65,9 @@
 	</ItemGroup>
 
 	<ItemGroup>
+		<PackageReference Include="Microsoft.Extensions.Logging.Debug" />
 		<PackageReference Include="CommunityToolkit.Maui" />
 		<PackageReference Include="CommunityToolkit.Mvvm" />
-		<PackageReference Include="ElectionGuard.Encryption" />
-		<PackageReference Include="Microsoft.Extensions.Logging.Debug" />
 	</ItemGroup>
 
 	<ItemGroup>
@@ -80,6 +80,9 @@
 	    <AutoGen>True</AutoGen>
 	    <DependentUpon>AppResources.resx</DependentUpon>
 	  </Compile>
+	  <Compile Update="Views\ViewKeyCeremonyPage.xaml.cs">
+	    <DependentUpon>ViewKeyCeremonyPage.xaml</DependentUpon>
+	  </Compile>
 	</ItemGroup>
 
 	<ItemGroup>
@@ -90,5 +93,8 @@
 	    <Generator>ResXFileCodeGenerator</Generator>
 	    <LastGenOutput>AppResources.Designer.cs</LastGenOutput>
 	  </EmbeddedResource>
+	</ItemGroup>
+	<ItemGroup>
+	  <None Remove="Services\" />
 	</ItemGroup>
 </Project>

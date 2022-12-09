@@ -1,4 +1,6 @@
 using CommunityToolkit.Maui;
+using ElectionGuard.UI.Lib.Services;
+using ElectionGuard.UI.Services;
 using Microsoft.Extensions.Logging;
 
 namespace ElectionGuard.UI;
@@ -21,7 +23,7 @@ public static class MauiProgram
     public static MauiAppBuilder SetupLogging(this MauiAppBuilder builder)
     {
 #if DEBUG
-		builder.Logging.AddDebug();
+        builder.Logging.AddDebug();
 #endif
         return builder;
     }
@@ -40,17 +42,35 @@ public static class MauiProgram
 
     public static MauiAppBuilder SetupServices(this MauiAppBuilder builder)
     {
-        // setup viewmodels
-        builder.Services.AddSingleton<LoginViewModel>();
-        builder.Services.AddSingleton<GuardianHomeViewModel>();
-        builder.Services.AddSingleton<AdminHomeViewModel>();
-        builder.Services.AddSingleton<ElectionViewModel>();
+        // setup services
+        builder.Services.AddSingleton((_) => EgServiceProvider.Current);
+        builder.Services.AddTransient<IAuthenticationService, AuthenticationService>();
+        builder.Services.AddTransient<IConfigurationService, ConfigurationService>();
+        // LocalizationService has to be singleton because it uses events to propagate changes to language changed
+        builder.Services.AddSingleton<ILocalizationService, LocalizationService>();
+        // NavigationService has to be singleton because it stores the current page and vm
+        builder.Services.AddSingleton<INavigationService, NavigationService>();
+        builder.Services.AddTransient<IKeyCeremonyService, KeyCeremonyService>();
+
+        // setup view models
+        builder.Services.AddTransient<LoginViewModel>();
+        builder.Services.AddTransient<GuardianHomeViewModel>();
+        builder.Services.AddTransient<AdminHomeViewModel>();
+        builder.Services.AddTransient<ElectionViewModel>();
+        builder.Services.AddTransient<SettingsViewModel>();
+        builder.Services.AddTransient<CreateKeyCeremonyAdminViewModel>();
+        builder.Services.AddTransient<ViewKeyCeremonyViewModel>();
 
         // setup views
-        builder.Services.AddSingleton<LoginPage>();
-        builder.Services.AddSingleton<GuardianHomePage>();
-        builder.Services.AddSingleton<AdminHomePage>();
-        builder.Services.AddSingleton<ElectionPage>();
+        builder.Services.AddTransient<LoginPage>();
+        builder.Services.AddTransient<GuardianHomePage>();
+        builder.Services.AddTransient<AdminHomePage>();
+        builder.Services.AddTransient<ElectionPage>();
+        builder.Services.AddTransient<CreateKeyCeremonyAdminPage>();
+        builder.Services.AddTransient<ViewKeyCeremonyPage>();
+
+        // popup pages
+        builder.Services.AddTransient<SettingsPage>();
 
         return builder;
     }

@@ -1,12 +1,12 @@
 <?xml version="1.0" encoding="utf-8" ?>
-<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
-             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
-             x:Class="ElectionGuard.UI.Views.ElectionPage"
-             xmlns:helper="clr-namespace:ElectionGuard.UI.Helpers"
-             Title="{helper:Translate ElectionDetails}"
-             xmlns:vm="clr-namespace:ElectionGuard.UI.ViewModels"
-             x:DataType="vm:ElectionViewModel"
-             ControlTemplate="{StaticResource PageTemplate}">
+<views:ContentPageBase x:TypeArguments="viewModels:ElectionViewModel" xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+                       xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+                       x:Class="ElectionGuard.UI.Views.ElectionPage"
+                       xmlns:helper="clr-namespace:ElectionGuard.UI.Helpers"
+                       xmlns:viewModels="clr-namespace:ElectionGuard.UI.Lib.ViewModels;assembly=ElectionGuard.UI.Lib"
+                       xmlns:views="using:ElectionGuard.UI.Views"
+                       x:DataType="viewModels:ElectionViewModel"
+                       ControlTemplate="{StaticResource PageTemplate}">
     <Grid ColumnDefinitions="2*, *, *" Margin="20">
         <VerticalStackLayout Grid.Column="0">
             <Label Style="{StaticResource H1}"
@@ -78,4 +78,4 @@
                 Text="{helper:Translate ElectionChecklist}" />
         </VerticalStackLayout>
     </Grid>
-</ContentPage>
+</views:ContentPageBase>

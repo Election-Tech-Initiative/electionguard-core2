@@ -82,7 +82,7 @@ namespace ElectionGuard
         {
             get
             {
-                var status = NativeInterface.Constants.ZERO_MOD_P(out NativeInterface.ElementModP.ElementModPHandle handle);
+                var status = NativeInterface.Constants.ONE_MOD_P(out NativeInterface.ElementModP.ElementModPHandle handle);
                 if (status != Status.ELECTIONGUARD_STATUS_SUCCESS)
                 {
                     throw new ElectionGuardException($"ONE_MOD_P Error Status: {status}");
@@ -98,7 +98,7 @@ namespace ElectionGuard
         {
             get
             {
-                var status = NativeInterface.Constants.ZERO_MOD_P(out NativeInterface.ElementModP.ElementModPHandle handle);
+                var status = NativeInterface.Constants.TWO_MOD_P(out NativeInterface.ElementModP.ElementModPHandle handle);
                 if (status != Status.ELECTIONGUARD_STATUS_SUCCESS)
                 {
                     throw new ElectionGuardException($"TWO_MOD_P Error Status: {status}");

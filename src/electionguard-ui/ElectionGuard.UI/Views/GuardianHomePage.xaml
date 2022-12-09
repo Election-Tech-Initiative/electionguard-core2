@@ -1,22 +1,23 @@
 <?xml version="1.0" encoding="utf-8" ?>
-<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
-             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
-             x:Class="ElectionGuard.UI.Views.GuardianHomePage"
-             xmlns:helper="clr-namespace:ElectionGuard.UI.Helpers"
-             xmlns:model="clr-namespace:ElectionGuard.UI.Lib.Models;assembly=ElectionGuard.UI.Lib"
-             Title="{helper:Translate GuardianHome}"
-             xmlns:vm="clr-namespace:ElectionGuard.UI.ViewModels"
-             xmlns:views="using:ElectionGuard.UI.Views"
-             xmlns:controls="using:ElectionGuard.UI.Controls"
-             x:DataType="vm:GuardianHomeViewModel"
-             ControlTemplate="{StaticResource PageTemplate}">
+<views:ContentPageBase x:TypeArguments="viewModels:GuardianHomeViewModel"
+    xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+                                                        xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+                                                        x:Class="ElectionGuard.UI.Views.GuardianHomePage"
+                                                        xmlns:helper="clr-namespace:ElectionGuard.UI.Helpers"
+                                                        xmlns:model="clr-namespace:ElectionGuard.UI.Lib.Models;assembly=ElectionGuard.UI.Lib"
+                                                        xmlns:viewModels="clr-namespace:ElectionGuard.UI.Lib.ViewModels;assembly=ElectionGuard.UI.Lib"
+                                                        xmlns:controls="clr-namespace:ElectionGuard.UI.Controls"
+                                                        xmlns:views="using:ElectionGuard.UI.Views"
+                                                        x:DataType="viewModels:GuardianHomeViewModel"
+                                                        ControlTemplate="{StaticResource PageTemplate}">
     <VerticalStackLayout Style="{StaticResource FullWidthPage}">
         <Grid ColumnDefinitions="*,*">
             <VerticalStackLayout Grid.Column="0" >
                 <Label Style="{StaticResource H1}" Text="{helper:Translate ElectionsText}" />
                 <CollectionView ItemsSource="{Binding KeyCeremonies}" 
                                 SelectedItem="{Binding CurrentKeyCeremony}"
-                                SelectionMode="Single">
+                                SelectionMode="Single"
+                                SelectionChangedCommand="{Binding KeyCeremonySelectionChangedCommand}" >
                     <CollectionView.EmptyView>
                         <controls:NoContentView Text="{helper:Translate NoKeyCeremonies}"></controls:NoContentView>
                     </CollectionView.EmptyView>
@@ -50,4 +51,4 @@
         </Grid>
     </VerticalStackLayout>
 
-</ContentPage>
+</views:ContentPageBase>

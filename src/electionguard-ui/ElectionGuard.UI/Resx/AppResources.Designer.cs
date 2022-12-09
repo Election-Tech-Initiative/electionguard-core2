@@ -79,6 +79,24 @@ namespace ElectionGuard.UI.Resx {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to What Do You Want To Do?.
+        /// </summary>
+        internal static string AdminHomePageTitle {
+            get {
+                return ResourceManager.GetString("AdminHomePageTitle", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to already exists.  Try a different name..
+        /// </summary>
+        internal static string AlreadyExists {
+            get {
+                return ResourceManager.GetString("AlreadyExists", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Ballot Count.
         /// </summary>
         internal static string BallotCountText {
@@ -138,6 +156,15 @@ namespace ElectionGuard.UI.Resx {
         internal static string CreateElection {
             get {
                 return ResourceManager.GetString("CreateElection", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Create Key Ceremony.
+        /// </summary>
+        internal static string CreateKeyCeremony {
+            get {
+                return ResourceManager.GetString("CreateKeyCeremony", resourceCulture);
             }
         }
         
@@ -205,6 +232,15 @@ namespace ElectionGuard.UI.Resx {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Create Key Ceremony.
+        /// </summary>
+        internal static string GoToCreateKeyCeremonyAdmin {
+            get {
+                return ResourceManager.GetString("GoToCreateKeyCeremonyAdmin", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Guardian Home.
         /// </summary>
         internal static string GuardianHome {
@@ -232,11 +268,29 @@ namespace ElectionGuard.UI.Resx {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Join.
+        /// </summary>
+        internal static string Join {
+            get {
+                return ResourceManager.GetString("Join", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Key Ceremonies.
         /// </summary>
         internal static string KeyCeremoniesText {
             get {
                 return ResourceManager.GetString("KeyCeremoniesText", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Key Ceremony Name.
+        /// </summary>
+        internal static string KeyCeremonyName {
+            get {
+                return ResourceManager.GetString("KeyCeremonyName", resourceCulture);
             }
         }
         
@@ -313,11 +367,29 @@ namespace ElectionGuard.UI.Resx {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Number of Guardians.
+        /// </summary>
+        internal static string NumberOfGuardians {
+            get {
+                return ResourceManager.GetString("NumberOfGuardians", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Parties.
         /// </summary>
         internal static string PartiesText {
             get {
                 return ResourceManager.GetString("PartiesText", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Quorum.
+        /// </summary>
+        internal static string Quorum {
+            get {
+                return ResourceManager.GetString("Quorum", resourceCulture);
             }
         }
         
@@ -336,6 +408,15 @@ namespace ElectionGuard.UI.Resx {
         internal static string Settings {
             get {
                 return ResourceManager.GetString("Settings", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Start Ceremony.
+        /// </summary>
+        internal static string StartCeremony {
+            get {
+                return ResourceManager.GetString("StartCeremony", resourceCulture);
             }
         }
         
@@ -390,6 +471,15 @@ namespace ElectionGuard.UI.Resx {
         internal static string UserSetup {
             get {
                 return ResourceManager.GetString("UserSetup", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to View Key Ceremony.
+        /// </summary>
+        internal static string ViewKeyCeremony {
+            get {
+                return ResourceManager.GetString("ViewKeyCeremony", resourceCulture);
             }
         }
         

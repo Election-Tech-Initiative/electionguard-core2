@@ -18,7 +18,8 @@ namespace ElectionGuard
         /// <Summary>
         /// Get the integer representation of the element
         /// </Summary>
-        public ulong[] Data { 
+        public ulong[] Data
+        {
             get => GetNative();
             internal set => NewNative(value);
         }
@@ -39,6 +40,19 @@ namespace ElectionGuard
             {
                 throw new ElectionGuardException("construction error", ex);
             }
+        }
+
+        /// <summary>
+        /// Create a `ElementModP`
+        /// </summary>
+        /// <param name="data">integer representing the value of the initialized data</param>
+        /// <param name="uncheckedInput">if data is checked or not</param>
+        public ElementModP(ulong data, bool uncheckedInput = false)
+        {
+            var status = uncheckedInput ?
+                NativeInterface.ElementModP.FromUint64Unchecked(data, out Handle)
+                : NativeInterface.ElementModP.FromUint64(data, out Handle);
+            status.ThrowIfError();
         }
 
         internal ElementModP(NaiveElementModP handle)

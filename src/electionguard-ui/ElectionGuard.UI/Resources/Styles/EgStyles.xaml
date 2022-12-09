@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="UTF-8" ?>
+﻿<?xml version="1.0" encoding="UTF-8" ?>
 <?xaml-comp compile="true" ?>
 <ResourceDictionary 
     xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
@@ -29,6 +29,7 @@
 
     <Style x:Key="FullWidth" TargetType="Button">
         <Setter Property="HorizontalOptions" Value="Fill" />
+        <Setter Property="Margin" Value="0,0,0,10" />
     </Style>
 
     <Style x:Key="NarrowWidth" TargetType="Button">
@@ -71,6 +72,11 @@
         <Setter Property="Padding" Value="20" />
     </Style>
 
+    <Style x:Key="Error" TargetType="Label">
+        <Setter Property="TextColor" Value="Red" />
+        <Setter Property="Margin" Value="0,0,0,20"></Setter>
+    </Style>
+
     <ControlTemplate x:Key="PageTemplate">
         <Grid RowDefinitions="auto, *, auto" BindingContext="{Binding BindingContext, Source={RelativeSource TemplatedParent}}">
             <Grid BackgroundColor="{StaticResource HeaderColor}" Padding="2" Grid.Row="0">
@@ -88,7 +94,7 @@
                                 </Label.GestureRecognizers>
                             </Label>
                             <Label Text=" / " FontSize="20" TextColor="White" VerticalOptions="Center" Margin=" 10,0,10,0" />
-                            <Label Text="{Binding Page.Title}" FontSize="20" TextColor="White" VerticalOptions="Center" />
+                            <Label Text="{Binding PageTitle}" FontSize="20" TextColor="White" VerticalOptions="Center" />
                         </HorizontalStackLayout>
                         <Label Text="{Binding UserName}" VerticalOptions="Center" HorizontalOptions="EndAndExpand" FontSize="18" TextColor="White">
                             <Label.GestureRecognizers>

@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Runtime.ConstrainedExecution;
 using System.Runtime.InteropServices;
 // ReSharper disable InconsistentNaming
@@ -107,6 +107,20 @@ namespace ElectionGuard
             internal static extern Status NewUnchecked(
                 ulong* in_data, out ElementModPHandle handle);
 
+            [DllImport(DllName, EntryPoint = "eg_element_mod_p_from_uint64",
+                CallingConvention = CallingConvention.Cdecl, SetLastError = true)]
+            internal static extern Status FromUint64(
+                UInt64 uint64,
+                out ElementModPHandle handle);
+
+
+            [DllImport(DllName, EntryPoint = "eg_element_mod_p_from_uint64_unchecked",
+                CallingConvention = CallingConvention.Cdecl, SetLastError = true)]
+            internal static extern Status FromUint64Unchecked(
+                UInt64 uint64,
+                out ElementModPHandle handle);
+
+
             [DllImport(DllName, EntryPoint = "eg_element_mod_p_free",
                 CallingConvention = CallingConvention.Cdecl, SetLastError = true)]
             internal static extern Status Free(ElementModPType* handle);
@@ -176,6 +190,18 @@ namespace ElectionGuard
                 CallingConvention = CallingConvention.Cdecl, SetLastError = true)]
             internal static extern Status FromHexUnchecked(
                 [MarshalAs(UnmanagedType.LPStr)] string hex,
+                out ElementModQHandle handle);
+
+            [DllImport(DllName, EntryPoint = "eg_element_mod_q_from_uint64",
+                CallingConvention = CallingConvention.Cdecl, SetLastError = true)]
+            internal static extern Status FromUint64(
+                UInt64 uint64,
+                out ElementModQHandle handle);
+
+            [DllImport(DllName, EntryPoint = "eg_element_mod_q_from_uint64_unchecked",
+                CallingConvention = CallingConvention.Cdecl, SetLastError = true)]
+            internal static extern Status FromUint64Unchecked(
+                UInt64 uint64,
                 out ElementModQHandle handle);
 
             [DllImport(DllName, EntryPoint = "eg_element_mod_q_rand_q_new",

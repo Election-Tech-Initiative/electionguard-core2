@@ -6,6 +6,5 @@ public partial class LoginPage
     {
         InitializeComponent();
         BindingContext = vm;
-        vm.Page = this;
     }
 }

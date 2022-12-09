@@ -1,4 +1,6 @@
-﻿namespace ElectionGuard.UI.Test.Services
+﻿using Shouldly;
+
+namespace ElectionGuard.UI.Test.Services
 {
     internal class DbAvailabilityServiceTest
     {
@@ -12,7 +14,7 @@
             var isDbAvailable = dbAvailabilityService.IsDbAvailable();
 
             // ASSERT
-            Assert.IsTrue(isDbAvailable);
+            isDbAvailable.ShouldBeTrue();
         }
     }
 }

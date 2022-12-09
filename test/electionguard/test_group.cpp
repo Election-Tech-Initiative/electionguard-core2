@@ -34,6 +34,19 @@ TEST_CASE("add_mod_q for ints 1 and 1 should return q of 2")
     CHECK(result->toHex() == two->toHex());
 }
 
+TEST_CASE("g_pow_p")
+{
+    // Arrange
+    auto two = ElementModQ::fromUint64(2UL);
+
+    // Act
+    auto result = g_pow_p(*two);
+    auto test2 = mul_mod_p(G(), G());
+
+    // Assert
+    CHECK(test2->toHex() == result->toHex());
+}
+
 TEST_CASE("add_mod_q (Q + 0) % Q = 0")
 {
     // Arrange
