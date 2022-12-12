@@ -4,7 +4,6 @@
     <TargetFramework>net7.0</TargetFramework>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
-    <UseMaui>true</UseMaui>
     <IsPackable>false</IsPackable>
   </PropertyGroup>
 
@@ -28,6 +27,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\ElectionGuard.UI.Lib\ElectionGuard.UI.Lib.csproj" />
+    <ProjectReference Include="..\ElectionGuard.UI\ElectionGuard.UI.csproj" />
   </ItemGroup>
 
   <ItemGroup>

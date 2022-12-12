@@ -43,7 +43,7 @@ public static class MauiProgram
     public static MauiAppBuilder SetupServices(this MauiAppBuilder builder)
     {
         // setup services
-        builder.Services.AddSingleton((_) => EgServiceProvider.Current);
+        builder.Services.AddSingleton<IMauiInitializeService>(new EgServiceProvider());
         builder.Services.AddTransient<IAuthenticationService, AuthenticationService>();
         builder.Services.AddTransient<IConfigurationService, ConfigurationService>();
         // LocalizationService has to be singleton because it uses events to propagate changes to language changed
