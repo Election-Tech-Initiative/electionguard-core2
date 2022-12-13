@@ -3,7 +3,7 @@
                        xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
                        x:Class="ElectionGuard.UI.Views.ElectionPage"
                        xmlns:helper="clr-namespace:ElectionGuard.UI.Helpers"
-                       xmlns:viewModels="clr-namespace:ElectionGuard.UI.Lib.ViewModels;assembly=ElectionGuard.UI.Lib"
+                       xmlns:viewModels="clr-namespace:ElectionGuard.UI.ViewModels"
                        xmlns:views="using:ElectionGuard.UI.Views"
                        x:DataType="viewModels:ElectionViewModel"
                        ControlTemplate="{StaticResource PageTemplate}">

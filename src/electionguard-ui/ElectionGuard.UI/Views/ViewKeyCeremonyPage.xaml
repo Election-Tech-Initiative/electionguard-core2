@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <views:ContentPageBase x:TypeArguments="viewModels:ViewKeyCeremonyViewModel" xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
                        xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
-                       xmlns:viewModels="clr-namespace:ElectionGuard.UI.Lib.ViewModels;assembly=ElectionGuard.UI.Lib"
+                       xmlns:viewModels="clr-namespace:ElectionGuard.UI.ViewModels"
                        xmlns:helper="clr-namespace:ElectionGuard.UI.Helpers"
                        xmlns:toolkit="http://schemas.microsoft.com/dotnet/2022/maui/toolkit"
                        xmlns:views="using:ElectionGuard.UI.Views"

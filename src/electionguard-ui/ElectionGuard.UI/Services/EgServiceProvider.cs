@@ -1,14 +1,12 @@
+using CommunityToolkit.Mvvm.DependencyInjection;
 using ElectionGuard.UI.Lib.Services;
 
 namespace ElectionGuard.UI.Services;
 
-public class EgServiceProvider
+public class EgServiceProvider : IMauiInitializeService
 {
-    public static IServiceProvider Current
-        =>
-#if MACCATALYST
-            MauiUIApplicationDelegate.Current.Services;
-#else
-            MauiWinUIApplication.Current.Services;
-#endif
+    public void Initialize(IServiceProvider services)
+    {
+        Ioc.Default.ConfigureServices(services);
+    }
 }

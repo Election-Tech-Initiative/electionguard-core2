@@ -1,4 +1,5 @@
 using CommunityToolkit.Maui.Views;
+using CommunityToolkit.Mvvm.DependencyInjection;
 using ElectionGuard.UI.Lib.Services;
 
 namespace ElectionGuard.UI.Services;
@@ -67,7 +68,7 @@ public class NavigationService : INavigationService
 
     private static Popup GetPopupInstance(Type type)
     {
-        var popup = EgServiceProvider.Current.GetService(type);
+        var popup = Ioc.Default.GetService(type);
         if (popup != null) return (Popup)popup;
         throw new ArgumentException(
             $"The type {type} isn't registered in the service collection, set it in MauiProgram.cs");

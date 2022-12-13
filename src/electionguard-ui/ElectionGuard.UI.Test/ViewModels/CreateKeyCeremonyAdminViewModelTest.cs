@@ -1,5 +1,5 @@
 ﻿using ElectionGuard.UI.Lib.Models;
-using ElectionGuard.UI.Lib.ViewModels;
+using ElectionGuard.UI.ViewModels;
 using NSubstitute;
 using Shouldly;
 

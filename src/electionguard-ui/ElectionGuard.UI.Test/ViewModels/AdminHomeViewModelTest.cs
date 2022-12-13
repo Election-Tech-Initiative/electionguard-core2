@@ -1,4 +1,4 @@
-﻿using ElectionGuard.UI.Lib.ViewModels;
+﻿using ElectionGuard.UI.ViewModels;
 using NSubstitute;
 
 namespace ElectionGuard.UI.Test.ViewModels;

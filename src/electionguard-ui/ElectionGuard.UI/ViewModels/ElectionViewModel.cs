@@ -1,6 +1,6 @@
 ﻿using ElectionGuard.UI.Lib.Models;
 
-namespace ElectionGuard.UI.Lib.ViewModels;
+namespace ElectionGuard.UI.ViewModels;
 
 [QueryProperty(CurrentElectionParam, nameof(CurrentElection))]
 public partial class ElectionViewModel : BaseViewModel
