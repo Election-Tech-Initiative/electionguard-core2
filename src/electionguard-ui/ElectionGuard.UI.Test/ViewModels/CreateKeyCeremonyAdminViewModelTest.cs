@@ -19,7 +19,7 @@ namespace ElectionGuard.UI.Test.ViewModels
         {
             // ARRANGE
             var createKeyCeremonyAdminViewModel = CreateKeyCeremonyAdminViewModel();
-            _keyCeremonyService.Create(Arg.Any<KeyCeremony>()).Returns(42);
+            _keyCeremonyService.Create(Arg.Any<KeyCeremony>()).Returns("42");
 
             // ACT
             await createKeyCeremonyAdminViewModel.CreateKeyCeremonyCommand.ExecuteAsync(null);
@@ -27,7 +27,7 @@ namespace ElectionGuard.UI.Test.ViewModels
             // ASSERT
             await NavigationService.Received().GoToPage(
                 typeof(ViewKeyCeremonyViewModel), 
-                Arg.Is<Dictionary<string, object>>(dict => (int)dict["KeyCeremonyId"] == 42));
+                Arg.Is<Dictionary<string, object>>(dict => (string)dict["KeyCeremonyId"] == "42"));
         }
 
         [Test]

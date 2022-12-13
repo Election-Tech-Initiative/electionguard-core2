@@ -9,6 +9,10 @@ public static class MauiProgram
 {
     public static MauiApp CreateMauiApp()
     {
+        var DbHost = Preferences.Get("DbAddress", "127.0.0.1");
+        var DbPassword = Preferences.Get("DbPassword", "");
+        DbService.Init(DbHost, DbPassword);
+
         var builder = MauiApp.CreateBuilder();
         builder
             .UseMauiApp<App>()

@@ -17,6 +17,7 @@ public class AuthenticationService : IAuthenticationService
         App.CurrentUser.Name = username;
         var isAdmin = username.ToLower(CultureInfo.CurrentCulture).Contains("admin");
         App.CurrentUser.IsAdmin = isAdmin;
+        User.Save(App.CurrentUser);
         await _navigationService.GoHome();
     }
 

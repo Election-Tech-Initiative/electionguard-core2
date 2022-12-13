@@ -21,6 +21,7 @@
 	</PropertyGroup>
 	<ItemGroup>
 		<PackageReference Include="CommunityToolkit.Mvvm" />
+		<PackageReference Include="MongoDB.Driver" />
 	</ItemGroup>
 	<ItemGroup>
 		<Folder Include="ViewModels\" />

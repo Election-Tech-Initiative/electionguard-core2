@@ -7,4 +7,9 @@ public partial class SettingsPage
         InitializeComponent();
         BindingContext = settingsViewModel;
     }
+
+    private void Button_Clicked(object sender, EventArgs e)
+    {
+        Close();
+    }
 }
