@@ -17,7 +17,7 @@ public partial class AdminHomeViewModel : BaseViewModel
     [ObservableProperty]
     private Election? _currentElection;
 
-    [RelayCommand]
+    [RelayCommand(AllowConcurrentExecutions = true)]
     public async Task GoKeyCeremony()
     {
         await NavigationService.GoToPage(typeof(CreateKeyCeremonyAdminViewModel));
@@ -30,7 +30,7 @@ public partial class AdminHomeViewModel : BaseViewModel
     }
 #pragma warning restore CA1822
 
-    [RelayCommand]
+    [RelayCommand(AllowConcurrentExecutions = true)]
     private async Task SelectionChanged()
     {
         if (CurrentElection is not null)

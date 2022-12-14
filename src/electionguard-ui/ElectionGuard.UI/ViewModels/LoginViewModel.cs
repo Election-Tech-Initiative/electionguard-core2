@@ -12,7 +12,7 @@ public partial class LoginViewModel : BaseViewModel
     [NotifyCanExecuteChangedFor(nameof(LoginCommand))]
     private string _name = string.Empty;
 
-    [RelayCommand(CanExecute = nameof(CanLogin))]
+    [RelayCommand(CanExecute = nameof(CanLogin), AllowConcurrentExecutions = true)]
     public async Task Login()
     {
         await AuthenticationService.Login(Name);
