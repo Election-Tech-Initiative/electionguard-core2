@@ -80,7 +80,7 @@ public class NavigationService : INavigationService
         var contentPage = GetPage(viewModel);
         _currentPage = contentPage.Page;
         var url = contentPage.IsGlobal ? $"//{_currentPage.Name}" : _currentPage.Name;
-        await Shell.Current.GoToAsync(url, pageParams ?? new Dictionary<string, object>());
+        await Shell.Current.GoToAsync(url, pageParams ?? new());
     }
 
     private static PageType GetPage(Type viewModel)

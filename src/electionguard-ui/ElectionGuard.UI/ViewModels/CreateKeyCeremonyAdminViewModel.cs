@@ -5,10 +5,10 @@ namespace ElectionGuard.UI.ViewModels;
 
 public partial class CreateKeyCeremonyAdminViewModel : BaseViewModel
 {
-    private readonly IKeyCeremonyService _keyCeremonyService;
+    private readonly KeyCeremonyService _keyCeremonyService;
     private const string PageName = "CreateKeyCeremony";
 
-    public CreateKeyCeremonyAdminViewModel(IServiceProvider serviceProvider, IKeyCeremonyService keyCeremonyService) : base(PageName, serviceProvider)
+    public CreateKeyCeremonyAdminViewModel(IServiceProvider serviceProvider, KeyCeremonyService keyCeremonyService) : base(PageName, serviceProvider)
     {
         _keyCeremonyService = keyCeremonyService;
     }
@@ -31,7 +31,7 @@ public partial class CreateKeyCeremonyAdminViewModel : BaseViewModel
     [RelayCommand(CanExecute = nameof(CanCreate), AllowConcurrentExecutions = true)]
     public async Task CreateKeyCeremony()
     {
-        var existingKeyCeremony = await _keyCeremonyService.FindByName(_keyCeremonyName);
+        var existingKeyCeremony = await _keyCeremonyService.GetByNameAsync(_keyCeremonyName);
         if (existingKeyCeremony != null)
         {
             var alreadyExists = LocalizationService.GetValue("AlreadyExists");
@@ -41,7 +41,8 @@ public partial class CreateKeyCeremonyAdminViewModel : BaseViewModel
         }
 
         var keyCeremony = new KeyCeremony(KeyCeremonyName, Quorum, NumberOfGuardians);
-        var keyCeremonyId = _keyCeremonyService.Create(keyCeremony);
+        await _keyCeremonyService.SaveAsync(keyCeremony);
+        var keyCeremonyId = keyCeremony.Id;
         await NavigationService.GoToPage(typeof(ViewKeyCeremonyViewModel), new Dictionary<string, object>
         {
             { ViewKeyCeremonyViewModel.CurrentKeyCeremonyParam, keyCeremonyId }

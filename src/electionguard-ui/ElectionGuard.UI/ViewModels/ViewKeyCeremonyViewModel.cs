@@ -9,7 +9,7 @@ public partial class ViewKeyCeremonyViewModel : BaseViewModel
 {
     public const string CurrentKeyCeremonyParam = "KeyCeremonyId";
 
-    public ViewKeyCeremonyViewModel(IServiceProvider serviceProvider, IKeyCeremonyService keyCeremonyService) : 
+    public ViewKeyCeremonyViewModel(IServiceProvider serviceProvider, KeyCeremonyService keyCeremonyService) : 
         base("ViewKeyCeremony", serviceProvider)
     {
         _keyCeremonyService = keyCeremonyService;
@@ -23,11 +23,11 @@ public partial class ViewKeyCeremonyViewModel : BaseViewModel
     private bool _isJoinVisible;
 
     [ObservableProperty] 
-    private int _keyCeremonyId;
+    private string _keyCeremonyId = string.Empty;
 
     public override async Task Appearing()
     {
-        KeyCeremony = await _keyCeremonyService.Get(KeyCeremonyId);
+        KeyCeremony = await _keyCeremonyService.GetByIdAsync(KeyCeremonyId);
     }
 
     [RelayCommand]
@@ -38,5 +38,5 @@ public partial class ViewKeyCeremonyViewModel : BaseViewModel
         var guardian = Guardian.FromNonce(currentGuardianUserName, 0, KeyCeremony.NumberOfGuardians, KeyCeremony.Quorum);
     }
 
-    private readonly IKeyCeremonyService _keyCeremonyService;
+    private readonly KeyCeremonyService _keyCeremonyService;
 }
