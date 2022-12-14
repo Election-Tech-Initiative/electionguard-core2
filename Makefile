@@ -73,9 +73,9 @@ endif
 
 environment-ui: environment
 ifeq ($(OPERATING_SYSTEM),Windows)
-	dotnet workload restore ./src/electionguard-ui/ElectionGuard.UI.sln
+	dotnet workload restore ./src/electionguard-ui/ElectionGuard.UI.sln::TargetFramework=net7.0
 else
-	sudo dotnet workload restore ./src/electionguard-ui/ElectionGuard.UI.sln
+	sudo dotnet workload restore ./src/electionguard-ui/ElectionGuard.UI.sln::TargetFramework=net7.0
 endif
 
 
