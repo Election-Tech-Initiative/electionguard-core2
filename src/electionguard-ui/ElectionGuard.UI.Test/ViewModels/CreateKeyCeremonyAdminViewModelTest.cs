@@ -7,11 +7,11 @@ namespace ElectionGuard.UI.Test.ViewModels
 {
     public class CreateKeyCeremonyAdminViewModelTest : TestBase
     {
-        private readonly IKeyCeremonyService _keyCeremonyService;
+        private readonly KeyCeremonyService _keyCeremonyService;
 
         public CreateKeyCeremonyAdminViewModelTest()
         {
-            _keyCeremonyService = Substitute.For<IKeyCeremonyService>();
+            _keyCeremonyService = Substitute.For<KeyCeremonyService>();
         }
 
         [Test]
@@ -19,15 +19,16 @@ namespace ElectionGuard.UI.Test.ViewModels
         {
             // ARRANGE
             var createKeyCeremonyAdminViewModel = CreateKeyCeremonyAdminViewModel();
-            _keyCeremonyService.Create(Arg.Any<KeyCeremony>()).Returns("42");
+            var ret = new KeyCeremony("test", 1, 1);
+            _keyCeremonyService.SaveAsync(Arg.Any<KeyCeremony>()).Returns(ret);
 
             // ACT
             await createKeyCeremonyAdminViewModel.CreateKeyCeremonyCommand.ExecuteAsync(null);
 
             // ASSERT
             await NavigationService.Received().GoToPage(
-                typeof(ViewKeyCeremonyViewModel), 
-                Arg.Is<Dictionary<string, object>>(dict => (string)dict["KeyCeremonyId"] == "42"));
+                typeof(ViewKeyCeremonyViewModel),
+                Arg.Is<Dictionary<string, object>>(dict => (string)dict["KeyCeremonyId"] == ret.Id));
         }
 
         [Test]
@@ -96,7 +97,7 @@ namespace ElectionGuard.UI.Test.ViewModels
             // ARRANGE
             var createKeyCeremonyAdminViewModel = CreateKeyCeremonyAdminViewModel();
             createKeyCeremonyAdminViewModel.KeyCeremonyName = "kc1";
-            _keyCeremonyService.FindByName("kc1").Returns(new KeyCeremony("kc1", 1, 1));
+            _keyCeremonyService.GetByNameAsync("kc1").Returns(new KeyCeremony("kc1", 1, 1));
 
             // ACT
             await createKeyCeremonyAdminViewModel.CreateKeyCeremonyCommand.ExecuteAsync(null);

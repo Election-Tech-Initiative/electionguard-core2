@@ -16,7 +16,7 @@ internal interface IDatabaseService<T>
     Task<T?> GetByIdAsync(string id, string? table = null);
     Task<T?> GetByNameAsync(string name, string? table = null);
     Task<T?> GetByFieldAsync(string fieldName, object fieldValue, string? table = null);
-    Task SaveAsync(T data, string? table = null);
+    Task<T> SaveAsync(T data, string? table = null);
 }
 
 /// <summary>
@@ -49,10 +49,11 @@ public class BaseDatabaseService<T> : IDatabaseService<T>
     /// <param name="data">data to be saved</param>
     /// <param name="table">Optional parameter to allow data type to use a different collection</param>
     /// <returns></returns>
-    public async Task SaveAsync(T data, string? table = null)
+    virtual public async Task<T> SaveAsync(T data, string? table = null)
     {
         var collection = DbService.GetCollection<T>(table ?? _collection);
         await collection.InsertOneAsync(data);
+        return data;
     }
 
     /// <summary>
@@ -99,7 +100,7 @@ public class BaseDatabaseService<T> : IDatabaseService<T>
     /// <param name="name">Name to search for</param>
     /// <param name="table">Optional parameter to allow data type to use a different collection</param>
     /// <returns>Document that matches the given name</returns>
-    public async Task<T?> GetByNameAsync(string name, string? table = null)
+    virtual public async Task<T?> GetByNameAsync(string name, string? table = null)
     {
         return await GetByFieldAsync("Name", name, table);
     }
