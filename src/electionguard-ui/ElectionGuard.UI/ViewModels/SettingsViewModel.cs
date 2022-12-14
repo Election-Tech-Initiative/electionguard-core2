@@ -1,6 +1,8 @@
-﻿namespace ElectionGuard.UI.ViewModels;
+﻿using CommunityToolkit.Mvvm.Input;
 
-public class SettingsViewModel : BaseViewModel
+namespace ElectionGuard.UI.ViewModels;
+
+public partial class SettingsViewModel : BaseViewModel
 {
     public SettingsViewModel(IServiceProvider serviceProvider) : base(null, serviceProvider)
     {
