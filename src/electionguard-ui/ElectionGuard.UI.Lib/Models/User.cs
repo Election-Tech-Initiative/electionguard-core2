@@ -2,14 +2,8 @@
 
 namespace ElectionGuard.UI.Lib.Models;
 
-public partial class User : BaseModel<User>
+public partial class User : BaseModel
 {
-    private readonly static string table = "users";
-
-    public User() : base(table)
-    {
-    }
-
     [ObservableProperty]
     private string? name;
 

@@ -1,10 +1,8 @@
 ﻿namespace ElectionGuard.UI.Lib.Models;
 
-public partial class KeyCeremony : BaseModel<KeyCeremony>
+public partial class KeyCeremony : BaseModel
 {
-    private readonly static string table = "key_ceremonies";
-
-    public KeyCeremony(string name, int numberOfGuardians, int quorum) : base(table)
+    public KeyCeremony(string name, int numberOfGuardians, int quorum)
     {
         _name = name;
         _numberOfGuardians = numberOfGuardians;

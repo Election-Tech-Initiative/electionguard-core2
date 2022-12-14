@@ -2,14 +2,8 @@
 
 namespace ElectionGuard.UI.Lib.Models;
 
-public partial class Tally : BaseModel<Tally>
+public partial class Tally : BaseModel
 {
-    private readonly static string table = "tallies";
-
-    public Tally() : base(table)
-    {
-    }
-
     [ObservableProperty]
     private string? _name;
 
