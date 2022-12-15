@@ -402,12 +402,12 @@ test-netstandard: build-netstandard
 test-ui:
 	@echo 🧪 TEST UI
 	
-	ifeq ($(OPERATING_SYSTEM),Windows)
-		dotnet test -r win-x64 --configuration $(TARGET) ./src/electionguard-ui/ElectionGuard.UI.sln 	
-	endif
-	ifeq ($(OPERATING_SYSTEM),Darwin)
-		dotnet test -r osx-x64 --configuration $(TARGET) ./src/electionguard-ui/ElectionGuard.UI.sln 	
-	endif
+ifeq ($(OPERATING_SYSTEM),Windows)
+	dotnet test -r win-x64 --no-build --configuration $(TARGET) ./src/electionguard-ui/ElectionGuard.UI.sln 	
+endif
+ifeq ($(OPERATING_SYSTEM),Darwin)
+	dotnet test -r osx-x64 --no-build --configuration $(TARGET) ./src/electionguard-ui/ElectionGuard.UI.sln 	
+endif
 
 coverage:
 	@echo ✅ CHECK COVERAGE
