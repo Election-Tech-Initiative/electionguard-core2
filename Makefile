@@ -73,9 +73,11 @@ endif
 
 environment-ui: environment
 ifeq ($(OPERATING_SYSTEM),Windows)
-	dotnet workload restore ./src/electionguard-ui/ElectionGuard.UI.sln
+	dotnet workload install maui
+	dotnet workload restore ./src/electionguard-ui/ElectionGuard.UI/ElectionGuard.UI.csproj && dotnet restore ./src/electionguard-ui/ElectionGuard.UI.sln
 else
-	sudo dotnet workload restore ./src/electionguard-ui/ElectionGuard.UI.sln
+	sudo dotnet workload install maui
+	sudo dotnet workload restore ./src/electionguard-ui/ElectionGuard.UI/ElectionGuard.UI.csproj && dotnet restore ./src/electionguard-ui/ElectionGuard.UI.sln
 endif
 
 
@@ -108,7 +110,7 @@ ifeq ($(OPERATING_SYSTEM),Windows)
 	dotnet publish -f net7.0-windows10.0.19041.0 -c $(TARGET) /p:ApplicationVersion=$(BUILD) /p:RuntimeIdentifierOverride=win10-x64 src/electionguard-ui/ElectionGuard.UI/ElectionGuard.UI.csproj
 endif
 ifeq ($(OPERATING_SYSTEM),Darwin)
-	dotnet build -c $(TARGET) /p:CreatePackage=true /p:ApplicationVersion=$(BUILD) src/electionguard-ui/ElectionGuard.UI/ElectionGuard.UI.csproj
+	dotnet build -f net7.0-maccatalyst -c $(TARGET) /p:CreatePackage=true /p:ApplicationVersion=$(BUILD) src/electionguard-ui/ElectionGuard.UI/ElectionGuard.UI.csproj
 endif
 
 generate-interop:
@@ -399,7 +401,13 @@ test-netstandard: build-netstandard
 
 test-ui:
 	@echo 🧪 TEST UI
-	dotnet test --no-build --configuration $(TARGET) ./src/electionguard-ui/ElectionGuard.UI.sln 
+	dotnet build -a x64 --configuration $(TARGET) ./src/electionguard-ui/electionGuard.UI.Test/ElectionGuard.UI.Test.csproj
+ifeq ($(OPERATING_SYSTEM),Windows)
+	dotnet test -a x64 --no-build --configuration $(TARGET) ./src/electionguard-ui/ElectionGuard.UI.sln 	
+endif
+ifeq ($(OPERATING_SYSTEM),Darwin)
+	dotnet test -a x64 --no-build --configuration $(TARGET) ./src/electionguard-ui/ElectionGuard.UI.sln 	
+endif
 
 coverage:
 	@echo ✅ CHECK COVERAGE

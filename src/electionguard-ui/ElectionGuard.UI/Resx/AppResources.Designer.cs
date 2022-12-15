@@ -178,6 +178,24 @@ namespace ElectionGuard.UI.Resx {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Database IP Address.
+        /// </summary>
+        internal static string DatabaseAddress {
+            get {
+                return ResourceManager.GetString("DatabaseAddress", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Database Password.
+        /// </summary>
+        internal static string DatabasePassword {
+            get {
+                return ResourceManager.GetString("DatabasePassword", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Election Checklist.
         /// </summary>
         internal static string ElectionChecklist {
@@ -264,6 +282,15 @@ namespace ElectionGuard.UI.Resx {
         internal static string HelloWorld {
             get {
                 return ResourceManager.GetString("HelloWorld", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to IP address of the database.
+        /// </summary>
+        internal static string IPAddressPlaceholder {
+            get {
+                return ResourceManager.GetString("IPAddressPlaceholder", resourceCulture);
             }
         }
         
@@ -385,6 +412,15 @@ namespace ElectionGuard.UI.Resx {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Password to use for the database.
+        /// </summary>
+        internal static string PasswordDefaultPlaceholder {
+            get {
+                return ResourceManager.GetString("PasswordDefaultPlaceholder", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Quorum.
         /// </summary>
         internal static string Quorum {
@@ -399,6 +435,15 @@ namespace ElectionGuard.UI.Resx {
         internal static string QuorumText {
             get {
                 return ResourceManager.GetString("QuorumText", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Save.
+        /// </summary>
+        internal static string Save {
+            get {
+                return ResourceManager.GetString("Save", resourceCulture);
             }
         }
         

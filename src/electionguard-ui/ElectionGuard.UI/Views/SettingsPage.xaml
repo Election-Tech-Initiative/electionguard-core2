@@ -4,8 +4,25 @@
              xmlns:helper="clr-namespace:ElectionGuard.UI.Helpers"
              xmlns:views="http://schemas.microsoft.com/dotnet/2022/maui/toolkit"
              x:Class="ElectionGuard.UI.Views.SettingsPage">
-    <Grid Style="{StaticResource PopupView}">
-        <Label Style="{StaticResource H1}" Text="{helper:Translate Settings}"  />
+    <Grid>
+        <VerticalStackLayout Style="{StaticResource PopupView}">
+            <Label Style="{StaticResource H1}" Text="{helper:Translate Settings}"  />
+            <Grid ColumnDefinitions="*,2*">
+                <Label Grid.Column="0" HorizontalTextAlignment="End" VerticalTextAlignment="Center" Text="{helper:Translate DatabaseAddress}" />
+                <Entry Grid.Column="1" HorizontalTextAlignment="Start" VerticalTextAlignment="Center" Placeholder="{helper:Translate IPAddressPlaceholder}" Text="{Binding DatabaseAddress}" />
+            </Grid>
+            <Grid ColumnDefinitions="*,2*">
+                <Label Grid.Column="0" HorizontalTextAlignment="End" VerticalTextAlignment="Center" Text="{helper:Translate DatabasePassword}" />
+                <Entry Grid.Column="1" HorizontalTextAlignment="Start" VerticalTextAlignment="Center" IsPassword="True" Placeholder="{helper:Translate PasswordDefaultPlaceholder}" Text="{Binding DatabasePassword}" />
+            </Grid>
+
+        </VerticalStackLayout>
+        <Button Text="{helper:Translate Save}"                     
+                HorizontalOptions="Start"
+                VerticalOptions="End"
+                Margin="10"
+                Command="{Binding SaveCommand}"
+                Clicked="Button_Clicked"/>
         <ImageButton Source="world.png" 
                      HorizontalOptions="End"
                      VerticalOptions="End"
@@ -15,6 +32,5 @@
                      Command="{Binding ChangeLanguageCommand}" 
                      BorderWidth="0" 
                      BackgroundColor="Transparent" />
-
     </Grid>
 </views:Popup>

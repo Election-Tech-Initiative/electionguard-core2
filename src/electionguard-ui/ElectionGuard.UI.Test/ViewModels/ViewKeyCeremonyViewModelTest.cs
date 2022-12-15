@@ -6,11 +6,11 @@ namespace ElectionGuard.UI.Test.ViewModels
 {
     public class ViewKeyCeremonyViewModelTest : TestBase
     {
-        private readonly IKeyCeremonyService _keyCeremonyService;
+        private readonly KeyCeremonyService _keyCeremonyService;
 
         public ViewKeyCeremonyViewModelTest()
         {
-            _keyCeremonyService = Substitute.For<IKeyCeremonyService>();
+            _keyCeremonyService = Substitute.For<KeyCeremonyService>();
         }
 
         [Test]

@@ -6,9 +6,9 @@ namespace ElectionGuard.UI.ViewModels;
 
 public partial class GuardianHomeViewModel : BaseViewModel
 {
-    private readonly IKeyCeremonyService _keyCeremonyService;
+    private readonly KeyCeremonyService _keyCeremonyService;
 
-    public GuardianHomeViewModel(IServiceProvider serviceProvider, IKeyCeremonyService keyCeremonyService) : base("GuardianHome", serviceProvider)
+    public GuardianHomeViewModel(IServiceProvider serviceProvider, KeyCeremonyService keyCeremonyService) : base("GuardianHome", serviceProvider)
     {
         _keyCeremonyService = keyCeremonyService;
         // create some fake tallies to add to the list
@@ -19,7 +19,7 @@ public partial class GuardianHomeViewModel : BaseViewModel
 
     public override async Task Appearing()
     {
-        var keyCeremonies = await _keyCeremonyService.List();
+        var keyCeremonies = await _keyCeremonyService.GetAllAsync();
         KeyCeremonies = new ObservableCollection<KeyCeremony>(keyCeremonies);
     }
 

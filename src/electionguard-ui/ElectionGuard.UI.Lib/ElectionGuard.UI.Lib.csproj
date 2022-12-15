@@ -1,9 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 	<PropertyGroup>
-		<UseMaui>true</UseMaui>
-		<TargetFrameworks>net7.0;net7.0-maccatalyst</TargetFrameworks>
-		<TargetFrameworks Condition="$([MSBuild]::IsOSPlatform('windows'))">$(TargetFrameworks);net7.0-windows10.0.19041.0</TargetFrameworks>
-		<ManagePackageVersionsCentrally>true</ManagePackageVersionsCentrally>
+    <TargetFrameworks>net7.0</TargetFrameworks>
+    <ManagePackageVersionsCentrally>true</ManagePackageVersionsCentrally>
 		<ImplicitUsings>enable</ImplicitUsings>
 		<Nullable>enable</Nullable>
 	</PropertyGroup>
@@ -21,6 +19,7 @@
 	</PropertyGroup>
 	<ItemGroup>
 		<PackageReference Include="CommunityToolkit.Mvvm" />
+		<PackageReference Include="MongoDB.Driver" />
 	</ItemGroup>
 	<ItemGroup>
 	  <ProjectReference Include="..\..\..\bindings\netstandard\ElectionGuard\ElectionGuard.ElectionSetup\ElectionGuard.ElectionSetup.csproj" />

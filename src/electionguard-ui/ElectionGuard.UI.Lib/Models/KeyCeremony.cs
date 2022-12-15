@@ -1,6 +1,6 @@
 ﻿namespace ElectionGuard.UI.Lib.Models;
 
-public partial class KeyCeremony : ObservableObject
+public partial class KeyCeremony : BaseModel
 {
     public KeyCeremony(string name, int numberOfGuardians, int quorum)
     {
@@ -8,9 +8,6 @@ public partial class KeyCeremony : ObservableObject
         _numberOfGuardians = numberOfGuardians;
         _quorum = quorum;
     }
-
-    [ObservableProperty] 
-    private int _id;
 
     [ObservableProperty]
     private string _name;

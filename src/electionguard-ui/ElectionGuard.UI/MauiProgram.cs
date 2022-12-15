@@ -9,6 +9,10 @@ public static class MauiProgram
 {
     public static MauiApp CreateMauiApp()
     {
+        var DbHost = Preferences.Get("DbAddress", "127.0.0.1");
+        var DbPassword = Preferences.Get("DbPassword", "");
+        DbService.Init(DbHost, DbPassword);
+
         var builder = MauiApp.CreateBuilder();
         builder
             .UseMauiApp<App>()
@@ -50,7 +54,12 @@ public static class MauiProgram
         builder.Services.AddSingleton<ILocalizationService, LocalizationService>();
         // NavigationService has to be singleton because it stores the current page and vm
         builder.Services.AddSingleton<INavigationService, NavigationService>();
-        builder.Services.AddTransient<IKeyCeremonyService, KeyCeremonyService>();
+
+        // setup database services
+        builder.Services.AddTransient<KeyCeremonyService>();
+        builder.Services.AddTransient<UserService>();
+        builder.Services.AddTransient<ElectionService>();
+        builder.Services.AddTransient<TallyService>();
 
         // setup view models
         builder.Services.AddTransient<LoginViewModel>();

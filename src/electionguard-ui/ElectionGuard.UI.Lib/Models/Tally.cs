@@ -2,10 +2,10 @@
 
 namespace ElectionGuard.UI.Lib.Models;
 
-public partial class Tally : ObservableObject
+public partial class Tally : BaseModel
 {
     [ObservableProperty]
-    private string? name;
+    private string? _name;
 
 }
 
