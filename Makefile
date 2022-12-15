@@ -73,9 +73,11 @@ endif
 
 environment-ui: environment
 ifeq ($(OPERATING_SYSTEM),Windows)
-	dotnet workload restore ./src/electionguard-ui/ElectionGuard.UI.sln && dotnet restore ./src/electionguard-ui/ElectionGuard.UI.sln
+	dotnet workload install maui
+	dotnet workload restore ./src/electionguard-ui/ElectionGuard.UI/ElectionGuard.UI.csproj && dotnet restore ./src/electionguard-ui/ElectionGuard.UI.sln
 else
-	sudo dotnet workload restore ./src/electionguard-ui/ElectionGuard.UI.sln && dotnet restore ./src/electionguard-ui/ElectionGuard.UI.sln
+	sudo dotnet workload install maui
+	sudo dotnet workload restore ./src/electionguard-ui/ElectionGuard.UI/ElectionGuard.UI.csproj && dotnet restore ./src/electionguard-ui/ElectionGuard.UI.sln
 endif
 
 
