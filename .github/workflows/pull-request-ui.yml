@@ -22,7 +22,7 @@ jobs:
         include:
           - name: macOS
             os: macOS-12
-            version: "14.0.1"
+            version: "14.1"
             osFolder: "maccatalyst"
           - name: windows-os
             os: windows-2022
