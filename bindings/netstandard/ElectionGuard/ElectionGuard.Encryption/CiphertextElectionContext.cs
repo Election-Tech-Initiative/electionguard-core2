@@ -118,9 +118,10 @@ namespace ElectionGuard
         internal NativeInterface.CiphertextElectionContext.CiphertextElectionContextHandle Handle;
 
         /// <summary>
-        /// Makes a CiphertextElectionContext object.
+        /// Creates an <see cref="CiphertextElectionContext">CiphertextElectionContext</see> object from a <see href="https://www.rfc-editor.org/rfc/rfc8259.html#section-8.1">[RFC-8259]</see> UTF-8 encoded JSON string
         /// </summary>
-        /// <param name="json">json representation</param>
+        /// <param name="json">A UTF-8 Encoded JSON data string</param>
+        /// <returns>
         public CiphertextElectionContext(string json)
         {
             var status = NativeInterface.CiphertextElectionContext.FromJson(json, out Handle);

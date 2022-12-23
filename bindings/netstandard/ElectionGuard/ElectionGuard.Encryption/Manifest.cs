@@ -61,19 +61,20 @@ namespace ElectionGuard
     /// information such as candidates, contests, and vote counts.  This class is
     /// based on the NIST Election Common Standard Data Specification.  Some deviations
     /// from the standard exist.
-    ///
+    /// 
     /// This structure is considered an immutable input object and should not be changed
     /// through the course of an election, as it's hash representation is the basis for all
     /// other hash representations within an ElectionGuard election context.
-    ///
-    /// See: https://developers.google.com/elections-data/reference/election
+    /// 
+    /// <see href="https://www.electionguard.vote/overview/Glossary/#manifest">The ElectionGuard Documentation</see>
+    /// <see href="https://developers.google.com/elections-data/reference/election>The Civics Common Standard Data Specification</see>
     /// </summary>
     public partial class Manifest : DisposableBase
     {
         /// <summary>
-        /// Creates a `Manifest` object
+        /// Creates a <see cref="Manifest">Manifest</see> object from a <see href="https://www.rfc-editor.org/rfc/rfc8259.html#section-8.1">[RFC-8259]</see> UTF-8 encoded JSON string
         /// </summary>
-        /// <param name="json">string of json data describing the manifest</param>
+        /// <param name="json">A UTF-8 Encoded JSON data string</param>
         public Manifest(string json)
         {
             var data = Language.EncodeNonAsciiCharacters(json);
