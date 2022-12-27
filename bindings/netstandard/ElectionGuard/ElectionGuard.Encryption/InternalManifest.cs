@@ -82,7 +82,6 @@ namespace ElectionGuard
         /// Creates an <see cref="InternalManifest">InternalManifest</see> object from a <see href="https://www.rfc-editor.org/rfc/rfc8259.html#section-8.1">[RFC-8259]</see> UTF-8 encoded JSON string
         /// </summary>
         /// <param name="json">A UTF-8 Encoded JSON data string</param>
-        /// <returns>
         public InternalManifest(string json)
         {
             var status = NativeInterface.InternalManifest.FromJson(json, out Handle);

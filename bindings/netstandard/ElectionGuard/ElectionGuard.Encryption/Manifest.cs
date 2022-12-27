@@ -67,7 +67,7 @@ namespace ElectionGuard
     /// other hash representations within an ElectionGuard election context.
     /// 
     /// <see href="https://www.electionguard.vote/overview/Glossary/#manifest">The ElectionGuard Documentation</see>
-    /// <see href="https://developers.google.com/elections-data/reference/election>The Civics Common Standard Data Specification</see>
+    /// <see href="https://developers.google.com/elections-data/reference/election">The Civics Common Standard Data Specification</see>
     /// </summary>
     public partial class Manifest : DisposableBase
     {

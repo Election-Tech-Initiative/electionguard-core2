@@ -18,7 +18,6 @@ namespace ElectionGuard
         /// Creates an <see cref="CiphertextBallot">CiphertextBallot</see> object from a <see href="https://www.rfc-editor.org/rfc/rfc8259.html#section-8.1">[RFC-8259]</see> UTF-8 encoded JSON string
         /// </summary>
         /// <param name="json">A UTF-8 Encoded JSON data string</param>
-        /// <returns>
         public CiphertextBallot(string json)
         {
             var status = NativeInterface.CiphertextBallot.FromJson(json, out Handle);

@@ -49,7 +49,6 @@ namespace ElectionGuard
         /// Creates an <see cref="EncryptionDevice">EncryptionDevice</see> object from a <see href="https://www.rfc-editor.org/rfc/rfc8259.html#section-8.1">[RFC-8259]</see> UTF-8 encoded JSON string
         /// </summary>
         /// <param name="json">A UTF-8 Encoded JSON data string</param>
-        /// <returns>
         public EncryptionDevice(string json)
         {
             var status = NativeInterface.EncryptionDevice.FromJson(json, out Handle);
