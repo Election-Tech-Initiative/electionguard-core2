@@ -101,6 +101,7 @@ if(USE_TEST_PRIMES)
     message("++ Using Test Primes. Do not use in production.")
     add_compile_definitions(USE_TEST_PRIMES)
 else()
+    message("++ Using Standard Primes.")
     add_compile_definitions(USE_STANDARD_PRIMES)
 endif()
 

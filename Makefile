@@ -43,8 +43,10 @@ ifeq ($(OPERATING_SYSTEM),Darwin)
 	brew install wget
 	brew install cmake
 	brew install cppcheck
+	brew install clang-format
 	brew install include-what-you-use
 	brew install llvm
+	brew install ninja
 	test -f /usr/local/bin/clang-tidy || sudo ln -s "$(shell brew --prefix llvm)/bin/clang-tidy" "/usr/local/bin/clang-tidy"
 endif
 ifeq ($(OPERATING_SYSTEM),Linux)
@@ -58,6 +60,7 @@ ifeq ($(OPERATING_SYSTEM),Linux)
 	sudo apt install -y cppcheck
 	sudo apt install -y clang-format
 	sudo apt install -y clang-tidy
+	sudo apt install -y ninja-build
 	sudo apt install -y valgrind
 endif
 ifeq ($(OPERATING_SYSTEM),Windows)
@@ -65,6 +68,7 @@ ifeq ($(OPERATING_SYSTEM),Windows)
 	choco upgrade wget -y
 	choco upgrade unzip -y
 	choco upgrade cmake -y
+	choco upgrade ninja -y
 endif
 	wget -O cmake/CPM.cmake https://github.com/cpm-cmake/CPM.cmake/releases/download/v0.35.5/CPM.cmake
 	make fetch-sample-data

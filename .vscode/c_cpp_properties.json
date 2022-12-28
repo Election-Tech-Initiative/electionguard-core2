@@ -5,7 +5,9 @@
             "includePath": [
                 "${workspaceFolder}/**"
             ],
-            "defines": [],
+            "defines": [
+                "USE_STANDARD_PRIMES"
+            ],
             "compilerPath": "/usr/bin/gcc",
             "cStandard": "c11",
             "cppStandard": "c++17",
@@ -20,7 +22,9 @@
                 "${workspaceFolder}/src/**",
                 "${workspaceFolder}/test/**"
             ],
-            "defines": [],
+            "defines": [
+                "USE_STANDARD_PRIMES"
+            ],
             "macFrameworkPath": [
                 "/System/Library/Frameworks",
                 "/Library/Frameworks"
@@ -47,7 +51,8 @@
             "defines": [
                 "_DEBUG",
                 "UNICODE",
-                "_UNICODE"
+                "_UNICODE",
+                "USE_STANDARD_PRIMES"
             ],
             "windowsSdkVersion": "10.0.18362.0",
             "compilerPath": "C:\\msys64\\mingw64\\bin\\gcc.exe",

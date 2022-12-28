@@ -8,7 +8,8 @@
       "visualstudioexptteam.vscodeintellicode",
       "twxs.cmake",
       "ryanluker.vscode-coverage-gutters",
-      "cschleiden.vscode-github-actions"
+      "cschleiden.vscode-github-actions",
+      "ms-vscode.cmake-tools"
     ],
     // List of extensions recommended by VS Code that should not be recommended for users of this workspace.
     "unwantedRecommendations": []
