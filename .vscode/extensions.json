@@ -5,11 +5,10 @@
     // List of extensions which should be recommended for users of this workspace.
     "recommendations": [
       "ms-vscode.cpptools",
+      "ms-vscode.cmake-tools",
       "visualstudioexptteam.vscodeintellicode",
       "twxs.cmake",
       "ryanluker.vscode-coverage-gutters",
-      "cschleiden.vscode-github-actions",
-      "ms-vscode.cmake-tools"
     ],
     // List of extensions recommended by VS Code that should not be recommended for users of this workspace.
     "unwantedRecommendations": []
