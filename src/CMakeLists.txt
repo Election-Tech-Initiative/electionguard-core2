@@ -253,6 +253,7 @@ if(OPTION_ENABLE_TESTS)
         target_compile_options(${META_PROJECT_TARGET} PUBLIC -Wno-redundant-decls)
         target_compile_options(${META_PROJECT_TARGET} PUBLIC -Wno-unknown-pragmas)
         target_compile_options(${META_PROJECT_TARGET} PUBLIC -Wno-useless-cast)
+        target_compile_options(${META_PROJECT_TARGET} PUBLIC -Wno-vla-extension)
     endif()
 
     if(CMAKE_CXX_COMPILER_ID MATCHES "Clang")
