@@ -52,19 +52,21 @@ EG_API eg_electionguard_status_t eg_encryption_device_free(eg_encryption_device_
  * @brief Get the hash for the encrypion device
  * 
  * @param[out] out_hash The hash code for the encryption device
- *                      The caller is responsible for freeing the object
+ *                      The caller is responsible for freeing the object.
  */
-EG_API eg_electionguard_status_t eg_encryption_device_get_hash(eg_encryption_device_t *handle,eg_element_mod_q_t **out_hash);
+EG_API eg_electionguard_status_t eg_encryption_device_get_hash(eg_encryption_device_t *handle,
+                                                               eg_element_mod_q_t **out_hash);
 
- /**
- * @brief Get the encrpytion device when given JSON
+/**
+ * @brief Creates an EncryptionDevice object from a [RFC-8259](https://www.rfc-editor.org/rfc/rfc8259.html#section-8.1) UTF-8 encoded JSON string
  * 
- * @param[in] in_data The Json that will be converted into a device
- * 
- * @param[out] out_handle The encryption device
- */                                                              
-EG_API eg_electionguard_status_t eg_encryption_device_from_json(char *in_data, eg_encryption_device_t **out_handle);
-
+ * @param[in] in_data The UTF-8 Encoded JSON data string
+ * @param[out] out_handle a handle to an @ref eg_encryption_device_t object.
+ *                        The caller is responsible for freeing the object.
+ * @return eg_electionguard_status_t indicating success or failure 
+ */
+EG_API eg_electionguard_status_t
+eg_encryption_device_from_json(char *in_data, eg_encryption_device_t **out_handle);
 
 /**
  * @brief Get the JSON representation of this encrption device
@@ -72,7 +74,7 @@ EG_API eg_electionguard_status_t eg_encryption_device_from_json(char *in_data, e
  * 
  * @param[out] out_data The json representation of the encryption device
  * @param[out] out_size The size of this JSON representation
- */  
+ */
 EG_API eg_electionguard_status_t eg_encryption_device_to_json(eg_encryption_device_t *handle,
                                                               char **out_data, uint64_t *out_size);
 #endif

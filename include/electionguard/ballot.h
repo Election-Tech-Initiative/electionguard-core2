@@ -275,7 +275,12 @@ EG_API eg_electionguard_status_t eg_plaintext_ballot_new(
   const uint64_t in_contests_size, eg_plaintext_ballot_t **out_handle);
 
 /**
- * Import the ballot representation from JSON
+ * @brief Creates a PlaintextBallot object from a [RFC-8259](https://www.rfc-editor.org/rfc/rfc8259.html#section-8.1) UTF-8 encoded JSON string
+ * 
+ * @param[in] in_data The UTF-8 Encoded JSON data string
+ * @param[out] out_handle a handle to an @ref eg_plaintext_ballot_t object. 
+ *                        The caller is responsible for freeing the object.
+ * @return eg_electionguard_status_t indicating success or failure 
  */
 EG_API eg_electionguard_status_t eg_plaintext_ballot_from_json(char *in_data,
                                                                eg_plaintext_ballot_t **out_handle);
@@ -339,7 +344,12 @@ EG_API eg_electionguard_status_t eg_ciphertext_ballot_crypto_hash_with(
 // TODO: eg_ciphertext_ballot_make
 
 /**
- * Import the ballot representation from JSON
+ * @brief Creates a CiphertextBallot object from a [RFC-8259](https://www.rfc-editor.org/rfc/rfc8259.html#section-8.1) UTF-8 encoded JSON string
+ * 
+ * @param[in] in_data The UTF-8 Encoded JSON data string
+ * @param[out] out_handle a handle to an @ref eg_ciphertext_ballot_t object. 
+ *                        The caller is responsible for freeing the object.
+ * @return eg_electionguard_status_t indicating success or failure 
  */
 EG_API eg_electionguard_status_t
 eg_ciphertext_ballot_from_json(char *in_data, eg_ciphertext_ballot_t **out_handle);
@@ -433,7 +443,12 @@ EG_API eg_electionguard_status_t eg_submitted_ballot_from(eg_ciphertext_ballot_t
                                                           eg_submitted_ballot_t **out_handle);
 
 /**
- * Import the ballot representation from JSON
+ * @brief Creates a SubmittedBallot object from a [RFC-8259](https://www.rfc-editor.org/rfc/rfc8259.html#section-8.1) UTF-8 encoded JSON string
+ * 
+ * @param[in] in_data The UTF-8 Encoded JSON data string
+ * @param[out] out_handle a handle to an @ref eg_submitted_ballot_t object. 
+ *                        The caller is responsible for freeing the object.
+ * @return eg_electionguard_status_t indicating success or failure 
  */
 EG_API eg_electionguard_status_t eg_submitted_ballot_from_json(char *in_data,
                                                                eg_submitted_ballot_t **out_handle);

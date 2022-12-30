@@ -268,6 +268,14 @@ namespace electionguard
 
         std::vector<uint8_t> toBson() const;
         std::string toJson() const;
+
+        /// <summary>
+        /// Creates a <see cref="CiphertextElectionContext">CiphertextElectionContext</see> object from a <see href="https://www.rfc-editor.org/rfc/rfc8259.html#section-8.1">[RFC-8259]</see> UTF-8 encoded JSON string
+        /// </summary>
+        /// <param name="data">A UTF-8 Encoded JSON data string</param>
+        /// <returns>
+        /// A unique pointer to a <see cref="CiphertextElectionContext">CiphertextElectionContext</see> Object
+        /// </returns>
         static std::unique_ptr<CiphertextElectionContext> fromJson(std::string data);
         static std::unique_ptr<CiphertextElectionContext> fromBson(std::vector<uint8_t> data);
 
