@@ -1,7 +1,7 @@
 #include "electionguard/hmac.hpp"
 
-#include "../karamel/Lib_Memzero0.h"
-#include "../karamel/internal/Hacl_HMAC.h"
+#include "Hacl_HMAC.h"
+#include "Lib_Memzero0.h"
 #include "log.hpp"
 
 #include <iomanip>

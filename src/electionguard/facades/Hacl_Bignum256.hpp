@@ -1,10 +1,10 @@
 #ifndef __FACADES__Hacl_Bignum256_H_INCLUDED__
 #define __FACADES__Hacl_Bignum256_H_INCLUDED__
 
-#include "../../karamel/Hacl_Bignum256.h"
 #include "electionguard/export.h"
 
 #include <cstdint>
+#include <memory>
 #include <vector>
 
 namespace hacl
@@ -45,7 +45,8 @@ namespace hacl
                     bool useConstTime = false) const;
 
       private:
-        Hacl_Bignum_MontArithmetic_bn_mont_ctx_u64 *context;
+        struct Impl;
+        std::unique_ptr<Impl> pimpl;
     };
 
     /// <summary>

@@ -1,13 +1,11 @@
 #include "electionguard/elgamal.hpp"
 
-#include "../karamel/Hacl_Bignum4096.h"
-#include "../karamel/Lib_Memzero0.h"
-#include "../karamel/internal/Hacl_HMAC.h"
+#include "Hacl_Bignum4096.h"
+#include "Hacl_HMAC.h"
+#include "Lib_Memzero0.h"
 #include "electionguard/hash.hpp"
 #include "electionguard/hmac.hpp"
-
 #include "electionguard/precompute_buffers.hpp"
-
 #include "log.hpp"
 
 #include <array>
@@ -211,8 +209,8 @@ namespace electionguard
 
 #pragma endregion
 
-    unique_ptr<ElGamalCiphertext>
-    elgamalEncrypt(uint64_t m, const ElementModQ &nonce, const ElementModP &publicKey)
+    unique_ptr<ElGamalCiphertext> elgamalEncrypt(uint64_t m, const ElementModQ &nonce,
+                                                 const ElementModP &publicKey)
     {
         if ((const_cast<ElementModQ &>(nonce) == ZERO_MOD_Q())) {
             throw invalid_argument("elgamalEncrypt encryption requires a non-zero nonce");

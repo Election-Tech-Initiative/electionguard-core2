@@ -1,28 +1,63 @@
 #include "Hacl_Bignum4096.hpp"
 
-#include "../../karamel/Hacl_Bignum4096.h"
-#ifdef _WIN32
-#include "../../karamel/Hacl_GenericField32.h"
-#endif // _WIN32
-#include "../../karamel/Hacl_GenericField64.h"
 #include "../log.hpp"
+
+#ifdef _WIN32
+#    include "Hacl_Bignum4096_32.h"
+#    include "Hacl_GenericField32.h"
+#endif // _WIN32
+
+#include "Hacl_Bignum4096.h"
+#include "Hacl_GenericField64.h"
 
 using electionguard::Log;
 
 namespace hacl
 {
+    struct handle_destructor {
 #ifdef _WIN32
-    Bignum4096::Bignum4096(uint32_t *elem)
-    {
-        HaclBignumContext4096 ctx{Hacl_Bignum4096_32_mont_ctx_init(elem)};
-        context = std::move(ctx);
-    }
+        void operator()(Hacl_Bignum_MontArithmetic_bn_mont_ctx_u32 *handle) const
+        {
+            Hacl_Bignum4096_32_mont_ctx_free(handle);
+        }
 #else
-    Bignum4096::Bignum4096(uint64_t *elem)
-    {
-        HaclBignumContext4096 ctx{Hacl_Bignum4096_mont_ctx_init(elem)};
-        context = std::move(ctx);
-    }
+        void operator()(Hacl_Bignum_MontArithmetic_bn_mont_ctx_u64 *handle) const
+        {
+            Hacl_Bignum4096_mont_ctx_free(handle);
+        }
+#endif // _WIN32
+    };
+
+#ifdef _WIN32
+    typedef std::unique_ptr<Hacl_Bignum_MontArithmetic_bn_mont_ctx_u32, handle_destructor>
+      HaclBignumContext4096;
+#else
+    typedef std::unique_ptr<Hacl_Bignum_MontArithmetic_bn_mont_ctx_u64, handle_destructor>
+      HaclBignumContext4096;
+#endif // _WIN32
+
+    struct Bignum4096::Impl {
+
+        HaclBignumContext4096 context;
+#ifdef _WIN32
+        Impl(uint32_t *elem)
+        {
+            HaclBignumContext4096 ctx{Hacl_Bignum4096_32_mont_ctx_init(elem)};
+            context = std::move(ctx);
+        }
+#else
+        Impl(uint64_t *elem)
+        {
+            HaclBignumContext4096 ctx{Hacl_Bignum4096_mont_ctx_init(elem)};
+            context = std::move(ctx);
+        }
+#endif // _WIN32
+    };
+
+#ifdef _WIN32
+    Bignum4096::Bignum4096(uint32_t *elem) : pimpl(new Impl(elem)) {}
+#else
+    Bignum4096::Bignum4096(uint64_t *elem) : pimpl(new Impl(elem)) {}
 #endif // _WIN32
     Bignum4096::~Bignum4096() {}
 
@@ -51,8 +86,7 @@ namespace hacl
     void Bignum4096::mul(uint64_t *a, uint64_t *b, uint64_t *res)
     {
 #ifdef _WIN32
-        Hacl_Bignum4096_32_mul(reinterpret_cast<uint32_t *>(a),
-                               reinterpret_cast<uint32_t *>(b),
+        Hacl_Bignum4096_32_mul(reinterpret_cast<uint32_t *>(a), reinterpret_cast<uint32_t *>(b),
                                reinterpret_cast<uint32_t *>(res));
 #else
         Hacl_Bignum4096_mul(a, b, res);
@@ -61,7 +95,7 @@ namespace hacl
 
     bool Bignum4096::mod(uint64_t *n, uint64_t *a, uint64_t *res)
     {
-        
+
 #ifdef _WIN32
         return Hacl_Bignum4096_32_mod(reinterpret_cast<uint32_t *>(n),
                                       reinterpret_cast<uint32_t *>(a),
@@ -73,27 +107,24 @@ namespace hacl
 
     bool Bignum4096::modExp(uint64_t *n, uint64_t *a, uint32_t bBits, uint64_t *b, uint64_t *res,
                             bool useConstTime /* = true */)
-    { 
+    {
         if (bBits <= 0) {
             Log::trace("Bignum4096::modExp:: bbits <= 0");
             return false;
         }
         if (useConstTime) {
 #ifdef _WIN32
-            return Hacl_Bignum4096_32_mod_exp_consttime(reinterpret_cast<uint32_t *>(n),
-                                                        reinterpret_cast<uint32_t *>(a), bBits,
-                                                        reinterpret_cast<uint32_t *>(b),
-                                                        reinterpret_cast<uint32_t *>(res));
+            return Hacl_Bignum4096_32_mod_exp_consttime(
+              reinterpret_cast<uint32_t *>(n), reinterpret_cast<uint32_t *>(a), bBits,
+              reinterpret_cast<uint32_t *>(b), reinterpret_cast<uint32_t *>(res));
 #else
             return Hacl_Bignum4096_mod_exp_consttime(n, a, bBits, b, res);
 #endif // WIN32
         }
 #ifdef _WIN32
-        return Hacl_Bignum4096_32_mod_exp_vartime(reinterpret_cast<uint32_t *>(n),
-                                                  reinterpret_cast<uint32_t *>(a),
-                                                  bBits,
-                                                  reinterpret_cast<uint32_t *>(b),
-                                                  reinterpret_cast<uint32_t *>(res));
+        return Hacl_Bignum4096_32_mod_exp_vartime(
+          reinterpret_cast<uint32_t *>(n), reinterpret_cast<uint32_t *>(a), bBits,
+          reinterpret_cast<uint32_t *>(b), reinterpret_cast<uint32_t *>(res));
 #else
         return Hacl_Bignum4096_mod_exp_vartime(n, a, bBits, b, res);
 #endif // _WIN32
@@ -117,10 +148,10 @@ namespace hacl
     void Bignum4096::mod(uint64_t *a, uint64_t *res) const
     {
 #ifdef _WIN32
-        Hacl_Bignum4096_32_mod_precomp(context.get(), reinterpret_cast<uint32_t *>(a),
+        Hacl_Bignum4096_32_mod_precomp(pimpl->context.get(), reinterpret_cast<uint32_t *>(a),
                                        reinterpret_cast<uint32_t *>(res));
 #else
-        Hacl_Bignum4096_mod_precomp(context.get(), a, res);
+        Hacl_Bignum4096_mod_precomp(pimpl->context.get(), a, res);
 #endif // _WIN32
     }
 
@@ -133,57 +164,58 @@ namespace hacl
         }
         if (useConstTime) {
 #ifdef _WIN32
-            return Hacl_Bignum4096_32_mod_exp_consttime_precomp(context.get(),
-                                                                reinterpret_cast<uint32_t *>(a), bBits,
-                                                                reinterpret_cast<uint32_t *>(b),
-                                                                reinterpret_cast<uint32_t *>(res));
+            return Hacl_Bignum4096_32_mod_exp_consttime_precomp(
+              pimpl->context.get(), reinterpret_cast<uint32_t *>(a), bBits,
+              reinterpret_cast<uint32_t *>(b), reinterpret_cast<uint32_t *>(res));
 #else
-            return Hacl_Bignum4096_mod_exp_consttime_precomp(context.get(), a, bBits, b, res);
+            return Hacl_Bignum4096_mod_exp_consttime_precomp(pimpl->context.get(), a, bBits, b,
+                                                             res);
 #endif // _WIN32
         }
 #ifdef _WIN32
-        return Hacl_Bignum4096_32_mod_exp_vartime_precomp(context.get(), reinterpret_cast<uint32_t *>(a),
-                                                          bBits, reinterpret_cast<uint32_t *>(b),
-                                                          reinterpret_cast<uint32_t *>(res));
+        return Hacl_Bignum4096_32_mod_exp_vartime_precomp(
+          pimpl->context.get(), reinterpret_cast<uint32_t *>(a), bBits,
+          reinterpret_cast<uint32_t *>(b), reinterpret_cast<uint32_t *>(res));
 #else
-        return Hacl_Bignum4096_mod_exp_vartime_precomp(context.get(), a, bBits, b, res);
+        return Hacl_Bignum4096_mod_exp_vartime_precomp(pimpl->context.get(), a, bBits, b, res);
 #endif // _WIN32
     }
 
     void Bignum4096::to_montgomery_form(uint64_t *a, uint64_t *aM) const
     {
 #ifdef _WIN32
-        Hacl_GenericField32_to_field(context.get(), reinterpret_cast<uint32_t *>(a),
+        Hacl_GenericField32_to_field(pimpl->context.get(), reinterpret_cast<uint32_t *>(a),
                                      reinterpret_cast<uint32_t *>(aM));
 #else
-        Hacl_GenericField64_to_field(context.get(), a, aM);
+        Hacl_GenericField64_to_field(pimpl->context.get(), a, aM);
 #endif // _WIN32
     }
 
     void Bignum4096::from_montgomery_form(uint64_t *aM, uint64_t *a) const
     {
 #ifdef _WIN32
-        Hacl_GenericField32_from_field(context.get(), reinterpret_cast<uint32_t *>(aM),
+        Hacl_GenericField32_from_field(pimpl->context.get(), reinterpret_cast<uint32_t *>(aM),
                                        reinterpret_cast<uint32_t *>(a));
 #else
-        Hacl_GenericField64_from_field(context.get(), aM, a);
+        Hacl_GenericField64_from_field(pimpl->context.get(), aM, a);
 #endif // _WIN32
     }
 
-    void Bignum4096::montgomery_mod_mul_stay_in_mont_form(uint64_t *aM, uint64_t *bM, uint64_t *cM) const
+    void Bignum4096::montgomery_mod_mul_stay_in_mont_form(uint64_t *aM, uint64_t *bM,
+                                                          uint64_t *cM) const
     {
 #ifdef _WIN32
-        Hacl_GenericField32_mul(context.get(), reinterpret_cast<uint32_t *>(aM),
+        Hacl_GenericField32_mul(pimpl->context.get(), reinterpret_cast<uint32_t *>(aM),
                                 reinterpret_cast<uint32_t *>(bM), reinterpret_cast<uint32_t *>(cM));
 #else
-        Hacl_GenericField64_mul(context.get(), aM, bM, cM);
+        Hacl_GenericField64_mul(pimpl->context.get(), aM, bM, cM);
 #endif // _WIN32
     }
 
     const Bignum4096 &CONTEXT_P()
     {
 #ifdef _WIN32
-        static Bignum4096 instance{(uint32_t*)(P_ARRAY_REVERSE)};
+        static Bignum4096 instance{(uint32_t *)(P_ARRAY_REVERSE)};
 #else
         static Bignum4096 instance{const_cast<uint64_t *>(P_ARRAY_REVERSE)};
 #endif // _WIN32

@@ -1,8 +1,8 @@
 #include "electionguard/group.hpp"
 
-#include "../karamel/Hacl_HMAC_DRBG.h"
-#include "../karamel/Lib_Memzero0.h"
-#include "../karamel/Lib_RandomBuffer_System.h"
+#include "Hacl_HMAC_DRBG.h"
+#include "Lib_Memzero0.h"
+#include "Lib_RandomBuffer_System.h"
 #include "convert.hpp"
 #include "facades/Hacl_Bignum256.hpp"
 #include "facades/Hacl_Bignum4096.hpp"
@@ -24,7 +24,9 @@ using hacl::Bignum256;
 using hacl::Bignum4096;
 using hacl::CONTEXT_P;
 using hacl::CONTEXT_Q;
+using std::begin;
 using std::copy;
+using std::end;
 using std::get;
 using std::holds_alternative;
 using std::invalid_argument;

@@ -1,10 +1,6 @@
 #ifndef __FACADES__Hacl_Bignum4096_H_INCLUDED__
 #define __FACADES__Hacl_Bignum4096_H_INCLUDED__
 
-#ifdef _WIN32
-#include "../../karamel/Hacl_Bignum4096_32.h"
-#endif // _WIN32
-#include "../../karamel/Hacl_Bignum4096.h"
 #include "electionguard/export.h"
 
 #include <cstdint>
@@ -65,31 +61,11 @@ namespace hacl
 
         void from_montgomery_form(uint64_t *aM, uint64_t *a) const;
 
-        void montgomery_mod_mul_stay_in_mont_form(uint64_t *aM, uint64_t *bM,
-                                                         uint64_t *cM) const;
+        void montgomery_mod_mul_stay_in_mont_form(uint64_t *aM, uint64_t *bM, uint64_t *cM) const;
 
       private:
-        struct handle_destructor {
-#ifdef _WIN32
-            void operator()(Hacl_Bignum_MontArithmetic_bn_mont_ctx_u32 *handle) const
-            {
-                Hacl_Bignum4096_32_mont_ctx_free(handle);
-            }
-#else
-            void operator()(Hacl_Bignum_MontArithmetic_bn_mont_ctx_u64 *handle) const
-            {
-                Hacl_Bignum4096_mont_ctx_free(handle);
-            }
-#endif // _WIN32
-        };
-#ifdef _WIN32
-        typedef std::unique_ptr<Hacl_Bignum_MontArithmetic_bn_mont_ctx_u32, handle_destructor>
-          HaclBignumContext4096;
-#else
-        typedef std::unique_ptr<Hacl_Bignum_MontArithmetic_bn_mont_ctx_u64, handle_destructor>
-          HaclBignumContext4096;
-#endif // _WIN32
-        HaclBignumContext4096 context;
+        struct Impl;
+        std::unique_ptr<Impl> pimpl;
     };
 
     /// <summary>

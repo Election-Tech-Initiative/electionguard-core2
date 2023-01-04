@@ -10,7 +10,6 @@
 #include <codecvt>
 #include <iomanip>
 #include <iostream>
-#include <karamel/LowStar_Endianness.h>
 #include <sstream>
 #include <string>
 #include <vector>
@@ -97,20 +96,7 @@ namespace electionguard
         return (size_t)number;
     }
 
-    inline vector<uint8_t> bignum_to_bytes(const vector<uint64_t> &bignum)
-    {
-        size_t offset = sizeof(uint64_t) / sizeof(uint8_t);
-        std::vector<uint8_t> bytes;
-        bytes.reserve((bignum.size() * offset));
-        for (auto number : bignum) {
-            uint64_t buffer = htobe64(number);
-            for (size_t i = 0; i < sizeof(buffer); i++) {
-                bytes.push_back(buffer & 0xFF);
-                buffer >>= 8;
-            }
-        }
-        return bytes;
-    }
+    vector<uint8_t> bignum_to_bytes(const vector<uint64_t> &bignum);
 
     inline vector<uint8_t> bignum_to_bytes(uint64_t *data, size_t size)
     {

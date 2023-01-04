@@ -1,11 +1,11 @@
 #include "date/date.h"
+#include "krml/lowstar_endianness.h"
 #include "log.hpp"
 
 #include <chrono>
 #include <codecvt>
 #include <iomanip>
 #include <iostream>
-#include <karamel/LowStar_Endianness.h>
 #include <sstream>
 #include <string>
 #include <vector>
@@ -20,6 +20,21 @@ using std::chrono::system_clock;
 
 namespace electionguard
 {
+    vector<uint8_t> bignum_to_bytes(const vector<uint64_t> &bignum)
+    {
+        size_t offset = sizeof(uint64_t) / sizeof(uint8_t);
+        std::vector<uint8_t> bytes;
+        bytes.reserve((bignum.size() * offset));
+        for (auto number : bignum) {
+            uint64_t buffer = htobe64(number);
+            for (size_t i = 0; i < sizeof(buffer); i++) {
+                bytes.push_back(buffer & 0xFF);
+                buffer >>= 8;
+            }
+        }
+        return bytes;
+    }
+
     const string defaultFormat = "%FT%TZ";
     const string secondaryFormat = "%FT%T%Ez";
 

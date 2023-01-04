@@ -1,7 +1,7 @@
 #include "electionguard/hash.hpp"
 
-#include "../karamel/Hacl_Bignum256.h"
-#include "../karamel/Hacl_Streaming_SHA2.h"
+#include "Hacl_Bignum256.h"
+#include "Hacl_Streaming_SHA2.h"
 #include "log.hpp"
 
 #include <iomanip>
@@ -241,8 +241,7 @@ namespace electionguard
                 vector<uint8_t> temp = get<vector<uint8_t>>(a);
                 return vector_uint8_t_to_hex(temp);
             }
-                
-        }
+                }
 
         return null_string;
     }

@@ -1,7 +1,7 @@
 #include "Hacl_Bignum256.hpp"
 
-#include "../../karamel/Hacl_Bignum256.h"
 #include "../log.hpp"
+#include "Hacl_Bignum256.h"
 
 #include <electionguard/constants.h>
 
@@ -10,8 +10,14 @@ using std::vector;
 
 namespace hacl
 {
-    Bignum256::Bignum256(uint64_t *elem) { context = Hacl_Bignum256_mont_ctx_init(elem); }
-    Bignum256::~Bignum256() { Hacl_Bignum256_mont_ctx_free(context); }
+    struct Bignum256::Impl {
+        Hacl_Bignum_MontArithmetic_bn_mont_ctx_u64 *context;
+
+        Impl(uint64_t *elem) { context = Hacl_Bignum256_mont_ctx_init(elem); }
+    };
+
+    Bignum256::Bignum256(uint64_t *elem) : pimpl(new Impl(elem)) {}
+    Bignum256::~Bignum256() { Hacl_Bignum256_mont_ctx_free(pimpl->context); }
 
     uint64_t Bignum256::add(uint64_t *a, uint64_t *b, uint64_t *res)
     {
@@ -64,7 +70,7 @@ namespace hacl
 
     void Bignum256::mod(uint64_t *a, uint64_t *res) const
     {
-        Hacl_Bignum256_mod_precomp(context, a, res);
+        Hacl_Bignum256_mod_precomp(pimpl->context, a, res);
     }
 
     void Bignum256::modExp(uint64_t *a, uint32_t bBits, uint64_t *b, uint64_t *res,
@@ -75,9 +81,9 @@ namespace hacl
             return throw;
         }
         if (useConstTime) {
-            return Hacl_Bignum256_mod_exp_consttime_precomp(context, a, bBits, b, res);
+            return Hacl_Bignum256_mod_exp_consttime_precomp(pimpl->context, a, bBits, b, res);
         }
-        return Hacl_Bignum256_mod_exp_vartime_precomp(context, a, bBits, b, res);
+        return Hacl_Bignum256_mod_exp_vartime_precomp(pimpl->context, a, bBits, b, res);
     }
 
     const Bignum256 &CONTEXT_Q()

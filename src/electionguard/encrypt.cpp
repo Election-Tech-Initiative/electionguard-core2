@@ -17,7 +17,7 @@
 #include <nlohmann/json.hpp>
 
 extern "C" {
-#include "../karamel/Hacl_Bignum4096.h"
+#include "Hacl_Bignum4096.h"
 }
 
 using std::invalid_argument;
