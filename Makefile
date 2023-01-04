@@ -15,8 +15,27 @@ CPM_SOURCE_CACHE=$(subst \,/,$(realpath .))/.cache/CPM
 # Detect operating system
 ifeq ($(OS),Windows_NT)
 	OPERATING_SYSTEM := Windows
+	ifeq ($(PROCESSOR_ARCHITECTURE),arm)
+        PLATFORM ?= arm64
+    endif
+	ifeq ($(PROCESSOR_ARCHITECTURE),AMD64)
+        PLATFORM ?= x64
+    endif
+    ifeq ($(PROCESSOR_ARCHITECTURE),x86)
+        PLATFORM ?= x86
+    endif
 else
 	OPERATING_SYSTEM := $(shell uname 2>/dev/null || echo Unknown)
+	UNAME_P := $(shell uname -p)
+    ifeq ($(UNAME_P),x86_64)
+        PLATFORM ?= x64
+    endif
+    ifneq ($(filter %86,$(UNAME_P)),)
+        PLATFORM ?= x86
+    endif
+    ifneq ($(filter arm%,$(UNAME_P)),)
+        PLATFORM ?= arm64
+    endif
 endif
 
 # Default build number
@@ -36,6 +55,8 @@ NDK_PATH?=C:\Android\android-sdk\ndk-bundle
 endif
 
 all: environment build
+
+# Configure Environment
 
 environment:
 ifeq ($(OPERATING_SYSTEM),Darwin)
@@ -74,7 +95,6 @@ endif
 	make fetch-sample-data
 	dotnet tool restore
 
-
 environment-ui: environment
 ifeq ($(OPERATING_SYSTEM),Windows)
 	dotnet workload install maui
@@ -84,55 +104,38 @@ else
 	sudo dotnet workload restore ./src/electionguard-ui/ElectionGuard.UI/ElectionGuard.UI.csproj && dotnet restore ./src/electionguard-ui/ElectionGuard.UI.sln
 endif
 
-
-fetch-sample-data:
-	@echo ⬇️ FETCH Sample Data
-	wget -O sample-data-1-0.zip https://github.com/microsoft/electionguard/releases/download/v1.0/sample-data.zip
-	unzip -o sample-data-1-0.zip
-
+# Builds
 
 build:
-	@echo 🧱 BUILD $(TARGET)
+	@echo 🧱 BUILD $(OPERATING_SYSTEM) $(PLATFORM) $(TARGET)
 ifeq ($(OPERATING_SYSTEM),Windows)
-	cmake -S . -B $(ELECTIONGUARD_BUILD_LIBS_DIR)/x86_64/$(TARGET) -G "MSYS Makefiles" \
+	cmake -S . -B $(ELECTIONGUARD_BUILD_LIBS_DIR)/$(PLATFORM)/$(TARGET) -G "Visual Studio 17 2022" -A $(PLATFORM) \
 		-DCMAKE_BUILD_TYPE=$(TARGET) \
 		-DBUILD_SHARED_LIBS=ON \
 		-DCAN_USE_VECTOR_INTRINSICS=ON \
 		-DCPM_SOURCE_CACHE=$(CPM_SOURCE_CACHE)
+	cmake --build $(ELECTIONGUARD_BUILD_LIBS_DIR)/$(PLATFORM)/$(TARGET)--config $(TARGET)
 else
-	cmake -S . -B $(ELECTIONGUARD_BUILD_LIBS_DIR)/x86_64/$(TARGET) \
+	cmake -S . -B $(ELECTIONGUARD_BUILD_LIBS_DIR)/$(PLATFORM)/$(TARGET) \
+		-DCMAKE_BUILD_TYPE=$(TARGET) \
+		-DBUILD_SHARED_LIBS=ON \
+		-DCPM_SOURCE_CACHE=$(CPM_SOURCE_CACHE) \
+		-DCMAKE_TOOLCHAIN_FILE=cmake/toolchains/$(PLATFORM)-$(OPERATING_SYSTEM).cmake
+	cmake --build $(ELECTIONGUARD_BUILD_LIBS_DIR)/$(PLATFORM)/$(TARGET)
+endif
+	
+build-msys2:
+	@echo 🖥️ BUILD $(OPERATING_SYSTEM) MSYS2 $(PLATFORM)
+ifeq ($(OPERATING_SYSTEM),Windows)
+	cmake -S . -B $(ELECTIONGUARD_BUILD_LIBS_DIR)/$(PLATFORM)/$(TARGET) -G "MSYS Makefiles" \
 		-DCMAKE_BUILD_TYPE=$(TARGET) \
 		-DBUILD_SHARED_LIBS=ON \
 		-DCAN_USE_VECTOR_INTRINSICS=ON \
-		-DCPM_SOURCE_CACHE=$(CPM_SOURCE_CACHE)
-endif
-	cmake --build $(ELECTIONGUARD_BUILD_LIBS_DIR)/x86_64/$(TARGET)
-
-publish-ui:
-	@echo 🧱 BUILD UI
-ifeq ($(OPERATING_SYSTEM),Windows)
-	dotnet publish -f net7.0-windows10.0.19041.0 -c $(TARGET) /p:ApplicationVersion=$(BUILD) /p:RuntimeIdentifierOverride=win10-x64 src/electionguard-ui/ElectionGuard.UI/ElectionGuard.UI.csproj
-endif
-ifeq ($(OPERATING_SYSTEM),Darwin)
-	dotnet build -f net7.0-maccatalyst -c $(TARGET) /p:CreatePackage=true /p:ApplicationVersion=$(BUILD) src/electionguard-ui/ElectionGuard.UI/ElectionGuard.UI.csproj
-endif
-
-generate-interop:
-	cd ./src/interop-generator/ElectionGuard.InteropGenerator && \
-		dotnet run -- ./EgInteropClasses.json ../../../ && \
-		cd ../../../
-
-build-msvc:
-	@echo 🖥️ BUILD MSVC
-ifeq ($(OPERATING_SYSTEM),Windows)
-	cmake -S . -B $(ELECTIONGUARD_BUILD_LIBS_DIR)/msvc/x64 -G "Visual Studio 17 2022" -A x64 \
-		-DCMAKE_BUILD_TYPE=$(TARGET) \
-		-DBUILD_SHARED_LIBS=ON \
-		-DCAN_USE_VECTOR_INTRINSICS=ON \
-		-DCPM_SOURCE_CACHE=$(CPM_SOURCE_CACHE)
-	cmake --build $(ELECTIONGUARD_BUILD_LIBS_DIR)/msvc/x64 --config $(TARGET)
+		-DCPM_SOURCE_CACHE=$(CPM_SOURCE_CACHE) \
+		-DCMAKE_TOOLCHAIN_FILE=cmake/toolchains/$(PLATFORM)-$(OPERATING_SYSTEM).cmake
+	cmake --build $(ELECTIONGUARD_BUILD_LIBS_DIR)/$(PLATFORM)/$(TARGET)
 else
-	echo "MSVC builds are only supported on Windows"
+	echo "MSYS2 builds are only supported on Windows"
 endif
 
 build-android:
@@ -184,15 +187,12 @@ else
 endif
 
 build-netstandard:
-ifeq ($(OPERATING_SYSTEM),Windows)
-	make build-msvc
-else
-	make build
-endif
-
 	@echo 🖥️ BUILD NETSTANDARD
+	make build
 	cd ./bindings/netstandard/ElectionGuard && dotnet restore
 	dotnet build --configuration $(TARGET) ./bindings/netstandard/ElectionGuard/ElectionGuard.sln /p:Platform=x64
+
+# Clean
 
 clean:
 	@echo 🗑️ Cleaning Output Directory
@@ -218,7 +218,9 @@ else
 	if [ ! -d "$(ELECTIONGUARD_BINDING_TEST_DIR)/obj" ]; then mkdir $(ELECTIONGUARD_BINDING_TEST_DIR)/obj; fi
 
 	if [ ! -d "$(ELECTIONGUARD_BUILD_LIBS_DIR)" ]; then mkdir $(ELECTIONGUARD_BUILD_LIBS_DIR); fi
-	if [ ! -d "$(ELECTIONGUARD_BUILD_LIBS_DIR)/x86_64" ]; then mkdir $(ELECTIONGUARD_BUILD_LIBS_DIR)/x86_64; fi
+	if [ ! -d "$(ELECTIONGUARD_BUILD_LIBS_DIR)/arm64" ]; then mkdir $(ELECTIONGUARD_BUILD_LIBS_DIR)/arm64; fi
+	if [ ! -d "$(ELECTIONGUARD_BUILD_LIBS_DIR)/x86" ]; then mkdir $(ELECTIONGUARD_BUILD_LIBS_DIR)/x86; fi
+	if [ ! -d "$(ELECTIONGUARD_BUILD_LIBS_DIR)/x64" ]; then mkdir $(ELECTIONGUARD_BUILD_LIBS_DIR)/x64; fi
 	if [ ! -d "$(ELECTIONGUARD_BUILD_LIBS_DIR)/android" ]; then mkdir $(ELECTIONGUARD_BUILD_LIBS_DIR)/android; fi
 	if [ ! -d "$(ELECTIONGUARD_BUILD_LIBS_DIR)/ios" ]; then mkdir $(ELECTIONGUARD_BUILD_LIBS_DIR)/ios; fi
 endif
@@ -231,83 +233,85 @@ clean-ui:
 	@echo 🗑️ CLEAN UI
 	dotnet clean ./src/electionguard-ui/ElectionGuard.UI.sln
 
+# Generate
+
+generate-interop:
+	cd ./src/interop-generator/ElectionGuard.InteropGenerator && \
+		dotnet run -- ./EgInteropClasses.json ../../../ && \
+		cd ../../../
+
+# Lint / Format
+
 format: build
-	cd $(ELECTIONGUARD_BUILD_LIBS_DIR)/x86_64 && $(MAKE) format
+	cd $(ELECTIONGUARD_BUILD_LIBS_DIR)/$(PLATFORM) && $(MAKE) format
+
+lint:
+	dotnet jb inspectcode -o="lint-results.xml" -f="Xml" --build --verbosity="WARN" -s="Warning" bindings/netstandard/ElectionGuard/ElectionGuard.sln
+	dotnet nvika parsereport "lint-results.xml" --treatwarningsaserrors
+
+# Memcheck
 
 memcheck:
 	@echo 🧼 RUN STATIC ANALYSIS
 ifeq ($(OPERATING_SYSTEM),Windows)
 	@echo "Static analysis is only supported on Linux"
 else
-	cd $(ELECTIONGUARD_BUILD_LIBS_DIR)/x86_64 && $(MAKE) memcheck-ElectionGuardTests
+	cd $(ELECTIONGUARD_BUILD_LIBS_DIR)/$(PLATFORM) && $(MAKE) memcheck-ElectionGuardTests
 endif
+
+# Publish
+
+publish-ui:
+	@echo 🧱 BUILD UI
+ifeq ($(OPERATING_SYSTEM),Windows)
+	dotnet publish -f net7.0-windows10.0.19041.0 -c $(TARGET) /p:ApplicationVersion=$(BUILD) /p:RuntimeIdentifierOverride=win10-x64 src/electionguard-ui/ElectionGuard.UI/ElectionGuard.UI.csproj
+endif
+ifeq ($(OPERATING_SYSTEM),Darwin)
+	dotnet build -f net7.0-maccatalyst -c $(TARGET) /p:CreatePackage=true /p:ApplicationVersion=$(BUILD) src/electionguard-ui/ElectionGuard.UI/ElectionGuard.UI.csproj
+endif
+
+# Rebuild
 
 rebuild: clean build
 
 rebuild-ui: clean-ui build-ui
 
+# Sanitizers
+
 sanitize: sanitize-asan sanitize-tsan
 
 sanitize-asan:
-	@echo 🧼 SANITIZE ADDRESS AND UNDEFINED
+	@echo 🧼 SANITIZE ADDRESS AND UNDEFINED $(PLATFORM)
 ifeq ($(OPERATING_SYSTEM),Windows)
-	cmake -S . -B $(ELECTIONGUARD_BUILD_LIBS_DIR)/msvc/x64 -G "Visual Studio 17 2022" -A x64 \
-		-DCMAKE_BUILD_TYPE=Debug \
-		-DBUILD_SHARED_LIBS=ON \
-		-DEXPORT_INTERNALS=ON \
-		-DCAN_USE_VECTOR_INTRINSICS=ON \
-		-DUSE_TEST_PRIMES=OFF \
-		-DOPTION_ENABLE_TESTS=ON \
-		-DUSE_SANITIZER="address" \
-		-DLOG_LEVEL=debug \
-		-DCPM_SOURCE_CACHE=$(CPM_SOURCE_CACHE)
-	cmake --build $(ELECTIONGUARD_BUILD_LIBS_DIR)/msvc/x64 --config Debug
-	$(ELECTIONGUARD_BUILD_LIBS_DIR)/msvc/x64/test/Debug/ElectionGuardTests
-	$(ELECTIONGUARD_BUILD_LIBS_DIR)/msvc/x64/test/Debug/ElectionGuardCTests
+	cmake -S . -B $(ELECTIONGUARD_BUILD_LIBS_DIR)/$(PLATFORM)/Debug -G "Visual Studio 17 2022" -A $(PLATFORM) \
+		-DCPM_SOURCE_CACHE=$(CPM_SOURCE_CACHE) \
+		-DCMAKE_TOOLCHAIN_FILE=cmake/toolchains/sanitize.asan.cmake
+	cmake --build $(ELECTIONGUARD_BUILD_LIBS_DIR)/$(PLATFORM)/Debug --config Debug
+	$(ELECTIONGUARD_BUILD_LIBS_DIR)/$(PLATFORM)/Debug/test/Debug/ElectionGuardTests
+	$(ELECTIONGUARD_BUILD_LIBS_DIR)/$(PLATFORM)/Debug/test/Debug/ElectionGuardCTests
 else
-	cmake -S . -B $(ELECTIONGUARD_BUILD_LIBS_DIR)/x86_64/Debug \
-		-DCMAKE_BUILD_TYPE=Debug \
-		-DBUILD_SHARED_LIBS=ON \
-		-DCAN_USE_VECTOR_INTRINSICS=ON \
-		-DEXPORT_INTERNALS=ON \
-		-DOPTION_ENABLE_TESTS=ON \
-		-DCODE_COVERAGE=ON \
-		-DUSE_TEST_PRIMES=OFF \
-		-DUSE_STATIC_ANALYSIS=ON \
-		-DUSE_DYNAMIC_ANALYSIS=ON \
-		-DUSE_SANITIZER="address" \
-		-DCLANG_TIDY=ON \
-		-DCPPCHECK=ON \
-		-DIWYU=ON \
-		-DLOG_LEVEL=debug \
-		-DCPM_SOURCE_CACHE=$(CPM_SOURCE_CACHE)
-	cmake --build $(ELECTIONGUARD_BUILD_LIBS_DIR)/x86_64/Debug
-	$(ELECTIONGUARD_BUILD_LIBS_DIR)/x86_64/Debug/test/ElectionGuardTests
-	$(ELECTIONGUARD_BUILD_LIBS_DIR)/x86_64/Debug/test/ElectionGuardCTests
+	cmake -S . -B $(ELECTIONGUARD_BUILD_LIBS_DIR)/$(PLATFORM)/Debug \
+		-DCPM_SOURCE_CACHE=$(CPM_SOURCE_CACHE) \
+		-DCMAKE_TOOLCHAIN_FILE=cmake/toolchains/sanitize.asan.cmake
+	cmake --build $(ELECTIONGUARD_BUILD_LIBS_DIR)/$(PLATFORM)/Debug
+	$(ELECTIONGUARD_BUILD_LIBS_DIR)/$(PLATFORM)/Debug/test/ElectionGuardTests
+	$(ELECTIONGUARD_BUILD_LIBS_DIR)/$(PLATFORM)/Debug/test/ElectionGuardCTests
 endif
 
 sanitize-tsan:
-	@echo 🧼 SANITIZE THREADS
+	@echo 🧼 SANITIZE THREADS $(PLATFORM)
 ifeq ($(OPERATING_SYSTEM),Windows)
 	echo "Thread sanitizer is only supported on Linux & Mac"
 else
-	cmake -S . -B $(ELECTIONGUARD_BUILD_LIBS_DIR)/x86_64/Debug \
-		-DCMAKE_BUILD_TYPE=Debug \
-		-DBUILD_SHARED_LIBS=ON \
-		-DEXPORT_INTERNALS=ON \
-		-DCAN_USE_VECTOR_INTRINSICS=ON \
-		-DUSE_TEST_PRIMES=OFF \
-		-DOPTION_ENABLE_TESTS=ON \
-		-DCODE_COVERAGE=ON \
-		-DUSE_STATIC_ANALYSIS=ON \
-		-DUSE_DYNAMIC_ANALYSIS=ON \
-		-DUSE_SANITIZER="thread" \
-		-DLOG_LEVEL=debug \
-		-DCPM_SOURCE_CACHE=$(CPM_SOURCE_CACHE)
-	cmake --build $(ELECTIONGUARD_BUILD_LIBS_DIR)/x86_64/Debug
-	$(ELECTIONGUARD_BUILD_LIBS_DIR)/x86_64/Debug/test/ElectionGuardTests
-	$(ELECTIONGUARD_BUILD_LIBS_DIR)/x86_64/Debug/test/ElectionGuardCTests
+	cmake -S . -B $(ELECTIONGUARD_BUILD_LIBS_DIR)/$(PLATFORM)/Debug \
+		-DCPM_SOURCE_CACHE=$(CPM_SOURCE_CACHE) \
+		-DCMAKE_TOOLCHAIN_FILE=cmake/toolchains/sanitize.tsan.cmake
+	cmake --build $(ELECTIONGUARD_BUILD_LIBS_DIR)/$(PLATFORM)/Debug
+	$(ELECTIONGUARD_BUILD_LIBS_DIR)/$(PLATFORM)/Debug/test/ElectionGuardTests
+	$(ELECTIONGUARD_BUILD_LIBS_DIR)/$(PLATFORM)/Debug/test/ElectionGuardCTests
 endif
+
+# Start/Stop Docker Services (database)
 
 start-db:
 ifeq "${EG_DB_PASSWORD}" ""
@@ -319,27 +323,20 @@ endif
 stop-db:
 	docker compose --env-file ./.env -f src/electionguard-db/docker-compose.db.yml down
 
+# Benchmarks
+
 bench:
-	@echo 🧪 BENCHMARK
+	@echo 🧪 BENCHMARK $(PLATFORM)
 ifeq ($(OPERATING_SYSTEM),Windows)
-	cmake -S . -B $(ELECTIONGUARD_BUILD_LIBS_DIR)/x86_64/$(TARGET) -G "MSYS Makefiles" \
+	cmake -S . -B $(ELECTIONGUARD_BUILD_LIBS_DIR)/$(PLATFORM)/$(TARGET) -G "MSYS Makefiles" \
 		-DCMAKE_BUILD_TYPE=$(TARGET) \
-		-DBUILD_SHARED_LIBS=ON \
-		-DEXPORT_INTERNALS=ON \
-		-DCAN_USE_VECTOR_INTRINSICS=ON \
-		-DUSE_TEST_PRIMES=OFF \
-		-DOPTION_ENABLE_TESTS=ON \
-		-DCPM_SOURCE_CACHE=$(CPM_SOURCE_CACHE)
+		-DCPM_SOURCE_CACHE=$(CPM_SOURCE_CACHE) \
+		-DCMAKE_TOOLCHAIN_FILE=cmake/toolchains/benchmark.cmake
 else
-	cmake -S . -B $(ELECTIONGUARD_BUILD_LIBS_DIR)/x86_64/$(TARGET) \
+	cmake -S . -B $(ELECTIONGUARD_BUILD_LIBS_DIR)/$(PLATFORM)/$(TARGET) \
 		-DCMAKE_BUILD_TYPE=$(TARGET) \
-		-DBUILD_SHARED_LIBS=ON \
-		-DEXPORT_INTERNALS=ON \
-		-DCAN_USE_VECTOR_INTRINSICS=ON \
-		-DUSE_TEST_PRIMES=OFF \
-		-DOPTION_ENABLE_TESTS=ON \
-		-DLOG_LEVEL=info \
-		-DCPM_SOURCE_CACHE=$(CPM_SOURCE_CACHE)
+		-DCPM_SOURCE_CACHE=$(CPM_SOURCE_CACHE) \
+		-DCMAKE_TOOLCHAIN_FILE=cmake/toolchains/benchmark.cmake
 endif
 	cmake --build $(ELECTIONGUARD_BUILD_LIBS_DIR)/x86_64/$(TARGET)
 ifeq ($(OPERATING_SYSTEM),Windows)
@@ -355,96 +352,82 @@ bench-netstandard: build-netstandard
 	./bindings/netstandard/ElectionGuard/ElectionGuard.Encryption.Bench/bin/x64/$(TARGET)/net48/ElectionGuard.Encryption.Bench
 
 # Test
+
 test:
-	@echo 🧪 TEST
+	@echo 🧪 TEST $(OPERATING_SYSTEM) $(PLATFORM) $(TARGET)
+ifeq ($(OPERATING_SYSTEM),Windows)
+	cmake -S . -B $(ELECTIONGUARD_BUILD_LIBS_DIR)/$(PLATFORM)/$(TARGET) -G "Visual Studio 17 2022" -A $(PLATFORM) \
+		-DCMAKE_BUILD_TYPE=$(TARGET) \
+		-DCPM_SOURCE_CACHE=$(CPM_SOURCE_CACHE) \
+		-DCMAKE_TOOLCHAIN_FILE=cmake/toolchains/test.cmake
+	cmake --build $(ELECTIONGUARD_BUILD_LIBS_DIR)/$(PLATFORM)/$(TARGET) --config $(TARGET)
+	$(ELECTIONGUARD_BUILD_LIBS_DIR)/$(PLATFORM)/$(TARGET)/test/$(TARGET)/ElectionGuardTests
+	$(ELECTIONGUARD_BUILD_LIBS_DIR)/$(PLATFORM)/$(TARGET)/test/$(TARGET)/ElectionGuardCTests
+else
+	cmake -S . -B $(ELECTIONGUARD_BUILD_LIBS_DIR)/$(PLATFORM)/$(TARGET) \
+		-DCMAKE_BUILD_TYPE=$(TARGET) \
+		-DCPM_SOURCE_CACHE=$(CPM_SOURCE_CACHE) \
+		-DCMAKE_TOOLCHAIN_FILE=cmake/toolchains/test.cmake
+	cmake --build $(ELECTIONGUARD_BUILD_LIBS_DIR)/$(PLATFORM)/$(TARGET)
+	$(ELECTIONGUARD_BUILD_LIBS_DIR)/$(PLATFORM)/$(TARGET)/test/ElectionGuardTests
+	$(ELECTIONGUARD_BUILD_LIBS_DIR)/$(PLATFORM)/$(TARGET)/test/ElectionGuardCTests
+endif
+	
+
+test-msys2:
+	@echo 🧪 TEST MSVC
 ifeq ($(OPERATING_SYSTEM),Windows)
 	cmake -S . -B $(ELECTIONGUARD_BUILD_LIBS_DIR)/x86_64/$(TARGET) -G "MSYS Makefiles" \
 		-DCMAKE_BUILD_TYPE=$(TARGET) \
-		-DBUILD_SHARED_LIBS=ON \
-		-DEXPORT_INTERNALS=ON \
-		-DCAN_USE_VECTOR_INTRINSICS=ON \
-		-DUSE_TEST_PRIMES=OFF \
-		-DOPTION_ENABLE_TESTS=ON \
-		-DLOG_LEVEL=debug \
-		-DCPM_SOURCE_CACHE=$(CPM_SOURCE_CACHE)
-else
-	cmake -S . -B $(ELECTIONGUARD_BUILD_LIBS_DIR)/x86_64/$(TARGET) \
-		-DCMAKE_BUILD_TYPE=$(TARGET) \
-		-DBUILD_SHARED_LIBS=ON \
-		-DEXPORT_INTERNALS=ON \
-		-DCAN_USE_VECTOR_INTRINSICS=ON \
-		-DUSE_TEST_PRIMES=OFF \
-		-DOPTION_ENABLE_TESTS=ON \
-		-DLOG_LEVEL=debug \
-		-DCPM_SOURCE_CACHE=$(CPM_SOURCE_CACHE)
-endif
-	cmake --build $(ELECTIONGUARD_BUILD_LIBS_DIR)/x86_64/$(TARGET)
-	$(ELECTIONGUARD_BUILD_LIBS_DIR)/x86_64/$(TARGET)/test/ElectionGuardTests
-	$(ELECTIONGUARD_BUILD_LIBS_DIR)/x86_64/$(TARGET)/test/ElectionGuardCTests
-
-test-msvc:
-	@echo 🧪 TEST MSVC
-ifeq ($(OPERATING_SYSTEM),Windows)
-	cmake -S . -B $(ELECTIONGUARD_BUILD_LIBS_DIR)/msvc/x64 -G "Visual Studio 17 2022" -A x64 \
-		-DCMAKE_BUILD_TYPE=$(TARGET) \
-		-DBUILD_SHARED_LIBS=ON \
-		-DEXPORT_INTERNALS=ON \
-		-DCAN_USE_VECTOR_INTRINSICS=ON \
-		-DUSE_TEST_PRIMES=OFF \
-		-DOPTION_ENABLE_TESTS=ON \
-		-DLOG_LEVEL=debug \
-		-DCPM_SOURCE_CACHE=$(CPM_SOURCE_CACHE)
-	cmake --build $(ELECTIONGUARD_BUILD_LIBS_DIR)/msvc/x64 --config $(TARGET)
-	$(ELECTIONGUARD_BUILD_LIBS_DIR)/msvc/x64/test/$(TARGET)/ElectionGuardTests
-	$(ELECTIONGUARD_BUILD_LIBS_DIR)/msvc/x64/test/$(TARGET)/ElectionGuardCTests
+		-DCPM_SOURCE_CACHE=$(CPM_SOURCE_CACHE) \
+		-DCMAKE_TOOLCHAIN_FILE=cmake/toolchains/test.cmake
+	cmake --build $(ELECTIONGUARD_BUILD_LIBS_DIR)/$(PLATFORM)/$(TARGET)
+	$(ELECTIONGUARD_BUILD_LIBS_DIR)/$(PLATFORM)/$(TARGET)/test/ElectionGuardTests
+	$(ELECTIONGUARD_BUILD_LIBS_DIR)/$(PLATFORM)/$(TARGET)/test/ElectionGuardCTests
 endif
 
 test-netstandard: build-netstandard
-	@echo 🧪 TEST NETSTANDARD
-	dotnet test --configuration $(TARGET) ./bindings/netstandard/ElectionGuard/ElectionGuard.sln
+	@echo 🧪 TEST NETSTANDARD $(PLATFORM) $(TARGET)
+	dotnet test -a $(PLATFORM) --configuration $(TARGET) ./bindings/netstandard/ElectionGuard/ElectionGuard.sln
 
 test-ui:
-	@echo 🧪 TEST UI
-	dotnet build -a x64 --configuration $(TARGET) ./src/electionguard-ui/electionGuard.UI.Test/ElectionGuard.UI.Test.csproj
+	@echo 🧪 TEST UI $(PLATFORM) $(TARGET)
+	dotnet build -a $(PLATFORM) --configuration $(TARGET) ./src/electionguard-ui/electionGuard.UI.Test/ElectionGuard.UI.Test.csproj
 ifeq ($(OPERATING_SYSTEM),Windows)
-	dotnet test -a x64 --no-build --configuration $(TARGET) ./src/electionguard-ui/ElectionGuard.UI.sln 	
+	dotnet test -a $(PLATFORM) --no-build --configuration $(TARGET) ./src/electionguard-ui/ElectionGuard.UI.sln 	
 endif
 ifeq ($(OPERATING_SYSTEM),Darwin)
-	dotnet test -a x64 --no-build --configuration $(TARGET) ./src/electionguard-ui/ElectionGuard.UI.sln 	
+	dotnet test -a $(PLATFORM) --no-build --configuration $(TARGET) ./src/electionguard-ui/ElectionGuard.UI.sln 	
 endif
 
+# Coverage
+
 coverage:
-	@echo ✅ CHECK COVERAGE
+	@echo ✅ CHECK COVERAGE $(PLATFORM) $(TARGET)
 ifeq ($(OPERATING_SYSTEM),Windows)
-	cmake -S . -B $(ELECTIONGUARD_BUILD_LIBS_DIR)/x86_64/$(TARGET) -G "MSYS Makefiles" \
+	cmake -S . -B $(ELECTIONGUARD_BUILD_LIBS_DIR)/$(PLATFORM)/$(TARGET) -G "MSYS Makefiles" \
 		-DCMAKE_BUILD_TYPE=$(TARGET) \
-		-DBUILD_SHARED_LIBS=ON \
-		-DEXPORT_INTERNALS=ON \
-		-DCAN_USE_VECTOR_INTRINSICS=ON \
-		-DOPTION_ENABLE_TESTS=ON \
 		-DCODE_COVERAGE=ON \
-		-DCPM_SOURCE_CACHE=$(CPM_SOURCE_CACHE)
+		-DCPM_SOURCE_CACHE=$(CPM_SOURCE_CACHE) \
+		-DCMAKE_TOOLCHAIN_FILE=cmake/toolchains/test.cmake
 else
-	cmake -S . -B $(ELECTIONGUARD_BUILD_LIBS_DIR)/x86_64/$(TARGET) \
+	cmake -S . -B $(ELECTIONGUARD_BUILD_LIBS_DIR)/$(PLATFORM)/$(TARGET) \
 		-DCMAKE_BUILD_TYPE=$(TARGET) \
-		-DBUILD_SHARED_LIBS=ON \
-		-DEXPORT_INTERNALS=ON \
-		-DCAN_USE_VECTOR_INTRINSICS=ON \
-		-DUSE_TEST_PRIMES=OFF \
-		-DOPTION_ENABLE_TESTS=ON \
 		-DCODE_COVERAGE=ON \
 		-DUSE_STATIC_ANALYSIS=ON \
-		-DCPM_SOURCE_CACHE=$(CPM_SOURCE_CACHE)
+		-DCPM_SOURCE_CACHE=$(CPM_SOURCE_CACHE) \
+		-DCMAKE_TOOLCHAIN_FILE=cmake/toolchains/test.cmake
 endif
-	cmake --build $(ELECTIONGUARD_BUILD_LIBS_DIR)/x86_64/$(TARGET)
-	$(ELECTIONGUARD_BUILD_LIBS_DIR)/x86_64/$(TARGET)/test/ElectionGuardTests
-	$(ELECTIONGUARD_BUILD_LIBS_DIR)/x86_64/$(TARGET)/test/ElectionGuardCTests
+	cmake --build $(ELECTIONGUARD_BUILD_LIBS_DIR)/$(PLATFORM)/$(TARGET)
+	$(ELECTIONGUARD_BUILD_LIBS_DIR)/$(PLATFORM)/$(TARGET)/test/ElectionGuardTests
+	$(ELECTIONGUARD_BUILD_LIBS_DIR)/$(PLATFORM)/$(TARGET)/test/ElectionGuardCTests
 
 # Sample Data
 
-lint:
-	dotnet jb inspectcode -o="lint-results.xml" -f="Xml" --build --verbosity="WARN" -s="Warning" bindings/netstandard/ElectionGuard/ElectionGuard.sln
-	dotnet nvika parsereport "lint-results.xml" --treatwarningsaserrors
+fetch-sample-data:
+	@echo ⬇️ FETCH Sample Data
+	wget -O sample-data-1-0.zip https://github.com/microsoft/electionguard/releases/download/v1.0/sample-data.zip
+	unzip -o sample-data-1-0.zip
 
 generate-sample-data:
 	@echo Generate Sample Data
