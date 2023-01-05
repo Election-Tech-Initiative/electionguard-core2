@@ -25,17 +25,7 @@ if(PROJECT_SOURCE_DIR STREQUAL PROJECT_BINARY_DIR)
 endif()
 
 # ---- Options ----
-option(CMAKE_BUILD_TYPE "Build with or without debug symbols" Release)
-option(BUILD_SHARED_LIBS "Build SHARED libraries" OFF)
-option(EXPORT_INTERNALS "Export Internal Headers" OFF)
-option(USE_32BIT_MATH "Use the 32 bit optimized math impl" OFF)
-option(USE_TEST_PRIMES "Use the smaller test primes (do not use in prod)" OFF)
-option(OPTION_ENABLE_TESTS "Enable support for testing private headers" OFF)
-option(TEST_SPEC_VERSION "Use this spec version for tests" "0.95.0")
-option(TEST_USE_SAMPLE "the sample to use, full, hamilton-general, minimal, small" "hamilton-general")
-option(CODE_COVERAGE "Use code coverage" OFF)
-option(OPTION_GENERATE_DOCS "Generate documentation" OFF)
-option(USE_DYNAMIC_ANALYSIS "Enable Dynamic tools" OFF)
+include(cmake/options.cmake)
 
 # ---- Modules ----
 list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake")
@@ -66,42 +56,6 @@ set(CMAKE_POSITION_INDEPENDENT_CODE ON)
 # IDE's usually prefer folders
 set_property(GLOBAL PROPERTY USE_FOLDERS ON)
 set(IDE_FOLDER "")
-
-# Set a DEBUG definition
-if(CMAKE_BUILD_TYPE MATCHES Debug)
-    message("++ Setting DEBUG during compile")
-    add_compile_definitions(DEBUG)
-    add_compile_definitions(LOG_DEBUG)
-    add_compile_definitions(JSON_DIAGNOSTICS=1)
-endif()
-
-# Allow explicitly setting debug logs in release builds
-if(LOG_LEVEL MATCHES debug)
-    message("++ Using DEBUG Logs")
-    add_compile_definitions(LOG_DEBUG)
-elseif(LOG_LEVEL MATCHES trace)
-    message("++ Using TRACE Logs")
-    add_compile_definitions(LOG_TRACE)
-endif()
-
-if(EXPORT_INTERNALS)
-    message("++ Exporting Internal Headers")
-    add_compile_definitions(EXPORT_INTERNALS)
-endif()
-
-if(USE_TEST_PRIMES)
-    message("++ Using Test Primes. Do not use in production.")
-    add_compile_definitions(USE_TEST_PRIMES)
-else()
-    message("++ Using Standard Primes.")
-    add_compile_definitions(USE_STANDARD_PRIMES)
-endif()
-
-# HACK: Disable explicit bzero on android
-# TODO: define explicit secure zero on android and re-enable
-if(DEFINED CMAKE_ANDROID_ARCH_ABI)
-    add_compile_definitions(LINUX_NO_EXPLICIT_BZERO)
-endif()
 
 # ---- Sources ----
 add_subdirectory(src)
