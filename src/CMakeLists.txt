@@ -207,20 +207,24 @@ install(
 # export the spdlog config
 export(EXPORT spdlog FILE "${project_config_out}")
 
-# Generate the build-tree ElectionGuardConfig.cmake for use
-# in other cmake projects without needing to install
-export(
-    EXPORT ${META_PROJECT_EXPORT}
-    FILE "${PROJECT_BINARY_DIR}/${META_PROJECT_EXPORT}Config.cmake"
-)
+# HACK Temporary Disable Cmake configuration exports
+# TODO: reenable after support is added downstream
+# https://github.com/cryspen/hacl-packages/pull/320
 
-# Generate the install-tree ElectionGuardConfig.cmake for use
-# in other cmake projects after this library has been installed
-install(
-    EXPORT ${META_PROJECT_EXPORT}
-    FILE ${META_PROJECT_EXPORT}Config.cmake
-    DESTINATION lib/cmake/${META_PROJECT_EXPORT}/${PROJECT_VERSION}
-)
+# # Generate the build-tree ElectionGuardConfig.cmake for use
+# # in other cmake projects without needing to install
+# export(
+# EXPORT ${META_PROJECT_EXPORT}
+# FILE "${PROJECT_BINARY_DIR}/${META_PROJECT_EXPORT}Config.cmake"
+# )
+
+# # Generate the install-tree ElectionGuardConfig.cmake for use
+# # in other cmake projects after this library has been installed
+# install(
+# EXPORT ${META_PROJECT_EXPORT}
+# FILE ${META_PROJECT_EXPORT}Config.cmake
+# DESTINATION lib/cmake/${META_PROJECT_EXPORT}/${PROJECT_VERSION}
+# )
 
 # ---- Test ----
 if(OPTION_ENABLE_TESTS)
