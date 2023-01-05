@@ -44,6 +44,9 @@ BUILD := 1
 # Debug or Release (capitalized)
 TARGET?=Release
 
+# Tempoarily disable Vale
+DISABLE_VALE=ON
+
 ifeq ($(OPERATING_SYSTEM),Darwin)
 NDK_PATH?=/Users/$$USER/Library/Android/sdk/ndk/21.3.6528147
 endif
@@ -109,20 +112,23 @@ endif
 build:
 	@echo 🧱 BUILD $(OPERATING_SYSTEM) $(PLATFORM) $(TARGET)
 ifeq ($(OPERATING_SYSTEM),Windows)
-	cmake -S . -B $(ELECTIONGUARD_BUILD_LIBS_DIR)/$(PLATFORM)/$(TARGET) -G "Visual Studio 17 2022" -A $(PLATFORM) \
+	cmake -S . -B $(ELECTIONGUARD_BUILD_LIBS_DIR)/$(PLATFORM)/ -G "Visual Studio 17 2022" -A $(PLATFORM) \
 		-DCMAKE_BUILD_TYPE=$(TARGET) \
 		-DBUILD_SHARED_LIBS=ON \
-		-DCAN_USE_VECTOR_INTRINSICS=ON \
 		-DCPM_SOURCE_CACHE=$(CPM_SOURCE_CACHE)
-	cmake --build $(ELECTIONGUARD_BUILD_LIBS_DIR)/$(PLATFORM)/$(TARGET)--config $(TARGET)
+	cmake --build $(ELECTIONGUARD_BUILD_LIBS_DIR)/$(PLATFORM)/--config $(TARGET)
 else
 	cmake -S . -B $(ELECTIONGUARD_BUILD_LIBS_DIR)/$(PLATFORM)/$(TARGET) \
 		-DCMAKE_BUILD_TYPE=$(TARGET) \
 		-DBUILD_SHARED_LIBS=ON \
+		-DDISABLE_VALE=$(DISABLE_VALE) \
 		-DCPM_SOURCE_CACHE=$(CPM_SOURCE_CACHE) \
 		-DCMAKE_TOOLCHAIN_FILE=cmake/toolchains/$(PLATFORM)-$(OPERATING_SYSTEM).cmake
 	cmake --build $(ELECTIONGUARD_BUILD_LIBS_DIR)/$(PLATFORM)/$(TARGET)
 endif
+
+build-x64:
+	PLATFORM=x64 && make build
 	
 build-msys2:
 	@echo 🖥️ BUILD $(OPERATING_SYSTEM) MSYS2 $(PLATFORM)
@@ -187,10 +193,13 @@ else
 endif
 
 build-netstandard:
-	@echo 🖥️ BUILD NETSTANDARD
+	@echo 🖥️ BUILD NETSTANDARD $(OPERATING_SYSTEM) $(PLATFORM) $(TARGET)
 	make build
 	cd ./bindings/netstandard/ElectionGuard && dotnet restore
-	dotnet build --configuration $(TARGET) ./bindings/netstandard/ElectionGuard/ElectionGuard.sln /p:Platform=x64
+	dotnet build --configuration $(TARGET) ./bindings/netstandard/ElectionGuard/ElectionGuard.sln /p:Platform=$(PLATFORM)
+
+build-netstandard-x64:
+	PLATFORM=x64 && make build-netstandard
 
 # Clean
 
@@ -326,7 +335,7 @@ stop-db:
 # Benchmarks
 
 bench:
-	@echo 🧪 BENCHMARK $(PLATFORM)
+	@echo 🧪 BENCHMARK $(OPERATING_SYSTEM) $(PLATFORM) $(TARGET)
 ifeq ($(OPERATING_SYSTEM),Windows)
 	cmake -S . -B $(ELECTIONGUARD_BUILD_LIBS_DIR)/$(PLATFORM)/$(TARGET) -G "MSYS Makefiles" \
 		-DCMAKE_BUILD_TYPE=$(TARGET) \
@@ -340,7 +349,7 @@ else
 endif
 	cmake --build $(ELECTIONGUARD_BUILD_LIBS_DIR)/x86_64/$(TARGET)
 ifeq ($(OPERATING_SYSTEM),Windows)
-	pwsh -Command "xcopy 'build\libs\x86_64\$(TARGET)\_deps\benchmark-build\src\libbenchmark.dll' 'build\libs\x86_64\$(TARGET)\test' /Q /Y;  $$null"
+	pwsh -Command "xcopy 'build\libs\$(PLATFORM)\$(TARGET)\_deps\benchmark-build\src\libbenchmark.dll' 'build\libs\$(PLATFORM)\$(TARGET)\test' /Q /Y;  $$null"
 endif
 	$(ELECTIONGUARD_BUILD_LIBS_DIR)/x86_64/$(TARGET)/test/ElectionGuardBenchmark
 
@@ -356,26 +365,26 @@ bench-netstandard: build-netstandard
 test:
 	@echo 🧪 TEST $(OPERATING_SYSTEM) $(PLATFORM) $(TARGET)
 ifeq ($(OPERATING_SYSTEM),Windows)
-	cmake -S . -B $(ELECTIONGUARD_BUILD_LIBS_DIR)/$(PLATFORM)/$(TARGET) -G "Visual Studio 17 2022" -A $(PLATFORM) \
+	cmake -S . -B $(ELECTIONGUARD_BUILD_LIBS_DIR)/$(PLATFORM) -G "Visual Studio 17 2022" -A $(PLATFORM) \
 		-DCMAKE_BUILD_TYPE=$(TARGET) \
 		-DCPM_SOURCE_CACHE=$(CPM_SOURCE_CACHE) \
 		-DCMAKE_TOOLCHAIN_FILE=cmake/toolchains/test.cmake
 	cmake --build $(ELECTIONGUARD_BUILD_LIBS_DIR)/$(PLATFORM)/$(TARGET) --config $(TARGET)
-	$(ELECTIONGUARD_BUILD_LIBS_DIR)/$(PLATFORM)/$(TARGET)/test/$(TARGET)/ElectionGuardTests
-	$(ELECTIONGUARD_BUILD_LIBS_DIR)/$(PLATFORM)/$(TARGET)/test/$(TARGET)/ElectionGuardCTests
+	$(ELECTIONGUARD_BUILD_LIBS_DIR)/$(PLATFORM)/test/$(TARGET)/ElectionGuardTests
+	$(ELECTIONGUARD_BUILD_LIBS_DIR)/$(PLATFORM)/test/$(TARGET)/ElectionGuardCTests
 else
 	cmake -S . -B $(ELECTIONGUARD_BUILD_LIBS_DIR)/$(PLATFORM)/$(TARGET) \
 		-DCMAKE_BUILD_TYPE=$(TARGET) \
+		-DDISABLE_VALE=$(DISABLE_VALE) \
 		-DCPM_SOURCE_CACHE=$(CPM_SOURCE_CACHE) \
 		-DCMAKE_TOOLCHAIN_FILE=cmake/toolchains/test.cmake
 	cmake --build $(ELECTIONGUARD_BUILD_LIBS_DIR)/$(PLATFORM)/$(TARGET)
 	$(ELECTIONGUARD_BUILD_LIBS_DIR)/$(PLATFORM)/$(TARGET)/test/ElectionGuardTests
 	$(ELECTIONGUARD_BUILD_LIBS_DIR)/$(PLATFORM)/$(TARGET)/test/ElectionGuardCTests
 endif
-	
 
 test-msys2:
-	@echo 🧪 TEST MSVC
+	@echo 🧪 TEST MSYS2 $(OPERATING_SYSTEM) $(PLATFORM) $(TARGET)
 ifeq ($(OPERATING_SYSTEM),Windows)
 	cmake -S . -B $(ELECTIONGUARD_BUILD_LIBS_DIR)/x86_64/$(TARGET) -G "MSYS Makefiles" \
 		-DCMAKE_BUILD_TYPE=$(TARGET) \
@@ -390,6 +399,9 @@ test-netstandard: build-netstandard
 	@echo 🧪 TEST NETSTANDARD $(PLATFORM) $(TARGET)
 	dotnet test -a $(PLATFORM) --configuration $(TARGET) ./bindings/netstandard/ElectionGuard/ElectionGuard.sln
 
+test-netstandard-x64:
+	PLATFORM=x64 && make test-netstandard
+
 test-ui:
 	@echo 🧪 TEST UI $(PLATFORM) $(TARGET)
 	dotnet build -a $(PLATFORM) --configuration $(TARGET) ./src/electionguard-ui/electionGuard.UI.Test/ElectionGuard.UI.Test.csproj
@@ -403,7 +415,7 @@ endif
 # Coverage
 
 coverage:
-	@echo ✅ CHECK COVERAGE $(PLATFORM) $(TARGET)
+	@echo ✅ CHECK COVERAGE $(OPERATING_SYSTEM) $(PLATFORM) $(TARGET)
 ifeq ($(OPERATING_SYSTEM),Windows)
 	cmake -S . -B $(ELECTIONGUARD_BUILD_LIBS_DIR)/$(PLATFORM)/$(TARGET) -G "MSYS Makefiles" \
 		-DCMAKE_BUILD_TYPE=$(TARGET) \
