@@ -14,10 +14,10 @@
 namespace electionguard
 {
 
-    /// <Summary>
+    /// <summary>
     /// Enumeration for the type of ElectionType
     /// see: https://developers.google.com/elections-data/reference/election-type
-    /// </Summary>
+    /// </summary>
     enum class ElectionType {
         unknown = 0,
         general = 1,
@@ -29,21 +29,21 @@ namespace electionguard
         other = 7
     };
 
-    /// <Summary>
+    /// <summary>
     /// Get a string representation of a ElectionType enum
-    /// </Summary>
+    /// </summary>
     EG_API std::string getElectionTypeString(const ElectionType &value);
 
-    /// <Summary>
+    /// <summary>
     /// Get a ElectionType enum from a string.
     /// <returns>ElectionType.unknown if the value cannot be resolved</returns>
-    /// </Summary>
+    /// </summary>
     EG_API ElectionType getElectionType(const std::string &value);
 
-    /// <Summary>
+    /// <summary>
     /// Enumeration for the type of geopolitical unit
     /// see: https://developers.google.com/elections-data/reference/reporting-unit-type
-    /// </Summary>
+    /// </summary>
     enum class ReportingUnitType {
         unknown = 0,
         ballotBatch = 1,
@@ -76,21 +76,21 @@ namespace electionguard
         other = 28,
     };
 
-    /// <Summary>
+    /// <summary>
     /// Get a string representation of a ReportingUnitType enum
-    /// </Summary>
+    /// </summary>
     EG_API std::string getReportingUnitTypeString(const ReportingUnitType &value);
 
-    /// <Summary>
+    /// <summary>
     /// Get a ReportingUnitType enum from a string.
     /// <returns>ReportingUnitType.unknown if the value cannot be resolved</returns>
-    /// </Summary>
+    /// </summary>
     EG_API ReportingUnitType getReportingUnitType(const std::string &value);
 
-    /// <Summary>
+    /// <summary>
     /// Enumeration for the type of VoteVariationType
     /// see: https://developers.google.com/elections-data/reference/vote-variation
-    /// </Summary>
+    /// </summary>
     enum class VoteVariationType {
         unknown = 0,
         one_of_m = 1,
@@ -107,21 +107,21 @@ namespace electionguard
         other = 12
     };
 
-    /// <Summary>
+    /// <summary>
     /// Get a string representation of a VoteVariationType enum
-    /// </Summary>
+    /// </summary>
     EG_API std::string getVoteVariationTypeString(const VoteVariationType &value);
 
-    /// <Summary>
+    /// <summary>
     /// Get a VoteVariationType enum from a string.
     /// <returns>VoteVariationType.unknown if the value cannot be resolved</returns>
-    /// </Summary>
+    /// </summary>
     EG_API VoteVariationType getVoteVariationType(const std::string &value);
 
-    /// <Summary>
+    /// <summary>
     /// Use this as a type for character strings.
     /// See: https://developers.google.com/elections-data/reference/annotated-string
-    /// </Summary>
+    /// </summary>
     class EG_API AnnotatedString : public CryptoHashable
     {
       public:
@@ -133,24 +133,24 @@ namespace electionguard
         AnnotatedString &operator=(const AnnotatedString &other);
         AnnotatedString &operator=(AnnotatedString &&other) noexcept;
 
-        /// <Summary>
+        /// <summary>
         /// An annotation of up to 16 characters that's associated with a character string.
-        /// </Summary>
+        /// </summary>
         std::string getAnnotation() const;
 
-        /// <Summary>
+        /// <summary>
         /// The character string
-        /// </Summary>
+        /// </summary>
         std::string getValue() const;
 
-        /// <Summary>
+        /// <summary>
         /// A hash representation of the object
-        /// </Summary>
+        /// </summary>
         virtual std::unique_ptr<ElementModQ> crypto_hash() override;
 
-        /// <Summary>
+        /// <summary>
         /// A hash representation of the object
-        /// </Summary>
+        /// </summary>
         virtual std::unique_ptr<ElementModQ> crypto_hash() const override;
 
       private:
@@ -159,11 +159,11 @@ namespace electionguard
         std::unique_ptr<Impl> pimpl;
     };
 
-    /// <Summary>
+    /// <summary>
     /// The ISO-639 language
     /// see: https://en.wikipedia.org/wiki/ISO_639
     /// see: https://developers.google.com/civics-data/reference/internationalized-text#language-string
-    /// </Summary>
+    /// </summary>
     class EG_API Language : public CryptoHashable
     {
       public:
@@ -175,24 +175,24 @@ namespace electionguard
         Language &operator=(const Language &other);
         Language &operator=(Language &&other) noexcept;
 
-        /// <Summary>
+        /// <summary>
         /// The value
-        /// </Summary>
+        /// </summary>
         std::string getValue() const;
 
-        /// <Summary>
+        /// <summary>
         /// Identifies the language
-        /// </Summary>
+        /// </summary>
         std::string getLanguage() const;
 
-        /// <Summary>
+        /// <summary>
         /// A hash representation of the object
-        /// </Summary>
+        /// </summary>
         virtual std::unique_ptr<ElementModQ> crypto_hash() override;
 
-        /// <Summary>
+        /// <summary>
         /// A hash representation of the object
-        /// </Summary>
+        /// </summary>
         virtual std::unique_ptr<ElementModQ> crypto_hash() const override;
 
       private:
@@ -201,10 +201,10 @@ namespace electionguard
         std::unique_ptr<Impl> pimpl;
     };
 
-    /// <Summary>
+    /// <summary>
     /// Data entity used to represent multi-national text. Use when text on a ballot contains multi-national text.
     /// See: https://developers.google.com/elections-data/reference/internationalized-text
-    /// </Summary>
+    /// </summary>
     class EG_API InternationalizedText : public CryptoHashable
     {
       public:
@@ -216,19 +216,19 @@ namespace electionguard
         InternationalizedText &operator=(InternationalizedText other);
         InternationalizedText &operator=(InternationalizedText &&other);
 
-        /// <Summary>
+        /// <summary>
         /// A string of possibly non-English text.
-        /// </Summary>
+        /// </summary>
         std::vector<std::reference_wrapper<Language>> getText() const;
 
-        /// <Summary>
+        /// <summary>
         /// A hash representation of the object
-        /// </Summary>
+        /// </summary>
         virtual std::unique_ptr<ElementModQ> crypto_hash() override;
 
-        /// <Summary>
+        /// <summary>
         /// A hash representation of the object
-        /// </Summary>
+        /// </summary>
         virtual std::unique_ptr<ElementModQ> crypto_hash() const override;
 
       private:
@@ -237,14 +237,14 @@ namespace electionguard
         std::unique_ptr<Impl> pimpl;
     };
 
-    /// <Summary>
+    /// <summary>
     /// For defining contact information about objects such as persons, boards of authorities, and organizations.
     ///
     /// Contact Information values are not used internally by ElectionGuard when encrypting ballots
     /// but are included for checking the validity of a supplied manifest.
     ///
     /// See: https://developers.google.com/elections-data/reference/contact-information
-    /// </Summary>
+    /// </summary>
     class EG_API ContactInformation : public CryptoHashable
     {
       public:
@@ -265,33 +265,33 @@ namespace electionguard
         ContactInformation &operator=(ContactInformation other);
         ContactInformation &operator=(ContactInformation &&other);
 
-        /// <Summary>
+        /// <summary>
         /// Associates an address with the contact.
         /// AddressLine needs to contain the lines that someone would
         /// enter into a web mapping service to find the address on a map.
         /// That is, the value of the field needs to geocode the contact location.
-        /// </Summary>
+        /// </summary>
         std::vector<std::string> getAddressLine() const;
 
-        /// <Summary>
+        /// <summary>
         /// Associates an email address with the contact.
-        /// </Summary>
+        /// </summary>
         std::vector<std::reference_wrapper<AnnotatedString>> getEmail() const;
 
-        /// <Summary>
+        /// <summary>
         /// Associates a phone number with the contact.
-        /// </Summary>
+        /// </summary>
         std::vector<std::reference_wrapper<AnnotatedString>> getPhone() const;
         std::string getName() const;
 
-        /// <Summary>
+        /// <summary>
         /// A hash representation of the object
-        /// </Summary>
+        /// </summary>
         virtual std::unique_ptr<ElementModQ> crypto_hash() override;
 
-        /// <Summary>
+        /// <summary>
         /// A hash representation of the object
-        /// </Summary>
+        /// </summary>
         virtual std::unique_ptr<ElementModQ> crypto_hash() const override;
 
       private:
@@ -300,7 +300,7 @@ namespace electionguard
         std::unique_ptr<Impl> pimpl;
     };
 
-    /// <Summary>
+    /// <summary>
     /// A geopolitical unit describes any physical or
     /// virtual unit of representation or vote/seat aggregation.
     /// Use this entity for defining geopolitical units such as
@@ -312,7 +312,7 @@ namespace electionguard
     /// ElectionGuard to determine the validity of ballot styles.
     ///
     /// See: https://developers.google.com/elections-data/reference/gp-unit
-    /// </Summary>
+    /// </summary>
     class EG_API GeopoliticalUnit : public CryptoHashable
     {
       public:
@@ -328,31 +328,31 @@ namespace electionguard
         GeopoliticalUnit &operator=(GeopoliticalUnit other);
         GeopoliticalUnit &operator=(GeopoliticalUnit &&other);
 
-        /// <Summary>
+        /// <summary>
         /// Unique internal identifier that's used by other elements to reference this element.
-        /// </Summary>
+        /// </summary>
         std::string getObjectId() const;
 
-        /// <Summary>
+        /// <summary>
         /// Name of the geopolitical unit.
-        /// </Summary>
+        /// </summary>
         std::string getName() const;
 
-        /// <Summary>
+        /// <summary>
         /// The type of reporting unit
-        /// </Summary>
+        /// </summary>
         ReportingUnitType getType() const;
 
         ContactInformation *getContactInformation() const;
 
-        /// <Summary>
+        /// <summary>
         /// A hash representation of the object
-        /// </Summary>
+        /// </summary>
         virtual std::unique_ptr<ElementModQ> crypto_hash() override;
 
-        /// <Summary>
+        /// <summary>
         /// A hash representation of the object
-        /// </Summary>
+        /// </summary>
         virtual std::unique_ptr<ElementModQ> crypto_hash() const override;
 
       private:
@@ -361,7 +361,7 @@ namespace electionguard
         std::unique_ptr<Impl> pimpl;
     };
 
-    /// <Summary>
+    /// <summary>
     /// A BallotStyle works as a key to uniquely specify a set of contests. See also `ContestDescription`.
     ///
     /// For ElectionGuard, each contest is associated with a specific geopolitical unit,
@@ -369,7 +369,7 @@ namespace electionguard
     ///
     /// It is up to the consuming application to determine how to interpreit the relationships
     /// between these entity types.
-    /// </Summary>
+    /// </summary>
     class EG_API BallotStyle : public CryptoHashable
     {
       public:
@@ -385,34 +385,34 @@ namespace electionguard
         BallotStyle &operator=(BallotStyle other);
         BallotStyle &operator=(BallotStyle &&other);
 
-        /// <Summary>
+        /// <summary>
         /// Unique internal identifier that's used by other elements to reference this element.
-        /// </Summary>
+        /// </summary>
         std::string getObjectId() const;
 
-        /// <Summary>
+        /// <summary>
         /// the Geopolitical Unit Id or id's that correlate to this ballot style
-        /// </Summary>
+        /// </summary>
         std::vector<std::string> getGeopoliticalUnitIds() const;
 
-        /// <Summary>
+        /// <summary>
         /// the Party Id or Id's (if any) for this ballot style
-        /// </Summary>
+        /// </summary>
         std::vector<std::string> getPartyIds() const;
 
-        /// <Summary>
+        /// <summary>
         /// The image uri
-        /// </Summary>
+        /// </summary>
         std::string getImageUri() const;
 
-        /// <Summary>
+        /// <summary>
         /// A hash representation of the object
-        /// </Summary>
+        /// </summary>
         virtual std::unique_ptr<ElementModQ> crypto_hash() override;
 
-        /// <Summary>
+        /// <summary>
         /// A hash representation of the object
-        /// </Summary>
+        /// </summary>
         virtual std::unique_ptr<ElementModQ> crypto_hash() const override;
 
       private:
@@ -421,13 +421,13 @@ namespace electionguard
         std::unique_ptr<Impl> pimpl;
     };
 
-    /// <Summary>
+    /// <summary>
     /// Use this entity to describe a political party that can then be referenced from other entities.
     ///
     /// It is not required to define a party for Electionguard.
     ///
     /// See: https://developers.google.com/elections-data/reference/party
-    /// </Summary>
+    /// </summary>
     class EG_API Party : public CryptoHashable
     {
       public:
@@ -445,39 +445,39 @@ namespace electionguard
         Party &operator=(Party other);
         Party &operator=(Party &&other);
 
-        /// <Summary>
+        /// <summary>
         /// Unique internal identifier that's used by other elements to reference this element.
-        /// </Summary>
+        /// </summary>
         std::string getObjectId() const;
 
-        /// <Summary>
+        /// <summary>
         /// Name of the party
-        /// </Summary>
+        /// </summary>
         InternationalizedText *getName() const;
 
-        /// <Summary>
+        /// <summary>
         /// Abbreviation of the party
-        /// </Summary>
+        /// </summary>
         std::string getAbbreviation() const;
 
-        /// <Summary>
+        /// <summary>
         /// An optional color in hex
-        /// </Summary>
+        /// </summary>
         std::string getColor() const;
 
-        /// <Summary>
+        /// <summary>
         /// An optional logo uri
-        /// </Summary>
+        /// </summary>
         std::string getLogoUri() const;
 
-        /// <Summary>
+        /// <summary>
         /// A hash representation of the object
-        /// </Summary>
+        /// </summary>
         virtual std::unique_ptr<ElementModQ> crypto_hash() override;
 
-        /// <Summary>
+        /// <summary>
         /// A hash representation of the object
-        /// </Summary>
+        /// </summary>
         virtual std::unique_ptr<ElementModQ> crypto_hash() const override;
 
       private:
@@ -486,7 +486,7 @@ namespace electionguard
         std::unique_ptr<Impl> pimpl;
     };
 
-    /// <Summary>
+    /// <summary>
     /// Entity describing information about a candidate in a contest.
     /// See: https://developers.google.com/elections-data/reference/candidate
     ///
@@ -495,7 +495,7 @@ namespace electionguard
     /// for instance, on a yes-no referendum contest, two `candidate` objects
     /// would be included in the model to represent the `affirmative` and `negative`
     /// selections for the contest.  See the wiki, readme's, and tests in this repo for more info.
-    /// </Summary>
+    /// </summary>
     class EG_API Candidate : public CryptoHashable
     {
       public:
@@ -514,44 +514,44 @@ namespace electionguard
         Candidate &operator=(Candidate other);
         Candidate &operator=(Candidate &&other);
 
-        /// <Summary>
+        /// <summary>
         /// Unique internal identifier that's used by other elements to reference this element.
-        /// </Summary>
+        /// </summary>
         std::string getObjectId() const;
 
-        /// <Summary>
+        /// <summary>
         /// A convenience accessor for getObjectId
-        /// </Summary>
+        /// </summary>
         std::string getCandidateId() const;
 
-        /// <Summary>
+        /// <summary>
         /// Name of the candidate
-        /// </Summary>
+        /// </summary>
         InternationalizedText *getName() const;
 
-        /// <Summary>
+        /// <summary>
         /// Optional party id of the candidate
-        /// </Summary>
+        /// </summary>
         std::string getPartyId() const;
 
-        /// <Summary>
+        /// <summary>
         /// Optional image uri for the candidate
-        /// </Summary>
+        /// </summary>
         std::string getImageUri() const;
 
-        /// <Summary>
+        /// <summary>
         /// Does the candidate support write-ins?
-        /// </Summary>
+        /// </summary>
         bool isWriteIn() const;
 
-        /// <Summary>
+        /// <summary>
         /// A hash representation of the object
-        /// </Summary>
+        /// </summary>
         virtual std::unique_ptr<ElementModQ> crypto_hash() override;
 
-        /// <Summary>
+        /// <summary>
         /// A hash representation of the object
-        /// </Summary>
+        /// </summary>
         virtual std::unique_ptr<ElementModQ> crypto_hash() const override;
 
       private:
@@ -586,31 +586,31 @@ namespace electionguard
         SelectionDescription &operator=(SelectionDescription other);
         SelectionDescription &operator=(SelectionDescription &&other);
 
-        /// <Summary>
+        /// <summary>
         /// Unique internal identifier that's used by other elements to reference this element.
-        /// </Summary>
+        /// </summary>
         std::string getObjectId() const;
 
-        /// <Summary>
+        /// <summary>
         /// the object id of the candidate
-        /// </Summary>
+        /// </summary>
         std::string getCandidateId() const;
 
-        /// <Summary>
+        /// <summary>
         /// The sequence order defining this selections place in the contest selection collection.
         /// Note: this is specifically for programs to interpret and does not necessarily represent
         /// the order in which selections are presented to a user.
-        /// </Summary>
+        /// </summary>
         uint64_t getSequenceOrder() const;
 
-        /// <Summary>
+        /// <summary>
         /// A hash representation of the object
-        /// </Summary>
+        /// </summary>
         virtual std::unique_ptr<ElementModQ> crypto_hash() override;
 
-        /// <Summary>
+        /// <summary>
         /// A hash representation of the object
-        /// </Summary>
+        /// </summary>
         virtual std::unique_ptr<ElementModQ> crypto_hash() const override;
 
       private:
@@ -671,68 +671,68 @@ namespace electionguard
         ContestDescription &operator=(ContestDescription other);
         ContestDescription &operator=(ContestDescription &&other);
 
-        /// <Summary>
+        /// <summary>
         /// Unique internal identifier that's used by other elements to reference this element.
-        /// </Summary>
+        /// </summary>
         std::string getObjectId() const;
 
-        /// <Summary>
+        /// <summary>
         /// The object id of the geopolitical unit associated with this contest.
         /// Note: in concordance with the NIST standard, the name `ElectoralDistrictId` is kept
-        /// </Summary>
+        /// </summary>
         std::string getElectoralDistrictId() const;
 
-        /// <Summary>
+        /// <summary>
         /// The sequence order defining this contest's place in the contest collection of the ballot style.
         /// Note: this is specifically for programs to interpret and does not necessarily represent
         /// the order in which contests are presented to a user.
-        /// </Summary>
+        /// </summary>
         uint64_t getSequenceOrder() const;
 
-        /// <Summary>
+        /// <summary>
         /// The vote variation type.  Currently ElectionGuard supports one_of_m and n_of_m
-        /// </Summary>
+        /// </summary>
         VoteVariationType getVoteVariation() const;
 
-        /// <Summary>
+        /// <summary>
         /// The number of candidates that are elected in the contest, which is the n of an n-of-m contest
-        /// </Summary>
+        /// </summary>
         uint64_t getNumberElected() const;
 
-        /// <Summary>
+        /// <summary>
         /// The maximum number of votes or write-ins allowed per voter in this contest.
-        /// </Summary>
+        /// </summary>
         uint64_t getVotesAllowed() const;
 
-        /// <Summary>
+        /// <summary>
         /// Name of the contest as it's listed on the results report,
         /// not necessarily as it appears on the ballot.
-        /// </Summary>
+        /// </summary>
         std::string getName() const;
 
-        /// <Summary>
+        /// <summary>
         /// Title of the contest, which must match how it appears on the voters' ballots.
-        /// </Summary>
+        /// </summary>
         InternationalizedText *getBallotTitle() const;
 
-        /// <Summary>
+        /// <summary>
         /// Subtitle of the contest, which must match how it appears on the voters' ballots.
-        /// </Summary>
+        /// </summary>
         InternationalizedText *getBallotSubtitle() const;
 
-        /// <Summary>
+        /// <summary>
         /// The collection of selections in this contest.
-        /// </Summary>
+        /// </summary>
         std::vector<std::reference_wrapper<SelectionDescription>> getSelections() const;
 
-        /// <Summary>
+        /// <summary>
         /// A hash representation of the object
-        /// </Summary>
+        /// </summary>
         virtual std::unique_ptr<ElementModQ> crypto_hash() override;
 
-        /// <Summary>
+        /// <summary>
         /// A hash representation of the object
-        /// </Summary>
+        /// </summary>
         virtual std::unique_ptr<ElementModQ> crypto_hash() const override;
 
         bool isValid() const;
@@ -792,21 +792,21 @@ namespace electionguard
         ContestDescriptionWithPlaceholders &operator=(ContestDescriptionWithPlaceholders other);
         ContestDescriptionWithPlaceholders &operator=(ContestDescriptionWithPlaceholders &&other);
 
-        /// <Summary>
+        /// <summary>
         /// The collection of placeholder selections in this contest.  Order is not guaranteed.
-        /// </Summary>
+        /// </summary>
         std::vector<std::reference_wrapper<SelectionDescription>> getPlaceholders() const;
 
-        /// <Summary>
+        /// <summary>
         /// Check if a specific selection is a placeholder.
-        /// </Summary>
+        /// </summary>
         bool IsPlaceholder(SelectionDescription &selection) const;
 
         // TODO: bool isValid() const;
 
-        /// <Summary>
+        /// <summary>
         /// Get a selection for a specific selection id.
-        /// </Summary>
+        /// </summary>
         std::reference_wrapper<SelectionDescription> selectionFor(std::string &selectionId);
 
       private:
@@ -855,104 +855,108 @@ namespace electionguard
         Manifest &operator=(Manifest other);
         Manifest &operator=(Manifest &&other);
 
-        /// <Summary>
+        /// <summary>
         /// Unique identifier for a GpUnit element. Associates the election with
         /// a reporting unit that represents the geographical scope of the election,
         /// such as a state or city.
-        /// </Summary>
+        /// </summary>
         std::string getElectionScopeId() const;
 
-        /// <Summary>
+        /// <summary>
         /// Enumerated type of election, such as partisan-primary or open-primary.
-        /// </Summary>
+        /// </summary>
         ElectionType getElectionType() const;
 
-        /// <Summary>
+        /// <summary>
         /// The start date/time of the election.
-        /// </Summary>
+        /// </summary>
         std::chrono::system_clock::time_point getStartDate() const;
 
-        /// <Summary>
+        /// <summary>
         /// The end date/time of the election.
-        /// </Summary>
+        /// </summary>
         std::chrono::system_clock::time_point getEndDate() const;
 
-        /// <Summary>
+        /// <summary>
         /// Collection of geopolitical units for this election.
-        /// </Summary>
+        /// </summary>
         std::vector<std::reference_wrapper<GeopoliticalUnit>> getGeopoliticalUnits() const;
 
-        /// <Summary>
+        /// <summary>
         /// Collection of parties for this election.
-        /// </Summary>
+        /// </summary>
         std::vector<std::reference_wrapper<Party>> getParties() const;
 
-        /// <Summary>
+        /// <summary>
         /// Collection of candidates for this election.
-        /// </Summary>
+        /// </summary>
         std::vector<std::reference_wrapper<Candidate>> getCandidates() const;
 
-        /// <Summary>
+        /// <summary>
         /// Collection of contests for this election.
-        /// </Summary>
+        /// </summary>
         std::vector<std::reference_wrapper<ContestDescription>> getContests() const;
 
-        /// <Summary>
+        /// <summary>
         /// Collection of ballot styles for this election.
-        /// </Summary>
+        /// </summary>
         std::vector<std::reference_wrapper<BallotStyle>> getBallotStyles() const;
 
-        /// <Summary>
+        /// <summary>
         /// The friendly name of the election
-        /// </Summary>
+        /// </summary>
         InternationalizedText *getName() const;
         ContactInformation *getContactInformation() const;
 
         bool isValid() const;
 
-        /// <Summary>
+        /// <summary>
         /// Export the representation as BSON
-        /// </Summary>
+        /// </summary>
         std::vector<uint8_t> toBson() const;
 
-        /// <Summary>
+        /// <summary>
         /// Export the representation as MsgPack
-        /// </Summary>
+        /// </summary>
         std::vector<uint8_t> toMsgPack() const;
 
-        /// <Summary>
+        /// <summary>
         /// Export the representation as JSON
-        /// </Summary>
+        /// </summary>
         std::string toJson();
 
-        /// <Summary>
+        /// <summary>
         /// Export the representation as JSON
-        /// </Summary>
+        /// </summary>
         std::string toJson() const;
 
-        /// <Summary>
-        /// Import the representation from JSON
-        /// </Summary>
+        /// <summary>
+        /// Creates a <see cref="Manifest">Manifest</see> object from a <see href="https://www.rfc-editor.org/rfc/rfc8259.html#section-8.1">[RFC-8259]</see> UTF-8 encoded JSON string
+        /// </summary>
+        /// <param name="data">A UTF-8 Encoded JSON data string</param>
+        /// <returns>
+        /// A unique pointer to a <see cref="Manifest"> Manifest Object</see>
+        /// </returns>
         static std::unique_ptr<Manifest> fromJson(std::string data);
 
-        /// <Summary>
+        /// <summary>
         /// Import the representation from BSON
-        /// </Summary>
+        /// </summary>
         static std::unique_ptr<Manifest> fromBson(std::vector<uint8_t> data);
 
-        /// <Summary>
+        /// <summary>
         /// Import the representation from MsgPack
-        /// </Summary>
+        /// </summary>
         static std::unique_ptr<Manifest> fromMsgPack(std::vector<uint8_t> data);
 
-        /// <Summary>
+        /// <summary>
         /// A hash representation of the object
-        /// </Summary>
+        /// </summary>
         virtual std::unique_ptr<ElementModQ> crypto_hash() override;
 
-        /// <Summary>
+        /// <summary>
         /// A hash representation of the object
-        /// </Summary>
+        /// </summary>
         virtual std::unique_ptr<ElementModQ> crypto_hash() const override;
 
       private:
@@ -987,70 +991,74 @@ namespace electionguard
         /// </summary>
         const ElementModQ *getManifestHash() const;
 
-        /// <Summary>
+        /// <summary>
         /// Collection of geopolitical units for this election.
-        /// </Summary>
+        /// </summary>
         std::vector<std::reference_wrapper<GeopoliticalUnit>> getGeopoliticalUnits() const;
 
-        /// <Summary>
+        /// <summary>
         /// Collection of candidates for this election.
-        /// </Summary>
+        /// </summary>
         std::vector<std::reference_wrapper<Candidate>> getCandidates() const;
 
-        /// <Summary>
+        /// <summary>
         /// Collection of contests for this election.
-        /// </Summary>
+        /// </summary>
         std::vector<std::reference_wrapper<ContestDescriptionWithPlaceholders>> getContests() const;
 
-        /// <Summary>
+        /// <summary>
         /// Collection of ballot styles for this election.
-        /// </Summary>
+        /// </summary>
         std::vector<std::reference_wrapper<BallotStyle>> getBallotStyles() const;
 
-        /// <Summary>
+        /// <summary>
         /// Get a ballot style for a given ballot style id
-        /// </Summary>
+        /// </summary>
         BallotStyle *getBallotStyle(const std::string &ballotStyleId) const;
 
-        /// <Summary>
+        /// <summary>
         /// Collection of contests for a given ballot style id
-        /// </Summary>
+        /// </summary>
         std::vector<std::reference_wrapper<ContestDescriptionWithPlaceholders>>
         getContestsFor(const std::string &ballotStyleId) const;
 
-        /// <Summary>
+        /// <summary>
         /// Export the ballot representation as BSON
-        /// </Summary>
+        /// </summary>
         std::vector<uint8_t> toBson() const;
 
-        /// <Summary>
+        /// <summary>
         /// Export the representation as MsgPack
-        /// </Summary>
+        /// </summary>
         std::vector<uint8_t> toMsgPack() const;
 
-        /// <Summary>
+        /// <summary>
         /// Export the ballot representation as JSON
-        /// </Summary>
+        /// </summary>
         std::string toJson();
 
-        /// <Summary>
+        /// <summary>
         /// Export the ballot representation as JSON
-        /// </Summary>
+        /// </summary>
         std::string toJson() const;
 
-        /// <Summary>
-        /// Import the ballot representation from JSON
-        /// </Summary>
+        /// <summary>
+        /// Creates a <see cref="InternalManifest" >InternalManifest</see> object from a <see href="https://www.rfc-editor.org/rfc/rfc8259.html#section-8.1">[RFC-8259]</see> UTF-8 encoded JSON string
+        /// </summary>
+        /// <param name="data">A UTF-8 Encoded JSON data string</param>
+        /// <returns>
+        /// A unique pointer to an <see cref="InternalManifest">InternalManifest</see> Object
+        /// </returns>
         static std::unique_ptr<InternalManifest> fromJson(std::string data);
 
-        /// <Summary>
+        /// <summary>
         /// Import the ballot representation from BSON
-        /// </Summary>
+        /// </summary>
         static std::unique_ptr<InternalManifest> fromBson(std::vector<uint8_t> data);
 
-        /// <Summary>
+        /// <summary>
         /// Import the representation from MsgPack
-        /// </Summary>
+        /// </summary>
         static std::unique_ptr<InternalManifest> fromMsgPack(std::vector<uint8_t> data);
 
       protected:

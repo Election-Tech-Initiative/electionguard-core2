@@ -148,9 +148,9 @@ namespace ElectionGuard
         }
 
         /// <summary>
-        /// Crate a SubmittedBallot
+        /// Creates a <see cref="SubmittedBallot">SubmittedBallot</see> object from a <see href="https://www.rfc-editor.org/rfc/rfc8259.html#section-8.1">[RFC-8259]</see> UTF-8 encoded JSON string
         /// </summary>
-        /// <param name="json"></param>
+        /// <param name="json">A UTF-8 Encoded JSON data string</param>
         public SubmittedBallot(string json)
         {
             var status = NativeInterface.SubmittedBallot.FromJson(json, out Handle);
