@@ -1,9 +1,30 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Numerics;
+using System.Security.Cryptography.X509Certificates;
 using System.Threading.Tasks;
 using ElectionGuard.ElectionSetup.Extensions;
-using GuardianId = System.String;
 
 namespace ElectionGuard.ElectionSetup;
+
+
+public record GuardianPrivateRecord(
+    string GuardianId,
+    ElectionKeyPair ElectionKeys,
+    Dictionary<string, ElectionPartialKeyBackup> BackupsToShare,
+    Dictionary<string, ElectionPublicKey> GuardianElectionPublicKeys,
+    Dictionary<string, ElectionPartialKeyBackup> GuardianElectionPartialKeyBackups,
+    Dictionary<string, ElectionPartialKeyVerification> GuardianElectionPartialKeyVerifications
+    );
+
+public record GuardianRecord(
+    string GuardianId,
+    ulong SequenceOrder,
+    ElementModP ElectionPublicKey,
+    List<ElementModP> ElectionCommitments,
+    List<SchnorrProof> ElectionProofs
+    );
 
 /// <summary>
 /// Guardian of election responsible for safeguarding information and decrypting results.
@@ -14,12 +35,15 @@ namespace ElectionGuard.ElectionSetup;
 public class Guardian
 {
     private readonly ElectionKeyPair _electionKeys;
-    private readonly CeremonyDetails _ceremonyDetails;
+    //private readonly CeremonyDetails _ceremonyDetails;
     private readonly Dictionary<string, ElectionPublicKey> _otherGuardianPublicKeys;
     private readonly Dictionary<string, ElectionPartialKeyBackup> _otherGuardianPartialKeyBackups;
+    private Dictionary<string, ElectionPartialKeyVerification> _otherGuardianPartialKeyVerification = new();
 
     public string GuardianId { get; set; }
-    public Dictionary<int, ElectionPartialKeyBackup> BackupToShare { get; set; } = new();
+    public ulong SequenceOrder { get; set; }
+    public CeremonyDetails CeremonyDetails { get; set; }
+    public Dictionary<string, ElectionPartialKeyBackup> BackupsToShare { get; set; } = new();
 
     /// <summary>
     /// Initialize a guardian with the specified arguments.
@@ -33,91 +57,122 @@ public class Guardian
     public Guardian(
         ElectionKeyPair keyPair,
         CeremonyDetails ceremonyDetails,
-        Dictionary<GuardianId, ElectionPublicKey> otherGuardianPublicKeys = null,
-        Dictionary<GuardianId, ElectionPartialKeyBackup> otherGuardianPartialKeyBackups = null,
-        Dictionary<int, ElectionPartialKeyBackup> partialKeyBackup = null,
-
-        Dictionary<GuardianId, ElectionPartialKeyVerification> guardianElectionPartialKeyVerifications = null
+        Dictionary<string, ElectionPublicKey> otherGuardianPublicKeys = null,
+        Dictionary<string, ElectionPartialKeyBackup> otherGuardianPartialKeyBackups = null,
+        Dictionary<string, ElectionPartialKeyBackup> partialKeyBackup = null,
+        Dictionary<string, ElectionPartialKeyVerification> guardianElectionPartialKeyVerifications = null
         )
     {
         _electionKeys = keyPair;
-        _ceremonyDetails = ceremonyDetails;
+        GuardianId = keyPair.OwnerId;
+        SequenceOrder = keyPair.SequenceOrder;
+        CeremonyDetails = ceremonyDetails;
+
         _otherGuardianPublicKeys = otherGuardianPublicKeys;
         _otherGuardianPartialKeyBackups = otherGuardianPartialKeyBackups;
 
         if (partialKeyBackup != null)
         {
-            BackupToShare = partialKeyBackup;
+            BackupsToShare = partialKeyBackup;
         }
 
-        GenerateBackupKeys();
-    }
-
-    private void GenerateBackupKeys()
-    {
-        Parallel.For(0, _ceremonyDetails.numberOfGuardians, (i) =>
+        if (guardianElectionPartialKeyVerifications != null)
         {
-            if (i == _electionKeys.SequenceOrder)
-            {
-                // Don't generate a backup for your own key.
-                return;
-            }
+            _otherGuardianPartialKeyVerification = guardianElectionPartialKeyVerifications;
+        }
 
-            BackupToShare.Add(i, GenerateBackupKey((ulong)i));
-        });
+        SaveGuardianKey(keyPair.Share());
+        //GenerateBackupKeys();
     }
+
+    //private void GenerateBackupKeys()
+    //{
+    //    Parallel.For(0, CeremonyDetails.numberOfGuardians, (i) =>
+    //    {
+    //        if (i == _electionKeys.SequenceOrder)
+    //        {
+    //            // Don't generate a backup for your own key.
+    //            return;
+    //        }
+
+    //        BackupsToShare.Add(i.ToString(), GenerateElectionPartialKeyBackup((ulong)i));
+    //    });
+    //}
 
     /// <summary>
     /// Share a backup key 
     /// </summary>
     /// <param name="sequenceOrder"></param>
     /// <returns></returns>
-    public ElectionPartialKeyBackup Share(int sequenceOrder) => BackupToShare[sequenceOrder];
+    public ElectionPartialKeyBackup Share(string sequenceOrder) => BackupsToShare[sequenceOrder];
 
-    public static Guardian FromNonce(
-        string guardianId,
-        int sequenceOrder,
+
+    public static Guardian FromPublicKey(
         int numberOfGuardians,
         int quorum,
-        ElementModQ nonce = null)
+        string keyCeremonyId,
+        ElectionPublicKey public_key)
     {
-        var keyPair = ElectionKeyPair.GenerateElectionKeyPair(guardianId, sequenceOrder, quorum, nonce);
-        var ceremonyDetails = new CeremonyDetails(numberOfGuardians, quorum);
+        var el_gamal_key_pair = ElGamalKeyPair.FromPair(Constants.ZERO_MOD_Q, public_key.Key);
+        var keyPair = new ElectionKeyPair(
+            public_key.OwnerId,
+            public_key.SequenceOrder,
+            el_gamal_key_pair,
+            new ElectionPolynomial(new()));
+        var ceremonyDetails = new CeremonyDetails(keyCeremonyId, numberOfGuardians, quorum);
         return new(keyPair, ceremonyDetails);
     }
 
-    private ElectionPartialKeyBackup GenerateBackupKey(ulong sequenceOrder)
+    public static Guardian FromNonce(
+        string guardianId,
+        ulong sequenceOrder,
+        int numberOfGuardians,
+        int quorum,
+        string keyCeremonyId,
+        ElementModQ nonce = null)
     {
-        var coordinate = ComputePolynomialCoordinate(sequenceOrder);
-
-
-        //     coordinate_data = CoordinateData(coordinate)
-        //     nonce = rand_q()
-        //     seed = get_backup_seed(
-        //         receiver_guardian_public_key.owner_id,
-        //         receiver_guardian_public_key.sequence_order,
-        //     )
-        //     encrypted_coordinate = hashed_elgamal_encrypt(
-        //         coordinate_data.to_bytes(),
-        //         nonce,
-        //         receiver_guardian_public_key.key,
-        //         seed,
-        //     )
-        //     return ElectionPartialKeyBackup(
-        //         sender_guardian_id,
-        //         receiver_guardian_public_key.owner_id,
-        //         receiver_guardian_public_key.sequence_order,
-        //         encrypted_coordinate,
-        //     )
-        return new();
+        var keyPair = ElectionKeyPair.GenerateElectionKeyPair(guardianId, sequenceOrder, quorum, nonce);
+        var ceremonyDetails = new CeremonyDetails(keyCeremonyId, numberOfGuardians, quorum);
+        return new(keyPair, ceremonyDetails);
     }
 
-    private ElementModQ ComputePolynomialCoordinate(ulong sequenceOrder)
+
+
+    //    private ElectionPartialKeyBackup GenerateElectionPartialKeyBackup(ulong sequenceOrder)
+    private ElectionPartialKeyBackup GenerateElectionPartialKeyBackup(string senderGuardianID, ElectionPolynomial senderGuardianPolynomial, ElectionPublicKey receiverGuardianPublicKey)
+    {
+        var coordinate = ComputePolynomialCoordinate((ulong)receiverGuardianPublicKey.SequenceOrder);
+        var nonce = BigMath.RandQ();
+        var seed = GetBackupSeed(
+                receiverGuardianPublicKey.OwnerId,
+                receiverGuardianPublicKey.SequenceOrder
+            );
+
+        var data = coordinate.ToBytes();
+        var encryptedCoordinate = HashedElgamal.Encrypt(data, (ulong)data.Length, nonce, receiverGuardianPublicKey.Key, seed);
+
+        return new()
+        {
+            OwnerId = senderGuardianID,
+            DesignedId = receiverGuardianPublicKey.OwnerId,
+            DesignatedSequenceOrder = receiverGuardianPublicKey.SequenceOrder,
+            EncryptedCoordinate = encryptedCoordinate
+        };
+    }
+
+    private ElementModQ GetBackupSeed(string ownerId, ulong sequenceOrder)
+    {
+        return BigMath.HashElems(ownerId, sequenceOrder);
+    }
+
+    private ElementModQ ComputePolynomialCoordinate(ulong sequenceOrder, ElectionPolynomial? polynomial = null)
     {
         var sequenceOrderModQ = new ElementModQ(sequenceOrder);
         var coordinate = Constants.ZERO_MOD_Q; // start at 0 mod q.
 
-        foreach (var (coefficient, index) in _electionKeys.Polynomial.Coefficients.WithIndex())
+        var coefficients = polynomial != null ? polynomial.Coefficients : _electionKeys.Polynomial.Coefficients;
+
+        foreach (var (coefficient, index) in coefficients.WithIndex())
         {
             coordinate = GetCoordinate(sequenceOrderModQ, coordinate, coefficient, index);
         }
@@ -139,10 +194,262 @@ public class Guardian
         return BigMath.AddModQ(initialState, coordinateShift);
     }
 
-    public CeremonyDetails CeremonyDetails { get; set; }
-
     public ElectionPublicKey ShareKey()
     {
         return _electionKeys.Share();
     }
+
+    private void SaveGuardianKey(ElectionPublicKey key)
+    {
+        _otherGuardianPublicKeys[key.OwnerId] = key;
+    }
+
+    // fromPrivateRecord
+    public static implicit operator GuardianRecord(Guardian data)
+    {
+        var key = data._electionKeys.Share();
+        return new(
+            key.OwnerId,
+            key.SequenceOrder,
+            key.Key,
+            key.CoefficientCommitments,
+            key.CoefficientProofs);
+    }
+    public GuardianRecord Publish()
+    {
+        return this;
+    }
+
+    // export_private_data
+    public static implicit operator GuardianPrivateRecord(Guardian data)
+    {
+        return new(
+            data.GuardianId,
+            data._electionKeys,
+            data.BackupsToShare,
+            data._otherGuardianPublicKeys,
+            data._otherGuardianPartialKeyBackups,
+            data._otherGuardianPartialKeyVerification);
+    }
+
+    public GuardianPrivateRecord ExportPrivateData()
+    {
+        return this;
+    }
+
+
+    // Set_ceremonoy_details
+    public void SetCeremonyDetails(
+        int numberOfGuardians,
+        int quorum,
+        string keyCeremonyId)
+    {
+        CeremonyDetails = new CeremonyDetails(keyCeremonyId, numberOfGuardians, quorum);
+    }
+
+    // decrypt_backup
+    public ElementModQ? DecryptBackup(ElectionPartialKeyBackup backup)
+    {
+        // TODO: finish the decrypt
+        // return decrypt_backup(get_optional(backup), self._election_keys)
+
+        return null;
+    }
+
+    // all_guardian_keys_received
+    public bool AllGuardianKeysReceived()
+    {
+        return _otherGuardianPublicKeys.Count == CeremonyDetails.numberOfGuardians;
+    }
+
+    // generate_election_partial_key_backups
+    public bool GenerateElectionPartialKeyBackups()
+    {
+        foreach (var guardian_key in _otherGuardianPublicKeys)
+        {
+            var backup = GenerateElectionPartialKeyBackup(GuardianId, _electionKeys.Polynomial, guardian_key.Value);
+            if (backup == null)
+            {
+                // add logging
+                return false;
+            }
+            BackupsToShare[guardian_key.Key] = backup;
+        }
+        return true;
+    }
+
+    // share_election_partial_key_backup
+    public ElectionPartialKeyBackup? ShareElectionPartialKeyBackup(string designatedId)
+    {
+        return BackupsToShare[designatedId];
+    }
+
+    // share_election_partial_key_backups
+    public List<ElectionPartialKeyBackup> ShareElectionPartialKeyBackups()
+    {
+        return BackupsToShare.Values.ToList();
+    }
+
+    // save_election_partial_key_backup
+    public void SaveElectionPartialKeyBackup(ElectionPartialKeyBackup backup)
+    {
+        _otherGuardianPartialKeyBackups[backup.OwnerId] = backup;
+    }
+
+    // all_election_partial_key_backups_received
+    public bool AllElectionPartialKeyBackupsReceived()
+    {
+        return _otherGuardianPartialKeyBackups.Count == CeremonyDetails.numberOfGuardians - 1;
+    }
+
+
+    // verify_election_partial_key_backup
+    public ElectionPartialKeyVerification? VerifyElectionPartialKeyBackup(string guardianId)
+    {
+        var backup = _otherGuardianPartialKeyBackups[guardianId];
+        var public_key = _otherGuardianPublicKeys[guardianId];
+        if (backup is null)
+        {
+            //raise ValueError(f"No backup exists for {guardian_id}")
+        }
+        if (public_key is null)
+        {
+            //raise ValueError(f"No public key exists for {guardian_id}")
+        }
+        return VerifyElectionPartialKeyBackup(guardianId, backup, public_key, _electionKeys);
+    }
+
+    private ElectionPartialKeyVerification VerifyElectionPartialKeyBackup(string receiverGuardianId, ElectionPartialKeyBackup senderGuardianBackup, ElectionPublicKey senderGuardianPublicKey, ElectionKeyPair receiverGuardianKeys)
+    {
+        var encryption_seed = GetBackupSeed(
+                receiverGuardianId,
+                senderGuardianBackup.DesignatedSequenceOrder
+            );
+
+        var secret_key = receiverGuardianKeys.KeyPair.SecretKey;
+        var data = senderGuardianBackup.EncryptedCoordinate.Decrypt(
+                secret_key, encryption_seed, false);
+
+        var coordinate_data = new ElementModQ(data);
+
+        var verified = VerifyPolynomialCoordinate(
+                coordinate_data,
+                senderGuardianBackup.DesignatedSequenceOrder,
+                senderGuardianPublicKey.CoefficientCommitments
+            );
+        return new ElectionPartialKeyVerification()
+        {
+            OwnerId = senderGuardianBackup.OwnerId,
+            DesignatedId = senderGuardianBackup.DesignedId,
+            VerifierId = receiverGuardianId,
+            Verified = verified
+        };
+    }
+
+    // publish_election_backup_challenge
+    public ElectionPartialKeyChallenge? PublishElectionBackupChallenge(string guardianId)
+    {
+        var backup = BackupsToShare[guardianId];
+        if (backup is null)
+            return null;
+        return GenerateElectionPartialKeyChallenge(backup, _electionKeys.Polynomial);
+    }
+
+    private ElectionPartialKeyChallenge GenerateElectionPartialKeyChallenge(ElectionPartialKeyBackup backup, ElectionPolynomial polynomial)
+    {
+        return new ElectionPartialKeyChallenge()
+        {
+            OwnerId = backup.OwnerId,
+            DesignatedId = backup.DesignedId,
+            DesignatedSequenceOrder = backup.DesignatedSequenceOrder,
+            Value = ComputePolynomialCoordinate(backup.DesignatedSequenceOrder, polynomial),
+            CoefficientCommitments = polynomial.GetCommitments(),
+            CoefficientProofs = polynomial.GetProofs()
+        };
+
+    }
+
+    // verify_election_partial_key_challenge
+    public ElectionPartialKeyVerification VerifyElectionPartialKeyChallenge(ElectionPartialKeyChallenge challenge)
+    {
+        return VerifyElectionPartialKeyChallenge(GuardianId, challenge);
+    }
+
+    private ElectionPartialKeyVerification VerifyElectionPartialKeyChallenge(string verifierId, ElectionPartialKeyChallenge challenge)
+    {
+        return new ElectionPartialKeyVerification()
+        {
+            OwnerId = challenge.OwnerId,
+            DesignatedId = challenge.DesignatedId,
+            VerifierId = verifierId,
+            Verified = VerifyPolynomialCoordinate(
+                challenge.Value,
+                challenge.DesignatedSequenceOrder,
+                challenge.CoefficientCommitments)
+        };
+    }
+
+    private bool VerifyPolynomialCoordinate(ElementModQ coordinate, ulong exponent_modifier, List<ElementModP> commitments)
+    {
+        var exponent_modifier_mod_q = new ElementModP(exponent_modifier);
+        var commitment_output = Constants.ONE_MOD_P;
+        foreach (var (commitment, i) in commitments.WithIndex())
+        {
+            var modi = new ElementModP((ulong)i);
+            var exponent = BigMath.PowModP(exponent_modifier_mod_q, modi);
+            var factor = BigMath.PowModP(commitment, exponent);
+            commitment_output = BigMath.MultModP(commitment_output, factor);
+        }
+        var value_output = BigMath.GPowP(coordinate);
+        return value_output == commitment_output;
+    }
+
+    // save_election_partial_key_verification
+    public void SaveElectionPartialKeyVerification(ElectionPartialKeyVerification verification)
+    {
+        _otherGuardianPartialKeyVerification[verification.DesignatedId] = verification;
+    }
+
+    // all_election_partial_key_backups_verified
+    public bool AllElectionPartialKeyBackupsVerified()
+    {
+        var required = CeremonyDetails.numberOfGuardians - 1;
+        if (_otherGuardianPartialKeyVerification.Count != required)
+            return false;
+        foreach (var verification in _otherGuardianPartialKeyVerification.Values)
+        {
+            if (verification.Verified is false)
+                return false;
+        }
+        return true;
+    }
+
+    // publish_joint_key
+    public ElementModP? PublishJointKey()
+    {
+        if (AllGuardianKeysReceived() is false)
+            return null;
+        if (AllElectionPartialKeyBackupsVerified() is false)
+            return null;
+
+        // public_keys = map(
+        //     lambda public_key: public_key.key,
+        //     self._guardian_election_public_keys.values(),
+        // )
+        // return ElgamalCombinePublicKeys(public_keys);
+        return null;
+    }
+
+    // share_other_guardian_key
+    public ElectionPublicKey? ShareOtherGuardianKey(string guardianId)
+    {
+        return _otherGuardianPublicKeys[guardianId];
+    }
+
+    // compute_tally_share
+    // compute_ballot_shares
+    // compute_compensated_tally_share
+    // compute_compensated_ballot_shares
+    // get_valid_ballot_shares
+
 }

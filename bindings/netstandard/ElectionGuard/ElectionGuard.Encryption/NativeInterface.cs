@@ -107,6 +107,11 @@ namespace ElectionGuard
             internal static extern Status NewUnchecked(
                 ulong* in_data, out ElementModPHandle handle);
 
+            [DllImport(DllName, EntryPoint = "eg_element_mod_p_new_bytes",
+                CallingConvention = CallingConvention.Cdecl, SetLastError = true)]
+            internal static extern Status NewBytes(
+                byte* in_data, ulong length, out ElementModPHandle handle);
+
             [DllImport(DllName, EntryPoint = "eg_element_mod_p_from_uint64",
                 CallingConvention = CallingConvention.Cdecl, SetLastError = true)]
             internal static extern Status FromUint64(
@@ -134,6 +139,11 @@ namespace ElectionGuard
                 CallingConvention = CallingConvention.Cdecl, SetLastError = true)]
             internal static extern Status ToHex(
                 ElementModPHandle handle, out IntPtr data);
+
+            [DllImport(DllName, EntryPoint = "eg_element_mod_p_to_bytes",
+                CallingConvention = CallingConvention.Cdecl, SetLastError = true)]
+            internal static extern Status ToBytes(
+                ElementModPHandle handle, out IntPtr data, out ulong size);
         }
 
         internal static class ElementModQ
@@ -166,6 +176,11 @@ namespace ElectionGuard
             internal static extern Status NewUnchecked(
                 ulong* in_data, out ElementModQHandle handle);
 
+            [DllImport(DllName, EntryPoint = "eg_element_mod_q_new_bytes",
+                CallingConvention = CallingConvention.Cdecl, SetLastError = true)]
+            internal static extern Status NewBytes(
+                byte* in_data, ulong length, out ElementModQHandle handle);
+
             [DllImport(DllName, EntryPoint = "eg_element_mod_q_free",
                 CallingConvention = CallingConvention.Cdecl, SetLastError = true)]
             internal static extern Status Free(ElementModQType* handle);
@@ -174,6 +189,11 @@ namespace ElectionGuard
                 CallingConvention = CallingConvention.Cdecl, SetLastError = true)]
             internal static extern Status GetData(
                 ElementModQHandle handle, ulong** out_data, out ulong out_size);
+
+            [DllImport(DllName, EntryPoint = "eg_element_mod_q_to_bytes",
+                CallingConvention = CallingConvention.Cdecl, SetLastError = true)]
+            internal static extern Status ToBytes(
+                ElementModQHandle handle, out IntPtr data, out ulong size);
 
             [DllImport(DllName, EntryPoint = "eg_element_mod_q_to_hex",
                 CallingConvention = CallingConvention.Cdecl, SetLastError = true)]
@@ -287,6 +307,13 @@ namespace ElectionGuard
                 ElementModQ.ElementModQHandle in_secret_key,
                 out ElGamalKeyPairHandle handle);
 
+            [DllImport(DllName, EntryPoint = "eg_elgamal_keypair_from_pair_new",
+                CallingConvention = CallingConvention.Cdecl, SetLastError = true)]
+            internal static extern Status New(
+                ElementModQ.ElementModQHandle in_secret_key,
+                ElementModP.ElementModPHandle in_public_key,
+                out ElGamalKeyPairHandle handle);
+
             [DllImport(DllName, EntryPoint = "eg_elgamal_keypair_free",
                 CallingConvention = CallingConvention.Cdecl, SetLastError = true)]
             internal static extern Status Free(ElGamalKeyPairType* handle);
@@ -367,6 +394,80 @@ namespace ElectionGuard
                 ElementModP.ElementModPHandle public_key,
                 out ElGamalCiphertext.ElGamalCiphertextHandle handle);
         }
+
+
+        internal static class HashedElGamalCiphertext
+        {
+            internal struct HashedElGamalCiphertextType { };
+
+            internal class HashedElGamalCiphertextHandle
+                : ElectionGuardSafeHandle<HashedElGamalCiphertextType>
+            {
+                protected override bool Free()
+                {
+                    if (IsClosed) return true;
+
+                    var status = HashedElGamalCiphertext.Free(TypedPtr);
+                    if (status != Status.ELECTIONGUARD_STATUS_SUCCESS)
+                    {
+                        throw new ElectionGuardException($"HashedElGamalCiphertext Error Free: {status}", status);
+                    }
+                    return true;
+                }
+            }
+
+            [DllImport(DllName, EntryPoint = "eg_hashed_elgamal_ciphertext_free",
+                CallingConvention = CallingConvention.Cdecl, SetLastError = true)]
+            internal static extern Status Free(HashedElGamalCiphertextType* handle);
+
+            [DllImport(DllName, EntryPoint = "eg_hashed_elgamal_ciphertext_get_pad",
+                CallingConvention = CallingConvention.Cdecl, SetLastError = true)]
+            internal static extern Status GetPad(
+                HashedElGamalCiphertextHandle handle,
+                out ElementModP.ElementModPHandle elgamal_public_key);
+
+            [DllImport(DllName, EntryPoint = "eg_hashed_elgamal_ciphertext_get_data",
+                CallingConvention = CallingConvention.Cdecl, SetLastError = true)]
+            internal static extern Status GetData(
+                HashedElGamalCiphertextHandle handle,
+                out IntPtr data, out ulong size);
+
+            [DllImport(DllName, EntryPoint = "eg_hashed_elgamal_ciphertext_get_mac",
+                CallingConvention = CallingConvention.Cdecl, SetLastError = true)]
+            internal static extern Status GetMac(
+                HashedElGamalCiphertextHandle handle,
+                out IntPtr data, out ulong size);
+
+            [DllImport(DllName, EntryPoint = "eg_hashed_elgamal_ciphertext_crypto_hash",
+                CallingConvention = CallingConvention.Cdecl, SetLastError = true)]
+            internal static extern Status GetCryptoHash(
+                HashedElGamalCiphertextHandle handle,
+                out ElementModQ.ElementModQHandle crypto_base_hash);
+
+            [DllImport(DllName, EntryPoint = "eg_hashed_elgamal_ciphertext_decrypt_with_secret",
+                CallingConvention = CallingConvention.Cdecl, SetLastError = true)]
+            internal static extern Status Decrypt(
+                HashedElGamalCiphertextHandle handle,
+                ElementModQ.ElementModQHandle secret_key,
+                ElementModQ.ElementModQHandle description_hash,
+                bool lookForPadding,
+                out IntPtr data,
+                out ulong size);
+
+        }
+        internal static class HashedElGamal
+        {
+            [DllImport(DllName, EntryPoint = "eg_hashed_elgamal_encrypt",
+                CallingConvention = CallingConvention.Cdecl, SetLastError = true)]
+            // ReSharper disable once MemberHidesStaticFromOuterClass
+            internal static extern Status Encrypt(
+                byte* plaintext, ulong length,
+                ElementModQ.ElementModQHandle nonce,
+                ElementModP.ElementModPHandle public_key,
+                ElementModQ.ElementModQHandle seed,
+                out HashedElGamalCiphertext.HashedElGamalCiphertextHandle handle);
+        }
+
 
         #endregion
 

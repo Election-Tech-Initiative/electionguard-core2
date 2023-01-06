@@ -11,15 +11,15 @@
         public void TestEndToEndElection()
         {
             Step0ConfigureElection();
-            //            Step1KeyCeremony();
+            Step1KeyCeremony();
         }
 
         private void Step1KeyCeremony()
         {
-            for (int i = 0; i < NumberOfGuardians; i++)
+            for (ulong i = 0; i < NumberOfGuardians; i++)
             {
                 var guardianId = (i + 1).ToString();
-                var guardian = Guardian.FromNonce(guardianId, i + 1, NumberOfGuardians, Quorum);
+                var guardian = Guardian.FromNonce(guardianId, i + 1, NumberOfGuardians, Quorum, "testkey");
                 _guardians.Add(guardian);
             }
 

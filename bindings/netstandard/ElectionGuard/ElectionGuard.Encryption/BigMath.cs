@@ -143,6 +143,20 @@ namespace ElectionGuard
         }
 
         /// <summary>
+        /// Hash together the ElementModP values
+        /// </summary>
+        /// <param name="id">first value for the hash</param>
+        /// <param name="sequence">second value for the hash</param>
+        public static ElementModQ HashElems(string id, ulong sequence)
+        {
+            var status = External.HashElems(id, sequence,
+                out NativeInterface.ElementModQ.ElementModQHandle value);
+            status.ThrowIfError();
+            return new ElementModQ(value);
+        }
+
+
+        /// <summary>
         /// Multiple two ElementModQ values
         /// </summary>
         /// <param name="lhs">left hand side for the multiply</param>
@@ -233,7 +247,7 @@ namespace ElectionGuard
 
             [DllImport(
                 NativeInterface.DllName,
-                EntryPoint = "eg_hash_elems",
+                EntryPoint = "eg_hash_elems_modp_modp",
                 CallingConvention = CallingConvention.Cdecl,
                 SetLastError = true)]
             internal static extern Status HashElems(
@@ -241,6 +255,18 @@ namespace ElectionGuard
                 NativeInterface.ElementModP.ElementModPHandle commitment,
                 out NativeInterface.ElementModQ.ElementModQHandle handle
                 );
+
+            [DllImport(
+                NativeInterface.DllName,
+                EntryPoint = "eg_hash_elems_string_int",
+                CallingConvention = CallingConvention.Cdecl,
+                SetLastError = true)]
+            internal static extern Status HashElems(
+                string publickey,
+                ulong commitment,
+                out NativeInterface.ElementModQ.ElementModQHandle handle
+                );
+
 
             [DllImport(
                 NativeInterface.DllName,

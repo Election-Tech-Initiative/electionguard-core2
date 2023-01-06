@@ -40,6 +40,9 @@ namespace electionguard
         static std::unique_ptr<ElGamalKeyPair> fromSecret(const ElementModQ &secretKey,
                                                           bool isFixedBase = true);
 
+        static std::unique_ptr<ElGamalKeyPair> fromPair(const ElementModQ &secretKey,
+                                                        const ElementModP &publicKeyData);
+
       private:
         class Impl;
 #pragma warning(suppress : 4251)

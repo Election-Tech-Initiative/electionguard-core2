@@ -10,12 +10,12 @@ using MongoDB.Driver;
 
 namespace ElectionGuard.UI.Lib.Models
 {
-    public class BaseModel : ObservableObject
+    public class DatabaseRecord : ObservableObject
     {
         [BsonRepresentation(BsonType.ObjectId)]
         public string Id { get; set; }
 
-        public BaseModel()
+        public DatabaseRecord()
         {
             Id = MongoDB.Bson.ObjectId.GenerateNewId().ToString();
         }

@@ -35,13 +35,23 @@ public partial class GuardianHomeViewModel : BaseViewModel
     [ObservableProperty]
     private Tally? _currentTally;
 
-    [RelayCommand]
-    public async Task KeyCeremonySelectionChanged()
+    partial void OnCurrentKeyCeremonyChanged(KeyCeremony? value)
     {
         if (CurrentKeyCeremony == null) return;
-        await NavigationService.GoToPage(typeof(ViewKeyCeremonyViewModel), new Dictionary<string, object>
-        {
-            { "KeyCeremonyId", CurrentKeyCeremony.Id }
-        });
+        MainThread.BeginInvokeOnMainThread(async() =>
+            await NavigationService.GoToPage(typeof(ViewKeyCeremonyViewModel), new Dictionary<string, object>
+            {
+                { "KeyCeremonyId", CurrentKeyCeremony.Id }
+            }));
     }
+
+    //[RelayCommand]
+    //public async Task KeyCeremonySelectionChanged()
+    //{
+    //    if (CurrentKeyCeremony == null) return;
+    //    await NavigationService.GoToPage(typeof(ViewKeyCeremonyViewModel), new Dictionary<string, object>
+    //    {
+    //        { "KeyCeremonyId", CurrentKeyCeremony.Id }
+    //    });
+    //}
 }

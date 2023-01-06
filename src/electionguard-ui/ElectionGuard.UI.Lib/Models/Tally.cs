@@ -2,7 +2,7 @@
 
 namespace ElectionGuard.UI.Lib.Models;
 
-public partial class Tally : BaseModel
+public partial class Tally : DatabaseRecord
 {
     [ObservableProperty]
     private string? _name;

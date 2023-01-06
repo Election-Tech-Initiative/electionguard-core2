@@ -10,12 +10,12 @@ namespace ElectionGuard.ElectionSetup
         /// <summary>
         /// The Id of the guardian that generated this backup
         /// </summary>
-        private String OwnerId { get; }
+        private string OwnerId { get; }
 
         /// <summary>
         /// The Id of the guardian to receive this backup
         /// </summary>
-        private String DesignatedId { get; }
+        private string DesignatedId { get; }
 
         /// <summary>
         /// The sequence order of the designated guardian

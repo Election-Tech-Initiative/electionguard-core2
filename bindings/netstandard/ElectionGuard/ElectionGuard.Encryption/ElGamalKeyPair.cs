@@ -46,6 +46,12 @@
                 secretKey.Handle, out Handle);
             status.ThrowIfError();
         }
+        private ElGamalKeyPair(ElementModQ secretKey, ElementModP publicKey)
+        {
+            var status = NativeInterface.ElGamalKeyPair.New(
+                secretKey.Handle, publicKey.Handle, out Handle);
+            status.ThrowIfError();
+        }
 
         /// <Summary>
         /// Make an elgamal key pair from a secret.
@@ -53,6 +59,17 @@
         public static ElGamalKeyPair FromSecret(ElementModQ secretKey)
         {
             return new ElGamalKeyPair(secretKey);
+        }
+
+        /// <summary>
+        /// Make an elgamal key pair from a secret and a public key.
+        /// </summary>
+        /// <param name="secretKey"></param>
+        /// <param name="publicKey"></param>
+        /// <returns></returns>
+        public static ElGamalKeyPair FromPair(ElementModQ secretKey, ElementModP publicKey)
+        {
+            return new ElGamalKeyPair(secretKey, publicKey);
         }
 
 #pragma warning disable CS1591 // Missing XML comment for publicly visible type or member

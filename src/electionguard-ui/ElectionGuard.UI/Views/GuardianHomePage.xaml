@@ -16,8 +16,7 @@
                 <Label Style="{StaticResource H1}" Text="{helper:Translate ElectionsText}" />
                 <CollectionView ItemsSource="{Binding KeyCeremonies}" 
                                 SelectedItem="{Binding CurrentKeyCeremony}"
-                                SelectionMode="Single"
-                                SelectionChangedCommand="{Binding KeyCeremonySelectionChangedCommand}" >
+                                SelectionMode="Single">
                     <CollectionView.EmptyView>
                         <controls:NoContentView Text="{helper:Translate NoKeyCeremonies}"></controls:NoContentView>
                     </CollectionView.EmptyView>

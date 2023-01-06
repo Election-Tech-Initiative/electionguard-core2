@@ -19,23 +19,32 @@ public partial class ViewKeyCeremonyViewModel : BaseViewModel
     [ObservableProperty]
     private KeyCeremony? _keyCeremony;
 
-    [ObservableProperty] 
+    [ObservableProperty]
     private bool _isJoinVisible;
 
-    [ObservableProperty] 
+    [ObservableProperty]
     private string _keyCeremonyId = string.Empty;
 
-    public override async Task Appearing()
+    partial void OnKeyCeremonyIdChanged(string value)
     {
-        KeyCeremony = await _keyCeremonyService.GetByIdAsync(KeyCeremonyId);
+        Task.Run(async() => KeyCeremony = await _keyCeremonyService.GetByIdAsync(value)).Wait();
     }
 
-    [RelayCommand]
+    //    public override async Task Appearing()
+    //    {
+    //        KeyCeremony = await _keyCeremonyService.GetByIdAsync(KeyCeremonyId);
+    //    }
+
+    [RelayCommand(CanExecute = nameof(CanJoin))]
     public void Join()
     {
-        if (KeyCeremony == null) throw new ArgumentNullException(nameof(KeyCeremony));
         var currentGuardianUserName = AuthenticationService.UserName;
-        var guardian = Guardian.FromNonce(currentGuardianUserName, 0, KeyCeremony.NumberOfGuardians, KeyCeremony.Quorum);
+        var guardian = Guardian.FromNonce(currentGuardianUserName, 0, KeyCeremony!.NumberOfGuardians, KeyCeremony.Quorum, KeyCeremony.KeyCeremonyId);
+    }
+
+    private bool CanJoin()
+    {
+        return KeyCeremony is not null;
     }
 
     private readonly KeyCeremonyService _keyCeremonyService;

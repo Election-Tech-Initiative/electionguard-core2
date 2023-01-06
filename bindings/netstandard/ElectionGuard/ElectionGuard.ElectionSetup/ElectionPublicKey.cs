@@ -9,7 +9,7 @@ public class ElectionPublicKey
 {
     public ElectionPublicKey(
         string ownerId,
-        int sequenceOrder,
+        ulong sequenceOrder,
         ElementModP publicKey,
         List<ElementModP> publicCommitments,
         List<SchnorrProof> coefficientProofs)
@@ -29,7 +29,7 @@ public class ElectionPublicKey
     /// <summary>
     /// The sequence order of the owner guardian
     /// </summary>
-    public int SequenceOrder { get; }
+    public ulong SequenceOrder { get; }
 
     /// <summary>
     /// The election public for the guardian
