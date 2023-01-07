@@ -12,18 +12,6 @@ CPMAddPackage(
     VERSION 3.0.1
 )
 
-# Fetch the hacl dependency but enforce an explicit GIT_TAG hash
-# note, since the hacl migration is still under heavy development
-# we pull from an explicit commit instead of a release for now
-CPMAddPackage(
-    NAME hacl
-    GITHUB_REPOSITORY cryspen/hacl-packages
-    VERSION 0.6.0
-    GIT_TAG 5cb0015ef6e7c025cb6a6174af2458cf44ff32bc
-    OPTIONS
-    ""
-)
-
 CPMAddPackage(
     NAME nlohmann_json
     VERSION 3.11.2
@@ -41,80 +29,15 @@ CPMAddPackage(
 find_package(Threads REQUIRED)
 
 # ---- Library Sources ----
+include(${PROJECT_SOURCE_DIR}/src/electionguard/sources.cmake)
+
+# TODO: move libs/hacl to its on TU
 set(PROJECT_SOURCE_FILES
 
-    # Source Files
-    ${PROJECT_SOURCE_DIR}/src/electionguard/facades/ballot_code.cpp
-    ${PROJECT_SOURCE_DIR}/src/electionguard/facades/ballot_compact.cpp
-    ${PROJECT_SOURCE_DIR}/src/electionguard/facades/ballot.cpp
-    ${PROJECT_SOURCE_DIR}/src/electionguard/facades/chaum_pedersen.cpp
-    ${PROJECT_SOURCE_DIR}/src/electionguard/facades/collections.c
-    ${PROJECT_SOURCE_DIR}/src/electionguard/facades/election.cpp
-    ${PROJECT_SOURCE_DIR}/src/electionguard/facades/elgamal.cpp
-    ${PROJECT_SOURCE_DIR}/src/electionguard/facades/encrypt.cpp
-    ${PROJECT_SOURCE_DIR}/src/electionguard/facades/group.cpp
-    ${PROJECT_SOURCE_DIR}/src/electionguard/facades/Hacl_Bignum256.hpp
-    ${PROJECT_SOURCE_DIR}/src/electionguard/facades/Hacl_Bignum256.cpp
-    ${PROJECT_SOURCE_DIR}/src/electionguard/facades/Hacl_Bignum4096.hpp
-    ${PROJECT_SOURCE_DIR}/src/electionguard/facades/Hacl_Bignum4096.cpp
-    ${PROJECT_SOURCE_DIR}/src/electionguard/facades/hash.cpp
-    ${PROJECT_SOURCE_DIR}/src/electionguard/facades/manifest.cpp
-    ${PROJECT_SOURCE_DIR}/src/electionguard/async.hpp
-    ${PROJECT_SOURCE_DIR}/src/electionguard/ballot_code.cpp
-    ${PROJECT_SOURCE_DIR}/src/electionguard/ballot_compact.cpp
-    ${PROJECT_SOURCE_DIR}/src/electionguard/ballot.cpp
-    ${PROJECT_SOURCE_DIR}/src/electionguard/chaum_pedersen.cpp
-    ${PROJECT_SOURCE_DIR}/src/electionguard/convert.cpp
-    ${PROJECT_SOURCE_DIR}/src/electionguard/election.cpp
-    ${PROJECT_SOURCE_DIR}/src/electionguard/elgamal.cpp
-    ${PROJECT_SOURCE_DIR}/src/electionguard/encrypt.cpp
-    ${PROJECT_SOURCE_DIR}/src/electionguard/group.cpp
-    ${PROJECT_SOURCE_DIR}/src/electionguard/hash.cpp
-    ${PROJECT_SOURCE_DIR}/src/electionguard/hmac.cpp
-    ${PROJECT_SOURCE_DIR}/src/electionguard/log.hpp
-    ${PROJECT_SOURCE_DIR}/src/electionguard/log.cpp
-    ${PROJECT_SOURCE_DIR}/src/electionguard/lookup_table.hpp
-    ${PROJECT_SOURCE_DIR}/src/electionguard/manifest.cpp
-    ${PROJECT_SOURCE_DIR}/src/electionguard/nonces.cpp
-    ${PROJECT_SOURCE_DIR}/src/electionguard/nonces.hpp
-    ${PROJECT_SOURCE_DIR}/src/electionguard/precompute_buffers.cpp
-    ${PROJECT_SOURCE_DIR}/src/electionguard/convert.hpp
-    ${PROJECT_SOURCE_DIR}/src/electionguard/random.cpp
-    ${PROJECT_SOURCE_DIR}/src/electionguard/random.hpp
-    ${PROJECT_SOURCE_DIR}/src/electionguard/utils.hpp
-    ${PROJECT_SOURCE_DIR}/src/electionguard/variant_cast.hpp
-
-    # Include Files
-    ${PROJECT_SOURCE_DIR}/include/electionguard/ballot_code.h
-    ${PROJECT_SOURCE_DIR}/include/electionguard/ballot_code.hpp
-    ${PROJECT_SOURCE_DIR}/include/electionguard/ballot_compact.h
-    ${PROJECT_SOURCE_DIR}/include/electionguard/ballot_compact.hpp
-    ${PROJECT_SOURCE_DIR}/include/electionguard/plaintext_ballot.generated.h
-    ${PROJECT_SOURCE_DIR}/include/electionguard/plaintext_ballot_contest.generated.h
-    ${PROJECT_SOURCE_DIR}/include/electionguard/plaintext_ballot_selection.generated.h
-    ${PROJECT_SOURCE_DIR}/include/electionguard/ballot.h
-    ${PROJECT_SOURCE_DIR}/include/electionguard/ballot.hpp
-    ${PROJECT_SOURCE_DIR}/include/electionguard/chaum_pedersen.h
-    ${PROJECT_SOURCE_DIR}/include/electionguard/chaum_pedersen.hpp
-    ${PROJECT_SOURCE_DIR}/include/electionguard/constants.h
-    ${PROJECT_SOURCE_DIR}/include/electionguard/collections.h
-    ${PROJECT_SOURCE_DIR}/include/electionguard/crypto_hashable.hpp
-    ${PROJECT_SOURCE_DIR}/include/electionguard/election_object_base.hpp
-    ${PROJECT_SOURCE_DIR}/include/electionguard/election.h
-    ${PROJECT_SOURCE_DIR}/include/electionguard/election.hpp
-    ${PROJECT_SOURCE_DIR}/include/electionguard/elgamal.h
-    ${PROJECT_SOURCE_DIR}/include/electionguard/elgamal.hpp
-    ${PROJECT_SOURCE_DIR}/include/electionguard/encrypt.h
-    ${PROJECT_SOURCE_DIR}/include/electionguard/encrypt.hpp
-    ${PROJECT_SOURCE_DIR}/include/electionguard/export.h
-    ${PROJECT_SOURCE_DIR}/include/electionguard/group.h
-    ${PROJECT_SOURCE_DIR}/include/electionguard/group.hpp
-    ${PROJECT_SOURCE_DIR}/include/electionguard/hash.h
-    ${PROJECT_SOURCE_DIR}/include/electionguard/hash.hpp
-    ${PROJECT_SOURCE_DIR}/include/electionguard/manifest.h
-    ${PROJECT_SOURCE_DIR}/include/electionguard/manifest.hpp
-    ${PROJECT_SOURCE_DIR}/include/electionguard/precompute_buffers.hpp
-    ${PROJECT_SOURCE_DIR}/include/electionguard/status.h
+    # ${SOURCES_hacl_cpp}
+    ${FACADES_electionguard}
+    ${SOURCES_electionguard}
+    ${INCLUDES_electionguard}
 )
 
 add_library(${META_PROJECT_TARGET} ${PROJECT_SOURCE_FILES})
@@ -131,6 +54,10 @@ target_compile_options(${META_PROJECT_TARGET} PUBLIC "$<$<BOOL:${MSVC}>:/permiss
 if(BUILD_SHARED_LIBS)
     message("++ Building Shared Libs")
     add_compile_definitions(ELECTIONGUARD_BUILD_SHARED)
+endif()
+
+if(WIN32 AND NOT USE_32BIT_MATH)
+    message("++ Warning buidling for WIN32 with 64-bit math. Consider setting USE_32BIT_MATH for optimized performance")
 endif()
 
 if(MINGW)
@@ -167,25 +94,32 @@ target_include_directories(${META_PROJECT_TARGET}
 )
 
 # ---- Dependencies ----
-add_library(hacl::hacl ALIAS hacl)
+
+# Include the karamel sources from hacl directly in the library
+# since some of the headers are still referenced directly
+# the rest of hacl is loaded as part of the libs/hacl cpp module
 target_include_directories(${META_PROJECT_TARGET} PRIVATE
-    ${hacl_SOURCE_DIR}/include
-    ${hacl_SOURCE_DIR}/build
     ${hacl_SOURCE_DIR}/karamel/include
     ${hacl_SOURCE_DIR}/karamel/krmllib/dist/minimal
-    ${hacl_SOURCE_DIR}/vale/include
 )
+
 add_library(nlohmann_json INTERFACE IMPORTED)
 target_include_directories(nlohmann_json INTERFACE ${nlohmann_json_SOURCE_DIR}/include)
 
 if(MINGW)
-    target_link_libraries(${META_PROJECT_TARGET} PRIVATE date::date hacl nlohmann_json spdlog::spdlog_header_only Threads::Threads)
+    target_link_libraries(${META_PROJECT_TARGET} PRIVATE date::date hacl::hacl nlohmann_json spdlog::spdlog_header_only Threads::Threads)
 
     # Statically link in libstdc++
     set(CMAKE_EXE_LINKER_FLAGS " -static")
     target_link_libraries(${META_PROJECT_TARGET} PRIVATE -static-libstdc++)
 else()
-    target_link_libraries(${META_PROJECT_TARGET} PRIVATE date::date hacl::hacl nlohmann_json spdlog::spdlog_header_only Threads::Threads)
+    target_link_libraries(${META_PROJECT_TARGET}
+        PRIVATE
+        date::date
+        hacl::hacl
+        nlohmann_json
+        spdlog::spdlog_header_only
+        Threads::Threads)
 endif()
 
 # ---- Install ----

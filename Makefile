@@ -347,11 +347,11 @@ else
 		-DCPM_SOURCE_CACHE=$(CPM_SOURCE_CACHE) \
 		-DCMAKE_TOOLCHAIN_FILE=cmake/toolchains/benchmark.cmake
 endif
-	cmake --build $(ELECTIONGUARD_BUILD_LIBS_DIR)/x86_64/$(TARGET)
+	cmake --build $(ELECTIONGUARD_BUILD_LIBS_DIR)/$(PLATFORM)/$(TARGET)
 ifeq ($(OPERATING_SYSTEM),Windows)
 	pwsh -Command "xcopy 'build\libs\$(PLATFORM)\$(TARGET)\_deps\benchmark-build\src\libbenchmark.dll' 'build\libs\$(PLATFORM)\$(TARGET)\test' /Q /Y;  $$null"
 endif
-	$(ELECTIONGUARD_BUILD_LIBS_DIR)/x86_64/$(TARGET)/test/ElectionGuardBenchmark
+	$(ELECTIONGUARD_BUILD_LIBS_DIR)/$(PLATFORM)/$(TARGET)/test/ElectionGuardBenchmark
 
 bench-netstandard: build-netstandard
 	@echo 🧪 BENCHMARK
