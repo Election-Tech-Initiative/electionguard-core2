@@ -1,7 +1,5 @@
-#ifndef __FACADES__Hacl_Bignum256_H_INCLUDED__
-#define __FACADES__Hacl_Bignum256_H_INCLUDED__
-
-#include "electionguard/export.h"
+#ifndef __Hacl_Bignum256_HPP_INCLUDED__
+#define __Hacl_Bignum256_HPP_INCLUDED__
 
 #include <cstdint>
 #include <memory>
@@ -15,7 +13,7 @@ namespace hacl
     /// Instantiating this class creates a montgomery context
     /// that can be cached and reused to improve performance of mod and modexp functions
     /// </summary>
-    class EG_INTERNAL_API Bignum256
+    class Bignum256
     {
       public:
         explicit Bignum256(uint64_t *elem);
@@ -34,7 +32,6 @@ namespace hacl
 
         static uint64_t *fromBytes(uint32_t len, uint8_t *bytes);
 
-        static std::vector<uint8_t> toBytes(uint64_t *bytes);
         static void toBytes(uint64_t *bytes, uint8_t *res);
 
         static uint64_t lessThan(uint64_t *a, uint64_t *b);
@@ -49,10 +46,6 @@ namespace hacl
         std::unique_ptr<Impl> pimpl;
     };
 
-    /// <summary>
-    /// A Bignum256 instance initialized with the small prime montgomery context
-    /// </summary>
-    const EG_INTERNAL_API Bignum256 &CONTEXT_Q();
 } // namespace hacl
 
-#endif /* __FACADES__Hacl_Bignum256_H_INCLUDED__ */
+#endif /* __Hacl_Bignum256_HPP_INCLUDED__ */

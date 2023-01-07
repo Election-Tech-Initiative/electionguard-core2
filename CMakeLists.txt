@@ -58,6 +58,7 @@ set_property(GLOBAL PROPERTY USE_FOLDERS ON)
 set(IDE_FOLDER "")
 
 # ---- Sources ----
+add_subdirectory(libs/hacl)
 add_subdirectory(src)
 
 if(OPTION_ENABLE_TESTS)
