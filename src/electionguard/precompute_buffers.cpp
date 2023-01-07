@@ -1,4 +1,3 @@
-#include "Lib_Memzero0.h"
 #include "electionguard/group.hpp"
 #include "utils.hpp"
 

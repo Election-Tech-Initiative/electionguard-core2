@@ -1,12 +1,14 @@
 #include "electionguard/hmac.hpp"
 
-#include "Hacl_HMAC.h"
-#include "Lib_Memzero0.h"
+#include "../../libs/hacl/Hacl_HMAC.hpp"
+#include "../../libs/hacl/Lib.hpp"
 #include "log.hpp"
 
 #include <iomanip>
 #include <iostream>
 
+using hacl::HMACAlgorithm;
+using hacl::Lib;
 using std::get;
 using std::make_unique;
 using std::nullptr_t;
@@ -19,10 +21,9 @@ using std::vector;
 
 namespace electionguard
 {
-    vector<uint8_t> get_hmac(std::vector<uint8_t> key, std::vector<uint8_t> message,
-                             uint32_t length, uint32_t start)
+    vector<uint8_t> HMAC::compute(const vector<uint8_t> &key, const vector<uint8_t> &message,
+                                  uint32_t length, uint32_t start)
     {
-        vector<uint8_t> hmac(32, 0);
         vector<uint8_t> data_to_hmac;
 
         if (length > 0) {
@@ -36,9 +37,8 @@ namespace electionguard
         }
 
         // calculate the hmac and then zeroize the buffer holding the data we hmaced
-        Hacl_HMAC_compute_sha2_256(&hmac.front(), &key.front(), key.size(), &data_to_hmac.front(),
-                                   data_to_hmac.size());
-        Lib_Memzero0_memzero(&data_to_hmac.front(), data_to_hmac.size());
+        auto hmac = hacl::HMAC::compute(key, data_to_hmac, HMACAlgorithm::SHA2_256);
+        Lib::memZero(&data_to_hmac.front(), data_to_hmac.size());
 
         return hmac;
     }

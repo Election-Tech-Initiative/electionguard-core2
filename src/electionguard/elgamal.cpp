@@ -1,11 +1,11 @@
 #include "electionguard/elgamal.hpp"
 
-#include "Hacl_Bignum4096.h"
-#include "Hacl_HMAC.h"
-#include "Lib_Memzero0.h"
+#include "../../libs/hacl/Lib.hpp"
 #include "electionguard/hash.hpp"
 #include "electionguard/hmac.hpp"
 #include "electionguard/precompute_buffers.hpp"
+#include "facades/bignum4096.hpp"
+#include "krml/lowstar_endianness.h"
 #include "log.hpp"
 
 #include <array>
@@ -13,6 +13,8 @@
 #include <memory>
 #include <stdexcept>
 
+using electionguard::HMAC;
+using electionguard::facades::Bignum4096;
 using std::invalid_argument;
 using std::make_unique;
 using std::move;
@@ -163,25 +165,29 @@ namespace electionguard
         const auto &p = P();
         auto secret = secretKey.toElementModP();
         uint64_t divisor[MAX_P_LEN] = {};
-        bool success =
-          Hacl_Bignum4096_mod_exp_consttime(p.get(), this->getPad()->get(), MAX_P_SIZE,
-                                            secret->get(), static_cast<uint64_t *>(divisor));
+        bool success = Bignum4096::modExp(p.get(), this->getPad()->get(), MAX_P_SIZE, secret->get(),
+                                          static_cast<uint64_t *>(divisor), true);
         if (!success) {
             Log::warn("could not calculate mod exp");
             return 0;
         }
 
         uint64_t inverse[MAX_P_LEN] = {};
-        Hacl_Bignum4096_mod_inv_prime_vartime(p.get(), static_cast<uint64_t *>(divisor),
-                                              static_cast<uint64_t *>(inverse));
+        success = Bignum4096::modInvPrime(p.get(), static_cast<uint64_t *>(divisor),
+                                          static_cast<uint64_t *>(inverse));
+
+        if (!success) {
+            Log::warn("could not calculate mod inv prime");
+            return 0;
+        }
 
         uint64_t mulResult[MAX_P_LEN_DOUBLE] = {};
-        Hacl_Bignum4096_mul(this->getData()->get(), static_cast<uint64_t *>(inverse),
-                            static_cast<uint64_t *>(mulResult));
+        Bignum4096::mul(this->getData()->get(), static_cast<uint64_t *>(inverse),
+                        static_cast<uint64_t *>(mulResult));
 
         uint64_t result[MAX_P_LEN] = {};
-        success = Hacl_Bignum4096_mod(p.get(), static_cast<uint64_t *>(mulResult),
-                                      static_cast<uint64_t *>(result));
+        success = Bignum4096::mod(p.get(), static_cast<uint64_t *>(mulResult),
+                                  static_cast<uint64_t *>(result));
         if (!success) {
             Log::warn("could not calculate mod");
             return 0;
@@ -369,14 +375,14 @@ namespace electionguard
         // hash g_to_r and publicKey_to_r to get the session key
         auto session_key = hash_elems({pimpl->pad.get(), publicKey_to_r.get()});
 
-        vector<uint8_t> mac_key = get_hmac(session_key->toBytes(), encryption_seed.toBytes(),
-                                           number_of_blocks * HASHED_BLOCK_LENGTH_IN_BITS, 0);
+        vector<uint8_t> mac_key = HMAC::compute(session_key->toBytes(), encryption_seed.toBytes(),
+                                                number_of_blocks * HASHED_BLOCK_LENGTH_IN_BITS, 0);
 
         // calculate the mac (c0 is g ^ r mod p and c1 is the ciphertext, they are concatenated)
         vector<uint8_t> c0_and_c1(pimpl->pad->toBytes());
         c0_and_c1.insert(c0_and_c1.end(), pimpl->data.begin(), pimpl->data.end());
-        vector<uint8_t> our_mac = get_hmac(mac_key, c0_and_c1, 0, 0);
-        Lib_Memzero0_memzero(&mac_key.front(), mac_key.size());
+        vector<uint8_t> our_mac = HMAC::compute(mac_key, c0_and_c1, 0, 0);
+        hacl::Lib::memZero(&mac_key.front(), mac_key.size());
 
         if (pimpl->mac != our_mac) {
             throw runtime_error(
@@ -388,8 +394,8 @@ namespace electionguard
             vector<int8_t> temp_plaintext(HASHED_CIPHERTEXT_BLOCK_LENGTH, 0);
 
             vector<uint8_t> xor_key =
-              get_hmac(session_key->toBytes(), encryption_seed.toBytes(),
-                       number_of_blocks * HASHED_BLOCK_LENGTH_IN_BITS, i + 1);
+              HMAC::compute(session_key->toBytes(), encryption_seed.toBytes(),
+                            number_of_blocks * HASHED_BLOCK_LENGTH_IN_BITS, i + 1);
 
             // XOR the key with the plaintext
             for (int j = 0; j < (int)HASHED_CIPHERTEXT_BLOCK_LENGTH; j++) {
@@ -397,11 +403,11 @@ namespace electionguard
                 // advance the plaintext index
                 plaintext_index++;
             }
-            Lib_Memzero0_memzero(&xor_key.front(), xor_key.size());
+            hacl::Lib::memZero(&xor_key.front(), xor_key.size());
 
             plaintext_with_padding.insert(plaintext_with_padding.end(), temp_plaintext.begin(),
                                           temp_plaintext.end());
-            Lib_Memzero0_memzero(&temp_plaintext.front(), temp_plaintext.size());
+            hacl::Lib::memZero(&temp_plaintext.front(), temp_plaintext.size());
         }
 
         if (look_for_padding) {
@@ -523,8 +529,8 @@ namespace electionguard
             vector<uint8_t> temp_ciphertext(HASHED_CIPHERTEXT_BLOCK_LENGTH, 0);
 
             vector<uint8_t> xor_key =
-              get_hmac(session_key->toBytes(), encryption_seed.toBytes(),
-                       number_of_blocks * HASHED_BLOCK_LENGTH_IN_BITS, i + 1);
+              HMAC::compute(session_key->toBytes(), encryption_seed.toBytes(),
+                            number_of_blocks * HASHED_BLOCK_LENGTH_IN_BITS, i + 1);
 
             // XOR the key with the plaintext
             for (int j = 0; j < (int)HASHED_CIPHERTEXT_BLOCK_LENGTH; j++) {
@@ -532,20 +538,20 @@ namespace electionguard
                 // advance the plaintext index
                 plaintext_index++;
             }
-            Lib_Memzero0_memzero(&xor_key.front(), xor_key.size());
+            hacl::Lib::memZero(&xor_key.front(), xor_key.size());
 
             ciphertext.insert(ciphertext.end(), temp_ciphertext.begin(), temp_ciphertext.end());
-            Lib_Memzero0_memzero(&temp_ciphertext.front(), temp_ciphertext.size());
+            hacl::Lib::memZero(&temp_ciphertext.front(), temp_ciphertext.size());
         }
 
-        vector<uint8_t> mac_key = get_hmac(session_key->toBytes(), encryption_seed.toBytes(),
-                                           number_of_blocks * HASHED_BLOCK_LENGTH_IN_BITS, 0);
+        vector<uint8_t> mac_key = HMAC::compute(session_key->toBytes(), encryption_seed.toBytes(),
+                                                number_of_blocks * HASHED_BLOCK_LENGTH_IN_BITS, 0);
 
         // calculate the mac (c0 is g ^ r mod p and c1 is the ciphertext, they are concatenated)
         vector<uint8_t> c0_and_c1(g_to_r->toBytes());
         c0_and_c1.insert(c0_and_c1.end(), ciphertext.begin(), ciphertext.end());
-        vector<uint8_t> mac = get_hmac(mac_key, c0_and_c1, 0, 0);
-        Lib_Memzero0_memzero(&mac_key.front(), mac_key.size());
+        vector<uint8_t> mac = HMAC::compute(mac_key, c0_and_c1, 0, 0);
+        hacl::Lib::memZero(&mac_key.front(), mac_key.size());
 
         return make_unique<HashedElGamalCiphertext>(move(g_to_r), ciphertext, mac);
     }

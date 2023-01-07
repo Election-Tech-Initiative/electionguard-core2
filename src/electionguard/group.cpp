@@ -1,11 +1,11 @@
 #include "electionguard/group.hpp"
 
-#include "Hacl_HMAC_DRBG.h"
-#include "Lib_Memzero0.h"
-#include "Lib_RandomBuffer_System.h"
+#include "../../libs/hacl/Hacl_Bignum256.hpp"
+#include "../../libs/hacl/Lib.hpp"
 #include "convert.hpp"
-#include "facades/Hacl_Bignum256.hpp"
-#include "facades/Hacl_Bignum4096.hpp"
+#include "facades/bignum256.hpp"
+#include "facades/bignum4096.hpp"
+#include "krml/lowstar_endianness.h"
 #include "log.hpp"
 #include "lookup_table.hpp"
 #include "random.hpp"
@@ -20,10 +20,11 @@
 #include <stdexcept>
 #include <vector>
 
+using electionguard::facades::Bignum4096;
+using electionguard::facades::CONTEXT_P;
+using electionguard::facades::CONTEXT_Q;
 using hacl::Bignum256;
-using hacl::Bignum4096;
-using hacl::CONTEXT_P;
-using hacl::CONTEXT_Q;
+using hacl::Lib;
 using std::begin;
 using std::copy;
 using std::end;
@@ -136,7 +137,7 @@ namespace electionguard
             copy(begin(elem), end(elem), begin(data));
         };
 
-        ~Impl() { Lib_Memzero0_memzero(static_cast<uint64_t *>(data), MAX_P_LEN); };
+        ~Impl() { hacl::Lib::memZero(static_cast<uint64_t *>(data), MAX_P_LEN); };
 
         [[nodiscard]] unique_ptr<ElementModP::Impl> clone() const
         {
@@ -295,7 +296,7 @@ namespace electionguard
             copy(begin(elem), end(elem), begin(data));
         };
 
-        ~Impl() { Lib_Memzero0_memzero(static_cast<uint64_t *>(data), MAX_Q_LEN); };
+        ~Impl() { hacl::Lib::memZero(static_cast<uint64_t *>(data), MAX_Q_LEN); };
 
         [[nodiscard]] unique_ptr<ElementModQ::Impl> clone() const
         {
@@ -433,7 +434,7 @@ namespace electionguard
             throw out_of_range("Cannot convert ElementModP with size: " + to_string(size));
         }
 
-        auto *bigNum = Bignum4096::fromBytes(size, const_cast<uint8_t *>(bytes));
+        auto *bigNum = Bignum4096::fromBytes64(size, const_cast<uint8_t *>(bytes));
         if (bigNum == nullptr) {
             throw bad_alloc();
         }
@@ -822,7 +823,7 @@ namespace electionguard
     {
         auto bytes = Random::getBytes();
 
-        auto *bigNum = Bignum4096::fromBytes(MAX_P_SIZE, const_cast<uint8_t *>(bytes.data()));
+        auto *bigNum = Bignum4096::fromBytes64(MAX_P_SIZE, const_cast<uint8_t *>(bytes.data()));
         if (bigNum == nullptr) {
             throw bad_alloc();
         }
