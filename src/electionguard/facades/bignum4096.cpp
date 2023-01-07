@@ -7,8 +7,6 @@
 #include <memory>
 #include <variant>
 
-// using HaclBignum4096_32 = hacl::Bignum4096_32;
-// using HaclBignum4096 = hacl::Bignum4096;
 using std::get;
 using std::make_unique;
 using std::move;
@@ -24,14 +22,6 @@ namespace electionguard::facades
 
     using HaclBignumType =
       std::variant<unique_ptr<hacl::Bignum4096>, unique_ptr<hacl::Bignum4096_32>>;
-
-    // using HaclBignumType =
-    //   std::variant<hacl::Bignum4096, hacl::Bignum4096_32>;
-
-    // struct CallMod32 {
-    //     void operator()(const hacl::Bignum4096_32 &d) {}
-    //     void operator()(const hacl::Bignum4096 &ed) {}
-    // };
 
     struct Bignum4096::Impl {
         HaclBignumType element;
@@ -181,56 +171,7 @@ namespace electionguard::facades
 
 #pragma endregion
 
-    template <class... Fs> struct overload : Fs... {
-        template <class... Ts> overload(Ts &&...ts) : Fs{std::forward<Ts>(ts)}... {}
-
-        using Fs::operator()...;
-    };
-
-    template <class... Ts> overload(Ts &&...) -> overload<std::remove_reference_t<Ts>...>;
-
-    // helper type for the visitor #4
-    template <class... Ts> struct overloaded : Ts... {
-        using Ts::operator()...;
-    };
-    // explicit deduction guide (not needed as of C++20)
-    template <class... Ts> overloaded(Ts...) -> overloaded<Ts...>;
-
-    // template <class... Ts> struct overload : Ts... {
-    //     using Ts::operator()...;
-    // };
-    // template <class... Ts> overload(Ts...) -> overload<Ts...>;
-
 #pragma region Instance Members
-
-    //     struct CallHaclMod {
-    //     void operator()(const Derived& d) { d.PrintName(intro); }
-    //     void operator()(const ExtraDerived& ed) { ed.PrintName(intro); }
-
-    //     std::string_view intro;
-    // };
-
-    // void Bignum4096::mod(uint32_t *a, uint32_t *res) const
-    // {
-    //     //std::get<hacl::Bignum4096_32 *>(pimpl->element)->mod(a, res);
-
-    //     std::visit(overloaded{
-    //                  [a, res](hacl::Bignum4096_32 &element) { element.mod(a, res); },
-    //                  [a, res](hacl::Bignum4096 &element) {
-    //                      element.mod(reinterpret_cast<uint64_t *>(a),
-    //                                  reinterpret_cast<uint64_t *>(res));
-    //                  },
-    //                },
-    //                pimpl->element);
-    // }
-    // void Bignum4096::mod(uint64_t *a, uint64_t *res) const
-    // {
-    //     if (pimpl->prefer32BitMath) {
-    //         mod(reinterpret_cast<uint32_t *>(a), reinterpret_cast<uint32_t *>(res));
-    //         return;
-    //     }
-    //     std::get<hacl::Bignum4096 *>(pimpl->element)->mod(a, res);
-    // }
 
     void Bignum4096::mod(uint32_t *a, uint32_t *res) const
     {
