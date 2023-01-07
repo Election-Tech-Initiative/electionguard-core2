@@ -1,4 +1,4 @@
-#include "../../../src/electionguard/facades/Hacl_Bignum4096.hpp"
+#include "../../../src/electionguard/facades/bignum4096.hpp"
 #include "../utils/constants.hpp"
 
 #include <benchmark/benchmark.h>
@@ -7,7 +7,7 @@
 #include <electionguard/hash.hpp>
 
 using namespace electionguard;
-using namespace hacl;
+using namespace electionguard::facades;
 using namespace std;
 
 class HaclBignum4096Fixture : public benchmark::Fixture
