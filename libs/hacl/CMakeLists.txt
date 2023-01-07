@@ -15,7 +15,7 @@ CPMAddPackage(
     NAME hacl
     GITHUB_REPOSITORY cryspen/hacl-packages
     VERSION 0.6.0
-    GIT_TAG 5cb0015ef6e7c025cb6a6174af2458cf44ff32bc
+    GIT_TAG 2ad16266f6dbc7a75011e078dee7a30bbd76666b
     OPTIONS
     ""
 )
