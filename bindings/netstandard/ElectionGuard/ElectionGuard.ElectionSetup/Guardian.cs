@@ -6,10 +6,10 @@ namespace ElectionGuard.ElectionSetup;
 public record GuardianPrivateRecord(
     string GuardianId,
     ElectionKeyPair ElectionKeys,
-    Dictionary<string, ElectionPartialKeyBackup> BackupsToShare,
-    Dictionary<string, ElectionPublicKey> GuardianElectionPublicKeys,
-    Dictionary<string, ElectionPartialKeyBackup> GuardianElectionPartialKeyBackups,
-    Dictionary<string, ElectionPartialKeyVerification> GuardianElectionPartialKeyVerifications
+    Dictionary<string, ElectionPartialKeyBackup>? BackupsToShare,
+    Dictionary<string, ElectionPublicKey>? GuardianElectionPublicKeys,
+    Dictionary<string, ElectionPartialKeyBackup>? GuardianElectionPartialKeyBackups,
+    Dictionary<string, ElectionPartialKeyVerification>? GuardianElectionPartialKeyVerifications
     );
 
 public record GuardianRecord(
@@ -154,9 +154,9 @@ public class Guardian
         };
     }
 
-    private ElementModQ GetBackupSeed(string ownerId, ulong sequenceOrder)
+    private ElementModQ GetBackupSeed(string ownerId, ulong? sequenceOrder)
     {
-        return BigMath.HashElems(ownerId, sequenceOrder);
+        return BigMath.HashElems(ownerId, sequenceOrder ?? 0);
     }
 
     private ElementModQ ComputePolynomialCoordinate(ulong sequenceOrder, ElectionPolynomial? polynomial = null)
@@ -195,7 +195,7 @@ public class Guardian
 
     private void SaveGuardianKey(ElectionPublicKey key)
     {
-        if (_otherGuardianPublicKeys != null)
+        if (_otherGuardianPublicKeys is not null)
         {
             _otherGuardianPublicKeys[key.OwnerId] = key;
         }
@@ -290,7 +290,10 @@ public class Guardian
     // save_election_partial_key_backup
     public void SaveElectionPartialKeyBackup(ElectionPartialKeyBackup backup)
     {
-        _otherGuardianPartialKeyBackups[backup.OwnerId] = backup;
+        if (_otherGuardianPartialKeyBackups is not null)
+        {
+            _otherGuardianPartialKeyBackups[backup.OwnerId] = backup;
+        }
     }
 
     // all_election_partial_key_backups_received
@@ -303,8 +306,8 @@ public class Guardian
     // verify_election_partial_key_backup
     public ElectionPartialKeyVerification? VerifyElectionPartialKeyBackup(string guardianId)
     {
-        var backup = _otherGuardianPartialKeyBackups[guardianId];
-        var publicKey = _otherGuardianPublicKeys[guardianId];
+        var backup = _otherGuardianPartialKeyBackups?[guardianId];
+        var publicKey = _otherGuardianPublicKeys?[guardianId];
         if (backup is null)
         {
             //raise ValueError(f"No backup exists for {guardian_id}")
@@ -316,15 +319,15 @@ public class Guardian
         return VerifyElectionPartialKeyBackup(guardianId, backup, publicKey, _electionKeys);
     }
 
-    private ElectionPartialKeyVerification VerifyElectionPartialKeyBackup(string receiverGuardianId, ElectionPartialKeyBackup senderGuardianBackup, ElectionPublicKey senderGuardianPublicKey, ElectionKeyPair receiverGuardianKeys)
+    private ElectionPartialKeyVerification VerifyElectionPartialKeyBackup(string receiverGuardianId, ElectionPartialKeyBackup? senderGuardianBackup, ElectionPublicKey? senderGuardianPublicKey, ElectionKeyPair receiverGuardianKeys)
     {
         var encryption_seed = GetBackupSeed(
                 receiverGuardianId,
-                senderGuardianBackup.DesignatedSequenceOrder
+                senderGuardianBackup?.DesignatedSequenceOrder
             );
 
         var secretKey = receiverGuardianKeys.KeyPair.SecretKey;
-        var data = senderGuardianBackup.EncryptedCoordinate.Decrypt(
+        var data = senderGuardianBackup?.EncryptedCoordinate.Decrypt(
                 secretKey, encryption_seed, false);
 
         var coordinateData = new ElementModQ(data);
@@ -404,7 +407,10 @@ public class Guardian
     // save_election_partial_key_verification
     public void SaveElectionPartialKeyVerification(ElectionPartialKeyVerification verification)
     {
-        _otherGuardianPartialKeyVerification[verification.DesignatedId] = verification;
+        if (_otherGuardianPublicKeys is not null)
+        {
+            _otherGuardianPartialKeyVerification[verification.DesignatedId] = verification;
+        }
     }
 
     // all_election_partial_key_backups_verified
