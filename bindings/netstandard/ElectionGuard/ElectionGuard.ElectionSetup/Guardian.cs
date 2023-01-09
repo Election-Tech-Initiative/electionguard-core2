@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Numerics;
-using System.Security.Cryptography.X509Certificates;
-using System.Threading.Tasks;
-using ElectionGuard.ElectionSetup.Extensions;
+﻿using ElectionGuard.ElectionSetup.Extensions;
 
 namespace ElectionGuard.ElectionSetup;
 
@@ -36,9 +30,9 @@ public class Guardian
 {
     private readonly ElectionKeyPair _electionKeys;
     //private readonly CeremonyDetails _ceremonyDetails;
-    private readonly Dictionary<string, ElectionPublicKey> _otherGuardianPublicKeys;
-    private readonly Dictionary<string, ElectionPartialKeyBackup> _otherGuardianPartialKeyBackups;
-    private Dictionary<string, ElectionPartialKeyVerification> _otherGuardianPartialKeyVerification = new();
+    private readonly Dictionary<string, ElectionPublicKey>? _otherGuardianPublicKeys;
+    private readonly Dictionary<string, ElectionPartialKeyBackup>? _otherGuardianPartialKeyBackups;
+    private Dictionary<string, ElectionPartialKeyVerification>? _otherGuardianPartialKeyVerification = new();
 
     public string GuardianId { get; set; }
     public ulong SequenceOrder { get; set; }
@@ -57,10 +51,10 @@ public class Guardian
     public Guardian(
         ElectionKeyPair keyPair,
         CeremonyDetails ceremonyDetails,
-        Dictionary<string, ElectionPublicKey> otherGuardianPublicKeys = null,
-        Dictionary<string, ElectionPartialKeyBackup> otherGuardianPartialKeyBackups = null,
-        Dictionary<string, ElectionPartialKeyBackup> partialKeyBackup = null,
-        Dictionary<string, ElectionPartialKeyVerification> guardianElectionPartialKeyVerifications = null
+        Dictionary<string, ElectionPublicKey>? otherGuardianPublicKeys = null,
+        Dictionary<string, ElectionPartialKeyBackup>? otherGuardianPartialKeyBackups = null,
+        Dictionary<string, ElectionPartialKeyBackup>? partialKeyBackup = null,
+        Dictionary<string, ElectionPartialKeyVerification>? guardianElectionPartialKeyVerifications = null
         )
     {
         _electionKeys = keyPair;
@@ -129,7 +123,7 @@ public class Guardian
         int numberOfGuardians,
         int quorum,
         string keyCeremonyId,
-        ElementModQ nonce = null)
+        ElementModQ? nonce = null)
     {
         var keyPair = ElectionKeyPair.GenerateElectionKeyPair(guardianId, sequenceOrder, quorum, nonce);
         var ceremonyDetails = new CeremonyDetails(keyCeremonyId, numberOfGuardians, quorum);
@@ -201,7 +195,10 @@ public class Guardian
 
     private void SaveGuardianKey(ElectionPublicKey key)
     {
-        _otherGuardianPublicKeys[key.OwnerId] = key;
+        if (_otherGuardianPublicKeys != null)
+        {
+            _otherGuardianPublicKeys[key.OwnerId] = key;
+        }
     }
 
     // fromPrivateRecord
@@ -259,21 +256,21 @@ public class Guardian
     // all_guardian_keys_received
     public bool AllGuardianKeysReceived()
     {
-        return _otherGuardianPublicKeys.Count == CeremonyDetails.numberOfGuardians;
+        return _otherGuardianPublicKeys.Count == CeremonyDetails.NumberOfGuardians;
     }
 
     // generate_election_partial_key_backups
     public bool GenerateElectionPartialKeyBackups()
     {
-        foreach (var guardian_key in _otherGuardianPublicKeys)
+        foreach (var guardianKey in _otherGuardianPublicKeys)
         {
-            var backup = GenerateElectionPartialKeyBackup(GuardianId, _electionKeys.Polynomial, guardian_key.Value);
+            var backup = GenerateElectionPartialKeyBackup(GuardianId, _electionKeys.Polynomial, guardianKey.Value);
             if (backup == null)
             {
                 // add logging
                 return false;
             }
-            BackupsToShare[guardian_key.Key] = backup;
+            BackupsToShare[guardianKey.Key] = backup;
         }
         return true;
     }
@@ -299,7 +296,7 @@ public class Guardian
     // all_election_partial_key_backups_received
     public bool AllElectionPartialKeyBackupsReceived()
     {
-        return _otherGuardianPartialKeyBackups.Count == CeremonyDetails.numberOfGuardians - 1;
+        return _otherGuardianPartialKeyBackups.Count == CeremonyDetails.NumberOfGuardians - 1;
     }
 
 
@@ -307,16 +304,16 @@ public class Guardian
     public ElectionPartialKeyVerification? VerifyElectionPartialKeyBackup(string guardianId)
     {
         var backup = _otherGuardianPartialKeyBackups[guardianId];
-        var public_key = _otherGuardianPublicKeys[guardianId];
+        var publicKey = _otherGuardianPublicKeys[guardianId];
         if (backup is null)
         {
             //raise ValueError(f"No backup exists for {guardian_id}")
         }
-        if (public_key is null)
+        if (publicKey is null)
         {
             //raise ValueError(f"No public key exists for {guardian_id}")
         }
-        return VerifyElectionPartialKeyBackup(guardianId, backup, public_key, _electionKeys);
+        return VerifyElectionPartialKeyBackup(guardianId, backup, publicKey, _electionKeys);
     }
 
     private ElectionPartialKeyVerification VerifyElectionPartialKeyBackup(string receiverGuardianId, ElectionPartialKeyBackup senderGuardianBackup, ElectionPublicKey senderGuardianPublicKey, ElectionKeyPair receiverGuardianKeys)
@@ -326,14 +323,14 @@ public class Guardian
                 senderGuardianBackup.DesignatedSequenceOrder
             );
 
-        var secret_key = receiverGuardianKeys.KeyPair.SecretKey;
+        var secretKey = receiverGuardianKeys.KeyPair.SecretKey;
         var data = senderGuardianBackup.EncryptedCoordinate.Decrypt(
-                secret_key, encryption_seed, false);
+                secretKey, encryption_seed, false);
 
-        var coordinate_data = new ElementModQ(data);
+        var coordinateData = new ElementModQ(data);
 
         var verified = VerifyPolynomialCoordinate(
-                coordinate_data,
+                coordinateData,
                 senderGuardianBackup.DesignatedSequenceOrder,
                 senderGuardianPublicKey.CoefficientCommitments
             );
@@ -392,16 +389,16 @@ public class Guardian
     private bool VerifyPolynomialCoordinate(ElementModQ coordinate, ulong exponent_modifier, List<ElementModP> commitments)
     {
         var exponent_modifier_mod_q = new ElementModP(exponent_modifier);
-        var commitment_output = Constants.ONE_MOD_P;
+        var commitmentOutput = Constants.ONE_MOD_P;
         foreach (var (commitment, i) in commitments.WithIndex())
         {
             var modi = new ElementModP((ulong)i);
             var exponent = BigMath.PowModP(exponent_modifier_mod_q, modi);
             var factor = BigMath.PowModP(commitment, exponent);
-            commitment_output = BigMath.MultModP(commitment_output, factor);
+            commitmentOutput = BigMath.MultModP(commitmentOutput, factor);
         }
-        var value_output = BigMath.GPowP(coordinate);
-        return value_output == commitment_output;
+        var valueOutput = BigMath.GPowP(coordinate);
+        return valueOutput == commitmentOutput;
     }
 
     // save_election_partial_key_verification
@@ -413,7 +410,7 @@ public class Guardian
     // all_election_partial_key_backups_verified
     public bool AllElectionPartialKeyBackupsVerified()
     {
-        var required = CeremonyDetails.numberOfGuardians - 1;
+        var required = CeremonyDetails.NumberOfGuardians - 1;
         if (_otherGuardianPartialKeyVerification.Count != required)
             return false;
         foreach (var verification in _otherGuardianPartialKeyVerification.Values)

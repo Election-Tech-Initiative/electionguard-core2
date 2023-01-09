@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
-using System.Linq;
-
-using ElectionGuard;
+﻿using System.ComponentModel.DataAnnotations;
 
 namespace ElectionGuard.ElectionSetup;
 
@@ -53,7 +48,7 @@ public class ElectionPolynomial
     /// </remarks>
     public static ElectionPolynomial GeneratePolynomial(
         [Range(1, int.MaxValue)] int numberOfCoefficients,
-        ElementModQ nonce = null)
+        ElementModQ? nonce = null)
     {
         List<Coefficient> coefficients = new();
 
@@ -65,7 +60,7 @@ public class ElectionPolynomial
         return new(coefficients);
     }
 
-    private static Coefficient GenerateCoefficient(ElementModQ nonce, int i)
+    private static Coefficient GenerateCoefficient(ElementModQ? nonce, int i)
     {
         var keypair = ElGamalKeyPair.FromSecret(
             GenerateSecretKey(nonce, i));
@@ -79,7 +74,7 @@ public class ElectionPolynomial
     /// Force a random value to be generated for production purposes.
     /// In a production environment, nonce should be null and a random value will be generated.
     /// </summary>
-    private static ElementModQ GenerateSecretKey(ElementModQ nonce, int index)
+    private static ElementModQ GenerateSecretKey(ElementModQ? nonce, int index)
     {
         if (nonce == null)
         {
