@@ -31,10 +31,7 @@ find_package(Threads REQUIRED)
 # ---- Library Sources ----
 include(${PROJECT_SOURCE_DIR}/src/electionguard/sources.cmake)
 
-# TODO: move libs/hacl to its on TU
 set(PROJECT_SOURCE_FILES
-
-    # ${SOURCES_hacl_cpp}
     ${FACADES_electionguard}
     ${SOURCES_electionguard}
     ${INCLUDES_electionguard}

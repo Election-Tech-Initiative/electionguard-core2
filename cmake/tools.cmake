@@ -28,6 +28,12 @@ CPMAddPackage(
     GIT_TAG 22.01
 )
 
+CPMAddPackage(
+    NAME ios-cmake
+    GITHUB_REPOSITORY leetal/ios-cmake
+    GIT_TAG 4.3.0
+)
+
 # ---- Enable Tools ----
 
 # available values are: Address, Memory, MemoryWithOrigins, Undefined, Thread, Leak, 'Address;Undefined'

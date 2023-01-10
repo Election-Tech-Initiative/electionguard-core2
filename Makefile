@@ -16,7 +16,7 @@ CPM_SOURCE_CACHE=$(subst \,/,$(realpath .))/.cache/CPM
 # These vars can be set from the command line.
 # not all platforms can compile all targets.
 # valid values:
-# OPERATING_SYSTEM: Android, IOS, Linux, Darwin, Windows
+# OPERATING_SYSTEM: Android, Ios, Linux, Darwin, Windows
 # PLATFORM: arm64, x64, x86
 ifeq ($(OS),Windows_NT)
 	OPERATING_SYSTEM ?= Windows
