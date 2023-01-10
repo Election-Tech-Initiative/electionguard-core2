@@ -4,6 +4,7 @@
 #include "../../libs/hacl/Hacl_Streaming_SHA2.hpp"
 #include "log.hpp"
 
+#include <cstring>
 #include <iomanip>
 #include <iostream>
 
