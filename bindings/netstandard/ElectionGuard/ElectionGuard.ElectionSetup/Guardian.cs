@@ -133,9 +133,9 @@ public class Guardian
 
 
     //    private ElectionPartialKeyBackup GenerateElectionPartialKeyBackup(ulong sequenceOrder)
-    private ElectionPartialKeyBackup GenerateElectionPartialKeyBackup(string senderGuardianID, ElectionPolynomial senderGuardianPolynomial, ElectionPublicKey receiverGuardianPublicKey)
+    private ElectionPartialKeyBackup GenerateElectionPartialKeyBackup(string senderGuardianId, ElectionPolynomial senderGuardianPolynomial, ElectionPublicKey receiverGuardianPublicKey)
     {
-        var coordinate = ComputePolynomialCoordinate((ulong)receiverGuardianPublicKey.SequenceOrder);
+        var coordinate = ComputePolynomialCoordinate(receiverGuardianPublicKey.SequenceOrder, senderGuardianPolynomial);
         var nonce = BigMath.RandQ();
         var seed = GetBackupSeed(
                 receiverGuardianPublicKey.OwnerId,
@@ -147,7 +147,7 @@ public class Guardian
 
         return new()
         {
-            OwnerId = senderGuardianID,
+            OwnerId = senderGuardianId,
             DesignedId = receiverGuardianPublicKey.OwnerId,
             DesignatedSequenceOrder = receiverGuardianPublicKey.SequenceOrder,
             EncryptedCoordinate = encryptedCoordinate
@@ -247,21 +247,48 @@ public class Guardian
     // decrypt_backup
     public ElementModQ? DecryptBackup(ElectionPartialKeyBackup backup)
     {
-        // TODO: finish the decrypt
-        // return decrypt_backup(get_optional(backup), self._election_keys)
-
-        return null;
+        return DecryptBackup(backup, _electionKeys);
     }
+
+    public ElementModQ? DecryptBackup(ElectionPartialKeyBackup GuardianBackup, ElectionKeyPair KeyPair)
+    {
+        /*
+        Decrypts a compensated partial decryption of an elgamal encryption on behalf of a missing guardian
+
+        :param guardian_backup: Missing guardian's backup
+        :param key_pair: The present guardian's key pair that will be used to decrypt the backup
+        :return: a 'Tuple[ElementModP, ChaumPedersenProof]' of the decryption and its proof
+        */
+        var encryptionSeed = GetBackupSeed(
+            KeyPair.OwnerId,
+            KeyPair.SequenceOrder
+        );
+
+        var bytesOptional = GuardianBackup.EncryptedCoordinate.Decrypt(
+            KeyPair.KeyPair.SecretKey, encryptionSeed, false);
+
+        if (bytesOptional is null)
+            return null;
+
+        var coordinateData = new ElementModQ(bytesOptional);
+        return coordinateData;
+    }
+
 
     // all_guardian_keys_received
     public bool AllGuardianKeysReceived()
     {
-        return _otherGuardianPublicKeys.Count == CeremonyDetails.NumberOfGuardians;
+        return _otherGuardianPublicKeys?.Count == CeremonyDetails.NumberOfGuardians;
     }
 
     // generate_election_partial_key_backups
     public bool GenerateElectionPartialKeyBackups()
     {
+        if (_otherGuardianPublicKeys is null)
+        {
+            return false;
+        }
+
         foreach (var guardianKey in _otherGuardianPublicKeys)
         {
             var backup = GenerateElectionPartialKeyBackup(GuardianId, _electionKeys.Polynomial, guardianKey.Value);
@@ -299,7 +326,7 @@ public class Guardian
     // all_election_partial_key_backups_received
     public bool AllElectionPartialKeyBackupsReceived()
     {
-        return _otherGuardianPartialKeyBackups.Count == CeremonyDetails.NumberOfGuardians - 1;
+        return _otherGuardianPartialKeyBackups?.Count == CeremonyDetails.NumberOfGuardians - 1;
     }
 
 
@@ -366,7 +393,6 @@ public class Guardian
             CoefficientCommitments = polynomial.GetCommitments(),
             CoefficientProofs = polynomial.GetProofs()
         };
-
     }
 
     // verify_election_partial_key_challenge
@@ -407,7 +433,7 @@ public class Guardian
     // save_election_partial_key_verification
     public void SaveElectionPartialKeyVerification(ElectionPartialKeyVerification verification)
     {
-        if (_otherGuardianPublicKeys is not null)
+        if (_otherGuardianPartialKeyVerification is not null)
         {
             _otherGuardianPartialKeyVerification[verification.DesignatedId] = verification;
         }
@@ -417,7 +443,7 @@ public class Guardian
     public bool AllElectionPartialKeyBackupsVerified()
     {
         var required = CeremonyDetails.NumberOfGuardians - 1;
-        if (_otherGuardianPartialKeyVerification.Count != required)
+        if (_otherGuardianPartialKeyVerification?.Count != required)
             return false;
         foreach (var verification in _otherGuardianPartialKeyVerification.Values)
         {
@@ -446,10 +472,23 @@ public class Guardian
     // share_other_guardian_key
     public ElectionPublicKey? ShareOtherGuardianKey(string guardianId)
     {
-        return _otherGuardianPublicKeys[guardianId];
+        return _otherGuardianPublicKeys is not null ? _otherGuardianPublicKeys[guardianId] : null;
     }
 
     // compute_tally_share
+    // public DecryptionShare? ComputeTallyShare(CiphertextTally tally, CiphertextElectionContext context)
+    // {
+    //     /*
+    //     Compute the decryption share of tally.
+
+    //     :param tally: Ciphertext tally to get share of
+    //     :param context: Election context
+    //     :return: Decryption share of tally or None if failure
+    //     */
+    //     return ComputeDecryptionShare(_electionKeys, tally, context);
+    // }
+
+
     // compute_ballot_shares
     // compute_compensated_tally_share
     // compute_compensated_ballot_shares

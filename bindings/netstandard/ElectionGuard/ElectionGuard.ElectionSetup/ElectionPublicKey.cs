@@ -1,6 +1,4 @@
-﻿using System.Collections.Generic;
-
-namespace ElectionGuard.ElectionSetup;
+﻿namespace ElectionGuard.ElectionSetup;
 
 /// <summary>
 /// A tuple of election public key and owner information
