@@ -8,12 +8,12 @@
         /// <summary>
         /// The Id of the guardian that generated this backup
         /// </summary>
-        public string OwnerId { get; init; }
+        public string? OwnerId { get; init; }
 
         /// <summary>
         /// The Id of the guardian to receive this backup
         /// </summary>
-        public string DesignatedId { get; init; }
+        public string? DesignatedId { get; init; }
 
         /// <summary>
         /// The sequence order of the designated guardian
@@ -23,6 +23,6 @@
         /// <summary>
         /// The coordinate corresponding to a secret election polynomial
         /// </summary>
-        public HashedElGamalCiphertext EncryptedCoordinate { get; init; }
+        public HashedElGamalCiphertext? EncryptedCoordinate { get; init; }
     }
 }

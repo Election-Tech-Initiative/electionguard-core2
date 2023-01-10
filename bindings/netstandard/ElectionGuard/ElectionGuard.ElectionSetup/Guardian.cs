@@ -264,7 +264,7 @@ public class Guardian
             keyPair.SequenceOrder
         );
 
-        var bytesOptional = guardianBackup.EncryptedCoordinate.Decrypt(
+        var bytesOptional = guardianBackup.EncryptedCoordinate?.Decrypt(
             keyPair.KeyPair.SecretKey, encryptionSeed, false);
 
         if (bytesOptional is null)
@@ -314,7 +314,7 @@ public class Guardian
     {
         if (_otherGuardianPartialKeyBackups is not null)
         {
-            _otherGuardianPartialKeyBackups[backup.OwnerId] = backup;
+            _otherGuardianPartialKeyBackups[backup.OwnerId!] = backup;
         }
     }
 
@@ -351,15 +351,15 @@ public class Guardian
             );
 
         var secretKey = receiverGuardianKeys.KeyPair.SecretKey;
-        var data = senderGuardianBackup?.EncryptedCoordinate.Decrypt(
+        var data = senderGuardianBackup?.EncryptedCoordinate?.Decrypt(
                 secretKey, encryptionSeed, false);
 
         var coordinateData = new ElementModQ(data);
 
         var verified = VerifyPolynomialCoordinate(
                 coordinateData,
-                senderGuardianBackup.DesignatedSequenceOrder,
-                senderGuardianPublicKey.CoefficientCommitments
+                senderGuardianBackup!.DesignatedSequenceOrder,
+                senderGuardianPublicKey!.CoefficientCommitments
             );
         return new ElectionPartialKeyVerification()
         {
@@ -412,11 +412,11 @@ public class Guardian
         };
     }
 
-    private bool VerifyPolynomialCoordinate(ElementModQ coordinate, ulong exponentModifier, List<ElementModP> commitments)
+    private bool VerifyPolynomialCoordinate(ElementModQ? coordinate, ulong exponentModifier, List<ElementModP>? commitments)
     {
         var exponentModifierModQ = new ElementModP(exponentModifier);
         var commitmentOutput = Constants.ONE_MOD_P;
-        foreach (var (commitment, i) in commitments.WithIndex())
+        foreach (var (commitment, i) in commitments!.WithIndex())
         {
             var modi = new ElementModP(i);
             var exponent = BigMath.PowModP(exponentModifierModQ, modi);
@@ -432,7 +432,7 @@ public class Guardian
     {
         if (_otherGuardianPartialKeyVerification is not null)
         {
-            _otherGuardianPartialKeyVerification[verification.DesignatedId] = verification;
+            _otherGuardianPartialKeyVerification[verification.DesignatedId!] = verification;
         }
     }
 
