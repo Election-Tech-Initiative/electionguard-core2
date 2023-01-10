@@ -160,7 +160,6 @@ else
 endif
 
 build-android:
-	@echo 🤖 BUILD ANDROID
 	PLATFORM=arm64 OPERATING_SYSTEM=Android && make build
 
 build-ios:
