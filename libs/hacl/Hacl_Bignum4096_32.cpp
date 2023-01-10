@@ -1,5 +1,6 @@
 #include "Hacl_Bignum4096_32.hpp"
 
+#include "<stdexcept>"
 #include "Hacl_Bignum4096_32.h"
 #include "Hacl_GenericField32.h"
 

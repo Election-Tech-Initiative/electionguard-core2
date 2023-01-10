@@ -1,5 +1,6 @@
 #include "Hacl_Bignum256.hpp"
 
+#include "<stdexcept>"
 #include "Hacl_Bignum256.h"
 
 using std::out_of_range;
