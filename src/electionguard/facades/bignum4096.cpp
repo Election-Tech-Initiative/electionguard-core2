@@ -29,17 +29,39 @@ namespace electionguard::facades
 
         Impl(uint32_t *elem) : element(make_unique<hacl::Bignum4096_32>(move(elem)))
         {
+            // When passing in 32-bit objects we always prefer
             this->prefer32BitMath = true;
         }
 
-        Impl(uint64_t *elem) : element(make_unique<hacl::Bignum4096>(move(elem)))
+        Impl(uint64_t *elem) : prefer32BitMath(Bignum4096::use32BitMath)
         {
-            this->prefer32BitMath = Bignum4096::use32BitMath;
+            // when compiling with USE_32BIT_MATH we prefer
+            if (prefer32BitMath) {
+                element =
+                  make_unique<hacl::Bignum4096_32>(move(reinterpret_cast<uint32_t *>(elem)));
+            } else {
+                element = make_unique<hacl::Bignum4096>(move(elem));
+            }
+        }
+
+        Impl(uint64_t *elem, bool prefer32BitMath) : prefer32BitMath(prefer32BitMath)
+        {
+            // when calling this overload we allow the value to be set at runtime
+            if (prefer32BitMath) {
+                element =
+                  make_unique<hacl::Bignum4096_32>(move(reinterpret_cast<uint32_t *>(elem)));
+            } else {
+                element = make_unique<hacl::Bignum4096>(move(elem));
+            }
         }
     };
 
     Bignum4096::Bignum4096(uint32_t *elem) : pimpl(new Impl(elem)) {}
     Bignum4096::Bignum4096(uint64_t *elem) : pimpl(new Impl(elem)) {}
+    Bignum4096::Bignum4096(uint64_t *elem, bool prefer32BitMath)
+        : pimpl(new Impl(elem, prefer32BitMath))
+    {
+    }
     Bignum4096::~Bignum4096() {}
 
 #pragma region Static Members

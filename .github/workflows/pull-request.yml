@@ -41,7 +41,7 @@ jobs:
         include:
           - name: ubuntu-22.04-clang-14.0.0
             os: ubuntu-22.04
-            processor: "x64"
+            processor: x64
             compiler: clang
             version: "14"
             makeReleaseBuild: false
@@ -49,7 +49,7 @@ jobs:
             runCsTests: false
           - name: ubuntu-22.04-gcc-12.1.0
             os: ubuntu-22.04
-            processor: "x64"
+            processor: x64
             compiler: gcc
             version: "12"
             makeReleaseBuild: false
@@ -57,7 +57,7 @@ jobs:
             runCsTests: false
           - name: macOS-12-xcode-14.1
             os: macOS-12
-            processor: "x64"
+            processor: x64
             compiler: xcode
             version: "14.1"
             makeReleaseBuild: false
@@ -65,7 +65,7 @@ jobs:
             runCsTests: true
           - name: macOS-12-xcode-14.1-arm64
             os: macOS-12
-            processor: "arm64"
+            processor: arm64
             compiler: xcode
             version: "14.1"
             makeReleaseBuild: false
@@ -73,7 +73,7 @@ jobs:
             runCsTests: false
           - name: windows-2022-gcc-11
             os: windows-2022
-            processor: "x64"
+            processor: x64
             compiler: gcc
             version: "11"
             makeReleaseBuild: false
@@ -81,7 +81,7 @@ jobs:
             runCsTests: false
           - name: windows-2022-msvc-latest
             os: windows-2022
-            processor: "x64"
+            processor: x64
             compiler: msvc
             version: "latest"
             makeReleaseBuild: false
@@ -89,7 +89,7 @@ jobs:
             runCsTests: true
           - name: windows-2022-msvc-latest-x86
             os: windows-2022
-            processor: "x86"
+            processor: x86
             compiler: msvc
             version: "latest"
             makeReleaseBuild: false
@@ -97,7 +97,7 @@ jobs:
             runCsTests: true
           - name: ubuntu-22.04-linter
             os: ubuntu-22.04
-            processor: "x64"
+            processor: x64
             compiler: clang
             version: "14"
             makeReleaseBuild: false
@@ -137,7 +137,7 @@ jobs:
           sudo xcode-select -switch /Applications/Xcode_${{ matrix.version }}.app
 
       - name: Update Environment
-        if: (runner.os == 'Windows' && matrix.compiler != 'msvc')
+        if: (runner.os == 'Windows' && matrix.compiler == 'gcc')
         uses: msys2/setup-msys2@v2
         with:
           update: true
@@ -174,7 +174,7 @@ jobs:
       - name: Run Tests (Windows-msys2)
         env:
           PLATFORM: ${{ matrix.processor }}
-        if: (runner.os == 'Windows' && matrix.compiler != 'msvc')
+        if: (runner.os == 'Windows' && matrix.compiler == 'gcc')
         run: make test-msys2
 
       - name: Run .Net Tests

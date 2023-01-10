@@ -2,6 +2,7 @@
 
 # ElectionGuard Options
 set(USE_32BIT_MATH, ON)
+set(USE_MSVC ON)
 
 # Enable cross-compilation
 if(NOT ${CMAKE_HOST_SYSTEM_PROCESSOR} MATCHES "x86|X86|i586|i686")

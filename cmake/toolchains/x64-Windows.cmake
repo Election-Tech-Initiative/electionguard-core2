@@ -1,5 +1,8 @@
 # Toolchain file compiling for x64 Windows
 
+# Default to using MSVC on windows
+set(USE_MSVC ON)
+
 # Enable cross-compilation
 if(NOT ${CMAKE_HOST_SYSTEM_PROCESSOR} MATCHES "x64|X64|amd64|AMD64|EM64T")
     message(STATUS "Cross Compiling for Windows 64")
