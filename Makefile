@@ -1,4 +1,4 @@
-.PHONY: all build build-msvc build-android build-ios clean clean-netstandard environment format memcheck sanitize sanitize-asan sanitize-tsan test test-msvc test-netstandard
+.PHONY: all build build-msys2 build-android build-ios clean clean-netstandard environment format memcheck sanitize sanitize-asan sanitize-tsan test test-msvc test-netstandard
 
 .EXPORT_ALL_VARIABLES:
 ELECTIONGUARD_BINDING_DIR=$(realpath .)/bindings
@@ -12,46 +12,59 @@ ELECTIONGUARD_BUILD_BINDING_DIR=$(ELECTIONGUARD_BUILD_DIR)/bindings
 ELECTIONGUARD_BUILD_LIBS_DIR=$(ELECTIONGUARD_BUILD_DIR)/libs
 CPM_SOURCE_CACHE=$(subst \,/,$(realpath .))/.cache/CPM
 
-# Detect operating system
+# Detect operating system & platform
+# These vars can be set from the command line.
+# not all platforms can compile all targets.
+# valid values:
+# OPERATING_SYSTEM: Android, IOS, Linux, Darwin, Windows
+# PLATFORM: arm64, x64, x86
 ifeq ($(OS),Windows_NT)
-	OPERATING_SYSTEM := Windows
+	OPERATING_SYSTEM ?= Windows
 	ifeq ($(PROCESSOR_ARCHITECTURE),arm)
-        PLATFORM ?= arm64
+        PLATFORM?=arm64
     endif
 	ifeq ($(PROCESSOR_ARCHITECTURE),AMD64)
-        PLATFORM ?= x64
+        PLATFORM?=x64
     endif
     ifeq ($(PROCESSOR_ARCHITECTURE),x86)
-        PLATFORM ?= x86
+        PLATFORM?=x86
     endif
 else
-	OPERATING_SYSTEM := $(shell uname 2>/dev/null || echo Unknown)
-	UNAME_P := $(shell uname -p)
+	OPERATING_SYSTEM ?= $(shell uname 2>/dev/null || echo Unknown)
+	UNAME_P ?= $(shell uname -p)
     ifeq ($(UNAME_P),x86_64)
-        PLATFORM ?= x64
+        PLATFORM?=x64
     endif
     ifneq ($(filter %86,$(UNAME_P)),)
-        PLATFORM ?= x86
+        PLATFORM?=x86
     endif
     ifneq ($(filter arm%,$(UNAME_P)),)
-        PLATFORM ?= arm64
+        PLATFORM?=arm64
     endif
 endif
 
 # Default build number
-BUILD := 1
+BUILD:=1
+
+# Temporarily disable vale support on x86
+ifeq ($(PLATFORM),x86)
+TEMP_DISABLE_VALE=ON
+else
+TEMP_DISABLE_VALE=ON
+endif
 
 # Debug or Release (capitalized)
 TARGET?=Release
 
+# Set the Android NDK for cross-compilation
 ifeq ($(OPERATING_SYSTEM),Darwin)
-NDK_PATH?=/Users/$$USER/Library/Android/sdk/ndk/21.3.6528147
+ANDROID_NDK_PATH?=/Users/$(USER)/Library/Android/sdk/ndk/25.1.8937393
 endif
 ifeq ($(OPERATING_SYSTEM),Linux)
-NDK_PATH?=/usr/local/lib/android/sdk/ndk/21.3.6528147
+ANDROID_NDK_PATH?=/usr/local/lib/android/sdk/ndk/25.1.8937393
 endif
 ifeq ($(OPERATING_SYSTEM),Windows)
-NDK_PATH?=C:\Android\android-sdk\ndk-bundle
+ANDROID_NDK_PATH?=C:\Android\android-sdk\ndk-bundle
 endif
 
 all: environment build
@@ -109,19 +122,25 @@ endif
 build:
 	@echo 🧱 BUILD $(OPERATING_SYSTEM) $(PLATFORM) $(TARGET)
 ifeq ($(OPERATING_SYSTEM),Windows)
-	cmake -S . -B $(ELECTIONGUARD_BUILD_LIBS_DIR)/$(PLATFORM)/ -G "Visual Studio 17 2022" -A $(PLATFORM) \
+	cmake -S . -B $(ELECTIONGUARD_BUILD_LIBS_DIR)/$(OPERATING_SYSTEM)/$(PLATFORM)/$(TARGET) -G "Visual Studio 17 2022" -A $(PLATFORM) \
 		-DCMAKE_BUILD_TYPE=$(TARGET) \
 		-DBUILD_SHARED_LIBS=ON \
+		-DANDROID_NDK_PATH=$(ANDROID_NDK_PATH) \
 		-DCPM_SOURCE_CACHE=$(CPM_SOURCE_CACHE)
-	cmake --build $(ELECTIONGUARD_BUILD_LIBS_DIR)/$(PLATFORM)/--config $(TARGET)
+	cmake --build $(ELECTIONGUARD_BUILD_LIBS_DIR)/$(OPERATING_SYSTEM)/$(PLATFORM)/$(TARGET)/ --config $(TARGET)
 else
-	cmake -S . -B $(ELECTIONGUARD_BUILD_LIBS_DIR)/$(PLATFORM)/$(TARGET) \
+	cmake -S . -B $(ELECTIONGUARD_BUILD_LIBS_DIR)/$(OPERATING_SYSTEM)/$(PLATFORM)/$(TARGET) \
 		-DCMAKE_BUILD_TYPE=$(TARGET) \
 		-DBUILD_SHARED_LIBS=ON \
+		-DDISABLE_VALE=$(TEMP_DISABLE_VALE) \
+		-DANDROID_NDK_PATH=$(ANDROID_NDK_PATH) \
 		-DCPM_SOURCE_CACHE=$(CPM_SOURCE_CACHE) \
 		-DCMAKE_TOOLCHAIN_FILE=cmake/toolchains/$(PLATFORM)-$(OPERATING_SYSTEM).cmake
-	cmake --build $(ELECTIONGUARD_BUILD_LIBS_DIR)/$(PLATFORM)/$(TARGET)
+	cmake --build $(ELECTIONGUARD_BUILD_LIBS_DIR)/$(OPERATING_SYSTEM)/$(PLATFORM)/$(TARGET)
 endif
+
+build-x86:
+	PLATFORM=x86 && make build
 
 build-x64:
 	PLATFORM=x64 && make build
@@ -142,34 +161,7 @@ endif
 
 build-android:
 	@echo 🤖 BUILD ANDROID
-	cmake -S . -B $(ELECTIONGUARD_BUILD_LIBS_DIR)/android/$(TARGET)/arm64-v8a \
-		-DCMAKE_BUILD_TYPE=$(TARGET) \
-		-DBUILD_SHARED_LIBS=ON \
-		-DCPM_SOURCE_CACHE=$(CPM_SOURCE_CACHE) \
-		-DCMAKE_SYSTEM_NAME=Android \
-		-DCMAKE_ANDROID_NDK=$(NDK_PATH) \
-		-DCMAKE_ANDROID_ARCH_ABI=arm64-v8a \
-		-DCMAKE_SYSTEM_VERSION=26
-	cmake --build $(ELECTIONGUARD_BUILD_LIBS_DIR)/android/$(TARGET)/arm64-v8a
-	cmake -S . -B $(ELECTIONGUARD_BUILD_LIBS_DIR)/android/$(TARGET)/armeabi-v7a \
-		-DCMAKE_BUILD_TYPE=$(TARGET) \
-		-DBUILD_SHARED_LIBS=ON \
-		-DCPM_SOURCE_CACHE=$(CPM_SOURCE_CACHE) \
-		-DCMAKE_SYSTEM_NAME=Android \
-		-DCMAKE_ANDROID_NDK=$(NDK_PATH) \
-		-DCMAKE_ANDROID_ARCH_ABI=armeabi-v7a \
-		-DCMAKE_SYSTEM_VERSION=26 \
-		-DCMAKE_ANDROID_ARM_NEON=ON
-	cmake --build $(ELECTIONGUARD_BUILD_LIBS_DIR)/android/$(TARGET)/armeabi-v7a
-	cmake -S . -B $(ELECTIONGUARD_BUILD_LIBS_DIR)/android/$(TARGET)/x86_64 \
-		-DCMAKE_BUILD_TYPE=$(TARGET) \
-		-DBUILD_SHARED_LIBS=ON \
-		-DCPM_SOURCE_CACHE=$(CPM_SOURCE_CACHE) \
-		-DCMAKE_SYSTEM_NAME=Android \
-		-DCMAKE_ANDROID_NDK=$(NDK_PATH) \
-		-DCMAKE_ANDROID_ARCH_ABI=x86_64 \
-		-DCMAKE_SYSTEM_VERSION=26
-	cmake --build $(ELECTIONGUARD_BUILD_LIBS_DIR)/android/$(TARGET)/x86_64
+	PLATFORM=arm64 OPERATING_SYSTEM=Android && make build
 
 build-ios:
 	@echo 📱 BUILD IOS
@@ -372,6 +364,7 @@ else
 	cmake -S . -B $(ELECTIONGUARD_BUILD_LIBS_DIR)/$(PLATFORM)/$(TARGET) \
 		-DCMAKE_BUILD_TYPE=$(TARGET) \
 		-DCPM_SOURCE_CACHE=$(CPM_SOURCE_CACHE) \
+		-DDISABLE_VALE=$(TEMP_DISABLE_VALE) \
 		-DCMAKE_TOOLCHAIN_FILE=cmake/toolchains/test.cmake
 	cmake --build $(ELECTIONGUARD_BUILD_LIBS_DIR)/$(PLATFORM)/$(TARGET)
 	$(ELECTIONGUARD_BUILD_LIBS_DIR)/$(PLATFORM)/$(TARGET)/test/ElectionGuardTests
@@ -422,6 +415,7 @@ else
 		-DCMAKE_BUILD_TYPE=$(TARGET) \
 		-DCODE_COVERAGE=ON \
 		-DUSE_STATIC_ANALYSIS=ON \
+		-DDISABLE_VALE=$(TEMP_DISABLE_VALE) \
 		-DCPM_SOURCE_CACHE=$(CPM_SOURCE_CACHE) \
 		-DCMAKE_TOOLCHAIN_FILE=cmake/toolchains/test.cmake
 endif

@@ -71,20 +71,20 @@
     <PlatformTarget>anycpu</PlatformTarget>
   </PropertyGroup>
   <ItemGroup Label="C++ Built Libraries">
-    <Content Name="Windows" Include="$(ElectionGuardLibs)\$(Platform)\src\$(Configuration)\*.dll*" Pack="true">
+    <Content Name="Windows" Include="$(ElectionGuardLibs)\Windows\$(Platform)\src\$(Configuration)\*.dll*" Pack="true">
       <CopyToOutputDirectory Condition="'$(Platform)' == 'x64' AND '$(OS)' == 'Windows_NT'">Always</CopyToOutputDirectory>
       <PackageCopyToOutput Condition="'$(Platform)' == 'x64' AND '$(OS)' == 'Windows_NT'">true</PackageCopyToOutput>
       <PackagePath>runtimes\win-x64\native</PackagePath>
     </Content>
-    <Content Name="Windows Symbols" Include="$(ElectionGuardLibs)\$(Platform)\src\$(Configuration)\*.pdb*" Pack="true">
+    <Content Name="Windows Symbols" Include="$(ElectionGuardLibs)\Windows\$(Platform)\src\$(Configuration)\*.pdb*" Pack="true">
       <CopyToOutputDirectory Condition="'$(Platform)' == 'x64' AND '$(OS)' == 'Windows_NT' AND '$(Configuration)' == 'Debug'">Always</CopyToOutputDirectory>
       <PackageCopyToOutput Condition="'$(Platform)' == 'x64' AND '$(OS)' == 'Windows_NT' AND '$(Configuration)' == 'Debug'">true</PackageCopyToOutput>
     </Content>
-    <Content Name="MacOS" Include="$(ElectionGuardLibs)\$(Platform)\$(Configuration)\src\*.dylib" Pack="true" PackagePath="runtimes\osx-arm\native">
+    <Content Name="MacOS" Include="$(ElectionGuardLibs)\Darwin\$(Platform)\$(Configuration)\src\*.dylib" Pack="true" PackagePath="runtimes\osx-arm\native">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
       <PackageCopyToOutput>true</PackageCopyToOutput>
     </Content>
-    <Content Name="Linux" Include="$(ElectionGuardLibs)\$(Platform)\$(Configuration)\src\*.so" Pack="true" PackagePath="runtimes\linux-x64\native">
+    <Content Name="Linux" Include="$(ElectionGuardLibs)\Linux\$(Platform)\$(Configuration)\src\*.so" Pack="true" PackagePath="runtimes\linux-x64\native">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
       <PackageCopyToOutput>true</PackageCopyToOutput>
     </Content>

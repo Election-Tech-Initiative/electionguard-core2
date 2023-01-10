@@ -1,6 +1,10 @@
-# Toolchain file compiling for x64 macOS
+# Toolchain file compiling for x86 MacOS
 
-# Enable cross-compilation
+# ElectionGuard Options
+message("++ Uing USE_32BIT_MATH")
+set(USE_32BIT_MATH, ON)
+set(DISABLE_VALE, ON)
+
 if(NOT ${CMAKE_HOST_SYSTEM_PROCESSOR} MATCHES "x86_64|amd64|AMD64")
     message(STATUS "Cross Compiling for MacOs x86_64")
     set(arch x86_64)

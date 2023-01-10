@@ -1,9 +1,12 @@
-# Toolchain file compiling for x64 Windows
+# Toolchain file compiling for x86 Windows
+
+# ElectionGuard Options
+set(USE_32BIT_MATH, ON)
 
 # Enable cross-compilation
-if(NOT ${CMAKE_HOST_SYSTEM_PROCESSOR} MATCHES "x64|X64|amd64|AMD64|EM64T")
-    message(STATUS "Cross Compiling for Windows 64")
-    set(arch x64)
+if(NOT ${CMAKE_HOST_SYSTEM_PROCESSOR} MATCHES "x86|X86|i586|i686")
+    message(STATUS "Cross Compiling for Windows x86")
+    set(arch x86)
 
     # For some reason we have to set the system name here in order to make the
     # CMAKE_SYSTEM_PROCESSOR being picked up correctly.
