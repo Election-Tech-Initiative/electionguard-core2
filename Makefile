@@ -217,8 +217,11 @@ else
 	if [ ! -d "$(ELECTIONGUARD_BUILD_LIBS_DIR)/arm64" ]; then mkdir $(ELECTIONGUARD_BUILD_LIBS_DIR)/arm64; fi
 	if [ ! -d "$(ELECTIONGUARD_BUILD_LIBS_DIR)/x86" ]; then mkdir $(ELECTIONGUARD_BUILD_LIBS_DIR)/x86; fi
 	if [ ! -d "$(ELECTIONGUARD_BUILD_LIBS_DIR)/x64" ]; then mkdir $(ELECTIONGUARD_BUILD_LIBS_DIR)/x64; fi
-	if [ ! -d "$(ELECTIONGUARD_BUILD_LIBS_DIR)/android" ]; then mkdir $(ELECTIONGUARD_BUILD_LIBS_DIR)/android; fi
-	if [ ! -d "$(ELECTIONGUARD_BUILD_LIBS_DIR)/ios" ]; then mkdir $(ELECTIONGUARD_BUILD_LIBS_DIR)/ios; fi
+
+	if [ ! -d "$(ELECTIONGUARD_BUILD_LIBS_DIR)/Android" ]; then mkdir $(ELECTIONGUARD_BUILD_LIBS_DIR)/Android; fi
+	if [ ! -d "$(ELECTIONGUARD_BUILD_LIBS_DIR)/Ios" ]; then mkdir $(ELECTIONGUARD_BUILD_LIBS_DIR)/Ios; fi
+	if [ ! -d "$(ELECTIONGUARD_BUILD_LIBS_DIR)/Darwin" ]; then mkdir $(ELECTIONGUARD_BUILD_LIBS_DIR)/Darwin; fi
+	if [ ! -d "$(ELECTIONGUARD_BUILD_LIBS_DIR)/Linux" ]; then mkdir $(ELECTIONGUARD_BUILD_LIBS_DIR)/Linux; fi
 endif
 
 clean-netstandard: 
@@ -388,6 +391,9 @@ test-netstandard: build-netstandard
 
 test-netstandard-x64:
 	PLATFORM=x64 && make test-netstandard
+
+test-netstandard-x86:
+	PLATFORM=x86 && make test-netstandard
 
 test-ui:
 	@echo 🧪 TEST UI $(PLATFORM) $(TARGET)

@@ -2,7 +2,7 @@
 
   <PropertyGroup>
     <TargetFrameworks>netstandard2.0;net48</TargetFrameworks>
-    <Platforms>x64;arm64</Platforms>
+    <Platforms>arm64;x64;x86</Platforms>
 
     <!-- Project -->
     <RootNamespace>ElectionGuard</RootNamespace>

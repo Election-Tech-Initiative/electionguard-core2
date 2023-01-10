@@ -5,6 +5,7 @@
 #include <electionguard/export.h>
 #include <exception>
 #include <map>
+#include <stdexcept>
 
 using std::map;
 using std::out_of_range;

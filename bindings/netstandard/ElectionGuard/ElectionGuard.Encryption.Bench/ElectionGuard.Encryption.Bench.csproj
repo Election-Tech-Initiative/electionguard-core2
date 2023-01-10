@@ -4,7 +4,7 @@
     <OutputType>Exe</OutputType>
     <TargetFrameworks>net6.0;net48</TargetFrameworks>
     <IsPackable>false</IsPackable>
-    <Platforms>x64</Platforms>
+    <Platforms>arm64;x64;x86</Platforms>
   </PropertyGroup>
 
   <ItemGroup>
@@ -16,7 +16,7 @@
     <ElectionGuardLibs>..\..\..\..\build\libs</ElectionGuardLibs>
   </PropertyGroup>
   <ItemGroup Label="C++ Built Libraries">
-    <None Name="Windows x64" Visible="false" Include="$(ElectionGuardLibs)\mWindows\$(Platform)\src\$(Configuration)\*.dll*">
+    <None Name="Windows x64" Visible="false" Include="$(ElectionGuardLibs)\Windows\$(Platform)\src\$(Configuration)\*.dll*">
       <CopyToOutputDirectory Condition="'$(Platform)' == 'x64' AND '$(OS)' == 'Windows_NT'">Always</CopyToOutputDirectory>
     </None>
     <None Name="Non Windows x64" Visible="false" Include="$(ElectionGuardLibs)\$(Platform)\$(Configuration)\src\*.dll*">
