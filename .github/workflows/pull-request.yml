@@ -154,21 +154,31 @@ jobs:
 
       # Tests
       - name: Run Tests (Linux)
+        env:
+          PLATFORM: ${{ matrix.processor }}
         if: (runner.os == 'Linux')
-        run: PLATFORM=${{ matrix.processor }} && make test
+        run: make test
 
       - name: Run Tests (MacOS)
+        env:
+          PLATFORM: ${{ matrix.processor }}
         if: runner.os == 'macOS'
-        run: PLATFORM=${{ matrix.processor }} && make test
+        run:  make test
 
       - name: Run Tests (Windows)
+        env:
+          PLATFORM: ${{ matrix.processor }}
         if: (runner.os == 'Windows' && matrix.compiler == 'msvc')
-        run: PLATFORM=${{ matrix.processor }} && make test
+        run: make test
 
       - name: Run Tests (Windows-msys2)
+        env:
+          PLATFORM: ${{ matrix.processor }}
         if: (runner.os == 'Windows' && matrix.compiler != 'msvc')
-        run: PLATFORM=${{ matrix.processor }} && make test-msys2
+        run: make test-msys2
 
       - name: Run .Net Tests
+        env:
+          PLATFORM: ${{ matrix.processor }}
         if: (matrix.runCsTests)
-        run: PLATFORM=${{ matrix.processor }} && make test-netstandard
+        run: make test-netstandard
