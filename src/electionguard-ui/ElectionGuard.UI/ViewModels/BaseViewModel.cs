@@ -5,12 +5,6 @@ namespace ElectionGuard.UI.ViewModels;
 
 public partial class BaseViewModel : ObservableObject, IDisposable
 {
-    [RelayCommand]
-    public virtual async Task Appearing()
-    {
-        await Task.Yield();
-    }
-
     [ObservableProperty]
     private string _version;
 

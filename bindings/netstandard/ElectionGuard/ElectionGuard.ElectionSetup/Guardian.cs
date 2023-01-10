@@ -179,9 +179,9 @@ public class Guardian
         ElementModQ initialState,
         ElementModQ baseElement,
         Coefficient coefficient,
-                    int index)
+                    ulong index)
     {
-        var exponent = new ElementModQ((ulong)index);
+        var exponent = new ElementModQ(index);
         var factor = BigMath.PowModQ(baseElement, exponent);
         var coordinateShift = BigMath.MultModQ(coefficient.Value, factor);
 
@@ -241,7 +241,7 @@ public class Guardian
         int quorum,
         string keyCeremonyId)
     {
-        CeremonyDetails = new CeremonyDetails(keyCeremonyId, numberOfGuardians, quorum);
+        CeremonyDetails = new(keyCeremonyId, numberOfGuardians, quorum);
     }
 
     // decrypt_backup
@@ -292,11 +292,6 @@ public class Guardian
         foreach (var guardianKey in _otherGuardianPublicKeys)
         {
             var backup = GenerateElectionPartialKeyBackup(GuardianId, _electionKeys.Polynomial, guardianKey.Value);
-            if (backup == null)
-            {
-                // add logging
-                return false;
-            }
             BackupsToShare[guardianKey.Key] = backup;
         }
         return true;
@@ -423,7 +418,7 @@ public class Guardian
         var commitmentOutput = Constants.ONE_MOD_P;
         foreach (var (commitment, i) in commitments.WithIndex())
         {
-            var modi = new ElementModP((ulong)i);
+            var modi = new ElementModP(i);
             var exponent = BigMath.PowModP(exponentModifierModQ, modi);
             var factor = BigMath.PowModP(commitment, exponent);
             commitmentOutput = BigMath.MultModP(commitmentOutput, factor);
@@ -474,7 +469,7 @@ public class Guardian
     // share_other_guardian_key
     public ElectionPublicKey? ShareOtherGuardianKey(string guardianId)
     {
-        return _otherGuardianPublicKeys is not null ? _otherGuardianPublicKeys[guardianId] : null;
+        return _otherGuardianPublicKeys?[guardianId];
     }
 
     // compute_tally_share
