@@ -2,7 +2,7 @@
 
 #include "Hacl_Bignum256.h"
 
-#include <exception>
+#include <stdexcept>
 
 using std::out_of_range;
 using std::vector;

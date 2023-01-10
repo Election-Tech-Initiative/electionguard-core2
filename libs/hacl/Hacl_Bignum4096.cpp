@@ -3,7 +3,7 @@
 #include "Hacl_Bignum4096.h"
 #include "Hacl_GenericField64.h"
 
-#include <exception>
+#include <stdexcept>
 
 using std::out_of_range;
 
