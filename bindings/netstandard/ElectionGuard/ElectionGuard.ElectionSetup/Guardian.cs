@@ -260,12 +260,12 @@ public class Guardian
         :return: a 'Tuple[ElementModP, ChaumPedersenProof]' of the decryption and its proof
         */
         var encryptionSeed = GetBackupSeed(
-            KeyPair.OwnerId,
-            KeyPair.SequenceOrder
+            keyPair.OwnerId,
+            keyPair.SequenceOrder
         );
 
-        var bytesOptional = GuardianBackup.EncryptedCoordinate.Decrypt(
-            KeyPair.KeyPair.SecretKey, encryptionSeed, false);
+        var bytesOptional = guardianBackup.EncryptedCoordinate.Decrypt(
+            keyPair.KeyPair.SecretKey, encryptionSeed, false);
 
         if (bytesOptional is null)
             return null;
