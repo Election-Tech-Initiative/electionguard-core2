@@ -127,6 +127,7 @@ ifeq ($(OPERATING_SYSTEM),Windows)
 	cmake -S . -B $(ELECTIONGUARD_BUILD_LIBS_DIR)/$(OPERATING_SYSTEM)/$(PLATFORM)/$(TARGET) -G "Visual Studio 17 2022" -A $(PLATFORM) \
 		-DCMAKE_BUILD_TYPE=$(TARGET) \
 		-DBUILD_SHARED_LIBS=ON \
+		-DUSE_MSVC=ON \
 		-DANDROID_NDK_PATH=$(ANDROID_NDK_PATH) \
 		-DCPM_SOURCE_CACHE=$(CPM_SOURCE_CACHE)
 	cmake --build $(ELECTIONGUARD_BUILD_LIBS_DIR)/$(OPERATING_SYSTEM)/$(PLATFORM)/$(TARGET)/ --config $(TARGET)
@@ -154,6 +155,8 @@ ifeq ($(OPERATING_SYSTEM),Windows)
 		-DCMAKE_BUILD_TYPE=$(TARGET) \
 		-DBUILD_SHARED_LIBS=ON \
 		-DCAN_USE_VECTOR_INTRINSICS=ON \
+		-DCMAKE_C_COMPILER="C:/ProgramData/chocolatey/bin/gcc.exe" \
+		-DCMAKE_CXX_COMPILER="C:/ProgramData/chocolatey/bin/c++.exe" \
 		-DCPM_SOURCE_CACHE=$(CPM_SOURCE_CACHE) \
 		-DCMAKE_TOOLCHAIN_FILE=cmake/toolchains/$(PLATFORM)-$(OPERATING_SYSTEM)-msys2.cmake
 	cmake --build $(ELECTIONGUARD_BUILD_LIBS_DIR)/$(PLATFORM)/$(TARGET)
@@ -359,6 +362,7 @@ test:
 ifeq ($(OPERATING_SYSTEM),Windows)
 	cmake -S . -B $(ELECTIONGUARD_BUILD_LIBS_DIR)/$(PLATFORM) -G "Visual Studio 17 2022" -A $(PLATFORM) \
 		-DCMAKE_BUILD_TYPE=$(TARGET) \
+		-DUSE_MSVC=ON \
 		-DCPM_SOURCE_CACHE=$(CPM_SOURCE_CACHE) \
 		-DCMAKE_TOOLCHAIN_FILE=cmake/toolchains/test.cmake
 	cmake --build $(ELECTIONGUARD_BUILD_LIBS_DIR)/$(PLATFORM)/$(TARGET) --config $(TARGET)
@@ -385,8 +389,10 @@ test-x86:
 test-msys2:
 	@echo 🧪 TEST MSYS2 $(OPERATING_SYSTEM) $(PLATFORM) $(TARGET)
 ifeq ($(OPERATING_SYSTEM),Windows)
-	cmake -S . -B $(ELECTIONGUARD_BUILD_LIBS_DIR)/x86_64/$(TARGET) -G "MSYS Makefiles" \
+	cmake -S . -B $(ELECTIONGUARD_BUILD_LIBS_DIR)/$(PLATFORM)/$(TARGET) -G "MSYS Makefiles" \
 		-DCMAKE_BUILD_TYPE=$(TARGET) \
+		-DCMAKE_C_COMPILER="C:/ProgramData/chocolatey/bin/gcc.exe" \
+		-DCMAKE_CXX_COMPILER="C:/ProgramData/chocolatey/bin/c++.exe" \
 		-DCPM_SOURCE_CACHE=$(CPM_SOURCE_CACHE) \
 		-DCMAKE_TOOLCHAIN_FILE=cmake/toolchains/test.cmake
 	cmake --build $(ELECTIONGUARD_BUILD_LIBS_DIR)/$(PLATFORM)/$(TARGET)
@@ -426,6 +432,7 @@ ifeq ($(OPERATING_SYSTEM),Windows)
 	cmake -S . -B $(ELECTIONGUARD_BUILD_LIBS_DIR)/$(PLATFORM)/$(TARGET) -G "MSYS Makefiles" \
 		-DCMAKE_BUILD_TYPE=$(TARGET) \
 		-DCODE_COVERAGE=ON \
+		-DUSE_MSVC=ON \
 		-DCPM_SOURCE_CACHE=$(CPM_SOURCE_CACHE) \
 		-DCMAKE_TOOLCHAIN_FILE=cmake/toolchains/test.cmake
 else
