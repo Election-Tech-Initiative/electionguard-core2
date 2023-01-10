@@ -2,6 +2,7 @@
 #define __Hacl_HMAC_DRBG_HPP_INCLUDED__
 
 #include <cstdint>
+#include <memory>
 #include <vector>
 
 namespace hacl

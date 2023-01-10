@@ -2,6 +2,7 @@
 #define __Hacl_STREAMING_SHA2_HPP_INCLUDED__
 
 #include <cstdint>
+#include <memory>
 #include <vector>
 
 namespace hacl
