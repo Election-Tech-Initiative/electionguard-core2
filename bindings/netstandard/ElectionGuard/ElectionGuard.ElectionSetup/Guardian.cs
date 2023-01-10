@@ -250,7 +250,7 @@ public class Guardian
         return DecryptBackup(backup, _electionKeys);
     }
 
-    public ElementModQ? DecryptBackup(ElectionPartialKeyBackup GuardianBackup, ElectionKeyPair KeyPair)
+    public ElementModQ? DecryptBackup(ElectionPartialKeyBackup guardianBackup, ElectionKeyPair keyPair)
     {
         /*
         Decrypts a compensated partial decryption of an elgamal encryption on behalf of a missing guardian
@@ -337,10 +337,12 @@ public class Guardian
         var publicKey = _otherGuardianPublicKeys?[guardianId];
         if (backup is null)
         {
+            return null;
             //raise ValueError(f"No backup exists for {guardian_id}")
         }
         if (publicKey is null)
         {
+            return null;
             //raise ValueError(f"No public key exists for {guardian_id}")
         }
         return VerifyElectionPartialKeyBackup(guardianId, backup, publicKey, _electionKeys);
@@ -427,7 +429,7 @@ public class Guardian
             commitmentOutput = BigMath.MultModP(commitmentOutput, factor);
         }
         var valueOutput = BigMath.GPowP(coordinate);
-        return valueOutput == commitmentOutput;
+        return valueOutput.Equals(commitmentOutput);
     }
 
     // save_election_partial_key_verification

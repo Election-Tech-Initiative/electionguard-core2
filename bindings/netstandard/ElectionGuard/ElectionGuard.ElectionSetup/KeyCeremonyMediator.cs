@@ -1,6 +1,5 @@
-﻿using MediatorId=System.String;
-using GuardianId=System.String;
-using System.Collections.Generic;
+﻿using MediatorId = System.String;
+using GuardianId = System.String;
 
 namespace ElectionGuard.ElectionSetup
 {
