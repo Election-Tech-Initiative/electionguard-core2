@@ -48,7 +48,7 @@ public class ElectionKeyPair
         string guardianId,
         ulong sequenceOrder,
         int quorum,
-        ElementModQ nonce)
+        ElementModQ? nonce)
     {
         var polynomial = ElectionPolynomial.GeneratePolynomial(quorum, nonce);
         var firstKeyPair = polynomial.Coefficients[0].KeyPair;

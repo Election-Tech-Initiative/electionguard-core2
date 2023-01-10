@@ -105,13 +105,13 @@ public class Guardian
         int numberOfGuardians,
         int quorum,
         string keyCeremonyId,
-        ElectionPublicKey public_key)
+        ElectionPublicKey publicKey)
     {
-        var el_gamal_key_pair = ElGamalKeyPair.FromPair(Constants.ZERO_MOD_Q, public_key.Key);
+        var elgamalKeyPair = ElGamalKeyPair.FromPair(Constants.ZERO_MOD_Q, publicKey.Key);
         var keyPair = new ElectionKeyPair(
-            public_key.OwnerId,
-            public_key.SequenceOrder,
-            el_gamal_key_pair,
+            publicKey.OwnerId,
+            publicKey.SequenceOrder,
+            elgamalKeyPair,
             new ElectionPolynomial(new()));
         var ceremonyDetails = new CeremonyDetails(keyCeremonyId, numberOfGuardians, quorum);
         return new(keyPair, ceremonyDetails);
@@ -321,14 +321,14 @@ public class Guardian
 
     private ElectionPartialKeyVerification VerifyElectionPartialKeyBackup(string receiverGuardianId, ElectionPartialKeyBackup? senderGuardianBackup, ElectionPublicKey? senderGuardianPublicKey, ElectionKeyPair receiverGuardianKeys)
     {
-        var encryption_seed = GetBackupSeed(
+        var encryptionSeed = GetBackupSeed(
                 receiverGuardianId,
                 senderGuardianBackup?.DesignatedSequenceOrder
             );
 
         var secretKey = receiverGuardianKeys.KeyPair.SecretKey;
         var data = senderGuardianBackup?.EncryptedCoordinate.Decrypt(
-                secretKey, encryption_seed, false);
+                secretKey, encryptionSeed, false);
 
         var coordinateData = new ElementModQ(data);
 
@@ -389,14 +389,14 @@ public class Guardian
         };
     }
 
-    private bool VerifyPolynomialCoordinate(ElementModQ coordinate, ulong exponent_modifier, List<ElementModP> commitments)
+    private bool VerifyPolynomialCoordinate(ElementModQ coordinate, ulong exponentModifier, List<ElementModP> commitments)
     {
-        var exponent_modifier_mod_q = new ElementModP(exponent_modifier);
+        var exponentModifierModQ = new ElementModP(exponentModifier);
         var commitmentOutput = Constants.ONE_MOD_P;
         foreach (var (commitment, i) in commitments.WithIndex())
         {
             var modi = new ElementModP((ulong)i);
-            var exponent = BigMath.PowModP(exponent_modifier_mod_q, modi);
+            var exponent = BigMath.PowModP(exponentModifierModQ, modi);
             var factor = BigMath.PowModP(commitment, exponent);
             commitmentOutput = BigMath.MultModP(commitmentOutput, factor);
         }
