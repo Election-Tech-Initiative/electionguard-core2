@@ -48,9 +48,11 @@ BUILD:=1
 
 # Temporarily disable vale support on x86
 ifeq ($(PLATFORM),x86)
-TEMP_DISABLE_VALE=ON
+TEMP_DISABLE_VALE?=ON
+USE_32BIT_MATH?=ON
 else
-TEMP_DISABLE_VALE=ON
+TEMP_DISABLE_VALE?=ON
+USE_32BIT_MATH?=OFF
 endif
 
 # Debug or Release (capitalized)
@@ -367,11 +369,18 @@ else
 		-DCMAKE_BUILD_TYPE=$(TARGET) \
 		-DCPM_SOURCE_CACHE=$(CPM_SOURCE_CACHE) \
 		-DDISABLE_VALE=$(TEMP_DISABLE_VALE) \
+		-DUSE_32BIT_MATH=$(USE_32BIT_MATH) \
 		-DCMAKE_TOOLCHAIN_FILE=cmake/toolchains/test.cmake
 	cmake --build $(ELECTIONGUARD_BUILD_LIBS_DIR)/$(PLATFORM)/$(TARGET)
 	$(ELECTIONGUARD_BUILD_LIBS_DIR)/$(PLATFORM)/$(TARGET)/test/ElectionGuardTests
 	$(ELECTIONGUARD_BUILD_LIBS_DIR)/$(PLATFORM)/$(TARGET)/test/ElectionGuardCTests
 endif
+
+test-x64:
+	PLATFORM=x64 && make test
+
+test-x86:
+	PLATFORM=x86 USE_32BIT_MATH=ON && make test
 
 test-msys2:
 	@echo 🧪 TEST MSYS2 $(OPERATING_SYSTEM) $(PLATFORM) $(TARGET)
@@ -393,7 +402,11 @@ test-netstandard-x64:
 	PLATFORM=x64 && make test-netstandard
 
 test-netstandard-x86:
+ifeq ($(OPERATING_SYSTEM),Darwin)
+	echo "x86 builds are not supported on MacOS"
+else
 	PLATFORM=x86 && make test-netstandard
+endif
 
 test-ui:
 	@echo 🧪 TEST UI $(PLATFORM) $(TARGET)
