@@ -250,15 +250,14 @@ public class Guardian
         return DecryptBackup(backup, _electionKeys);
     }
 
+    /// <summary>
+    /// Decrypts a compensated partial decryption of an elgamal encryption on behalf of a missing guardian
+    /// </summary>
+    /// <param name="guardianBackup">Missing guardian's backup</param>
+    /// <param name="keyPair">The present guardian's key pair that will be used to decrypt the backup</param>
+    /// <returns>coordinatedata of the decryption and its proof</returns>
     public ElementModQ? DecryptBackup(ElectionPartialKeyBackup guardianBackup, ElectionKeyPair keyPair)
     {
-        /*
-        Decrypts a compensated partial decryption of an elgamal encryption on behalf of a missing guardian
-
-        :param guardian_backup: Missing guardian's backup
-        :param key_pair: The present guardian's key pair that will be used to decrypt the backup
-        :return: a 'Tuple[ElementModP, ChaumPedersenProof]' of the decryption and its proof
-        */
         var encryptionSeed = GetBackupSeed(
             keyPair.OwnerId,
             keyPair.SequenceOrder
@@ -300,8 +299,7 @@ public class Guardian
     // share_election_partial_key_backup
     public ElectionPartialKeyBackup? ShareElectionPartialKeyBackup(string designatedId)
     {
-        ElectionPartialKeyBackup? ret;
-        BackupsToShare.TryGetValue(designatedId, out ret);
+        BackupsToShare.TryGetValue(designatedId, out var ret);
         return ret;
     }
 
@@ -334,13 +332,11 @@ public class Guardian
         var publicKey = _otherGuardianPublicKeys?[guardianId];
         if (backup is null)
         {
-            return null;
-            //raise ValueError(f"No backup exists for {guardian_id}")
+            return null;          
         }
         if (publicKey is null)
         {
             return null;
-            //raise ValueError(f"No public key exists for {guardian_id}")
         }
         return VerifyElectionPartialKeyBackup(guardianId, backup, publicKey, _electionKeys);
     }
@@ -375,8 +371,7 @@ public class Guardian
     // publish_election_backup_challenge
     public ElectionPartialKeyChallenge? PublishElectionBackupChallenge(string guardianId)
     {
-        ElectionPartialKeyBackup? backup;
-        BackupsToShare.TryGetValue(guardianId, out backup);
+        BackupsToShare.TryGetValue(guardianId, out var backup);
         if (backup is null)
             return null;
         return GenerateElectionPartialKeyChallenge(backup, _electionKeys.Polynomial);
@@ -461,12 +456,17 @@ public class Guardian
         if (AllElectionPartialKeyBackupsVerified() is false)
             return null;
 
-        // public_keys = map(
-        //     lambda public_key: public_key.key,
-        //     self._guardian_election_public_keys.values(),
-        // )
-        // return ElgamalCombinePublicKeys(public_keys);
-        return null;
+        return ElgamalCombinePublicKeys();
+    }
+
+    private ElementModP ElgamalCombinePublicKeys()
+    {
+        ElementModP combinedKey = new(1);
+        foreach (var item in _otherGuardianPublicKeys!.Values)
+        {
+            combinedKey = BigMath.MultModP(combinedKey, item.Key);
+        }
+        return combinedKey;
     }
 
     // share_other_guardian_key
