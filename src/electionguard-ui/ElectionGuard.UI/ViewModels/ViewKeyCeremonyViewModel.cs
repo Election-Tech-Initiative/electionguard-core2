@@ -39,7 +39,7 @@ public partial class ViewKeyCeremonyViewModel : BaseViewModel
     public void Join()
     {
         var currentGuardianUserName = AuthenticationService.UserName;
-        var guardian = Guardian.FromNonce(currentGuardianUserName, 0, KeyCeremony!.NumberOfGuardians, KeyCeremony.Quorum, KeyCeremony.KeyCeremonyId);
+        var guardian = Guardian.FromNonce(currentGuardianUserName!, 0, KeyCeremony!.NumberOfGuardians, KeyCeremony.Quorum, KeyCeremony.KeyCeremonyId!);
     }
 
     private bool CanJoin()
