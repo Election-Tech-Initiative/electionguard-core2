@@ -300,7 +300,9 @@ public class Guardian
     // share_election_partial_key_backup
     public ElectionPartialKeyBackup? ShareElectionPartialKeyBackup(string designatedId)
     {
-        return BackupsToShare[designatedId];
+        ElectionPartialKeyBackup? ret;
+        BackupsToShare.TryGetValue(designatedId, out ret);
+        return ret;
     }
 
     // share_election_partial_key_backups
@@ -373,7 +375,8 @@ public class Guardian
     // publish_election_backup_challenge
     public ElectionPartialKeyChallenge? PublishElectionBackupChallenge(string guardianId)
     {
-        var backup = BackupsToShare[guardianId];
+        ElectionPartialKeyBackup? backup;
+        BackupsToShare.TryGetValue(guardianId, out backup);
         if (backup is null)
             return null;
         return GenerateElectionPartialKeyChallenge(backup, _electionKeys.Polynomial);

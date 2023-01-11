@@ -17,7 +17,7 @@ public partial class GuardianHomeViewModel : BaseViewModel
         _tallies.Add(new Tally { Name = "Real Election Tally" });
     }
 
-    public override async Task Appearing()
+    public override async Task OnAppearing()
     {
         var keyCeremonies = await _keyCeremonyService.GetAllAsync();
         KeyCeremonies = new ObservableCollection<KeyCeremony>(keyCeremonies);

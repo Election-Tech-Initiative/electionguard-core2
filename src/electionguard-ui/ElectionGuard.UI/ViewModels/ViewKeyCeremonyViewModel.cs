@@ -30,11 +30,6 @@ public partial class ViewKeyCeremonyViewModel : BaseViewModel
         Task.Run(async() => KeyCeremony = await _keyCeremonyService.GetByIdAsync(value)).Wait();
     }
 
-    //    public override async Task Appearing()
-    //    {
-    //        KeyCeremony = await _keyCeremonyService.GetByIdAsync(KeyCeremonyId);
-    //    }
-
     [RelayCommand(CanExecute = nameof(CanJoin))]
     public void Join()
     {

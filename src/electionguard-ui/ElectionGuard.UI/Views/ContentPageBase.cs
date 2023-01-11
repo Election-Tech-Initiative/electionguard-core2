@@ -13,6 +13,6 @@ public class ContentPageBase<TViewModel> : ContentPage where TViewModel : BaseVi
     protected override async void OnAppearing()
     {
         base.OnAppearing();
-        await ViewModel.AppearingCommand.ExecuteAsync(null);
+        await ViewModel.OnAppearing();
     }
 }

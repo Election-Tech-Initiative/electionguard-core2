@@ -14,6 +14,11 @@ public partial class BaseViewModel : ObservableObject, IDisposable
     [ObservableProperty]
     private string _pageTitle = "";
 
+    public virtual async Task OnAppearing()
+    {
+        await Task.Yield();
+    }
+
     [RelayCommand]
     private async Task Logout() => await NavigationService.GoToPage(typeof(LoginViewModel));
 
