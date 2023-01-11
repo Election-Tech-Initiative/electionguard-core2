@@ -16,9 +16,9 @@ namespace ElectionGuard
     public partial class PlaintextBallot : DisposableBase
     {
         /// <summary>
-        /// Create a Plaintext Ballot
+        /// Creates a <see cref="PlaintextBallot">PlaintextBallot</see> object from a <see href="https://www.rfc-editor.org/rfc/rfc8259.html#section-8.1">[RFC-8259]</see> UTF-8 encoded JSON string
         /// </summary>
-        /// <param name="json">json representation</param>
+        /// <param name="json">A UTF-8 Encoded JSON data string</param>
         public PlaintextBallot(string json)
         {
             var status = NativeInterface.PlaintextBallot.FromJson(json, out Handle);

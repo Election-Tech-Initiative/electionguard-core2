@@ -15,33 +15,33 @@
 
 namespace electionguard
 {
-    /// <Summary>
+    /// <summary>
     /// Enumeration used when marking a ballot as cast or spoiled
-    /// </Summary>
+    /// </summary>
     enum class BallotBoxState {
-        /// <Summary>
+        /// <summary>
         /// A ballot that has been explicitly cast
-        /// </Summary>
+        /// </summary>
         cast = 1,
-        /// <Summary>
+        /// <summary>
         /// A ballot that has been explicitly spoiled
-        /// </Summary>
+        /// </summary>
         spoiled = 2,
-        /// <Summary>
+        /// <summary>
         /// A ballot whose state is unknown to ElectionGuard and will not be included in any election results
-        /// </Summary>
+        /// </summary>
         unknown = 999
     };
 
-    /// <Summary>
+    /// <summary>
     /// Get a string representation of a BallotBoxState enum
-    /// </Summary>
+    /// </summary>
     EG_API std::string getBallotBoxStateString(const BallotBoxState &value);
 
-    /// <Summary>
+    /// <summary>
     /// Get a BallotBoxState enum from a string.
     /// <returns>BallotBoxState.unknown if the value cannot be resolved</returns>
-    /// </Summary>
+    /// </summary>
     EG_API BallotBoxState getBallotBoxState(const std::string &value);
 
     /// <summary>
@@ -52,21 +52,21 @@ namespace electionguard
     /// </summary>
     struct ExtendedData {
       public:
-        /// <Summary>
+        /// <summary>
         /// The string value
-        /// </Summary>
+        /// </summary>
         std::string value;
 
-        /// <Summary>
+        /// <summary>
         /// The length of the string value
-        /// </Summary>
+        /// </summary>
         uint64_t length;
 
         ExtendedData(std::string value, uint64_t length) : value(value), length(length) {}
 
-        /// <Summary>
+        /// <summary>
         /// Clone the value by making a deep copy and returning a new unique pointer
-        /// </Summary>
+        /// </summary>
         std::unique_ptr<ExtendedData> clone() const
         {
             return std::make_unique<ExtendedData>(this->value, this->length);
@@ -101,15 +101,15 @@ namespace electionguard
         PlaintextBallotSelection &operator=(PlaintextBallotSelection other);
         PlaintextBallotSelection &operator=(PlaintextBallotSelection &&other);
 
-        /// <Summary>
+        /// <summary>
         /// Get the objectId of the selection, which is the unique id for
         /// the selection in a specific contest described in the election manifest.
-        /// </Summary>
+        /// </summary>
         std::string getObjectId() const;
 
-        /// <Summary>
+        /// <summary>
         /// Get the plaintext vote
-        /// </Summary>
+        /// </summary>
         uint64_t getVote() const;
 
         /// <summary>
@@ -128,9 +128,9 @@ namespace electionguard
         /// </summary>
         bool isValid(const std::string &expectedObjectId) const;
 
-        /// <Summary>
+        /// <summary>
         /// Clone the value by making a deep copy and returning a new unique pointer
-        /// </Summary>
+        /// </summary>
         std::unique_ptr<PlaintextBallotSelection> clone() const;
 
       private:
@@ -179,15 +179,15 @@ namespace electionguard
         CiphertextBallotSelection &operator=(CiphertextBallotSelection other);
         CiphertextBallotSelection &operator=(CiphertextBallotSelection &&other);
 
-        /// <Summary>
+        /// <summary>
         /// Get the objectId of the selection, which is the unique id for
         /// the selection in a specific contest described in the election manifest.
-        /// </Summary>
+        /// </summary>
         std::string getObjectId() const;
 
-        /// <Summary>
+        /// <summary>
         /// Get the sequence order of the selection
-        /// </Summary>
+        /// </summary>
         uint64_t getSequenceOrder() const;
 
         /// <summary>
@@ -360,22 +360,22 @@ namespace electionguard
         PlaintextBallotContest &operator=(PlaintextBallotContest other);
         PlaintextBallotContest &operator=(PlaintextBallotContest &&other);
 
-        /// <Summary>
+        /// <summary>
         /// Get the objectId of the contest, which is the unique id for
         /// the contest in a specific ballot style described in the election manifest.
-        /// </Summary>
+        /// </summary>
         std::string getObjectId() const;
 
-        /// <Summary>
+        /// <summary>
         /// The collection of selections for this ballot contest
-        /// </Summary>
+        /// </summary>
         std::vector<std::reference_wrapper<PlaintextBallotSelection>> getSelections() const;
 
-        /// <Summary>
+        /// <summary>
         /// Given a PlaintextBallotContest returns true if the state is representative of the expected values.
         ///
         /// Note: because this class supports partial representations, undervotes are considered a valid state.
-        /// </Summary>
+        /// </summary>
         eg_valid_contest_return_type_t isValid(const std::string &expectedObjectId,
                                                uint64_t expectedNumberSelections,
                                                uint64_t expectedNumberElected,
@@ -420,15 +420,15 @@ namespace electionguard
         CiphertextBallotContest &operator=(CiphertextBallotContest other);
         CiphertextBallotContest &operator=(CiphertextBallotContest &&other);
 
-        /// <Summary>
+        /// <summary>
         /// Get the objectId of the contest, which is the unique id for
         /// the contest in a specific ballot style described in the election manifest.
-        /// </Summary>
+        /// </summary>
         std::string getObjectId() const;
 
-        /// <Summary>
+        /// <summary>
         /// Get the sequence order of the contest
-        /// </Summary>
+        /// </summary>
         uint64_t getSequenceOrder() const;
 
         /// <summary>
@@ -564,52 +564,56 @@ namespace electionguard
         PlaintextBallot &operator=(PlaintextBallot other);
         PlaintextBallot &operator=(PlaintextBallot &&other);
 
-        /// <Summary>
+        /// <summary>
         /// A unique Ballot ID that is relevant to the external system and must be unique
         /// within the dataset of the election.
-        /// </Summary>
+        /// </summary>
         std::string getObjectId() const;
 
-        /// <Summary>
+        /// <summary>
         /// The Object Id of the ballot style in the election manifest.  This value is used
         /// to determine which contests to expect on the ballot, to fill in missing values,
         /// and to validate that the ballot is well-formed
-        /// </Summary>
+        /// </summary>
         std::string getStyleId() const;
 
-        /// <Summary>
+        /// <summary>
         /// The collection of contests on the ballot
-        /// </Summary>
+        /// </summary>
         std::vector<std::reference_wrapper<PlaintextBallotContest>> getContests() const;
 
-        /// <Summary>
+        /// <summary>
         /// Export the ballot representation as BSON
-        /// </Summary>
+        /// </summary>
         std::vector<uint8_t> toBson() const;
 
-        /// <Summary>
+        /// <summary>
         /// Export the ballot representation as JSON
-        /// </Summary>
+        /// </summary>
         std::string toJson() const;
 
-        /// <Summary>
+        /// <summary>
         /// Export the ballot representation as MsgPack
-        /// </Summary>
+        /// </summary>
         std::vector<uint8_t> toMsgPack() const;
 
-        /// <Summary>
+        /// <summary>
         /// Import the ballot representation from BSON
-        /// </Summary>
+        /// </summary>
         static std::unique_ptr<PlaintextBallot> fromBson(std::vector<uint8_t> data);
 
-        /// <Summary>
-        /// Import the ballot representation from JSON
-        /// </Summary>
+        /// <summary>
+        /// Creates a <see cref="PlaintextBallot">PlaintextBallot</see> object from a <see href="https://www.rfc-editor.org/rfc/rfc8259.html#section-8.1">[RFC-8259]</see> UTF-8 encoded JSON string
+        /// </summary>
+        /// <param name="data">A UTF-8 Encoded JSON data string</param>
+        /// <returns>
+        /// A unique pointer to a <see cref="PlaintextBallot">PlaintextBallot</see> Object
+        /// </returns>
         static std::unique_ptr<PlaintextBallot> fromJson(std::string data);
 
-        /// <Summary>
+        /// <summary>
         /// Import the ballot representation from MsgPack
-        /// </Summary>
+        /// </summary>
         static std::unique_ptr<PlaintextBallot> fromMsgPack(std::vector<uint8_t> data);
 
       private:
@@ -649,11 +653,11 @@ namespace electionguard
         /// </summary>
         std::string getObjectId() const;
 
-        /// <Summary>
+        /// <summary>
         /// The Object Id of the ballot style in the election manifest.  This value is used
         /// to determine which contests to expect on the ballot, to fill in missing values,
         /// and to validate that the ballot is well-formed
-        /// </Summary>
+        /// </summary>
         std::string getStyleId() const;
 
         /// <summary>
@@ -756,34 +760,38 @@ namespace electionguard
         /// </summary>
         std::unique_ptr<ElementModQ> nonceSeed();
 
-        /// <Summary>
+        /// <summary>
         /// Export the ballot representation as BSON
-        /// </Summary>
+        /// </summary>
         std::vector<uint8_t> toBson(bool withNonces = false) const;
 
-        /// <Summary>
+        /// <summary>
         /// Export the ballot representation as JSON
-        /// </Summary>
+        /// </summary>
         std::string toJson(bool withNonces = false) const;
 
-        /// <Summary>
+        /// <summary>
         /// Export the ballot representation as MsgPack
-        /// </Summary>
+        /// </summary>
         std::vector<uint8_t> toMsgPack(bool withNonces = false) const;
 
-        /// <Summary>
-        /// Import the ballot representation from JSON
-        /// </Summary>
+        /// <summary>
+        /// Creates a <see cref="CiphertextBallot">CiphertextBallot</see> object from a <see href="https://www.rfc-editor.org/rfc/rfc8259.html#section-8.1">[RFC-8259]</see> UTF-8 encoded JSON string
+        /// </summary>
+        /// <param name="data">A UTF-8 Encoded JSON data string</param>
+        /// <returns>
+        /// A unique pointer to a <see cref="CiphertextBallot">CiphertextBallot</see> Object
+        /// </returns>
         static std::unique_ptr<CiphertextBallot> fromJson(std::string data);
 
-        /// <Summary>
+        /// <summary>
         /// Import the ballot representation from BSON
-        /// </Summary>
+        /// </summary>
         static std::unique_ptr<CiphertextBallot> fromBson(std::vector<uint8_t> data);
 
-        /// <Summary>
+        /// <summary>
         /// Import the ballot representation from MsgPack
-        /// </Summary>
+        /// </summary>
         static std::unique_ptr<CiphertextBallot> fromMsgPack(std::vector<uint8_t> data);
 
       protected:
@@ -860,34 +868,38 @@ namespace electionguard
              std::unique_ptr<ElementModQ> ballotCode = nullptr,
              BallotBoxState state = BallotBoxState::unknown);
 
-        /// <Summary>
+        /// <summary>
         /// Export the ballot representation as BSON
-        /// </Summary>
+        /// </summary>
         std::vector<uint8_t> toBson() const;
 
-        /// <Summary>
+        /// <summary>
         /// Export the ballot representation as JSON
-        /// </Summary>
+        /// </summary>
         std::string toJson() const;
 
-        /// <Summary>
+        /// <summary>
         /// Export the ballot representation as MsgPack
-        /// </Summary>
+        /// </summary>
         std::vector<uint8_t> toMsgPack() const;
 
-        /// <Summary>
-        /// Import the ballot representation from JSON
-        /// </Summary>
+        /// <summary>
+        /// Creates a <see cref="SubmittedBallot">SubmittedBallot</see> object from a <see href="https://www.rfc-editor.org/rfc/rfc8259.html#section-8.1">[RFC-8259]</see> UTF-8 encoded JSON string
+        /// </summary>
+        /// <param name="json">A UTF-8 Encoded JSON data string</param>
+        /// <returns>
+        /// A unique pointer to a <see cref="SubmittedBallot">SubmittedBallot</see> Object
+        /// </returns>
         static std::unique_ptr<SubmittedBallot> fromJson(std::string data);
 
-        /// <Summary>
+        /// <summary>
         /// Import the ballot representation from BSON
-        /// </Summary>
+        /// </summary>
         static std::unique_ptr<SubmittedBallot> fromBson(std::vector<uint8_t> data);
 
-        /// <Summary>
+        /// <summary>
         /// Import the ballot representation from MsgPack
-        /// </Summary>
+        /// </summary>
         static std::unique_ptr<SubmittedBallot> fromMsgPack(std::vector<uint8_t> data);
 
       private:

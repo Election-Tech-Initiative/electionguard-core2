@@ -1939,9 +1939,6 @@ namespace ElectionGuard
 
         #endregion
 
-
-
-
         #region CiphertextElectionContext
 
         internal static class CiphertextElectionContext
@@ -2612,8 +2609,6 @@ namespace ElectionGuard
                 CallingConvention = CallingConvention.Cdecl, SetLastError = true)]
             internal static extern Status ToJson(
                 EncryptionDeviceHandle handle, out IntPtr data, out ulong size);
-
-
         }
 
         internal static class EncryptionMediator
@@ -2680,7 +2675,6 @@ namespace ElectionGuard
                 ElectionGuard.PlaintextBallot.External.PlaintextBallotHandle plainutext,
                 out ElectionGuard.CiphertextBallot.External.CiphertextBallotHandle ciphertext);
         }
-
 
         internal static class Encrypt
         {
@@ -2749,6 +2743,8 @@ namespace ElectionGuard
                 out CompactCiphertextBallot.CompactCiphertextBallotHandle handle);
         }
 
+        #endregion
+
         #region Precompute
         internal static class PrecomputeBuffers
         {
@@ -2771,7 +2767,6 @@ namespace ElectionGuard
 
         #endregion
 
-
         #region Memory
         internal static class Memory
         {
@@ -2786,7 +2781,4 @@ namespace ElectionGuard
         #endregion
 
     }
-
-    #endregion
-
 }

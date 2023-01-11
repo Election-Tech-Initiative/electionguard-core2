@@ -175,7 +175,7 @@ namespace ElectionGuard.Encryption.Tests
                 string.Empty,
                 false);
 
-            List<Candidate> candidates = new List<Candidate>
+            var candidates = new List<Candidate>
             {
                 candidate
             };

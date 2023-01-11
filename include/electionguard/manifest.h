@@ -802,6 +802,14 @@ EG_API eg_electionguard_status_t eg_election_manifest_crypto_hash(
 
 EG_API bool eg_election_manifest_is_valid(eg_election_manifest_t *handle);
 
+/**
+ * @brief Creates a Manifest object from a [RFC-8259](https://www.rfc-editor.org/rfc/rfc8259.html#section-8.1) UTF-8 encoded JSON string
+ * 
+ * @param[in] in_data The UTF-8 Encoded JSON data string
+ * @param[out] out_handle a handle to an @ref eg_election_manifest_t object. 
+ *                        The caller is responsible for freeing the object.
+ * @return eg_electionguard_status_t indicating success or failure 
+ */
 EG_API eg_electionguard_status_t
 eg_election_manifest_from_json(char *in_data, eg_election_manifest_t **out_handle);
 
@@ -877,6 +885,14 @@ EG_API eg_electionguard_status_t
 eg_internal_manifest_get_ballot_style(eg_internal_manifest_t *handle, char *in_ballot_style_id,
                                       eg_ballot_style_t **out_ballot_style_ref);
 
+/**
+ * @brief Creates an Internal Manifest object from a [RFC-8259](https://www.rfc-editor.org/rfc/rfc8259.html#section-8.1) UTF-8 encoded JSON string
+ * 
+ * @param[in] in_data The UTF-8 Encoded JSON data string
+ * @param[out] out_handle a handle to an @ref eg_internal_manifest_t object. 
+ *                        The caller is responsible for freeing the object.
+ * @return eg_electionguard_status_t indicating success or failure 
+ */
 EG_API eg_electionguard_status_t
 eg_internal_manifest_from_json(char *in_data, eg_internal_manifest_t **out_handle);
 

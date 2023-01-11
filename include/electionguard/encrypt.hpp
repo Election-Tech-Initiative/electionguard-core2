@@ -14,7 +14,6 @@ using std::string;
 using std::unique_ptr;
 using std::vector;
 
-
 namespace electionguard
 {
     /// <summary>
@@ -63,12 +62,19 @@ namespace electionguard
         std::string toJson() const;
 
         static std::unique_ptr<EncryptionDevice> fromBson(std::vector<uint8_t> data);
+
+        /// <summary>
+        /// Creates a <see cref="EncryptionDevice">EncryptionDevice</see> object from a <see href="https://www.rfc-editor.org/rfc/rfc8259.html#section-8.1">[RFC-8259]</see> UTF-8 encoded JSON string
+        /// </summary>
+        /// <param name="data">A UTF-8 Encoded JSON data string</param>
+        /// <returns>
+        /// A unique pointer to an <see cref="EncryptionDevice">EncryptionDevice</see> Object
+        /// </returns>
         static std::unique_ptr<EncryptionDevice> fromJson(std::string data);
 
       private:
         class Impl;
         std::unique_ptr<Impl> pimpl;
-
     };
 
     /// <summary>
