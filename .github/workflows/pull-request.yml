@@ -168,6 +168,9 @@ jobs:
       - name: Run Tests (Windows)
         env:
           PLATFORM: ${{ matrix.processor }}
+        uses: ilammy/msvc-dev-cmd@v1
+        with:
+          arch: ${{ matrix.processor }}
         if: (runner.os == 'Windows' && matrix.compiler == 'msvc')
         run: make test
 

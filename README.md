@@ -51,9 +51,8 @@ This c++ implementation also includes a C API that can be consumed from anywhere
 To build for android, you need the Android SDK and platforms 21 and 26. The easiest way is to download android studio. Alternatively, you can use the SDK installation that ships with the Xamarin Tooling in Visual Studio. WE also require the use of the Android NDK. Android builds can be compiled on Linux, Mac, or Windows
 
 - [Android SDK](https://developer.android.com/studio/#downloads)
-- [SDK 21](https://developer.android.com/studio/releases/platforms#5.0)
-- [SDK 26](https://developer.android.com/studio/releases/platforms#8.0)
-- [NDK 21](https://developer.android.com/ndk/downloads/)
+- [SDK 28](https://developer.android.com/studio/releases/platforms#9.0)
+- [NDK 25](https://developer.android.com/ndk/downloads/)
 
 ### 🍏 iOS
 

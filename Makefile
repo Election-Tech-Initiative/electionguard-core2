@@ -23,6 +23,10 @@ ifeq ($(OS),Windows_NT)
 	ifeq ($(PROCESSOR_ARCHITECTURE),arm)
         PLATFORM?=arm64
     endif
+	# https://learn.microsoft.com/en-us/windows/win32/winprog64/wow64-implementation-details
+	ifeq ($(PROCESSOR_ARCHITEW6432),AMD64)
+		PLATFORM?=x64
+	endif
 	ifeq ($(PROCESSOR_ARCHITECTURE),AMD64)
         PLATFORM?=x64
     endif
@@ -129,7 +133,8 @@ ifeq ($(OPERATING_SYSTEM),Windows)
 		-DBUILD_SHARED_LIBS=ON \
 		-DUSE_MSVC=ON \
 		-DANDROID_NDK_PATH=$(ANDROID_NDK_PATH) \
-		-DCPM_SOURCE_CACHE=$(CPM_SOURCE_CACHE)
+		-DCPM_SOURCE_CACHE=$(CPM_SOURCE_CACHE) \
+		-DCMAKE_TOOLCHAIN_FILE=cmake/toolchains/$(PLATFORM)-$(OPERATING_SYSTEM).cmake
 	cmake --build $(ELECTIONGUARD_BUILD_LIBS_DIR)/$(OPERATING_SYSTEM)/$(PLATFORM)/$(TARGET)/ --config $(TARGET)
 else
 	cmake -S . -B $(ELECTIONGUARD_BUILD_LIBS_DIR)/$(OPERATING_SYSTEM)/$(PLATFORM)/$(TARGET) \
