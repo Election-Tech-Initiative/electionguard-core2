@@ -115,7 +115,7 @@ jobs:
           dotnet-version: 6.0.x
 
       # Runner Configuration
-      - name: Update Environment
+      - name: Update Environment (Linux)
         if: runner.os == 'Linux'
         run: |
           sudo apt-get update
@@ -129,21 +129,28 @@ jobs:
             echo "CXX=clang++-${{ matrix.version }}" >> $GITHUB_ENV
           fi
 
-      - name: Update Environment
+      - name: Update Environment (Mac)
         if: runner.os == 'macOS'
         run: |
           ls -ls /Applications/
           ls -ls $ANDROID_SDK_ROOT/ndk
           sudo xcode-select -switch /Applications/Xcode_${{ matrix.version }}.app
 
-      - name: Update Environment
+      - name: Update Environment (Windows MSYS2)
         if: (runner.os == 'Windows' && matrix.compiler == 'gcc')
         uses: msys2/setup-msys2@v2
         with:
           update: true
           install: mingw-w64-x86_64-gcc
 
+      - name: Update Environment (Windows MSVC)
+        (runner.os == 'Windows' && matrix.compiler == 'msvc')
+        uses: ilammy/msvc-dev-cmd@v1
+          with:
+            arch: ${{ matrix.processor }}
+
       # Environment
+      
       - name: Configure Environment
         run: make environment
 
@@ -168,9 +175,6 @@ jobs:
       - name: Run Tests (Windows)
         env:
           PLATFORM: ${{ matrix.processor }}
-        uses: ilammy/msvc-dev-cmd@v1
-        with:
-          arch: ${{ matrix.processor }}
         if: (runner.os == 'Windows' && matrix.compiler == 'msvc')
         run: make test
 
