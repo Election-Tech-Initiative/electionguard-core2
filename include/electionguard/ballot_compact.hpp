@@ -45,64 +45,68 @@ namespace electionguard
         CompactPlaintextBallot &operator=(CompactPlaintextBallot other);
         CompactPlaintextBallot &operator=(CompactPlaintextBallot &&other);
 
-        /// <Summary>
+        /// <summary>
         /// A unique Ballot ID that is relevant to the external system and must be unique
         /// within the dataset of the election.
-        /// </Summary>
+        /// </summary>
         std::string getObjectId() const;
 
-        /// <Summary>
+        /// <summary>
         /// The Object Id of the ballot style in the election manifest.  This value is used
         /// to determine which contests to expect on the ballot, to fill in missing values,
         /// and to validate that the ballot is well-formed
-        /// </Summary>
+        /// </summary>
         std::string getStyleId() const;
 
-        /// <Summary>
+        /// <summary>
         /// The collection of selections on the ballot ordered by the contest sequence order
         /// and the selection sequence order.  It is up to the consumer to guarantee the order of elements
-        /// </Summary>
+        /// </summary>
         std::vector<uint64_t> getSelections() const;
 
-        /// <Summary>
+        /// <summary>
         /// The collection of writeins on the ballot ordered by the contest sequence order
         /// and the selection sequence order.  It is up to the consumer to guarantee the order of elements
-        /// </Summary>
+        /// </summary>
         std::vector<std::string> getWriteIns() const;
 
-        /// <Summary>
+        /// <summary>
         /// Make a compact representation of a plaintext ballot
-        /// </Summary>
+        /// </summary>
         static std::unique_ptr<CompactPlaintextBallot> make(const PlaintextBallot &plaintext);
 
-        /// <Summary>
+        /// <summary>
         /// Export the ballot representation as BSON
-        /// </Summary>
+        /// </summary>
         std::vector<uint8_t> toBson() const;
 
-        /// <Summary>
+        /// <summary>
         /// Export the ballot representation as JSON
-        /// </Summary>
+        /// </summary>
         std::string toJson() const;
 
-        /// <Summary>
+        /// <summary>
         /// Export the ballot representation as MsgPack
-        /// </Summary>
+        /// </summary>
         std::vector<uint8_t> toMsgPack() const;
 
-        /// <Summary>
-        /// Import the ballot representation from JSON
-        /// </Summary>
+        /// <summary>
+        /// Creates a <see cref="CompactPlaintextBallot">CompactPlaintextBallot</see> object from a <see href="https://www.rfc-editor.org/rfc/rfc8259.html#section-8.1">[RFC-8259]</see> UTF-8 encoded JSON string
+        /// </summary>
+        /// <param name="data">A UTF-8 Encoded JSON data string</param>
+        /// <returns>
+        /// A unique pointer to a <see cref="CompactPlaintextBallot">CompactPlaintextBallot</see> Object
+        /// </returns>
         static std::unique_ptr<CompactPlaintextBallot> fromJson(std::string data);
 
-        /// <Summary>
+        /// <summary>
         /// Import the ballot representation from BSON
-        /// </Summary>
+        /// </summary>
         static std::unique_ptr<CompactPlaintextBallot> fromBson(std::vector<uint8_t> data);
 
-        /// <Summary>
+        /// <summary>
         /// Import the ballot representation from MsgPack
-        /// </Summary>
+        /// </summary>
         static std::unique_ptr<CompactPlaintextBallot> fromMsgPack(std::vector<uint8_t> data);
 
       private:
@@ -135,15 +139,15 @@ namespace electionguard
         CompactCiphertextBallot &operator=(CompactCiphertextBallot other);
         CompactCiphertextBallot &operator=(CompactCiphertextBallot &&other);
 
-        /// <Summary>
+        /// <summary>
         /// A unique Ballot ID that is relevant to the external system and must be unique
         /// within the dataset of the election.
-        /// </Summary>
+        /// </summary>
         std::string getObjectId() const;
 
-        /// <Summary>
+        /// <summary>
         /// Get a pointer to the plaintext representation
-        /// </Summary>
+        /// </summary>
         CompactPlaintextBallot *getPlaintext() const;
 
         /// <summary>
@@ -188,34 +192,38 @@ namespace electionguard
         /// </summary>
         void setBallotBoxState(BallotBoxState state);
 
-        /// <Summary>
+        /// <summary>
         /// Export the ballot representation as BSON
-        /// </Summary>
+        /// </summary>
         std::vector<uint8_t> toBson() const;
 
-        /// <Summary>
+        /// <summary>
         /// Export the ballot representation as JSON
-        /// </Summary>
+        /// </summary>
         std::string toJson() const;
 
-        /// <Summary>
+        /// <summary>
         /// Export the ballot representation as MsgPack
-        /// </Summary>
+        /// </summary>
         std::vector<uint8_t> toMsgPack() const;
 
-        /// <Summary>
-        /// Import the ballot representation from JSON
-        /// </Summary>
+        /// <summary>
+        /// Creates a <see cref="CompactCiphertextBallot">CompactCiphertextBallot</see> object from a <see href="https://www.rfc-editor.org/rfc/rfc8259.html#section-8.1">[RFC-8259]</see> UTF-8 encoded JSON string
+        /// </summary>
+        /// <param name="data">A UTF-8 Encoded JSON data string</param>
+        /// <returns>
+        /// A unique pointer to a <see cref="CompactCiphertextBallot">CompactCiphertextBallot</see> Object
+        /// </returns>
         static std::unique_ptr<CompactCiphertextBallot> fromJson(std::string data);
 
-        /// <Summary>
+        /// <summary>
         /// Import the ballot representation from BSON
-        /// </Summary>
+        /// </summary>
         static std::unique_ptr<CompactCiphertextBallot> fromBson(std::vector<uint8_t> data);
 
-        /// <Summary>
+        /// <summary>
         /// Import the ballot representation from MsgPack
-        /// </Summary>
+        /// </summary>
         static std::unique_ptr<CompactCiphertextBallot> fromMsgPack(std::vector<uint8_t> data);
 
       private:
@@ -224,28 +232,28 @@ namespace electionguard
         std::unique_ptr<Impl> pimpl;
     };
 
-    /// <Summary>
+    /// <summary>
     /// Make a compact representation of a plaintext ballot
-    /// </Summary>
+    /// </summary>
     EG_API std::unique_ptr<CompactPlaintextBallot>
     compressPlaintextBallot(const PlaintextBallot &plaintext);
 
-    /// <Summary>
+    /// <summary>
     /// Make a compact representation of a ciphertext ballot
-    /// </Summary>
+    /// </summary>
     EG_API std::unique_ptr<CompactCiphertextBallot>
     compressCiphertextBallot(const PlaintextBallot &plaintext, const CiphertextBallot &ciphertext);
 
-    /// <Summary>
+    /// <summary>
     /// Expand a compact plaintext ballot into a plaintext ballot
-    /// </Summary>
+    /// </summary>
     EG_API std::unique_ptr<PlaintextBallot>
     expandCompactPlaintextBallot(const CompactPlaintextBallot &compactBallot,
                                  const InternalManifest &manifest);
 
-    /// <Summary>
+    /// <summary>
     /// Expand a compact ciphertext ballot into a ciphertext ballot
-    /// </Summary>
+    /// </summary>
     EG_API std::unique_ptr<CiphertextBallot>
     expandCompactCiphertextBallot(const CompactCiphertextBallot &compactCiphertext,
                                   const InternalManifest &manifest,
