@@ -146,8 +146,8 @@ jobs:
       - name: Update Environment (Windows MSVC)
         if: (runner.os == 'Windows' && matrix.compiler == 'msvc')
         uses: ilammy/msvc-dev-cmd@v1
-          with:
-            arch: ${{ matrix.processor }}
+        with:
+          arch: ${{ matrix.processor }}
 
       # Environment
       
