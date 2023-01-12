@@ -5,9 +5,9 @@
     /// </summary>
     public class ElectionPartialKeyVerification
     {
-        public string? OwnerId { get; set; }
-        public string? DesignatedId { get; internal set; }
-        public string? VerifierId { get; set; }
-        public bool Verified { get; internal set; }
+        public string? OwnerId { get; init; }
+        public string? DesignatedId { get; init; }
+        public string? VerifierId { get; init; }
+        public bool Verified { get; init; }
     }
 }

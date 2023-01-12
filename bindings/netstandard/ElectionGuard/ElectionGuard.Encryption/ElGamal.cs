@@ -29,7 +29,7 @@
     }
 
     /// <summary>
-    /// 
+    /// Class to hold the factory method to create HashedElGamalCiphertext
     /// </summary>
     public static class HashedElgamal
     {

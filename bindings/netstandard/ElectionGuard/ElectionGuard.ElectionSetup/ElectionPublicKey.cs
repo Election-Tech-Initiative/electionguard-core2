@@ -3,7 +3,7 @@
 /// <summary>
 /// A tuple of election public key and owner information
 /// </summary>
-public class ElectionPublicKey
+public record ElectionPublicKey
 {
     public ElectionPublicKey(
         string ownerId,
@@ -22,26 +22,26 @@ public class ElectionPublicKey
     /// <summary>
     /// The id of the owner guardian
     /// </summary>
-    public string OwnerId { get; }
+    public string OwnerId { get; init; }
 
     /// <summary>
     /// The sequence order of the owner guardian
     /// </summary>
-    public ulong SequenceOrder { get; }
+    public ulong SequenceOrder { get; init; }
 
     /// <summary>
     /// The election public for the guardian
     /// Note: This is the same as the first coefficient commitment
     /// </summary>
-    public ElementModP Key { get; }
+    public ElementModP Key { get; init; }
 
     /// <summary>
     /// The commitments for the coefficients in the secret polynomial
     /// </summary>
-    public List<ElementModP> CoefficientCommitments { get; }
+    public List<ElementModP> CoefficientCommitments { get; init; }
 
     /// <summary>
     /// The proofs for the coefficients in the secret polynomial
     /// </summary>
-    public List<SchnorrProof> CoefficientProofs { get; }
+    public List<SchnorrProof> CoefficientProofs { get; init; }
 }

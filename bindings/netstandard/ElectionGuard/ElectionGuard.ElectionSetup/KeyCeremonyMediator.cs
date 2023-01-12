@@ -1,7 +1,4 @@
-﻿using MediatorId = System.String;
-using GuardianId = System.String;
-
-namespace ElectionGuard.ElectionSetup
+﻿namespace ElectionGuard.ElectionSetup
 {
     /// <summary>
     /// KeyCeremonyMediator for assisting communication between guardians
@@ -14,12 +11,12 @@ namespace ElectionGuard.ElectionSetup
             CeremonyDetails = ceremonyDetails;
         }
 
-        public MediatorId Id { get; }
+        public string Id { get; }
         public CeremonyDetails CeremonyDetails { get; }
 
         // From Guardians
         // Round 1
-        private readonly Dictionary<GuardianId, ElectionPublicKey> _electionPublicKeys = new Dictionary<string, ElectionPublicKey>();
+        private readonly Dictionary<string, ElectionPublicKey> _electionPublicKeys = new();
 
         public void Announce(ElectionPublicKey shareKey)
         {

@@ -41,9 +41,8 @@ namespace ElectionGuard
             }
         }
         /// <summary>
-        /// 
+        /// Message Authentication Code value
         /// </summary>
-        /// <value></value>
         public byte[] Mac
         {
             get

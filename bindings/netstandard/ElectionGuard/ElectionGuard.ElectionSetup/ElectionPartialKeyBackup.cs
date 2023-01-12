@@ -5,11 +5,11 @@
 /// </summary>
 public record ElectionPartialKeyBackup
 {
-    public string? OwnerId { get; set; }
+    public string? OwnerId { get; init; } = default;
 
-    public string? DesignedId { get; set; }
+    public string? DesignedId { get; init; } = default;
 
-    public ulong DesignatedSequenceOrder { get; set; }
+    public ulong DesignatedSequenceOrder { get; init; } = default;
 
-    public HashedElGamalCiphertext? EncryptedCoordinate { get; set; }
+    public HashedElGamalCiphertext? EncryptedCoordinate { get; init; } = default;
 }

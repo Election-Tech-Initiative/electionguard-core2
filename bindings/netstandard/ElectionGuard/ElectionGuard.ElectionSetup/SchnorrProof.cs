@@ -3,27 +3,27 @@
 /// <summary>
 /// Representation of a Schnorr proof
 /// </summary>
-public class SchnorrProof
+public record SchnorrProof
 {
     /// <summary>
     /// k in the spec
     /// </summary>
-    public ElementModP PublicKey { get; set; }
+    public ElementModP PublicKey { get; init; }
 
     /// <summary>
     /// h in the spec
     /// </summary>
-    public ElementModP Commitment { get; set; }
+    public ElementModP Commitment { get; init; }
 
     /// <summary>
     /// c in the spec
     /// </summary>
-    public ElementModQ Challenge { get; set; }
+    public ElementModQ Challenge { get; init; }
 
     /// <summary>
     /// u in the spec
     /// </summary>
-    public ElementModQ Response { get; set; }
+    public ElementModQ Response { get; init; }
 
     public ProofUsage Usage = ProofUsage.SecretValue;
 
