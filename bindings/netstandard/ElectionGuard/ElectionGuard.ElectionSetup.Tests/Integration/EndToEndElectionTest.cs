@@ -16,10 +16,10 @@
 
         private void Step1KeyCeremony()
         {
-            for (ulong i = 0; i < NumberOfGuardians; i++)
+            for (ulong i = 1; i <= NumberOfGuardians; i++)
             {
-                var guardianId = (i + 1).ToString();
-                var guardian = Guardian.FromNonce(guardianId, i + 1, NumberOfGuardians, Quorum, "testkey");
+                var guardianId = i.ToString();
+                var guardian = Guardian.FromNonce(guardianId, i, NumberOfGuardians, Quorum, "testkey");
                 _guardians.Add(guardian);
             }
 
