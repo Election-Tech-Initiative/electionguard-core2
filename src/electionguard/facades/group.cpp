@@ -12,6 +12,8 @@ extern "C" {
 
 #include <cstring>
 
+using electionguard::bytes_to_p;
+using electionguard::bytes_to_q;
 using electionguard::dynamicCopy;
 using electionguard::ElementModP;
 using electionguard::ElementModQ;
@@ -71,6 +73,20 @@ eg_electionguard_status_t eg_element_mod_p_new_unchecked(const uint64_t in_data[
     }
 }
 
+EG_API eg_electionguard_status_t eg_element_mod_p_new_bytes(uint8_t *in_data, uint64_t in_size,
+                                                            eg_element_mod_p_t **out_handle)
+{
+    try {
+        auto element = bytes_to_p(in_data, in_size);
+        *out_handle = AS_TYPE(eg_element_mod_p_t, element.release());
+
+        return ELECTIONGUARD_STATUS_SUCCESS;
+    } catch (const exception &e) {
+        Log::error(__func__, e);
+        return ELECTIONGUARD_STATUS_ERROR_BAD_ALLOC;
+    }
+}
+
 eg_electionguard_status_t eg_element_mod_p_free(eg_element_mod_p_t *handle)
 {
     if (handle == nullptr) {
@@ -101,6 +117,23 @@ eg_electionguard_status_t eg_element_mod_p_to_hex(eg_element_mod_p_t *handle, ch
     try {
         auto hex_rep = AS_TYPE(ElementModP, handle)->toHex();
         *out_hex = dynamicCopy(hex_rep);
+
+        return ELECTIONGUARD_STATUS_SUCCESS;
+    } catch (const exception &e) {
+        Log::error(__func__, e);
+        return ELECTIONGUARD_STATUS_ERROR_BAD_ALLOC;
+    }
+}
+
+eg_electionguard_status_t eg_element_mod_p_to_bytes(eg_element_mod_p_t *handle, uint8_t **out_bytes,
+                                                    size_t *out_size)
+{
+    try {
+        auto hex_rep = AS_TYPE(ElementModP, handle)->toBytes();
+
+        size_t size = 0;
+        *out_bytes = dynamicCopy(hex_rep, &size);
+        *out_size = (uint64_t)size;
 
         return ELECTIONGUARD_STATUS_SUCCESS;
     } catch (const exception &e) {
@@ -147,6 +180,20 @@ eg_electionguard_status_t eg_element_mod_q_new_unchecked(const uint64_t in_data[
     }
 }
 
+EG_API eg_electionguard_status_t eg_element_mod_q_new_bytes(uint8_t *in_data, uint64_t in_size,
+                                                            eg_element_mod_q_t **out_handle)
+{
+    try {
+        auto element = bytes_to_q(in_data, in_size);
+        *out_handle = AS_TYPE(eg_element_mod_q_t, element.release());
+
+        return ELECTIONGUARD_STATUS_SUCCESS;
+    } catch (const exception &e) {
+        Log::error(__func__, e);
+        return ELECTIONGUARD_STATUS_ERROR_BAD_ALLOC;
+    }
+}
+
 eg_electionguard_status_t eg_element_mod_q_free(eg_element_mod_q_t *handle)
 {
     if (handle == nullptr) {
@@ -170,6 +217,23 @@ eg_electionguard_status_t eg_element_mod_q_get_data(eg_element_mod_q_t *handle, 
     *out_size = (uint64_t)MAX_Q_LEN;
 
     return ELECTIONGUARD_STATUS_SUCCESS;
+}
+
+eg_electionguard_status_t eg_element_mod_q_to_bytes(eg_element_mod_q_t *handle, uint8_t **out_bytes,
+                                                    uint64_t *out_size)
+{
+    try {
+        auto hex_rep = AS_TYPE(ElementModQ, handle)->toBytes();
+
+        size_t size = 0;
+        *out_bytes = dynamicCopy(hex_rep, &size);
+        *out_size = (uint64_t)size;
+
+        return ELECTIONGUARD_STATUS_SUCCESS;
+    } catch (const exception &e) {
+        Log::error(__func__, e);
+        return ELECTIONGUARD_STATUS_ERROR_BAD_ALLOC;
+    }
 }
 
 eg_electionguard_status_t eg_element_mod_q_to_hex(eg_element_mod_q_t *handle, char **out_hex)
@@ -488,14 +552,29 @@ EG_API eg_electionguard_status_t eg_element_mod_p_pow_mod_p(eg_element_mod_p_t *
     }
 }
 
-EG_API eg_electionguard_status_t eg_hash_elems(eg_element_mod_p_t *publickey,
-                                               eg_element_mod_p_t *commitment,
-                                               eg_element_mod_q_t **out_handle)
+EG_API eg_electionguard_status_t eg_hash_elems_modp_modp(eg_element_mod_p_t *publickey,
+                                                         eg_element_mod_p_t *commitment,
+                                                         eg_element_mod_q_t **out_handle)
 {
     try {
         auto *p = AS_TYPE(ElementModP, publickey);
         auto *c = AS_TYPE(ElementModP, commitment);
         auto result = hash_elems({p, c});
+
+        *out_handle = AS_TYPE(eg_element_mod_q_t, result.release());
+        return ELECTIONGUARD_STATUS_SUCCESS;
+    } catch (const exception &e) {
+        Log::error(__func__, e);
+        return ELECTIONGUARD_STATUS_ERROR_BAD_ALLOC;
+    }
+}
+
+EG_API eg_electionguard_status_t eg_hash_elems_string_int(char *in_first, uint64_t in_second,
+                                                          eg_element_mod_q_t **out_handle)
+{
+    try {
+        auto first = string(in_first);
+        auto result = hash_elems({first, in_second});
 
         *out_handle = AS_TYPE(eg_element_mod_q_t, result.release());
         return ELECTIONGUARD_STATUS_SUCCESS;

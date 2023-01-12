@@ -24,6 +24,8 @@ EG_API eg_electionguard_status_t eg_element_mod_p_new(const uint64_t in_data[MAX
                                                       eg_element_mod_p_t **out_handle);
 EG_API eg_electionguard_status_t eg_element_mod_p_new_unchecked(const uint64_t in_data[MAX_P_LEN],
                                                                 eg_element_mod_p_t **out_handle);
+EG_API eg_electionguard_status_t eg_element_mod_p_new_bytes(uint8_t *in_data, uint64_t in_size,
+                                                            eg_element_mod_p_t **out_handle);
 
 EG_API eg_electionguard_status_t eg_element_mod_p_free(eg_element_mod_p_t *handle);
 
@@ -32,6 +34,9 @@ EG_API eg_electionguard_status_t eg_element_mod_p_get_data(eg_element_mod_p_t *h
 
 EG_API eg_electionguard_status_t eg_element_mod_p_to_hex(eg_element_mod_p_t *handle,
                                                          char **out_hex);
+
+EG_API eg_electionguard_status_t eg_element_mod_p_to_bytes(eg_element_mod_p_t *handle,
+                                                           uint8_t **out_bytes, uint64_t *out_size);
 
 // TODO: ISSUE #129: finish implementation
 
@@ -46,6 +51,8 @@ EG_API eg_electionguard_status_t eg_element_mod_q_new(const uint64_t in_data[MAX
                                                       eg_element_mod_q_t **out_handle);
 EG_API eg_electionguard_status_t eg_element_mod_q_new_unchecked(const uint64_t in_data[MAX_Q_LEN],
                                                                 eg_element_mod_q_t **out_handle);
+EG_API eg_electionguard_status_t eg_element_mod_q_new_bytes(uint8_t *in_data, uint64_t in_size,
+                                                            eg_element_mod_q_t **out_handle);
 
 EG_API eg_electionguard_status_t eg_element_mod_q_free(eg_element_mod_q_t *handle);
 
@@ -57,6 +64,9 @@ EG_API eg_electionguard_status_t eg_element_mod_q_to_hex(eg_element_mod_q_t *han
 
 EG_API eg_electionguard_status_t eg_element_mod_q_from_hex(char *in_hex,
                                                            eg_element_mod_q_t **out_handle);
+
+EG_API eg_electionguard_status_t eg_element_mod_q_to_bytes(eg_element_mod_q_t *handle,
+                                                           uint8_t **out_bytes, uint64_t *out_size);
 
 EG_API eg_electionguard_status_t
 eg_element_mod_q_from_hex_unchecked(char *in_hex, eg_element_mod_q_t **out_handle);
@@ -141,9 +151,12 @@ EG_API eg_electionguard_status_t eg_element_mod_q_mult_mod_q(eg_element_mod_q_t 
                                                              eg_element_mod_q_t *rhs,
                                                              eg_element_mod_q_t **out_handle);
 
-EG_API eg_electionguard_status_t eg_hash_elems(eg_element_mod_p_t *publickey,
-                                               eg_element_mod_p_t *commitment,
-                                               eg_element_mod_q_t **out_handle);
+EG_API eg_electionguard_status_t eg_hash_elems_modp_modp(eg_element_mod_p_t *publickey,
+                                                         eg_element_mod_p_t *commitment,
+                                                         eg_element_mod_q_t **out_handle);
+
+EG_API eg_electionguard_status_t eg_hash_elems_string_int(char *publickey, uint64_t commitment,
+                                                          eg_element_mod_q_t **out_handle);
 #endif
 
 #ifdef __cplusplus

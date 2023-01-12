@@ -2,12 +2,12 @@
 
 namespace ElectionGuard.UI.Lib.Models;
 
-public partial class User : BaseModel
+public partial class User : DatabaseRecord
 {
     [ObservableProperty]
-    private string? name;
+    private string? _name;
 
     [ObservableProperty]
-    private bool isAdmin = false;
+    private bool _isAdmin = false;
 
 }

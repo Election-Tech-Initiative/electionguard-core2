@@ -1,30 +1,28 @@
-﻿using System;
-
-namespace ElectionGuard.ElectionSetup
+﻿namespace ElectionGuard.ElectionSetup
 {
     /// <summary>
     /// Election partial key backup used for key sharing
     /// </summary>
-    public class ElectionPartialKeyBackupAttribute
+    public record ElectionPartialKeyBackupAttribute
     {
         /// <summary>
         /// The Id of the guardian that generated this backup
         /// </summary>
-        private String OwnerId { get; }
+        public string? OwnerId { get; init; }
 
         /// <summary>
         /// The Id of the guardian to receive this backup
         /// </summary>
-        private String DesignatedId { get; }
+        public string? DesignatedId { get; init; }
 
         /// <summary>
         /// The sequence order of the designated guardian
         /// </summary>
-        private int DesignatedSequenceOrder { get; }
+        public int DesignatedSequenceOrder { get; init; }
 
         /// <summary>
         /// The coordinate corresponding to a secret election polynomial
         /// </summary>
-        private HashedElGamalCiphertext EncryptedCoordinate { get; }
+        public HashedElGamalCiphertext? EncryptedCoordinate { get; init; }
     }
 }

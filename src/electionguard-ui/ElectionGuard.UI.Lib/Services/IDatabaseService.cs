@@ -133,6 +133,11 @@ public class KeyCeremonyService : BaseDatabaseService<KeyCeremony>
     /// Default constructor that sets the collection name
     /// </summary>
     public KeyCeremonyService() : base(_collection) { }
+
+    public async Task<KeyCeremony?> GetByKeyCeremonyId(string id)
+    {
+        return await GetByFieldAsync("KeyCeremonyId", id);
+    }
 }
 
 /// <summary>

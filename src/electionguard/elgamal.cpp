@@ -5,9 +5,7 @@
 #include "../karamel/internal/Hacl_HMAC.h"
 #include "electionguard/hash.hpp"
 #include "electionguard/hmac.hpp"
-
 #include "electionguard/precompute_buffers.hpp"
-
 #include "log.hpp"
 
 #include <array>
@@ -74,6 +72,18 @@ namespace electionguard
         auto privateKey = make_unique<ElementModQ>(secretKey);
         auto publicKey = g_pow_p(secretKey);
         publicKey->setIsFixedBase(isFixedBase);
+        return make_unique<ElGamalKeyPair>(move(privateKey), move(publicKey));
+    }
+
+    // TODO: do we really need this??
+    unique_ptr<ElGamalKeyPair> ElGamalKeyPair::fromPair(const ElementModQ &secretKey,
+                                                        const ElementModP &publicKeyData)
+    {
+        if (const_cast<ElementModQ &>(secretKey) < TWO_MOD_Q()) {
+            throw invalid_argument("ElGamalKeyPair fromSecret secret key needs to be in [2,Q).");
+        }
+        auto privateKey = make_unique<ElementModQ>(secretKey);
+        auto publicKey = make_unique<ElementModP>(publicKeyData);
         return make_unique<ElGamalKeyPair>(move(privateKey), move(publicKey));
     }
 
@@ -211,8 +221,8 @@ namespace electionguard
 
 #pragma endregion
 
-    unique_ptr<ElGamalCiphertext>
-    elgamalEncrypt(uint64_t m, const ElementModQ &nonce, const ElementModP &publicKey)
+    unique_ptr<ElGamalCiphertext> elgamalEncrypt(uint64_t m, const ElementModQ &nonce,
+                                                 const ElementModP &publicKey)
     {
         if ((const_cast<ElementModQ &>(nonce) == ZERO_MOD_Q())) {
             throw invalid_argument("elgamalEncrypt encryption requires a non-zero nonce");
