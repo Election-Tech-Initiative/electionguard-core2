@@ -46,6 +46,7 @@
                 secretKey.Handle, out Handle);
             status.ThrowIfError();
         }
+
         private ElGamalKeyPair(ElementModQ secretKey, ElementModP publicKey)
         {
             var status = NativeInterface.ElGamalKeyPair.New(
