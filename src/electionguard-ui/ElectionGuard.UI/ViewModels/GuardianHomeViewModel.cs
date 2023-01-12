@@ -45,13 +45,4 @@ public partial class GuardianHomeViewModel : BaseViewModel
             }));
     }
 
-    //[RelayCommand]
-    //public async Task KeyCeremonySelectionChanged()
-    //{
-    //    if (CurrentKeyCeremony == null) return;
-    //    await NavigationService.GoToPage(typeof(ViewKeyCeremonyViewModel), new Dictionary<string, object>
-    //    {
-    //        { "KeyCeremonyId", CurrentKeyCeremony.Id }
-    //    });
-    //}
 }
