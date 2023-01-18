@@ -4,7 +4,7 @@
 set(USE_MSVC ON)
 
 # Enable cross-compilation
-if(NOT ${CMAKE_HOST_SYSTEM_PROCESSOR} MATCHES "x64|X64|amd64|AMD64|EM64T")
+if(NOT ${CMAKE_HOST_SYSTEM_PROCESSOR} MATCHES "x64|X64|amd64|AMD64")
     message(STATUS "Cross Compiling for Windows 64")
     set(arch x64)
 

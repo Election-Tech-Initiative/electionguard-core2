@@ -20,8 +20,11 @@ namespace electionguard
 {
     inline bool is_little_endian()
     {
-        const unsigned one = 1U;
-        return reinterpret_cast<const char *>(&one) + sizeof(unsigned) - 1;
+        const int value{0x01};
+        const void *address = static_cast<const void *>(&value);
+        const unsigned char *least_significant_address =
+          static_cast<const unsigned char *>(address);
+        return (*least_significant_address == 0x01);
     }
 
     inline bool isPowerOfTwo(uint64_t x) { return x && !(x & (x - 1)); }

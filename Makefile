@@ -17,33 +17,33 @@ CPM_SOURCE_CACHE=$(subst \,/,$(realpath .))/.cache/CPM
 # not all platforms can compile all targets.
 # valid values:
 # OPERATING_SYSTEM: Android, Ios, Linux, Darwin, Windows
-# PLATFORM: arm64, x64, x86
+# PROCESSOR: arm64, x64, x86
 ifeq ($(OS),Windows_NT)
 	OPERATING_SYSTEM ?= Windows
 	ifeq ($(PROCESSOR_ARCHITECTURE),arm)
-        PLATFORM?=arm64
+        PROCESSOR?=arm64
     endif
 	# https://learn.microsoft.com/en-us/windows/win32/winprog64/wow64-implementation-details
 	ifeq ($(PROCESSOR_ARCHITEW6432),AMD64)
-		PLATFORM?=x64
+		PROCESSOR?=x64
 	endif
 	ifeq ($(PROCESSOR_ARCHITECTURE),AMD64)
-        PLATFORM?=x64
+        PROCESSOR?=x64
     endif
     ifeq ($(PROCESSOR_ARCHITECTURE),x86)
-        PLATFORM?=x86
+        PROCESSOR?=x86
     endif
 else
 	OPERATING_SYSTEM ?= $(shell uname 2>/dev/null || echo Unknown)
 	UNAME_P ?= $(shell uname -p)
     ifeq ($(UNAME_P),x86_64)
-        PLATFORM?=x64
+        PROCESSOR?=x64
     endif
     ifneq ($(filter %86,$(UNAME_P)),)
-        PLATFORM?=x86
+        PROCESSOR?=x86
     endif
     ifneq ($(filter arm%,$(UNAME_P)),)
-        PLATFORM?=arm64
+        PROCESSOR?=arm64
     endif
 endif
 
@@ -51,7 +51,7 @@ endif
 BUILD:=1
 
 # Temporarily disable vale support on x86
-ifeq ($(PLATFORM),x86)
+ifeq ($(PROCESSOR),x86)
 TEMP_DISABLE_VALE?=ON
 USE_32BIT_MATH?=ON
 else
@@ -127,50 +127,50 @@ endif
 # Builds
 
 build:
-	@echo 🧱 BUILD $(OPERATING_SYSTEM) $(PLATFORM) $(TARGET)
+	@echo 🧱 BUILD $(OPERATING_SYSTEM) $(PROCESSOR) $(TARGET)
 ifeq ($(OPERATING_SYSTEM),Windows)
-	cmake -S . -B $(ELECTIONGUARD_BUILD_LIBS_DIR)/$(OPERATING_SYSTEM)/$(PLATFORM)/$(TARGET) \
-		-G "Visual Studio 17 2022" -A $(PLATFORM) \
+	cmake -S . -B $(ELECTIONGUARD_BUILD_LIBS_DIR)/$(OPERATING_SYSTEM)/$(PROCESSOR)/$(TARGET) \
+		-G "Visual Studio 17 2022" -A $(PROCESSOR) \
 		-DCMAKE_BUILD_TYPE=$(TARGET) \
 		-DBUILD_SHARED_LIBS=ON \
 		-DUSE_MSVC=ON \
 		-DANDROID_NDK_PATH=$(ANDROID_NDK_PATH) \
 		-DCPM_SOURCE_CACHE=$(CPM_SOURCE_CACHE) \
-		-DCMAKE_TOOLCHAIN_FILE=cmake/toolchains/$(PLATFORM)-$(OPERATING_SYSTEM).cmake
-	cmake --build $(ELECTIONGUARD_BUILD_LIBS_DIR)/$(OPERATING_SYSTEM)/$(PLATFORM)/$(TARGET)/ --config $(TARGET)
+		-DCMAKE_TOOLCHAIN_FILE=cmake/toolchains/$(PROCESSOR)-$(OPERATING_SYSTEM).cmake
+	cmake --build $(ELECTIONGUARD_BUILD_LIBS_DIR)/$(OPERATING_SYSTEM)/$(PROCESSOR)/$(TARGET)/ --config $(TARGET)
 else
-	cmake -S . -B $(ELECTIONGUARD_BUILD_LIBS_DIR)/$(OPERATING_SYSTEM)/$(PLATFORM)/$(TARGET) \
+	cmake -S . -B $(ELECTIONGUARD_BUILD_LIBS_DIR)/$(OPERATING_SYSTEM)/$(PROCESSOR)/$(TARGET) \
 		-DCMAKE_BUILD_TYPE=$(TARGET) \
 		-DBUILD_SHARED_LIBS=ON \
 		-DDISABLE_VALE=$(TEMP_DISABLE_VALE) \
 		-DANDROID_NDK_PATH=$(ANDROID_NDK_PATH) \
 		-DCPM_SOURCE_CACHE=$(CPM_SOURCE_CACHE) \
-		-DCMAKE_TOOLCHAIN_FILE=cmake/toolchains/$(PLATFORM)-$(OPERATING_SYSTEM).cmake
-	cmake --build $(ELECTIONGUARD_BUILD_LIBS_DIR)/$(OPERATING_SYSTEM)/$(PLATFORM)/$(TARGET)
+		-DCMAKE_TOOLCHAIN_FILE=cmake/toolchains/$(PROCESSOR)-$(OPERATING_SYSTEM).cmake
+	cmake --build $(ELECTIONGUARD_BUILD_LIBS_DIR)/$(OPERATING_SYSTEM)/$(PROCESSOR)/$(TARGET)
 endif
 
 build-x86:
-	PLATFORM=x86 && make build
+	PROCESSOR=x86 && make build
 
 build-x64:
-	PLATFORM=x64 && make build
+	PROCESSOR=x64 && make build
 	
 build-msys2:
-	@echo 🖥️ BUILD MSYS2 $(OPERATING_SYSTEM) $(PLATFORM) $(TARGET)
+	@echo 🖥️ BUILD MSYS2 $(OPERATING_SYSTEM) $(PROCESSOR) $(TARGET)
 ifeq ($(OPERATING_SYSTEM),Windows)
-	cmake -S . -B $(ELECTIONGUARD_BUILD_LIBS_DIR)/$(OPERATING_SYSTEM)/$(PLATFORM)/$(TARGET) -G "MSYS Makefiles" \
+	cmake -S . -B $(ELECTIONGUARD_BUILD_LIBS_DIR)/$(OPERATING_SYSTEM)/$(PROCESSOR)/$(TARGET) -G "MSYS Makefiles" \
 		-DCMAKE_BUILD_TYPE=$(TARGET) \
 		-DBUILD_SHARED_LIBS=ON \
 		-DCAN_USE_VECTOR_INTRINSICS=ON \
 		-DCPM_SOURCE_CACHE=$(CPM_SOURCE_CACHE) \
-		-DCMAKE_TOOLCHAIN_FILE=cmake/toolchains/$(PLATFORM)-$(OPERATING_SYSTEM)-msys2.cmake
-	cmake --build $(ELECTIONGUARD_BUILD_LIBS_DIR)/$(OPERATING_SYSTEM)/$(PLATFORM)/$(TARGET)
+		-DCMAKE_TOOLCHAIN_FILE=cmake/toolchains/$(PROCESSOR)-$(OPERATING_SYSTEM)-msys2.cmake
+	cmake --build $(ELECTIONGUARD_BUILD_LIBS_DIR)/$(OPERATING_SYSTEM)/$(PROCESSOR)/$(TARGET)
 else
 	echo "MSYS2 builds are only supported on Windows"
 endif
 
 build-android:
-	PLATFORM=arm64 OPERATING_SYSTEM=Android && make build
+	PROCESSOR=arm64 OPERATING_SYSTEM=Android && make build
 
 build-ios:
 	@echo 📱 BUILD IOS
@@ -190,13 +190,13 @@ else
 endif
 
 build-netstandard:
-	@echo 🖥️ BUILD NETSTANDARD $(OPERATING_SYSTEM) $(PLATFORM) $(TARGET)
+	@echo 🖥️ BUILD NETSTANDARD $(OPERATING_SYSTEM) $(PROCESSOR) $(TARGET)
 	make build
 	cd ./bindings/netstandard/ElectionGuard && dotnet restore
-	dotnet build --configuration $(TARGET) ./bindings/netstandard/ElectionGuard/ElectionGuard.sln /p:Platform=$(PLATFORM)
+	dotnet build --configuration $(TARGET) ./bindings/netstandard/ElectionGuard/ElectionGuard.sln /p:Platform=$(PROCESSOR)
 
 build-netstandard-x64:
-	PLATFORM=x64 && make build-netstandard
+	PROCESSOR=x64 && make build-netstandard
 
 # Clean
 
@@ -252,7 +252,7 @@ generate-interop:
 # Lint / Format
 
 format: build
-	cd $(ELECTIONGUARD_BUILD_LIBS_DIR)/$(PLATFORM) && $(MAKE) format
+	cd $(ELECTIONGUARD_BUILD_LIBS_DIR)/$(PROCESSOR) && $(MAKE) format
 
 lint:
 	dotnet jb inspectcode -o="lint-results.xml" -f="Xml" --build --verbosity="WARN" -s="Warning" bindings/netstandard/ElectionGuard/ElectionGuard.sln
@@ -265,7 +265,7 @@ memcheck:
 ifeq ($(OPERATING_SYSTEM),Windows)
 	@echo "Static analysis is only supported on Linux"
 else
-	cd $(ELECTIONGUARD_BUILD_LIBS_DIR)/$(PLATFORM) && $(MAKE) memcheck-ElectionGuardTests
+	cd $(ELECTIONGUARD_BUILD_LIBS_DIR)/$(PROCESSOR) && $(MAKE) memcheck-ElectionGuardTests
 endif
 
 # Publish
@@ -290,34 +290,34 @@ rebuild-ui: clean-ui build-ui
 sanitize: sanitize-asan sanitize-tsan
 
 sanitize-asan:
-	@echo 🧼 SANITIZE ADDRESS AND UNDEFINED $(PLATFORM)
+	@echo 🧼 SANITIZE ADDRESS AND UNDEFINED $(PROCESSOR)
 ifeq ($(OPERATING_SYSTEM),Windows)
-	cmake -S . -B $(ELECTIONGUARD_BUILD_LIBS_DIR)/$(PLATFORM)/Debug -G "Visual Studio 17 2022" -A $(PLATFORM) \
+	cmake -S . -B $(ELECTIONGUARD_BUILD_LIBS_DIR)/$(PROCESSOR)/Debug -G "Visual Studio 17 2022" -A $(PROCESSOR) \
 		-DCPM_SOURCE_CACHE=$(CPM_SOURCE_CACHE) \
 		-DCMAKE_TOOLCHAIN_FILE=cmake/toolchains/sanitize.asan.cmake
-	cmake --build $(ELECTIONGUARD_BUILD_LIBS_DIR)/$(PLATFORM)/Debug --config Debug
-	$(ELECTIONGUARD_BUILD_LIBS_DIR)/$(PLATFORM)/Debug/test/Debug/ElectionGuardTests
-	$(ELECTIONGUARD_BUILD_LIBS_DIR)/$(PLATFORM)/Debug/test/Debug/ElectionGuardCTests
+	cmake --build $(ELECTIONGUARD_BUILD_LIBS_DIR)/$(PROCESSOR)/Debug --config Debug
+	$(ELECTIONGUARD_BUILD_LIBS_DIR)/$(PROCESSOR)/Debug/test/Debug/ElectionGuardTests
+	$(ELECTIONGUARD_BUILD_LIBS_DIR)/$(PROCESSOR)/Debug/test/Debug/ElectionGuardCTests
 else
-	cmake -S . -B $(ELECTIONGUARD_BUILD_LIBS_DIR)/$(PLATFORM)/Debug \
+	cmake -S . -B $(ELECTIONGUARD_BUILD_LIBS_DIR)/$(PROCESSOR)/Debug \
 		-DCPM_SOURCE_CACHE=$(CPM_SOURCE_CACHE) \
 		-DCMAKE_TOOLCHAIN_FILE=cmake/toolchains/sanitize.asan.cmake
-	cmake --build $(ELECTIONGUARD_BUILD_LIBS_DIR)/$(PLATFORM)/Debug
-	$(ELECTIONGUARD_BUILD_LIBS_DIR)/$(PLATFORM)/Debug/test/ElectionGuardTests
-	$(ELECTIONGUARD_BUILD_LIBS_DIR)/$(PLATFORM)/Debug/test/ElectionGuardCTests
+	cmake --build $(ELECTIONGUARD_BUILD_LIBS_DIR)/$(PROCESSOR)/Debug
+	$(ELECTIONGUARD_BUILD_LIBS_DIR)/$(PROCESSOR)/Debug/test/ElectionGuardTests
+	$(ELECTIONGUARD_BUILD_LIBS_DIR)/$(PROCESSOR)/Debug/test/ElectionGuardCTests
 endif
 
 sanitize-tsan:
-	@echo 🧼 SANITIZE THREADS $(PLATFORM)
+	@echo 🧼 SANITIZE THREADS $(PROCESSOR)
 ifeq ($(OPERATING_SYSTEM),Windows)
 	echo "Thread sanitizer is only supported on Linux & Mac"
 else
-	cmake -S . -B $(ELECTIONGUARD_BUILD_LIBS_DIR)/$(PLATFORM)/Debug \
+	cmake -S . -B $(ELECTIONGUARD_BUILD_LIBS_DIR)/$(PROCESSOR)/Debug \
 		-DCPM_SOURCE_CACHE=$(CPM_SOURCE_CACHE) \
 		-DCMAKE_TOOLCHAIN_FILE=cmake/toolchains/sanitize.tsan.cmake
-	cmake --build $(ELECTIONGUARD_BUILD_LIBS_DIR)/$(PLATFORM)/Debug
-	$(ELECTIONGUARD_BUILD_LIBS_DIR)/$(PLATFORM)/Debug/test/ElectionGuardTests
-	$(ELECTIONGUARD_BUILD_LIBS_DIR)/$(PLATFORM)/Debug/test/ElectionGuardCTests
+	cmake --build $(ELECTIONGUARD_BUILD_LIBS_DIR)/$(PROCESSOR)/Debug
+	$(ELECTIONGUARD_BUILD_LIBS_DIR)/$(PROCESSOR)/Debug/test/ElectionGuardTests
+	$(ELECTIONGUARD_BUILD_LIBS_DIR)/$(PROCESSOR)/Debug/test/ElectionGuardCTests
 endif
 
 # Start/Stop Docker Services (database)
@@ -335,23 +335,23 @@ stop-db:
 # Benchmarks
 
 bench:
-	@echo 🧪 BENCHMARK $(OPERATING_SYSTEM) $(PLATFORM) $(TARGET)
+	@echo 🧪 BENCHMARK $(OPERATING_SYSTEM) $(PROCESSOR) $(TARGET)
 ifeq ($(OPERATING_SYSTEM),Windows)
-	cmake -S . -B $(ELECTIONGUARD_BUILD_LIBS_DIR)/$(PLATFORM)/$(TARGET) -G "MSYS Makefiles" \
+	cmake -S . -B $(ELECTIONGUARD_BUILD_LIBS_DIR)/$(PROCESSOR)/$(TARGET) -G "MSYS Makefiles" \
 		-DCMAKE_BUILD_TYPE=$(TARGET) \
 		-DCPM_SOURCE_CACHE=$(CPM_SOURCE_CACHE) \
 		-DCMAKE_TOOLCHAIN_FILE=cmake/toolchains/benchmark.cmake
 else
-	cmake -S . -B $(ELECTIONGUARD_BUILD_LIBS_DIR)/$(PLATFORM)/$(TARGET) \
+	cmake -S . -B $(ELECTIONGUARD_BUILD_LIBS_DIR)/$(PROCESSOR)/$(TARGET) \
 		-DCMAKE_BUILD_TYPE=$(TARGET) \
 		-DCPM_SOURCE_CACHE=$(CPM_SOURCE_CACHE) \
 		-DCMAKE_TOOLCHAIN_FILE=cmake/toolchains/benchmark.cmake
 endif
-	cmake --build $(ELECTIONGUARD_BUILD_LIBS_DIR)/$(PLATFORM)/$(TARGET)
+	cmake --build $(ELECTIONGUARD_BUILD_LIBS_DIR)/$(PROCESSOR)/$(TARGET)
 ifeq ($(OPERATING_SYSTEM),Windows)
-	pwsh -Command "xcopy 'build\libs\$(PLATFORM)\$(TARGET)\_deps\benchmark-build\src\libbenchmark.dll' 'build\libs\$(PLATFORM)\$(TARGET)\test' /Q /Y;  $$null"
+	pwsh -Command "xcopy 'build\libs\$(PROCESSOR)\$(TARGET)\_deps\benchmark-build\src\libbenchmark.dll' 'build\libs\$(PROCESSOR)\$(TARGET)\test' /Q /Y;  $$null"
 endif
-	$(ELECTIONGUARD_BUILD_LIBS_DIR)/$(PLATFORM)/$(TARGET)/test/ElectionGuardBenchmark
+	$(ELECTIONGUARD_BUILD_LIBS_DIR)/$(PROCESSOR)/$(TARGET)/test/ElectionGuardBenchmark
 
 bench-netstandard: build-netstandard
 	@echo 🧪 BENCHMARK
@@ -363,83 +363,83 @@ bench-netstandard: build-netstandard
 # Test
 
 test:
-	@echo 🧪 TEST $(OPERATING_SYSTEM) $(PLATFORM) $(TARGET)
+	@echo 🧪 TEST $(OPERATING_SYSTEM) $(PROCESSOR) $(TARGET)
 ifeq ($(OPERATING_SYSTEM),Windows)
-	cmake -S . -B $(ELECTIONGUARD_BUILD_LIBS_DIR)/$(OPERATING_SYSTEM)/$(PLATFORM)/$(TARGET) \
-		-G "Visual Studio 17 2022" -A $(PLATFORM) \
+	cmake -S . -B $(ELECTIONGUARD_BUILD_LIBS_DIR)/$(OPERATING_SYSTEM)/$(PROCESSOR)/$(TARGET) \
+		-G "Visual Studio 17 2022" -A $(PROCESSOR) \
 		-DCMAKE_BUILD_TYPE=$(TARGET) \
 		-DUSE_MSVC=ON \
 		-DCPM_SOURCE_CACHE=$(CPM_SOURCE_CACHE) \
 		-DCMAKE_TOOLCHAIN_FILE=cmake/toolchains/test.cmake
-	cmake --build $(ELECTIONGUARD_BUILD_LIBS_DIR)/$(OPERATING_SYSTEM)/$(PLATFORM)/$(TARGET)/ --config $(TARGET)
-	$(ELECTIONGUARD_BUILD_LIBS_DIR)/$(OPERATING_SYSTEM)/$(PLATFORM)/$(TARGET)/test/$(TARGET)/ElectionGuardTests
-	$(ELECTIONGUARD_BUILD_LIBS_DIR)/$(OPERATING_SYSTEM)/$(PLATFORM)/$(TARGET)/test/$(TARGET)/ElectionGuardCTests
+	cmake --build $(ELECTIONGUARD_BUILD_LIBS_DIR)/$(OPERATING_SYSTEM)/$(PROCESSOR)/$(TARGET)/ --config $(TARGET)
+	$(ELECTIONGUARD_BUILD_LIBS_DIR)/$(OPERATING_SYSTEM)/$(PROCESSOR)/$(TARGET)/test/$(TARGET)/ElectionGuardTests
+	$(ELECTIONGUARD_BUILD_LIBS_DIR)/$(OPERATING_SYSTEM)/$(PROCESSOR)/$(TARGET)/test/$(TARGET)/ElectionGuardCTests
 else
-	cmake -S . -B $(ELECTIONGUARD_BUILD_LIBS_DIR)/$(PLATFORM)/$(TARGET) \
+	cmake -S . -B $(ELECTIONGUARD_BUILD_LIBS_DIR)/$(PROCESSOR)/$(TARGET) \
 		-DCMAKE_BUILD_TYPE=$(TARGET) \
 		-DCPM_SOURCE_CACHE=$(CPM_SOURCE_CACHE) \
 		-DDISABLE_VALE=$(TEMP_DISABLE_VALE) \
 		-DUSE_32BIT_MATH=$(USE_32BIT_MATH) \
 		-DCMAKE_TOOLCHAIN_FILE=cmake/toolchains/test.cmake
-	cmake --build $(ELECTIONGUARD_BUILD_LIBS_DIR)/$(PLATFORM)/$(TARGET)
-	$(ELECTIONGUARD_BUILD_LIBS_DIR)/$(PLATFORM)/$(TARGET)/test/ElectionGuardTests
-	$(ELECTIONGUARD_BUILD_LIBS_DIR)/$(PLATFORM)/$(TARGET)/test/ElectionGuardCTests
+	cmake --build $(ELECTIONGUARD_BUILD_LIBS_DIR)/$(PROCESSOR)/$(TARGET)
+	$(ELECTIONGUARD_BUILD_LIBS_DIR)/$(PROCESSOR)/$(TARGET)/test/ElectionGuardTests
+	$(ELECTIONGUARD_BUILD_LIBS_DIR)/$(PROCESSOR)/$(TARGET)/test/ElectionGuardCTests
 endif
 
 test-x64:
-	PLATFORM=x64 && make test
+	PROCESSOR=x64 && make test
 
 test-x86:
-	PLATFORM=x86 USE_32BIT_MATH=ON && make test
+	PROCESSOR=x86 USE_32BIT_MATH=ON && make test
 
 test-msys2:
-	@echo 🧪 TEST MSYS2 $(OPERATING_SYSTEM) $(PLATFORM) $(TARGET)
+	@echo 🧪 TEST MSYS2 $(OPERATING_SYSTEM) $(PROCESSOR) $(TARGET)
 ifeq ($(OPERATING_SYSTEM),Windows)
-	cmake -S . -B $(ELECTIONGUARD_BUILD_LIBS_DIR)/$(PLATFORM)/$(TARGET) -G "MSYS Makefiles" \
+	cmake -S . -B $(ELECTIONGUARD_BUILD_LIBS_DIR)/$(PROCESSOR)/$(TARGET) -G "MSYS Makefiles" \
 		-DCMAKE_BUILD_TYPE=$(TARGET) \
 		-DCPM_SOURCE_CACHE=$(CPM_SOURCE_CACHE) \
 		-DCMAKE_TOOLCHAIN_FILE=cmake/toolchains/test.cmake
-	cmake --build $(ELECTIONGUARD_BUILD_LIBS_DIR)/$(PLATFORM)/$(TARGET)
-	$(ELECTIONGUARD_BUILD_LIBS_DIR)/$(PLATFORM)/$(TARGET)/test/ElectionGuardTests
-	$(ELECTIONGUARD_BUILD_LIBS_DIR)/$(PLATFORM)/$(TARGET)/test/ElectionGuardCTests
+	cmake --build $(ELECTIONGUARD_BUILD_LIBS_DIR)/$(PROCESSOR)/$(TARGET)
+	$(ELECTIONGUARD_BUILD_LIBS_DIR)/$(PROCESSOR)/$(TARGET)/test/ElectionGuardTests
+	$(ELECTIONGUARD_BUILD_LIBS_DIR)/$(PROCESSOR)/$(TARGET)/test/ElectionGuardCTests
 endif
 
 test-netstandard: build-netstandard
-	@echo 🧪 TEST NETSTANDARD $(PLATFORM) $(TARGET)
-	dotnet test -a $(PLATFORM) --configuration $(TARGET) ./bindings/netstandard/ElectionGuard/ElectionGuard.sln
+	@echo 🧪 TEST NETSTANDARD $(PROCESSOR) $(TARGET)
+	dotnet test -a $(PROCESSOR) --configuration $(TARGET) ./bindings/netstandard/ElectionGuard/ElectionGuard.sln
 
 test-netstandard-x64:
-	PLATFORM=x64 && make test-netstandard
+	PROCESSOR=x64 && make test-netstandard
 
 test-netstandard-x86:
 ifeq ($(OPERATING_SYSTEM),Darwin)
 	echo "x86 builds are not supported on MacOS"
 else
-	PLATFORM=x86 && make test-netstandard
+	PROCESSOR=x86 && make test-netstandard
 endif
 
 test-ui:
-	@echo 🧪 TEST UI $(PLATFORM) $(TARGET)
-	dotnet build -a $(PLATFORM) --configuration $(TARGET) ./src/electionguard-ui/electionGuard.UI.Test/ElectionGuard.UI.Test.csproj
+	@echo 🧪 TEST UI $(PROCESSOR) $(TARGET)
+	dotnet build -a $(PROCESSOR) --configuration $(TARGET) ./src/electionguard-ui/electionGuard.UI.Test/ElectionGuard.UI.Test.csproj
 ifeq ($(OPERATING_SYSTEM),Windows)
-	dotnet test -a $(PLATFORM) --no-build --configuration $(TARGET) ./src/electionguard-ui/ElectionGuard.UI.sln 	
+	dotnet test -a $(PROCESSOR) --no-build --configuration $(TARGET) ./src/electionguard-ui/ElectionGuard.UI.sln 	
 endif
 ifeq ($(OPERATING_SYSTEM),Darwin)
-	dotnet test -a $(PLATFORM) --no-build --configuration $(TARGET) ./src/electionguard-ui/ElectionGuard.UI.sln 	
+	dotnet test -a $(PROCESSOR) --no-build --configuration $(TARGET) ./src/electionguard-ui/ElectionGuard.UI.sln 	
 endif
 
 # Coverage
 
 coverage:
-	@echo ✅ CHECK COVERAGE $(OPERATING_SYSTEM) $(PLATFORM) $(TARGET)
+	@echo ✅ CHECK COVERAGE $(OPERATING_SYSTEM) $(PROCESSOR) $(TARGET)
 ifeq ($(OPERATING_SYSTEM),Windows)
-	cmake -S . -B $(ELECTIONGUARD_BUILD_LIBS_DIR)/$(PLATFORM)/$(TARGET) -G "MSYS Makefiles" \
+	cmake -S . -B $(ELECTIONGUARD_BUILD_LIBS_DIR)/$(PROCESSOR)/$(TARGET) -G "MSYS Makefiles" \
 		-DCMAKE_BUILD_TYPE=$(TARGET) \
 		-DCODE_COVERAGE=ON \
 		-DCPM_SOURCE_CACHE=$(CPM_SOURCE_CACHE) \
 		-DCMAKE_TOOLCHAIN_FILE=cmake/toolchains/test.cmake
 else
-	cmake -S . -B $(ELECTIONGUARD_BUILD_LIBS_DIR)/$(PLATFORM)/$(TARGET) \
+	cmake -S . -B $(ELECTIONGUARD_BUILD_LIBS_DIR)/$(PROCESSOR)/$(TARGET) \
 		-DCMAKE_BUILD_TYPE=$(TARGET) \
 		-DCODE_COVERAGE=ON \
 		-DUSE_STATIC_ANALYSIS=ON \
@@ -447,9 +447,9 @@ else
 		-DCPM_SOURCE_CACHE=$(CPM_SOURCE_CACHE) \
 		-DCMAKE_TOOLCHAIN_FILE=cmake/toolchains/test.cmake
 endif
-	cmake --build $(ELECTIONGUARD_BUILD_LIBS_DIR)/$(PLATFORM)/$(TARGET)
-	$(ELECTIONGUARD_BUILD_LIBS_DIR)/$(PLATFORM)/$(TARGET)/test/ElectionGuardTests
-	$(ELECTIONGUARD_BUILD_LIBS_DIR)/$(PLATFORM)/$(TARGET)/test/ElectionGuardCTests
+	cmake --build $(ELECTIONGUARD_BUILD_LIBS_DIR)/$(PROCESSOR)/$(TARGET)
+	$(ELECTIONGUARD_BUILD_LIBS_DIR)/$(PROCESSOR)/$(TARGET)/test/ElectionGuardTests
+	$(ELECTIONGUARD_BUILD_LIBS_DIR)/$(PROCESSOR)/$(TARGET)/test/ElectionGuardCTests
 
 # Sample Data
 

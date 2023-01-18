@@ -107,7 +107,6 @@ namespace electionguard
         // and free the allocated resources
         uint64_t normalized[MAX_Q_LEN] = {};
         memcpy(static_cast<uint64_t *>(normalized), bigNum, sizeof(output));
-        //Hacl_Streaming_SHA2_free_256(p);
         free(bigNum);
 
         auto element = make_unique<ElementModQ>(normalized, true);

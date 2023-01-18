@@ -162,30 +162,30 @@ jobs:
       # Tests
       - name: Run Tests (Linux)
         env:
-          PLATFORM: ${{ matrix.processor }}
+          PROCESSOR: ${{ matrix.processor }}
         if: (runner.os == 'Linux')
         run: make test
 
       - name: Run Tests (MacOS)
         env:
-          PLATFORM: ${{ matrix.processor }}
+          PROCESSOR: ${{ matrix.processor }}
         if: runner.os == 'macOS'
         run:  make test
 
       - name: Run Tests (Windows)
         env:
-          PLATFORM: ${{ matrix.processor }}
+          PROCESSOR: ${{ matrix.processor }}
         if: (runner.os == 'Windows' && matrix.compiler == 'msvc')
         run: make test
 
       - name: Run Tests (Windows-msys2)
         env:
-          PLATFORM: ${{ matrix.processor }}
+          PROCESSOR: ${{ matrix.processor }}
         if: (runner.os == 'Windows' && matrix.compiler == 'gcc')
         run: make test-msys2
 
       - name: Run .Net Tests
         env:
-          PLATFORM: ${{ matrix.processor }}
+          PROCESSOR: ${{ matrix.processor }}
         if: (matrix.runCsTests)
         run: make test-netstandard
