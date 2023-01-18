@@ -71,12 +71,12 @@
     <PlatformTarget>anycpu</PlatformTarget>
   </PropertyGroup>
   <ItemGroup Label="C++ Built Libraries">
-    <Content Name="Windows" Include="$(ElectionGuardLibs)\Windows\$(Platform)\src\$(Configuration)\*.dll*" Pack="true">
+    <Content Name="Windows" Include="$(ElectionGuardLibs)\Windows\$(Platform)\$(Configuration)\src\$(Configuration)\*.dll*" Pack="true">
       <CopyToOutputDirectory Condition="'$(Platform)' == 'x64' AND '$(OS)' == 'Windows_NT'">Always</CopyToOutputDirectory>
       <PackageCopyToOutput Condition="'$(Platform)' == 'x64' AND '$(OS)' == 'Windows_NT'">true</PackageCopyToOutput>
       <PackagePath>runtimes\win-x64\native</PackagePath>
     </Content>
-    <Content Name="Windows Symbols" Include="$(ElectionGuardLibs)\Windows\$(Platform)\src\$(Configuration)\*.pdb*" Pack="true">
+    <Content Name="Windows Symbols" Include="$(ElectionGuardLibs)\Windows\$(Platform)\$(Configuration)\src\$(Configuration)\*.pdb*" Pack="true">
       <CopyToOutputDirectory Condition="'$(Platform)' == 'x64' AND '$(OS)' == 'Windows_NT' AND '$(Configuration)' == 'Debug'">Always</CopyToOutputDirectory>
       <PackageCopyToOutput Condition="'$(Platform)' == 'x64' AND '$(OS)' == 'Windows_NT' AND '$(Configuration)' == 'Debug'">true</PackageCopyToOutput>
     </Content>

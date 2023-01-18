@@ -7,6 +7,7 @@
 #include <cmath>
 #include <codecvt>
 #include <cstring>
+#include <electionguard/export.h>
 #include <iomanip>
 #include <iostream>
 #include <sstream>
@@ -95,7 +96,7 @@ namespace electionguard
         return (size_t)number;
     }
 
-    vector<uint8_t> bignum_to_bytes(const vector<uint64_t> &bignum);
+    EG_INTERNAL_API vector<uint8_t> bignum_to_bytes(const vector<uint64_t> &bignum);
 
     vector<uint8_t> bignum256_to_bytes(uint64_t *bytes);
 
