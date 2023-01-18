@@ -5,12 +5,6 @@ namespace ElectionGuard.UI.ViewModels;
 
 public partial class BaseViewModel : ObservableObject, IDisposable
 {
-    [RelayCommand]
-    public virtual async Task Appearing()
-    {
-        await Task.Yield();
-    }
-
     [ObservableProperty]
     private string _version;
 
@@ -19,6 +13,11 @@ public partial class BaseViewModel : ObservableObject, IDisposable
 
     [ObservableProperty]
     private string _pageTitle = "";
+
+    public virtual async Task OnAppearing()
+    {
+        await Task.Yield();
+    }
 
     [RelayCommand]
     private async Task Logout() => await NavigationService.GoToPage(typeof(LoginViewModel));

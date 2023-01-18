@@ -77,6 +77,18 @@ namespace electionguard
         return make_unique<ElGamalKeyPair>(move(privateKey), move(publicKey));
     }
 
+    // TODO: do we really need this??
+    unique_ptr<ElGamalKeyPair> ElGamalKeyPair::fromPair(const ElementModQ &secretKey,
+                                                        const ElementModP &publicKeyData)
+    {
+        if (const_cast<ElementModQ &>(secretKey) < TWO_MOD_Q()) {
+            throw invalid_argument("ElGamalKeyPair fromSecret secret key needs to be in [2,Q).");
+        }
+        auto privateKey = make_unique<ElementModQ>(secretKey);
+        auto publicKey = make_unique<ElementModP>(publicKeyData);
+        return make_unique<ElGamalKeyPair>(move(privateKey), move(publicKey));
+    }
+
 #pragma endregion
 
 #pragma region ElGamalCiphertext

@@ -5,7 +5,7 @@
 /// </summary>
 public class ElectionKeyPair
 {
-    public ElectionKeyPair(string guardianId, int sequenceOrder, ElGamalKeyPair keyPair, ElectionPolynomial polynomial)
+    public ElectionKeyPair(string guardianId, ulong sequenceOrder, ElGamalKeyPair keyPair, ElectionPolynomial polynomial)
     {
         OwnerId = guardianId;
         SequenceOrder = sequenceOrder;
@@ -21,7 +21,7 @@ public class ElectionKeyPair
     /// <summary>
     /// The sequence order of the owner guardian
     /// </summary>
-    public int SequenceOrder { get; set; }
+    public ulong SequenceOrder { get; set; }
 
     /// <summary>
     /// The pair of public and private election keys for the guardian
@@ -46,9 +46,9 @@ public class ElectionKeyPair
 
     public static ElectionKeyPair GenerateElectionKeyPair(
         string guardianId,
-        int sequenceOrder,
+        ulong sequenceOrder,
         int quorum,
-        ElementModQ nonce)
+        ElementModQ? nonce)
     {
         var polynomial = ElectionPolynomial.GeneratePolynomial(quorum, nonce);
         var firstKeyPair = polynomial.Coefficients[0].KeyPair;

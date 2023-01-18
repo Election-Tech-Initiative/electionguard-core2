@@ -2,8 +2,13 @@
 
 namespace ElectionGuard.UI.Lib.Models;
 
-public partial class Election : BaseModel
+public partial class Election : DatabaseRecord
 {
     [ObservableProperty]
-    private string? name;
+    private string? _electionId;
+
+    [ObservableProperty]
+    private string? _name;
+
+
 }

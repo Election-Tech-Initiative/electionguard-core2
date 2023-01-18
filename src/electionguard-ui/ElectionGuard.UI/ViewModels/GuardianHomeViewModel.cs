@@ -17,7 +17,7 @@ public partial class GuardianHomeViewModel : BaseViewModel
         _tallies.Add(new Tally { Name = "Real Election Tally" });
     }
 
-    public override async Task Appearing()
+    public override async Task OnAppearing()
     {
         var keyCeremonies = await _keyCeremonyService.GetAllAsync();
         KeyCeremonies = new ObservableCollection<KeyCeremony>(keyCeremonies);
@@ -35,13 +35,14 @@ public partial class GuardianHomeViewModel : BaseViewModel
     [ObservableProperty]
     private Tally? _currentTally;
 
-    [RelayCommand]
-    public async Task KeyCeremonySelectionChanged()
+    partial void OnCurrentKeyCeremonyChanged(KeyCeremony? value)
     {
         if (CurrentKeyCeremony == null) return;
-        await NavigationService.GoToPage(typeof(ViewKeyCeremonyViewModel), new Dictionary<string, object>
-        {
-            { "KeyCeremonyId", CurrentKeyCeremony.Id }
-        });
+        MainThread.BeginInvokeOnMainThread(async() =>
+            await NavigationService.GoToPage(typeof(ViewKeyCeremonyViewModel), new Dictionary<string, object>
+            {
+                { "KeyCeremonyId", CurrentKeyCeremony.Id }
+            }));
     }
+
 }

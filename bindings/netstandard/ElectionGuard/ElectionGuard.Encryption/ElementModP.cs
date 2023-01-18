@@ -43,6 +43,23 @@ namespace ElectionGuard
         }
 
         /// <summary>
+        /// Creates a `ElementModP` object
+        /// </summary>
+        /// <param name="data">the data used to initialize the `ElementModP`</param>
+        public ElementModP(byte[] data)
+        {
+            try
+            {
+                NewNative(data, (ulong)data.Length);
+            }
+            catch (Exception ex)
+            {
+                throw new ElectionGuardException("construction error", ex);
+            }
+        }
+
+
+        /// <summary>
         /// Create a `ElementModP`
         /// </summary>
         /// <param name="data">integer representing the value of the initialized data</param>
@@ -86,6 +103,24 @@ namespace ElectionGuard
             return value;
         }
 
+        /// <Summary>
+        /// exports an array of bytes representation of the integer value in Big Endian format
+        /// </Summary>
+        public byte[] ToBytes()
+        {
+            var status = NativeInterface.ElementModP.ToBytes(Handle, out IntPtr data, out ulong size);
+            if (status != Status.ELECTIONGUARD_STATUS_SUCCESS)
+            {
+                throw new ElectionGuardException($"ToBytes Error Status: {status}");
+            }
+
+            var byteArray = new byte[(int)size];
+            Marshal.Copy(data, byteArray, 0, (int)size);
+            NativeInterface.Memory.DeleteIntPtr(data);
+            return byteArray;
+        }
+
+
         private unsafe void NewNative(ulong[] data)
         {
             fixed (ulong* pointer = new ulong[MaxSize])
@@ -96,6 +131,22 @@ namespace ElectionGuard
                 }
 
                 var status = NativeInterface.ElementModP.New(pointer, out Handle);
+                if (status != Status.ELECTIONGUARD_STATUS_SUCCESS)
+                {
+                    throw new ElectionGuardException($"createNative Error Status: {status}");
+                }
+            }
+        }
+        private unsafe void NewNative(byte[] data, ulong size)
+        {
+            fixed (byte* pointer = new byte[size])
+            {
+                for (ulong i = 0; i < size; i++)
+                {
+                    pointer[i] = data[i];
+                }
+
+                var status = NativeInterface.ElementModP.NewBytes(pointer, size, out Handle);
                 if (status != Status.ELECTIONGUARD_STATUS_SUCCESS)
                 {
                     throw new ElectionGuardException($"createNative Error Status: {status}");
@@ -132,5 +183,31 @@ namespace ElectionGuard
 
             return data;
         }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="obj"></param>
+        /// <returns></returns>
+        public override bool Equals(object obj)
+        {
+            if (obj == null)
+                return false;
+            if (!(obj is ElementModP other))
+                return false;
+            return this.ToHex() == other.ToHex();
+        }
+
+        /// <summary>
+        /// Generates a hashcode for the class
+        /// </summary>
+        /// <returns>the hashcode</returns>
+        public override int GetHashCode()
+        {
+            var hashCode = new HashCode();
+            hashCode.Add(this.ToHex());
+            return hashCode.GetHashCode();
+        }
+
     }
 }
