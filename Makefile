@@ -109,6 +109,7 @@ ifeq ($(OPERATING_SYSTEM),Windows)
 	choco upgrade unzip -y
 	choco upgrade cmake -y
 	choco upgrade ninja -y
+	choco upgrade vswhere -y
 endif
 	wget -O cmake/CPM.cmake https://github.com/cpm-cmake/CPM.cmake/releases/download/v0.35.5/CPM.cmake
 	make fetch-sample-data
@@ -128,7 +129,8 @@ endif
 build:
 	@echo 🧱 BUILD $(OPERATING_SYSTEM) $(PLATFORM) $(TARGET)
 ifeq ($(OPERATING_SYSTEM),Windows)
-	cmake -S . -B $(ELECTIONGUARD_BUILD_LIBS_DIR)/$(OPERATING_SYSTEM)/$(PLATFORM)/$(TARGET) -G "Visual Studio 17 2022" -A $(PLATFORM) \
+	cmake -S . -B $(ELECTIONGUARD_BUILD_LIBS_DIR)/$(OPERATING_SYSTEM)/$(PLATFORM)/$(TARGET) \
+		-G "Visual Studio 17 2022" -A $(PLATFORM) \
 		-DCMAKE_BUILD_TYPE=$(TARGET) \
 		-DBUILD_SHARED_LIBS=ON \
 		-DUSE_MSVC=ON \
@@ -154,17 +156,15 @@ build-x64:
 	PLATFORM=x64 && make build
 	
 build-msys2:
-	@echo 🖥️ BUILD $(OPERATING_SYSTEM) MSYS2 $(PLATFORM)
+	@echo 🖥️ BUILD MSYS2 $(OPERATING_SYSTEM) $(PLATFORM) $(TARGET)
 ifeq ($(OPERATING_SYSTEM),Windows)
-	cmake -S . -B $(ELECTIONGUARD_BUILD_LIBS_DIR)/$(PLATFORM)/$(TARGET) -G "MSYS Makefiles" \
+	cmake -S . -B $(ELECTIONGUARD_BUILD_LIBS_DIR)/$(OPERATING_SYSTEM)/$(PLATFORM)/$(TARGET) -G "MSYS Makefiles" \
 		-DCMAKE_BUILD_TYPE=$(TARGET) \
 		-DBUILD_SHARED_LIBS=ON \
 		-DCAN_USE_VECTOR_INTRINSICS=ON \
-		-DCMAKE_C_COMPILER="C:/ProgramData/chocolatey/bin/gcc.exe" \
-		-DCMAKE_CXX_COMPILER="C:/ProgramData/chocolatey/bin/c++.exe" \
 		-DCPM_SOURCE_CACHE=$(CPM_SOURCE_CACHE) \
 		-DCMAKE_TOOLCHAIN_FILE=cmake/toolchains/$(PLATFORM)-$(OPERATING_SYSTEM)-msys2.cmake
-	cmake --build $(ELECTIONGUARD_BUILD_LIBS_DIR)/$(PLATFORM)/$(TARGET)
+	cmake --build $(ELECTIONGUARD_BUILD_LIBS_DIR)/$(OPERATING_SYSTEM)/$(PLATFORM)/$(TARGET)
 else
 	echo "MSYS2 builds are only supported on Windows"
 endif
@@ -365,14 +365,15 @@ bench-netstandard: build-netstandard
 test:
 	@echo 🧪 TEST $(OPERATING_SYSTEM) $(PLATFORM) $(TARGET)
 ifeq ($(OPERATING_SYSTEM),Windows)
-	cmake -S . -B $(ELECTIONGUARD_BUILD_LIBS_DIR)/$(PLATFORM) -G "Visual Studio 17 2022" -A $(PLATFORM) \
+	cmake -S . -B $(ELECTIONGUARD_BUILD_LIBS_DIR)/$(OPERATING_SYSTEM)/$(PLATFORM)/$(TARGET) \
+		-G "Visual Studio 17 2022" -A $(PLATFORM) \
 		-DCMAKE_BUILD_TYPE=$(TARGET) \
 		-DUSE_MSVC=ON \
 		-DCPM_SOURCE_CACHE=$(CPM_SOURCE_CACHE) \
 		-DCMAKE_TOOLCHAIN_FILE=cmake/toolchains/test.cmake
-	cmake --build $(ELECTIONGUARD_BUILD_LIBS_DIR)/$(PLATFORM)/$(TARGET) --config $(TARGET)
-	$(ELECTIONGUARD_BUILD_LIBS_DIR)/$(PLATFORM)/test/$(TARGET)/ElectionGuardTests
-	$(ELECTIONGUARD_BUILD_LIBS_DIR)/$(PLATFORM)/test/$(TARGET)/ElectionGuardCTests
+	cmake --build $(ELECTIONGUARD_BUILD_LIBS_DIR)/$(OPERATING_SYSTEM)/$(PLATFORM)/$(TARGET)/ --config $(TARGET)
+	$(ELECTIONGUARD_BUILD_LIBS_DIR)/$(OPERATING_SYSTEM)/$(PLATFORM)/$(TARGET)/test/$(TARGET)/ElectionGuardTests
+	$(ELECTIONGUARD_BUILD_LIBS_DIR)/$(OPERATING_SYSTEM)/$(PLATFORM)/$(TARGET)/test/$(TARGET)/ElectionGuardCTests
 else
 	cmake -S . -B $(ELECTIONGUARD_BUILD_LIBS_DIR)/$(PLATFORM)/$(TARGET) \
 		-DCMAKE_BUILD_TYPE=$(TARGET) \
@@ -396,8 +397,6 @@ test-msys2:
 ifeq ($(OPERATING_SYSTEM),Windows)
 	cmake -S . -B $(ELECTIONGUARD_BUILD_LIBS_DIR)/$(PLATFORM)/$(TARGET) -G "MSYS Makefiles" \
 		-DCMAKE_BUILD_TYPE=$(TARGET) \
-		-DCMAKE_C_COMPILER="C:/ProgramData/chocolatey/bin/gcc.exe" \
-		-DCMAKE_CXX_COMPILER="C:/ProgramData/chocolatey/bin/c++.exe" \
 		-DCPM_SOURCE_CACHE=$(CPM_SOURCE_CACHE) \
 		-DCMAKE_TOOLCHAIN_FILE=cmake/toolchains/test.cmake
 	cmake --build $(ELECTIONGUARD_BUILD_LIBS_DIR)/$(PLATFORM)/$(TARGET)
@@ -437,7 +436,6 @@ ifeq ($(OPERATING_SYSTEM),Windows)
 	cmake -S . -B $(ELECTIONGUARD_BUILD_LIBS_DIR)/$(PLATFORM)/$(TARGET) -G "MSYS Makefiles" \
 		-DCMAKE_BUILD_TYPE=$(TARGET) \
 		-DCODE_COVERAGE=ON \
-		-DUSE_MSVC=ON \
 		-DCPM_SOURCE_CACHE=$(CPM_SOURCE_CACHE) \
 		-DCMAKE_TOOLCHAIN_FILE=cmake/toolchains/test.cmake
 else
