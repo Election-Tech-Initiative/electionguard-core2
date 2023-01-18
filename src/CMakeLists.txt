@@ -53,7 +53,7 @@ if(BUILD_SHARED_LIBS)
     add_compile_definitions(ELECTIONGUARD_BUILD_SHARED)
 endif()
 
-if(WIN32 AND NOT USE_32BIT_MATH)
+if(WIN32 AND CMAKE_SYSTEM_PROCESSOR MATCHES "x86" AND NOT USE_32BIT_MATH)
     message("++ Warning buidling for WIN32 with 64-bit math. Consider setting USE_32BIT_MATH for optimized performance")
 endif()
 
