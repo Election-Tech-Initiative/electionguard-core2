@@ -27,6 +27,7 @@ CPMAddPackage(
 
 # Variables
 set(HACL_CPP_EXPORT_NAME "hacl")
+set(HACL_CPP_ALIAS_NAME "hacl::hacl")
 set(HACL_CPP_TARGET_NAME "hacl_cpp")
 
 if(MSVC)
@@ -38,31 +39,58 @@ endif()
 include(${PROJECT_SOURCE_DIR}/libs/hacl/sources.cmake)
 
 add_library(${HACL_CPP_TARGET_NAME} SHARED ${SOURCES_hacl_cpp})
-add_library(${HACL_CPP_EXPORT_NAME}::${HACL_CPP_EXPORT_NAME} ALIAS ${HACL_CPP_TARGET_NAME})
+add_library(${HACL_CPP_ALIAS_NAME} ALIAS ${HACL_CPP_TARGET_NAME})
+set_target_properties(${HACL_CPP_TARGET_NAME} PROPERTIES
+                      VERSION ${hacl_VERSION}
+                      SOVERSION ${hacl_VERSION_MAJOR})
 
-target_compile_features(${HACL_CPP_TARGET_NAME} PRIVATE cxx_std_17)
+target_compile_features(${HACL_CPP_TARGET_NAME} PUBLIC cxx_std_17)
 
-target_include_directories(${HACL_CPP_TARGET_NAME} PUBLIC ${PROJECT_SOURCE_DIR}/libs/hacl)
+# target_include_directories(${HACL_CPP_TARGET_NAME}
+#     PUBLIC 
+#         $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/libs/hacl
+# )
 
 # Dependencies
 
-
 if (MSVC)
-    target_include_directories(${HACL_CPP_TARGET_NAME} PRIVATE
-        ${hacl_SOURCE_DIR}/include/msvc
-        ${hacl_SOURCE_DIR}/build
-        ${hacl_SOURCE_DIR}/karamel/include
-        ${hacl_SOURCE_DIR}/karamel/krmllib/dist/minimal
-        ${hacl_SOURCE_DIR}/vale/include
+    target_include_directories(${HACL_CPP_TARGET_NAME} 
+        PRIVATE
+            ${hacl_SOURCE_DIR}/include/msvc
+            ${hacl_SOURCE_DIR}/build
+            ${hacl_SOURCE_DIR}/karamel/include
+            ${hacl_SOURCE_DIR}/karamel/krmllib/dist/minimal
+            ${hacl_SOURCE_DIR}/vale/include
 )
 else()
-    target_include_directories(${HACL_CPP_TARGET_NAME} PRIVATE
-        ${hacl_SOURCE_DIR}/include
-        ${hacl_SOURCE_DIR}/build
-        ${hacl_SOURCE_DIR}/karamel/include
-        ${hacl_SOURCE_DIR}/karamel/krmllib/dist/minimal
-        ${hacl_SOURCE_DIR}/vale/include
+    target_include_directories(${HACL_CPP_TARGET_NAME} 
+        PRIVATE
+            ${hacl_SOURCE_DIR}/include
+            ${hacl_SOURCE_DIR}/build
+            ${hacl_SOURCE_DIR}/karamel/include
+            ${hacl_SOURCE_DIR}/karamel/krmllib/dist/minimal
+            ${hacl_SOURCE_DIR}/vale/include
 )
 endif()
 
 target_link_libraries(${HACL_CPP_TARGET_NAME} PRIVATE hacl)
+
+# Export
+install(
+    TARGETS ${HACL_CPP_TARGET_NAME}
+    #EXPORT ${HACL_CPP_EXPORT_NAME}Targets
+    EXPORT ${HACL_CPP_TARGET_NAME}
+)
+
+export(
+    EXPORT ${HACL_CPP_TARGET_NAME}
+    #NAMESPACE ${HACL_CPP_EXPORT_NAME}::
+    FILE ${PROJECT_BINARY_DIR}/${HACL_CPP_TARGET_NAME}Config.cmake
+)
+
+install(
+    #EXPORT ${HACL_CPP_EXPORT_NAME}Targets
+    EXPORT ${HACL_CPP_TARGET_NAME}
+    FILE ${HACL_CPP_TARGET_NAME}Config.cmake
+    DESTINATION lib/cmake/${HACL_CPP_TARGET_NAME}/${PROJECT_VERSION}
+)
