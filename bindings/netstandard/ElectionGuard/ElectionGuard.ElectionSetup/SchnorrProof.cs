@@ -50,7 +50,7 @@ public class SchnorrProof : DisposableBase
         var k = PublicKey;
         var h = Commitment;
         var u = Response;
-        var valid_public_key = k.IsValidResidue();
+        var validPublicKey = k.IsValidResidue();
         var inBoundsH = h.IsInBounds();
         var inBoundsU = u.IsInBounds();
 
@@ -62,7 +62,7 @@ public class SchnorrProof : DisposableBase
         var validChallenge = c.Equals(Challenge);
         var validProof = gp.Equals(mp);
 
-        var success = valid_public_key && inBoundsH && inBoundsU && validChallenge && validProof;
+        var success = validPublicKey && inBoundsH && inBoundsU && validChallenge && validProof;
         if (success is false)
         {
             //log_warning(

@@ -263,7 +263,7 @@ public class KeyCeremonyMediator : DisposableBase
         return verification;
     }
     private ElectionPartialKeyVerification VerifyElectionPartialKeyChallenge(
-        string verifier_id, ElectionPartialKeyChallenge challenge)
+        string verifierId, ElectionPartialKeyChallenge challenge)
     {
         /* """
             Verify a challenge to a previous verification of a partial key backup
@@ -275,7 +275,7 @@ public class KeyCeremonyMediator : DisposableBase
         {
             OwnerId = challenge.OwnerId,
             DesignatedId = challenge.DesignatedId,
-            VerifierId = verifier_id,
+            VerifierId = verifierId,
             Verified = VerifyPolynomialCoordinate(
                 challenge.Value!,
                 challenge.DesignatedSequenceOrder,
