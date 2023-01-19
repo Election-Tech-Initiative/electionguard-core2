@@ -1,8 +1,4 @@
 ﻿using ElectionGuard.ElectionSetup.Extensions;
-using System.Collections.Generic;
-using System.Numerics;
-using System.Security.Cryptography.X509Certificates;
-using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace ElectionGuard.ElectionSetup;
 
@@ -173,7 +169,7 @@ public class KeyCeremonyMediator : DisposableBase
         var others = announcedGuardians.Where(g => g != guardianId);
         foreach (var currentGuardianId in others)
         {
-            var backup = _electionPartialKeyBackups[new GuardianPair(currentGuardianId, guardianId)];
+            _electionPartialKeyBackups.TryGetValue(new GuardianPair(currentGuardianId, guardianId), out var backup);
             if (backup is not null)
                 backups.Add(backup);
         }

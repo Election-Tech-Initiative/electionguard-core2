@@ -51,18 +51,18 @@ public class SchnorrProof : DisposableBase
         var h = Commitment;
         var u = Response;
         var valid_public_key = k.IsValidResidue();
-        var in_bounds_h = h.IsInBounds();
-        var in_bounds_u = u.IsInBounds();
+        var inBoundsH = h.IsInBounds();
+        var inBoundsU = u.IsInBounds();
 
         using var c = BigMath.HashElems(k, h);
         using var gp = BigMath.GPowP(u);
         using var pp = BigMath.PowModP(k, c);
         using var mp = BigMath.MultModP(h, pp);
 
-        var valid_challenge = c.Equals(Challenge);
-        var valid_proof = gp.Equals(mp);
+        var validChallenge = c.Equals(Challenge);
+        var validProof = gp.Equals(mp);
 
-        var success = valid_public_key && in_bounds_h && in_bounds_u && valid_challenge && valid_proof;
+        var success = valid_public_key && inBoundsH && inBoundsU && validChallenge && validProof;
         if (success is false)
         {
             //log_warning(

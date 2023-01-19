@@ -13,7 +13,7 @@
   </PropertyGroup>
 
   <PropertyGroup>
-
+ 
     <!-- Package -->
     <PackageId>ElectionGuard.Encryption</PackageId>
     <Title>ElectionGuard Encryption</Title>

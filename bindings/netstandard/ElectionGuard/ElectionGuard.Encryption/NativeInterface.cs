@@ -148,9 +148,9 @@ namespace ElectionGuard
             [DllImport(DllName, EntryPoint = "eg_element_mod_p_mult_mod_p",
                 CallingConvention = CallingConvention.Cdecl, SetLastError = true)]
             internal static extern Status MultModP(
-                NativeInterface.ElementModP.ElementModPHandle lhs,
-                NativeInterface.ElementModP.ElementModPHandle rhs,
-                out NativeInterface.ElementModP.ElementModPHandle handle);
+                ElementModPHandle lhs,
+                ElementModPHandle rhs,
+                out ElementModPHandle handle);
 
         }
 

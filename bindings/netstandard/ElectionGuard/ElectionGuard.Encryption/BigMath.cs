@@ -344,8 +344,8 @@ namespace ElectionGuard
                 CallingConvention = CallingConvention.Cdecl,
                 SetLastError = true)]
             internal static extern Status HashElems(
-                [MarshalAs(UnmanagedType.LPArray)] IntPtr[] in_data,
-                ulong in_data_size,
+                [MarshalAs(UnmanagedType.LPArray)] IntPtr[] inData,
+                ulong inDataSize,
                 out NativeInterface.ElementModQ.ElementModQHandle handle
                 );
 
