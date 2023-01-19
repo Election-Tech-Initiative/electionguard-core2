@@ -470,7 +470,7 @@ public class Guardian
 
     private ElementModP ElgamalCombinePublicKeys()
     {
-        ElementModP combinedKey = new(1);
+        ElementModP combinedKey = Constants.ONE_MOD_P;
         foreach (var item in _otherGuardianPublicKeys!.Values)
         {
             combinedKey.MultModP(item.Key);

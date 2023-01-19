@@ -298,7 +298,7 @@ public class KeyCeremonyMediator : DisposableBase
             :return: True if verified on polynomial
         """ */
 
-        var commitmentOutput = Constants.ONE_MOD_P;
+        using var commitmentOutput = Constants.ONE_MOD_P;
         foreach (var (commitment, index) in commitments.WithIndex())
         {
             using var exponent = BigMath.PowModP(exponentModifier, index);
