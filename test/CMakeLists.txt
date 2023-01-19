@@ -93,10 +93,26 @@ add_executable(${CTEST_PROJECT_TARGET}
 target_compile_features(${CTEST_PROJECT_TARGET} PRIVATE c_std_99)
 
 # ---- Link Libraries ----
-target_link_libraries(${UTILS_PROJECT_TARGET} PUBLIC ${META_PROJECT_TARGET})
+target_link_libraries(${UTILS_PROJECT_TARGET} 
+    PUBLIC 
+        ${META_PROJECT_TARGET}
+        hacl::hacl
+)
 
-target_link_libraries(${CPP_BENCHMARK_TARGET} PRIVATE benchmark::benchmark ${UTILS_PROJECT_TARGET} ${META_PROJECT_TARGET})
-target_link_libraries(${CPPTEST_PROJECT_TARGET} PRIVATE doctest ${UTILS_PROJECT_TARGET} ${META_PROJECT_TARGET} hacl::hacl)
+target_link_libraries(${CPP_BENCHMARK_TARGET} 
+    PRIVATE 
+        benchmark::benchmark 
+        ${UTILS_PROJECT_TARGET} 
+        ${META_PROJECT_TARGET}
+        hacl::hacl
+)
+target_link_libraries(${CPPTEST_PROJECT_TARGET} 
+    PRIVATE 
+        doctest 
+        ${UTILS_PROJECT_TARGET} 
+        ${META_PROJECT_TARGET} 
+        hacl::hacl
+)
 
 if(MINGW)
     # Statically link in libstdc++
@@ -104,16 +120,37 @@ if(MINGW)
     target_link_libraries(${CPPTEST_PROJECT_TARGET} PRIVATE -static-libstdc++)
 endif()
 
-target_link_libraries(${CTEST_PROJECT_TARGET} PRIVATE ${UTILS_PROJECT_TARGET} ${META_PROJECT_TARGET})
+target_link_libraries(${CTEST_PROJECT_TARGET} 
+    PRIVATE 
+        ${UTILS_PROJECT_TARGET} 
+        ${META_PROJECT_TARGET}
+        hacl::hacl
+)
 
-if(WIN32)
+if(MINGW)
     # sometimes windows struggles with paths (particularly in CI)
-    # so, copy the .dll file to the test execution folder
+    # so, copy the .dll files to the test execution folder
     add_custom_command(
         TARGET ${CPPTEST_PROJECT_TARGET} POST_BUILD
         COMMAND ${CMAKE_COMMAND} -E copy_directory
+        ${benchmark_BINARY_DIR}/src
+        $<TARGET_FILE_DIR:hacl_cpp>
         $<TARGET_FILE_DIR:${META_PROJECT_TARGET}>
-        $<TARGET_FILE_DIR:${CPPTEST_PROJECT_TARGET}>)
+        $<TARGET_FILE_DIR:${CPPTEST_PROJECT_TARGET}>
+    )
+endif()
+
+if(MSVC)
+    # sometimes windows struggles with paths (particularly in CI)
+    # so, copy the .dll files to the test execution folder
+    add_custom_command(
+        TARGET ${CPPTEST_PROJECT_TARGET} POST_BUILD
+        COMMAND ${CMAKE_COMMAND} -E copy_directory
+        ${benchmark_BINARY_DIR}/src/Release
+        $<TARGET_FILE_DIR:hacl_cpp>
+        $<TARGET_FILE_DIR:${META_PROJECT_TARGET}>
+        $<TARGET_FILE_DIR:${CPPTEST_PROJECT_TARGET}>
+    )
 endif()
 
 # ---- Add Tests ----

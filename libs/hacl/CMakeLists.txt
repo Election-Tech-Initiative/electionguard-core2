@@ -46,11 +46,6 @@ set_target_properties(${HACL_CPP_TARGET_NAME} PROPERTIES
 
 target_compile_features(${HACL_CPP_TARGET_NAME} PUBLIC cxx_std_17)
 
-# target_include_directories(${HACL_CPP_TARGET_NAME}
-#     PUBLIC 
-#         $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/libs/hacl
-# )
-
 # Dependencies
 
 if (MSVC)
@@ -78,19 +73,36 @@ target_link_libraries(${HACL_CPP_TARGET_NAME} PRIVATE hacl)
 # Export
 install(
     TARGETS ${HACL_CPP_TARGET_NAME}
-    #EXPORT ${HACL_CPP_EXPORT_NAME}Targets
     EXPORT ${HACL_CPP_TARGET_NAME}
 )
 
 export(
     EXPORT ${HACL_CPP_TARGET_NAME}
-    #NAMESPACE ${HACL_CPP_EXPORT_NAME}::
     FILE ${PROJECT_BINARY_DIR}/${HACL_CPP_TARGET_NAME}Config.cmake
 )
 
 install(
-    #EXPORT ${HACL_CPP_EXPORT_NAME}Targets
     EXPORT ${HACL_CPP_TARGET_NAME}
     FILE ${HACL_CPP_TARGET_NAME}Config.cmake
     DESTINATION lib/cmake/${HACL_CPP_TARGET_NAME}/${PROJECT_VERSION}
 )
+
+if(MINGW)
+    # sometimes windows struggles with paths so copy the .dll files
+    add_custom_command(
+        TARGET ${HACL_CPP_TARGET_NAME} POST_BUILD
+        COMMAND ${CMAKE_COMMAND} -E copy_directory
+        ${hacl_BINARY_DIR}
+        $<TARGET_FILE_DIR:${HACL_CPP_TARGET_NAME}>
+    )
+endif()
+
+if(MSVC)
+    # sometimes windows struggles with paths so copy the .dll files
+    add_custom_command(
+        TARGET ${HACL_CPP_TARGET_NAME} POST_BUILD
+        COMMAND ${CMAKE_COMMAND} -E copy_directory
+        ${hacl_BINARY_DIR}/Release
+        $<TARGET_FILE_DIR:${HACL_CPP_TARGET_NAME}>
+    )
+endif()

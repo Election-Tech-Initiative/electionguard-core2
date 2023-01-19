@@ -50,13 +50,16 @@ endif
 # Default build number
 BUILD:=1
 
-# Temporarily disable vale support on x86
+# handle setting processor-specific build vars
 ifeq ($(PROCESSOR),x86)
+# Temporarily disable vale support on x86
 TEMP_DISABLE_VALE?=ON
 USE_32BIT_MATH?=ON
+VSPLATFORM?=Win32
 else
 TEMP_DISABLE_VALE?=ON
 USE_32BIT_MATH?=OFF
+VSPLATFORM?=x64
 endif
 
 # Debug or Release (capitalized)
@@ -130,7 +133,7 @@ build:
 	@echo 🧱 BUILD $(OPERATING_SYSTEM) $(PROCESSOR) $(TARGET)
 ifeq ($(OPERATING_SYSTEM),Windows)
 	cmake -S . -B $(ELECTIONGUARD_BUILD_LIBS_DIR)/$(OPERATING_SYSTEM)/$(PROCESSOR)/$(TARGET) \
-		-G "Visual Studio 17 2022" -A $(PROCESSOR) \
+		-G "Visual Studio 17 2022" -A $(VSPLATFORM) \
 		-DCMAKE_BUILD_TYPE=$(TARGET) \
 		-DBUILD_SHARED_LIBS=ON \
 		-DUSE_MSVC=ON \
@@ -150,7 +153,7 @@ else
 endif
 
 build-x86:
-	PROCESSOR=x86 && make build
+	PROCESSOR=x86 VSPLATFORM=Win32 && make build
 
 build-x64:
 	PROCESSOR=x64 && make build
@@ -348,9 +351,6 @@ else
 		-DCMAKE_TOOLCHAIN_FILE=cmake/toolchains/benchmark.cmake
 endif
 	cmake --build $(ELECTIONGUARD_BUILD_LIBS_DIR)/$(PROCESSOR)/$(TARGET)
-ifeq ($(OPERATING_SYSTEM),Windows)
-	pwsh -Command "xcopy 'build\libs\$(PROCESSOR)\$(TARGET)\_deps\benchmark-build\src\libbenchmark.dll' 'build\libs\$(PROCESSOR)\$(TARGET)\test' /Q /Y;  $$null"
-endif
 	$(ELECTIONGUARD_BUILD_LIBS_DIR)/$(PROCESSOR)/$(TARGET)/test/ElectionGuardBenchmark
 
 bench-netstandard: build-netstandard
@@ -366,7 +366,7 @@ test:
 	@echo 🧪 TEST $(OPERATING_SYSTEM) $(PROCESSOR) $(TARGET)
 ifeq ($(OPERATING_SYSTEM),Windows)
 	cmake -S . -B $(ELECTIONGUARD_BUILD_LIBS_DIR)/$(OPERATING_SYSTEM)/$(PROCESSOR)/$(TARGET) \
-		-G "Visual Studio 17 2022" -A $(PROCESSOR) \
+		-G "Visual Studio 17 2022" -A $(VSPLATFORM) \
 		-DCMAKE_BUILD_TYPE=$(TARGET) \
 		-DUSE_MSVC=ON \
 		-DCPM_SOURCE_CACHE=$(CPM_SOURCE_CACHE) \
@@ -390,7 +390,7 @@ test-x64:
 	PROCESSOR=x64 && make test
 
 test-x86:
-	PROCESSOR=x86 USE_32BIT_MATH=ON && make test
+	PROCESSOR=x86 USE_32BIT_MATH=ON VSPLATFORM=Win32 && make test
 
 test-msys2:
 	@echo 🧪 TEST MSYS2 $(OPERATING_SYSTEM) $(PROCESSOR) $(TARGET)
