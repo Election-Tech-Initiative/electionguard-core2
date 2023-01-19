@@ -256,7 +256,7 @@ public class KeyCeremonyMediator : DisposableBase
             Mediator receives challenge and will act to mediate and verify
         """ */
         var verification = VerifyElectionPartialKeyChallenge(Id, challenge);
-        if (verification.Verified is true)
+        if (verification.Verified)
         {
             ReceiveElectionPartialKeyVerification(verification);
         }

@@ -62,10 +62,10 @@ public class ElectionPolynomial : DisposableBase
 
     private static Coefficient GenerateCoefficient(ElementModQ? nonce, int i)
     {
-        using var secretKey = GenerateSecretKey(nonce, i);
-        using var keypair = ElGamalKeyPair.FromSecret(secretKey);
-        using var seed = BigMath.RandQ();
-        using SchnorrProof proof = new(keypair, seed);
+        var secretKey = GenerateSecretKey(nonce, i);
+        var keypair = ElGamalKeyPair.FromSecret(secretKey);
+        var seed = BigMath.RandQ();
+        SchnorrProof proof = new(keypair, seed);
 
         return new(keypair, proof);
     }

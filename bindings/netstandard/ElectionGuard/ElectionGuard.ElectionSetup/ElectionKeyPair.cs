@@ -50,7 +50,7 @@ public class ElectionKeyPair : DisposableBase
         int quorum,
         ElementModQ? nonce)
     {
-        using var polynomial = ElectionPolynomial.GeneratePolynomial(quorum, nonce);
+        var polynomial = ElectionPolynomial.GeneratePolynomial(quorum, nonce);
         var firstKeyPair = polynomial.Coefficients[0].KeyPair;
 
         return new(guardianId, sequenceOrder, firstKeyPair, polynomial);
