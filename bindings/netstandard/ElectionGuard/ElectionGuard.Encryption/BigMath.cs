@@ -1,4 +1,6 @@
-﻿using System.Runtime.InteropServices;
+﻿using System;
+using System.Collections.Generic;
+using System.Runtime.InteropServices;
 
 namespace ElectionGuard
 {
@@ -117,6 +119,33 @@ namespace ElectionGuard
         }
 
         /// <summary>
+        /// Raise a ElementModP value to an ElementModP exponent
+        /// </summary>
+        /// <param name="b">base value for the calculation</param>
+        /// <param name="e">exponent to raise the base by</param>
+        public static ElementModP PowModP(ElementModP b, ElementModQ e)
+        {
+            var status = External.QPowModP(b.Handle, e.Handle,
+                out NativeInterface.ElementModP.ElementModPHandle value);
+            status.ThrowIfError();
+            return new ElementModP(value);
+        }
+
+        /// <summary>
+        /// Raise a ElementModP value to an ElementModP exponent
+        /// </summary>
+        /// <param name="b">base value for the calculation</param>
+        /// <param name="e">exponent to raise the base by</param>
+        public static ElementModP PowModP(ulong b, ulong e)
+        {
+            var status = External.LongPowModP(b, e,
+                out NativeInterface.ElementModP.ElementModPHandle value);
+            status.ThrowIfError();
+            return new ElementModP(value);
+        }
+
+
+        /// <summary>
         /// Raise a ElementModQ value to an ElementModQ exponent
         /// </summary>
         /// <param name="b">base value for the calculation</param>
@@ -124,6 +153,19 @@ namespace ElectionGuard
         public static ElementModQ PowModQ(ElementModQ b, ElementModQ e)
         {
             var status = External.PowModQ(b.Handle, e.Handle,
+                out NativeInterface.ElementModQ.ElementModQHandle value);
+            status.ThrowIfError();
+            return new ElementModQ(value);
+        }
+
+        /// <summary>
+        /// Raise a ElementModQ value to a long exponent
+        /// </summary>
+        /// <param name="b">base value for the calculation</param>
+        /// <param name="e">exponent to raise the base by</param>
+        public static ElementModQ PowModQ(ElementModQ b, ulong e)
+        {
+            var status = External.LongPowModQ(b.Handle, e,
                 out NativeInterface.ElementModQ.ElementModQHandle value);
             status.ThrowIfError();
             return new ElementModQ(value);
@@ -155,9 +197,27 @@ namespace ElectionGuard
             return new ElementModQ(value);
         }
 
+        /// <summary>
+        /// Hash together the ElementModP values
+        /// </summary>
+        /// <param name="data">List of ElementModP to hash together</param>
+        public static ElementModQ HashElems(List<ElementModP> data)
+        {
+            IntPtr[] dataPointers = new IntPtr[data.Count];
+            for (var i = 0; i < data.Count; i++)
+            {
+                dataPointers[i] = data[i].Handle.Ptr;
+                data[i].Dispose();
+            }
+
+            var status = External.HashElems(dataPointers, (ulong)data.Count,
+                out NativeInterface.ElementModQ.ElementModQHandle value);
+            status.ThrowIfError();
+            return new ElementModQ(value);
+        }
 
         /// <summary>
-        /// Multiple two ElementModQ values
+        /// Multiply two ElementModQ values
         /// </summary>
         /// <param name="lhs">left hand side for the multiply</param>
         /// <param name="rhs">right hand side for the multiply</param>
@@ -186,6 +246,17 @@ namespace ElectionGuard
             internal static extern Status QPowModP(
                 NativeInterface.ElementModP.ElementModPHandle base1,
                 NativeInterface.ElementModQ.ElementModQHandle exponent,
+                out NativeInterface.ElementModP.ElementModPHandle handle
+                );
+
+            [DllImport(
+                NativeInterface.DllName,
+                EntryPoint = "eg_element_long_pow_mod_p",
+                CallingConvention = CallingConvention.Cdecl,
+                SetLastError = true)]
+            internal static extern Status LongPowModP(
+                ulong base1,
+                ulong exponent,
                 out NativeInterface.ElementModP.ElementModPHandle handle
                 );
 
@@ -267,6 +338,16 @@ namespace ElectionGuard
                 out NativeInterface.ElementModQ.ElementModQHandle handle
                 );
 
+            [DllImport(
+                NativeInterface.DllName,
+                EntryPoint = "eg_hash_elems_array",
+                CallingConvention = CallingConvention.Cdecl,
+                SetLastError = true)]
+            internal static extern Status HashElems(
+                [MarshalAs(UnmanagedType.LPArray)] IntPtr[] in_data,
+                ulong in_data_size,
+                out NativeInterface.ElementModQ.ElementModQHandle handle
+                );
 
             [DllImport(
                 NativeInterface.DllName,
@@ -287,6 +368,17 @@ namespace ElectionGuard
             internal static extern Status PowModQ(
                 NativeInterface.ElementModQ.ElementModQHandle b,
                 NativeInterface.ElementModQ.ElementModQHandle e,
+                out NativeInterface.ElementModQ.ElementModQHandle handle
+                );
+
+            [DllImport(
+                NativeInterface.DllName,
+                EntryPoint = "eg_element_long_pow_mod_q",
+                CallingConvention = CallingConvention.Cdecl,
+                SetLastError = true)]
+            internal static extern Status LongPowModQ(
+                NativeInterface.ElementModQ.ElementModQHandle b,
+                ulong e,
                 out NativeInterface.ElementModQ.ElementModQHandle handle
                 );
 

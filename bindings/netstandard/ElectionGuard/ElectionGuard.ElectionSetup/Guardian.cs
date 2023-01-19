@@ -29,7 +29,6 @@ public record GuardianRecord(
 public class Guardian
 {
     private readonly ElectionKeyPair _electionKeys;
-    //private readonly CeremonyDetails _ceremonyDetails;
     private readonly Dictionary<string, ElectionPublicKey>? _otherGuardianPublicKeys;
     private readonly Dictionary<string, ElectionPartialKeyBackup>? _otherGuardianPartialKeyBackups;
     private Dictionary<string, ElectionPartialKeyVerification>? _otherGuardianPartialKeyVerification = new();
@@ -76,7 +75,6 @@ public class Guardian
         }
 
         SaveGuardianKey(keyPair.Share());
-        //GenerateBackupKeys();
     }
 
     //private void GenerateBackupKeys()
@@ -113,7 +111,7 @@ public class Guardian
             publicKey.SequenceOrder,
             elgamalKeyPair,
             new ElectionPolynomial(new()));
-        var ceremonyDetails = new CeremonyDetails(keyCeremonyId, numberOfGuardians, quorum);
+        CeremonyDetails ceremonyDetails = new(keyCeremonyId, numberOfGuardians, quorum);
         return new(keyPair, ceremonyDetails);
     }
 
@@ -126,21 +124,34 @@ public class Guardian
         ElementModQ? nonce = null)
     {
         var keyPair = ElectionKeyPair.GenerateElectionKeyPair(guardianId, sequenceOrder, quorum, nonce);
-        var ceremonyDetails = new CeremonyDetails(keyCeremonyId, numberOfGuardians, quorum);
+        CeremonyDetails ceremonyDetails = new(keyCeremonyId, numberOfGuardians, quorum);
         return new(keyPair, ceremonyDetails);
     }
 
+    public static Guardian FromPrivateRecord(
+        GuardianPrivateRecord privateGuardianRecord,
+        string keyCeremonyId,
+        int numberOfGuardians,
+        int quorum)
+    {
+        return new(
+            privateGuardianRecord.ElectionKeys,
+            new(keyCeremonyId, numberOfGuardians, quorum),
+            privateGuardianRecord.GuardianElectionPublicKeys,
+            privateGuardianRecord.GuardianElectionPartialKeyBackups,
+            privateGuardianRecord.BackupsToShare,
+            privateGuardianRecord.GuardianElectionPartialKeyVerifications);
+    }
 
 
     //    private ElectionPartialKeyBackup GenerateElectionPartialKeyBackup(ulong sequenceOrder)
     private ElectionPartialKeyBackup GenerateElectionPartialKeyBackup(string senderGuardianId, ElectionPolynomial senderGuardianPolynomial, ElectionPublicKey receiverGuardianPublicKey)
     {
         var coordinate = ComputePolynomialCoordinate(receiverGuardianPublicKey.SequenceOrder, senderGuardianPolynomial);
-        var nonce = BigMath.RandQ();
+        using var nonce = BigMath.RandQ();
         var seed = GetBackupSeed(
                 receiverGuardianPublicKey.OwnerId,
-                receiverGuardianPublicKey.SequenceOrder
-            );
+                receiverGuardianPublicKey.SequenceOrder);
 
         var data = coordinate.ToBytes();
         var encryptedCoordinate = HashedElgamal.Encrypt(data, (ulong)data.Length, nonce, receiverGuardianPublicKey.Key, seed);
@@ -161,7 +172,7 @@ public class Guardian
 
     private ElementModQ ComputePolynomialCoordinate(ulong sequenceOrder, ElectionPolynomial? polynomial = null)
     {
-        var sequenceOrderModQ = new ElementModQ(sequenceOrder);
+        using var sequenceOrderModQ = new ElementModQ(sequenceOrder);
         var coordinate = Constants.ZERO_MOD_Q; // start at 0 mod q.
 
         var coefficients = polynomial != null ? polynomial.Coefficients : _electionKeys.Polynomial.Coefficients;
@@ -181,9 +192,9 @@ public class Guardian
         Coefficient coefficient,
                     ulong index)
     {
-        var exponent = new ElementModQ(index);
-        var factor = BigMath.PowModQ(baseElement, exponent);
-        var coordinateShift = BigMath.MultModQ(coefficient.Value, factor);
+        using var exponent = new ElementModQ(index);
+        using var factor = BigMath.PowModQ(baseElement, exponent);
+        using var coordinateShift = BigMath.MultModQ(coefficient.Value, factor);
 
         return BigMath.AddModQ(initialState, coordinateShift);
     }
@@ -332,7 +343,7 @@ public class Guardian
         var publicKey = _otherGuardianPublicKeys?[guardianId];
         if (backup is null)
         {
-            return null;          
+            return null;
         }
         if (publicKey is null)
         {
@@ -343,7 +354,7 @@ public class Guardian
 
     private ElectionPartialKeyVerification VerifyElectionPartialKeyBackup(string receiverGuardianId, ElectionPartialKeyBackup? senderGuardianBackup, ElectionPublicKey? senderGuardianPublicKey, ElectionKeyPair receiverGuardianKeys)
     {
-        var encryptionSeed = GetBackupSeed(
+        using var encryptionSeed = GetBackupSeed(
                 receiverGuardianId,
                 senderGuardianBackup?.DesignatedSequenceOrder
             );
@@ -352,7 +363,7 @@ public class Guardian
         var data = senderGuardianBackup?.EncryptedCoordinate?.Decrypt(
                 secretKey, encryptionSeed, false);
 
-        var coordinateData = new ElementModQ(data);
+        using var coordinateData = new ElementModQ(data);
 
         var verified = VerifyPolynomialCoordinate(
                 coordinateData,
@@ -412,16 +423,14 @@ public class Guardian
 
     private bool VerifyPolynomialCoordinate(ElementModQ? coordinate, ulong exponentModifier, List<ElementModP>? commitments)
     {
-        var exponentModifierModQ = new ElementModP(exponentModifier);
-        var commitmentOutput = Constants.ONE_MOD_P;
+        using var commitmentOutput = Constants.ONE_MOD_P;
         foreach (var (commitment, i) in commitments!.WithIndex())
         {
-            var modi = new ElementModP(i);
-            var exponent = BigMath.PowModP(exponentModifierModQ, modi);
-            var factor = BigMath.PowModP(commitment, exponent);
-            commitmentOutput = BigMath.MultModP(commitmentOutput, factor);
+            using var exponent = BigMath.PowModP(exponentModifier, i);
+            using var factor = BigMath.PowModP(commitment, exponent);
+            commitmentOutput.MultModP(factor);
         }
-        var valueOutput = BigMath.GPowP(coordinate);
+        using var valueOutput = BigMath.GPowP(coordinate);
         return valueOutput.Equals(commitmentOutput);
     }
 
@@ -464,7 +473,7 @@ public class Guardian
         ElementModP combinedKey = new(1);
         foreach (var item in _otherGuardianPublicKeys!.Values)
         {
-            combinedKey = BigMath.MultModP(combinedKey, item.Key);
+            combinedKey.MultModP(item.Key);
         }
         return combinedKey;
     }

@@ -3,7 +3,7 @@
 /// <summary>
 /// Election partial key backup used for key sharing
 /// </summary>
-public record ElectionPartialKeyBackup
+public class ElectionPartialKeyBackup : DisposableBase
 {
     public string? OwnerId { get; init; } = default;
 
@@ -12,4 +12,11 @@ public record ElectionPartialKeyBackup
     public ulong DesignatedSequenceOrder { get; init; } = default;
 
     public HashedElGamalCiphertext? EncryptedCoordinate { get; init; } = default;
+
+    protected override void DisposeUnmanaged()
+    {
+        base.DisposeUnmanaged();
+
+        EncryptedCoordinate?.Dispose();
+    }
 }

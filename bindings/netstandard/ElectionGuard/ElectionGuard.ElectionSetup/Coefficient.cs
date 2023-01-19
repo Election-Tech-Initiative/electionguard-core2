@@ -2,7 +2,7 @@
 /// <summary>
 /// A coefficient of an Election Polynomial
 /// </summary>
-public class Coefficient
+public class Coefficient : DisposableBase
 {
     /// <summary>
     /// The key pair associated with the coefficient
@@ -29,5 +29,13 @@ public class Coefficient
     {
         KeyPair = keyPair;
         Proof = proof;
+    }
+
+    protected override void DisposeUnmanaged()
+    {
+        base.DisposeUnmanaged();
+
+        KeyPair.Dispose();
+        Proof.Dispose();
     }
 }

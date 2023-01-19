@@ -223,6 +223,14 @@ namespace ElectionGuard
             return hashCode.GetHashCode();
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        public bool IsInBounds()
+        {
+            return true;
+        }
+
 
     }
 }

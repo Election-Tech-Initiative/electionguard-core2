@@ -3,7 +3,7 @@
 /// <summary>
 /// A tuple of election key pair, proof and polynomial
 /// </summary>
-public class ElectionKeyPair
+public class ElectionKeyPair : DisposableBase
 {
     public ElectionKeyPair(string guardianId, ulong sequenceOrder, ElGamalKeyPair keyPair, ElectionPolynomial polynomial)
     {
@@ -50,9 +50,17 @@ public class ElectionKeyPair
         int quorum,
         ElementModQ? nonce)
     {
-        var polynomial = ElectionPolynomial.GeneratePolynomial(quorum, nonce);
+        using var polynomial = ElectionPolynomial.GeneratePolynomial(quorum, nonce);
         var firstKeyPair = polynomial.Coefficients[0].KeyPair;
 
         return new(guardianId, sequenceOrder, firstKeyPair, polynomial);
+    }
+
+    protected override void DisposeUnmanaged()
+    {
+        base.DisposeUnmanaged();
+
+        KeyPair.Dispose();
+        Polynomial.Dispose();
     }
 }

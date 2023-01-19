@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Runtime.InteropServices;
 
 namespace ElectionGuard
@@ -208,6 +209,50 @@ namespace ElectionGuard
             hashCode.Add(this.ToHex());
             return hashCode.GetHashCode();
         }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        public bool IsValidResidue()
+        {
+            return true;
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        public bool IsInBounds()
+        {
+            return true;
+        }
+
+        /// <summary>
+        /// Multiply by an ElementModP value
+        /// </summary>
+        /// <param name="rhs">right hand side for the multiply</param>
+        public void MultModP(ElementModP rhs)
+        {
+            var status = NativeInterface.ElementModP.MultModP(Handle, rhs.Handle,
+                out NativeInterface.ElementModP.ElementModPHandle value);
+            Handle.Dispose();
+            status.ThrowIfError();
+            Handle = value;
+        }
+
+        /// <summary>
+        /// Multiply list of ElementModP values
+        /// </summary>
+        /// <param name="keys">list of keys the multiply</param>
+        public void MultModP(IEnumerable<ElementModP> keys)
+        {
+            foreach (var key in keys)
+            {
+                MultModP(key);
+            }
+        }
+
+
+
 
     }
 }

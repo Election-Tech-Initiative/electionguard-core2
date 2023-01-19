@@ -3,7 +3,7 @@
 /// <summary>
 /// A tuple of election public key and owner information
 /// </summary>
-public record ElectionPublicKey
+public class ElectionPublicKey : DisposableBase
 {
     public ElectionPublicKey(
         string ownerId,
@@ -44,4 +44,19 @@ public record ElectionPublicKey
     /// The proofs for the coefficients in the secret polynomial
     /// </summary>
     public List<SchnorrProof> CoefficientProofs { get; init; }
+
+    protected override void DisposeUnmanaged()
+    {
+        base.DisposeUnmanaged();
+
+        Key.Dispose();
+        for (int i = 0; i < CoefficientCommitments.Count; i++)
+        {
+            CoefficientCommitments[i].Dispose();
+        }
+        for (int i = 0; i < CoefficientProofs.Count; i++)
+        {
+            CoefficientProofs[i].Dispose();
+        }
+    }
 }

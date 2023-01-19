@@ -121,6 +121,9 @@ EG_API eg_electionguard_status_t eg_element_mod_q_pow_mod_p(eg_element_mod_p_t *
                                                             eg_element_mod_q_t *exponent,
                                                             eg_element_mod_p_t **out_handle);
 
+EG_API eg_electionguard_status_t eg_element_long_pow_mod_p(uint64_t base, uint64_t exponent,
+                                                           eg_element_mod_p_t **out_handle);
+
 EG_API eg_electionguard_status_t eg_element_mod_q_rand_q_new(eg_element_mod_q_t **out_handle);
 
 EG_API eg_electionguard_status_t eg_element_mod_q_add_mod_q(eg_element_mod_q_t *lhs,
@@ -147,6 +150,9 @@ EG_API eg_electionguard_status_t eg_element_mod_q_pow_mod_q(eg_element_mod_q_t *
                                                             eg_element_mod_q_t *rhs,
                                                             eg_element_mod_q_t **out_handle);
 
+EG_API eg_electionguard_status_t eg_element_long_pow_mod_q(eg_element_mod_q_t *lhs, uint64_t rhs,
+                                                           eg_element_mod_q_t **out_handle);
+
 EG_API eg_electionguard_status_t eg_element_mod_q_mult_mod_q(eg_element_mod_q_t *lhs,
                                                              eg_element_mod_q_t *rhs,
                                                              eg_element_mod_q_t **out_handle);
@@ -157,6 +163,11 @@ EG_API eg_electionguard_status_t eg_hash_elems_modp_modp(eg_element_mod_p_t *pub
 
 EG_API eg_electionguard_status_t eg_hash_elems_string_int(char *publickey, uint64_t commitment,
                                                           eg_element_mod_q_t **out_handle);
+
+EG_API eg_electionguard_status_t eg_hash_elems_array(eg_element_mod_p_t *in_data[],
+                                                     uint64_t in_data_size,
+                                                     eg_element_mod_q_t **out_handle);
+
 #endif
 
 #ifdef __cplusplus

@@ -8,14 +8,14 @@ namespace ElectionGuard.ElectionSetup;
 /// The 0-index coefficient is used for a secret key which can be
 /// discovered by a quorum of n guardians corresponding to n coefficients.
 /// </summary>
-public class ElectionPolynomial
+public class ElectionPolynomial : DisposableBase
 {
     public ElectionPolynomial(List<Coefficient> coefficients)
     {
         Coefficients = coefficients;
     }
 
-    public List<Coefficient> Coefficients;
+    public List<Coefficient> Coefficients { get; set; }
 
     /// <summary>
     /// Access the list of public keys generated from secret coefficient
@@ -62,10 +62,10 @@ public class ElectionPolynomial
 
     private static Coefficient GenerateCoefficient(ElementModQ? nonce, int i)
     {
-        var keypair = ElGamalKeyPair.FromSecret(
-            GenerateSecretKey(nonce, i));
-
-        SchnorrProof proof = new(keypair);
+        using var secretKey = GenerateSecretKey(nonce, i);
+        using var keypair = ElGamalKeyPair.FromSecret(secretKey);
+        using var seed = BigMath.RandQ();
+        using SchnorrProof proof = new(keypair, seed);
 
         return new(keypair, proof);
     }
@@ -82,5 +82,15 @@ public class ElectionPolynomial
         }
 
         return BigMath.AddModQ(nonce, (ulong)index);
+    }
+
+    protected override void DisposeUnmanaged()
+    {
+        base.DisposeUnmanaged();
+
+        for (int i = 0; i < Coefficients.Count; i++)
+        {
+            Coefficients[i].Dispose();
+        }
     }
 }
