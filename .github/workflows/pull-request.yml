@@ -87,14 +87,6 @@ jobs:
             makeReleaseBuild: false
             lint: false
             runCsTests: true
-          - name: windows-2022-msvc-latest-x86
-            os: windows-2022
-            processor: x86
-            compiler: msvc
-            version: "latest"
-            makeReleaseBuild: false
-            lint: false
-            runCsTests: true
           - name: ubuntu-22.04-linter
             os: ubuntu-22.04
             processor: x64
