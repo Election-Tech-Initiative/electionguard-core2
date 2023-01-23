@@ -1,4 +1,5 @@
 ﻿using System.ComponentModel.DataAnnotations;
+using ElectionGuard.ElectionSetup.Extensions;
 
 namespace ElectionGuard.ElectionSetup;
 
@@ -88,9 +89,6 @@ public class ElectionPolynomial : DisposableBase
     {
         base.DisposeUnmanaged();
 
-        for (int i = 0; i < Coefficients.Count; i++)
-        {
-            Coefficients[i].Dispose();
-        }
+        Coefficients.Dispose();
     }
 }
