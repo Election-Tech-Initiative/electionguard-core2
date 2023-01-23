@@ -211,19 +211,29 @@ namespace ElectionGuard
         }
 
         /// <summary>
-        /// 
+        /// Check to see if the residue is valid
         /// </summary>
         public bool IsValidResidue()
         {
-            return true;
+            var status = NativeInterface.ElementModP.IsValidResidue(Handle, out bool isValid);
+            if (status != Status.ELECTIONGUARD_STATUS_SUCCESS)
+            {
+                throw new ElectionGuardException($"IsValidResidue Error Status: {status}");
+            }
+            return isValid;
         }
 
         /// <summary>
-        /// 
+        /// Check if the ElementModP is in bounds
         /// </summary>
         public bool IsInBounds()
         {
-            return true;
+            var status = NativeInterface.ElementModP.IsInBounds(Handle, out bool inBounds);
+            if (status != Status.ELECTIONGUARD_STATUS_SUCCESS)
+            {
+                throw new ElectionGuardException($"IsInBounds Error Status: {status}");
+            }
+            return inBounds;
         }
 
         /// <summary>

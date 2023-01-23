@@ -168,6 +168,15 @@ EG_API eg_electionguard_status_t eg_hash_elems_array(eg_element_mod_p_t *in_data
                                                      uint64_t in_data_size,
                                                      eg_element_mod_q_t **out_handle);
 
+EG_API eg_electionguard_status_t eg_element_mod_p_is_valid_residue(eg_element_mod_p_t *modp,
+                                                                   bool *out_value);
+
+EG_API eg_electionguard_status_t eg_element_mod_p_is_in_bounds(eg_element_mod_p_t *modp,
+                                                               bool *out_value);
+
+EG_API eg_electionguard_status_t eg_element_mod_q_is_in_bounds(eg_element_mod_q_t *modp,
+                                                               bool *out_value);
+
 #endif
 
 #ifdef __cplusplus
