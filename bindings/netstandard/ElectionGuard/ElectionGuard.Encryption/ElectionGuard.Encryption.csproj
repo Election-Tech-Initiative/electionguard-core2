@@ -28,6 +28,7 @@
     <PackageIcon>icon.png</PackageIcon>
     <RestoreProjectStyle>PackageReference</RestoreProjectStyle>
     <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
+    <CopyLocalLockFileAssemblies>true</CopyLocalLockFileAssemblies>
     <!-- <PackageReleaseNotes>Changelog</PackageReleaseNotes> -->
   </PropertyGroup>
 
