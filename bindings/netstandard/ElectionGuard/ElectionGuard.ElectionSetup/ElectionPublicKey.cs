@@ -1,4 +1,6 @@
-﻿namespace ElectionGuard.ElectionSetup;
+﻿using ElectionGuard.ElectionSetup.Extensions;
+
+namespace ElectionGuard.ElectionSetup;
 
 /// <summary>
 /// A tuple of election public key and owner information
@@ -50,13 +52,7 @@ public class ElectionPublicKey : DisposableBase
         base.DisposeUnmanaged();
 
         Key.Dispose();
-        for (int i = 0; i < CoefficientCommitments.Count; i++)
-        {
-            CoefficientCommitments[i].Dispose();
-        }
-        for (int i = 0; i < CoefficientProofs.Count; i++)
-        {
-            CoefficientProofs[i].Dispose();
-        }
+        CoefficientCommitments.Dispose();
+        CoefficientProofs.Dispose();
     }
 }
