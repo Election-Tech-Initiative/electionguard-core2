@@ -185,15 +185,13 @@ public class Guardian
         return coordinate;
     }
 
-    // TODO: This is a candidate for a Math class... or a Polynomial class. This does not belong to a guardian.
     private static ElementModQ GetCoordinate(
         ElementModQ initialState,
         ElementModQ baseElement,
         Coefficient coefficient,
                     ulong index)
     {
-        using var exponent = new ElementModQ(index);
-        using var factor = BigMath.PowModQ(baseElement, exponent);
+        using var factor = BigMath.PowModQ(baseElement, index);
         using var coordinateShift = BigMath.MultModQ(coefficient.Value, factor);
 
         return BigMath.AddModQ(initialState, coordinateShift);
