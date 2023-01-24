@@ -29,6 +29,7 @@ using electionguard::R;
 using electionguard::rand_q;
 using electionguard::TWO_MOD_P;
 using electionguard::TWO_MOD_Q;
+using electionguard::uint64_to_size;
 using electionguard::ZERO_MOD_P;
 using electionguard::ZERO_MOD_Q;
 
@@ -420,6 +421,22 @@ eg_electionguard_status_t eg_element_mod_q_pow_mod_p(eg_element_mod_p_t *base,
     }
 }
 
+EG_API eg_electionguard_status_t eg_element_long_pow_mod_p(uint64_t base, uint64_t exponent,
+                                                           eg_element_mod_p_t **out_handle)
+{
+    try {
+        auto b = ElementModP::fromUint64(base);
+        auto e = ElementModP::fromUint64(exponent);
+        auto result = pow_mod_p(*b, *e);
+
+        *out_handle = AS_TYPE(eg_element_mod_p_t, result.release());
+        return ELECTIONGUARD_STATUS_SUCCESS;
+    } catch (const exception &e) {
+        Log::error(__func__, e);
+        return ELECTIONGUARD_STATUS_ERROR_BAD_ALLOC;
+    }
+}
+
 eg_electionguard_status_t eg_element_mod_q_rand_q_new(eg_element_mod_q_t **out_handle)
 {
     try {
@@ -518,6 +535,23 @@ EG_API eg_electionguard_status_t eg_element_mod_q_pow_mod_q(eg_element_mod_q_t *
     }
 }
 
+EG_API eg_electionguard_status_t eg_element_long_pow_mod_q(eg_element_mod_q_t *base,
+                                                           uint64_t exponent,
+                                                           eg_element_mod_q_t **out_handle)
+{
+    try {
+        auto *b = AS_TYPE(ElementModQ, base);
+        auto e = ElementModQ::fromUint64(exponent);
+        auto result = pow_mod_q(*b, *e);
+
+        *out_handle = AS_TYPE(eg_element_mod_q_t, result.release());
+        return ELECTIONGUARD_STATUS_SUCCESS;
+    } catch (const exception &e) {
+        Log::error(__func__, e);
+        return ELECTIONGUARD_STATUS_ERROR_BAD_ALLOC;
+    }
+}
+
 EG_API eg_electionguard_status_t eg_element_mod_p_mult_mod_p(eg_element_mod_p_t *lhs,
                                                              eg_element_mod_p_t *rhs,
                                                              eg_element_mod_p_t **out_handle)
@@ -569,12 +603,78 @@ EG_API eg_electionguard_status_t eg_hash_elems_modp_modp(eg_element_mod_p_t *pub
     }
 }
 
+EG_API eg_electionguard_status_t eg_element_mod_p_is_valid_residue(eg_element_mod_p_t *modp,
+                                                                   bool *out_value)
+{
+    try {
+        auto *p = AS_TYPE(ElementModP, modp);
+        auto result = p->isValidResidue();
+
+        *out_value = result;
+        return ELECTIONGUARD_STATUS_SUCCESS;
+    } catch (const exception &e) {
+        Log::error(__func__, e);
+        return ELECTIONGUARD_STATUS_ERROR_BAD_ALLOC;
+    }
+}
+
+EG_API eg_electionguard_status_t eg_element_mod_p_is_in_bounds(eg_element_mod_p_t *modp,
+                                                               bool *out_value)
+{
+    try {
+        auto *p = AS_TYPE(ElementModP, modp);
+        auto result = p->isInBounds();
+
+        *out_value = result;
+        return ELECTIONGUARD_STATUS_SUCCESS;
+    } catch (const exception &e) {
+        Log::error(__func__, e);
+        return ELECTIONGUARD_STATUS_ERROR_BAD_ALLOC;
+    }
+}
+
+EG_API eg_electionguard_status_t eg_element_mod_q_is_in_bounds(eg_element_mod_q_t *modq,
+                                                               bool *out_value)
+{
+    try {
+        auto *q = AS_TYPE(ElementModQ, modq);
+        auto result = q->isInBounds();
+
+        *out_value = result;
+        return ELECTIONGUARD_STATUS_SUCCESS;
+    } catch (const exception &e) {
+        Log::error(__func__, e);
+        return ELECTIONGUARD_STATUS_ERROR_BAD_ALLOC;
+    }
+}
+
 EG_API eg_electionguard_status_t eg_hash_elems_string_int(char *in_first, uint64_t in_second,
                                                           eg_element_mod_q_t **out_handle)
 {
     try {
         auto first = string(in_first);
         auto result = hash_elems({first, in_second});
+
+        *out_handle = AS_TYPE(eg_element_mod_q_t, result.release());
+        return ELECTIONGUARD_STATUS_SUCCESS;
+    } catch (const exception &e) {
+        Log::error(__func__, e);
+        return ELECTIONGUARD_STATUS_ERROR_BAD_ALLOC;
+    }
+}
+
+EG_API eg_electionguard_status_t eg_hash_elems_array(eg_element_mod_p_t *in_data[],
+                                                     uint64_t in_data_size,
+                                                     eg_element_mod_q_t **out_handle)
+{
+    try {
+        vector<ElementModP *> elements;
+        elements.reserve(uint64_to_size(in_data_size));
+        for (uint64_t i = 0; i < in_data_size; i++) {
+            auto *element = AS_TYPE(ElementModP, in_data[i]);
+            elements.push_back(element);
+        }
+        auto result = hash_elems(elements);
 
         *out_handle = AS_TYPE(eg_element_mod_q_t, result.release());
         return ELECTIONGUARD_STATUS_SUCCESS;

@@ -223,6 +223,19 @@ namespace ElectionGuard
             return hashCode.GetHashCode();
         }
 
+        /// <summary>
+        /// Check if the ElementModQ is in bounds
+        /// </summary>
+        public bool IsInBounds()
+        {
+            var status = NativeInterface.ElementModQ.IsInBounds(Handle, out bool inBounds);
+            if (status != Status.ELECTIONGUARD_STATUS_SUCCESS)
+            {
+                throw new ElectionGuardException($"IsInBounds Error Status: {status}");
+            }
+            return inBounds;
+        }
+
 
     }
 }

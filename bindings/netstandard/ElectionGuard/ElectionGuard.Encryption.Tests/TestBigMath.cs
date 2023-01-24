@@ -1,4 +1,5 @@
-﻿using NUnit.Framework;
+﻿using System.Collections.Generic;
+using NUnit.Framework;
 
 namespace ElectionGuard.Encryption.Tests
 {
@@ -120,6 +121,25 @@ namespace ElectionGuard.Encryption.Tests
             // Assert
             Assert.AreNotEqual(result1.ToHex(), result2.ToHex());
             Assert.AreEqual(result1.ToHex(), result3.ToHex());
+        }
+
+        [Test]
+        public void HashElemsArray()
+        {
+            // Arrange
+            var two = new ElementModP(2);
+            var three = new ElementModP(3);
+
+            var dataList = new List<ElementModP>();
+            dataList.Add(two);
+            dataList.Add(three);
+
+            // Act
+            var result1 = BigMath.HashElems(two, three);
+            var result2 = BigMath.HashElems(dataList);
+
+            // Assert
+            Assert.AreNotEqual(result1.ToHex(), result2.ToHex());
         }
 
     }

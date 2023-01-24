@@ -3,7 +3,7 @@
     /// <summary>
     /// Election partial key backup used for key sharing
     /// </summary>
-    public record ElectionPartialKeyBackupAttribute
+    public class ElectionPartialKeyBackupAttribute : DisposableBase
     {
         /// <summary>
         /// The Id of the guardian that generated this backup
@@ -24,5 +24,11 @@
         /// The coordinate corresponding to a secret election polynomial
         /// </summary>
         public HashedElGamalCiphertext? EncryptedCoordinate { get; init; }
+
+        protected override void DisposeUnmanaged()
+        {
+            base.DisposeUnmanaged();
+            EncryptedCoordinate?.Dispose();
+        }
     }
 }

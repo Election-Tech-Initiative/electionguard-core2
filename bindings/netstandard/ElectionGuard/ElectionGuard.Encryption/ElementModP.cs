@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Runtime.InteropServices;
 
 namespace ElectionGuard
@@ -208,6 +209,60 @@ namespace ElectionGuard
             hashCode.Add(this.ToHex());
             return hashCode.GetHashCode();
         }
+
+        /// <summary>
+        /// Check to see if the residue is valid
+        /// </summary>
+        public bool IsValidResidue()
+        {
+            var status = NativeInterface.ElementModP.IsValidResidue(Handle, out bool isValid);
+            if (status != Status.ELECTIONGUARD_STATUS_SUCCESS)
+            {
+                throw new ElectionGuardException($"IsValidResidue Error Status: {status}");
+            }
+            return isValid;
+        }
+
+        /// <summary>
+        /// Check if the ElementModP is in bounds
+        /// </summary>
+        public bool IsInBounds()
+        {
+            var status = NativeInterface.ElementModP.IsInBounds(Handle, out bool inBounds);
+            if (status != Status.ELECTIONGUARD_STATUS_SUCCESS)
+            {
+                throw new ElectionGuardException($"IsInBounds Error Status: {status}");
+            }
+            return inBounds;
+        }
+
+        /// <summary>
+        /// Multiply by an ElementModP value
+        /// </summary>
+        /// <param name="rhs">right hand side for the multiply</param>
+        public void MultModP(ElementModP rhs)
+        {
+            var status = NativeInterface.ElementModP.MultModP(Handle, rhs.Handle,
+                out NativeInterface.ElementModP.ElementModPHandle value);
+            Handle.Dispose();
+            status.ThrowIfError();
+            Handle = value;
+        }
+
+        /// <summary>
+        /// Multiply list of ElementModP values
+        /// </summary>
+        /// <param name="keys">list of keys the multiply</param>
+        public void MultModP(IEnumerable<ElementModP> keys)
+        {
+            foreach (var key in keys)
+            {
+                MultModP(key);
+            }
+        }
+
+
+
 
     }
 }

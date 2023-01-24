@@ -18,7 +18,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ElectionGuard.Encryption", 
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ElectionGuard.ElectionSetup", "..\..\bindings\netstandard\ElectionGuard\ElectionGuard.ElectionSetup\ElectionGuard.ElectionSetup.csproj", "{3C59A33A-5962-4BAD-8B9B-2E0613239B90}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ElectionGuard.ElectionSetup.Tests", "..\..\bindings\netstandard\ElectionGuard\ElectionGuard.ElectionSetup.Tests\ElectionGuard.ElectionSetup.Tests.csproj", "{04003A1A-7044-43A3-941D-0F67B06475DA}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ElectionGuard.ElectionSetup.Tests", "..\..\bindings\netstandard\ElectionGuard\ElectionGuard.ElectionSetup.Tests\ElectionGuard.ElectionSetup.Tests.csproj", "{C33B995C-F2DD-4431-8D04-73A7659FFE90}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -72,14 +72,14 @@ Global
 		{3C59A33A-5962-4BAD-8B9B-2E0613239B90}.Release|Any CPU.Build.0 = Release|Any CPU
 		{3C59A33A-5962-4BAD-8B9B-2E0613239B90}.Release|x64.ActiveCfg = Release|Any CPU
 		{3C59A33A-5962-4BAD-8B9B-2E0613239B90}.Release|x64.Build.0 = Release|Any CPU
-		{04003A1A-7044-43A3-941D-0F67B06475DA}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{04003A1A-7044-43A3-941D-0F67B06475DA}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{04003A1A-7044-43A3-941D-0F67B06475DA}.Debug|x64.ActiveCfg = Debug|Any CPU
-		{04003A1A-7044-43A3-941D-0F67B06475DA}.Debug|x64.Build.0 = Debug|Any CPU
-		{04003A1A-7044-43A3-941D-0F67B06475DA}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{04003A1A-7044-43A3-941D-0F67B06475DA}.Release|Any CPU.Build.0 = Release|Any CPU
-		{04003A1A-7044-43A3-941D-0F67B06475DA}.Release|x64.ActiveCfg = Release|Any CPU
-		{04003A1A-7044-43A3-941D-0F67B06475DA}.Release|x64.Build.0 = Release|Any CPU
+		{C33B995C-F2DD-4431-8D04-73A7659FFE90}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{C33B995C-F2DD-4431-8D04-73A7659FFE90}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{C33B995C-F2DD-4431-8D04-73A7659FFE90}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{C33B995C-F2DD-4431-8D04-73A7659FFE90}.Debug|x64.Build.0 = Debug|Any CPU
+		{C33B995C-F2DD-4431-8D04-73A7659FFE90}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{C33B995C-F2DD-4431-8D04-73A7659FFE90}.Release|Any CPU.Build.0 = Release|Any CPU
+		{C33B995C-F2DD-4431-8D04-73A7659FFE90}.Release|x64.ActiveCfg = Release|Any CPU
+		{C33B995C-F2DD-4431-8D04-73A7659FFE90}.Release|x64.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

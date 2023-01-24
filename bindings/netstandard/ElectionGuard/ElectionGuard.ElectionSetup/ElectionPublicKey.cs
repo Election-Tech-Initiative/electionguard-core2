@@ -1,9 +1,11 @@
-﻿namespace ElectionGuard.ElectionSetup;
+﻿using ElectionGuard.ElectionSetup.Extensions;
+
+namespace ElectionGuard.ElectionSetup;
 
 /// <summary>
 /// A tuple of election public key and owner information
 /// </summary>
-public record ElectionPublicKey
+public class ElectionPublicKey : DisposableBase
 {
     public ElectionPublicKey(
         string ownerId,
@@ -44,4 +46,13 @@ public record ElectionPublicKey
     /// The proofs for the coefficients in the secret polynomial
     /// </summary>
     public List<SchnorrProof> CoefficientProofs { get; init; }
+
+    protected override void DisposeUnmanaged()
+    {
+        base.DisposeUnmanaged();
+
+        Key.Dispose();
+        CoefficientCommitments.Dispose();
+        CoefficientProofs.Dispose();
+    }
 }

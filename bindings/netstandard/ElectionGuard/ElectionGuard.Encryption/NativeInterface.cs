@@ -144,6 +144,21 @@ namespace ElectionGuard
                 CallingConvention = CallingConvention.Cdecl, SetLastError = true)]
             internal static extern Status ToBytes(
                 ElementModPHandle handle, out IntPtr data, out ulong size);
+
+            [DllImport(DllName, EntryPoint = "eg_element_mod_p_mult_mod_p",
+                CallingConvention = CallingConvention.Cdecl, SetLastError = true)]
+            internal static extern Status MultModP(
+                ElementModPHandle lhs,
+                ElementModPHandle rhs,
+                out ElementModPHandle handle);
+
+            [DllImport(DllName, EntryPoint = "eg_element_mod_p_is_valid_residue",
+                CallingConvention = CallingConvention.Cdecl, SetLastError = true)]
+            internal static extern Status IsValidResidue(ElementModP.ElementModPHandle data, out bool isValid);
+
+            [DllImport(DllName, EntryPoint = "eg_element_mod_p_is_in_bounds",
+                CallingConvention = CallingConvention.Cdecl, SetLastError = true)]
+            internal static extern Status IsInBounds(ElementModP.ElementModPHandle data, out bool inBounds);
         }
 
         internal static class ElementModQ
@@ -227,6 +242,12 @@ namespace ElectionGuard
             [DllImport(DllName, EntryPoint = "eg_element_mod_q_rand_q_new",
                 CallingConvention = CallingConvention.Cdecl, SetLastError = true)]
             internal static extern Status Random(out ElementModQHandle handle);
+
+            [DllImport(DllName, EntryPoint = "eg_element_mod_q_is_in_bounds",
+                CallingConvention = CallingConvention.Cdecl, SetLastError = true)]
+            internal static extern Status IsInBounds(ElementModQ.ElementModQHandle data, out bool inBounds);
+
+
         }
 
         internal static class Constants
@@ -271,9 +292,12 @@ namespace ElectionGuard
                 CallingConvention = CallingConvention.Cdecl, SetLastError = true)]
             internal static extern Status TWO_MOD_Q(out ElementModQ.ElementModQHandle handle);
 
+
             [DllImport(DllName, EntryPoint = "eg_constant_to_json",
                 CallingConvention = CallingConvention.Cdecl, SetLastError = true)]
             internal static extern Status ToJson(out IntPtr data, out ulong size);
+
+            
 
         }
 
