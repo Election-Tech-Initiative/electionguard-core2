@@ -31,7 +31,7 @@ public partial class CreateKeyCeremonyAdminViewModel : BaseViewModel
     [RelayCommand(CanExecute = nameof(CanCreate), AllowConcurrentExecutions = true)]
     public async Task CreateKeyCeremony()
     {
-        var existingKeyCeremony = await _keyCeremonyService.GetByNameAsync(_keyCeremonyName);
+        var existingKeyCeremony = await _keyCeremonyService.GetByNameAsync(KeyCeremonyName);
         if (existingKeyCeremony != null)
         {
             var alreadyExists = LocalizationService.GetValue("AlreadyExists");

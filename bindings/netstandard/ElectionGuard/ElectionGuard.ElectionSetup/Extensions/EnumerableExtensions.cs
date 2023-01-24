@@ -6,4 +6,12 @@ public static class EnumerableExtensions
     {
         return source.Select((item, index) => (item, (ulong)index));
     }
+
+    public static void Dispose(this IEnumerable<DisposableBase> source)
+    {
+        foreach (var item in source)
+        {
+            item.Dispose();
+        }
+    }
 }
