@@ -228,14 +228,12 @@ else
 	if [ ! -d "$(ELECTIONGUARD_BINDING_TEST_DIR)/obj" ]; then mkdir $(ELECTIONGUARD_BINDING_TEST_DIR)/obj; fi
 
 	if [ ! -d "$(ELECTIONGUARD_BUILD_LIBS_DIR)" ]; then mkdir $(ELECTIONGUARD_BUILD_LIBS_DIR); fi
-	if [ ! -d "$(ELECTIONGUARD_BUILD_LIBS_DIR)/arm64" ]; then mkdir $(ELECTIONGUARD_BUILD_LIBS_DIR)/arm64; fi
-	if [ ! -d "$(ELECTIONGUARD_BUILD_LIBS_DIR)/x86" ]; then mkdir $(ELECTIONGUARD_BUILD_LIBS_DIR)/x86; fi
-	if [ ! -d "$(ELECTIONGUARD_BUILD_LIBS_DIR)/x64" ]; then mkdir $(ELECTIONGUARD_BUILD_LIBS_DIR)/x64; fi
 
 	if [ ! -d "$(ELECTIONGUARD_BUILD_LIBS_DIR)/Android" ]; then mkdir $(ELECTIONGUARD_BUILD_LIBS_DIR)/Android; fi
 	if [ ! -d "$(ELECTIONGUARD_BUILD_LIBS_DIR)/Ios" ]; then mkdir $(ELECTIONGUARD_BUILD_LIBS_DIR)/Ios; fi
 	if [ ! -d "$(ELECTIONGUARD_BUILD_LIBS_DIR)/Darwin" ]; then mkdir $(ELECTIONGUARD_BUILD_LIBS_DIR)/Darwin; fi
 	if [ ! -d "$(ELECTIONGUARD_BUILD_LIBS_DIR)/Linux" ]; then mkdir $(ELECTIONGUARD_BUILD_LIBS_DIR)/Linux; fi
+	if [ ! -d "$(ELECTIONGUARD_BUILD_LIBS_DIR)/Windows" ]; then mkdir $(ELECTIONGUARD_BUILD_LIBS_DIR)/Windows; fi
 endif
 
 clean-netstandard: 
@@ -409,6 +407,9 @@ endif
 test-netstandard: build-netstandard
 	@echo 🧪 TEST NETSTANDARD $(PROCESSOR) $(TARGET)
 	dotnet test -a $(PROCESSOR) --configuration $(TARGET) ./bindings/netstandard/ElectionGuard/ElectionGuard.sln
+
+test-netstandard-arm64:
+	PROCESSOR=arm64 && make test-netstandard
 
 test-netstandard-x64:
 	PROCESSOR=x64 && make test-netstandard
