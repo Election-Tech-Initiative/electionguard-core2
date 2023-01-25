@@ -8,7 +8,7 @@ list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/../cmake")
 # ---- Dependencies ----
 include(../../cmake/CPM.cmake)
 
-if (MSVC)
+if(MSVC)
     set(HACL_CUSTOM_CONFIG_FILE_PATH ${PROJECT_SOURCE_DIR}/libs/hacl/config.msvc.cmake)
 else()
     set(HACL_CUSTOM_CONFIG_FILE_PATH ${PROJECT_SOURCE_DIR}/libs/hacl/config.cmake)
@@ -41,31 +41,30 @@ include(${PROJECT_SOURCE_DIR}/libs/hacl/sources.cmake)
 add_library(${HACL_CPP_TARGET_NAME} SHARED ${SOURCES_hacl_cpp})
 add_library(${HACL_CPP_ALIAS_NAME} ALIAS ${HACL_CPP_TARGET_NAME})
 set_target_properties(${HACL_CPP_TARGET_NAME} PROPERTIES
-                      VERSION ${hacl_VERSION}
-                      SOVERSION ${hacl_VERSION_MAJOR})
+    VERSION ${hacl_VERSION}
+    SOVERSION ${hacl_VERSION_MAJOR})
 
 target_compile_features(${HACL_CPP_TARGET_NAME} PUBLIC cxx_std_17)
 
 # Dependencies
-
-if (MSVC)
-    target_include_directories(${HACL_CPP_TARGET_NAME} 
+if(MSVC)
+    target_include_directories(${HACL_CPP_TARGET_NAME}
         PRIVATE
-            ${hacl_SOURCE_DIR}/include/msvc
-            ${hacl_SOURCE_DIR}/build
-            ${hacl_SOURCE_DIR}/karamel/include
-            ${hacl_SOURCE_DIR}/karamel/krmllib/dist/minimal
-            ${hacl_SOURCE_DIR}/vale/include
-)
+        ${hacl_SOURCE_DIR}/include/msvc
+        ${hacl_SOURCE_DIR}/build
+        ${hacl_SOURCE_DIR}/karamel/include
+        ${hacl_SOURCE_DIR}/karamel/krmllib/dist/minimal
+        ${hacl_SOURCE_DIR}/vale/include
+    )
 else()
-    target_include_directories(${HACL_CPP_TARGET_NAME} 
+    target_include_directories(${HACL_CPP_TARGET_NAME}
         PRIVATE
-            ${hacl_SOURCE_DIR}/include
-            ${hacl_SOURCE_DIR}/build
-            ${hacl_SOURCE_DIR}/karamel/include
-            ${hacl_SOURCE_DIR}/karamel/krmllib/dist/minimal
-            ${hacl_SOURCE_DIR}/vale/include
-)
+        ${hacl_SOURCE_DIR}/include
+        ${hacl_SOURCE_DIR}/build
+        ${hacl_SOURCE_DIR}/karamel/include
+        ${hacl_SOURCE_DIR}/karamel/krmllib/dist/minimal
+        ${hacl_SOURCE_DIR}/vale/include
+    )
 endif()
 
 target_link_libraries(${HACL_CPP_TARGET_NAME} PRIVATE hacl)
@@ -87,22 +86,19 @@ install(
     DESTINATION lib/cmake/${HACL_CPP_TARGET_NAME}/${PROJECT_VERSION}
 )
 
-if(MINGW)
-    # sometimes windows struggles with paths so copy the .dll files
-    add_custom_command(
-        TARGET ${HACL_CPP_TARGET_NAME} POST_BUILD
-        COMMAND ${CMAKE_COMMAND} -E copy_directory
-        ${hacl_BINARY_DIR}
-        $<TARGET_FILE_DIR:${HACL_CPP_TARGET_NAME}>
-    )
-endif()
-
+# Copy the hacl library to the same directory as the hacl_cpp library
 if(MSVC)
-    # sometimes windows struggles with paths so copy the .dll files
     add_custom_command(
         TARGET ${HACL_CPP_TARGET_NAME} POST_BUILD
         COMMAND ${CMAKE_COMMAND} -E copy_directory
         ${hacl_BINARY_DIR}/Release
+        $<TARGET_FILE_DIR:${HACL_CPP_TARGET_NAME}>
+    )
+else()
+    add_custom_command(
+        TARGET ${HACL_CPP_TARGET_NAME} POST_BUILD
+        COMMAND ${CMAKE_COMMAND} -E copy_directory
+        ${hacl_BINARY_DIR}
         $<TARGET_FILE_DIR:${HACL_CPP_TARGET_NAME}>
     )
 endif()
