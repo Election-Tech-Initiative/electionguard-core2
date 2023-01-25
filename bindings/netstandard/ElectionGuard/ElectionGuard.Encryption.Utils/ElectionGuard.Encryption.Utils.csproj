@@ -1,9 +1,8 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <TargetFrameworks>net6.0;net48</TargetFrameworks>
     <IsPackable>false</IsPackable>
-    <Platforms>arm64;x64;x86</Platforms>
     <EnforceCodeStyleInBuild>true</EnforceCodeStyleInBuild>
   </PropertyGroup>
 
@@ -20,13 +19,18 @@
     </Content>  
   </ItemGroup>
   <ItemGroup Label="C++ Built Libraries">
-    <None Name="Windows MSVC x64" Visible="false" Include="$(ElectionGuardLibs)\Windows\$(Platform)\src\$(Configuration)\*.dll*">
-      <CopyToOutputDirectory Condition="'$(Platform)' == 'x64' AND '$(OS)' == 'Windows_NT'">Always</CopyToOutputDirectory>
+    <None Name="Windows (MSVC)" Visible="false" Include="$(ElectionGuardLibs)\Windows\$(PlatformTarget)\$(Configuration)\src\$(Configuration)\*.dll*">
+      <CopyToOutputDirectory Condition="'$(OS)' == 'Windows_NT'">Always</CopyToOutputDirectory>
     </None>
-    <None Name="Non Windows x64" Visible="false" Include="$(ElectionGuardLibs)\$(Platform)\$(Configuration)\src\*.dll*">
-      <CopyToOutputDirectory Condition="'$(OS)' != 'Windows_NT'">Always</CopyToOutputDirectory>
+    <None Name="Windows HACL (MSVC)" Visible="false" Include="$(ElectionGuardLibs)\Windows\$(PlatformTarget)\$(Configuration)\libs\hacl\$(Configuration)\*.dll*">
+      <CopyToOutputDirectory Condition="'$(OS)' == 'Windows_NT'">Always</CopyToOutputDirectory>
     </None>
-    <None Name="MacOS" Visible="false" Include="$(ElectionGuardLibs)\Darwin\$(Platform)\$(Configuration)\src\*.dylib" CopyToOutputDirectory="Always" />
-    <None Name="Linux" Visible="false" Include="$(ElectionGuardLibs)\Linux\$(Platform)\$(Configuration)\src\*.so" CopyToOutputDirectory="Always" />
+    <None Name="Windows Symbols (MSVC)" Visible="false" Include="$(ElectionGuardLibs)\Windows\$(PlatformTarget)\$(Configuration)\src\$(Configuration)\*.pdb*">
+      <CopyToOutputDirectory Condition="'$(OS)' == 'Windows_NT'">Always</CopyToOutputDirectory>
+    </None>
+
+    <None Name="Windows (msys2)" Visible="false" Include="$(ElectionGuardLibs)\Windows\$(PlatformTarget)\$(Configuration)\src\*.dll*" CopyToOutputDirectory="Always" />
+    <None Name="MacOS" Visible="false" Include="$(ElectionGuardLibs)\Darwin\$(PlatformTarget)\$(Configuration)\src\*.dylib" CopyToOutputDirectory="Always" />
+    <None Name="Linux" Visible="false" Include="$(ElectionGuardLibs)\Linux\$(PlatformTarget)\$(Configuration)\src\*.so" CopyToOutputDirectory="Always" />
   </ItemGroup>
 </Project>

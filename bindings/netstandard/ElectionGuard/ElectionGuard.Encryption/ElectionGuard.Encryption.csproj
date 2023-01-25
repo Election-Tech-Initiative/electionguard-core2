@@ -2,7 +2,6 @@
 
   <PropertyGroup>
     <TargetFrameworks>netstandard2.0;net6.0</TargetFrameworks>
-    <Platforms>arm64;x64;x86</Platforms>
 
     <!-- Project -->
     <RootNamespace>ElectionGuard</RootNamespace>
@@ -42,110 +41,57 @@
     <DebugType>full</DebugType>
     <DebugSymbols>true</DebugSymbols>
     <GenerateDocumentationFile>false</GenerateDocumentationFile>
+    <TreatWarningsAsErrors>True</TreatWarningsAsErrors>
+    <NoWarn>1701;1702</NoWarn>
+    <WarningLevel>4</WarningLevel>
+    <WarningsNotAsErrors>SYSLIB0004</WarningsNotAsErrors>
   </PropertyGroup>
 
   <PropertyGroup Label="Release" Condition=" '$(Configuration)' == 'Release' ">
     <DebugType>pdbonly</DebugType>
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+    <TreatWarningsAsErrors>True</TreatWarningsAsErrors>
+    <NoWarn>1701;1702</NoWarn>
+    <WarningLevel>4</WarningLevel>
+    <WarningsNotAsErrors>SYSLIB0004</WarningsNotAsErrors>
   </PropertyGroup>
 
   <PropertyGroup Label="Library Paths">
     <ElectionGuardLibs>..\..\..\..\build\libs</ElectionGuardLibs>
   </PropertyGroup>
 
-  <PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Debug|netstandard2.0|x64'">
-    <TreatWarningsAsErrors>True</TreatWarningsAsErrors>
-    <NoWarn>1701;1702</NoWarn>
-    <WarningLevel>4</WarningLevel>
-    <WarningsNotAsErrors>SYSLIB0004</WarningsNotAsErrors>
-  </PropertyGroup>
-
-  <PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Release|netstandard2.0|x64'">
-    <TreatWarningsAsErrors>True</TreatWarningsAsErrors>
-    <NoWarn>1701;1702</NoWarn>
-    <WarningLevel>4</WarningLevel>
-    <WarningsNotAsErrors>SYSLIB0004</WarningsNotAsErrors>
-  </PropertyGroup>
-
-  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|net6.0|arm64' ">
-    <TreatWarningsAsErrors>True</TreatWarningsAsErrors>
-    <NoWarn>1701;1702</NoWarn>
-    <WarningLevel>4</WarningLevel>
-    <WarningsNotAsErrors>SYSLIB0004</WarningsNotAsErrors>
-  </PropertyGroup>
-  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|net6.0|arm64' ">
-    <TreatWarningsAsErrors>True</TreatWarningsAsErrors>
-    <NoWarn>1701;1702</NoWarn>
-    <WarningLevel>4</WarningLevel>
-    <WarningsNotAsErrors>SYSLIB0004</WarningsNotAsErrors>
-  </PropertyGroup>
-
-  <PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Debug|net6.0|x64'">
-    <TreatWarningsAsErrors>True</TreatWarningsAsErrors>
-    <NoWarn>1701;1702</NoWarn>
-    <WarningLevel>4</WarningLevel>
-    <WarningsNotAsErrors>SYSLIB0004</WarningsNotAsErrors>
-  </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Release|net6.0|x64'">
-    <TreatWarningsAsErrors>True</TreatWarningsAsErrors>
-    <NoWarn>1701;1702</NoWarn>
-    <WarningLevel>4</WarningLevel>
-    <WarningsNotAsErrors>SYSLIB0004</WarningsNotAsErrors>
-  </PropertyGroup>
-
   <ItemGroup Label="C++ Built Libraries">
-    <Content 
-      Name="Windows (MSVC)" 
-      Include="$(ElectionGuardLibs)\Windows\$(Platform)\$(Configuration)\src\$(Configuration)\*.dll*" 
-      Pack="true">
+    <Content Name="Windows (MSVC)" Include="$(ElectionGuardLibs)\Windows\$(PlatformTarget)\$(Configuration)\src\$(Configuration)\*.dll*" Pack="true">
       <CopyToOutputDirectory Condition="'$(OS)' == 'Windows_NT'">Always</CopyToOutputDirectory>
       <PackageCopyToOutput Condition="'$(OS)' == 'Windows_NT'">true</PackageCopyToOutput>
       <PackagePath Condition="'$(Platform)' == 'arm64' AND '$(OS)' == 'Windows_NT'">runtimes\win-arm64\native</PackagePath>
       <PackagePath Condition="'$(Platform)' == 'x86' AND '$(OS)' == 'Windows_NT'">runtimes\win-x86\native</PackagePath>
       <PackagePath Condition="'$(Platform)' == 'x64' AND '$(OS)' == 'Windows_NT'">runtimes\win-x64\native</PackagePath>
     </Content>
-    <Content 
-      Name="Windows HACL (MSVC)" 
-      Include="$(ElectionGuardLibs)\Windows\$(Platform)\$(Configuration)\libs\hacl\$(Configuration)\*.dll*" 
-      Pack="true">
+    <Content Name="Windows HACL (MSVC)" Include="$(ElectionGuardLibs)\Windows\$(PlatformTarget)\$(Configuration)\libs\hacl\$(Configuration)\*.dll*" Pack="true">
       <CopyToOutputDirectory Condition="'$(OS)' == 'Windows_NT'">Always</CopyToOutputDirectory>
       <PackageCopyToOutput Condition="'$(OS)' == 'Windows_NT'">true</PackageCopyToOutput>
       <PackagePath Condition="'$(Platform)' == 'arm64' AND '$(OS)' == 'Windows_NT'">runtimes\win-arm64\native</PackagePath>
       <PackagePath Condition="'$(Platform)' == 'x86' AND '$(OS)' == 'Windows_NT'">runtimes\win-x86\native</PackagePath>
       <PackagePath Condition="'$(Platform)' == 'x64' AND '$(OS)' == 'Windows_NT'">runtimes\win-x64\native</PackagePath>
     </Content>
-    <Content 
-      Name="Windows Symbols (MSVC)" 
-      Include="$(ElectionGuardLibs)\Windows\$(Platform)\$(Configuration)\src\$(Configuration)\*.pdb*" 
-      Pack="true">
+    <Content Name="Windows Symbols (MSVC)" Include="$(ElectionGuardLibs)\Windows\$(PlatformTarget)\$(Configuration)\src\$(Configuration)\*.pdb*" Pack="true">
       <CopyToOutputDirectory Condition="'$(OS)' == 'Windows_NT' AND '$(Configuration)' == 'Debug'">Always</CopyToOutputDirectory>
       <PackageCopyToOutput Condition="'$(OS)' == 'Windows_NT' AND '$(Configuration)' == 'Debug'">true</PackageCopyToOutput>
       <PackagePath Condition="'$(Platform)' == 'arm64' AND '$(OS)' == 'Windows_NT'">runtimes\win-arm64\native</PackagePath>
       <PackagePath Condition="'$(Platform)' == 'x86' AND '$(OS)' == 'Windows_NT'">runtimes\win-x86\native</PackagePath>
       <PackagePath Condition="'$(Platform)' == 'x64' AND '$(OS)' == 'Windows_NT'">runtimes\win-x64\native</PackagePath>
     </Content>
-    <Content 
-      Name="Windows (msys2)" 
-      Include="$(ElectionGuardLibs)\Windows\$(Platform)\$(Configuration)\src\*.dll" 
-      Pack="true" 
-      PackagePath="runtimes\win-$(Platform)\native">
+    <Content Name="Windows (msys2)" Include="$(ElectionGuardLibs)\Windows\$(PlatformTarget)\$(Configuration)\src\*.dll" Pack="true" PackagePath="runtimes\win-$(Platform)\native">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
       <PackageCopyToOutput>true</PackageCopyToOutput>
     </Content>
-    <Content 
-      Name="MacOS" 
-      Include="$(ElectionGuardLibs)\Darwin\$(Platform)\$(Configuration)\src\*.dylib" 
-      Pack="true" 
-      PackagePath="runtimes\osx-$(Platform)\native">
+    <Content Name="MacOS" Include="$(ElectionGuardLibs)\Darwin\$(PlatformTarget)\$(Configuration)\src\*.dylib" Pack="true" PackagePath="runtimes\osx-$(Platform)\native">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
       <PackageCopyToOutput>true</PackageCopyToOutput>
     </Content>
-    <Content 
-      Name="Linux" 
-      Include="$(ElectionGuardLibs)\Linux\$(Platform)\$(Configuration)\src\*.so" 
-      Pack="true" 
-      PackagePath="runtimes\linux-$(Platform)\native">
+    <Content Name="Linux" Include="$(ElectionGuardLibs)\Linux\$(PlatformTarget)\$(Configuration)\src\*.so" Pack="true" PackagePath="runtimes\linux-$(Platform)\native">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
       <PackageCopyToOutput>true</PackageCopyToOutput>
     </Content>

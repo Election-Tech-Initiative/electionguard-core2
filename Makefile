@@ -1,10 +1,12 @@
-.PHONY: all build build-msys2 build-android build-ios clean clean-netstandard environment format memcheck sanitize sanitize-asan sanitize-tsan test test-msvc test-netstandard
+.PHONY: all build build-msys2 build-android build-ios build-netstandard build-ui clean clean-netstandard clean-ui environment format memcheck sanitize sanitize-asan sanitize-tsan bench bench-netstandard test test-msys2 test-netstandard
 
 .EXPORT_ALL_VARIABLES:
 ELECTIONGUARD_BINDING_DIR=$(realpath .)/bindings
 ELECTIONGUARD_BINDING_LIB_DIR=$(ELECTIONGUARD_BINDING_DIR)/netstandard/ElectionGuard/ElectionGuard.Encryption
 ELECTIONGUARD_BINDING_BENCH_DIR=$(ELECTIONGUARD_BINDING_DIR)/netstandard/ElectionGuard/ElectionGuard.Encryption.Bench
+ELECTIONGUARD_BINDING_CLI_DIR=$(ELECTIONGUARD_BINDING_DIR)/netstandard/ElectionGuard/ElectionGuard.Encryption.Cli
 ELECTIONGUARD_BINDING_TEST_DIR=$(ELECTIONGUARD_BINDING_DIR)/netstandard/ElectionGuard/ElectionGuard.Encryption.Tests
+ELECTIONGUARD_BINDING_UTILS_DIR=$(ELECTIONGUARD_BINDING_DIR)/netstandard/ElectionGuard/ElectionGuard.Encryption.Utils
 ELECTIONGUARD_BUILD_DIR=$(subst \,/,$(realpath .))/build
 ELECTIONGUARD_BUILD_DIR_WIN=$(subst \c\,C:\,$(subst /,\,$(ELECTIONGUARD_BUILD_DIR)))
 ELECTIONGUARD_BUILD_APPS_DIR=$(ELECTIONGUARD_BUILD_DIR)/apps
@@ -21,28 +23,35 @@ CPM_SOURCE_CACHE=$(subst \,/,$(realpath .))/.cache/CPM
 ifeq ($(OS),Windows_NT)
 	OPERATING_SYSTEM ?= Windows
 	ifeq ($(PROCESSOR_ARCHITECTURE),arm)
+		HOST_PROCESSOR:=arm64
         PROCESSOR?=arm64
     endif
 	# https://learn.microsoft.com/en-us/windows/win32/winprog64/wow64-implementation-details
 	ifeq ($(PROCESSOR_ARCHITEW6432),AMD64)
+		HOST_PROCESSOR:=x64
 		PROCESSOR?=x64
 	endif
 	ifeq ($(PROCESSOR_ARCHITECTURE),AMD64)
+		HOST_PROCESSOR:=x64
         PROCESSOR?=x64
     endif
     ifeq ($(PROCESSOR_ARCHITECTURE),x86)
+		HOST_PROCESSOR:=x86
         PROCESSOR?=x86
     endif
 else
 	OPERATING_SYSTEM ?= $(shell uname 2>/dev/null || echo Unknown)
 	UNAME_P ?= $(shell uname -p)
     ifeq ($(UNAME_P),x86_64)
+		HOST_PROCESSOR:=x64
         PROCESSOR?=x64
     endif
     ifneq ($(filter %86,$(UNAME_P)),)
+		HOST_PROCESSOR:=x86
         PROCESSOR?=x86
     endif
     ifneq ($(filter arm%,$(UNAME_P)),)
+		HOST_PROCESSOR:=arm64
         PROCESSOR?=arm64
     endif
 endif
@@ -68,12 +77,15 @@ TARGET?=Release
 # Set the Android NDK for cross-compilation
 ifeq ($(OPERATING_SYSTEM),Darwin)
 ANDROID_NDK_PATH?=/Users/$(USER)/Library/Android/sdk/ndk/25.1.8937393
+DOTNET_PATH?=/usr/local/share/dotnet
 endif
 ifeq ($(OPERATING_SYSTEM),Linux)
 ANDROID_NDK_PATH?=/usr/local/lib/android/sdk/ndk/25.1.8937393
+DOTNET_PATH?=/usr/share/dotnet
 endif
 ifeq ($(OPERATING_SYSTEM),Windows)
 ANDROID_NDK_PATH?=C:\Android\android-sdk\ndk-bundle
+DOTNET_PATH?=C:\Program Files\dotnet
 endif
 
 all: environment build
@@ -202,6 +214,12 @@ build-netstandard:
 build-netstandard-x64:
 	PROCESSOR=x64 && make build-netstandard
 
+build-ui: build-netstandard
+	@echo 🖥️ BUILD UI $(OPERATING_SYSTEM) $(PROCESSOR) $(TARGET)
+	cd ./src/electionguard-ui && dotnet restore
+	dotnet build --configuration $(TARGET) ./src/electionguard-ui/ElectionGuard.UI.sln /p:Platform=$(PROCESSOR)
+
+
 # Clean
 
 clean:
@@ -222,10 +240,20 @@ else
 	if [ -d "$(ELECTIONGUARD_BINDING_BENCH_DIR)/obj" ]; then rm -rf $(ELECTIONGUARD_BINDING_BENCH_DIR)/obj/*; fi
 	if [ ! -d "$(ELECTIONGUARD_BINDING_BENCH_DIR)/obj" ]; then mkdir $(ELECTIONGUARD_BINDING_BENCH_DIR)/obj; fi
 
+	if [ -d "$(ELECTIONGUARD_BINDING_CLI_DIR)/bin" ]; then rm -rf $(ELECTIONGUARD_BINDING_CLI_DIR)/bin/*; fi
+	if [ ! -d "$(ELECTIONGUARD_BINDING_CLI_DIR)/bin" ]; then mkdir $(ELECTIONGUARD_BINDING_CLI_DIR)/bin; fi
+	if [ -d "$(ELECTIONGUARD_BINDING_CLI_DIR)/obj" ]; then rm -rf $(ELECTIONGUARD_BINDING_CLI_DIR)/obj/*; fi
+	if [ ! -d "$(ELECTIONGUARD_BINDING_CLI_DIR)/obj" ]; then mkdir $(ELECTIONGUARD_BINDING_CLI_DIR)/obj; fi
+
 	if [ -d "$(ELECTIONGUARD_BINDING_TEST_DIR)/bin" ]; then rm -rf $(ELECTIONGUARD_BINDING_TEST_DIR)/bin/*; fi
 	if [ ! -d "$(ELECTIONGUARD_BINDING_TEST_DIR)/bin" ]; then mkdir $(ELECTIONGUARD_BINDING_TEST_DIR)/bin; fi
 	if [ -d "$(ELECTIONGUARD_BINDING_TEST_DIR)/obj" ]; then rm -rf $(ELECTIONGUARD_BINDING_TEST_DIR)/obj/*; fi
 	if [ ! -d "$(ELECTIONGUARD_BINDING_TEST_DIR)/obj" ]; then mkdir $(ELECTIONGUARD_BINDING_TEST_DIR)/obj; fi
+
+	if [ -d "$(ELECTIONGUARD_BINDING_UTILS_DIR)/bin" ]; then rm -rf $(ELECTIONGUARD_BINDING_UTILS_DIR)/bin/*; fi
+	if [ ! -d "$(ELECTIONGUARD_BINDING_UTILS_DIR)/bin" ]; then mkdir $(ELECTIONGUARD_BINDING_UTILS_DIR)/bin; fi
+	if [ -d "$(ELECTIONGUARD_BINDING_UTILS_DIR)/obj" ]; then rm -rf $(ELECTIONGUARD_BINDING_UTILS_DIR)/obj/*; fi
+	if [ ! -d "$(ELECTIONGUARD_BINDING_UTILS_DIR)/obj" ]; then mkdir $(ELECTIONGUARD_BINDING_UTILS_DIR)/obj; fi
 
 	if [ ! -d "$(ELECTIONGUARD_BUILD_LIBS_DIR)" ]; then mkdir $(ELECTIONGUARD_BUILD_LIBS_DIR); fi
 
@@ -235,8 +263,10 @@ else
 	if [ ! -d "$(ELECTIONGUARD_BUILD_LIBS_DIR)/Linux" ]; then mkdir $(ELECTIONGUARD_BUILD_LIBS_DIR)/Linux; fi
 	if [ ! -d "$(ELECTIONGUARD_BUILD_LIBS_DIR)/Windows" ]; then mkdir $(ELECTIONGUARD_BUILD_LIBS_DIR)/Windows; fi
 endif
+	dotnet clean ./bindings/netstandard/ElectionGuard/ElectionGuard.sln
+	dotnet clean ./src/electionguard-ui/ElectionGuard.UI.sln
 
-clean-netstandard: 
+clean-netstandard:
 	@echo 🗑️ CLEAN NETSTANDARD
 	dotnet clean ./bindings/netstandard/ElectionGuard/ElectionGuard.sln
 
@@ -353,11 +383,31 @@ endif
 	$(ELECTIONGUARD_BUILD_LIBS_DIR)/$(PROCESSOR)/$(TARGET)/test/ElectionGuardBenchmark
 
 bench-netstandard: build-netstandard
-	@echo 🧪 BENCHMARK
-	@echo net 6.0 x64
-	./bindings/netstandard/ElectionGuard/ElectionGuard.Encryption.Bench/bin/x64/$(TARGET)/net6.0/ElectionGuard.Encryption.Bench
-	@echo net 4.8 x64
-	./bindings/netstandard/ElectionGuard/ElectionGuard.Encryption.Bench/bin/x64/$(TARGET)/net48/ElectionGuard.Encryption.Bench
+	@echo 🧪 BENCHMARK $(OPERATING_SYSTEM) $(PROCESSOR) $(TARGET) net6.0
+
+# handle executing benchamrks on different processors
+ifeq ($(HOST_PROCESSOR),$(PROCESSOR))
+	$(DOTNET_PATH)/dotnet $(ELECTIONGUARD_BINDING_BENCH_DIR)/bin/$(PROCESSOR)/$(TARGET)/net6.0/ElectionGuard.Encryption.Bench.dll
+else
+	$(DOTNET_PATH)/$(PROCESSOR)/dotnet $(ELECTIONGUARD_BINDING_BENCH_DIR)/bin/$(PROCESSOR)/$(TARGET)/net6.0/ElectionGuard.Encryption.Bench.dll
+endif
+
+ifeq ($(OPERATING_SYSTEM),Windows)
+	@echo 🧪 BENCHMARK $(OPERATING_SYSTEM) $(PROCESSOR) $(TARGET) net48
+	$(DOTNET_PATH)/$(PROCESSOR)/dotnet $(ELECTIONGUARD_BINDING_BENCH_DIR)/bin/$(PROCESSOR)/$(TARGET)/net48/ElectionGuard.Encryption.Bench.exe
+endif
+	# $(DOTNET_PATH)/dotnet exec --runtimeconfig $(ELECTIONGUARD_BINDING_BENCH_DIR)/bin/$(PROCESSOR)/$(TARGET)/net6.0/ElectionGuard.Encryption.Bench.runtimeconfig.json $(ELECTIONGUARD_BINDING_BENCH_DIR)/bin/$(PROCESSOR)/$(TARGET)/net6.0/ElectionGuard.Encryption.Bench.dll
+	# dotnet run --framework net6.0 -a $(PROCESSOR) --configuration $(TARGET) \
+	# 	--project ./bindings/netstandard/ElectionGuard/ElectionGuard.Encryption.Bench/Electionguard.Encryption.Bench.csproj 
+	# @echo net 4.8 $(PROCESSOR)
+	# dotnet run --framework net48 -a $(PROCESSOR) --configuration $(TARGET) \
+	# 	--project ./bindings/netstandard/ElectionGuard/ElectionGuard.Encryption.Bench/Electionguard.Encryption.Bench.csproj 
+
+bench-netstandard-arm64:
+	PROCESSOR=arm64 && make bench-netstandard
+
+bench-netstandard-x64:
+	PROCESSOR=x64 && make bench-netstandard
 
 # Test
 
