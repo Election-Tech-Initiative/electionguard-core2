@@ -9,8 +9,6 @@ namespace ElectionGuard.Encryption.Utils.Generators
     {
         const string TestSpecVersion = "1.0";
         const string TestUseSample = "hamilton-general";
-        // Test data was moved to the solution level and needed to be offset here
-        const string TestOffset = @"../../../../../../../../..";
 
         /// <summary>
         /// A test manifest that is loaded from a json file
@@ -18,7 +16,7 @@ namespace ElectionGuard.Encryption.Utils.Generators
         public static Manifest GetJeffersonCountyManifest_FromFile()
         {
             var path = Path.Combine(
-                AppContext.BaseDirectory, TestOffset, "data", "election_manifest_jefferson_county.json");
+                AppContext.BaseDirectory, "data", "election_manifest_jefferson_county.json");
             var text = File.ReadAllText(path);
             return new Manifest(text);
         }
@@ -32,7 +30,7 @@ namespace ElectionGuard.Encryption.Utils.Generators
 
         private static Manifest GetManifestFromPath(string filepath)
         {
-            var path = Path.Combine(AppContext.BaseDirectory, TestOffset, "data", filepath);
+            var path = Path.Combine(AppContext.BaseDirectory, "data", filepath);
             var text = File.ReadAllText(path);
             return new Manifest(text);
         }
