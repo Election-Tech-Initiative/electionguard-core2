@@ -633,20 +633,9 @@ public class KeyCeremonyMediator : DisposableBase
     {
         base.DisposeUnmanaged();
 
-        foreach (var item in _electionPublicKeys)
-        {
-            item.Value.Dispose();
-        }
-
-        foreach (var item in _electionPartialKeyBackups)
-        {
-            item.Value.Dispose();
-        }
-
-        foreach (var item in _electionPartialKeyChallenges)
-        {
-            item.Value.Dispose();
-        }
+        _electionPublicKeys.Dispose();
+        _electionPartialKeyBackups.Dispose();
+        _electionPartialKeyChallenges.Dispose();
     }
 
 }

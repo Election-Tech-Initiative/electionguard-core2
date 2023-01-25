@@ -1,4 +1,10 @@
 ﻿using ElectionGuard.ElectionSetup.Extensions;
+using ElectionGuard.UI.Lib.Models;
+using ElectionGuard.UI.Lib.Services;
+using MongoDB.Bson.IO;
+using System.IO;
+using System.Text.Json;
+using System.Text.Json.Serialization;
 
 namespace ElectionGuard.ElectionSetup;
 
@@ -26,8 +32,12 @@ public record GuardianRecord(
 /// The first half of the guardian involves the key exchange known as the key ceremony.
 /// The second half relates to the decryption process.
 /// </summary>
-public class Guardian
+public class Guardian : DisposableBase
 {
+    private const string GUARDIAN_PREFIX = "guardian_";
+    private const string PRIVATE_KEY_FOLDER = "gui_private_keys";
+    private const string GUARDIAN_EXT = ".json";
+
     private readonly ElectionKeyPair _electionKeys;
     private readonly Dictionary<string, ElectionPublicKey>? _otherGuardianPublicKeys;
     private readonly Dictionary<string, ElectionPartialKeyBackup>? _otherGuardianPartialKeyBackups;
@@ -75,6 +85,16 @@ public class Guardian
         }
 
         SaveGuardianKey(keyPair.Share());
+    }
+
+    protected override void DisposeUnmanaged()
+    {
+        base.DisposeUnmanaged();
+
+        _electionKeys.Dispose();
+        _otherGuardianPublicKeys?.Dispose();
+        _otherGuardianPartialKeyBackups?.Dispose();
+        BackupsToShare.Dispose();
     }
 
     //private void GenerateBackupKeys()
@@ -480,6 +500,46 @@ public class Guardian
     public ElectionPublicKey? ShareOtherGuardianKey(string guardianId)
     {
         return _otherGuardianPublicKeys?[guardianId];
+    }
+
+
+    /// <summary>
+    /// Saves the guardian to the local storage device
+    /// </summary>
+    public void Save()
+    {
+        var storage = StorageService.GetInstance();
+
+        GuardianPrivateRecord data = this;
+        var dataJson = JsonSerializer.Serialize(data);
+
+        var filename = GUARDIAN_PREFIX + data.GuardianId + GUARDIAN_EXT;
+        var filePath = Path.Combine(PRIVATE_KEY_FOLDER, CeremonyDetails.KeyCeremonyId);
+
+        storage.ToFile(filePath, filename, dataJson);
+    }
+
+    /// <summary>
+    /// Loads the guardian from local storage device
+    /// </summary>
+    /// <param name="guardianId">guardian id</param>
+    /// <param name="keyCeremonyId">id for the key ceremony</param>
+    /// <param name="guardianCount">count of guardians</param>
+    /// <param name="quorum">minimum needed number of guardians</param>
+    /// <returns></returns>
+    public static Guardian? Load(string guardianId, string keyCeremonyId, int guardianCount, int quorum)
+    {
+        var storage = StorageService.GetInstance();
+
+        var filename = GUARDIAN_PREFIX + guardianId + GUARDIAN_EXT;
+        var filePath = Path.Combine(PRIVATE_KEY_FOLDER, keyCeremonyId, filename);
+
+        var data = storage.FromFile(filePath);
+        var privateGuardian = JsonSerializer.Deserialize<GuardianPrivateRecord>(data);
+        
+        return privateGuardian != null ? 
+            Guardian.FromPrivateRecord(privateGuardian, keyCeremonyId, guardianCount, quorum) : 
+            null;
     }
 
     // compute_tally_share
