@@ -1,10 +1,6 @@
 ﻿using ElectionGuard.ElectionSetup.Extensions;
-using ElectionGuard.UI.Lib.Models;
 using ElectionGuard.UI.Lib.Services;
-using MongoDB.Bson.IO;
-using System.IO;
 using System.Text.Json;
-using System.Text.Json.Serialization;
 
 namespace ElectionGuard.ElectionSetup;
 
@@ -34,9 +30,9 @@ public record GuardianRecord(
 /// </summary>
 public class Guardian : DisposableBase
 {
-    private const string GUARDIAN_PREFIX = "guardian_";
-    private const string PRIVATE_KEY_FOLDER = "gui_private_keys";
-    private const string GUARDIAN_EXT = ".json";
+    private const string GuardianPrefix = "guardian_";
+    private const string PrivateKeyFolder = "gui_private_keys";
+    private const string GuardianExt = ".json";
 
     private readonly ElectionKeyPair _electionKeys;
     private readonly Dictionary<string, ElectionPublicKey>? _otherGuardianPublicKeys;
@@ -513,8 +509,8 @@ public class Guardian : DisposableBase
         GuardianPrivateRecord data = this;
         var dataJson = JsonSerializer.Serialize(data);
 
-        var filename = GUARDIAN_PREFIX + data.GuardianId + GUARDIAN_EXT;
-        var filePath = Path.Combine(PRIVATE_KEY_FOLDER, CeremonyDetails.KeyCeremonyId);
+        var filename = GuardianPrefix + data.GuardianId + GuardianExt;
+        var filePath = Path.Combine(PrivateKeyFolder, CeremonyDetails.KeyCeremonyId);
 
         storage.ToFile(filePath, filename, dataJson);
     }
@@ -531,8 +527,8 @@ public class Guardian : DisposableBase
     {
         var storage = StorageService.GetInstance();
 
-        var filename = GUARDIAN_PREFIX + guardianId + GUARDIAN_EXT;
-        var filePath = Path.Combine(PRIVATE_KEY_FOLDER, keyCeremonyId, filename);
+        var filename = GuardianPrefix + guardianId + GuardianExt;
+        var filePath = Path.Combine(PrivateKeyFolder, keyCeremonyId, filename);
 
         var data = storage.FromFile(filePath);
         var privateGuardian = JsonSerializer.Deserialize<GuardianPrivateRecord>(data);

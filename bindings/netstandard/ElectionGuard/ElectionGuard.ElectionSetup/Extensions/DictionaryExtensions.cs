@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace ElectionGuard.ElectionSetup.Extensions;
+﻿namespace ElectionGuard.ElectionSetup.Extensions;
 
 public static class DictionaryExtensions
 {
