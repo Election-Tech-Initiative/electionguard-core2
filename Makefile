@@ -402,6 +402,7 @@ test-netstandard: build-netstandard
 test-ui:
 	@echo 🧪 TEST UI
 	dotnet build -a x64 --configuration $(TARGET) ./src/electionguard-ui/electionGuard.UI.Test/ElectionGuard.UI.Test.csproj
+	dotnet build -a x64 --configuration $(TARGET) ./bindings/netstandard/ElectionGuard/ElectionGuard.ElectionSetup.Tests/ElectionGuard.ElectionSetup.Tests.csproj
 ifeq ($(OPERATING_SYSTEM),Windows)
 	dotnet test -a x64 --no-build --configuration $(TARGET) ./src/electionguard-ui/ElectionGuard.UI.sln 	
 endif
