@@ -5,22 +5,83 @@ using System.Text.Json;
 namespace ElectionGuard.ElectionSetup;
 
 
-public record GuardianPrivateRecord(
-    string GuardianId,
-    ElectionKeyPair ElectionKeys,
-    Dictionary<string, ElectionPartialKeyBackup>? BackupsToShare,
-    Dictionary<string, ElectionPublicKey>? GuardianElectionPublicKeys,
-    Dictionary<string, ElectionPartialKeyBackup>? GuardianElectionPartialKeyBackups,
-    Dictionary<string, ElectionPartialKeyVerification>? GuardianElectionPartialKeyVerifications
-    );
+public record GuardianPrivateRecord : DisposableRecordBase
+{
+    public string GuardianId { get; init; }
 
-public record GuardianRecord(
-    string GuardianId,
-    ulong SequenceOrder,
-    ElementModP ElectionPublicKey,
-    List<ElementModP> ElectionCommitments,
-    List<SchnorrProof> ElectionProofs
-    );
+    public ElectionKeyPair ElectionKeys { get; init; }
+
+    public Dictionary<string, ElectionPartialKeyBackup>? BackupsToShare { get; init; }
+
+    public Dictionary<string, ElectionPublicKey>? GuardianElectionPublicKeys { get; init; }
+
+    public Dictionary<string, ElectionPartialKeyBackup>? GuardianElectionPartialKeyBackups { get; init; }
+
+    public Dictionary<string, ElectionPartialKeyVerification>? GuardianElectionPartialKeyVerifications { get; init; }
+
+    public GuardianPrivateRecord(
+        string guardianId,
+        ElectionKeyPair electionKeys,
+        Dictionary<string, ElectionPartialKeyBackup>? backupsToShare,
+        Dictionary<string, ElectionPublicKey>? guardianElectionPublicKeys,
+        Dictionary<string, ElectionPartialKeyBackup>? guardianElectionPartialKeyBackups,
+        Dictionary<string, ElectionPartialKeyVerification>? guardianElectionPartialKeyVerifications)
+    {
+        GuardianId = guardianId;
+        ElectionKeys = electionKeys;
+        BackupsToShare = backupsToShare;
+        GuardianElectionPublicKeys = guardianElectionPublicKeys;
+        GuardianElectionPartialKeyBackups = guardianElectionPartialKeyBackups;
+        GuardianElectionPartialKeyVerifications = guardianElectionPartialKeyVerifications;
+    }
+
+    protected override void DisposeUnmanaged()
+    {
+        base.DisposeUnmanaged();
+
+        ElectionKeys.Dispose();
+        BackupsToShare?.Dispose();
+        GuardianElectionPublicKeys?.Dispose();
+        GuardianElectionPartialKeyBackups?.Dispose();
+    }
+
+}
+
+public record GuardianRecord : DisposableRecordBase
+{
+    public string GuardianId { get; init; }
+
+    public ulong SequenceOrder { get; init; }
+
+    public ElementModP ElectionPublicKey { get; init; }
+
+    public List<ElementModP> ElectionCommitments { get; init; }
+
+    public List<SchnorrProof> ElectionProofs { get; init; }
+
+    public GuardianRecord(
+        string guardianId,
+        ulong sequenceOrder,
+        ElementModP electionPublicKey,
+        List<ElementModP> electionCommitments,
+        List<SchnorrProof> electionProofs)
+    {
+        GuardianId = guardianId;
+        SequenceOrder = sequenceOrder;
+        ElectionPublicKey = electionPublicKey;
+        ElectionCommitments = electionCommitments;
+        ElectionProofs = electionProofs;
+    }
+
+    protected override void DisposeUnmanaged()
+    {
+        base.DisposeUnmanaged();
+
+        ElectionPublicKey.Dispose();
+        ElectionCommitments.Dispose();
+        ElectionProofs.Dispose();
+    }
+}
 
 /// <summary>
 /// Guardian of election responsible for safeguarding information and decrypting results.
@@ -532,9 +593,9 @@ public class Guardian : DisposableBase
 
         var data = storage.FromFile(filePath);
         var privateGuardian = JsonSerializer.Deserialize<GuardianPrivateRecord>(data);
-        
-        return privateGuardian != null ? 
-            Guardian.FromPrivateRecord(privateGuardian, keyCeremonyId, guardianCount, quorum) : 
+
+        return privateGuardian != null ?
+            Guardian.FromPrivateRecord(privateGuardian, keyCeremonyId, guardianCount, quorum) :
             null;
     }
 
