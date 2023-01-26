@@ -73,6 +73,7 @@
 
 	<ItemGroup>
 	  <ProjectReference Include="..\..\..\bindings\netstandard\ElectionGuard\ElectionGuard.ElectionSetup\ElectionGuard.ElectionSetup.csproj" />
+	  <ProjectReference Include="..\..\..\bindings\netstandard\ElectionGuard\ElectionGuard.Encryption\ElectionGuard.Encryption.csproj" />
 	  <ProjectReference Include="..\ElectionGuard.UI.Lib\ElectionGuard.UI.Lib.csproj" />
 	</ItemGroup>
 
