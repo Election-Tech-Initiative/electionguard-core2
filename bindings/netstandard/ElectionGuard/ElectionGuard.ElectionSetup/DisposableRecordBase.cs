@@ -1,4 +1,4 @@
-﻿namespace ElectionGuard;
+﻿namespace ElectionGuard.ElectionSetup;
 
 /// <summary>
 /// Disposable Record Base
