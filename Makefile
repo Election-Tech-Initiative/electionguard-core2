@@ -406,11 +406,13 @@ test-ui:
 ifeq ($(OPERATING_SYSTEM),Windows)
 	make build-msvc
 	cp "build/libs/msvc/x64/src/$(TARGET)/electionguard.dll" "src/electionguard-ui/electionGuard.UI.Test/bin/$(TARGET)/net7.0/win-x64/electionguard.dll"
+	cp "build/libs/msvc/x64/src/$(TARGET)/electionguard.dll" "bindings/netstandard/ElectionGuard/ElectionGuard.ElectionSetup.Tests/bin/$(TARGET)/net7.0/win-x64/electionguard.dll"
 	dotnet test -a x64 --no-build --configuration $(TARGET) ./src/electionguard-ui/ElectionGuard.UI.sln 	
 endif
 ifeq ($(OPERATING_SYSTEM),Darwin)
 	make build
 	cp "build/libs/x86_64/$(TARGET)/src/*.dylib" "src/electionguard-ui/electionGuard.UI.Test/bin/$(TARGET)/net7.0/osx-x64/*.dll"
+	cp "build/libs/x86_64/$(TARGET)/src/*.dylib" "bindings/netstandard/ElectionGuard/ElectionGuard.ElectionSetup.Tests/bin/$(TARGET)/net7.0/osx-x64/*.dll"
 	dotnet test -a x64 --no-build --configuration $(TARGET) ./src/electionguard-ui/ElectionGuard.UI.sln 	
 endif
 
