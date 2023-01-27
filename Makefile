@@ -402,10 +402,17 @@ test-netstandard: build-netstandard
 test-ui:
 	@echo 🧪 TEST UI
 	dotnet build -a x64 --configuration $(TARGET) ./src/electionguard-ui/electionGuard.UI.Test/ElectionGuard.UI.Test.csproj
+	dotnet build -a x64 --configuration $(TARGET) ./bindings/netstandard/ElectionGuard/ElectionGuard.ElectionSetup.Tests/ElectionGuard.ElectionSetup.Tests.csproj
 ifeq ($(OPERATING_SYSTEM),Windows)
+	make build-msvc
+	cp "build/libs/msvc/x64/src/$(TARGET)/electionguard.dll" "src/electionguard-ui/electionGuard.UI.Test/bin/$(TARGET)/net7.0/win-x64/electionguard.dll"
+	cp "build/libs/msvc/x64/src/$(TARGET)/electionguard.dll" "bindings/netstandard/ElectionGuard/ElectionGuard.ElectionSetup.Tests/bin/$(TARGET)/net7.0/win-x64/electionguard.dll"
 	dotnet test -a x64 --no-build --configuration $(TARGET) ./src/electionguard-ui/ElectionGuard.UI.sln 	
 endif
 ifeq ($(OPERATING_SYSTEM),Darwin)
+	make build
+	cp "build/libs/x86_64/$(TARGET)/src/libelectionguard.dylib" "src/electionguard-ui/electionGuard.UI.Test/bin/$(TARGET)/net7.0/osx-x64/libelectionguard.dylib"
+	cp "build/libs/x86_64/$(TARGET)/src/libelectionguard.dylib" "bindings/netstandard/ElectionGuard/ElectionGuard.ElectionSetup.Tests/bin/$(TARGET)/net7.0/osx-x64/libelectionguard.dylib"
 	dotnet test -a x64 --no-build --configuration $(TARGET) ./src/electionguard-ui/ElectionGuard.UI.sln 	
 endif
 

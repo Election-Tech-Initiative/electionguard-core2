@@ -154,11 +154,11 @@ namespace ElectionGuard
 
             [DllImport(DllName, EntryPoint = "eg_element_mod_p_is_valid_residue",
                 CallingConvention = CallingConvention.Cdecl, SetLastError = true)]
-            internal static extern Status IsValidResidue(ElementModP.ElementModPHandle data, out bool isValid);
+            internal static extern Status IsValidResidue(ElementModPHandle data, out bool isValid);
 
             [DllImport(DllName, EntryPoint = "eg_element_mod_p_is_in_bounds",
                 CallingConvention = CallingConvention.Cdecl, SetLastError = true)]
-            internal static extern Status IsInBounds(ElementModP.ElementModPHandle data, out bool inBounds);
+            internal static extern Status IsInBounds(ElementModPHandle data, out bool inBounds);
         }
 
         internal static class ElementModQ
@@ -245,7 +245,7 @@ namespace ElectionGuard
 
             [DllImport(DllName, EntryPoint = "eg_element_mod_q_is_in_bounds",
                 CallingConvention = CallingConvention.Cdecl, SetLastError = true)]
-            internal static extern Status IsInBounds(ElementModQ.ElementModQHandle data, out bool inBounds);
+            internal static extern Status IsInBounds(ElementModQHandle data, out bool inBounds);
 
 
         }
