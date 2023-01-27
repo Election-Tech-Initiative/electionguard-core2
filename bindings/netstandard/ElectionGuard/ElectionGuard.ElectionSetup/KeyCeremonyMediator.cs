@@ -421,19 +421,21 @@ public class KeyCeremonyMediator : DisposableBase
 
          */
 
-        var currentGuardianUserName = userId;
+        // var currentGuardianUserName = userId;
 
         // append guadian joined to key ceremony (db)
 
         // get guardian number
+        //        int guardianNumber = 0;
 
         // make guardian
-        //var guardian = Guardian.FromNonce(currentGuardianUserName!, 0, KeyCeremony!.NumberOfGuardians, KeyCeremony.Quorum, KeyCeremony.KeyCeremonyId!);
+        //        var guardian = Guardian.FromNonce(currentGuardianUserName!, guardianNumber, KeyCeremony!.NumberOfGuardians, KeyCeremony.Quorum, keyCeremonyId);
 
         // save guardian to local drive / yubikey
+        //        guardian.Save();
 
         // get public key
-        //var public_key = guardian.ShareKey();
+        //        var public_key = guardian.ShareKey();
 
         // append to key ceremony (db)
 
