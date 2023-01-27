@@ -2,20 +2,20 @@
 
 public static class DictionaryExtensions
 {
-    public static void Dispose<T>(this Dictionary<string, T> source)
+    public static void Dispose<T>(this Dictionary<string, T> source) where T : DisposableBase
     {
         foreach (var item in source.Values)
         {
-            (item as DisposableBase)?.Dispose();
+            item.Dispose();
         }
         source.Clear();
     }
 
-    public static void Dispose<T>(this Dictionary<GuardianPair, T> source)
+    public static void Dispose<T>(this Dictionary<GuardianPair, T> source) where T : DisposableBase
     {
         foreach (var item in source.Values)
         {
-            (item as DisposableBase)?.Dispose();
+            item.Dispose();
         }
         source.Clear();
     }
