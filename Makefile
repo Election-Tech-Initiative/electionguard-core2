@@ -411,7 +411,6 @@ ifeq ($(OPERATING_SYSTEM),Windows)
 endif
 ifeq ($(OPERATING_SYSTEM),Darwin)
 	make build
-	ls -R "build/libs/x86_64/$(TARGET)/src"
 	cp "build/libs/x86_64/$(TARGET)/src/libelectionguard.dylib" "src/electionguard-ui/electionGuard.UI.Test/bin/$(TARGET)/net7.0/osx-x64/libelectionguard.dylib"
 	cp "build/libs/x86_64/$(TARGET)/src/libelectionguard.dylib" "bindings/netstandard/ElectionGuard/ElectionGuard.ElectionSetup.Tests/bin/$(TARGET)/net7.0/osx-x64/libelectionguard.dylib"
 	dotnet test -a x64 --no-build --configuration $(TARGET) ./src/electionguard-ui/ElectionGuard.UI.sln 	
