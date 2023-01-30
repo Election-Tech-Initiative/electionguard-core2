@@ -1,4 +1,5 @@
 ﻿using ElectionGuard.ElectionSetup.Extensions;
+using ElectionGuard.UI.Lib.Models;
 
 namespace ElectionGuard.ElectionSetup;
 public class ElectionPartialKeyChallenge : DisposableBase

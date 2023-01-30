@@ -10,4 +10,8 @@ public partial class User : DatabaseRecord
     [ObservableProperty]
     private bool _isAdmin = false;
 
+    public User() : base(nameof(User))
+    {
+
+    }
 }

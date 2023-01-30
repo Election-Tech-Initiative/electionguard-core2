@@ -1,4 +1,4 @@
-﻿namespace ElectionGuard.ElectionSetup;
+﻿namespace ElectionGuard.UI.Lib.Models;
 
 /// <summary>
 /// Representation of a Schnorr proof

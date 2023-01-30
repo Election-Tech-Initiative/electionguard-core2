@@ -7,5 +7,10 @@ public partial class Tally : DatabaseRecord
     [ObservableProperty]
     private string? _name;
 
+    public Tally() : base(nameof(Tally))
+    {
+
+    }
+
 }
 

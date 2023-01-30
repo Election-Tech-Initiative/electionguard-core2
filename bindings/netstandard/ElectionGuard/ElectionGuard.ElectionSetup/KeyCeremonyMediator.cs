@@ -1,4 +1,6 @@
 ﻿using ElectionGuard.ElectionSetup.Extensions;
+using ElectionGuard.UI.Lib.Models;
+using ElectionGuard.UI.Lib.Services;
 
 namespace ElectionGuard.ElectionSetup;
 
@@ -8,32 +10,6 @@ public record GuardianPair(string OwnerId, string DesignatedId);
 /// The state of the verifications of all guardian election partial key backups
 /// </summary>
 public record BackupVerificationState(bool AllSent = false, bool AllVerified = false, List<GuardianPair>? FailedVerification = null);
-
-/// <summary>
-/// The Election joint key
-/// </summary>
-public class ElectionJointKey : DisposableBase
-{
-    /// <summary>
-    /// The product of the guardian public keys
-    /// K = ∏ ni=1 Ki mod p.
-    /// </summary>
-    public ElementModP? JointPublicKey { get; init; }
-
-    /// <summary>
-    /// The hash of the commitments that the guardians make to each other
-    /// H = H(K 1,0 , K 2,0 ... , K n,0 )
-    /// </summary>
-    public ElementModQ? CommitmentHash { get; init; }
-
-    protected override void DisposeUnmanaged()
-    {
-        base.DisposeUnmanaged();
-
-        JointPublicKey?.Dispose();
-        CommitmentHash?.Dispose();
-    }
-}
 
 
 /// <summary>
@@ -398,7 +374,18 @@ public class KeyCeremonyMediator : DisposableBase
         _electionPublicKeys[publicKey.OwnerId] = publicKey;
     }
 
-    public void RunStep1(string keyCeremonyId, string userId)
+    private async Task<ulong> GetGuardianNumberAsync(GuardianPublicKeyService service, string keyCeremonyId, string guardianId)
+    {
+        var list = await service.GetByKeyCeremonyId(keyCeremonyId);
+        foreach ( (var item, ulong index) in list.WithIndex() ) 
+        {
+            if (item.GuardianId == guardianId)
+                return index;
+        }
+        return 0;
+    }
+
+    public async void RunStep1(string keyCeremonyId, string userId)
     {
         /* - guardian side
             key_ceremony_id = key_ceremony.id
@@ -421,28 +408,32 @@ public class KeyCeremonyMediator : DisposableBase
 
          */
 
-        // var currentGuardianUserName = userId;
+        var currentGuardianUserName = userId;
 
-        // append guadian joined to key ceremony (db)
+        // append guardian joined to key ceremony (db)
+        GuardianPublicKeyService service = new();
+        GuardianPublicKey data = new() { KeyCeremonyId= keyCeremonyId, GuardianId = currentGuardianUserName };
+        await service.SaveAsync(data);
 
         // get guardian number
-        //        int guardianNumber = 0;
+        ulong guardianNumber = await GetGuardianNumberAsync(service, keyCeremonyId, currentGuardianUserName);
 
         // make guardian
-        //        var guardian = Guardian.FromNonce(currentGuardianUserName!, guardianNumber, KeyCeremony!.NumberOfGuardians, KeyCeremony.Quorum, keyCeremonyId);
+        var guardian = Guardian.FromNonce(currentGuardianUserName!, guardianNumber, CeremonyDetails.NumberOfGuardians, CeremonyDetails.Quorum, keyCeremonyId);
 
         // save guardian to local drive / yubikey
-        //        guardian.Save();
+        guardian.Save();
 
         // get public key
-        //        var public_key = guardian.ShareKey();
+        var publicKey = guardian.ShareKey();
 
         // append to key ceremony (db)
+        await service.UpdatePublicKeyAsync(keyCeremonyId, currentGuardianUserName, publicKey);
 
         // notify change to admin (signalR)
     }
 
-    public void RunStep2()
+    public void RunStep2(string keyCeremonyId)
     {
         /* - admin side
             def should_run(

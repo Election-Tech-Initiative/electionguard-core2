@@ -1,6 +1,6 @@
 ﻿using ElectionGuard.ElectionSetup.Extensions;
 
-namespace ElectionGuard.ElectionSetup;
+namespace ElectionGuard.UI.Lib.Models;
 
 /// <summary>
 /// A tuple of election public key and owner information

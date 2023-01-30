@@ -1,4 +1,5 @@
 ﻿using ElectionGuard.ElectionSetup.Extensions;
+using ElectionGuard.UI.Lib.Models;
 using ElectionGuard.UI.Lib.Services;
 using System.Text.Json;
 

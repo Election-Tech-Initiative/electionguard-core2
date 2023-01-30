@@ -3,6 +3,26 @@ using ElectionGuard.UI.Lib.Models;
 
 namespace ElectionGuard.UI.Lib.Services;
 
+internal static class Constants
+{
+    public readonly static string DataType = "DataType";
+
+    public readonly static string GuardianId = "GuardianId";
+
+    public readonly static string Id = "Id";
+
+    public readonly static string KeyCeremonyId = "KeyCeremonyId";
+
+    public readonly static string Name = "Name";
+
+    public readonly static string PublicKey = "PublicKey";
+
+    public readonly static string SoftDeleted = "SoftDeleted";
+
+    public readonly static string State = "State";
+}
+
+
 /// <summary>
 /// Interface for defining the basic calls for the database for a given data type.
 /// Any other functions that are not generic across all of the types can be added to
@@ -17,6 +37,8 @@ internal interface IDatabaseService<T>
     Task<T?> GetByNameAsync(string name, string? table = null);
     Task<T?> GetByFieldAsync(string fieldName, object fieldValue, string? table = null);
     Task<T> SaveAsync(T data, string? table = null);
+    Task UpdateAsync(FilterDefinition<T> filter, UpdateDefinition<T> update, string? table = null);
+    FilterDefinition<T> UpdateFilter(FilterDefinition<T> filter);
 }
 
 /// <summary>
@@ -57,6 +79,18 @@ public class BaseDatabaseService<T> : IDatabaseService<T>
     }
 
     /// <summary>
+    /// Update the data into the collection
+    /// </summary>
+    /// <param name="data">data to be updated</param>
+    /// <param name="table">Optional parameter to allow data type to use a different collection</param>
+    /// <returns></returns>
+    virtual public async Task UpdateAsync(FilterDefinition<T> filter, UpdateDefinition<T> update, string? table = null)
+    {
+        var collection = DbService.GetCollection<T>(table ?? _collection);
+        await collection.UpdateOneAsync(filter, update);
+    }
+
+    /// <summary>
     /// Get all of a data type from a given collection
     /// </summary>
     /// <param name="table">Optional parameter to allow data type to use a different collection</param>
@@ -64,7 +98,7 @@ public class BaseDatabaseService<T> : IDatabaseService<T>
     public async Task<List<T>> GetAllAsync(string? table = null)
     {
         var data = DbService.GetCollection<T>(table ?? _collection);
-        var item = await data.FindAsync<T>(Builders<T>.Filter.Empty);
+        var item = await data.FindAsync<T>(UpdateFilter(Builders<T>.Filter.Empty));
         return item.ToList();
     }
 
@@ -78,8 +112,9 @@ public class BaseDatabaseService<T> : IDatabaseService<T>
     public async Task<List<T>> GetAllByFieldAsync(string fieldName, object fieldValue, string? table = null)
     {
         var data = DbService.GetCollection<T>(table ?? _collection);
-        var filter = Builders<T>.Filter.Eq(fieldName, fieldValue);
-        var item = await data.FindAsync<T>(filter);
+        var builder = Builders<T>.Filter;
+        var filter = builder.And(builder.Eq(fieldName, fieldValue), builder.Eq(Constants.DataType, nameof(T)));
+        var item = await data.FindAsync<T>(UpdateFilter(filter));
         return item.ToList();
     }
 
@@ -91,7 +126,7 @@ public class BaseDatabaseService<T> : IDatabaseService<T>
     /// <returns>Document that matches the given id</returns>
     public async Task<T?> GetByIdAsync(string id, string? table= null)
     {
-        return await GetByFieldAsync("Id", id, table);
+        return await GetByFieldAsync(Constants.Id, id, table);
     }
 
     /// <summary>
@@ -102,7 +137,7 @@ public class BaseDatabaseService<T> : IDatabaseService<T>
     /// <returns>Document that matches the given name</returns>
     virtual public async Task<T?> GetByNameAsync(string name, string? table = null)
     {
-        return await GetByFieldAsync("Name", name, table);
+        return await GetByFieldAsync(Constants.Name, name, table);
     }
 
     /// <summary>
@@ -117,26 +152,17 @@ public class BaseDatabaseService<T> : IDatabaseService<T>
         var list = await GetAllByFieldAsync(fieldName, fieldValue, table);
         return list.FirstOrDefault();
     }
-}
-
-/// <summary>
-/// Data Service for Key Ceremonies
-/// </summary>
-public class KeyCeremonyService : BaseDatabaseService<KeyCeremony>
-{
-    /// <summary>
-    /// The collection name to use to get/save data into
-    /// </summary>
-    private readonly static string _collection = "key_ceremonies";
 
     /// <summary>
-    /// Default constructor that sets the collection name
+    /// Updates the filter to only get non-deleted items
     /// </summary>
-    public KeyCeremonyService() : base(_collection) { }
-
-    public async Task<KeyCeremony?> GetByKeyCeremonyId(string id)
+    /// <param name="filter"></param>
+    /// <returns></returns>
+    /// <exception cref="NotImplementedException"></exception>
+    public FilterDefinition<T> UpdateFilter(FilterDefinition<T> filter)
     {
-        return await GetByFieldAsync("KeyCeremonyId", id);
+        var builder = Builders<T>.Filter;
+        return builder.And(filter, builder.Eq(Constants.SoftDeleted, true));
     }
 }
 
