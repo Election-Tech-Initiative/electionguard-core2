@@ -1,24 +1,87 @@
 ﻿using ElectionGuard.ElectionSetup.Extensions;
+using ElectionGuard.UI.Lib.Services;
+using System.Text.Json;
 
 namespace ElectionGuard.ElectionSetup;
 
 
-public record GuardianPrivateRecord(
-    string GuardianId,
-    ElectionKeyPair ElectionKeys,
-    Dictionary<string, ElectionPartialKeyBackup>? BackupsToShare,
-    Dictionary<string, ElectionPublicKey>? GuardianElectionPublicKeys,
-    Dictionary<string, ElectionPartialKeyBackup>? GuardianElectionPartialKeyBackups,
-    Dictionary<string, ElectionPartialKeyVerification>? GuardianElectionPartialKeyVerifications
-    );
+public record GuardianPrivateRecord : DisposableRecordBase
+{
+    public string GuardianId { get; init; }
 
-public record GuardianRecord(
-    string GuardianId,
-    ulong SequenceOrder,
-    ElementModP ElectionPublicKey,
-    List<ElementModP> ElectionCommitments,
-    List<SchnorrProof> ElectionProofs
-    );
+    public ElectionKeyPair ElectionKeys { get; init; }
+
+    public Dictionary<string, ElectionPartialKeyBackup>? BackupsToShare { get; init; }
+
+    public Dictionary<string, ElectionPublicKey>? GuardianElectionPublicKeys { get; init; }
+
+    public Dictionary<string, ElectionPartialKeyBackup>? GuardianElectionPartialKeyBackups { get; init; }
+
+    public Dictionary<string, ElectionPartialKeyVerification>? GuardianElectionPartialKeyVerifications { get; init; }
+
+    public GuardianPrivateRecord(
+        string guardianId,
+        ElectionKeyPair electionKeys,
+        Dictionary<string, ElectionPartialKeyBackup>? backupsToShare,
+        Dictionary<string, ElectionPublicKey>? guardianElectionPublicKeys,
+        Dictionary<string, ElectionPartialKeyBackup>? guardianElectionPartialKeyBackups,
+        Dictionary<string, ElectionPartialKeyVerification>? guardianElectionPartialKeyVerifications)
+    {
+        GuardianId = guardianId;
+        ElectionKeys = electionKeys;
+        BackupsToShare = backupsToShare;
+        GuardianElectionPublicKeys = guardianElectionPublicKeys;
+        GuardianElectionPartialKeyBackups = guardianElectionPartialKeyBackups;
+        GuardianElectionPartialKeyVerifications = guardianElectionPartialKeyVerifications;
+    }
+
+    protected override void DisposeUnmanaged()
+    {
+        base.DisposeUnmanaged();
+
+        ElectionKeys.Dispose();
+        BackupsToShare?.Dispose();
+        GuardianElectionPublicKeys?.Dispose();
+        GuardianElectionPartialKeyBackups?.Dispose();
+    }
+
+}
+
+public record GuardianRecord : DisposableRecordBase
+{
+    public string GuardianId { get; init; }
+
+    public ulong SequenceOrder { get; init; }
+
+    public ElementModP ElectionPublicKey { get; init; }
+
+    public List<ElementModP> ElectionCommitments { get; init; }
+
+    public List<SchnorrProof> ElectionProofs { get; init; }
+
+    public GuardianRecord(
+        string guardianId,
+        ulong sequenceOrder,
+        ElementModP electionPublicKey,
+        List<ElementModP> electionCommitments,
+        List<SchnorrProof> electionProofs)
+    {
+        GuardianId = guardianId;
+        SequenceOrder = sequenceOrder;
+        ElectionPublicKey = electionPublicKey;
+        ElectionCommitments = electionCommitments;
+        ElectionProofs = electionProofs;
+    }
+
+    protected override void DisposeUnmanaged()
+    {
+        base.DisposeUnmanaged();
+
+        ElectionPublicKey.Dispose();
+        ElectionCommitments.Dispose();
+        ElectionProofs.Dispose();
+    }
+}
 
 /// <summary>
 /// Guardian of election responsible for safeguarding information and decrypting results.
@@ -26,8 +89,12 @@ public record GuardianRecord(
 /// The first half of the guardian involves the key exchange known as the key ceremony.
 /// The second half relates to the decryption process.
 /// </summary>
-public class Guardian
+public class Guardian : DisposableBase
 {
+    private const string GuardianPrefix = "guardian_";
+    private const string PrivateKeyFolder = "gui_private_keys";
+    private const string GuardianExt = ".json";
+
     private readonly ElectionKeyPair _electionKeys;
     private readonly Dictionary<string, ElectionPublicKey>? _otherGuardianPublicKeys;
     private readonly Dictionary<string, ElectionPartialKeyBackup>? _otherGuardianPartialKeyBackups;
@@ -75,6 +142,16 @@ public class Guardian
         }
 
         SaveGuardianKey(keyPair.Share());
+    }
+
+    protected override void DisposeUnmanaged()
+    {
+        base.DisposeUnmanaged();
+
+        _electionKeys.Dispose();
+        _otherGuardianPublicKeys?.Dispose();
+        _otherGuardianPartialKeyBackups?.Dispose();
+        BackupsToShare.Dispose();
     }
 
     //private void GenerateBackupKeys()
@@ -185,15 +262,13 @@ public class Guardian
         return coordinate;
     }
 
-    // TODO: This is a candidate for a Math class... or a Polynomial class. This does not belong to a guardian.
     private static ElementModQ GetCoordinate(
         ElementModQ initialState,
         ElementModQ baseElement,
         Coefficient coefficient,
                     ulong index)
     {
-        using var exponent = new ElementModQ(index);
-        using var factor = BigMath.PowModQ(baseElement, exponent);
+        using var factor = BigMath.PowModQ(baseElement, index);
         using var coordinateShift = BigMath.MultModQ(coefficient.Value, factor);
 
         return BigMath.AddModQ(initialState, coordinateShift);
@@ -482,6 +557,46 @@ public class Guardian
     public ElectionPublicKey? ShareOtherGuardianKey(string guardianId)
     {
         return _otherGuardianPublicKeys?[guardianId];
+    }
+
+
+    /// <summary>
+    /// Saves the guardian to the local storage device
+    /// </summary>
+    public void Save()
+    {
+        var storage = StorageService.GetInstance();
+
+        GuardianPrivateRecord data = this;
+        var dataJson = JsonSerializer.Serialize(data);
+
+        var filename = GuardianPrefix + data.GuardianId + GuardianExt;
+        var filePath = Path.Combine(PrivateKeyFolder, CeremonyDetails.KeyCeremonyId);
+
+        storage.ToFile(filePath, filename, dataJson);
+    }
+
+    /// <summary>
+    /// Loads the guardian from local storage device
+    /// </summary>
+    /// <param name="guardianId">guardian id</param>
+    /// <param name="keyCeremonyId">id for the key ceremony</param>
+    /// <param name="guardianCount">count of guardians</param>
+    /// <param name="quorum">minimum needed number of guardians</param>
+    /// <returns></returns>
+    public static Guardian? Load(string guardianId, string keyCeremonyId, int guardianCount, int quorum)
+    {
+        var storage = StorageService.GetInstance();
+
+        var filename = GuardianPrefix + guardianId + GuardianExt;
+        var filePath = Path.Combine(PrivateKeyFolder, keyCeremonyId, filename);
+
+        var data = storage.FromFile(filePath);
+        var privateGuardian = JsonSerializer.Deserialize<GuardianPrivateRecord>(data);
+
+        return privateGuardian != null ?
+            Guardian.FromPrivateRecord(privateGuardian, keyCeremonyId, guardianCount, quorum) :
+            null;
     }
 
     // compute_tally_share

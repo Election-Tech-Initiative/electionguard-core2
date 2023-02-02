@@ -4,7 +4,7 @@ namespace ElectionGuard
     /// <summary>
     /// Disposable Base
     /// </summary>
-    public class DisposableBase: IDisposable
+    public class DisposableBase : IDisposable
     {
         private bool _disposedValue;
 
@@ -72,4 +72,5 @@ namespace ElectionGuard
             GC.SuppressFinalize(this);
         }
     }
+
 }

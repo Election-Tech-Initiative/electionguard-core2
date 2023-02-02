@@ -3,7 +3,7 @@
     /// <summary>
     /// Verification of election partial key used in key sharing
     /// </summary>
-    public class ElectionPartialKeyVerification
+    public record ElectionPartialKeyVerification
     {
         public string? OwnerId { get; init; }
         public string? DesignatedId { get; init; }
