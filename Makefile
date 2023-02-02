@@ -165,6 +165,9 @@ else
 	cmake --build $(ELECTIONGUARD_BUILD_LIBS_DIR)/$(OPERATING_SYSTEM)/$(PROCESSOR)/$(TARGET)
 endif
 
+build-arm64:
+	PROCESSOR=arm64 && make build
+
 build-x86:
 	PROCESSOR=x86 VSPLATFORM=Win32 && make build
 
@@ -435,6 +438,9 @@ else
 	$(ELECTIONGUARD_BUILD_LIBS_DIR)/$(PROCESSOR)/$(TARGET)/test/ElectionGuardTests
 	$(ELECTIONGUARD_BUILD_LIBS_DIR)/$(PROCESSOR)/$(TARGET)/test/ElectionGuardCTests
 endif
+
+test-arm64:
+	PROCESSOR=arm64 && make test
 
 test-x64:
 	PROCESSOR=x64 && make test
