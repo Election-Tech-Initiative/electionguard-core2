@@ -1,4 +1,4 @@
-﻿using ElectionGuard.UI.Lib.Models;
+﻿using System.Text.Json.Serialization;
 
 namespace ElectionGuard.UI.Lib.Models;
 
@@ -40,6 +40,23 @@ public class GuardianPublicKey : DatabaseRecord
     {
     }
 }
+
+public class GuardianBackups : DatabaseRecord
+{
+    public string? KeyCeremonyId { get; set; }
+
+    public string? GuardianId { get; set; }
+
+    public string? DesignatedId { get; set; }
+
+    public ElectionPartialKeyBackup? Backup { get; set; }
+
+    public GuardianBackups() : base(nameof(GuardianBackups))
+    {
+    }
+}
+
+
 
 public partial class KeyCeremony : DatabaseRecord
 {

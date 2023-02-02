@@ -3,9 +3,14 @@ using ElectionGuard.UI.Lib.Models;
 
 namespace ElectionGuard.UI.Lib.Services;
 
+/// <summary>
+/// static class used for constant strings used in database calls
+/// </summary>
 internal static class Constants
 {
     public readonly static string DataType = "DataType";
+
+    public readonly static string DesignatedId = "DesignatedId";
 
     public readonly static string GuardianId = "GuardianId";
 
@@ -20,6 +25,14 @@ internal static class Constants
     public readonly static string SoftDeleted = "SoftDeleted";
 
     public readonly static string State = "State";
+
+    public readonly static string TableKeyCeremonies = "key_ceremonies";
+
+    public readonly static string CompletedAt = "CompletedAt";
+
+    public readonly static string JointKey = "JointKey";
+
+    
 }
 
 
@@ -32,13 +45,14 @@ internal static class Constants
 internal interface IDatabaseService<T>
 {
     Task<List<T>> GetAllAsync(string? table = null);
+    Task<List<T>> GetAllByFilterAsync(FilterDefinition<T> filter, string? table = null);
     Task<List<T>> GetAllByFieldAsync(string fieldName, object fieldValue, string? table = null);
     Task<T?> GetByIdAsync(string id, string? table = null);
     Task<T?> GetByNameAsync(string name, string? table = null);
     Task<T?> GetByFieldAsync(string fieldName, object fieldValue, string? table = null);
     Task<T> SaveAsync(T data, string? table = null);
     Task UpdateAsync(FilterDefinition<T> filter, UpdateDefinition<T> update, string? table = null);
-    FilterDefinition<T> UpdateFilter(FilterDefinition<T> filter);
+    FilterDefinition<T> UpdateFilter(FilterDefinition<T> filter, bool getDeleted = false);
 }
 
 /// <summary>
@@ -87,7 +101,7 @@ public class BaseDatabaseService<T> : IDatabaseService<T>
     virtual public async Task UpdateAsync(FilterDefinition<T> filter, UpdateDefinition<T> update, string? table = null)
     {
         var collection = DbService.GetCollection<T>(table ?? _collection);
-        await collection.UpdateOneAsync(filter, update);
+        await collection.UpdateOneAsync(UpdateFilter(filter), update);
     }
 
     /// <summary>
@@ -97,9 +111,9 @@ public class BaseDatabaseService<T> : IDatabaseService<T>
     /// <returns>List of the documents found in the given collection</returns>
     public async Task<List<T>> GetAllAsync(string? table = null)
     {
-        var data = DbService.GetCollection<T>(table ?? _collection);
-        var item = await data.FindAsync<T>(UpdateFilter(Builders<T>.Filter.Empty));
-        return item.ToList();
+        var builder = Builders<T>.Filter;
+        var filter = builder.Eq(Constants.DataType, nameof(T));
+        return await GetAllByFilterAsync(filter);
     }
 
     /// <summary>
@@ -111,9 +125,19 @@ public class BaseDatabaseService<T> : IDatabaseService<T>
     /// <returns>List of the documents found in the given collection that matches the given field</returns>
     public async Task<List<T>> GetAllByFieldAsync(string fieldName, object fieldValue, string? table = null)
     {
-        var data = DbService.GetCollection<T>(table ?? _collection);
         var builder = Builders<T>.Filter;
         var filter = builder.And(builder.Eq(fieldName, fieldValue), builder.Eq(Constants.DataType, nameof(T)));
+        return await GetAllByFilterAsync(filter, table);
+    }
+
+    /// <summary>
+    /// Get all of a data type from a given collection using a filter
+    /// </summary>
+    /// <param name="table">Optional parameter to allow data type to use a different collection</param>
+    /// <returns>List of the documents found in the given collection</returns>
+    public async Task<List<T>> GetAllByFilterAsync(FilterDefinition<T> filter, string? table = null)
+    {
+        var data = DbService.GetCollection<T>(table ?? _collection);
         var item = await data.FindAsync<T>(UpdateFilter(filter));
         return item.ToList();
     }
@@ -156,13 +180,12 @@ public class BaseDatabaseService<T> : IDatabaseService<T>
     /// <summary>
     /// Updates the filter to only get non-deleted items
     /// </summary>
-    /// <param name="filter"></param>
-    /// <returns></returns>
-    /// <exception cref="NotImplementedException"></exception>
-    public FilterDefinition<T> UpdateFilter(FilterDefinition<T> filter)
+    /// <param name="filter">filter to base from</param>
+    /// <returns>New filter adding soft delete as false</returns>
+    public FilterDefinition<T> UpdateFilter(FilterDefinition<T> filter, bool getDeleted = false)
     {
         var builder = Builders<T>.Filter;
-        return builder.And(filter, builder.Eq(Constants.SoftDeleted, true));
+        return builder.And(filter, builder.Eq(Constants.SoftDeleted, getDeleted));
     }
 }
 

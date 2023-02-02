@@ -237,7 +237,7 @@ public class Guardian : DisposableBase
         return new()
         {
             OwnerId = senderGuardianId,
-            DesignedId = receiverGuardianPublicKey.OwnerId,
+            DesignatedId = receiverGuardianPublicKey.OwnerId,
             DesignatedSequenceOrder = receiverGuardianPublicKey.SequenceOrder,
             EncryptedCoordinate = encryptedCoordinate
         };
@@ -280,7 +280,7 @@ public class Guardian : DisposableBase
         return _electionKeys.Share();
     }
 
-    private void SaveGuardianKey(ElectionPublicKey key)
+    public void SaveGuardianKey(ElectionPublicKey key)
     {
         if (_otherGuardianPublicKeys is not null)
         {
@@ -413,7 +413,7 @@ public class Guardian : DisposableBase
 
 
     // verify_election_partial_key_backup
-    public ElectionPartialKeyVerification? VerifyElectionPartialKeyBackup(string guardianId)
+    public ElectionPartialKeyVerification? VerifyElectionPartialKeyBackup(string guardianId, string keyCeremonyId)
     {
         var backup = _otherGuardianPartialKeyBackups?[guardianId];
         var publicKey = _otherGuardianPublicKeys?[guardianId];
@@ -425,10 +425,10 @@ public class Guardian : DisposableBase
         {
             return null;
         }
-        return VerifyElectionPartialKeyBackup(guardianId, backup, publicKey, _electionKeys);
+        return VerifyElectionPartialKeyBackup(guardianId, backup, publicKey, _electionKeys, keyCeremonyId);
     }
 
-    private ElectionPartialKeyVerification VerifyElectionPartialKeyBackup(string receiverGuardianId, ElectionPartialKeyBackup? senderGuardianBackup, ElectionPublicKey? senderGuardianPublicKey, ElectionKeyPair receiverGuardianKeys)
+    private ElectionPartialKeyVerification VerifyElectionPartialKeyBackup(string receiverGuardianId, ElectionPartialKeyBackup? senderGuardianBackup, ElectionPublicKey? senderGuardianPublicKey, ElectionKeyPair receiverGuardianKeys, string keyCeremonyId)
     {
         using var encryptionSeed = GetBackupSeed(
                 receiverGuardianId,
@@ -446,10 +446,11 @@ public class Guardian : DisposableBase
                 senderGuardianBackup!.DesignatedSequenceOrder,
                 senderGuardianPublicKey!.CoefficientCommitments
             );
-        return new ElectionPartialKeyVerification()
+        return new()
         {
+            KeyCeremonyId = keyCeremonyId,
             OwnerId = senderGuardianBackup.OwnerId,
-            DesignatedId = senderGuardianBackup.DesignedId,
+            DesignatedId = senderGuardianBackup.DesignatedId,
             VerifierId = receiverGuardianId,
             Verified = verified
         };
@@ -466,10 +467,10 @@ public class Guardian : DisposableBase
 
     private ElectionPartialKeyChallenge GenerateElectionPartialKeyChallenge(ElectionPartialKeyBackup backup, ElectionPolynomial polynomial)
     {
-        return new ElectionPartialKeyChallenge()
+        return new()
         {
             OwnerId = backup.OwnerId,
-            DesignatedId = backup.DesignedId,
+            DesignatedId = backup.DesignatedId,
             DesignatedSequenceOrder = backup.DesignatedSequenceOrder,
             Value = ComputePolynomialCoordinate(backup.DesignatedSequenceOrder, polynomial),
             CoefficientCommitments = polynomial.GetCommitments(),
@@ -598,6 +599,11 @@ public class Guardian : DisposableBase
         return privateGuardian != null ?
             Guardian.FromPrivateRecord(privateGuardian, keyCeremonyId, guardianCount, quorum) :
             null;
+    }
+
+    public static Guardian? Load(string guardianId, KeyCeremony keyCeremony)
+    {
+        return Load(guardianId, keyCeremony.KeyCeremonyId!, keyCeremony.NumberOfGuardians, keyCeremony.Quorum);
     }
 
     // compute_tally_share
