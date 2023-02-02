@@ -383,21 +383,21 @@ endif
 	$(ELECTIONGUARD_BUILD_LIBS_DIR)/$(PROCESSOR)/$(TARGET)/test/ElectionGuardBenchmark
 
 bench-netstandard: build-netstandard
-	@echo 🧪 BENCHMARK $(OPERATING_SYSTEM) $(PROCESSOR) $(TARGET) net6.0
+	@echo 🧪 BENCHMARK $(OPERATING_SYSTEM) $(PROCESSOR) $(TARGET) net7.0
 
 # handle executing benchamrks on different processors
 ifeq ($(HOST_PROCESSOR),$(PROCESSOR))
-	$(DOTNET_PATH)/dotnet $(ELECTIONGUARD_BINDING_BENCH_DIR)/bin/$(PROCESSOR)/$(TARGET)/net6.0/ElectionGuard.Encryption.Bench.dll
+	$(DOTNET_PATH)/dotnet $(ELECTIONGUARD_BINDING_BENCH_DIR)/bin/$(PROCESSOR)/$(TARGET)/net7.0/ElectionGuard.Encryption.Bench.dll
 else
-	$(DOTNET_PATH)/$(PROCESSOR)/dotnet $(ELECTIONGUARD_BINDING_BENCH_DIR)/bin/$(PROCESSOR)/$(TARGET)/net6.0/ElectionGuard.Encryption.Bench.dll
+	$(DOTNET_PATH)/$(PROCESSOR)/dotnet $(ELECTIONGUARD_BINDING_BENCH_DIR)/bin/$(PROCESSOR)/$(TARGET)/net7.0/ElectionGuard.Encryption.Bench.dll
 endif
 
 ifeq ($(OPERATING_SYSTEM),Windows)
 	@echo 🧪 BENCHMARK $(OPERATING_SYSTEM) $(PROCESSOR) $(TARGET) net48
 	$(DOTNET_PATH)/$(PROCESSOR)/dotnet $(ELECTIONGUARD_BINDING_BENCH_DIR)/bin/$(PROCESSOR)/$(TARGET)/net48/ElectionGuard.Encryption.Bench.exe
 endif
-	# $(DOTNET_PATH)/dotnet exec --runtimeconfig $(ELECTIONGUARD_BINDING_BENCH_DIR)/bin/$(PROCESSOR)/$(TARGET)/net6.0/ElectionGuard.Encryption.Bench.runtimeconfig.json $(ELECTIONGUARD_BINDING_BENCH_DIR)/bin/$(PROCESSOR)/$(TARGET)/net6.0/ElectionGuard.Encryption.Bench.dll
-	# dotnet run --framework net6.0 -a $(PROCESSOR) --configuration $(TARGET) \
+	# $(DOTNET_PATH)/dotnet exec --runtimeconfig $(ELECTIONGUARD_BINDING_BENCH_DIR)/bin/$(PROCESSOR)/$(TARGET)/net7.0/ElectionGuard.Encryption.Bench.runtimeconfig.json $(ELECTIONGUARD_BINDING_BENCH_DIR)/bin/$(PROCESSOR)/$(TARGET)/net7.0/ElectionGuard.Encryption.Bench.dll
+	# dotnet run --framework net7.0 -a $(PROCESSOR) --configuration $(TARGET) \
 	# 	--project ./bindings/netstandard/ElectionGuard/ElectionGuard.Encryption.Bench/Electionguard.Encryption.Bench.csproj 
 	# @echo net 4.8 $(PROCESSOR)
 	# dotnet run --framework net48 -a $(PROCESSOR) --configuration $(TARGET) \
