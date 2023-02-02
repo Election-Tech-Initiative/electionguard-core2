@@ -419,7 +419,7 @@ public class KeyCeremonyMediator : DisposableBase
         ulong guardianNumber = await GetGuardianNumberAsync(service, keyCeremonyId, currentGuardianUserName);
 
         // make guardian
-        var guardian = Guardian.FromNonce(currentGuardianUserName!, guardianNumber, CeremonyDetails.NumberOfGuardians, CeremonyDetails.Quorum, keyCeremonyId);
+        var guardian = Guardian.FromNonce(currentGuardianUserName, guardianNumber, CeremonyDetails.NumberOfGuardians, CeremonyDetails.Quorum, keyCeremonyId);
 
         // save guardian to local drive / yubikey
         guardian.Save();
@@ -641,7 +641,7 @@ public class KeyCeremonyMediator : DisposableBase
         foreach (var backup in myBackups!)
         {
             guardian!.SaveElectionPartialKeyBackup(backup.Backup!);
-            var verification = guardian!.VerifyElectionPartialKeyBackup(backup.Backup!.OwnerId!, keyCeremonyId);
+            var verification = guardian.VerifyElectionPartialKeyBackup(backup.Backup!.OwnerId!, keyCeremonyId);
             if(verification == null)
             {
                 throw new Exception($"Error verifying back from {backup.Backup!.OwnerId!}");
