@@ -1,4 +1,4 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk">
 
 	<PropertyGroup>
 		<TargetFrameworks Condition="$([MSBuild]::IsOSPlatform('OSX'))">net7.0-maccatalyst;net7.0</TargetFrameworks>
@@ -31,43 +31,43 @@
 		<!-- <Platforms>arm64;x64;x86</Platforms> -->
   </PropertyGroup>
 
- <PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Debug|net7.0-maccatalyst|arm64'">
+ <PropertyGroup Label="Debug|arm64" Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Debug|net7.0-maccatalyst|arm64'">
 	  <TreatWarningsAsErrors>True</TreatWarningsAsErrors>
 	  <CreatePackage>false</CreatePackage>
 		<RuntimeIdentifiers>maccatalyst-arm64</RuntimeIdentifiers>
 	</PropertyGroup>
 
-	<PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Release|net7.0-maccatalyst|arm64'">
+	<PropertyGroup Label="Release|arm64" Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Release|net7.0-maccatalyst|arm64'">
 	  <TreatWarningsAsErrors>True</TreatWarningsAsErrors>
 	  <CreatePackage>false</CreatePackage>
 		<RuntimeIdentifiers>maccatalyst-arm64</RuntimeIdentifiers>
 	</PropertyGroup>
 
-	 <PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Debug|net7.0-maccatalyst|x64'">
+	 <PropertyGroup Label="Debug|x64" Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Debug|net7.0-maccatalyst|x64'">
 	  <TreatWarningsAsErrors>True</TreatWarningsAsErrors>
 	  <CreatePackage>false</CreatePackage>
 		<RuntimeIdentifiers>maccatalyst-x64</RuntimeIdentifiers>
 	</PropertyGroup>
 
-	<PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Release|net7.0-maccatalyst|x64'">
+	<PropertyGroup Label="Release|x64" Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Release|net7.0-maccatalyst|x64'">
 	  <TreatWarningsAsErrors>True</TreatWarningsAsErrors>
 	  <CreatePackage>false</CreatePackage>
 		<RuntimeIdentifiers>maccatalyst-x64</RuntimeIdentifiers>
 	</PropertyGroup>
 
-	<PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Debug|net7.0-windows10.0.19041.0|arm64'">
+	<PropertyGroup Label="Debug|arm64" Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Debug|net7.0-windows10.0.19041.0|arm64'">
 	  <TreatWarningsAsErrors>True</TreatWarningsAsErrors>
 	</PropertyGroup>
 
-	<PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Release|net7.0-windows10.0.19041.0|arm64'">
+	<PropertyGroup Label="Release|arm64" Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Release|net7.0-windows10.0.19041.0|arm64'">
 	  <TreatWarningsAsErrors>True</TreatWarningsAsErrors>
 	</PropertyGroup>
 
-	<PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Debug|net7.0-windows10.0.19041.0|x64'">
+	<PropertyGroup Label="Debug|x64" Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Debug|net7.0-windows10.0.19041.0|x64'">
 	  <TreatWarningsAsErrors>True</TreatWarningsAsErrors>
 	</PropertyGroup>
 
-	<PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Release|net7.0-windows10.0.19041.0|x64'">
+	<PropertyGroup Label="Release|x64" Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Release|net7.0-windows10.0.19041.0|x64'">
 	  <TreatWarningsAsErrors>True</TreatWarningsAsErrors>
 	</PropertyGroup>
 
