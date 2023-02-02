@@ -1,7 +1,6 @@
 ﻿using ElectionGuard.ElectionSetup.Extensions;
 using ElectionGuard.UI.Lib.Models;
 using ElectionGuard.UI.Lib.Services;
-using System.Runtime.CompilerServices;
 
 namespace ElectionGuard.ElectionSetup;
 
@@ -639,7 +638,7 @@ public class KeyCeremonyMediator : DisposableBase
             guardian!.SaveGuardianKey(item.PublicKey!);
         }
         List<ElectionPartialKeyVerification> verifications = new();
-        foreach (var backup in myBackups)
+        foreach (var backup in myBackups!)
         {
             guardian!.SaveElectionPartialKeyBackup(backup.Backup!);
             var verification = guardian!.VerifyElectionPartialKeyBackup(backup.Backup!.OwnerId!, keyCeremonyId);
@@ -699,6 +698,7 @@ public class KeyCeremonyMediator : DisposableBase
         // get backups
         GuardianBackupService backupService = new();
         var backups = await backupService.GetByKeyCeremonyIdAsync(keyCeremonyId);
+        ReceiveBackups(backups!);
 
         // get all verifications
         VerificationService verificationService = new();
