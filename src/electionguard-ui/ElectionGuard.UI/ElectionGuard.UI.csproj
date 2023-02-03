@@ -27,8 +27,8 @@
 		<Nullable>enable</Nullable>
     <CopyLocalLockFileAssemblies>true</CopyLocalLockFileAssemblies>
     <RestoreProjectStyle>PackageReference</RestoreProjectStyle>    
-    <!-- <Configurations>Release;Debug</Configurations> -->
-		<!-- <Platforms>arm64;x64;x86</Platforms> -->
+    <!--<Configurations>Release;Debug</Configurations>-->
+		<Platforms>arm64;x64</Platforms>
   </PropertyGroup>
 
  <PropertyGroup Label="Debug|arm64" Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Debug|net7.0-maccatalyst|arm64'">
