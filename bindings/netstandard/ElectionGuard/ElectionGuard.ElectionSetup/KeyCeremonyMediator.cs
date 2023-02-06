@@ -1,4 +1,5 @@
-﻿using ElectionGuard.ElectionSetup.Extensions;
+﻿using ElectionGuard.ElectionSetup.Exceptions;
+using ElectionGuard.ElectionSetup.Extensions;
 using ElectionGuard.UI.Lib.Models;
 using ElectionGuard.UI.Lib.Services;
 
@@ -385,29 +386,9 @@ public class KeyCeremonyMediator : DisposableBase
         return 0;
     }
 
-    public async void RunStep1(string keyCeremonyId, string userId)
+    public async void RunStep1(string userId)
     {
-        /* - guardian side
-            key_ceremony_id = key_ceremony.id
-            user_id = self._auth_service.get_required_user_id()
-            self._key_ceremony_service.append_guardian_joined(db, key_ceremony_id, user_id)
-            # refresh key ceremony to get the list of guardians with the authoritative order they joined in
-            key_ceremony = self._key_ceremony_service.get(db, key_ceremony_id)
-            guardian_number = get_guardian_number(key_ceremony, user_id)
-            self.log.debug(
-                f"user {user_id} about to join key ceremony {key_ceremony_id} as guardian #{guardian_number}"
-            )
-            guardian = make_guardian(user_id, guardian_number, key_ceremony)
-            self._guardian_service.save_guardian(guardian, key_ceremony)
-            public_key = guardian.share_key()
-            self._key_ceremony_service.append_key(db, key_ceremony_id, public_key)
-            self.log.debug(
-                f"{user_id} joined key ceremony {key_ceremony_id} as guardian #{guardian_number}"
-            )
-            self._key_ceremony_service.notify_changed(db, key_ceremony_id)
-
-         */
-
+        string keyCeremonyId = CeremonyDetails.KeyCeremonyId;
         var currentGuardianUserName = userId;
 
         // append guardian joined to key ceremony (db)
@@ -449,7 +430,7 @@ public class KeyCeremonyMediator : DisposableBase
         AnnounceGuardians(list);
     }
 
-    public async Task RunStep2(string keyCeremonyId)
+    public async Task RunStep2(string userId)
     {
         /* - admin side
         def should_run(
@@ -461,6 +442,8 @@ public class KeyCeremonyMediator : DisposableBase
         */
 
         // change state to step2
+        string keyCeremonyId = CeremonyDetails.KeyCeremonyId;
+
         KeyCeremonyService service = new();
         await service.UpdateStateAsync(keyCeremonyId, KeyCeremonyState.PendingAdminAnnounce);
 
@@ -475,7 +458,7 @@ public class KeyCeremonyMediator : DisposableBase
 
     }
 
-    public async Task RunStep3(string keyCeremonyId, string userId)
+    public async Task RunStep3(string userId)
     {
         /* - guardian side
             def should_run(
@@ -491,6 +474,8 @@ public class KeyCeremonyMediator : DisposableBase
                     and not current_user_backup_exists
                 )
          */
+        string keyCeremonyId = CeremonyDetails.KeyCeremonyId;
+
         KeyCeremonyService service = new();
         var keyCeremony = await service.GetByKeyCeremonyIdAsync(keyCeremonyId);
 
@@ -527,7 +512,7 @@ public class KeyCeremonyMediator : DisposableBase
 
     }
 
-    public async Task RunStep4(string keyCeremonyId, string userId)
+    public async Task RunStep4(string userId)
     {
         /* - admin side
             def should_run(
@@ -536,30 +521,8 @@ public class KeyCeremonyMediator : DisposableBase
                 is_admin: bool = self._auth_service.is_admin()
                 return is_admin and state == KeyCeremonyStates.PendingAdminToShareBackups
          */
-        /* 
-           def run(self, db: Database, key_ceremony: KeyCeremonyDto) -> None:
-               current_user_id = self._auth_service.get_user_id()
-               self.log.debug(f"sharing backups for admin {current_user_id}")
-               shared_backups = self.share_backups(key_ceremony)
-               self._key_ceremony_service.append_shared_backups(
-                   db, key_ceremony.id, shared_backups
-               )
-               self._key_ceremony_service.notify_changed(db, key_ceremony.id)
+        string keyCeremonyId = CeremonyDetails.KeyCeremonyId;
 
-           def share_backups(self, key_ceremony: KeyCeremonyDto) -> List[Any]:
-               mediator = make_mediator(key_ceremony)
-               announce_guardians(key_ceremony, mediator)
-               mediator.receive_backups(key_ceremony.get_backups())
-               shared_backups = []
-               for guardian_id in key_ceremony.guardians_joined:
-                   self.log.debug(f"sharing backups for guardian {guardian_id}")
-                   guardian_backups = mediator.share_backups(guardian_id)
-                   if guardian_backups is None:
-                       raise Exception("Error sharing backups")
-                   backups_as_dict = [backup_to_dict(backup) for backup in guardian_backups]
-                   shared_backups.append({"owner_id": guardian_id, "backups": backups_as_dict})
-               return shared_backups
-        */
         // change state
         KeyCeremonyService service = new();
         await service.UpdateStateAsync(keyCeremonyId, KeyCeremonyState.PendingAdminToShareBackups);
@@ -584,7 +547,7 @@ public class KeyCeremonyMediator : DisposableBase
 
     }
 
-    public async Task RunStep5(string keyCeremonyId, string userId)
+    public async Task RunStep5(string userId)
     {
         /* - guardian side
             def should_run(
@@ -602,34 +565,12 @@ public class KeyCeremonyMediator : DisposableBase
                     and not current_user_verification_exists
                 )
          */
-        /* 
-           def run(self, db: Database, key_ceremony: KeyCeremonyDto) -> None:
-               current_user_id = self._auth_service.get_required_user_id()
-               shared_backups = key_ceremony.get_shared_backups_for_guardian(current_user_id)
-               guardian = self._guardian_service.load_guardian_from_key_ceremony(
-                   current_user_id, key_ceremony
-               )
-               self._guardian_service.load_other_keys(key_ceremony, current_user_id, guardian)
-               verifications: List[ElectionPartialKeyVerification] = []
-               for backup in shared_backups:
-                   self.log.debug(
-                       f"verifying backup from {backup.owner_id} to {current_user_id}"
-                   )
-                   guardian.save_election_partial_key_backup(backup)
-                   verification = guardian.verify_election_partial_key_backup(backup.owner_id)
-                   if verification is None:
-                       raise Exception("Error verifying backup")
-                   verifications.append(verification)
-               self._key_ceremony_service.append_verifications(
-                   db, key_ceremony.id, verifications
-               )
-               # notify the admin that a new verification was created
-               self._key_ceremony_service.notify_changed(db, key_ceremony.id)
-        */
+        string keyCeremonyId = CeremonyDetails.KeyCeremonyId;
+
         KeyCeremonyService keyCeremonyService = new();
         GuardianBackupService backupService = new();
         GuardianPublicKeyService publicKeyService = new();
-        var myBackups = await backupService.GetByGuardianIdAsync(keyCeremonyId, userId);
+        var backups = await backupService.GetByGuardianIdAsync(keyCeremonyId, userId);
         var keyCeremony = await keyCeremonyService.GetByIdAsync(keyCeremonyId);
         var guardian = Guardian.Load(userId, keyCeremony!);
         var list = await publicKeyService.GetByKeyCeremonyIdAsync(keyCeremonyId);
@@ -638,13 +579,17 @@ public class KeyCeremonyMediator : DisposableBase
             guardian!.SaveGuardianKey(item.PublicKey!);
         }
         List<ElectionPartialKeyVerification> verifications = new();
-        foreach (var backup in myBackups!)
+        foreach (var backup in backups!)
         {
             guardian!.SaveElectionPartialKeyBackup(backup.Backup!);
             var verification = guardian.VerifyElectionPartialKeyBackup(backup.Backup!.OwnerId!, keyCeremonyId);
             if(verification == null)
             {
-                throw new Exception($"Error verifying back from {backup.Backup!.OwnerId!}");
+                throw new KeyCeremonyException(
+                    keyCeremony!.State,
+                    keyCeremonyId,
+                    userId,
+                    $"Error verifying back from {backup.Backup!.OwnerId!}");
             }
             verifications.Add(verification);
         }
@@ -659,7 +604,7 @@ public class KeyCeremonyMediator : DisposableBase
 
     }
 
-    public async Task RunStep6(string keyCeremonyId, string userId)
+    public async Task RunStep6(string userId)
     {
         /* - admin side
             def should_run(
@@ -668,26 +613,8 @@ public class KeyCeremonyMediator : DisposableBase
                 is_admin = self._auth_service.is_admin()
                 return is_admin and state == KeyCeremonyStates.PendingAdminToPublishJointKey
          */
-        /* 
-           def run(self, db: Database, key_ceremony: KeyCeremonyDto) -> None:
-               current_user_id = self._auth_service.get_user_id()
-               self.log.debug(f"receiving verifications for admin {current_user_id}")
-               mediator = make_mediator(key_ceremony)
-               announce_guardians(key_ceremony, mediator)
-               mediator.receive_backups(key_ceremony.get_backups())
-               verifications = key_ceremony.get_verifications()
-               mediator.receive_backup_verifications(verifications)
-               election_joint_key = mediator.publish_joint_key()
-               if election_joint_key is None:
-                   raise Exception("Failed to publish joint key")
-               self.log.info(f"joint key published: {election_joint_key.joint_public_key}")
-               self._key_ceremony_service.append_joint_key(
-                   db, key_ceremony.id, election_joint_key
-               )
-               self._key_ceremony_service.set_complete(db, key_ceremony.id)
-               # notify everyone that verifications completed and the joint key published
-               self._key_ceremony_service.notify_changed(db, key_ceremony.id)
-        */
+        string keyCeremonyId = CeremonyDetails.KeyCeremonyId;
+
         // change state
         KeyCeremonyService service = new();
         await service.UpdateStateAsync(keyCeremonyId, KeyCeremonyState.PendingAdminToPublishJointKey);
@@ -712,7 +639,11 @@ public class KeyCeremonyMediator : DisposableBase
         // if null then throw
         if(jointKey == null)
         {
-            throw new Exception($"Failed to publish joint key for {keyCeremonyId}");
+            throw new KeyCeremonyException(
+                KeyCeremonyState.PendingAdminToPublishJointKey,
+                keyCeremonyId,
+                userId,
+                $"Failed to publish joint key for {keyCeremonyId}");
         }
 
         // save joint key to key ceremony
