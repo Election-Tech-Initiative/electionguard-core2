@@ -1,4 +1,6 @@
-﻿namespace ElectionGuard.ElectionSetup;
+﻿using ElectionGuard.UI.Lib.Models;
+
+namespace ElectionGuard.ElectionSetup;
 
 /// <summary>
 /// A tuple of election key pair, proof and polynomial

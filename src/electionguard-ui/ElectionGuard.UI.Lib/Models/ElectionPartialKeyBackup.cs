@@ -1,4 +1,4 @@
-﻿namespace ElectionGuard.ElectionSetup;
+﻿namespace ElectionGuard.UI.Lib.Models;
 
 /// <summary>
 /// Election partial key backup used for key sharing
@@ -7,7 +7,7 @@ public class ElectionPartialKeyBackup : DisposableBase
 {
     public string? OwnerId { get; init; } = default;
 
-    public string? DesignedId { get; init; } = default;
+    public string? DesignatedId { get; init; } = default;
 
     public ulong DesignatedSequenceOrder { get; init; } = default;
 
