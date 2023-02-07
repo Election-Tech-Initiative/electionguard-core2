@@ -41,16 +41,16 @@ ifeq ($(OS),Windows_NT)
     endif
 else
 	OPERATING_SYSTEM ?= $(shell uname 2>/dev/null || echo Unknown)
-	UNAME_P ?= $(shell uname -p)
-    ifeq ($(UNAME_P),x86_64)
+	UNAME_M ?= $(shell uname -m)
+    ifeq ($(UNAME_M),x86_64)
 		HOST_PROCESSOR:=x64
         PROCESSOR?=x64
     endif
-    ifneq ($(filter %86,$(UNAME_P)),)
+    ifneq ($(filter %86,$(UNAME_M)),)
 		HOST_PROCESSOR:=x86
         PROCESSOR?=x86
     endif
-    ifneq ($(filter arm%,$(UNAME_P)),)
+    ifneq ($(filter arm%,$(UNAME_M)),)
 		HOST_PROCESSOR:=arm64
         PROCESSOR?=arm64
     endif
