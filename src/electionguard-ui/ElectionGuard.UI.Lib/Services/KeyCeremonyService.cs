@@ -36,8 +36,7 @@ public class KeyCeremonyService : BaseDatabaseService<KeyCeremony>
     virtual public async Task UpdateStateAsync(string keyCeremonyId, KeyCeremonyState state)
     {
         var filterBuilder = Builders<KeyCeremony>.Filter;
-        var filter = filterBuilder.And(filterBuilder.Eq(Constants.KeyCeremonyId, keyCeremonyId),
-            filterBuilder.Eq(Constants.DataType, nameof(KeyCeremony)));
+        var filter = filterBuilder.And(filterBuilder.Eq(Constants.KeyCeremonyId, keyCeremonyId));
 
         var updateBuilder = Builders<KeyCeremony>.Update;
         var update = updateBuilder.Set(Constants.State, state);
@@ -46,14 +45,13 @@ public class KeyCeremonyService : BaseDatabaseService<KeyCeremony>
     }
 
     /// <summary>
-    /// Updates the key cermeony to a compelted state and sets the completed at date/time
+    /// Updates the key cermeony to a completed state and sets the completed at date/time
     /// </summary>
     /// <param name="keyCeremonyId">key ceremony id to update</param>
     virtual public async Task UpdateCompleteAsync(string keyCeremonyId, ElectionJointKey jointKey)
     {
         var filterBuilder = Builders<KeyCeremony>.Filter;
-        var filter = filterBuilder.And(filterBuilder.Eq(Constants.KeyCeremonyId, keyCeremonyId),
-            filterBuilder.Eq(Constants.DataType, nameof(KeyCeremony)));
+        var filter = filterBuilder.And(filterBuilder.Eq(Constants.KeyCeremonyId, keyCeremonyId));
 
         var updateBuilder = Builders<KeyCeremony>.Update;
         var update = updateBuilder.Set(Constants.State, KeyCeremonyState.Complete)
