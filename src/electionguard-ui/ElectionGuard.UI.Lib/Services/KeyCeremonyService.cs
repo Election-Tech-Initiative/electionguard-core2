@@ -39,7 +39,8 @@ public class KeyCeremonyService : BaseDatabaseService<KeyCeremony>
         var filter = filterBuilder.And(filterBuilder.Eq(Constants.KeyCeremonyId, keyCeremonyId));
 
         var updateBuilder = Builders<KeyCeremony>.Update;
-        var update = updateBuilder.Set(Constants.State, state);
+        var update = updateBuilder.Set(Constants.State, state)
+                                    .Set(Constants.UpdatedAt, DateTime.UtcNow);
 
         await UpdateAsync(filter, update);
     }
@@ -56,6 +57,7 @@ public class KeyCeremonyService : BaseDatabaseService<KeyCeremony>
         var updateBuilder = Builders<KeyCeremony>.Update;
         var update = updateBuilder.Set(Constants.State, KeyCeremonyState.Complete)
                                     .Set(Constants.CompletedAt, DateTime.UtcNow)
+                                    .Set(Constants.UpdatedAt, DateTime.UtcNow)
                                     .Set(Constants.JointKey, jointKey);
 
         await UpdateAsync(filter, update);

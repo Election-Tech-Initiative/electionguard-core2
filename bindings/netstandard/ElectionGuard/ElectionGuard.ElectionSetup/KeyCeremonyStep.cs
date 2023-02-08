@@ -15,11 +15,11 @@ public class KeyCeremonyStep
     /// <summary>
     /// 
     /// </summary>
-    public Func<Task>? RunStep { get; set; }
+    public Func<Task> RunStep { get; set; }
 
     /// <summary>
     /// Function to be called to check if the step needs to be run by the user
     /// </summary>
-    public Func<Task<bool>>? ShouldRunStep { get; set; }
+    public Func<Task<bool>> ShouldRunStep { get; set; }
 }
 

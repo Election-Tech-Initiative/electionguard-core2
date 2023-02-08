@@ -31,7 +31,8 @@ internal static class Constants
 
     public readonly static string JointKey = "JointKey";
 
-    
+    public readonly static string UpdatedAt = "UpdatedAt";
+
 }
 
 
