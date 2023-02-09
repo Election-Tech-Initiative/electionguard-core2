@@ -14,7 +14,7 @@
             Step1KeyCeremony();
         }
 
-        private async Task Step1KeyCeremony()
+        private void Step1KeyCeremony()
         {
             for (ulong i = 1; i <= NumberOfGuardians; i++)
             {

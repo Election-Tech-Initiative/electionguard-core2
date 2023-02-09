@@ -2,8 +2,6 @@
 using ElectionGuard.ElectionSetup.Extensions;
 using ElectionGuard.UI.Lib.Models;
 using ElectionGuard.UI.Lib.Services;
-using System.Reflection.Metadata.Ecma335;
-using System.Runtime.CompilerServices;
 
 namespace ElectionGuard.ElectionSetup;
 
@@ -21,8 +19,8 @@ public class KeyCeremonyMediator : DisposableBase
         CreateGuardianSteps();
     }
 
-    private List<KeyCeremonyStep> AdminSteps = new();
-    private List<KeyCeremonyStep> GuardianSteps = new();
+    private List<KeyCeremonyStep> _adminSteps = new();
+    private List<KeyCeremonyStep> _guardianSteps = new();
 
     public string UserId { get; }
     public string Id { get; }
@@ -42,42 +40,42 @@ public class KeyCeremonyMediator : DisposableBase
 
     private void CreateAdminSteps()
     {
-        AdminSteps.Add(
+        _adminSteps.Add(
             new KeyCeremonyStep()
             {
                 State = KeyCeremonyState.PendingGuardiansJoin,
                 RunStep = RunStep2,
                 ShouldRunStep = ShouldAdminStartStep2
             });
-        AdminSteps.Add(
+        _adminSteps.Add(
             new KeyCeremonyStep()
             {
                 State = KeyCeremonyState.PendingAdminAnnounce,
                 RunStep = RunStep2,
                 ShouldRunStep = AlwaysRun
             });
-        AdminSteps.Add(
+        _adminSteps.Add(
             new KeyCeremonyStep()
             {
                 State = KeyCeremonyState.PendingGuardiansJoin,
                 RunStep = RunStep4,
                 ShouldRunStep = ShouldAdminStartStep4
             });
-        AdminSteps.Add(
+        _adminSteps.Add(
             new KeyCeremonyStep()
             {
                 State = KeyCeremonyState.PendingAdminToShareBackups,
                 RunStep = RunStep4,
                 ShouldRunStep = AlwaysRun
             });
-        AdminSteps.Add(
+        _adminSteps.Add(
             new KeyCeremonyStep()
             {
                 State = KeyCeremonyState.PendingGuardiansJoin,
                 RunStep = RunStep6,
                 ShouldRunStep = ShouldAdminStartStep6
             });
-        AdminSteps.Add(
+        _adminSteps.Add(
             new KeyCeremonyStep()
             {
                 State = KeyCeremonyState.PendingAdminToPublishJointKey,
@@ -88,21 +86,21 @@ public class KeyCeremonyMediator : DisposableBase
 
     private void CreateGuardianSteps()
     {
-        GuardianSteps.Add(
+        _guardianSteps.Add(
             new KeyCeremonyStep()
             {
                 State = KeyCeremonyState.PendingGuardiansJoin,
                 RunStep = RunStep1,
                 ShouldRunStep = ShouldGuardianRunStep1
             });
-        GuardianSteps.Add(
+        _guardianSteps.Add(
             new KeyCeremonyStep()
             {
                 State = KeyCeremonyState.PendingGuardianBackups,
                 RunStep = RunStep3,
                 ShouldRunStep = ShouldGuardianRunStep3
             });
-        GuardianSteps.Add(
+        _guardianSteps.Add(
             new KeyCeremonyStep()
             {
                 State = KeyCeremonyState.PendingGuardiansVerifyBackups,
@@ -479,11 +477,11 @@ public class KeyCeremonyMediator : DisposableBase
 
         var state = keyCeremony.State;
 
-        var steps = isAdmin ? AdminSteps : GuardianSteps;
+        var steps = isAdmin ? _adminSteps : _guardianSteps;
         var currentStep = steps.SingleOrDefault(s => s.State == state);
-        if (currentStep != null && await currentStep.ShouldRunStep())
+        if (currentStep != null && await currentStep.ShouldRunStep!())
         {
-            await currentStep.RunStep();
+            await currentStep.RunStep!();
         }
     }
 
