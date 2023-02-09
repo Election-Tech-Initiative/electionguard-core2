@@ -111,7 +111,7 @@ public class KeyCeremonyMediator : DisposableBase
             });
     }
 
-    private void Announce(ElectionPublicKey shareKey)
+    public void Announce(ElectionPublicKey shareKey)
     {
         ReceiveElectionPublicKey(shareKey);
     }

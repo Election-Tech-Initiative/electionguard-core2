@@ -14,7 +14,7 @@
             Step1KeyCeremony();
         }
 
-        private void Step1KeyCeremony()
+        private async Task Step1KeyCeremony()
         {
             for (ulong i = 1; i <= NumberOfGuardians; i++)
             {
@@ -25,7 +25,7 @@
 
             // Setup mediator
             _mediator = new KeyCeremonyMediator(
-                "mediator_1", _guardians[0].CeremonyDetails
+                "mediator_1", _guardians[0].GuardianId, _guardians[0].CeremonyDetails
             );
 
             // ROUND 1: Public Key Sharing
