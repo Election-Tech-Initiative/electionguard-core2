@@ -6,7 +6,7 @@
     <Nullable>enable</Nullable>
     <EnforceCodeStyleInBuild>true</EnforceCodeStyleInBuild>
     <IsPackable>false</IsPackable>
-    <Platforms>arm64;x64;x86</Platforms>
+    <Platforms>arm64;x64</Platforms>
     <Configurations>Debug;Release</Configurations>
   </PropertyGroup>
 

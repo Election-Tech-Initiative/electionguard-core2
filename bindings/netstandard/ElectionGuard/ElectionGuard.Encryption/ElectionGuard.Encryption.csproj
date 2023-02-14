@@ -10,11 +10,10 @@
     <AssemblyVersion>2.0.0.0</AssemblyVersion>
     <AssemblyFileVersion>2.0.0.0</AssemblyFileVersion>
     <EnforceCodeStyleInBuild>true</EnforceCodeStyleInBuild>
-    <Platforms>arm64;x64;x86</Platforms>
+    <Platforms>arm64;x64</Platforms>
   </PropertyGroup>
 
   <PropertyGroup>
- 
     <!-- Package -->
     <PackageId>ElectionGuard.Encryption</PackageId>
     <Title>ElectionGuard Encryption</Title>
@@ -199,23 +198,6 @@
     <WarningsNotAsErrors>SYSLIB0004</WarningsNotAsErrors>
     <NoStdLib>false</NoStdLib>
   </PropertyGroup>
-
-  <PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Debug|net48|x64'">
-    <TreatWarningsAsErrors>True</TreatWarningsAsErrors>
-    <NoWarn>1701;1702</NoWarn>
-    <WarningLevel>4</WarningLevel>
-    <WarningsNotAsErrors>SYSLIB0004</WarningsNotAsErrors>
-    <NoStdLib>false</NoStdLib>
-  </PropertyGroup>
-
-  <PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Release|net48|x64'">
-    <TreatWarningsAsErrors>True</TreatWarningsAsErrors>
-    <NoWarn>1701;1702</NoWarn>
-    <WarningLevel>4</WarningLevel>
-    <WarningsNotAsErrors>SYSLIB0004</WarningsNotAsErrors>
-    <NoStdLib>false</NoStdLib>
-  </PropertyGroup>
-
   <PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Debug|net7.0|x64'">
     <NoWarn>1701;1702</NoWarn>
     <WarningLevel>4</WarningLevel>

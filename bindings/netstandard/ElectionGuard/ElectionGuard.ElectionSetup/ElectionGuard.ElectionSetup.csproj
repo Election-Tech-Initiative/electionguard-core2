@@ -5,7 +5,7 @@
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
     <EnforceCodeStyleInBuild>true</EnforceCodeStyleInBuild>
-    <Platforms>arm64;x64;x86</Platforms>
+    <Platforms>arm64;x64</Platforms>
     <Configurations>Debug;Release</Configurations>
   </PropertyGroup>
 

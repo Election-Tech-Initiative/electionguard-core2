@@ -14,10 +14,10 @@ jobs:
     steps:
       - name: Checkout Code
         uses: actions/checkout@v3
-      - name: Install .NET 6
-        uses: actions/setup-dotnet@v2
+      - name: Install .NET
+        uses: actions/setup-dotnet@v3
         with:
-          dotnet-version: 6.0.x
+          dotnet-version: 7.0.x
       - name: Setup Environment
         run: make environment
       - name: Build
@@ -83,17 +83,17 @@ jobs:
       - name: Checkout Code
         uses: actions/checkout@v3
       - name: Get Windows x64 Build
-        uses: actions/download-artifact@v2
+        uses: actions/download-artifact@v3
         with:
           name: win-x64
           path: build/libs/Windows/x64/src/Release
       - name: Get Linux Build
-        uses: actions/download-artifact@v2
+        uses: actions/download-artifact@v3
         with:
           name: linux-x64
           path: build/libs/Linux/x64/Release/src
       - name: Get MacOS Artifact
-        uses: actions/download-artifact@v2
+        uses: actions/download-artifact@v3
         with:
           name: osx-x64
           path: build/libs/Darwin/x64/Release/src

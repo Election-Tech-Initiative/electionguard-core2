@@ -5,6 +5,7 @@
 /// </summary>
 public enum KeyCeremonyState
 {
+    DoesNotExist = 0,
     PendingGuardiansJoin = 1,
     PendingAdminAnnounce = 2,
     PendingGuardianBackups = 3,

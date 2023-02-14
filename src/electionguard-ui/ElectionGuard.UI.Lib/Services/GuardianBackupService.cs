@@ -37,9 +37,26 @@ public class GuardianBackupService : BaseDatabaseService<GuardianBackups>
     {
         var filterBuilder = Builders<GuardianBackups>.Filter;
         var filter = filterBuilder.And(filterBuilder.Eq(Constants.KeyCeremonyId, keyCeremonyId),
-            filterBuilder.Eq(Constants.DesignatedId, DesignatedId),
-            filterBuilder.Eq(Constants.DataType, nameof(GuardianPublicKey)));
+            filterBuilder.Eq(Constants.DesignatedId, DesignatedId));
 
         return await GetAllByFilterAsync(filter);
     }
+
+    public async Task<long> CountAsync(string keyCeremonyId)
+    {
+        var filterBuilder = Builders<GuardianBackups>.Filter;
+        var filter = filterBuilder.And(filterBuilder.Eq(Constants.KeyCeremonyId, keyCeremonyId));
+
+        return await CountByFilterAsync(filter);
+    }
+
+    public async Task<long> CountAsync(string keyCeremonyId, string guardianId)
+    {
+        var filterBuilder = Builders<GuardianBackups>.Filter;
+        var filter = filterBuilder.And(filterBuilder.Eq(Constants.KeyCeremonyId, keyCeremonyId),
+            filterBuilder.Eq(Constants.GuardianId, guardianId));
+
+        return await CountByFilterAsync(filter);
+    }
+
 }

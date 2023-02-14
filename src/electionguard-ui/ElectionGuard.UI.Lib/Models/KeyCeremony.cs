@@ -44,5 +44,14 @@ public partial class KeyCeremony : DatabaseRecord
     private DateTime? _completedAt;
 
     [ObservableProperty]
+    private DateTime? _updatedAt;
+
+    [ObservableProperty]
     private KeyCeremonyState _state;
+
+    public static implicit operator CeremonyDetails(KeyCeremony data)
+    {
+        return new(data.KeyCeremonyId!, data.NumberOfGuardians, data.Quorum);
+    }
+
 }

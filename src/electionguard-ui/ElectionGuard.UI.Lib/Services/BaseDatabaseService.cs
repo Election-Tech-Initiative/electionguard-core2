@@ -144,6 +144,6 @@ public class BaseDatabaseService<T> : IDatabaseService<T> where T : DatabaseReco
     public async Task<long> CountByFilterAsync(FilterDefinition<T> filter, string? table = null)
     {
         var data = DbService.GetCollection<T>(table ?? _collection);
-        return await data.CountDocumentsAsync(filter);
+        return await data.CountDocumentsAsync(UpdateFilter(filter));
     }
 }

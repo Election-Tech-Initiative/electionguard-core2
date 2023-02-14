@@ -25,7 +25,7 @@
 
             // Setup mediator
             _mediator = new KeyCeremonyMediator(
-                "mediator_1", _guardians[0].CeremonyDetails
+                "mediator_1", _guardians[0].GuardianId, _guardians[0].CeremonyDetails
             );
 
             // ROUND 1: Public Key Sharing

@@ -390,20 +390,22 @@ bench-netstandard: build-netstandard
 
 # handle executing benchamrks on different processors
 ifeq ($(HOST_PROCESSOR),$(PROCESSOR))
-	$(DOTNET_PATH)/dotnet $(ELECTIONGUARD_BINDING_BENCH_DIR)/bin/$(PROCESSOR)/$(TARGET)/net7.0/ElectionGuard.Encryption.Bench.dll
+	$(ELECTIONGUARD_BINDING_BENCH_DIR)/bin/$(PROCESSOR)/$(TARGET)/net7.0/ElectionGuard.Encryption.Bench.exe
 else
-	$(DOTNET_PATH)/$(PROCESSOR)/dotnet $(ELECTIONGUARD_BINDING_BENCH_DIR)/bin/$(PROCESSOR)/$(TARGET)/net7.0/ElectionGuard.Encryption.Bench.dll
+	$(ELECTIONGUARD_BINDING_BENCH_DIR)/bin/$(PROCESSOR)/$(TARGET)/net7.0/ElectionGuard.Encryption.Bench.exe
 endif
 
 ifeq ($(OPERATING_SYSTEM),Windows)
-	@echo 🧪 BENCHMARK $(OPERATING_SYSTEM) $(PROCESSOR) $(TARGET) net48
-	$(DOTNET_PATH)/$(PROCESSOR)/dotnet $(ELECTIONGUARD_BINDING_BENCH_DIR)/bin/$(PROCESSOR)/$(TARGET)/net48/ElectionGuard.Encryption.Bench.exe
+	@echo 🧪 BENCHMARK $(OPERATING_SYSTEM) $(PROCESSOR) $(TARGET) netstandard2.0
+	dotnet run --framework netstandard2.0 -a $(PROCESSOR) --configuration $(TARGET) \	
+		--project ./bindings/netstandard/ElectionGuard/ElectionGuard.Encryption.Bench/Electionguard.Encryption.Bench.csproj 	
+	# $(DOTNET_PATH)/$(PROCESSOR)/dotnet $(ELECTIONGUARD_BINDING_BENCH_DIR)/bin/$(PROCESSOR)/$(TARGET)/netstandard2.0/ElectionGuard.Encryption.Bench.dll
 endif
 	# $(DOTNET_PATH)/dotnet exec --runtimeconfig $(ELECTIONGUARD_BINDING_BENCH_DIR)/bin/$(PROCESSOR)/$(TARGET)/net7.0/ElectionGuard.Encryption.Bench.runtimeconfig.json $(ELECTIONGUARD_BINDING_BENCH_DIR)/bin/$(PROCESSOR)/$(TARGET)/net7.0/ElectionGuard.Encryption.Bench.dll
 	# dotnet run --framework net7.0 -a $(PROCESSOR) --configuration $(TARGET) \
 	# 	--project ./bindings/netstandard/ElectionGuard/ElectionGuard.Encryption.Bench/Electionguard.Encryption.Bench.csproj 
 	# @echo net 4.8 $(PROCESSOR)
-	# dotnet run --framework net48 -a $(PROCESSOR) --configuration $(TARGET) \
+	# dotnet run --framework netstandard2.0 -a $(PROCESSOR) --configuration $(TARGET) \
 	# 	--project ./bindings/netstandard/ElectionGuard/ElectionGuard.Encryption.Bench/Electionguard.Encryption.Bench.csproj 
 
 bench-netstandard-arm64:
@@ -411,6 +413,13 @@ bench-netstandard-arm64:
 
 bench-netstandard-x64:
 	PROCESSOR=x64 && make bench-netstandard
+
+
+	# @echo 🧪 BENCHMARK
+	# @echo net 7.0 x64
+	# ./bindings/netstandard/ElectionGuard/ElectionGuard.Encryption.Bench/bin/x64/$(TARGET)/net7.0/ElectionGuard.Encryption.Bench
+	# @echo netstandard 2.0 x64
+	# ./bindings/netstandard/ElectionGuard/ElectionGuard.Encryption.Bench/bin/x64/$(TARGET)/netstandard2.0/ElectionGuard.Encryption.Bench
 
 # Test
 
@@ -523,6 +532,14 @@ fetch-sample-data:
 	@echo ⬇️ FETCH Sample Data
 	wget -O sample-data-1-0.zip https://github.com/microsoft/electionguard/releases/download/v1.0/sample-data.zip
 	unzip -o sample-data-1-0.zip
+
+lint:
+	dotnet jb inspectcode -o="lint-results.xml" -f="Xml" --build --verbosity="WARN" --severity="Warning" bindings/netstandard/ElectionGuard/ElectionGuard.sln
+	dotnet nvika parsereport "lint-results.xml" --treatwarningsaserrors
+
+lint-ui:
+	dotnet jb inspectcode -o="lint-results.xml" -f="Xml" --build --verbosity="WARN" --severity="Warning" src/electionguard-ui/ElectionGuard.UI.sln
+	dotnet nvika parsereport "lint-results.xml" --treatwarningsaserrors
 
 generate-sample-data:
 	@echo Generate Sample Data
