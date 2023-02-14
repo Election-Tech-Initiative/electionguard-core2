@@ -446,7 +446,7 @@ endif
 # Sample Data
 
 lint:
-	dotnet jb inspectcode -o="lint-results.xml" -f="Xml" --build --verbosity="WARN" -s="Warning" bindings/netstandard/ElectionGuard/ElectionGuard.sln
+	dotnet jb inspectcode -o="lint-results.xml" -f="Xml" --build --verbosity="WARN" --severity="Warning" bindings/netstandard/ElectionGuard/ElectionGuard.sln
 	dotnet nvika parsereport "lint-results.xml" --treatwarningsaserrors
 
 generate-sample-data:
