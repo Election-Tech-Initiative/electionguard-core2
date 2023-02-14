@@ -345,10 +345,10 @@ endif
 
 bench-netstandard: build-netstandard
 	@echo 🧪 BENCHMARK
-	@echo net 6.0 x64
-	./bindings/netstandard/ElectionGuard/ElectionGuard.Encryption.Bench/bin/x64/$(TARGET)/net6.0/ElectionGuard.Encryption.Bench
-	@echo net 4.8 x64
-	./bindings/netstandard/ElectionGuard/ElectionGuard.Encryption.Bench/bin/x64/$(TARGET)/net48/ElectionGuard.Encryption.Bench
+	@echo net 7.0 x64
+	./bindings/netstandard/ElectionGuard/ElectionGuard.Encryption.Bench/bin/x64/$(TARGET)/net7.0/ElectionGuard.Encryption.Bench
+	@echo netstandard 2.0 x64
+	./bindings/netstandard/ElectionGuard/ElectionGuard.Encryption.Bench/bin/x64/$(TARGET)/netstandard2.0/ElectionGuard.Encryption.Bench
 
 # Test
 test:
@@ -447,6 +447,10 @@ endif
 
 lint:
 	dotnet jb inspectcode -o="lint-results.xml" -f="Xml" --build --verbosity="WARN" --severity="Warning" bindings/netstandard/ElectionGuard/ElectionGuard.sln
+	dotnet nvika parsereport "lint-results.xml" --treatwarningsaserrors
+
+lint-ui:
+	dotnet jb inspectcode -o="lint-results.xml" -f="Xml" --build --verbosity="WARN" --severity="Warning" src/electionguard-ui/ElectionGuard.UI.sln
 	dotnet nvika parsereport "lint-results.xml" --treatwarningsaserrors
 
 generate-sample-data:
