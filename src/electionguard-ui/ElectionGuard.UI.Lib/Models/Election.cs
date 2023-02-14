@@ -10,5 +10,9 @@ public partial class Election : DatabaseRecord
     [ObservableProperty]
     private string? _name;
 
+    public Election() : base(nameof(Election))
+    {
+
+    }
 
 }

@@ -15,9 +15,15 @@ namespace ElectionGuard.UI.Lib.Models
         [BsonRepresentation(BsonType.ObjectId)]
         public string Id { get; set; }
 
-        public DatabaseRecord()
+        public string DataType { get; set; }
+
+        public bool SoftDeleted { get; set; }
+
+        public DatabaseRecord(string dataType)
         {
             Id = MongoDB.Bson.ObjectId.GenerateNewId().ToString();
+            DataType = dataType;
+            SoftDeleted = false;
         }
     }
 }
