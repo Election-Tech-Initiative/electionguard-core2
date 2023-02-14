@@ -38,13 +38,31 @@ public class GuardianPublicKeyService : BaseDatabaseService<GuardianPublicKey>
     {
         var filterBuilder = Builders<GuardianPublicKey>.Filter;
         var filter = filterBuilder.And(filterBuilder.Eq(Constants.KeyCeremonyId, keyCeremonyId),
-            filterBuilder.Eq(Constants.GuardianId, guardianId),
-            filterBuilder.Eq(Constants.DataType, nameof(GuardianPublicKey)));
+            filterBuilder.Eq(Constants.GuardianId, guardianId));
         
         var updateBuilder = Builders<GuardianPublicKey>.Update;
         var update = updateBuilder.Set(Constants.PublicKey, key);
 
         await UpdateAsync(filter, update);
     }
+
+    public async Task<long> CountAsync(string keyCeremonyId)
+    {
+        var filterBuilder = Builders<GuardianPublicKey>.Filter;
+        var filter = filterBuilder.And(filterBuilder.Eq(Constants.KeyCeremonyId, keyCeremonyId));
+
+        return await CountByFilterAsync(filter);
+    }
+
+    public async Task<GuardianPublicKey?> GetByIdsAsync(string keyCeremonyId, string guardianId)
+    {
+        var filterBuilder = Builders<GuardianPublicKey>.Filter;
+        var filter = filterBuilder.And(filterBuilder.Eq(Constants.KeyCeremonyId, keyCeremonyId),
+            filterBuilder.Eq(Constants.GuardianId, guardianId));
+
+        var list = await GetAllByFilterAsync(Constants.KeyCeremonyId, keyCeremonyId);
+        return list.FirstOrDefault();
+    }
+
 
 }
