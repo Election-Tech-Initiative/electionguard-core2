@@ -297,7 +297,7 @@ namespace ElectionGuard
                 CallingConvention = CallingConvention.Cdecl, SetLastError = true)]
             internal static extern Status ToJson(out IntPtr data, out ulong size);
 
-            
+
 
         }
 
@@ -409,6 +409,14 @@ namespace ElectionGuard
 
         internal static class ElGamal
         {
+            [DllImport(DllName, EntryPoint = "eg_elgamal_add",
+                CallingConvention = CallingConvention.Cdecl, SetLastError = true)]
+            // ReSharper disable once MemberHidesStaticFromOuterClass
+            internal static extern Status Add(
+                [MarshalAs(UnmanagedType.LPArray)] IntPtr[] ciphertexts,
+                ulong ciphertextsSize,
+                out ElGamalCiphertext.ElGamalCiphertextHandle handle);
+
             [DllImport(DllName, EntryPoint = "eg_elgamal_encrypt",
                 CallingConvention = CallingConvention.Cdecl, SetLastError = true)]
             // ReSharper disable once MemberHidesStaticFromOuterClass

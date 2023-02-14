@@ -136,8 +136,10 @@ namespace electionguard
     /// </summary>
     EG_API std::unique_ptr<ElGamalCiphertext>
     elgamalEncrypt_with_precomputed(uint64_t m, ElementModP &gToRho, ElementModP &pubkeyToRho);
+
     /// <summary>
-    /// Accumulate the ciphertexts by adding them together.
+    /// Homomorphically accumulates one or more ElGamal ciphertexts by pairwise multiplication.
+    /// The exponents of vote counters will add.
     /// </summary>
     EG_API std::unique_ptr<ElGamalCiphertext>
     elgamalAdd(const std::vector<std::reference_wrapper<ElGamalCiphertext>> &ciphertexts);
@@ -156,8 +158,8 @@ namespace electionguard
     /// the ElectionGuard specification. The tuple g ^ r mod p concatenated with
     /// K ^ r mod p are used to feed into a hash function to generate a main key
     /// from which other keys derive to perform XOR encryption and to MAC the
-    /// result. Create one with `hashedElgamalEncrypt`. Decrypt using one the
-    /// 'decrypt' method.
+    /// result. Create one with `hashedElgamalEncrypt`. Decrypt using one of the
+    /// 'decrypt' methods.
     /// </summary>
     class EG_API HashedElGamalCiphertext : public CryptoHashable
     {

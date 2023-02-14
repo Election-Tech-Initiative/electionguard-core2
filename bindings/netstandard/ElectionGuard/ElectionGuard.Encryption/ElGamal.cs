@@ -1,5 +1,7 @@
 ﻿namespace ElectionGuard
 {
+    using System;
+    using System.Collections.Generic;
     // Declare native types for convenience
     using NativeElGamalCiphertext = NativeInterface.ElGamalCiphertext.ElGamalCiphertextHandle;
     using NativeHashedElGamalCiphertext = NativeInterface.HashedElGamalCiphertext.HashedElGamalCiphertextHandle;
@@ -7,7 +9,7 @@
     /// <summary>
     /// ElGamal Functions
     /// </summary>
-    public static class Elgamal
+    public static class ElGamal
     {
         /// <summary>
         /// Encrypts a message with a given random nonce and an ElGamal public key.
@@ -22,6 +24,30 @@
         {
             var status = NativeInterface.ElGamal.Encrypt(
                     plaintext, nonce.Handle, publicKey.Handle,
+                    out NativeElGamalCiphertext ciphertext);
+            status.ThrowIfError();
+            return new ElGamalCiphertext(ciphertext);
+        }
+
+        /// <summary>
+        /// Homomorphically accumulates one or more ElGamal ciphertexts by pairwise multiplication.
+        /// The exponents of vote counters will add.
+        ///
+        /// <param name="ciphertexts"> A collection of Ciphertexts to combine</param>
+        /// <returns>A ciphertext tuple.</returns>
+        /// </summary>
+        public static ElGamalCiphertext Add(
+            List<ElGamalCiphertext> ciphertexts)
+        {
+            IntPtr[] ciphertextPointers = new IntPtr[ciphertexts.Count];
+            for (var i = 0; i < ciphertexts.Count; i++)
+            {
+                ciphertextPointers[i] = ciphertexts[i].Handle.Ptr;
+                // ciphertexts[i].Dispose();
+            }
+
+            var status = NativeInterface.ElGamal.Add(
+                    ciphertextPointers, (ulong)ciphertexts.Count,
                     out NativeElGamalCiphertext ciphertext);
             status.ThrowIfError();
             return new ElGamalCiphertext(ciphertext);

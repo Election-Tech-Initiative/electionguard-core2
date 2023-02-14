@@ -5,10 +5,10 @@
 
 #include <doctest/doctest.h>
 #include <electionguard/constants.h>
+#include <electionguard/convert.hpp>
 #include <electionguard/elgamal.hpp>
 #include <electionguard/group.hpp>
 #include <electionguard/precompute_buffers.hpp>
-#include <electionguard/convert.hpp>
 #include <stdexcept>
 
 using namespace electionguard;
@@ -165,6 +165,24 @@ TEST_CASE("elgamalEncrypt encrypt 1 decrypts with secret")
     CHECK(1UL == decrypted);
 }
 
+TEST_CASE("elgamalAdd simple decrypts with secret")
+{
+    const auto &nonce = ONE_MOD_Q();
+    const auto &secret = TWO_MOD_Q();
+    auto keypair = ElGamalKeyPair::fromSecret(secret, false);
+    auto *publicKey = keypair->getPublicKey();
+
+    auto firstCiphertext = elgamalEncrypt(1UL, nonce, *publicKey);
+    auto secondCiphertext = elgamalEncrypt(1UL, nonce, *publicKey);
+
+    const vector<reference_wrapper<ElGamalCiphertext>> ciphertexts = {*firstCiphertext,
+                                                                      *secondCiphertext};
+    auto result = elgamalAdd(ciphertexts);
+
+    auto decrypted = result->decrypt(secret);
+    CHECK(2UL == decrypted);
+}
+
 TEST_CASE("HashedElGamalCiphertext encrypt and decrypt data")
 {
     uint64_t qwords_to_use[4] = {0x0102030405060708, 0x090a0b0c0d0e0f10, 0x1112131415161718,
@@ -247,8 +265,7 @@ TEST_CASE("HashedElGamalCiphertext encrypt and decrypt string data with padding"
                                 (plaintext_string.size() * 2));
 
     auto HEGResult =
-      hashedElgamalEncrypt(plaintext, *nonce, *publicKey,
-          *cryptoExtendedBaseHash, BYTES_512, true);
+      hashedElgamalEncrypt(plaintext, *nonce, *publicKey, *cryptoExtendedBaseHash, BYTES_512, true);
 
     unique_ptr<ElementModQ> hash_of_HEG = HEGResult->crypto_hash();
 
@@ -560,8 +577,9 @@ TEST_CASE("HashedElGamalCiphertext encrypt and decrypt with hard coded data for 
     unique_ptr<ElementModP> pad = make_unique<ElementModP>(*HEGResult->getPad());
     vector<uint8_t> data = HEGResult->getData();
     vector<uint8_t> mac = HEGResult->getMac();
-    
-    string hard_coded_pad_string("C102BAB526517D74FE5D5C249E"
+
+    string hard_coded_pad_string(
+      "C102BAB526517D74FE5D5C249E"
       "7F422993C0306C40A9398FBAD01A0D3547B50BDFD77C6EFC187C7B1FD7918A0B3C2A2FB0A3776A7240F9A"
       "75410569379B3D16877B547F52E79542C1129F6E369F2D006D0A1AA3919F0228CA07F5C9A4DFD1118A606"
       "AA4B7000F9EDC65963F130663FD4F7246F7CFE7A38F1E1DC9BC0698CAB881DCD5A75E6D7165B329C28D80"
@@ -575,7 +593,7 @@ TEST_CASE("HashedElGamalCiphertext encrypt and decrypt with hard coded data for 
       "0BEA43264765B34851ADE4E5F1F213C25DCF66D35BE92611555D8C05ACFDF1AC5CA82B7D7F0D9BE49596F"
       "8B7F3269D9887F40B4BAB5C3D2BA7049B6D2119C3D0D01501836203412869E0");
     CHECK(pad->toHex() == hard_coded_pad_string);
-    
+
     string hard_coded_data_string(
       "F8E994D157A065A1DB2DA5E38645C283F7CCB339E13F0DE29B83A4EFA"
       "2F4366C626FC8E318AF81DCB2E6083A598F8916A5FEEC3C1A1B8EBEB4081F3CB92FA86E000B4994B77E"

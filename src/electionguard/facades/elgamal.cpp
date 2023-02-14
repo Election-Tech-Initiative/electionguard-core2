@@ -6,6 +6,8 @@
 #include "electionguard/status.h"
 #include "variant_cast.hpp"
 
+#include <functional>
+
 extern "C" {
 #include "electionguard/elgamal.h"
 }
@@ -17,6 +19,8 @@ using electionguard::ElGamalCiphertext;
 using electionguard::ElGamalKeyPair;
 using electionguard::HashedElGamalCiphertext;
 using electionguard::Log;
+using electionguard::uint64_to_size;
+using std::reference_wrapper;
 
 #pragma region ElGamalKeyPair
 
@@ -153,6 +157,25 @@ eg_electionguard_status_t eg_elgamal_ciphertext_decrypt_with_secret(
 #pragma endregion
 
 #pragma region ElgamalEncrypt
+
+eg_electionguard_status_t eg_elgamal_add(eg_elgamal_ciphertext_t *in_ciphertexts[],
+                                         uint64_t in_ciphertexts_size,
+                                         eg_elgamal_ciphertext_t **out_ciphertext)
+{
+    try {
+        vector<reference_wrapper<ElGamalCiphertext>> ciphertexts;
+        ciphertexts.reserve(uint64_to_size(in_ciphertexts_size));
+        for (size_t i = 0; i < in_ciphertexts_size; i++) {
+            ciphertexts.push_back(*AS_TYPE(ElGamalCiphertext, in_ciphertexts[i]));
+        }
+        auto ciphertext = elgamalAdd(ciphertexts);
+        *out_ciphertext = AS_TYPE(eg_elgamal_ciphertext_t, ciphertext.release());
+        return ELECTIONGUARD_STATUS_SUCCESS;
+    } catch (const exception &e) {
+        Log::error(":eg_elgamal_add", e);
+        return ELECTIONGUARD_STATUS_ERROR_RUNTIME_ERROR;
+    }
+}
 
 eg_electionguard_status_t eg_elgamal_encrypt(uint64_t in_plaintext, eg_element_mod_q_t *in_nonce,
                                              eg_element_mod_p_t *in_public_key,

@@ -64,6 +64,19 @@ EG_API eg_electionguard_status_t eg_elgamal_ciphertext_decrypt_with_secret(
 #ifndef ElgamalEncrypt
 
 /**
+ * @brief Homomorphically accumulates one or more ElGamal ciphertexts by pairwise multiplication. 
+ * The exponents of vote counters will add.
+ * 
+ * @param[in] in_ciphertexts 
+ * @param[in] in_ciphertexts_size 
+ * @param[out] out_ciphertext 
+ * @return eg_electionguard_status_t 
+ */
+eg_electionguard_status_t eg_elgamal_add(eg_elgamal_ciphertext_t *in_ciphertexts[],
+                                         uint64_t in_ciphertexts_size,
+                                         eg_elgamal_ciphertext_t **out_ciphertext);
+
+/**
  * Encrypts a message with a given random nonce and an ElGamal public key.
 *
 * @param[in] m Message to elgamal_encrypt; must be an integer in [0,Q).
