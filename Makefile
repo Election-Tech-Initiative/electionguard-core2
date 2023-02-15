@@ -275,7 +275,12 @@ clean-netstandard:
 
 clean-ui:
 	@echo 🗑️ CLEAN UI
-	dotnet clean ./src/electionguard-ui/ElectionGuard.UI.sln
+	cd ./src/electionguard-ui && dotnet restore
+	dotnet clean ./src/electionguard-ui/ElectionGuard.UI/ElectionGuard.UI.csproj
+	dotnet clean ./src/electionguard-ui/ElectionGuard.UI.Test/ElectionGuard.UI.Test.csproj
+	dotnet clean ./bindings/netstandard/ElectionGuard/ElectionGuard.ElectionSetup/ElectionGuard.ElectionSetup.csproj
+	dotnet clean ./bindings/netstandard/ElectionGuard/ElectionGuard.ElectionSetup.Tests/ElectionGuard.ElectionSetup.Tests.csproj
+	dotnet clean ./src/electionguard-ui/ElectionGuard.UI.Lib/ElectionGuard.UI.Lib.csproj
 
 # Generate
 
@@ -490,18 +495,17 @@ test-ui:
 	@echo 🧪 TEST UI $(PROCESSOR) $(TARGET)
 	dotnet build -a $(PROCESSOR) --configuration $(TARGET) ./src/electionguard-ui/electionGuard.UI.Test/ElectionGuard.UI.Test.csproj
 	dotnet build -a $(PROCESSOR) --configuration $(TARGET) ./bindings/netstandard/ElectionGuard/ElectionGuard.ElectionSetup.Tests/ElectionGuard.ElectionSetup.Tests.csproj
-ifeq ($(OPERATING_SYSTEM),Windows)
 	make build
+ifeq ($(OPERATING_SYSTEM),Windows)
 	cp "build/libs/$(OPERATING_SYSTEM)/$(PROCESSOR)/$(TARGET)/src/$(TARGET)/electionguard.dll" "src/electionguard-ui/electionGuard.UI.Test/bin/$(TARGET)/net7.0/win-$(PROCESSOR)/electionguard.dll"
 	cp "build/libs/$(OPERATING_SYSTEM)/$(PROCESSOR)/$(TARGET)/src/$(TARGET)/electionguard.dll" "bindings/netstandard/ElectionGuard/ElectionGuard.ElectionSetup.Tests/bin/$(TARGET)/net7.0/win-$(PROCESSOR)/electionguard.dll"
-	dotnet test -a $(PROCESSOR) --configuration $(TARGET) ./src/electionguard-ui/ElectionGuard.UI.sln
 endif
 ifeq ($(OPERATING_SYSTEM),Darwin)
-	make build
 	cp "build/libs/$(OPERATING_SYSTEM)/$(PROCESSOR)/$(TARGET)/src/libelectionguard.dylib" "src/electionguard-ui/electionGuard.UI.Test/bin/$(TARGET)/net7.0/osx-$(PROCESSOR)/libelectionguard.dylib"
 	cp "build/libs/$(OPERATING_SYSTEM)/$(PROCESSOR)/$(TARGET)/src/libelectionguard.dylib" "bindings/netstandard/ElectionGuard/ElectionGuard.ElectionSetup.Tests/bin/$(TARGET)/net7.0/osx-$(PROCESSOR)/libelectionguard.dylib"
-	dotnet test -a $(PROCESSOR) --configuration $(TARGET) ./src/electionguard-ui/ElectionGuard.UI.sln
 endif
+	dotnet test -a $(PROCESSOR) --no-build --configuration $(TARGET) ./src/electionguard-ui/ElectionGuard.UI.Test/ElectionGuard.UI.Test.csproj
+	dotnet test -a $(PROCESSOR) --no-build --configuration $(TARGET) ./bindings/netstandard/ElectionGuard/ElectionGuard.ElectionSetup.Tests/ElectionGuard.ElectionSetup.Tests.csproj
 
 # Coverage
 
