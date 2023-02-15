@@ -28,7 +28,8 @@
     <CopyLocalLockFileAssemblies>true</CopyLocalLockFileAssemblies>
     <RestoreProjectStyle>PackageReference</RestoreProjectStyle>    
     <!--<Configurations>Release;Debug</Configurations>-->
-		<Platforms>arm64;x64</Platforms>
+		<Platforms Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'maccatalyst'">arm64;x64</Platforms>
+		<Platforms Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'windows'">x64</Platforms>
   </PropertyGroup>
 
  <PropertyGroup Label="Debug|arm64" Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Debug|net7.0-maccatalyst|arm64'">
