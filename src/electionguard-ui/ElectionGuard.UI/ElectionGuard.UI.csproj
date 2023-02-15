@@ -55,13 +55,13 @@
 		<RuntimeIdentifiers>maccatalyst-x64</RuntimeIdentifiers>
 	</PropertyGroup>
 
-	<PropertyGroup Label="Debug|arm64" Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Debug|net7.0-windows10.0.19041.0|arm64'">
+	<!-- <PropertyGroup Label="Debug|arm64" Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Debug|net7.0-windows10.0.19041.0|arm64'">
 	  <TreatWarningsAsErrors>True</TreatWarningsAsErrors>
 	</PropertyGroup>
 
 	<PropertyGroup Label="Release|arm64" Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Release|net7.0-windows10.0.19041.0|arm64'">
 	  <TreatWarningsAsErrors>True</TreatWarningsAsErrors>
-	</PropertyGroup>
+	</PropertyGroup> -->
 
 	<PropertyGroup Label="Debug|x64" Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Debug|net7.0-windows10.0.19041.0|x64'">
 	  <TreatWarningsAsErrors>True</TreatWarningsAsErrors>
