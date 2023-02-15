@@ -494,13 +494,13 @@ ifeq ($(OPERATING_SYSTEM),Windows)
 	make build
 	cp "build/libs/$(OPERATING_SYSTEM)/$(PROCESSOR)/$(TARGET)/src/$(TARGET)/electionguard.dll" "src/electionguard-ui/electionGuard.UI.Test/bin/$(TARGET)/net7.0/win-$(PROCESSOR)/electionguard.dll"
 	cp "build/libs/$(OPERATING_SYSTEM)/$(PROCESSOR)/$(TARGET)/src/$(TARGET)/electionguard.dll" "bindings/netstandard/ElectionGuard/ElectionGuard.ElectionSetup.Tests/bin/$(TARGET)/net7.0/win-$(PROCESSOR)/electionguard.dll"
-	dotnet test -a $(PROCESSOR) --no-build --configuration $(TARGET) ./src/electionguard-ui/ElectionGuard.UI.sln
+	dotnet test -a $(PROCESSOR) --configuration $(TARGET) ./src/electionguard-ui/ElectionGuard.UI.sln
 endif
 ifeq ($(OPERATING_SYSTEM),Darwin)
 	make build
 	cp "build/libs/$(OPERATING_SYSTEM)/$(PROCESSOR)/$(TARGET)/src/libelectionguard.dylib" "src/electionguard-ui/electionGuard.UI.Test/bin/$(TARGET)/net7.0/osx-$(PROCESSOR)/libelectionguard.dylib"
 	cp "build/libs/$(OPERATING_SYSTEM)/$(PROCESSOR)/$(TARGET)/src/libelectionguard.dylib" "bindings/netstandard/ElectionGuard/ElectionGuard.ElectionSetup.Tests/bin/$(TARGET)/net7.0/osx-$(PROCESSOR)/libelectionguard.dylib"
-	dotnet test -a $(PROCESSOR) --no-build --configuration $(TARGET) ./src/electionguard-ui/ElectionGuard.UI.sln
+	dotnet test -a $(PROCESSOR) --configuration $(TARGET) ./src/electionguard-ui/ElectionGuard.UI.sln
 endif
 
 # Coverage
