@@ -11,9 +11,7 @@ public partial class ViewKeyCeremonyViewModel : BaseViewModel
 
     private KeyCeremonyMediator? _mediator;
 
-    private bool joined = false;
-
-    public ViewKeyCeremonyViewModel(IServiceProvider serviceProvider, KeyCeremonyService keyCeremonyService) : 
+    public ViewKeyCeremonyViewModel(IServiceProvider serviceProvider, KeyCeremonyService keyCeremonyService) :
         base("ViewKeyCeremony", serviceProvider)
     {
         _keyCeremonyService = keyCeremonyService;
@@ -31,7 +29,7 @@ public partial class ViewKeyCeremonyViewModel : BaseViewModel
 
     partial void OnKeyCeremonyIdChanged(string value)
     {
-        Task.Run(async() => KeyCeremony = await _keyCeremonyService.GetByKeyCeremonyIdAsync(value));
+        Task.Run(async () => KeyCeremony = await _keyCeremonyService.GetByKeyCeremonyIdAsync(value));
     }
 
     partial void OnKeyCeremonyChanged(KeyCeremony? value)
@@ -46,7 +44,6 @@ public partial class ViewKeyCeremonyViewModel : BaseViewModel
     [RelayCommand(CanExecute = nameof(CanJoin))]
     public async Task Join()
     {
-        joined = true;
         // TODO: Tell the signalR hub what user has joined
         await _mediator!.RunKeyCeremony(IsAdmin);
         var timer = Dispatcher.GetForCurrentThread()!.CreateTimer();
