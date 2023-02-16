@@ -10,12 +10,17 @@
 
 namespace electionguard
 {
-    /// <param name="a"> Zero or more elements of any of the accepted types.</param>
-    /// <returns>A cryptographic hash of these elements, concatenated.</returns>
-    /// </Summary>
-    EG_API std::vector<uint8_t> get_hmac(std::vector<uint8_t> key,
-                                         std::vector<uint8_t> message,
-                                         uint32_t length, uint32_t start);
+    class HMAC
+    {
+      public:
+        /// <param name="a"> Zero or more elements of any of the accepted types.</param>
+        /// <returns>A cryptographic hash of these elements, concatenated.</returns>
+        /// </Summary>
+        EG_API static std::vector<uint8_t> compute(const std::vector<uint8_t> &key,
+                                                   const std::vector<uint8_t> &message,
+                                                   uint32_t length, uint32_t start);
+    };
+
 } // namespace electionguard
 
 #endif /* __ELECTIONGUARD_CPP_HMAC_HPP_INCLUDED__ */

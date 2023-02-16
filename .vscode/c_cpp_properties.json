@@ -5,11 +5,13 @@
             "includePath": [
                 "${workspaceFolder}/**"
             ],
-            "defines": [],
+            "defines": [
+                "USE_STANDARD_PRIMES"
+            ],
             "compilerPath": "/usr/bin/gcc",
             "cStandard": "c11",
             "cppStandard": "c++17",
-            "intelliSenseMode": "clang-x64",
+            "intelliSenseMode": "${default}",
             "compileCommands": "${workspaceFolder}/build/compile_commands.json"
         },
         {
@@ -20,7 +22,9 @@
                 "${workspaceFolder}/src/**",
                 "${workspaceFolder}/test/**"
             ],
-            "defines": [],
+            "defines": [
+                "USE_STANDARD_PRIMES"
+            ],
             "macFrameworkPath": [
                 "/System/Library/Frameworks",
                 "/Library/Frameworks"
@@ -36,10 +40,11 @@
                 "limitSymbolsToIncludedHeaders": true,
                 "databaseFilename": ""
             },
-            "configurationProvider": "ms-vscode.makefile-tools"
+            "compileCommands": "${workspaceFolder}/build/compile_commands.json",
+            "configurationProvider": "ms-vscode.cmake-tools"
         },
         {
-            "name": "Win64",
+            "name": "Mingw64",
             "includePath": [
                 "${workspaceFolder}/**",
                 "C:\\msys64\\mingw64\\include"
@@ -47,7 +52,8 @@
             "defines": [
                 "_DEBUG",
                 "UNICODE",
-                "_UNICODE"
+                "_UNICODE",
+                "USE_STANDARD_PRIMES"
             ],
             "windowsSdkVersion": "10.0.18362.0",
             "compilerPath": "C:\\msys64\\mingw64\\bin\\gcc.exe",
@@ -62,6 +68,33 @@
                 "databaseFilename": ""
             },
             "forcedInclude": []
+        },
+        {
+            "name": "Win32",
+            "includePath": [
+                "${workspaceFolder}/**"
+            ],
+            "defines": [
+                "_WIN32",
+                "USE_STANDARD_PRIMES"
+            ],
+            "windowsSdkVersion": "10.0.18362.0",
+            "cStandard": "c11",
+            "cppStandard": "c++17",
+            "intelliSenseMode": "msvc-x64"
+        },
+        {
+            "name": "Win64",
+            "includePath": [
+                "${workspaceFolder}/**"
+            ],
+            "defines": [
+                "USE_STANDARD_PRIMES"
+            ],
+            "windowsSdkVersion": "10.0.18362.0",
+            "cStandard": "c11",
+            "cppStandard": "c++17",
+            "intelliSenseMode": "msvc-x64"
         }
     ],
     "version": 4

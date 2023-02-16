@@ -237,7 +237,7 @@ namespace electionguard
     /// <summary>
     /// A simple thread pool that uses a common work queue for all threads
     /// </summary>
-    class ThreadPool
+    class EG_INTERNAL_API ThreadPool
     {
       public:
         ThreadPool(const std::uint_fast32_t &thread_count = std::thread::hardware_concurrency())

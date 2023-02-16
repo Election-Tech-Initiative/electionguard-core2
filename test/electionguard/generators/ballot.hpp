@@ -1,6 +1,7 @@
 #ifndef __ELECTIONGUARD_CPP_TOOLS_GENERATORS_BALLOT_HPP_INCLUDED__
 #define __ELECTIONGUARD_CPP_TOOLS_GENERATORS_BALLOT_HPP_INCLUDED__
 
+#include "../../../src/electionguard/log.hpp"
 #include "../../../src/electionguard/random.hpp"
 
 #include <electionguard/ballot.hpp>
