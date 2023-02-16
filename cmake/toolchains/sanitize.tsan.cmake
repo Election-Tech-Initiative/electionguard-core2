@@ -1,0 +1,11 @@
+# Common cmake variables when running benchmarks
+set(CMAKE_BUILD_TYPE Debug)
+set(BUILD_SHARED_LIBS ON)
+set(EXPORT_INTERNALS ON)
+set(USE_TEST_PRIMES OFF)
+set(OPTION_ENABLE_TESTS ON)
+set(CODE_COVERAGE ON)
+set(USE_STATIC_ANALYSIS ON)
+set(USE_DYNAMIC_ANALYSIS ON)
+set(USE_SANITIZER thread)
+set(LOG_LEVEL debug)

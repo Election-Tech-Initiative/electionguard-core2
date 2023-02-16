@@ -1,5 +1,6 @@
+#include "../../libs/hacl/Hacl_Bignum256.hpp"
 #include "../../src/electionguard/convert.hpp"
-#include "../../src/electionguard/facades/Hacl_Bignum256.hpp"
+#include "../../src/electionguard/facades/bignum4096.hpp"
 #include "../../src/electionguard/log.hpp"
 #include "../../src/electionguard/utils.hpp"
 #include "utils/byte_logger.hpp"
@@ -15,6 +16,7 @@
 #include <string>
 
 using namespace electionguard;
+using namespace electionguard::facades;
 using namespace std;
 using namespace hacl;
 

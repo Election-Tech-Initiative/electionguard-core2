@@ -20,10 +20,9 @@ jobs:
         name:
           [
             "ubuntu-22.04-clang-14.0.0",
-            "ubuntu-22.04-gcc-11.3.0",
-            "ubuntu-20.04-gcc-10.3.0",
-            "ubuntu-20.04-clang-12.0.0",
+            "ubuntu-22.04-gcc-12.1.0",
             "macos-12-xcode-14.1",
+            "macos-12-xcode-14.1-arm64",
             "windows-2022-gcc-11",
             "windows-2022-msvc-latest",
             "ubuntu-22.04-linter",
@@ -31,41 +30,39 @@ jobs:
         include:
           - name: ubuntu-22.04-clang-14.0.0
             os: ubuntu-22.04
+            processor: x64
             compiler: clang
             version: "14"
             makeReleaseBuild: false
             lint: false
             runCsTests: false
-          - name: ubuntu-22.04-gcc-11.3.0
+          - name: ubuntu-22.04-gcc-12.1.0
             os: ubuntu-22.04
+            processor: x64
             compiler: gcc
-            version: "11"
-            makeReleaseBuild: false
-            lint: false
-            runCsTests: false
-          - name: ubuntu-20.04-gcc-10.3.0
-            os: ubuntu-20.04
-            compiler: gcc
-            version: "10"
-            makeReleaseBuild: false
-            lint: false
-            runCsTests: false
-          - name: ubuntu-20.04-clang-12.0.0
-            os: ubuntu-20.04
-            compiler: clang
             version: "12"
             makeReleaseBuild: false
             lint: false
             runCsTests: false
           - name: macOS-12-xcode-14.1
             os: macOS-12
+            processor: x64
             compiler: xcode
             version: "14.1"
             makeReleaseBuild: false
             lint: false
             runCsTests: true
+          - name: macOS-12-xcode-14.1-arm64
+            os: macOS-12
+            processor: arm64
+            compiler: xcode
+            version: "14.1"
+            makeReleaseBuild: false
+            lint: false
+            runCsTests: false
           - name: windows-2022-gcc-11
             os: windows-2022
+            processor: x64
             compiler: gcc
             version: "11"
             makeReleaseBuild: false
@@ -73,6 +70,7 @@ jobs:
             runCsTests: false
           - name: windows-2022-msvc-latest
             os: windows-2022
+            processor: x64
             compiler: msvc
             version: "latest"
             makeReleaseBuild: false
@@ -80,6 +78,7 @@ jobs:
             runCsTests: true
           - name: ubuntu-22.04-linter
             os: ubuntu-22.04
+            processor: x64
             compiler: clang
             version: "14"
             makeReleaseBuild: false

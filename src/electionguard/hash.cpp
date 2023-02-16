@@ -1,12 +1,16 @@
 #include "electionguard/hash.hpp"
 
-#include "../karamel/Hacl_Bignum256.h"
-#include "../karamel/Hacl_Streaming_SHA2.h"
+#include "../../libs/hacl/Hacl_Bignum256.hpp"
+#include "../../libs/hacl/Hacl_Streaming_SHA2.hpp"
 #include "log.hpp"
 
+#include <cstring>
 #include <iomanip>
 #include <iostream>
 
+using hacl::Bignum256;
+using hacl::StreamingSHA2;
+using hacl::StreamingSHA2Mode;
 using std::get;
 using std::make_unique;
 using std::nullptr_t;
@@ -21,9 +25,9 @@ namespace electionguard
 {
     string get_hash_string(CryptoHashableType a);
     template <typename T> string hash_inner_vector(vector<T> inner_vector);
-    void push_hash_update(Hacl_Streaming_SHA2_state_sha2_224 *p, CryptoHashableType a);
-    Hacl_Streaming_SHA2_state_sha2_224 *hash_open();
-    unique_ptr<ElementModQ> hash_close(Hacl_Streaming_SHA2_state_sha2_224 *p);
+    void push_hash_update(StreamingSHA2 *p, CryptoHashableType a);
+    unique_ptr<StreamingSHA2> hash_open();
+    unique_ptr<ElementModQ> hash_close(StreamingSHA2 *p);
 
     enum CryptoHashableTypeEnum {
         NULL_PTR = 0,
@@ -60,39 +64,38 @@ namespace electionguard
     unique_ptr<ElementModQ> hash_elems(const vector<CryptoHashableType> &a)
     {
         uint8_t output[MAX_Q_SIZE] = {};
-        Hacl_Streaming_SHA2_state_sha2_224 *p = hash_open();
+        unique_ptr<StreamingSHA2> p = hash_open();
 
         if (a.empty()) {
-            push_hash_update(p, nullptr);
+            push_hash_update(p.get(), nullptr);
         } else {
             for (const CryptoHashableType &item : a) {
-                push_hash_update(p, item);
+                push_hash_update(p.get(), item);
             }
         }
-        return hash_close(p);
+        return hash_close(p.get());
     }
 
     unique_ptr<ElementModQ> hash_elems(CryptoHashableType a)
     {
-        Hacl_Streaming_SHA2_state_sha2_224 *p = hash_open();
-        push_hash_update(p, a);
-        return hash_close(p);
+        unique_ptr<StreamingSHA2> p = hash_open();
+        push_hash_update(p.get(), a);
+        return hash_close(p.get());
     }
 
-    Hacl_Streaming_SHA2_state_sha2_224 *hash_open()
+    unique_ptr<StreamingSHA2> hash_open()
     {
-        Hacl_Streaming_SHA2_state_sha2_224 *p = Hacl_Streaming_SHA2_create_in_256();
-        Hacl_Streaming_SHA2_update_256(p, static_cast<uint8_t *>(delimiter), sizeof(delimiter));
-        return p;
+        auto p = make_unique<StreamingSHA2>(StreamingSHA2Mode::SHA2_256);
+        p->update(static_cast<uint8_t *>(delimiter), sizeof(delimiter));
+        return move(p);
     }
 
-    unique_ptr<ElementModQ> hash_close(Hacl_Streaming_SHA2_state_sha2_224 *p)
+    unique_ptr<ElementModQ> hash_close(StreamingSHA2 *p)
     {
         uint8_t output[MAX_Q_SIZE] = {};
-        Hacl_Streaming_SHA2_finish_256(p, static_cast<uint8_t *>(output));
+        p->finish(static_cast<uint8_t *>(output));
 
-        auto *bigNum =
-          Hacl_Bignum256_new_bn_from_bytes_be(sizeof(output), static_cast<uint8_t *>(output));
+        auto *bigNum = Bignum256::fromBytes(sizeof(output), static_cast<uint8_t *>(output));
         if (bigNum == nullptr) {
             throw out_of_range("bytes_to_p could not allocate");
         }
@@ -104,7 +107,6 @@ namespace electionguard
         // and free the allocated resources
         uint64_t normalized[MAX_Q_LEN] = {};
         memcpy(static_cast<uint64_t *>(normalized), bigNum, sizeof(output));
-        Hacl_Streaming_SHA2_free_256(p);
         free(bigNum);
 
         auto element = make_unique<ElementModQ>(normalized, true);
@@ -241,17 +243,16 @@ namespace electionguard
                 vector<uint8_t> temp = get<vector<uint8_t>>(a);
                 return vector_uint8_t_to_hex(temp);
             }
-                
         }
 
         return null_string;
     }
 
-    void push_hash_update(Hacl_Streaming_SHA2_state_sha2_224 *p, CryptoHashableType a)
+    void push_hash_update(StreamingSHA2 *p, CryptoHashableType a)
     {
         string input_string = get_hash_string(a);
         const auto *input = reinterpret_cast<const uint8_t *>(input_string.c_str());
-        Hacl_Streaming_SHA2_update_256(p, const_cast<uint8_t *>(input), input_string.size());
-        Hacl_Streaming_SHA2_update_256(p, static_cast<uint8_t *>(delimiter), sizeof(delimiter));
+        p->update(const_cast<uint8_t *>(input), input_string.size());
+        p->update(static_cast<uint8_t *>(delimiter), sizeof(delimiter));
     }
 } // namespace electionguard

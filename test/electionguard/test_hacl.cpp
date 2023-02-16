@@ -1,5 +1,5 @@
-#include "../../src/electionguard/facades/Hacl_Bignum256.hpp"
-#include "../../src/electionguard/facades/Hacl_Bignum4096.hpp"
+#include "../../libs/hacl/Hacl_Bignum256.hpp"
+#include "../../libs/hacl/Hacl_Bignum4096.hpp"
 #include "../../src/electionguard/log.hpp"
 #include "utils/constants.hpp"
 

@@ -1,5 +1,12 @@
 {
+    "cmake.configureSettings": {
+        "BUILD_SHARED_LIBS": "ON",
+        "CAN_USE_VECTOR_INTRINSICS": "ON",
+        "CPM_SOURCE_CACHE": "${workspaceFolder}/.cache/CPM"
+    },
     "editor.formatOnSave": true,
+    "omnisharp.enableRoslynAnalyzers": true,
+    "omnisharp.enableEditorConfigSupport": true,
     "files.associations": {
         "hacl_hmac_drbg.h": "c",
         "array": "cpp",
