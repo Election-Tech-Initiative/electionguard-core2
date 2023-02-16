@@ -1,5 +1,3 @@
-#include "../karamel/Lib_Memzero0.h"
-#include "electionguard/async.hpp"
 #include "electionguard/group.hpp"
 #include "utils.hpp"
 

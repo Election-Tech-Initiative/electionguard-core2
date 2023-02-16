@@ -32,21 +32,11 @@ if(benchmark_ADDED)
 endif()
 
 # ---- Sources ----
+include(${CMAKE_CURRENT_SOURCE_DIR}/electionguard/sources.cmake)
 
 # Utils Library -----------------------------------------------
 add_library(${UTILS_PROJECT_TARGET} SHARED
-    ${CMAKE_CURRENT_SOURCE_DIR}/electionguard/generators/ballot.h
-    ${CMAKE_CURRENT_SOURCE_DIR}/electionguard/generators/ballot.hpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/electionguard/generators/ballot.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/electionguard/generators/election.h
-    ${CMAKE_CURRENT_SOURCE_DIR}/electionguard/generators/election.hpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/electionguard/generators/election.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/electionguard/generators/manifest.h
-    ${CMAKE_CURRENT_SOURCE_DIR}/electionguard/generators/manifest.hpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/electionguard/generators/manifest.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/electionguard/utils/byte_logger.hpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/electionguard/utils/constants.hpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/electionguard/utils/utils.h
+    ${SOURCES_electionguard_test_utils}
 )
 add_library(${UTILS_PROJECT_TARGET}::${UTILS_PROJECT_TARGET} ALIAS ${UTILS_PROJECT_TARGET})
 
@@ -68,16 +58,7 @@ endif()
 
 # C++ Benchmark -----------------------------------------------
 add_executable(${CPP_BENCHMARK_TARGET}
-    ${CMAKE_CURRENT_SOURCE_DIR}/electionguard/benchmark/main.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/electionguard/benchmark/bench_chaum_pedersen.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/electionguard/benchmark/bench_elgamal.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/electionguard/benchmark/bench_encrypt.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/electionguard/benchmark/bench_group.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/electionguard/benchmark/bench_hacl.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/electionguard/benchmark/bench_hash.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/electionguard/benchmark/bench_hashed_elgamal.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/electionguard/benchmark/bench_nonces.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/electionguard/benchmark/bench_precompute.cpp
+    ${SOURCES_electionguard_test_benchmark}
 )
 
 target_compile_features(${CPP_BENCHMARK_TARGET} PRIVATE cxx_std_17)
@@ -90,22 +71,7 @@ endif()
 
 # C++ Tests ---------------------------------------------------
 add_executable(${CPPTEST_PROJECT_TARGET}
-    ${CMAKE_CURRENT_SOURCE_DIR}/main.cpp
-
-    ${CMAKE_CURRENT_SOURCE_DIR}/electionguard/test_ballot_code.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/electionguard/test_ballot_compact.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/electionguard/test_ballot.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/electionguard/test_chaum_pedersen.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/electionguard/test_constants.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/electionguard/test_election.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/electionguard/test_elgamal.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/electionguard/test_encrypt.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/electionguard/test_encrypt_compact.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/electionguard/test_group.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/electionguard/test_hacl.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/electionguard/test_hash.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/electionguard/test_nonces.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/electionguard/test_manifest.cpp
+    ${SOURCES_electionguard_test_cpp_tests}
 )
 
 target_compile_features(${CPPTEST_PROJECT_TARGET} PRIVATE cxx_std_17)
@@ -121,27 +87,32 @@ endif()
 
 # C Tests -----------------------------------------------------
 add_executable(${CTEST_PROJECT_TARGET}
-    ${CMAKE_CURRENT_SOURCE_DIR}/main.c
-    ${CMAKE_CURRENT_SOURCE_DIR}/electionguard/test_ballot_code.c
-    ${CMAKE_CURRENT_SOURCE_DIR}/electionguard/test_ballot.c
-    ${CMAKE_CURRENT_SOURCE_DIR}/electionguard/test_chaum_pedersen.c
-    ${CMAKE_CURRENT_SOURCE_DIR}/electionguard/test_collections.c
-    ${CMAKE_CURRENT_SOURCE_DIR}/electionguard/test_election.c
-    ${CMAKE_CURRENT_SOURCE_DIR}/electionguard/test_elgamal.c
-    ${CMAKE_CURRENT_SOURCE_DIR}/electionguard/test_encrypt_compact.c
-    ${CMAKE_CURRENT_SOURCE_DIR}/electionguard/test_encrypt.c
-    ${CMAKE_CURRENT_SOURCE_DIR}/electionguard/test_group.c
-    ${CMAKE_CURRENT_SOURCE_DIR}/electionguard/test_hash.c
-    ${CMAKE_CURRENT_SOURCE_DIR}/electionguard/test_manifest.c
+    ${SOURCES_electionguard_test_c_tests}
 )
 
 target_compile_features(${CTEST_PROJECT_TARGET} PRIVATE c_std_99)
 
 # ---- Link Libraries ----
-target_link_libraries(${UTILS_PROJECT_TARGET} PUBLIC ${META_PROJECT_TARGET})
+target_link_libraries(${UTILS_PROJECT_TARGET} 
+    PUBLIC 
+        ${META_PROJECT_TARGET}
+        hacl::hacl
+)
 
-target_link_libraries(${CPP_BENCHMARK_TARGET} PRIVATE benchmark::benchmark ${UTILS_PROJECT_TARGET} ${META_PROJECT_TARGET})
-target_link_libraries(${CPPTEST_PROJECT_TARGET} PRIVATE doctest ${UTILS_PROJECT_TARGET} ${META_PROJECT_TARGET})
+target_link_libraries(${CPP_BENCHMARK_TARGET} 
+    PRIVATE 
+        benchmark::benchmark 
+        ${UTILS_PROJECT_TARGET} 
+        ${META_PROJECT_TARGET}
+        hacl::hacl
+)
+target_link_libraries(${CPPTEST_PROJECT_TARGET} 
+    PRIVATE 
+        doctest 
+        ${UTILS_PROJECT_TARGET} 
+        ${META_PROJECT_TARGET} 
+        hacl::hacl
+)
 
 if(MINGW)
     # Statically link in libstdc++
@@ -149,16 +120,37 @@ if(MINGW)
     target_link_libraries(${CPPTEST_PROJECT_TARGET} PRIVATE -static-libstdc++)
 endif()
 
-target_link_libraries(${CTEST_PROJECT_TARGET} PRIVATE ${UTILS_PROJECT_TARGET} ${META_PROJECT_TARGET})
+target_link_libraries(${CTEST_PROJECT_TARGET} 
+    PRIVATE 
+        ${UTILS_PROJECT_TARGET} 
+        ${META_PROJECT_TARGET}
+        hacl::hacl
+)
 
-if(WIN32)
+if(MINGW)
     # sometimes windows struggles with paths (particularly in CI)
-    # so, copy the .dll file to the test execution folder
+    # so, copy the .dll files to the test execution folder
     add_custom_command(
         TARGET ${CPPTEST_PROJECT_TARGET} POST_BUILD
         COMMAND ${CMAKE_COMMAND} -E copy_directory
+        ${benchmark_BINARY_DIR}/src
+        $<TARGET_FILE_DIR:hacl_cpp>
         $<TARGET_FILE_DIR:${META_PROJECT_TARGET}>
-        $<TARGET_FILE_DIR:${CPPTEST_PROJECT_TARGET}>)
+        $<TARGET_FILE_DIR:${CPPTEST_PROJECT_TARGET}>
+    )
+endif()
+
+if(MSVC)
+    # sometimes windows struggles with paths (particularly in CI)
+    # so, copy the .dll files to the test execution folder
+    add_custom_command(
+        TARGET ${CPPTEST_PROJECT_TARGET} POST_BUILD
+        COMMAND ${CMAKE_COMMAND} -E copy_directory
+        ${benchmark_BINARY_DIR}/src/Release
+        $<TARGET_FILE_DIR:hacl_cpp>
+        $<TARGET_FILE_DIR:${META_PROJECT_TARGET}>
+        $<TARGET_FILE_DIR:${CPPTEST_PROJECT_TARGET}>
+    )
 endif()
 
 # ---- Add Tests ----

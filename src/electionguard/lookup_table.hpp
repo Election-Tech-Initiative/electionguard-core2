@@ -1,8 +1,8 @@
 #ifndef __ELECTIONGUARD_CPP_LOOKUP_TABLE_HPP_INCLUDED__
 #define __ELECTIONGUARD_CPP_LOOKUP_TABLE_HPP_INCLUDED__
 
-#include "facades/Hacl_Bignum256.hpp"
-#include "facades/Hacl_Bignum4096.hpp"
+#include "facades/bignum256.hpp"
+#include "facades/bignum4096.hpp"
 #include "utils.hpp"
 
 #include <array>
@@ -14,9 +14,9 @@
 #include <iostream>
 #include <memory>
 
+using electionguard::facades::Bignum4096;
+using electionguard::facades::CONTEXT_P;
 using hacl::Bignum256;
-using hacl::Bignum4096;
-using hacl::CONTEXT_P;
 using std::begin;
 using std::copy;
 using std::end;

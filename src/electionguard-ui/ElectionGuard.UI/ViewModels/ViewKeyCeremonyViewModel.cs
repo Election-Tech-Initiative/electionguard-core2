@@ -26,7 +26,7 @@ public partial class ViewKeyCeremonyViewModel : BaseViewModel
 
     partial void OnKeyCeremonyIdChanged(string value)
     {
-        Task.Run(async() => KeyCeremony = await _keyCeremonyService.GetByIdAsync(value)).Wait();
+        Task.Run(async() => KeyCeremony = await _keyCeremonyService.GetByKeyCeremonyIdAsync(value)).Wait();
     }
 
     [RelayCommand(CanExecute = nameof(CanJoin))]

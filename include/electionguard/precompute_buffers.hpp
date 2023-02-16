@@ -28,7 +28,7 @@ namespace electionguard
     /// g ^ exp mod p (g_to_exp) and K ^ exp mod p (pubkey_to_exp - where K is
     /// the public key).
     /// </summary>
-    class EG_INTERNAL_API Triple
+    class EG_API Triple
     {
         unique_ptr<ElementModQ> exp;
         unique_ptr<ElementModP> g_to_exp;
@@ -66,7 +66,7 @@ namespace electionguard
     /// g ^ exp1 mod p (g_to_exp1) and (g ^ exp2 mod p) * (K ^ exp mod p)
     /// (g_to_exp2 mult_by_pubkey_to_exp1 - where K is the public key).
     /// </summary>
-    class EG_INTERNAL_API Quadruple
+    class EG_API Quadruple
     {
         unique_ptr<ElementModQ> exp1;
         unique_ptr<ElementModQ> exp2;
@@ -110,7 +110,7 @@ namespace electionguard
     /// from the ElGamal encryption of the selection as well as the
     /// computation of the Chaum Pedersen proof.
     /// </summary>
-    class EG_INTERNAL_API TwoTriplesAndAQuadruple
+    class EG_API TwoTriplesAndAQuadruple
     {
         unique_ptr<Triple> triple1;
         unique_ptr<Triple> triple2;
@@ -139,7 +139,7 @@ namespace electionguard
     /// <summary>
     /// A singleton context for a collection of precomputed triples and quadruples.
     /// </summary>
-    class EG_INTERNAL_API PrecomputeBufferContext
+    class EG_API PrecomputeBufferContext
     {
       public:
         PrecomputeBufferContext(const PrecomputeBufferContext &) = delete;
@@ -161,13 +161,13 @@ namespace electionguard
         /// <summary>
         /// The init method initializes the precompute and allows the queue
         /// size to be set.
-        /// 
+        ///
         /// <param name="size_of_queue">by default the quad queue size is 5000, so
         ///                             10000 triples, if the caller wants the
         ///                             queue size to be different then this
         ///                             parameter is used</param>
         /// </summary>
-        /// 
+        ///
         static void init(uint32_t size_of_queue = 0);
 
         /// <summary>

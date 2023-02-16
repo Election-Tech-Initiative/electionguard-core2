@@ -1,0 +1,81 @@
+# Explicitly define source files to be included in the build
+
+set(FACADES_electionguard
+    ${PROJECT_SOURCE_DIR}/src/electionguard/facades/ballot_code.cpp
+    ${PROJECT_SOURCE_DIR}/src/electionguard/facades/ballot_compact.cpp
+    ${PROJECT_SOURCE_DIR}/src/electionguard/facades/ballot.cpp
+    ${PROJECT_SOURCE_DIR}/src/electionguard/facades/bignum256.hpp
+    ${PROJECT_SOURCE_DIR}/src/electionguard/facades/bignum4096.cpp
+    ${PROJECT_SOURCE_DIR}/src/electionguard/facades/bignum4096.hpp
+    ${PROJECT_SOURCE_DIR}/src/electionguard/facades/chaum_pedersen.cpp
+    ${PROJECT_SOURCE_DIR}/src/electionguard/facades/collections.c
+    ${PROJECT_SOURCE_DIR}/src/electionguard/facades/discrete_log.cpp
+    ${PROJECT_SOURCE_DIR}/src/electionguard/facades/election.cpp
+    ${PROJECT_SOURCE_DIR}/src/electionguard/facades/elgamal.cpp
+    ${PROJECT_SOURCE_DIR}/src/electionguard/facades/encrypt.cpp
+    ${PROJECT_SOURCE_DIR}/src/electionguard/facades/group.cpp
+    ${PROJECT_SOURCE_DIR}/src/electionguard/facades/hash.cpp
+    ${PROJECT_SOURCE_DIR}/src/electionguard/facades/manifest.cpp
+)
+
+set(SOURCES_electionguard
+    ${PROJECT_SOURCE_DIR}/src/electionguard/ballot_code.cpp
+    ${PROJECT_SOURCE_DIR}/src/electionguard/ballot_compact.cpp
+    ${PROJECT_SOURCE_DIR}/src/electionguard/ballot.cpp
+    ${PROJECT_SOURCE_DIR}/src/electionguard/chaum_pedersen.cpp
+    ${PROJECT_SOURCE_DIR}/src/electionguard/convert.cpp
+    ${PROJECT_SOURCE_DIR}/src/electionguard/election.cpp
+    ${PROJECT_SOURCE_DIR}/src/electionguard/elgamal.cpp
+    ${PROJECT_SOURCE_DIR}/src/electionguard/encrypt.cpp
+    ${PROJECT_SOURCE_DIR}/src/electionguard/group.cpp
+    ${PROJECT_SOURCE_DIR}/src/electionguard/hash.cpp
+    ${PROJECT_SOURCE_DIR}/src/electionguard/hmac.cpp
+    ${PROJECT_SOURCE_DIR}/src/electionguard/log.hpp
+    ${PROJECT_SOURCE_DIR}/src/electionguard/log.cpp
+    ${PROJECT_SOURCE_DIR}/src/electionguard/lookup_table.hpp
+    ${PROJECT_SOURCE_DIR}/src/electionguard/manifest.cpp
+    ${PROJECT_SOURCE_DIR}/src/electionguard/nonces.cpp
+    ${PROJECT_SOURCE_DIR}/src/electionguard/nonces.hpp
+    ${PROJECT_SOURCE_DIR}/src/electionguard/precompute_buffers.cpp
+    ${PROJECT_SOURCE_DIR}/src/electionguard/convert.hpp
+    ${PROJECT_SOURCE_DIR}/src/electionguard/random.cpp
+    ${PROJECT_SOURCE_DIR}/src/electionguard/random.hpp
+    ${PROJECT_SOURCE_DIR}/src/electionguard/utils.hpp
+    ${PROJECT_SOURCE_DIR}/src/electionguard/variant_cast.hpp
+)
+
+set(INCLUDES_electionguard
+    ${PROJECT_SOURCE_DIR}/include/electionguard/async.hpp
+    ${PROJECT_SOURCE_DIR}/include/electionguard/ballot_code.h
+    ${PROJECT_SOURCE_DIR}/include/electionguard/ballot_code.hpp
+    ${PROJECT_SOURCE_DIR}/include/electionguard/ballot_compact.h
+    ${PROJECT_SOURCE_DIR}/include/electionguard/ballot_compact.hpp
+    ${PROJECT_SOURCE_DIR}/include/electionguard/plaintext_ballot.generated.h
+    ${PROJECT_SOURCE_DIR}/include/electionguard/plaintext_ballot_contest.generated.h
+    ${PROJECT_SOURCE_DIR}/include/electionguard/plaintext_ballot_selection.generated.h
+    ${PROJECT_SOURCE_DIR}/include/electionguard/ballot.h
+    ${PROJECT_SOURCE_DIR}/include/electionguard/ballot.hpp
+    ${PROJECT_SOURCE_DIR}/include/electionguard/chaum_pedersen.h
+    ${PROJECT_SOURCE_DIR}/include/electionguard/chaum_pedersen.hpp
+    ${PROJECT_SOURCE_DIR}/include/electionguard/constants.h
+    ${PROJECT_SOURCE_DIR}/include/electionguard/collections.h
+    ${PROJECT_SOURCE_DIR}/include/electionguard/crypto_hashable.hpp
+    ${PROJECT_SOURCE_DIR}/include/electionguard/discrete_log.h
+    ${PROJECT_SOURCE_DIR}/include/electionguard/discrete_log.hpp
+    ${PROJECT_SOURCE_DIR}/include/electionguard/election_object_base.hpp
+    ${PROJECT_SOURCE_DIR}/include/electionguard/election.h
+    ${PROJECT_SOURCE_DIR}/include/electionguard/election.hpp
+    ${PROJECT_SOURCE_DIR}/include/electionguard/elgamal.h
+    ${PROJECT_SOURCE_DIR}/include/electionguard/elgamal.hpp
+    ${PROJECT_SOURCE_DIR}/include/electionguard/encrypt.h
+    ${PROJECT_SOURCE_DIR}/include/electionguard/encrypt.hpp
+    ${PROJECT_SOURCE_DIR}/include/electionguard/export.h
+    ${PROJECT_SOURCE_DIR}/include/electionguard/group.h
+    ${PROJECT_SOURCE_DIR}/include/electionguard/group.hpp
+    ${PROJECT_SOURCE_DIR}/include/electionguard/hash.h
+    ${PROJECT_SOURCE_DIR}/include/electionguard/hash.hpp
+    ${PROJECT_SOURCE_DIR}/include/electionguard/manifest.h
+    ${PROJECT_SOURCE_DIR}/include/electionguard/manifest.hpp
+    ${PROJECT_SOURCE_DIR}/include/electionguard/precompute_buffers.hpp
+    ${PROJECT_SOURCE_DIR}/include/electionguard/status.h
+)

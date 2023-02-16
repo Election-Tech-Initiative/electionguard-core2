@@ -1,6 +1,5 @@
 #include "../../src/electionguard/log.hpp"
 #include "../../src/electionguard/nonces.hpp"
-#include "../../src/karamel/internal/Hacl_Hash.h"
 #include "utils/constants.hpp"
 
 #include <doctest/doctest.h>

@@ -1,6 +1,5 @@
 #include "../../../src/electionguard/convert.hpp"
-#include "../../../src/electionguard/facades/Hacl_Bignum256.hpp"
-#include "../../../src/electionguard/facades/Hacl_Bignum4096.hpp"
+#include "../../../src/electionguard/facades/bignum4096.hpp"
 #include "../../../src/electionguard/log.hpp"
 #include "../../../src/electionguard/utils.hpp"
 #include "../utils/byte_logger.hpp"
@@ -17,7 +16,6 @@
 
 using namespace electionguard;
 using namespace std;
-using namespace hacl;
 
 class GroupElementFixture : public benchmark::Fixture
 {
@@ -37,7 +35,6 @@ class GroupElementFixture : public benchmark::Fixture
         a = rand_q();
         b = rand_q();
         c = rand_q();
-
     }
 
     void TearDown(const ::benchmark::State &state) {}

@@ -1,16 +1,15 @@
 #ifndef __ELECTIONGUARD_CPP_CONVERT_HPP_INCLUDED__
 #define __ELECTIONGUARD_CPP_CONVERT_HPP_INCLUDED__
 
-#include "facades/Hacl_Bignum256.hpp"
-#include "facades/Hacl_Bignum4096.hpp"
 #include "log.hpp"
 
 #include <chrono>
 #include <cmath>
 #include <codecvt>
+#include <cstring>
+#include <electionguard/export.h>
 #include <iomanip>
 #include <iostream>
-#include <karamel/LowStar_Endianness.h>
 #include <sstream>
 #include <string>
 #include <vector>
@@ -97,20 +96,9 @@ namespace electionguard
         return (size_t)number;
     }
 
-    inline vector<uint8_t> bignum_to_bytes(const vector<uint64_t> &bignum)
-    {
-        size_t offset = sizeof(uint64_t) / sizeof(uint8_t);
-        std::vector<uint8_t> bytes;
-        bytes.reserve((bignum.size() * offset));
-        for (auto number : bignum) {
-            uint64_t buffer = htobe64(number);
-            for (size_t i = 0; i < sizeof(buffer); i++) {
-                bytes.push_back(buffer & 0xFF);
-                buffer >>= 8;
-            }
-        }
-        return bytes;
-    }
+    EG_INTERNAL_API vector<uint8_t> bignum_to_bytes(const vector<uint64_t> &bignum);
+
+    vector<uint8_t> bignum256_to_bytes(uint64_t *bytes);
 
     inline vector<uint8_t> bignum_to_bytes(uint64_t *data, size_t size)
     {
@@ -229,24 +217,9 @@ namespace electionguard
         return result;
     }
 
-    inline auto hacl_to_hex_256(uint64_t *data)
-    {
-        // Returned bytes array from Hacl needs to be pre-allocated to 32 bytes
-        uint8_t byteResult[MAX_Q_SIZE] = {};
-        // Use Hacl to convert the bignum to byte array
-        hacl::Bignum256::toBytes(static_cast<uint64_t *>(data), static_cast<uint8_t *>(byteResult));
-        return bytes_to_hex(byteResult);
-    }
+    string hacl_to_hex_256(uint64_t *data);
 
-    inline auto hacl_to_hex_4096(uint64_t *data)
-    {
-        // Returned bytes array from Hacl needs to be pre-allocated to 512 bytes
-        uint8_t byteResult[MAX_P_SIZE] = {};
-        // Use Hacl to convert the bignum to byte array
-        hacl::Bignum4096::toBytes(static_cast<uint64_t *>(data),
-                                  static_cast<uint8_t *>(byteResult));
-        return bytes_to_hex(byteResult);
-    }
+    string hacl_to_hex_4096(uint64_t *data);
 
     inline wstring stringToWideString(const std::string &str)
     {

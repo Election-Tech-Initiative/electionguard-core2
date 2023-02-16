@@ -6,6 +6,7 @@
 #include "electionguard/elgamal.hpp"
 #include "electionguard/hash.hpp"
 #include "electionguard/precompute_buffers.hpp"
+#include "facades/bignum4096.hpp"
 #include "log.hpp"
 #include "nonces.hpp"
 #include "serialize.hpp"
@@ -15,10 +16,6 @@
 #include <future>
 #include <iostream>
 #include <nlohmann/json.hpp>
-
-extern "C" {
-#include "../karamel/Hacl_Bignum4096.h"
-}
 
 using std::invalid_argument;
 using std::make_unique;

@@ -16,7 +16,7 @@ public class GuardianBackupService : BaseDatabaseService<GuardianBackups>
     /// <summary>
     /// Default constructor that sets the collection name
     /// </summary>
-    public GuardianBackupService() : base(_collection) { }
+    public GuardianBackupService() : base(_collection, nameof(GuardianBackups)) { }
 
     /// <summary>
     /// Get all of the backups for all guardians for a key ceremony
@@ -37,9 +37,26 @@ public class GuardianBackupService : BaseDatabaseService<GuardianBackups>
     {
         var filterBuilder = Builders<GuardianBackups>.Filter;
         var filter = filterBuilder.And(filterBuilder.Eq(Constants.KeyCeremonyId, keyCeremonyId),
-            filterBuilder.Eq(Constants.DesignatedId, DesignatedId),
-            filterBuilder.Eq(Constants.DataType, nameof(GuardianPublicKey)));
+            filterBuilder.Eq(Constants.DesignatedId, DesignatedId));
 
         return await GetAllByFilterAsync(filter);
     }
+
+    public async Task<long> CountAsync(string keyCeremonyId)
+    {
+        var filterBuilder = Builders<GuardianBackups>.Filter;
+        var filter = filterBuilder.And(filterBuilder.Eq(Constants.KeyCeremonyId, keyCeremonyId));
+
+        return await CountByFilterAsync(filter);
+    }
+
+    public async Task<long> CountAsync(string keyCeremonyId, string guardianId)
+    {
+        var filterBuilder = Builders<GuardianBackups>.Filter;
+        var filter = filterBuilder.And(filterBuilder.Eq(Constants.KeyCeremonyId, keyCeremonyId),
+            filterBuilder.Eq(Constants.GuardianId, guardianId));
+
+        return await CountByFilterAsync(filter);
+    }
+
 }

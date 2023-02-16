@@ -1,4 +1,5 @@
 ﻿using ElectionGuard.UI.Lib.Models;
+using MongoDB.Driver;
 
 namespace ElectionGuard.UI.Lib.Services;
 
@@ -15,7 +16,7 @@ public class VerificationService : BaseDatabaseService<ElectionPartialKeyVerific
     /// <summary>
     /// Default constructor that sets the collection name
     /// </summary>
-    public VerificationService() : base(_collection) { }
+    public VerificationService() : base(_collection, nameof(ElectionPartialKeyVerification)) { }
 
     /// <summary>
     /// Gets a key ceremony
@@ -25,5 +26,22 @@ public class VerificationService : BaseDatabaseService<ElectionPartialKeyVerific
     {
         return await GetAllByFieldAsync(Constants.KeyCeremonyId, keyCeremonyId);
     }
+
+    public async Task<long> CountAsync(string keyCeremonyId, string guardianId)
+    {
+        var filterBuilder = Builders<ElectionPartialKeyVerification>.Filter;
+        var filter = filterBuilder.And(filterBuilder.Eq(Constants.KeyCeremonyId, keyCeremonyId),
+            filterBuilder.Eq(Constants.DesignatedId, guardianId));
+
+        return await CountByFilterAsync(filter);
+    }
+    public async Task<long> CountAsync(string keyCeremonyId)
+    {
+        var filterBuilder = Builders<ElectionPartialKeyVerification>.Filter;
+        var filter = filterBuilder.And(filterBuilder.Eq(Constants.KeyCeremonyId, keyCeremonyId));
+
+        return await CountByFilterAsync(filter);
+    }
+
 
 }

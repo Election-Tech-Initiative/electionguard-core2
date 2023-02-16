@@ -40,8 +40,8 @@ class DisjunctiveChaumPedersenProofHarness : DisjunctiveChaumPedersenProof
         return DisjunctiveChaumPedersenProof::make_one(message, r, k, q, seed);
     }
 
-    static unique_ptr<DisjunctiveChaumPedersenProof> make_zero_with_precomputed(
-                               const ElGamalCiphertext &message,
+    static unique_ptr<DisjunctiveChaumPedersenProof>
+    make_zero_with_precomputed(const ElGamalCiphertext &message,
                                unique_ptr<TwoTriplesAndAQuadruple> precomputedTwoTriplesAndAQuad1,
                                const ElementModQ &q)
     {
@@ -49,8 +49,8 @@ class DisjunctiveChaumPedersenProofHarness : DisjunctiveChaumPedersenProof
           message, move(precomputedTwoTriplesAndAQuad1), q);
     }
 
-    static unique_ptr<DisjunctiveChaumPedersenProof> make_one_with_precomputed(
-                              const ElGamalCiphertext &message,
+    static unique_ptr<DisjunctiveChaumPedersenProof>
+    make_one_with_precomputed(const ElGamalCiphertext &message,
                               unique_ptr<TwoTriplesAndAQuadruple> precomputedTwoTriplesAndAQuad1,
                               const ElementModQ &q)
     {
@@ -156,16 +156,16 @@ TEST_CASE("Disjunctive CP Proof simple valid inputs generate valid proofs")
     auto triple1_4 = precomputedTwoTriplesAndAQuad4->get_triple1();
 
     auto firstMessage = elgamalEncrypt_with_precomputed(0UL, *triple1_1->get_g_to_exp(),
-                                                    *triple1_1->get_pubkey_to_exp());
+                                                        *triple1_1->get_pubkey_to_exp());
 
     auto secondMessage = elgamalEncrypt_with_precomputed(0UL, *triple1_2->get_g_to_exp(),
-                                                    *triple1_2->get_pubkey_to_exp());
-                                                    
+                                                         *triple1_2->get_pubkey_to_exp());
+
     auto thirdMessage = elgamalEncrypt_with_precomputed(1UL, *triple1_3->get_g_to_exp(),
-                                                    *triple1_3->get_pubkey_to_exp());
+                                                        *triple1_3->get_pubkey_to_exp());
 
     auto fourthMessage = elgamalEncrypt_with_precomputed(1UL, *triple1_4->get_g_to_exp(),
-                                                    *triple1_4->get_pubkey_to_exp());
+                                                         *triple1_4->get_pubkey_to_exp());
 
     // Act
     auto firstMessageZeroProof = DisjunctiveChaumPedersenProofHarness::make_zero_with_precomputed(
