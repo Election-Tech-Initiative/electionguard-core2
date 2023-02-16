@@ -1,5 +1,6 @@
 ﻿using CommunityToolkit.Mvvm.Input;
 using ElectionGuard.ElectionSetup;
+using ElectionGuard.UI.Helpers;
 
 namespace ElectionGuard.UI.ViewModels;
 
@@ -9,6 +10,8 @@ public partial class ViewKeyCeremonyViewModel : BaseViewModel
     public const string CurrentKeyCeremonyParam = "KeyCeremonyId";
 
     private KeyCeremonyMediator? _mediator;
+
+    private bool joined = false;
 
     public ViewKeyCeremonyViewModel(IServiceProvider serviceProvider, KeyCeremonyService keyCeremonyService) : 
         base("ViewKeyCeremony", serviceProvider)
@@ -41,14 +44,25 @@ public partial class ViewKeyCeremonyViewModel : BaseViewModel
     }
 
     [RelayCommand(CanExecute = nameof(CanJoin))]
-    public void Join()
+    public async Task Join()
     {
-        var currentGuardianUserName = AuthenticationService.UserName;
+        joined = true;
+        // TODO: Tell the signalR hub what user has joined
+        await _mediator!.RunKeyCeremony(IsAdmin);
+        var timer = Dispatcher.GetForCurrentThread()!.CreateTimer();
+        timer.Interval = TimeSpan.FromSeconds(UISettings.LONG_POLLING_INTERVAL);
+        timer.IsRepeating = true;
+        timer.Tick += CeremonyPollingTimer_Tick;
+    }
+
+    private void CeremonyPollingTimer_Tick(object? sender, EventArgs e)
+    {
+        Task.Run(async () => await _mediator!.RunKeyCeremony(IsAdmin));
     }
 
     private bool CanJoin()
     {
-        return KeyCeremony is not null;
+        return KeyCeremony is not null && _mediator is not null;
     }
 
     private readonly KeyCeremonyService _keyCeremonyService;
