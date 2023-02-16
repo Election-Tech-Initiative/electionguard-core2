@@ -1,7 +1,7 @@
 
 #include "electionguard/encrypt.hpp"
 
-#include "async.hpp"
+#include "electionguard/async.hpp"
 #include "electionguard/ballot_code.hpp"
 #include "electionguard/elgamal.hpp"
 #include "electionguard/hash.hpp"

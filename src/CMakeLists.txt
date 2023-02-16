@@ -35,6 +35,7 @@ set(PROJECT_SOURCE_FILES
     ${PROJECT_SOURCE_DIR}/src/electionguard/facades/ballot.cpp
     ${PROJECT_SOURCE_DIR}/src/electionguard/facades/chaum_pedersen.cpp
     ${PROJECT_SOURCE_DIR}/src/electionguard/facades/collections.c
+    ${PROJECT_SOURCE_DIR}/src/electionguard/facades/discrete_log.cpp
     ${PROJECT_SOURCE_DIR}/src/electionguard/facades/election.cpp
     ${PROJECT_SOURCE_DIR}/src/electionguard/facades/elgamal.cpp
     ${PROJECT_SOURCE_DIR}/src/electionguard/facades/encrypt.cpp
@@ -45,7 +46,6 @@ set(PROJECT_SOURCE_FILES
     ${PROJECT_SOURCE_DIR}/src/electionguard/facades/Hacl_Bignum4096.cpp
     ${PROJECT_SOURCE_DIR}/src/electionguard/facades/hash.cpp
     ${PROJECT_SOURCE_DIR}/src/electionguard/facades/manifest.cpp
-    ${PROJECT_SOURCE_DIR}/src/electionguard/async.hpp
     ${PROJECT_SOURCE_DIR}/src/electionguard/ballot_code.cpp
     ${PROJECT_SOURCE_DIR}/src/electionguard/ballot_compact.cpp
     ${PROJECT_SOURCE_DIR}/src/electionguard/ballot.cpp
@@ -100,6 +100,7 @@ set(PROJECT_SOURCE_FILES
     ${PROJECT_SOURCE_DIR}/src/karamel/Lib_RandomBuffer_System.c
     ${PROJECT_SOURCE_DIR}/src/karamel/Lib_RandomBuffer_System.h
     ${PROJECT_SOURCE_DIR}/src/karamel/libintvector.h
+    ${PROJECT_SOURCE_DIR}/include/electionguard/async.hpp
     ${PROJECT_SOURCE_DIR}/include/electionguard/ballot_code.h
     ${PROJECT_SOURCE_DIR}/include/electionguard/ballot_code.hpp
     ${PROJECT_SOURCE_DIR}/include/electionguard/ballot_compact.h
@@ -114,6 +115,8 @@ set(PROJECT_SOURCE_FILES
     ${PROJECT_SOURCE_DIR}/include/electionguard/constants.h
     ${PROJECT_SOURCE_DIR}/include/electionguard/collections.h
     ${PROJECT_SOURCE_DIR}/include/electionguard/crypto_hashable.hpp
+    ${PROJECT_SOURCE_DIR}/include/electionguard/discrete_log.h
+    ${PROJECT_SOURCE_DIR}/include/electionguard/discrete_log.hpp
     ${PROJECT_SOURCE_DIR}/include/electionguard/election_object_base.hpp
     ${PROJECT_SOURCE_DIR}/include/electionguard/election.h
     ${PROJECT_SOURCE_DIR}/include/electionguard/election.hpp

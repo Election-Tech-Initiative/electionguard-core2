@@ -1,13 +1,13 @@
 #ifndef __ELECTIONGUARD_CPP_LOOKUP_TABLE_HPP_INCLUDED__
 #define __ELECTIONGUARD_CPP_LOOKUP_TABLE_HPP_INCLUDED__
 
-#include "async.hpp"
 #include "facades/Hacl_Bignum256.hpp"
 #include "facades/Hacl_Bignum4096.hpp"
 #include "utils.hpp"
 
 #include <array>
 #include <cstdint>
+#include <electionguard/async.hpp>
 #include <electionguard/constants.h>
 #include <electionguard/export.h>
 #include <iomanip>
@@ -79,7 +79,7 @@ namespace electionguard
                 }
 
                 mul_mod_p_mont(montgomery_result, const_cast<uint64_t *>(_lookupTable[i][slice]),
-                          montgomery_result);
+                               montgomery_result);
             }
 
             // convert from montogomery form
@@ -101,7 +101,6 @@ namespace electionguard
             uint64_t row_base[MAX_P_LEN] = {};
             uint64_t running_base[MAX_P_LEN] = {};
             uint64_t one[MAX_P_LEN] = {1UL};
-
 
             // convert base to montgomery form
             CONTEXT_P().to_montgomery_form(base, row_base);
@@ -129,6 +128,7 @@ namespace electionguard
         {
             CONTEXT_P().montgomery_mod_mul_stay_in_mont_form(lhs, rhs, res);
         }
+
       private:
         FixedBaseTable _lookupTable = {};
         uint64_t one_in_montgomery_form[MAX_P_LEN] = {};

@@ -43,8 +43,16 @@ namespace electionguard
         /// </Summary>
         uint64_t *get() const;
 
+        /// <Summary>
+        /// Get the integer representation of the element as a reference
+        /// Note the Element is stored in HACL format
+        /// <Summary>
         uint64_t (&ref() const)[MAX_P_LEN];
 
+        ///<Summary>
+        /// Get the length of the element
+        /// <returns> the length of the element </returns>
+        /// </Summary>
         uint64_t length() const;
 
         bool isFixedBase() const;

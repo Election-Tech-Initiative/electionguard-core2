@@ -2,7 +2,6 @@
 #define __ELECTIONGUARD_CPP_ASYNC_HPP_INCLUDED__
 
 #include "electionguard/export.h"
-#include "log.hpp"
 
 #include <atomic>
 #include <chrono>

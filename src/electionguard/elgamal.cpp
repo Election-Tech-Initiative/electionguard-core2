@@ -3,6 +3,7 @@
 #include "../karamel/Hacl_Bignum4096.h"
 #include "../karamel/Lib_Memzero0.h"
 #include "../karamel/internal/Hacl_HMAC.h"
+#include "electionguard/discrete_log.hpp"
 #include "electionguard/hash.hpp"
 #include "electionguard/hmac.hpp"
 #include "electionguard/precompute_buffers.hpp"
@@ -201,17 +202,16 @@ namespace electionguard
 
         // TODO: ISSUE #133: traverse a discrete_log lookup to find the result
         auto result_as_p = make_unique<ElementModP>(result);
-        uint64_t retval = MAX_UINT64;
+        //uint64_t retval = MAX_UINT64;
         if (*result_as_p == ONE_MOD_P()) {
             // if it is 1 it is false
-            retval = 0;
+            return 0;
         } else if (*result_as_p == G()) {
             // if it is g, it is true
-            retval = 1;
+            return 1;
         }
 
-        // if it is anything else no result found (decrypt failed)
-        return retval;
+        return DiscreteLog::getAsync(*result_as_p);
     }
 
     unique_ptr<ElGamalCiphertext> ElGamalCiphertext::clone() const
