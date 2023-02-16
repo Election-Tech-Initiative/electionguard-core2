@@ -1,7 +1,6 @@
 ﻿using CommunityToolkit.Mvvm.Input;
 using ElectionGuard.ElectionSetup;
 using ElectionGuard.UI.Helpers;
-
 namespace ElectionGuard.UI.ViewModels;
 
 [QueryProperty(CurrentKeyCeremonyParam, "KeyCeremonyId")]
