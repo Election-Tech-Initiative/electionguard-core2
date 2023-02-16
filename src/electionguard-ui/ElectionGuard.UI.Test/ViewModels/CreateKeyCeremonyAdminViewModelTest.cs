@@ -28,7 +28,7 @@ namespace ElectionGuard.UI.Test.ViewModels
             // ASSERT
             await NavigationService.Received().GoToPage(
                 typeof(ViewKeyCeremonyViewModel),
-                Arg.Is<Dictionary<string, object>>(dict => (string)dict["KeyCeremonyId"] == ret.Id));
+                Arg.Is<Dictionary<string, object>>(dict => (string)dict["KeyCeremonyId"] == ret.KeyCeremonyId));
         }
 
         [Test]
