@@ -16,7 +16,7 @@ public class GuardianPublicKeyService : BaseDatabaseService<GuardianPublicKey>
     /// <summary>
     /// Default constructor that sets the collection name
     /// </summary>
-    public GuardianPublicKeyService() : base(_collection) { }
+    public GuardianPublicKeyService() : base(_collection, nameof(GuardianPublicKey)) { }
 
     /// <summary>
     /// Get all of the Public keys for a key ceremony

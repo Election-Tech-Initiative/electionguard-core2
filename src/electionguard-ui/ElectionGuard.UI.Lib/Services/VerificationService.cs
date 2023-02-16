@@ -16,7 +16,7 @@ public class VerificationService : BaseDatabaseService<ElectionPartialKeyVerific
     /// <summary>
     /// Default constructor that sets the collection name
     /// </summary>
-    public VerificationService() : base(_collection) { }
+    public VerificationService() : base(_collection, nameof(ElectionPartialKeyVerification)) { }
 
     /// <summary>
     /// Gets a key ceremony
