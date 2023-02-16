@@ -30,9 +30,12 @@ namespace electionguard
         ElementModP &operator=(ElementModP other);
         ElementModP &operator=(ElementModP &&other);
         bool operator==(const ElementModP &other);
+        bool operator==(const ElementModP &other) const;
         bool operator!=(const ElementModP &other);
+        bool operator!=(const ElementModP &other) const;
 
         bool operator<(const ElementModP &other);
+        bool operator<(const ElementModP &other) const;
 
         // TODO: ISSUE #130: math operators
 
@@ -120,9 +123,12 @@ namespace electionguard
         ElementModQ &operator=(ElementModQ other);
         ElementModQ &operator=(ElementModQ &&other);
         bool operator==(const ElementModQ &other);
+        bool operator==(const ElementModQ &other) const;
         bool operator!=(const ElementModQ &other);
+        bool operator!=(const ElementModQ &other) const;
 
         bool operator<(const ElementModQ &other);
+        bool operator<(const ElementModQ &other) const;
 
         // TODO: ISSUE #130: overload math operators and redirect to functions
 
@@ -280,6 +286,11 @@ namespace electionguard
     /// Computes (a * b) mod q.
     /// </summary>
     EG_API std::unique_ptr<ElementModQ> mul_mod_q(const ElementModQ &lhs, const ElementModQ &rhs);
+
+    /// <summary>
+    /// Multplies together the collection and returns the product mod Q
+    /// </summary>
+    EG_API std::unique_ptr<ElementModQ> mul_mod_q(const std::vector<ElementModQ> &elems);
 
     /// <summary>
     /// Computes b^e mod q.

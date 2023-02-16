@@ -189,9 +189,15 @@ namespace electionguard
 
     bool ElementModP::operator==(const ElementModP &other) { return *pimpl == *other.pimpl; }
 
+    bool ElementModP::operator==(const ElementModP &other) const { return *pimpl == *other.pimpl; }
+
     bool ElementModP::operator!=(const ElementModP &other) { return !(*this == other); }
 
+    bool ElementModP::operator!=(const ElementModP &other) const { return !(*this == other); }
+
     bool ElementModP::operator<(const ElementModP &other) { return *pimpl < *other.pimpl; }
+
+    bool ElementModP::operator<(const ElementModP &other) const { return *pimpl < *other.pimpl; }
 
     // Property Getters
 
@@ -345,9 +351,15 @@ namespace electionguard
 
     bool ElementModQ::operator==(const ElementModQ &other) { return *pimpl == *other.pimpl; }
 
+    bool ElementModQ::operator==(const ElementModQ &other) const { return *pimpl == *other.pimpl; }
+
     bool ElementModQ::operator!=(const ElementModQ &other) { return !(*this == other); }
 
+    bool ElementModQ::operator!=(const ElementModQ &other) const { return !(*this == other); }
+
     bool ElementModQ::operator<(const ElementModQ &other) { return *pimpl < *other.pimpl; }
+
+    bool ElementModQ::operator<(const ElementModQ &other) const { return *pimpl < *other.pimpl; }
 
     // Property Getters
 
@@ -700,6 +712,7 @@ namespace electionguard
             throw invalid_argument("must have one or more elements");
         }
 
+        // TODO: const reference
         auto result = ElementModQ::fromUint64(0UL, true);
         for (auto element : elements) {
             auto sum = add_mod_q(*result, element.get());
@@ -791,6 +804,16 @@ namespace electionguard
         uint64_t modResult[MAX_Q_LEN] = {};
         CONTEXT_Q().mod(static_cast<uint64_t *>(mulResult), static_cast<uint64_t *>(modResult));
         return make_unique<ElementModQ>(modResult, true);
+    }
+
+    unique_ptr<ElementModQ> mul_mod_q(const vector<ElementModQ> &elems)
+    {
+        auto product = ElementModQ::fromUint64(1UL, true);
+        for (const auto &elem : elems) {
+            auto res = mul_mod_q(*product, elem);
+            product.swap(res);
+        }
+        return make_unique<ElementModQ>(*product);
     }
 
     // (b^e) mod q
