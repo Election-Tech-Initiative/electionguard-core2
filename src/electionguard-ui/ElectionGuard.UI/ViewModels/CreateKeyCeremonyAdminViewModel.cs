@@ -42,7 +42,7 @@ public partial class CreateKeyCeremonyAdminViewModel : BaseViewModel
 
         var keyCeremony = new KeyCeremony(KeyCeremonyName, Quorum, NumberOfGuardians, this.UserName!);
         var ret = await _keyCeremonyService.SaveAsync(keyCeremony);
-        var keyCeremonyId = ret.Id;
+        var keyCeremonyId = ret.KeyCeremonyId!;
         await NavigationService.GoToPage(typeof(ViewKeyCeremonyViewModel), new Dictionary<string, object>
         {
             { ViewKeyCeremonyViewModel.CurrentKeyCeremonyParam, keyCeremonyId }

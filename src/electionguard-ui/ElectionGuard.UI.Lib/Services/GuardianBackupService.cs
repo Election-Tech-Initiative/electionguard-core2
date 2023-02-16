@@ -16,7 +16,7 @@ public class GuardianBackupService : BaseDatabaseService<GuardianBackups>
     /// <summary>
     /// Default constructor that sets the collection name
     /// </summary>
-    public GuardianBackupService() : base(_collection) { }
+    public GuardianBackupService() : base(_collection, nameof(GuardianBackups)) { }
 
     /// <summary>
     /// Get all of the backups for all guardians for a key ceremony

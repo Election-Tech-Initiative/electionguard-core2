@@ -18,13 +18,16 @@ public class BaseDatabaseService<T> : IDatabaseService<T> where T : DatabaseReco
     /// </summary>
     private readonly string? _collection = null;
 
+    private readonly string? _type = null;
+
     /// <summary>
     /// Constructor to set the collection name that will be used for this data type
     /// </summary>
     /// <param name="collection">Name of the collection to use for this data type</param>
-    public BaseDatabaseService(string collection)
+    public BaseDatabaseService(string collection, string? type=null)
     {
         _collection = collection;
+        _type = type;
     }
 
     /// <summary>
@@ -60,7 +63,7 @@ public class BaseDatabaseService<T> : IDatabaseService<T> where T : DatabaseReco
     public async Task<List<T>> GetAllAsync(string? table = null)
     {
         var builder = Builders<T>.Filter;
-        var filter = builder.Eq(Constants.DataType, nameof(T));
+        var filter = builder.Eq(Constants.DataType, _type);
         return await GetAllByFilterAsync(filter);
     }
 
@@ -74,7 +77,7 @@ public class BaseDatabaseService<T> : IDatabaseService<T> where T : DatabaseReco
     public async Task<List<T>> GetAllByFieldAsync(string fieldName, object fieldValue, string? table = null)
     {
         var builder = Builders<T>.Filter;
-        var filter = builder.And(builder.Eq(fieldName, fieldValue), builder.Eq(Constants.DataType, nameof(T)));
+        var filter = builder.And(builder.Eq(fieldName, fieldValue), builder.Eq(Constants.DataType, _type));
         return await GetAllByFilterAsync(filter, table);
     }
 

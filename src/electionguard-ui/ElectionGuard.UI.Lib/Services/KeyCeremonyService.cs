@@ -17,7 +17,7 @@ public class KeyCeremonyService : BaseDatabaseService<KeyCeremony>
     /// <summary>
     /// Default constructor that sets the collection name
     /// </summary>
-    public KeyCeremonyService() : base(_collection) { }
+    public KeyCeremonyService() : base(_collection, nameof(KeyCeremony)) { }
 
     /// <summary>
     /// Gets a key ceremony
