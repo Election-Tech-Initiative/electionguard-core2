@@ -29,6 +29,17 @@ public class KeyCeremonyService : BaseDatabaseService<KeyCeremony>
     }
 
     /// <summary>
+    /// Gets all key ceremonies that are not in a completed state
+    /// </summary>
+    public async Task<List<KeyCeremony>?> GetAllNotCompleteAsync()
+    {
+        var filterBuilder = Builders<KeyCeremony>.Filter;
+        var filter = filterBuilder.Ne(Constants.State, KeyCeremonyState.Complete);
+
+        return await GetAllByFilterAsync(filter);
+    }
+
+    /// <summary>
     /// Updated the current state of the key ceremony
     /// </summary>
     /// <param name="keyCeremonyId">key cermony id to use</param>
