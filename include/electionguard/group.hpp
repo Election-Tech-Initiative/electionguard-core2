@@ -234,6 +234,13 @@ namespace electionguard
     EG_API std::unique_ptr<ElementModP> mul_mod_p(const std::vector<ElementModPOrQ> &elems);
 
     /// <summary>
+    /// Computes numerator / denominator mod p
+    /// using the method numerator * denominator^-1 mod p
+    /// </summary>
+    EG_API std::unique_ptr<ElementModP> div_mod_p(const ElementModP &numerator,
+                                                  const ElementModP &denominator);
+
+    /// <summary>
     /// computes element mod p
     /// </summary>
     EG_API std::unique_ptr<ElementModP> mod_p(const ElementModP &element);
@@ -277,12 +284,6 @@ namespace electionguard
     EG_API std::unique_ptr<ElementModQ> sub_mod_q(const ElementModQ &a, const ElementModQ &b);
 
     /// <summary>
-    /// Computes (a + b * c) mod q.
-    /// </summary>
-    EG_API std::unique_ptr<ElementModQ> a_plus_bc_mod_q(const ElementModQ &a, const ElementModQ &b,
-                                                        const ElementModQ &c);
-
-    /// <summary>
     /// Computes (a * b) mod q.
     /// </summary>
     EG_API std::unique_ptr<ElementModQ> mul_mod_q(const ElementModQ &lhs, const ElementModQ &rhs);
@@ -291,6 +292,13 @@ namespace electionguard
     /// Multplies together the collection and returns the product mod Q
     /// </summary>
     EG_API std::unique_ptr<ElementModQ> mul_mod_q(const std::vector<ElementModQ> &elems);
+
+    /// <summary>
+    /// Computes numerator / denominator mod q
+    /// using the method numerator * denominator^-1 mod q
+    /// </summary>
+    EG_API std::unique_ptr<ElementModQ> div_mod_q(const ElementModQ &numerator,
+                                                  const ElementModQ &denominator);
 
     /// <summary>
     /// Computes b^e mod q.
@@ -302,6 +310,12 @@ namespace electionguard
     /// Computes (Q - a) mod q.
     /// </summary>
     EG_API std::unique_ptr<ElementModQ> sub_from_q(const ElementModQ &a);
+
+    /// <summary>
+    /// Computes (a + b * c) mod q.
+    /// </summary>
+    EG_API std::unique_ptr<ElementModQ> a_plus_bc_mod_q(const ElementModQ &a, const ElementModQ &b,
+                                                        const ElementModQ &c);
 
     /// <summary>
     /// Generate random number between 0 and P
