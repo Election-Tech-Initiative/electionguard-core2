@@ -303,6 +303,18 @@ namespace ElectionGuard
 
         #endregion
 
+        #region Discrete Log
+
+        internal static class DiscreteLog
+        {
+            [DllImport(DllName, EntryPoint = "eg_discrete_log_get_async",
+                CallingConvention = CallingConvention.Cdecl, SetLastError = true)]
+            internal static extern Status GetAsync(
+                ElementModP.ElementModPHandle in_element,
+                ref ulong out_result);
+        }
+        #endregion
+
         #region Elgamal
 
         internal static class ElGamalKeyPair
@@ -353,7 +365,6 @@ namespace ElectionGuard
             internal static extern Status GetSecretKey(
                 ElGamalKeyPairHandle handle,
                 out ElementModQ.ElementModQHandle out_secret_key);
-
         }
 
         internal static class ElGamalCiphertext
