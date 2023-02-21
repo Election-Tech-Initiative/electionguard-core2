@@ -97,12 +97,77 @@ namespace electionguard
                                                        const ElementModP &data);
 
         /// <Summary>
+        /// Decrypts an ElGamal ciphertext with a "known product" (the blinding factor used in the encryption).
+        ///
+        /// <param name="product">The known product (blinding factor).</param>
+        /// <returns>An exponentially encoded plaintext message.</returns
+        /// </Summary>
+        uint64_t decrypt(const ElementModP &product);
+
+        /// <Summary>
+        /// Decrypts an ElGamal ciphertext with a "known product" (the blinding factor used in the encryption).
+        ///
+        /// <param name="product">The known product (blinding factor).</param>
+        /// <returns>An exponentially encoded plaintext message.</returns
+        /// </Summary>
+        uint64_t decrypt(const ElementModP &product) const;
+
+        /// <Summary>
         /// Decrypt the ciphertext directly using the provided secret key.
         ///
         /// This is a convenience accessor useful for some use cases.
         /// This method should not be used by consumers operating in live secret ballot elections.
+        ///
+        /// <param name="secretKey">The corresponding ElGamal secret key.</param>
+        /// <returns>An exponentially encoded plaintext message.</returns
         /// </Summary>
         uint64_t decrypt(const ElementModQ &secretKey);
+
+        /// <Summary>
+        /// Decrypt the ciphertext directly using the provided secret key.
+        ///
+        /// This is a convenience accessor useful for some use cases.
+        /// This method should not be used by consumers operating in live secret ballot elections.
+        ///
+        /// <param name="secretKey">The corresponding ElGamal secret key.</param>
+        /// <returns>An exponentially encoded plaintext message.</returns
+        /// </Summary>
+        uint64_t decrypt(const ElementModQ &secretKey) const;
+
+        /// <Summary>
+        /// Decrypt an ElGamal ciphertext using a known nonce and the ElGamal public key.
+        ///
+        /// <param name="publicKey">The corresponding ElGamal Public Key</param>
+        /// <param name="nonce">The secret nonce used to create the ciphertext.</param>
+        /// <returns>An exponentially encoded plaintext message.</returns
+        /// </Summary>
+        uint64_t decrypt(const ElementModP &publicKey, const ElementModQ &nonce);
+
+        /// <Summary>
+        /// Decrypt an ElGamal ciphertext using a known nonce and the ElGamal public key.
+        ///
+        /// <param name="publicKey">The corresponding ElGamal Public Key</param>
+        /// <param name="nonce">The secret nonce used to create the ciphertext.</param>
+        /// <returns>An exponentially encoded plaintext message.</returns
+        /// </Summary>
+        uint64_t decrypt(const ElementModP &publicKey, const ElementModQ &nonce) const;
+
+        /// <Summary>
+        /// Partially Decrypts an ElGamal ciphertext with a known ElGamal secret key.
+
+        /// 𝑀_i = 𝐴^𝑠𝑖 mod 𝑝 in the spec
+        ///
+        /// <param name="secretKey">The corresponding ElGamal secret key.</param>
+        /// <returns>A partial decryption of the plaintext value</returns
+        /// </Summary>
+        std::unique_ptr<ElementModP> partialDecrypt(const ElementModQ &secretKey);
+
+        /// 𝑀_i = 𝐴^𝑠𝑖 mod 𝑝 in the spec
+        ///
+        /// <param name="secretKey">The corresponding ElGamal secret key.</param>
+        /// <returns>A partial decryption of the plaintext value</returns
+        /// </Summary>
+        std::unique_ptr<ElementModP> partialDecrypt(const ElementModQ &secretKey) const;
 
         /// <Summary>
         /// Clone the value by making a deep copy.

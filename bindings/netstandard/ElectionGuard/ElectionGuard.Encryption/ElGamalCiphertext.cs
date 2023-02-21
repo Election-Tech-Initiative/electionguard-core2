@@ -1,4 +1,6 @@
-﻿namespace ElectionGuard
+﻿using System.Collections.Generic;
+
+namespace ElectionGuard
 {
     /// <summary>
     /// An "exponential ElGamal ciphertext" (i.e., with the plaintext in the exponent to allow for
@@ -51,9 +53,21 @@
 
         internal NativeInterface.ElGamalCiphertext.ElGamalCiphertextHandle Handle;
 
+        public ElGamalCiphertext(ElementModP pad, ElementModP data)
+        {
+            var status = NativeInterface.ElGamalCiphertext.New(pad.Handle, data.Handle, out var handle);
+            status.ThrowIfError();
+            Handle = handle;
+        }
+
         internal ElGamalCiphertext(NativeInterface.ElGamalCiphertext.ElGamalCiphertextHandle handle)
         {
             Handle = handle;
+        }
+
+        public ElGamalCiphertext Add(ElGamalCiphertext other)
+        {
+            return ElGamal.Add(new List<ElGamalCiphertext> { this, other });
         }
 
         /// <Summary>

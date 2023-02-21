@@ -612,10 +612,11 @@ namespace electionguard
     // numerator * (denominator^-1) mod p
     unique_ptr<ElementModP> div_mod_p(const ElementModP &numerator, const ElementModP &denominator)
     {
-        uint64_t result[MAX_P_LEN] = {};
-        CONTEXT_P().modInvPrime(const_cast<ElementModP &>(denominator).get(),
-                                static_cast<uint64_t *>(result));
-        auto inverse = make_unique<ElementModP>(result, true);
+        const auto &p = P();
+        uint64_t divisor[MAX_P_LEN] = {};
+        Bignum4096::modInvPrime(p.get(), const_cast<ElementModP &>(denominator).get(),
+                                static_cast<uint64_t *>(divisor));
+        auto inverse = make_unique<ElementModP>(divisor, true);
         return mul_mod_p(numerator, *inverse);
     }
 
@@ -804,9 +805,10 @@ namespace electionguard
     std::unique_ptr<ElementModQ> div_mod_q(const ElementModQ &numerator,
                                            const ElementModQ &denominator)
     {
+        const auto &q = Q();
         uint64_t result[MAX_Q_LEN] = {};
-        CONTEXT_Q().modInvPrime(const_cast<ElementModQ &>(denominator).get(),
-                                static_cast<uint64_t *>(result));
+        Bignum256::modInvPrime(q.get(), const_cast<ElementModQ &>(denominator).get(),
+                               static_cast<uint64_t *>(result));
         auto inverse = make_unique<ElementModQ>(result, true);
         return mul_mod_q(numerator, *inverse);
     }

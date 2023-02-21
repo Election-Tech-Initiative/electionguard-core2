@@ -44,7 +44,9 @@ struct eg_elgamal_ciphertext_s;
 */
 typedef struct eg_elgamal_ciphertext_s eg_elgamal_ciphertext_t;
 
-// no constructors defined.  use `eg_elgamal_encrypt`
+EG_API eg_electionguard_status_t eg_elgamal_ciphertext_new(eg_element_mod_p_t *in_pad,
+                                                           eg_element_mod_p_t *in_data,
+                                                           eg_elgamal_ciphertext_t **out_handle);
 
 EG_API eg_electionguard_status_t eg_elgamal_ciphertext_free(eg_elgamal_ciphertext_t *handle);
 

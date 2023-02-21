@@ -20,6 +20,7 @@ using electionguard::ElGamalKeyPair;
 using electionguard::HashedElGamalCiphertext;
 using electionguard::Log;
 using electionguard::uint64_to_size;
+using std::make_unique;
 using std::reference_wrapper;
 
 #pragma region ElGamalKeyPair
@@ -100,6 +101,27 @@ eg_electionguard_status_t eg_elgamal_keypair_get_public_key(eg_elgamal_keypair_t
 #pragma endregion
 
 #pragma region ElGamalCiphertext
+
+eg_electionguard_status_t eg_elgamal_ciphertext_new(eg_element_mod_p_t *in_pad,
+                                                    eg_element_mod_p_t *in_data,
+                                                    eg_elgamal_ciphertext_t **out_handle)
+{
+    if (in_pad == nullptr || in_data == nullptr) {
+        return ELECTIONGUARD_STATUS_ERROR_INVALID_ARGUMENT;
+    }
+
+    try {
+        auto *pad = AS_TYPE(ElementModP, in_pad);
+        auto *data = AS_TYPE(ElementModP, in_data);
+        auto ciphertext = ElGamalCiphertext::make(*pad, *data);
+
+        *out_handle = AS_TYPE(eg_elgamal_ciphertext_t, ciphertext.release());
+        return ELECTIONGUARD_STATUS_SUCCESS;
+    } catch (const exception &e) {
+        Log::error(":eg_elgamal_ciphertext_new", e);
+        return ELECTIONGUARD_STATUS_ERROR_BAD_ALLOC;
+    }
+}
 
 eg_electionguard_status_t eg_elgamal_ciphertext_free(eg_elgamal_ciphertext_t *handle)
 {

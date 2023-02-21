@@ -168,56 +168,120 @@ namespace electionguard
 
     // Public Methods
 
+    uint64_t ElGamalCiphertext::decrypt(const ElementModP &product)
+    {
+        auto result = div_mod_p(*pimpl->data, product);
+
+        // check known values so we dont have to search for them
+        if (*result == ONE_MOD_P()) {
+            // if it is 1 it is false
+            return 0;
+        } else if (*result == G()) {
+            // if it is g, it is true
+            return 1;
+        }
+
+        return DiscreteLog::getAsync(*result);
+    }
+
+    uint64_t ElGamalCiphertext::decrypt(const ElementModP &product) const
+    {
+        auto result = div_mod_p(*pimpl->data, product);
+
+        // check known values so we dont have to search for them
+        if (*result == ONE_MOD_P()) {
+            // if it is 1 it is false
+            return 0;
+        } else if (*result == G()) {
+            // if it is g, it is true
+            return 1;
+        }
+
+        return DiscreteLog::getAsync(*result);
+    }
+
     uint64_t ElGamalCiphertext::decrypt(const ElementModQ &secretKey)
     {
+        auto product = pow_mod_p(*pimpl->pad, secretKey);
+        return decrypt(*product);
+
         // Note this decryption method is primarily used for testing
         // and is only capable of decrypting boolean results (0/1)
         // it should be extended with a discrete_log search to decrypt
         // values other than 0 or 1
 
-        const auto &p = P();
-        auto secret = secretKey.toElementModP();
-        uint64_t divisor[MAX_P_LEN] = {};
-        bool success = Bignum4096::modExp(p.get(), this->getPad()->get(), MAX_P_SIZE, secret->get(),
-                                          static_cast<uint64_t *>(divisor), true);
-        if (!success) {
-            Log::warn("could not calculate mod exp");
-            return 0;
-        }
+        // const auto &p = P();
+        // auto secret = secretKey.toElementModP();
+        // uint64_t divisor[MAX_P_LEN] = {};
+        // bool success = Bignum4096::modExp(p.get(), this->getPad()->get(), MAX_P_SIZE, secret->get(),
+        //                                   static_cast<uint64_t *>(divisor), true);
+        // if (!success) {
+        //     Log::warn("could not calculate mod exp");
+        //     return 0;
+        // }
 
-        uint64_t inverse[MAX_P_LEN] = {};
-        success = Bignum4096::modInvPrime(p.get(), static_cast<uint64_t *>(divisor),
-                                          static_cast<uint64_t *>(inverse));
+        // uint64_t inverse[MAX_P_LEN] = {};
+        // success = Bignum4096::modInvPrime(p.get(), static_cast<uint64_t *>(divisor),
+        //                                   static_cast<uint64_t *>(inverse));
 
-        if (!success) {
-            Log::warn("could not calculate mod inv prime");
-            return 0;
-        }
+        // if (!success) {
+        //     Log::warn("could not calculate mod inv prime");
+        //     return 0;
+        // }
 
-        uint64_t mulResult[MAX_P_LEN_DOUBLE] = {};
-        Bignum4096::mul(this->getData()->get(), static_cast<uint64_t *>(inverse),
-                        static_cast<uint64_t *>(mulResult));
+        // uint64_t mulResult[MAX_P_LEN_DOUBLE] = {};
+        // Bignum4096::mul(this->getData()->get(), static_cast<uint64_t *>(inverse),
+        //                 static_cast<uint64_t *>(mulResult));
 
-        uint64_t result[MAX_P_LEN] = {};
-        success = Bignum4096::mod(p.get(), static_cast<uint64_t *>(mulResult),
-                                  static_cast<uint64_t *>(result));
-        if (!success) {
-            Log::warn("could not calculate mod");
-            return 0;
-        }
+        // uint64_t result[MAX_P_LEN] = {};
+        // success = Bignum4096::mod(p.get(), static_cast<uint64_t *>(mulResult),
+        //                           static_cast<uint64_t *>(result));
+        // if (!success) {
+        //     Log::warn("could not calculate mod");
+        //     return 0;
+        // }
 
-        // TODO: ISSUE #133: traverse a discrete_log lookup to find the result
-        auto result_as_p = make_unique<ElementModP>(result);
-        //uint64_t retval = MAX_UINT64;
-        if (*result_as_p == ONE_MOD_P()) {
-            // if it is 1 it is false
-            return 0;
-        } else if (*result_as_p == G()) {
-            // if it is g, it is true
-            return 1;
-        }
+        // // TODO: ISSUE #133: traverse a discrete_log lookup to find the result
+        // auto result_as_p = make_unique<ElementModP>(result);
+        // //uint64_t retval = MAX_UINT64;
+        // if (*result_as_p == ONE_MOD_P()) {
+        //     // if it is 1 it is false
+        //     return 0;
+        // } else if (*result_as_p == G()) {
+        //     // if it is g, it is true
+        //     return 1;
+        // }
 
-        return DiscreteLog::getAsync(*result_as_p);
+        // return DiscreteLog::getAsync(*result_as_p);
+    }
+
+    uint64_t ElGamalCiphertext::decrypt(const ElementModQ &secretKey) const
+    {
+        auto product = pow_mod_p(*pimpl->pad, secretKey);
+        return decrypt(*product);
+    }
+
+    uint64_t ElGamalCiphertext::decrypt(const ElementModP &publicKey, const ElementModQ &nonce)
+    {
+        auto product = pow_mod_p(publicKey, nonce);
+        return decrypt(*product);
+    }
+
+    uint64_t ElGamalCiphertext::decrypt(const ElementModP &publicKey,
+                                        const ElementModQ &nonce) const
+    {
+        auto product = pow_mod_p(publicKey, nonce);
+        return decrypt(*product);
+    }
+
+    unique_ptr<ElementModP> ElGamalCiphertext::partialDecrypt(const ElementModQ &secretKey)
+    {
+        return pow_mod_p(*pimpl->pad, secretKey);
+    }
+
+    unique_ptr<ElementModP> ElGamalCiphertext::partialDecrypt(const ElementModQ &secretKey) const
+    {
+        return pow_mod_p(*pimpl->pad, secretKey);
     }
 
     unique_ptr<ElGamalCiphertext> ElGamalCiphertext::clone() const
