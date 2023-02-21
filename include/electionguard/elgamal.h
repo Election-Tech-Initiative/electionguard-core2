@@ -120,9 +120,9 @@ EG_API eg_electionguard_status_t eg_elgamal_ciphertext_partial_decrypt(
  * @param[out] out_ciphertext 
  * @return eg_electionguard_status_t 
  */
-eg_electionguard_status_t eg_elgamal_add(eg_elgamal_ciphertext_t *in_ciphertexts[],
-                                         uint64_t in_ciphertexts_size,
-                                         eg_elgamal_ciphertext_t **out_ciphertext);
+EG_API eg_electionguard_status_t eg_elgamal_add(eg_elgamal_ciphertext_t *in_ciphertexts[],
+                                                uint64_t in_ciphertexts_size,
+                                                eg_elgamal_ciphertext_t **out_ciphertext);
 
 /**
  * Encrypts a message with a given random nonce and an ElGamal public key.
