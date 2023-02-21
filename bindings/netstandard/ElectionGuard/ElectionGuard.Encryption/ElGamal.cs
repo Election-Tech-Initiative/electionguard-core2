@@ -47,17 +47,6 @@ namespace ElectionGuard
                     nativeCiphertexts.ToArray(), (ulong)nativeCiphertexts.Count(),
                     out var ciphertext);
 
-            // IntPtr[] ciphertextPointers = new IntPtr[ciphertexts.Count];
-            // for (var i = 0; i < ciphertexts.Count; i++)
-            // {
-            //     ciphertextPointers[i] = ciphertexts[i].Handle.Ptr;
-            //     // ciphertexts[i].Dispose();
-            // }
-
-            // var status = NativeInterface.ElGamal.Add(
-            //         ciphertextPointers, (ulong)ciphertexts.Count,
-            //         out var ciphertext);
-
             status.ThrowIfError();
             return new ElGamalCiphertext(ciphertext);
         }
