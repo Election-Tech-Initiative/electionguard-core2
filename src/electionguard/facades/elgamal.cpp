@@ -163,6 +163,20 @@ eg_electionguard_status_t eg_elgamal_ciphertext_crypto_hash(eg_elgamal_ciphertex
     }
 }
 
+eg_electionguard_status_t
+eg_elgamal_ciphertext_decrypt_known_product(eg_elgamal_ciphertext_t *handle,
+                                            eg_element_mod_p_t *in_product, uint64_t *out_plaintext)
+{
+    try {
+        auto *product = AS_TYPE(ElementModP, in_product);
+        *out_plaintext = AS_TYPE(ElGamalCiphertext, handle)->decrypt(*product);
+        return ELECTIONGUARD_STATUS_SUCCESS;
+    } catch (const exception &e) {
+        Log::error(":eg_elgamal_ciphertext_decrypt_known_product", e);
+        return ELECTIONGUARD_STATUS_ERROR_RUNTIME_ERROR;
+    }
+}
+
 eg_electionguard_status_t eg_elgamal_ciphertext_decrypt_with_secret(
   eg_elgamal_ciphertext_t *handle, eg_element_mod_q_t *in_secret_key, uint64_t *out_plaintext)
 {
@@ -172,6 +186,38 @@ eg_electionguard_status_t eg_elgamal_ciphertext_decrypt_with_secret(
         return ELECTIONGUARD_STATUS_SUCCESS;
     } catch (const exception &e) {
         Log::error(":eg_elgamal_ciphertext_decrypt_with_secret", e);
+        return ELECTIONGUARD_STATUS_ERROR_RUNTIME_ERROR;
+    }
+}
+
+eg_electionguard_status_t
+eg_elgamal_ciphertext_decrypt_known_nonce(eg_elgamal_ciphertext_t *handle,
+                                          eg_element_mod_p_t *in_public_key,
+                                          eg_element_mod_q_t *in_nonce, uint64_t *out_plaintext)
+{
+    try {
+        auto *publicKey = AS_TYPE(ElementModP, in_public_key);
+        auto *nonce = AS_TYPE(ElementModQ, in_nonce);
+        *out_plaintext = AS_TYPE(ElGamalCiphertext, handle)->decrypt(*publicKey, *nonce);
+        return ELECTIONGUARD_STATUS_SUCCESS;
+    } catch (const exception &e) {
+        Log::error(":eg_elgamal_ciphertext_decrypt_known_nonce", e);
+        return ELECTIONGUARD_STATUS_ERROR_RUNTIME_ERROR;
+    }
+}
+
+eg_electionguard_status_t
+eg_elgamal_ciphertext_partial_decrypt(eg_elgamal_ciphertext_t *handle,
+                                      eg_element_mod_q_t *in_secret_key,
+                                      eg_element_mod_p_t **out_partial_decryption)
+{
+    try {
+        auto *secretKey = AS_TYPE(ElementModQ, in_secret_key);
+        auto partialDecryption = AS_TYPE(ElGamalCiphertext, handle)->partialDecrypt(*secretKey);
+        *out_partial_decryption = AS_TYPE(eg_element_mod_p_t, partialDecryption.release());
+        return ELECTIONGUARD_STATUS_SUCCESS;
+    } catch (const exception &e) {
+        Log::error(":eg_elgamal_ciphertext_partial_decrypt", e);
         return ELECTIONGUARD_STATUS_ERROR_RUNTIME_ERROR;
     }
 }
