@@ -1,11 +1,12 @@
-﻿namespace ElectionGuard
-{
-    using System;
-    using System.Collections.Generic;
-    // Declare native types for convenience
-    using NativeElGamalCiphertext = NativeInterface.ElGamalCiphertext.ElGamalCiphertextHandle;
-    using NativeHashedElGamalCiphertext = NativeInterface.HashedElGamalCiphertext.HashedElGamalCiphertextHandle;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+// Declare native types for convenience
+using NativeElGamalCiphertext = ElectionGuard.NativeInterface.ElGamalCiphertext.ElGamalCiphertextHandle;
+using NativeHashedElGamalCiphertext = ElectionGuard.NativeInterface.HashedElGamalCiphertext.HashedElGamalCiphertextHandle;
 
+namespace ElectionGuard
+{
     /// <summary>
     /// ElGamal Functions
     /// </summary>
@@ -24,7 +25,7 @@
         {
             var status = NativeInterface.ElGamal.Encrypt(
                     plaintext, nonce.Handle, publicKey.Handle,
-                    out NativeElGamalCiphertext ciphertext);
+                    out var ciphertext);
             status.ThrowIfError();
             return new ElGamalCiphertext(ciphertext);
         }
@@ -37,18 +38,26 @@
         /// <returns>A ciphertext tuple.</returns>
         /// </summary>
         public static ElGamalCiphertext Add(
-            List<ElGamalCiphertext> ciphertexts)
+            IEnumerable<ElGamalCiphertext> ciphertexts)
         {
-            IntPtr[] ciphertextPointers = new IntPtr[ciphertexts.Count];
-            for (var i = 0; i < ciphertexts.Count; i++)
-            {
-                ciphertextPointers[i] = ciphertexts[i].Handle.Ptr;
-                // ciphertexts[i].Dispose();
-            }
+            var nativeCiphertexts =
+                ciphertexts.Select(c => c.Handle.Ptr);
 
             var status = NativeInterface.ElGamal.Add(
-                    ciphertextPointers, (ulong)ciphertexts.Count,
-                    out NativeElGamalCiphertext ciphertext);
+                    nativeCiphertexts.ToArray(), (ulong)nativeCiphertexts.Count(),
+                    out var ciphertext);
+
+            // IntPtr[] ciphertextPointers = new IntPtr[ciphertexts.Count];
+            // for (var i = 0; i < ciphertexts.Count; i++)
+            // {
+            //     ciphertextPointers[i] = ciphertexts[i].Handle.Ptr;
+            //     // ciphertexts[i].Dispose();
+            // }
+
+            // var status = NativeInterface.ElGamal.Add(
+            //         ciphertextPointers, (ulong)ciphertexts.Count,
+            //         out var ciphertext);
+
             status.ThrowIfError();
             return new ElGamalCiphertext(ciphertext);
         }
@@ -69,7 +78,7 @@
         /// <param name="seed"> ElGamal seed. </param>
         /// <returns>A ciphertext tuple.</returns>
         /// </summary>
-        public unsafe static HashedElGamalCiphertext Encrypt(
+        public static unsafe HashedElGamalCiphertext Encrypt(
             byte[] data, ulong length, ElementModQ nonce, ElementModP publicKey, ElementModQ seed)
         {
             fixed (byte* pointer = data)

@@ -416,12 +416,34 @@ namespace ElectionGuard
                 ElGamalCiphertextHandle handle,
                 out ElementModQ.ElementModQHandle crypto_base_hash);
 
+            [DllImport(DllName, EntryPoint = "eg_elgamal_ciphertext_decrypt_known_product",
+                CallingConvention = CallingConvention.Cdecl, SetLastError = true)]
+            internal static extern Status DecryptKnownProduct(
+                ElGamalCiphertextHandle handle,
+                ElementModP.ElementModPHandle known_Product,
+                ref ulong plaintext);
+
             [DllImport(DllName, EntryPoint = "eg_elgamal_ciphertext_decrypt_with_secret",
                 CallingConvention = CallingConvention.Cdecl, SetLastError = true)]
             internal static extern Status DecryptWithSecret(
                 ElGamalCiphertextHandle handle,
                 ElementModQ.ElementModQHandle secret_key,
                 ref ulong plaintext);
+
+            [DllImport(DllName, EntryPoint = "eg_elgamal_ciphertext_decrypt_known_nonce",
+                CallingConvention = CallingConvention.Cdecl, SetLastError = true)]
+            internal static extern Status DecryptKnownNonce(
+                ElGamalCiphertextHandle handle,
+                ElementModP.ElementModPHandle public_key,
+                ElementModQ.ElementModQHandle nonce,
+                ref ulong plaintext);
+
+            [DllImport(DllName, EntryPoint = "eg_elgamal_ciphertext_partial_decrypt",
+                CallingConvention = CallingConvention.Cdecl, SetLastError = true)]
+            internal static extern Status PartialDecrypt(
+                ElGamalCiphertextHandle handle,
+                ElementModQ.ElementModQHandle secret_key,
+                out ElementModP.ElementModPHandle partial_decryption);
 
         }
 

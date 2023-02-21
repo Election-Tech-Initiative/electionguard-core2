@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using NativeElGamalCiphertext = ElectionGuard.NativeInterface.ElGamalCiphertext.ElGamalCiphertextHandle;
 
 namespace ElectionGuard
 {
@@ -17,7 +18,7 @@ namespace ElectionGuard
             get
             {
                 var status = NativeInterface.ElGamalCiphertext.GetPad(
-                    Handle, out NativeInterface.ElementModP.ElementModPHandle value);
+                    Handle, out var value);
                 status.ThrowIfError();
                 return new ElementModP(value);
             }
@@ -31,7 +32,7 @@ namespace ElectionGuard
             get
             {
                 var status = NativeInterface.ElGamalCiphertext.GetData(
-                    Handle, out NativeInterface.ElementModP.ElementModPHandle value);
+                    Handle, out var value);
                 status.ThrowIfError();
                 return new ElementModP(value);
             }
@@ -45,22 +46,23 @@ namespace ElectionGuard
             get
             {
                 var status = NativeInterface.ElGamalCiphertext.GetCryptoHash(
-                    Handle, out NativeInterface.ElementModQ.ElementModQHandle value);
+                    Handle, out var value);
                 status.ThrowIfError();
                 return new ElementModQ(value);
             }
         }
 
-        internal NativeInterface.ElGamalCiphertext.ElGamalCiphertextHandle Handle;
+        internal NativeElGamalCiphertext Handle;
 
         public ElGamalCiphertext(ElementModP pad, ElementModP data)
         {
-            var status = NativeInterface.ElGamalCiphertext.New(pad.Handle, data.Handle, out var handle);
+            var status = NativeInterface.ElGamalCiphertext.New(
+                pad.Handle, data.Handle, out var handle);
             status.ThrowIfError();
             Handle = handle;
         }
 
-        internal ElGamalCiphertext(NativeInterface.ElGamalCiphertext.ElGamalCiphertextHandle handle)
+        internal ElGamalCiphertext(NativeElGamalCiphertext handle)
         {
             Handle = handle;
         }
@@ -68,6 +70,21 @@ namespace ElectionGuard
         public ElGamalCiphertext Add(ElGamalCiphertext other)
         {
             return ElGamal.Add(new List<ElGamalCiphertext> { this, other });
+        }
+
+        /// <Summary>
+        /// Decrypts an ElGamal ciphertext with a "known product" (the blinding factor used in the encryption).
+        ///
+        /// This is a convenience accessor useful for some use cases.
+        /// This method should not be used by consumers operating in live secret ballot elections.
+        /// </Summary>
+        public ulong? Decrypt(ElementModP knownProduct)
+        {
+            ulong plaintext = 0;
+            var status = NativeInterface.ElGamalCiphertext.DecryptKnownProduct(
+                Handle, knownProduct.Handle, ref plaintext);
+            status.ThrowIfError();
+            return plaintext;
         }
 
         /// <Summary>
@@ -85,13 +102,48 @@ namespace ElectionGuard
             return plaintext;
         }
 
+        /// <Summary>
+        /// Decrypt an ElGamal ciphertext using a known nonce and the ElGamal public key.
+        ///
+        /// This is a convenience accessor useful for some use cases.
+        /// This method should not be used by consumers operating in live secret ballot elections.
+        /// </Summary>
+        public ulong? Decrypt(ElementModP publicKey, ElementModQ nonce)
+        {
+            ulong plaintext = 0;
+            var status = NativeInterface.ElGamalCiphertext.DecryptKnownNonce(
+                Handle, publicKey.Handle, nonce.Handle, ref plaintext);
+            status.ThrowIfError();
+            return plaintext;
+        }
+
+        /// <Summary>
+        /// Partially Decrypts an ElGamal ciphertext with a known ElGamal secret key.
+        ///
+        /// 𝑀_i = 𝐴^𝑠𝑖 mod 𝑝 in the spec
+        ///
+        /// This is a convenience accessor useful for some use cases.
+        /// This method should be used by consumers operating in live secret ballot elections.
+        /// </Summary>
+        public ElementModP PartialDecrypt(ElementModQ secretKey)
+        {
+            var status = NativeInterface.ElGamalCiphertext.PartialDecrypt(
+                Handle, secretKey.Handle, out var value);
+            status.ThrowIfError();
+            return new ElementModP(value);
+        }
+
 #pragma warning disable CS1591 // Missing XML comment for publicly visible type or member
         protected override void DisposeUnmanaged()
 #pragma warning restore CS1591 // Missing XML comment for publicly visible type or member
         {
             base.DisposeUnmanaged();
 
-            if (Handle == null || Handle.IsInvalid) return;
+            if (Handle == null || Handle.IsInvalid)
+            {
+                return;
+            }
+
             Handle.Dispose();
             Handle = null;
         }
