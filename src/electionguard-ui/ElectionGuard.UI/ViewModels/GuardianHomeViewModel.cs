@@ -41,7 +41,7 @@ public partial class GuardianHomeViewModel : BaseViewModel
         MainThread.BeginInvokeOnMainThread(async() =>
             await NavigationService.GoToPage(typeof(ViewKeyCeremonyViewModel), new Dictionary<string, object>
             {
-                { "KeyCeremonyId", CurrentKeyCeremony.Id }
+                { "KeyCeremonyId", CurrentKeyCeremony.KeyCeremonyId! }
             }));
     }
 

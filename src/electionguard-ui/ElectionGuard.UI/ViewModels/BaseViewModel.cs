@@ -12,6 +12,12 @@ public partial class BaseViewModel : ObservableObject, IDisposable
     private string? _userName;
 
     [ObservableProperty]
+    private bool _isAdmin;
+
+    [ObservableProperty]
+    private bool _isLoading;
+
+    [ObservableProperty]
     private string _pageTitle = "";
 
     public virtual async Task OnAppearing()
@@ -43,6 +49,7 @@ public partial class BaseViewModel : ObservableObject, IDisposable
 
         _version = ConfigurationService.GetVersion();
         _userName = AuthenticationService.UserName;
+        _isAdmin = AuthenticationService.IsAdmin;
         SetPageTitle();
 
         LocalizationService.OnLanguageChanged += OnLanguageChanged;

@@ -9,7 +9,7 @@ public class AdminHomeViewModelTest : TestBase
     public async Task Given_WhenKeyCeremonyButtonClicked_ThenNavToCeremony()
     {
         // ARRANGE
-        var adminHomeViewModel = new AdminHomeViewModel(ServiceProvider);
+        var adminHomeViewModel = new AdminHomeViewModel(ServiceProvider, new KeyCeremonyService());
 
         // ACT
         await adminHomeViewModel.GoKeyCeremonyCommand.ExecuteAsync(null);

@@ -71,7 +71,7 @@ public class KeyCeremonyMediator : DisposableBase
         _adminSteps.Add(
             new KeyCeremonyStep()
             {
-                State = KeyCeremonyState.PendingGuardiansJoin,
+                State = KeyCeremonyState.PendingGuardiansVerifyBackups,
                 RunStep = RunStep6,
                 ShouldRunStep = ShouldAdminStartStep6
             });

@@ -1,5 +1,6 @@
 ﻿using CommunityToolkit.Mvvm.Input;
 using ElectionGuard.ElectionSetup;
+using ElectionGuard.UI.Helpers;
 
 namespace ElectionGuard.UI.ViewModels;
 
@@ -8,7 +9,9 @@ public partial class ViewKeyCeremonyViewModel : BaseViewModel
 {
     public const string CurrentKeyCeremonyParam = "KeyCeremonyId";
 
-    public ViewKeyCeremonyViewModel(IServiceProvider serviceProvider, KeyCeremonyService keyCeremonyService) : 
+    private KeyCeremonyMediator? _mediator;
+
+    public ViewKeyCeremonyViewModel(IServiceProvider serviceProvider, KeyCeremonyService keyCeremonyService) :
         base("ViewKeyCeremony", serviceProvider)
     {
         _keyCeremonyService = keyCeremonyService;
@@ -26,20 +29,37 @@ public partial class ViewKeyCeremonyViewModel : BaseViewModel
 
     partial void OnKeyCeremonyIdChanged(string value)
     {
-        Task.Run(async() => KeyCeremony = await _keyCeremonyService.GetByKeyCeremonyIdAsync(value)).Wait();
+        Task.Run(async () => KeyCeremony = await _keyCeremonyService.GetByKeyCeremonyIdAsync(value));
+    }
+
+    partial void OnKeyCeremonyChanged(KeyCeremony? value)
+    {
+        if (value is not null)
+        {
+            _mediator = new KeyCeremonyMediator("mediator", UserName!, value);
+            Task.Run(async () => await _mediator.RunKeyCeremony(IsAdmin));
+        }
     }
 
     [RelayCommand(CanExecute = nameof(CanJoin))]
-    public void Join()
+    public async Task Join()
     {
-        var currentGuardianUserName = AuthenticationService.UserName;
+        // TODO: Tell the signalR hub what user has joined
+        await _mediator!.RunKeyCeremony(IsAdmin);
+        var timer = Dispatcher.GetForCurrentThread()!.CreateTimer();
+        timer.Interval = TimeSpan.FromSeconds(UISettings.LONG_POLLING_INTERVAL);
+        timer.IsRepeating = true;
+        timer.Tick += CeremonyPollingTimer_Tick;
+    }
 
-
+    private void CeremonyPollingTimer_Tick(object? sender, EventArgs e)
+    {
+        Task.Run(async () => await _mediator!.RunKeyCeremony(IsAdmin));
     }
 
     private bool CanJoin()
     {
-        return KeyCeremony is not null;
+        return KeyCeremony is not null && _mediator is not null;
     }
 
     private readonly KeyCeremonyService _keyCeremonyService;
