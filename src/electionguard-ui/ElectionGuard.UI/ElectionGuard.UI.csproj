@@ -29,7 +29,7 @@
     <RestoreProjectStyle>PackageReference</RestoreProjectStyle>    
     <!--<Configurations>Release;Debug</Configurations>-->
 		<Platforms Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'maccatalyst'">arm64;x64</Platforms>
-		<Platforms Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'windows'">x64</Platforms>
+		<Platforms Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'windows'">AnyCPU</Platforms>
   </PropertyGroup>
 
  <PropertyGroup Label="Debug|arm64" Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Debug|net7.0-maccatalyst|arm64'">
@@ -86,6 +86,62 @@
 	  <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
 	</PropertyGroup> -->
 
+	<PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+	  <IntermediateOutputPath></IntermediateOutputPath>
+	  <DebugSymbols></DebugSymbols>
+	  <DebugType></DebugType>
+	  <Optimize></Optimize>
+	  <OutputPath></OutputPath>
+	  <DefineConstants></DefineConstants>
+	  <WarningLevel></WarningLevel>
+	  <TreatWarningsAsErrors></TreatWarningsAsErrors>
+	  <DocumentationFile></DocumentationFile>
+	  <ConsolePause>true</ConsolePause>
+	  <ExternalConsole>false</ExternalConsole>
+	  <Commandlineparameters></Commandlineparameters>
+	  <RunWithWarnings>true</RunWithWarnings>
+	  <AssemblyName></AssemblyName>
+	  <SignAssembly></SignAssembly>
+	  <DelaySign>false</DelaySign>
+	  <PublicSign>false</PublicSign>
+	  <AssemblyOriginatorKeyFile></AssemblyOriginatorKeyFile>
+	  <NoWarn></NoWarn>
+	  <AllowUnsafeBlocks></AllowUnsafeBlocks>
+	  <CheckForOverflowUnderflow></CheckForOverflowUnderflow>
+	  <LangVersion>Default</LangVersion>
+	  <NoStdLib></NoStdLib>
+	  <PlatformTarget></PlatformTarget>
+	  <WarningsNotAsErrors></WarningsNotAsErrors>
+	  <Nullable></Nullable>
+	</PropertyGroup>
+	<PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+	  <IntermediateOutputPath></IntermediateOutputPath>
+	  <DebugSymbols></DebugSymbols>
+	  <DebugType></DebugType>
+	  <Optimize></Optimize>
+	  <OutputPath></OutputPath>
+	  <DefineConstants></DefineConstants>
+	  <WarningLevel></WarningLevel>
+	  <TreatWarningsAsErrors></TreatWarningsAsErrors>
+	  <DocumentationFile></DocumentationFile>
+	  <ConsolePause>true</ConsolePause>
+	  <ExternalConsole>false</ExternalConsole>
+	  <Commandlineparameters></Commandlineparameters>
+	  <RunWithWarnings>true</RunWithWarnings>
+	  <AssemblyName></AssemblyName>
+	  <SignAssembly></SignAssembly>
+	  <DelaySign>false</DelaySign>
+	  <PublicSign>false</PublicSign>
+	  <AssemblyOriginatorKeyFile></AssemblyOriginatorKeyFile>
+	  <NoWarn></NoWarn>
+	  <AllowUnsafeBlocks></AllowUnsafeBlocks>
+	  <CheckForOverflowUnderflow></CheckForOverflowUnderflow>
+	  <LangVersion>Default</LangVersion>
+	  <NoStdLib></NoStdLib>
+	  <PlatformTarget>anycpu</PlatformTarget>
+	  <WarningsNotAsErrors></WarningsNotAsErrors>
+	  <Nullable></Nullable>
+	</PropertyGroup>
 	<ItemGroup>
 		<!-- App Icon -->
 		<MauiIcon Include="Resources\AppIcon\appicon.svg" ForegroundFile="Resources\AppIcon\logo.svg" />
