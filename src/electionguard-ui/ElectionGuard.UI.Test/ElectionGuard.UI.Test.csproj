@@ -90,7 +90,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\ElectionGuard.UI.Lib\ElectionGuard.UI.Lib.csproj" />
     <ProjectReference Include="..\ElectionGuard.UI\ElectionGuard.UI.csproj" />
   </ItemGroup>
 

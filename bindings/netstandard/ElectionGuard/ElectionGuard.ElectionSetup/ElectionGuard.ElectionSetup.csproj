@@ -5,7 +5,7 @@
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
     <EnforceCodeStyleInBuild>true</EnforceCodeStyleInBuild>
-    <Platforms>arm64;x64</Platforms>
+    <Platforms>arm64;x64;x86</Platforms>    <!-- Yes, we actually do need the x86. -->
     <Configurations>Debug;Release</Configurations>
   </PropertyGroup>
 
@@ -26,7 +26,7 @@
     <PlatformTarget>arm64</PlatformTarget>
     <IntermediateOutputPath>obj\arm64\Debug</IntermediateOutputPath>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
-    
+
     <TreatWarningsAsErrors>True</TreatWarningsAsErrors>
     <NoWarn>1701;1702</NoWarn>
     <WarningLevel>4</WarningLevel>
@@ -61,7 +61,7 @@
     <PlatformTarget>x64</PlatformTarget>
     <IntermediateOutputPath>obj\x64\Debug</IntermediateOutputPath>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
-    
+
     <TreatWarningsAsErrors>True</TreatWarningsAsErrors>
     <NoWarn>1701;1702</NoWarn>
     <WarningLevel>4</WarningLevel>
@@ -86,7 +86,7 @@
 
     <NoStdLib>false</NoStdLib>
   </PropertyGroup>
-  
+
   <PropertyGroup Label="Debug|x86" Condition=" '$(Configuration)|$(Platform)' == 'Debug|x86' ">
     <DebugType>full</DebugType>
     <DebugSymbols>true</DebugSymbols>
@@ -96,7 +96,7 @@
     <PlatformTarget>x86</PlatformTarget>
     <IntermediateOutputPath>obj\x86\Debug</IntermediateOutputPath>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
-    
+
     <TreatWarningsAsErrors>True</TreatWarningsAsErrors>
     <NoWarn>1701;1702</NoWarn>
     <WarningLevel>4</WarningLevel>
