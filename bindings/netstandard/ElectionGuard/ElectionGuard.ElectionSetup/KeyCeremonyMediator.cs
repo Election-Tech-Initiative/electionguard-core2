@@ -2,6 +2,7 @@
 using ElectionGuard.ElectionSetup.Extensions;
 using ElectionGuard.UI.Lib.Models;
 using ElectionGuard.UI.Lib.Services;
+using MongoDB.Bson;
 
 namespace ElectionGuard.ElectionSetup;
 
@@ -57,7 +58,7 @@ public class KeyCeremonyMediator : DisposableBase
         _adminSteps.Add(
             new KeyCeremonyStep()
             {
-                State = KeyCeremonyState.PendingGuardiansJoin,
+                State = KeyCeremonyState.PendingGuardianBackups,
                 RunStep = RunStep4,
                 ShouldRunStep = ShouldAdminStartStep4
             });
@@ -447,11 +448,13 @@ public class KeyCeremonyMediator : DisposableBase
 
     private async Task<ulong> GetGuardianNumberAsync(GuardianPublicKeyService service, string keyCeremonyId, string guardianId)
     {
-        var list = await service.GetByKeyCeremonyIdAsync(keyCeremonyId);
-        foreach ( (var item, ulong index) in list.WithIndex() ) 
+        var list = await service.GetAllByKeyCeremonyIdAsync(keyCeremonyId);
+        foreach ((var item, ulong index) in list.WithIndex())
         {
             if (item.GuardianId == guardianId)
+            {
                 return index;
+            }
         }
         return 0;
     }
@@ -542,25 +545,28 @@ public class KeyCeremonyMediator : DisposableBase
 
     private async Task<bool> ShouldGuardianRunStep1()
     {
-        string keyCeremonyId = CeremonyDetails.KeyCeremonyId;
-        string guardianId = UserId;
+        var keyCeremonyId = CeremonyDetails.KeyCeremonyId;
+        var guardianId = UserId;
 
         GuardianPublicKeyService guardianService = new();
         var guardian = await guardianService.GetByIdsAsync(keyCeremonyId, guardianId);
+        var count = await guardianService.CountAsync(keyCeremonyId);
 
-        return (guardian == null);
+        return guardian == null && count < CeremonyDetails.NumberOfGuardians;
     }
 
     private async Task<bool> ShouldGuardianRunStep3()
     {
-        string keyCeremonyId = CeremonyDetails.KeyCeremonyId;
-        string guardianId = UserId;
+        var keyCeremonyId = CeremonyDetails.KeyCeremonyId;
+        var guardianId = UserId;
 
         // might want to switch this to use a count instead of loading the object
         GuardianPublicKeyService guardianService = new();
         var guardian = await guardianService.GetByIdsAsync(keyCeremonyId, guardianId);
         if (guardian == null)
+        {
             return false;
+        }
 
         GuardianBackupService backupService = new();
         var backupCount = await backupService.CountAsync(keyCeremonyId, guardianId);
@@ -570,13 +576,15 @@ public class KeyCeremonyMediator : DisposableBase
 
     private async Task<bool> ShouldGuardianRunStep5()
     {
-        string keyCeremonyId = CeremonyDetails.KeyCeremonyId;
-        string guardianId = UserId;
+        var keyCeremonyId = CeremonyDetails.KeyCeremonyId;
+        var guardianId = UserId;
 
         GuardianPublicKeyService guardianService = new();
         var guardian = await guardianService.GetByIdsAsync(keyCeremonyId, guardianId);
         if (guardian == null)
+        {
             return false;
+        }
 
         GuardianBackupService backupService = new();
         var backupCount = await backupService.CountAsync(keyCeremonyId, guardianId);
@@ -591,13 +599,13 @@ public class KeyCeremonyMediator : DisposableBase
 
     private async Task RunStep1()
     {
-        string keyCeremonyId = CeremonyDetails.KeyCeremonyId;
+        var keyCeremonyId = CeremonyDetails.KeyCeremonyId;
         var currentGuardianUserName = UserId;
 
         // append guardian joined to key ceremony (db)
         GuardianPublicKeyService service = new();
         GuardianPublicKey data = new() { KeyCeremonyId= keyCeremonyId, GuardianId = currentGuardianUserName };
-        await service.SaveAsync(data);
+        _ = await service.SaveAsync(data);
 
         // get guardian number
         var guardianNumber = await GetGuardianNumberAsync(service, keyCeremonyId, currentGuardianUserName);
@@ -612,7 +620,14 @@ public class KeyCeremonyMediator : DisposableBase
         var publicKey = guardian.ShareKey();
 
         // append to key ceremony (db)
-        await service.UpdatePublicKeyAsync(keyCeremonyId, currentGuardianUserName, publicKey);
+        try
+        {
+            await service.UpdatePublicKeyAsync(keyCeremonyId, currentGuardianUserName, publicKey);
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine(ex);
+        }
 
         // notify change to admin (signalR)
     }
@@ -628,7 +643,7 @@ public class KeyCeremonyMediator : DisposableBase
     private async Task Announce(string keyCeremonyId)
     {
         GuardianPublicKeyService service = new();
-        var list = await service.GetByKeyCeremonyIdAsync(keyCeremonyId);
+        var list = await service.GetAllByKeyCeremonyIdAsync(keyCeremonyId);
 
         AnnounceGuardians(list);
     }
@@ -654,7 +669,7 @@ public class KeyCeremonyMediator : DisposableBase
 
     private async Task RunStep3()
     {
-        string keyCeremonyId = CeremonyDetails.KeyCeremonyId;
+        var keyCeremonyId = CeremonyDetails.KeyCeremonyId;
 
         KeyCeremonyService service = new();
         var keyCeremony = await service.GetByKeyCeremonyIdAsync(keyCeremonyId);
@@ -664,14 +679,14 @@ public class KeyCeremonyMediator : DisposableBase
 
         // load other keys
         GuardianPublicKeyService guardianService = new();
-        var list = await guardianService.GetByKeyCeremonyIdAsync(keyCeremonyId);
+        var list = await guardianService.GetAllByKeyCeremonyIdAsync(keyCeremonyId);
         foreach (var item in list)
         {
             guardian!.SaveGuardianKey(item.PublicKey!);
         }
 
         // generate election partial key backups
-        guardian!.GenerateElectionPartialKeyBackups();
+        _ = guardian!.GenerateElectionPartialKeyBackups();
 
         // share backups
         var backups = guardian.ShareElectionPartialKeyBackups();
@@ -680,12 +695,14 @@ public class KeyCeremonyMediator : DisposableBase
         GuardianBackupService backupService = new();
         foreach (var item in backups)
         {
-            GuardianBackups data = new() { 
-                KeyCeremonyId = keyCeremonyId, 
+            GuardianBackups data = new()
+            {
+                KeyCeremonyId = keyCeremonyId,
                 GuardianId = UserId,
                 DesignatedId = item.DesignatedId,
-                Backup = item };
-            await backupService.SaveAsync(data);
+                Backup = item
+            };
+            _ = await backupService.SaveAsync(data);
         }
 
         // notify change to admin (signalR)
@@ -694,7 +711,7 @@ public class KeyCeremonyMediator : DisposableBase
 
     private async Task RunStep4()
     {
-        string keyCeremonyId = CeremonyDetails.KeyCeremonyId;
+        var keyCeremonyId = CeremonyDetails.KeyCeremonyId;
 
         // change state
         KeyCeremonyService service = new();
@@ -722,15 +739,15 @@ public class KeyCeremonyMediator : DisposableBase
 
     private async Task RunStep5()
     {
-        string keyCeremonyId = CeremonyDetails.KeyCeremonyId;
+        var keyCeremonyId = CeremonyDetails.KeyCeremonyId;
 
         KeyCeremonyService keyCeremonyService = new();
         GuardianBackupService backupService = new();
         GuardianPublicKeyService publicKeyService = new();
         var backups = await backupService.GetByGuardianIdAsync(keyCeremonyId, UserId);
-        var keyCeremony = await keyCeremonyService.GetByIdAsync(keyCeremonyId);
+        var keyCeremony = await keyCeremonyService.GetByKeyCeremonyIdAsync(keyCeremonyId);
         var guardian = Guardian.Load(UserId, keyCeremony!);
-        var list = await publicKeyService.GetByKeyCeremonyIdAsync(keyCeremonyId);
+        var list = await publicKeyService.GetAllByKeyCeremonyIdAsync(keyCeremonyId);
         foreach (var item in list)
         {
             guardian!.SaveGuardianKey(item.PublicKey!);

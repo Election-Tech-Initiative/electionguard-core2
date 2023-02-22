@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Reflection;
 using System.Runtime.InteropServices;
 
 namespace ElectionGuard
@@ -72,6 +73,25 @@ namespace ElectionGuard
         }
 
         internal NativeInterface.HashedElGamalCiphertext.HashedElGamalCiphertextHandle Handle;
+
+
+        public unsafe HashedElGamalCiphertext(ElementModP pad, byte[] data, byte[] mac)
+        {
+            fixed (byte* _data = data)
+            {
+                fixed (byte* _mac = mac)
+                {
+                    var status = NativeInterface.HashedElGamalCiphertext.New(pad.Handle,
+                                                                            _data,
+                                                                            (ulong)data.Length,
+                                                                            _mac,
+                                                                            (ulong)mac.Length,
+                                                                            out Handle);
+                    status.ThrowIfError();
+                }
+            }
+        }
+
 
         internal HashedElGamalCiphertext(NativeInterface.HashedElGamalCiphertext.HashedElGamalCiphertextHandle handle)
         {

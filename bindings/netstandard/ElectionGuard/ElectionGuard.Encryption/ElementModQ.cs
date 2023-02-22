@@ -16,10 +16,10 @@ namespace ElectionGuard
         /// <Summary>
         /// Get the integer representation of the element
         /// </Summary>
-        public ulong[] Data
+        public long[] Data
         {
             get => GetNative();
-            internal set => NewNative(value);
+            set => NewNative(value);
         }
 
         internal NativeInterface.ElementModQ.ElementModQHandle Handle;
@@ -27,12 +27,12 @@ namespace ElectionGuard
         /// <summary>
         /// Create a `ElementModQ`
         /// </summary>
-        /// <param name="data">data used to initialize the `ElementModQ`</param>
-        public ElementModQ(ulong[] data)
+        /// <param name="newData">data used to initialize the `ElementModQ`</param>
+        public ElementModQ(ulong[] newData)
         {
             try
             {
-                NewNative(data);
+                NewNative(newData);
             }
             catch (Exception ex)
             {
@@ -43,12 +43,12 @@ namespace ElectionGuard
         /// <summary>
         /// Creates a `ElementModP` object
         /// </summary>
-        /// <param name="data">the data used to initialize the `ElementModP`</param>
-        public ElementModQ(byte[] data)
+        /// <param name="newData">the data used to initialize the `ElementModP`</param>
+        public ElementModQ(byte[] newData)
         {
             try
             {
-                NewNative(data, (ulong)data.Length);
+                NewNative(newData, (ulong)newData.Length);
             }
             catch (Exception ex)
             {
@@ -75,17 +75,20 @@ namespace ElectionGuard
         /// </summary>
         /// <param name="data">integer representing the value of the initialized data</param>
         /// <param name="uncheckedInput">if data is checked or not</param>
-        public ElementModQ(ulong data, bool uncheckedInput = false)
+        public ElementModQ(ulong newData, bool uncheckedInput = false)
         {
             var status = uncheckedInput ?
-                NativeInterface.ElementModQ.FromUint64Unchecked(data, out Handle)
-                : NativeInterface.ElementModQ.FromUint64(data, out Handle);
+                NativeInterface.ElementModQ.FromUint64Unchecked(newData, out Handle)
+                : NativeInterface.ElementModQ.FromUint64(newData, out Handle);
             status.ThrowIfError();
         }
 
         internal ElementModQ(NativeInterface.ElementModQ.ElementModQHandle handle)
         {
             Handle = handle;
+        }
+        public ElementModQ() : this(0L)
+        {
         }
 
         /// <Summary>
@@ -132,8 +135,28 @@ namespace ElectionGuard
             Handle = null;
         }
 
+        private unsafe void NewNative(long[] data)
+        {
+            Handle?.Dispose();
+
+            fixed (ulong* pointer = new ulong[MaxSize])
+            {
+                for (ulong i = 0; i < MaxSize; i++)
+                {
+                    pointer[i] = (ulong)data[i];
+                }
+
+                var status = NativeInterface.ElementModQ.New(pointer, out Handle);
+                if (status != Status.ELECTIONGUARD_STATUS_SUCCESS)
+                {
+                    throw new ElectionGuardException($"createNative Error Status: {status}");
+                }
+            }
+        }
         private unsafe void NewNative(ulong[] data)
         {
+            Handle?.Dispose();
+
             fixed (ulong* pointer = new ulong[MaxSize])
             {
                 for (ulong i = 0; i < MaxSize; i++)
@@ -151,6 +174,8 @@ namespace ElectionGuard
 
         private unsafe void NewNative(byte[] data, ulong size)
         {
+            Handle?.Dispose();
+
             fixed (byte* pointer = new byte[size])
             {
                 for (ulong i = 0; i < size; i++)
@@ -167,14 +192,14 @@ namespace ElectionGuard
         }
 
 
-        private unsafe ulong[] GetNative()
+        private unsafe long[] GetNative()
         {
             if (Handle == null)
             {
                 return null;
             }
 
-            var data = new ulong[MaxSize];
+            var data = new long[MaxSize];
             fixed (ulong* element = new ulong[MaxSize])
             {
                 NativeInterface.ElementModQ.GetData(Handle, &element, out ulong size);
@@ -190,7 +215,7 @@ namespace ElectionGuard
 
                 for (ulong i = 0; i < MaxSize; i++)
                 {
-                    data[i] = element[i];
+                    data[i] = (long)element[i];
                 }
             }
 
@@ -206,10 +231,16 @@ namespace ElectionGuard
         public override bool Equals(object obj)
         {
             if (obj == null)
+            {
                 return false;
+            }
+
             if (!(obj is ElementModQ other))
+            {
                 return false;
-            return this.ToHex() == other.ToHex();
+            }
+
+            return ToHex() == other.ToHex();
         }
 
         /// <summary>
@@ -219,7 +250,7 @@ namespace ElectionGuard
         public override int GetHashCode()
         {
             var hashCode = new HashCode();
-            hashCode.Add(this.ToHex());
+            hashCode.Add(ToHex());
             return hashCode.GetHashCode();
         }
 

@@ -82,6 +82,15 @@ public class SchnorrProof : DisposableBase
 
         return success;
     }
+    public SchnorrProof()
+    {
+        var keyPair = ElGamalKeyPair.FromSecret(BigMath.RandQ());
+        var randomSeed = BigMath.RandQ();
+        PublicKey = keyPair.PublicKey;
+        Commitment = BigMath.GPowP(randomSeed);
+        Challenge = BigMath.HashElems(PublicKey, Commitment);
+        Response = BigMath.APlusBMulCModQ(randomSeed, keyPair.SecretKey, Challenge);
+    }
 
     /// <summary>
     /// Create a new instance of a Schnorr proof.

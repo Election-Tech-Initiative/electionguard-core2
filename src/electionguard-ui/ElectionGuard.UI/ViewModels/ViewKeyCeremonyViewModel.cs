@@ -11,11 +11,25 @@ public partial class ViewKeyCeremonyViewModel : BaseViewModel
 
     private KeyCeremonyMediator? _mediator;
 
-    public ViewKeyCeremonyViewModel(IServiceProvider serviceProvider, KeyCeremonyService keyCeremonyService) :
+    private readonly IDispatcherTimer _timer;
+
+    public ViewKeyCeremonyViewModel(IServiceProvider serviceProvider,
+                                    KeyCeremonyService keyCeremonyService,
+                                    GuardianPublicKeyService guardianService,
+                                    GuardianBackupService backupService,
+                                    VerificationService verificationService) :
         base("ViewKeyCeremony", serviceProvider)
     {
         _keyCeremonyService = keyCeremonyService;
+        _guardianService = guardianService;
+        _backupService = backupService;
+        _verificationService = verificationService;
+
         IsJoinVisible = !AuthenticationService.IsAdmin;
+        _timer = Dispatcher.GetForCurrentThread()!.CreateTimer();
+        _timer.Interval = TimeSpan.FromSeconds(UISettings.LONG_POLLING_INTERVAL);
+        _timer.IsRepeating = true;
+        _timer.Tick += CeremonyPollingTimer_Tick;
     }
 
     [ObservableProperty]
@@ -27,9 +41,20 @@ public partial class ViewKeyCeremonyViewModel : BaseViewModel
     [ObservableProperty]
     private string _keyCeremonyId = string.Empty;
 
+    [ObservableProperty]
+    private List<GuardianPublicKey> _guardians = new();
+
     partial void OnKeyCeremonyIdChanged(string value)
     {
-        Task.Run(async () => KeyCeremony = await _keyCeremonyService.GetByKeyCeremonyIdAsync(value));
+        _ = Task.Run(async () => KeyCeremony = await _keyCeremonyService.GetByKeyCeremonyIdAsync(value));
+    }
+
+    private void UpdateKeyCeremony()
+    {
+        if(KeyCeremonyId != string.Empty)
+        {
+            OnKeyCeremonyIdChanged(KeyCeremonyId);
+        }
     }
 
     partial void OnKeyCeremonyChanged(KeyCeremony? value)
@@ -37,7 +62,14 @@ public partial class ViewKeyCeremonyViewModel : BaseViewModel
         if (value is not null)
         {
             _mediator = new KeyCeremonyMediator("mediator", UserName!, value);
-            Task.Run(async () => await _mediator.RunKeyCeremony(IsAdmin));
+            _ = Task.Run(async () => await _mediator.RunKeyCeremony(IsAdmin));
+
+            // load the guardians that have joined
+            _ = Task.Run(async () => Guardians = await _guardianService.GetAllByKeyCeremonyIdAsync(value.KeyCeremonyId!));
+
+            IsJoinVisible = !AuthenticationService.IsAdmin && value.State == KeyCeremonyState.PendingGuardiansJoin;
+
+            JoinCommand.NotifyCanExecuteChanged();
         }
     }
 
@@ -46,15 +78,21 @@ public partial class ViewKeyCeremonyViewModel : BaseViewModel
     {
         // TODO: Tell the signalR hub what user has joined
         await _mediator!.RunKeyCeremony(IsAdmin);
-        var timer = Dispatcher.GetForCurrentThread()!.CreateTimer();
-        timer.Interval = TimeSpan.FromSeconds(UISettings.LONG_POLLING_INTERVAL);
-        timer.IsRepeating = true;
-        timer.Tick += CeremonyPollingTimer_Tick;
+        _timer.Start();
     }
 
     private void CeremonyPollingTimer_Tick(object? sender, EventArgs e)
     {
-        Task.Run(async () => await _mediator!.RunKeyCeremony(IsAdmin));
+        List<GuardianPublicKey> localData = new();
+        _ = Task.Run(async () => await _mediator!.RunKeyCeremony(IsAdmin));
+        _ = Task.Run(async () =>
+        {
+            localData = await _guardianService.GetAllByKeyCeremonyIdAsync(KeyCeremonyId);
+            if (localData.Count >= Guardians.Count)
+            {
+                Guardians = localData;
+            }
+        });
     }
 
     private bool CanJoin()
@@ -63,4 +101,7 @@ public partial class ViewKeyCeremonyViewModel : BaseViewModel
     }
 
     private readonly KeyCeremonyService _keyCeremonyService;
+    private readonly GuardianPublicKeyService _guardianService;
+    private readonly GuardianBackupService _backupService;
+    private readonly VerificationService _verificationService;
 }

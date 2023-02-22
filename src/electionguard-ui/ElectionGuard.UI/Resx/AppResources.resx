@@ -276,4 +276,7 @@
   <data name="Save" xml:space="preserve">
     <value>Save</value>
   </data>
+  <data name="NoGuardians" xml:space="preserve">
+    <value>No guardians joined</value>
+  </data>
 </root>

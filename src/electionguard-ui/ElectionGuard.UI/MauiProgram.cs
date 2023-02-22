@@ -1,4 +1,4 @@
-using CommunityToolkit.Maui;
+﻿using CommunityToolkit.Maui;
 using ElectionGuard.UI.Lib.Services;
 using ElectionGuard.UI.Services;
 using Microsoft.Extensions.Logging;
@@ -57,6 +57,9 @@ public static class MauiProgram
 
         // setup database services
         builder.Services.AddTransient<KeyCeremonyService>();
+        builder.Services.AddTransient<GuardianPublicKeyService>();
+        builder.Services.AddTransient<GuardianBackupService>();
+        builder.Services.AddTransient<VerificationService>();
         builder.Services.AddTransient<UserService>();
         builder.Services.AddTransient<ElectionService>();
         builder.Services.AddTransient<TallyService>();

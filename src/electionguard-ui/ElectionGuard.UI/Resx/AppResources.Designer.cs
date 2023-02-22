@@ -376,6 +376,15 @@ namespace ElectionGuard.UI.Resx {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to No guardians joined.
+        /// </summary>
+        internal static string NoGuardians {
+            get {
+                return ResourceManager.GetString("NoGuardians", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to No key ceremonies found.
         /// </summary>
         internal static string NoKeyCeremonies {

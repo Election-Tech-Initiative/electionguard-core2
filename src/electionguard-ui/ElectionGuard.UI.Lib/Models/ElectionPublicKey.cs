@@ -1,4 +1,6 @@
 ﻿using ElectionGuard.ElectionSetup.Extensions;
+using MongoDB.Bson;
+using MongoDB.Bson.Serialization.Attributes;
 
 namespace ElectionGuard.UI.Lib.Models;
 
@@ -10,14 +12,14 @@ public class ElectionPublicKey : DisposableBase
     public ElectionPublicKey(
         string ownerId,
         ulong sequenceOrder,
-        ElementModP publicKey,
-        List<ElementModP> publicCommitments,
+        ElementModP key,
+        List<ElementModP> coefficientCommitments,
         List<SchnorrProof> coefficientProofs)
     {
         OwnerId = ownerId;
         SequenceOrder = sequenceOrder;
-        Key = publicKey;
-        CoefficientCommitments = publicCommitments;
+        Key = key;
+        CoefficientCommitments = coefficientCommitments;
         CoefficientProofs = coefficientProofs;
     }
 

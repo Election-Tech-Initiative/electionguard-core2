@@ -96,9 +96,9 @@ public class Guardian : DisposableBase
     private const string PrivateKeyFolder = "gui_private_keys";
     private const string GuardianExt = ".json";
 
-    private readonly ElectionKeyPair _electionKeys;
-    private readonly Dictionary<string, ElectionPublicKey>? _otherGuardianPublicKeys;
-    private readonly Dictionary<string, ElectionPartialKeyBackup>? _otherGuardianPartialKeyBackups;
+    private ElectionKeyPair _electionKeys;
+    private Dictionary<string, ElectionPublicKey>? _otherGuardianPublicKeys = new();
+    private Dictionary<string, ElectionPartialKeyBackup>? _otherGuardianPartialKeyBackups = new();
     private Dictionary<string, ElectionPartialKeyVerification>? _otherGuardianPartialKeyVerification = new();
 
     public string GuardianId { get; set; }
@@ -282,10 +282,12 @@ public class Guardian : DisposableBase
 
     public void SaveGuardianKey(ElectionPublicKey key)
     {
-        if (_otherGuardianPublicKeys is not null)
+        if (_otherGuardianPublicKeys is null)
         {
-            _otherGuardianPublicKeys[key.OwnerId] = key;
+            _otherGuardianPublicKeys = new();
         }
+
+        _otherGuardianPublicKeys[key.OwnerId] = key;
     }
 
     // fromPrivateRecord
@@ -399,10 +401,11 @@ public class Guardian : DisposableBase
     // save_election_partial_key_backup
     public void SaveElectionPartialKeyBackup(ElectionPartialKeyBackup backup)
     {
-        if (_otherGuardianPartialKeyBackups is not null)
+        if (_otherGuardianPartialKeyBackups is null)
         {
-            _otherGuardianPartialKeyBackups[backup.OwnerId!] = backup;
+            _otherGuardianPartialKeyBackups = new();
         }
+        _otherGuardianPartialKeyBackups[backup.OwnerId!] = backup;
     }
 
     // all_election_partial_key_backups_received
@@ -514,10 +517,11 @@ public class Guardian : DisposableBase
     // save_election_partial_key_verification
     public void SaveElectionPartialKeyVerification(ElectionPartialKeyVerification verification)
     {
-        if (_otherGuardianPartialKeyVerification is not null)
+        if (_otherGuardianPartialKeyVerification is null)
         {
-            _otherGuardianPartialKeyVerification[verification.DesignatedId!] = verification;
+            _otherGuardianPartialKeyVerification = new();
         }
+        _otherGuardianPartialKeyVerification[verification.DesignatedId!] = verification;
     }
 
     // all_election_partial_key_backups_verified
@@ -573,7 +577,8 @@ public class Guardian : DisposableBase
         var dataJson = JsonSerializer.Serialize(data);
 
         var filename = GuardianPrefix + data.GuardianId + GuardianExt;
-        var filePath = Path.Combine(PrivateKeyFolder, CeremonyDetails.KeyCeremonyId);
+        var basePath = Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData);
+        var filePath = Path.Combine(basePath, PrivateKeyFolder, CeremonyDetails.KeyCeremonyId);
 
         storage.ToFile(filePath, filename, dataJson);
     }
@@ -591,14 +596,22 @@ public class Guardian : DisposableBase
         var storage = StorageService.GetInstance();
 
         var filename = GuardianPrefix + guardianId + GuardianExt;
-        var filePath = Path.Combine(PrivateKeyFolder, keyCeremonyId, filename);
+        var basePath = Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData);
+        var filePath = Path.Combine(basePath, PrivateKeyFolder, keyCeremonyId, filename);
 
         var data = storage.FromFile(filePath);
-        var privateGuardian = JsonSerializer.Deserialize<GuardianPrivateRecord>(data);
-
-        return privateGuardian != null ?
-            Guardian.FromPrivateRecord(privateGuardian, keyCeremonyId, guardianCount, quorum) :
-            null;
+        try
+        {
+            var privateGuardian = JsonSerializer.Deserialize<GuardianPrivateRecord>(data);
+            return privateGuardian != null ?
+                Guardian.FromPrivateRecord(privateGuardian, keyCeremonyId, guardianCount, quorum) :
+                null;
+        }
+        catch (Exception ex)
+        {
+            var m = ex.Message;
+        }
+        return null;
     }
 
     public static Guardian? Load(string guardianId, KeyCeremony keyCeremony)

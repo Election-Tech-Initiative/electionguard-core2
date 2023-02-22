@@ -1,4 +1,5 @@
-﻿namespace ElectionGuard
+﻿
+namespace ElectionGuard
 {
     /// <summary>
     /// An exponential ElGamal key pair
@@ -47,7 +48,7 @@
             status.ThrowIfError();
         }
 
-        private ElGamalKeyPair(ElementModQ secretKey, ElementModP publicKey)
+        public ElGamalKeyPair(ElementModQ secretKey, ElementModP publicKey)
         {
             var status = NativeInterface.ElGamalKeyPair.New(
                 secretKey.Handle, publicKey.Handle, out Handle);

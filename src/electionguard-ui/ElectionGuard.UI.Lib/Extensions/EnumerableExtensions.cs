@@ -1,4 +1,4 @@
-namespace ElectionGuard.ElectionSetup.Extensions;
+﻿namespace ElectionGuard.ElectionSetup.Extensions;
 
 public static class EnumerableExtensions
 {
@@ -9,6 +9,7 @@ public static class EnumerableExtensions
 
     public static void Dispose(this IEnumerable<DisposableBase> source)
     {
+        if (source == null) return;
         foreach (var item in source)
         {
             item.Dispose();
