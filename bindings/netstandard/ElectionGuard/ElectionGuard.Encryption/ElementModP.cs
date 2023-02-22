@@ -289,9 +289,5 @@ namespace ElectionGuard
                 MultModP(key);
             }
         }
-
-
-
-
     }
 }

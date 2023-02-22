@@ -164,6 +164,24 @@ TEST_CASE("elgamalEncrypt encrypt 1 decrypts with secret")
     CHECK(1UL == decrypted);
 }
 
+TEST_CASE("elgamalAdd simple decrypts with secret")
+{
+    const auto &nonce = ONE_MOD_Q();
+    const auto &secret = TWO_MOD_Q();
+    auto keypair = ElGamalKeyPair::fromSecret(secret, false);
+    auto *publicKey = keypair->getPublicKey();
+
+    auto firstCiphertext = elgamalEncrypt(1UL, nonce, *publicKey);
+    auto secondCiphertext = elgamalEncrypt(1UL, nonce, *publicKey);
+
+    const vector<reference_wrapper<ElGamalCiphertext>> ciphertexts = {*firstCiphertext,
+                                                                      *secondCiphertext};
+    auto result = elgamalAdd(ciphertexts);
+
+    auto decrypted = result->decrypt(secret);
+    CHECK(2UL == decrypted);
+}
+
 TEST_CASE("HashedElGamalCiphertext encrypt and decrypt data")
 {
     uint64_t qwords_to_use[4] = {0x0102030405060708, 0x090a0b0c0d0e0f10, 0x1112131415161718,
