@@ -250,17 +250,22 @@ public class Guardian : DisposableBase
 
     private ElementModQ ComputePolynomialCoordinate(ulong sequenceOrder, ElectionPolynomial? polynomial = null)
     {
-        using var sequenceOrderModQ = new ElementModQ(sequenceOrder);
-        var coordinate = Constants.ZERO_MOD_Q; // start at 0 mod q.
+        using var exponentModifierModQ = new ElementModQ(sequenceOrder);
+        var computedValue = Constants.ZERO_MOD_Q; // start at 0 mod q.
 
         var coefficients = polynomial != null ? polynomial.Coefficients : _electionKeys.Polynomial.Coefficients;
 
         foreach (var (coefficient, index) in coefficients.WithIndex())
         {
-            coordinate = GetCoordinate(sequenceOrderModQ, coordinate, coefficient, index);
+            using var exponent = BigMath.PowModQ(exponentModifierModQ, index);
+            using var factor = BigMath.MultModQ(coefficient.Value, exponent);
+
+            computedValue =  BigMath.AddModQ(computedValue, factor);
+
+            //coordinate = GetCoordinate(sequenceOrderModQ, coordinate, coefficient, index);
         }
 
-        return coordinate;
+        return computedValue;
     }
 
     private static ElementModQ GetCoordinate(

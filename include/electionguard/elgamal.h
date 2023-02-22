@@ -107,7 +107,7 @@ EG_API eg_electionguard_status_t eg_hashed_elgamal_ciphertext_get_mac(
 EG_API eg_electionguard_status_t eg_hashed_elgamal_ciphertext_crypto_hash(
   eg_hashed_elgamal_ciphertext_t *handle, eg_element_mod_q_t **out_crypto_hash);
 
-eg_electionguard_status_t eg_hashed_elgamal_ciphertext_decrypt_with_secret(
+EG_API eg_electionguard_status_t eg_hashed_elgamal_ciphertext_decrypt_with_secret(
   eg_hashed_elgamal_ciphertext_t *handle, eg_element_mod_q_t *in_secret_key,
   eg_element_mod_q_t *in_description_hash, bool in_look_for_padding, uint8_t **out_data,
   uint64_t *out_size);

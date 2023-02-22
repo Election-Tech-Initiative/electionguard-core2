@@ -210,6 +210,9 @@ namespace electionguard
         virtual std::unique_ptr<ElementModQ> crypto_hash() override;
         virtual std::unique_ptr<ElementModQ> crypto_hash() const override;
 
+        static std::unique_ptr<HashedElGamalCiphertext>
+        make(const ElementModP &pad, std::vector<uint8_t> data, std::vector<uint8_t> mac);
+
         /// <summary>
         /// Decrypts ciphertext with the Auxiliary Encryption method (as specified in the
         /// ElectionGuard specification) given a random nonce, an ElGamal public key,

@@ -182,20 +182,10 @@ eg_hashed_elgamal_ciphertext_new(eg_element_mod_p_t *in_pad, uint8_t *in_data,
 {
     try {
         auto *pad = AS_TYPE(ElementModP, in_pad);
-        Log::info("1");
-        auto _pad = make_unique<ElementModP>(*pad);
-        Log::info("2");
-        auto _fpad = make_unique<ElementModP>(ONE_MOD_P_ARRAY);
-        Log::info("3");
         auto data_bytes = vector<uint8_t>(in_data, in_data + in_data_length);
-        Log::info("4");
-        auto mac_bytes = vector<uint8_t>(in_mac, in_data + in_mac_length);
-        Log::info("5");
-        auto result = make_unique<HashedElGamalCiphertext>(move(_pad), data_bytes, mac_bytes);
-        Log::info("6");
+        auto mac_bytes = vector<uint8_t>(in_mac, in_mac + in_mac_length);
+        auto result = HashedElGamalCiphertext::make(*pad, data_bytes, mac_bytes);
         *out_handle = AS_TYPE(eg_hashed_elgamal_ciphertext_t, result.release());
-        Log::info("7");
-        Log::info(_pad->toHex());
         return ELECTIONGUARD_STATUS_SUCCESS;
     } catch (const exception &e) {
         Log::error(__func__, e);
