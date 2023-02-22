@@ -43,6 +43,9 @@ public partial class ViewKeyCeremonyViewModel : BaseViewModel
     [ObservableProperty]
     private List<GuardianPublicKey> _guardians = new();
 
+    [ObservableProperty]
+    private List<GuardianPublicKey> _guardians = new();
+
     public override async Task OnLeavingPage()
     {
         _timer.Stop();
