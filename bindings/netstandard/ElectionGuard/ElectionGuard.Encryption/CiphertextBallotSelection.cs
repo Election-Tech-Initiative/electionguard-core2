@@ -1,3 +1,5 @@
+using ElectionGuard.Encryption.Ballot;
+
 namespace ElectionGuard
 {
     /// <summary>
@@ -23,7 +25,7 @@ namespace ElectionGuard
     ///
     /// By keeping the `proof` the nonce is not required footer verify the encrypted selection.
     /// </summary>
-    public partial class CiphertextBallotSelection : DisposableBase
+    public partial class CiphertextBallotSelection : DisposableBase, ICiphertextSelection
     {
         internal CiphertextBallotSelection(External.CiphertextBallotSelectionHandle handle)
         {

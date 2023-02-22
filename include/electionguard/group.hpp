@@ -30,9 +30,12 @@ namespace electionguard
         ElementModP &operator=(ElementModP other);
         ElementModP &operator=(ElementModP &&other);
         bool operator==(const ElementModP &other);
+        bool operator==(const ElementModP &other) const;
         bool operator!=(const ElementModP &other);
+        bool operator!=(const ElementModP &other) const;
 
         bool operator<(const ElementModP &other);
+        bool operator<(const ElementModP &other) const;
 
         // TODO: ISSUE #130: math operators
 
@@ -43,8 +46,16 @@ namespace electionguard
         /// </Summary>
         uint64_t *get() const;
 
+        /// <Summary>
+        /// Get the integer representation of the element as a reference
+        /// Note the Element is stored in HACL format
+        /// <Summary>
         uint64_t (&ref() const)[MAX_P_LEN];
 
+        ///<Summary>
+        /// Get the length of the element
+        /// <returns> the length of the element </returns>
+        /// </Summary>
         uint64_t length() const;
 
         bool isFixedBase() const;
@@ -112,9 +123,12 @@ namespace electionguard
         ElementModQ &operator=(ElementModQ other);
         ElementModQ &operator=(ElementModQ &&other);
         bool operator==(const ElementModQ &other);
+        bool operator==(const ElementModQ &other) const;
         bool operator!=(const ElementModQ &other);
+        bool operator!=(const ElementModQ &other) const;
 
         bool operator<(const ElementModQ &other);
+        bool operator<(const ElementModQ &other) const;
 
         // TODO: ISSUE #130: overload math operators and redirect to functions
 
@@ -220,6 +234,13 @@ namespace electionguard
     EG_API std::unique_ptr<ElementModP> mul_mod_p(const std::vector<ElementModPOrQ> &elems);
 
     /// <summary>
+    /// Computes numerator / denominator mod p
+    /// using the method numerator * denominator^-1 mod p
+    /// </summary>
+    EG_API std::unique_ptr<ElementModP> div_mod_p(const ElementModP &numerator,
+                                                  const ElementModP &denominator);
+
+    /// <summary>
     /// computes element mod p
     /// </summary>
     EG_API std::unique_ptr<ElementModP> mod_p(const ElementModP &element);
@@ -263,15 +284,21 @@ namespace electionguard
     EG_API std::unique_ptr<ElementModQ> sub_mod_q(const ElementModQ &a, const ElementModQ &b);
 
     /// <summary>
-    /// Computes (a + b * c) mod q.
-    /// </summary>
-    EG_API std::unique_ptr<ElementModQ> a_plus_bc_mod_q(const ElementModQ &a, const ElementModQ &b,
-                                                        const ElementModQ &c);
-
-    /// <summary>
     /// Computes (a * b) mod q.
     /// </summary>
     EG_API std::unique_ptr<ElementModQ> mul_mod_q(const ElementModQ &lhs, const ElementModQ &rhs);
+
+    /// <summary>
+    /// Multplies together the collection and returns the product mod Q
+    /// </summary>
+    EG_API std::unique_ptr<ElementModQ> mul_mod_q(const std::vector<ElementModQ> &elems);
+
+    /// <summary>
+    /// Computes numerator / denominator mod q
+    /// using the method numerator * denominator^-1 mod q
+    /// </summary>
+    EG_API std::unique_ptr<ElementModQ> div_mod_q(const ElementModQ &numerator,
+                                                  const ElementModQ &denominator);
 
     /// <summary>
     /// Computes b^e mod q.
@@ -283,6 +310,12 @@ namespace electionguard
     /// Computes (Q - a) mod q.
     /// </summary>
     EG_API std::unique_ptr<ElementModQ> sub_from_q(const ElementModQ &a);
+
+    /// <summary>
+    /// Computes (a + b * c) mod q.
+    /// </summary>
+    EG_API std::unique_ptr<ElementModQ> a_plus_bc_mod_q(const ElementModQ &a, const ElementModQ &b,
+                                                        const ElementModQ &c);
 
     /// <summary>
     /// Generate random number between 0 and P

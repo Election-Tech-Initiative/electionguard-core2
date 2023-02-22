@@ -297,10 +297,22 @@ namespace ElectionGuard
                 CallingConvention = CallingConvention.Cdecl, SetLastError = true)]
             internal static extern Status ToJson(out IntPtr data, out ulong size);
 
-            
+
 
         }
 
+        #endregion
+
+        #region Discrete Log
+
+        internal static class DiscreteLog
+        {
+            [DllImport(DllName, EntryPoint = "eg_discrete_log_get_async",
+                CallingConvention = CallingConvention.Cdecl, SetLastError = true)]
+            internal static extern Status GetAsync(
+                ElementModP.ElementModPHandle in_element,
+                ref ulong out_result);
+        }
         #endregion
 
         #region Elgamal
@@ -353,7 +365,6 @@ namespace ElectionGuard
             internal static extern Status GetSecretKey(
                 ElGamalKeyPairHandle handle,
                 out ElementModQ.ElementModQHandle out_secret_key);
-
         }
 
         internal static class ElGamalCiphertext
@@ -375,6 +386,13 @@ namespace ElectionGuard
                     return true;
                 }
             }
+
+            [DllImport(DllName, EntryPoint = "eg_elgamal_ciphertext_new",
+                CallingConvention = CallingConvention.Cdecl, SetLastError = true)]
+            internal static extern Status New(
+                ElementModP.ElementModPHandle in_pad,
+                ElementModP.ElementModPHandle in_data,
+                out ElGamalCiphertextHandle handle);
 
             [DllImport(DllName, EntryPoint = "eg_elgamal_ciphertext_free",
                 CallingConvention = CallingConvention.Cdecl, SetLastError = true)]
@@ -398,6 +416,13 @@ namespace ElectionGuard
                 ElGamalCiphertextHandle handle,
                 out ElementModQ.ElementModQHandle crypto_base_hash);
 
+            [DllImport(DllName, EntryPoint = "eg_elgamal_ciphertext_decrypt_known_product",
+                CallingConvention = CallingConvention.Cdecl, SetLastError = true)]
+            internal static extern Status DecryptKnownProduct(
+                ElGamalCiphertextHandle handle,
+                ElementModP.ElementModPHandle known_Product,
+                ref ulong plaintext);
+
             [DllImport(DllName, EntryPoint = "eg_elgamal_ciphertext_decrypt_with_secret",
                 CallingConvention = CallingConvention.Cdecl, SetLastError = true)]
             internal static extern Status DecryptWithSecret(
@@ -405,10 +430,33 @@ namespace ElectionGuard
                 ElementModQ.ElementModQHandle secret_key,
                 ref ulong plaintext);
 
+            [DllImport(DllName, EntryPoint = "eg_elgamal_ciphertext_decrypt_known_nonce",
+                CallingConvention = CallingConvention.Cdecl, SetLastError = true)]
+            internal static extern Status DecryptKnownNonce(
+                ElGamalCiphertextHandle handle,
+                ElementModP.ElementModPHandle public_key,
+                ElementModQ.ElementModQHandle nonce,
+                ref ulong plaintext);
+
+            [DllImport(DllName, EntryPoint = "eg_elgamal_ciphertext_partial_decrypt",
+                CallingConvention = CallingConvention.Cdecl, SetLastError = true)]
+            internal static extern Status PartialDecrypt(
+                ElGamalCiphertextHandle handle,
+                ElementModQ.ElementModQHandle secret_key,
+                out ElementModP.ElementModPHandle partial_decryption);
+
         }
 
         internal static class ElGamal
         {
+            [DllImport(DllName, EntryPoint = "eg_elgamal_add",
+                CallingConvention = CallingConvention.Cdecl, SetLastError = true)]
+            // ReSharper disable once MemberHidesStaticFromOuterClass
+            internal static extern Status Add(
+                [MarshalAs(UnmanagedType.LPArray)] IntPtr[] ciphertexts,
+                ulong ciphertextsSize,
+                out ElGamalCiphertext.ElGamalCiphertextHandle handle);
+
             [DllImport(DllName, EntryPoint = "eg_elgamal_encrypt",
                 CallingConvention = CallingConvention.Cdecl, SetLastError = true)]
             // ReSharper disable once MemberHidesStaticFromOuterClass

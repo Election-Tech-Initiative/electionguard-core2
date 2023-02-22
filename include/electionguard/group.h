@@ -32,11 +32,17 @@ EG_API eg_electionguard_status_t eg_element_mod_p_free(eg_element_mod_p_t *handl
 EG_API eg_electionguard_status_t eg_element_mod_p_get_data(eg_element_mod_p_t *handle,
                                                            uint64_t **out_data, uint64_t *out_size);
 
-EG_API eg_electionguard_status_t eg_element_mod_p_to_hex(eg_element_mod_p_t *handle,
-                                                         char **out_hex);
+EG_API eg_electionguard_status_t eg_element_mod_p_is_valid_residue(eg_element_mod_p_t *modp,
+                                                                   bool *out_value);
+
+EG_API eg_electionguard_status_t eg_element_mod_p_is_in_bounds(eg_element_mod_p_t *modp,
+                                                               bool *out_value);
 
 EG_API eg_electionguard_status_t eg_element_mod_p_to_bytes(eg_element_mod_p_t *handle,
                                                            uint8_t **out_bytes, uint64_t *out_size);
+
+EG_API eg_electionguard_status_t eg_element_mod_p_to_hex(eg_element_mod_p_t *handle,
+                                                         char **out_hex);
 
 // TODO: ISSUE #129: finish implementation
 
@@ -58,6 +64,9 @@ EG_API eg_electionguard_status_t eg_element_mod_q_free(eg_element_mod_q_t *handl
 
 EG_API eg_electionguard_status_t eg_element_mod_q_get_data(eg_element_mod_q_t *handle,
                                                            uint64_t **out_data, uint64_t *out_size);
+
+EG_API eg_electionguard_status_t eg_element_mod_q_is_in_bounds(eg_element_mod_q_t *modp,
+                                                               bool *out_value);
 
 EG_API eg_electionguard_status_t eg_element_mod_q_to_hex(eg_element_mod_q_t *handle,
                                                          char **out_hex);
@@ -113,49 +122,73 @@ EG_API eg_electionguard_status_t eg_constant_to_json(char **out_data, uint64_t *
 
 #endif
 
-#ifndef Group Math Functions
+#ifndef ElementModP Group Math Functions
 
 // TODO: ISSUE #129: finish implementation
-
-EG_API eg_electionguard_status_t eg_element_mod_q_pow_mod_p(eg_element_mod_p_t *base,
-                                                            eg_element_mod_q_t *exponent,
-                                                            eg_element_mod_p_t **out_handle);
-
-EG_API eg_electionguard_status_t eg_element_long_pow_mod_p(uint64_t base, uint64_t exponent,
-                                                           eg_element_mod_p_t **out_handle);
-
-EG_API eg_electionguard_status_t eg_element_mod_q_rand_q_new(eg_element_mod_q_t **out_handle);
-
-EG_API eg_electionguard_status_t eg_element_mod_q_add_mod_q(eg_element_mod_q_t *lhs,
-                                                            eg_element_mod_q_t *rhs,
-                                                            eg_element_mod_q_t **out_handle);
 
 EG_API eg_electionguard_status_t eg_element_mod_p_add_mod_p(eg_element_mod_p_t *lhs,
                                                             eg_element_mod_p_t *rhs,
                                                             eg_element_mod_p_t **out_handle);
 
-EG_API eg_electionguard_status_t
-eg_element_mod_q_a_plus_b_mul_c_mod_q(eg_element_mod_q_t *a, eg_element_mod_q_t *b,
-                                      eg_element_mod_q_t *c, eg_element_mod_q_t **out_handle);
-
 EG_API eg_electionguard_status_t eg_element_mod_p_mult_mod_p(eg_element_mod_p_t *lhs,
                                                              eg_element_mod_p_t *rhs,
                                                              eg_element_mod_p_t **out_handle);
 
-EG_API eg_electionguard_status_t eg_element_mod_p_pow_mod_p(eg_element_mod_p_t *b,
-                                                            eg_element_mod_p_t *e,
+EG_API eg_electionguard_status_t eg_element_mod_p_div_mod_p(eg_element_mod_p_t *numerator,
+                                                            eg_element_mod_p_t *denominator,
                                                             eg_element_mod_p_t **out_handle);
 
-EG_API eg_electionguard_status_t eg_element_mod_q_pow_mod_q(eg_element_mod_q_t *lhs,
+EG_API eg_electionguard_status_t eg_element_mod_p_pow_mod_p(eg_element_mod_p_t *base,
+                                                            eg_element_mod_p_t *exponent,
+                                                            eg_element_mod_p_t **out_handle);
+
+// TODO: rename to eg_element_mod_p_pow_mod_p_as_uints
+EG_API eg_electionguard_status_t eg_element_long_pow_mod_p(uint64_t base, uint64_t exponent,
+                                                           eg_element_mod_p_t **out_handle);
+
+// TODO: rename to eg_element_mod_p_pow_mod_p_with_q_exp
+EG_API eg_electionguard_status_t eg_element_mod_q_pow_mod_p(eg_element_mod_p_t *base,
+                                                            eg_element_mod_q_t *exponent,
+                                                            eg_element_mod_p_t **out_handle);
+
+#endif
+
+#ifndef ElementModQ Group Math Functions
+
+EG_API eg_electionguard_status_t eg_element_mod_q_add_mod_q(eg_element_mod_q_t *lhs,
                                                             eg_element_mod_q_t *rhs,
                                                             eg_element_mod_q_t **out_handle);
 
-EG_API eg_electionguard_status_t eg_element_long_pow_mod_q(eg_element_mod_q_t *lhs, uint64_t rhs,
-                                                           eg_element_mod_q_t **out_handle);
+EG_API eg_electionguard_status_t eg_element_mod_q_sub_mod_q(eg_element_mod_q_t *lhs,
+                                                            eg_element_mod_q_t *rhs,
+                                                            eg_element_mod_q_t **out_handle);
 
 EG_API eg_electionguard_status_t eg_element_mod_q_mult_mod_q(eg_element_mod_q_t *lhs,
                                                              eg_element_mod_q_t *rhs,
                                                              eg_element_mod_q_t **out_handle);
+
+EG_API eg_electionguard_status_t eg_element_mod_q_div_mod_q(eg_element_mod_q_t *numerator,
+                                                            eg_element_mod_q_t *denominator,
+                                                            eg_element_mod_q_t **out_handle);
+
+EG_API eg_electionguard_status_t eg_element_mod_q_pow_mod_q(eg_element_mod_q_t *base,
+                                                            eg_element_mod_q_t *exponent,
+                                                            eg_element_mod_q_t **out_handle);
+
+// TODO: rename to eg_element_mod_q_pow_mod_q_with_long_exp
+EG_API eg_electionguard_status_t eg_element_long_pow_mod_q(eg_element_mod_q_t *base,
+                                                           uint64_t exponent,
+                                                           eg_element_mod_q_t **out_handle);
+
+EG_API eg_electionguard_status_t
+eg_element_mod_q_a_plus_b_mul_c_mod_q(eg_element_mod_q_t *a, eg_element_mod_q_t *b,
+                                      eg_element_mod_q_t *c, eg_element_mod_q_t **out_handle);
+
+EG_API eg_electionguard_status_t eg_element_mod_q_rand_q_new(eg_element_mod_q_t **out_handle);
+
+#endif
+
+#ifndef ElementModP Group Hash Functions
 
 EG_API eg_electionguard_status_t eg_hash_elems_modp_modp(eg_element_mod_p_t *publickey,
                                                          eg_element_mod_p_t *commitment,
@@ -167,15 +200,6 @@ EG_API eg_electionguard_status_t eg_hash_elems_string_int(char *publickey, uint6
 EG_API eg_electionguard_status_t eg_hash_elems_array(eg_element_mod_p_t *in_data[],
                                                      uint64_t in_data_size,
                                                      eg_element_mod_q_t **out_handle);
-
-EG_API eg_electionguard_status_t eg_element_mod_p_is_valid_residue(eg_element_mod_p_t *modp,
-                                                                   bool *out_value);
-
-EG_API eg_electionguard_status_t eg_element_mod_p_is_in_bounds(eg_element_mod_p_t *modp,
-                                                               bool *out_value);
-
-EG_API eg_electionguard_status_t eg_element_mod_q_is_in_bounds(eg_element_mod_q_t *modp,
-                                                               bool *out_value);
 
 #endif
 

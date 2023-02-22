@@ -28,6 +28,18 @@ namespace hacl
         static uint64_t add(uint64_t *a, uint64_t *b, uint64_t *res);
 
         /**
+        Write `(a + b) mod n` in `res`.
+
+          The arguments a, b, n and the outparam res are meant to be 4096-bit bignums, i.e. uint64_t[64].
+
+          Before calling this function, the caller will need to ensure that the following
+          preconditions are observed.
+          • a < n
+          • b < n
+        */
+        static void addMod(uint64_t *n, uint64_t *a, uint64_t *b, uint64_t *res);
+
+        /**
         Write `a - b mod 2^4096` in `res`.
 
         This functions returns the carry.
@@ -35,6 +47,18 @@ namespace hacl
         The arguments a, b and res are meant to be 4096-bit bignums, i.e. uint64_t[64]
         */
         static uint64_t sub(uint64_t *a, uint64_t *b, uint64_t *res);
+
+        /**
+        Write `(a - b) mod n` in `res`.
+
+          The arguments a, b, n and the outparam res are meant to be 4096-bit bignums, i.e. uint64_t[64].
+
+          Before calling this function, the caller will need to ensure that the following
+          preconditions are observed.
+          • a < n
+          • b < n
+        */
+        static void subMod(uint64_t *n, uint64_t *a, uint64_t *b, uint64_t *res);
 
         /**
         Write `a * b` in `res`.

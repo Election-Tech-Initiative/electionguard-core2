@@ -1,13 +1,13 @@
 #ifndef __ELECTIONGUARD_CPP_LOOKUP_TABLE_HPP_INCLUDED__
 #define __ELECTIONGUARD_CPP_LOOKUP_TABLE_HPP_INCLUDED__
 
-#include "../../libs/hacl/Hacl_Bignum256.hpp"
-#include "async.hpp"
+#include "facades/bignum256.hpp"
 #include "facades/bignum4096.hpp"
 #include "utils.hpp"
 
 #include <array>
 #include <cstdint>
+#include <electionguard/async.hpp>
 #include <electionguard/constants.h>
 #include <electionguard/export.h>
 #include <iomanip>

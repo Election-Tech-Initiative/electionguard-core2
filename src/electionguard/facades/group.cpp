@@ -113,12 +113,29 @@ eg_electionguard_status_t eg_element_mod_p_get_data(eg_element_mod_p_t *handle, 
     return ELECTIONGUARD_STATUS_SUCCESS;
 }
 
-eg_electionguard_status_t eg_element_mod_p_to_hex(eg_element_mod_p_t *handle, char **out_hex)
+EG_API eg_electionguard_status_t eg_element_mod_p_is_valid_residue(eg_element_mod_p_t *modp,
+                                                                   bool *out_value)
 {
     try {
-        auto hex_rep = AS_TYPE(ElementModP, handle)->toHex();
-        *out_hex = dynamicCopy(hex_rep);
+        auto *p = AS_TYPE(ElementModP, modp);
+        auto result = p->isValidResidue();
 
+        *out_value = result;
+        return ELECTIONGUARD_STATUS_SUCCESS;
+    } catch (const exception &e) {
+        Log::error(__func__, e);
+        return ELECTIONGUARD_STATUS_ERROR_BAD_ALLOC;
+    }
+}
+
+EG_API eg_electionguard_status_t eg_element_mod_p_is_in_bounds(eg_element_mod_p_t *modp,
+                                                               bool *out_value)
+{
+    try {
+        auto *p = AS_TYPE(ElementModP, modp);
+        auto result = p->isInBounds();
+
+        *out_value = result;
         return ELECTIONGUARD_STATUS_SUCCESS;
     } catch (const exception &e) {
         Log::error(__func__, e);
@@ -135,6 +152,19 @@ eg_electionguard_status_t eg_element_mod_p_to_bytes(eg_element_mod_p_t *handle, 
         size_t size = 0;
         *out_bytes = dynamicCopy(hex_rep, &size);
         *out_size = (uint64_t)size;
+
+        return ELECTIONGUARD_STATUS_SUCCESS;
+    } catch (const exception &e) {
+        Log::error(__func__, e);
+        return ELECTIONGUARD_STATUS_ERROR_BAD_ALLOC;
+    }
+}
+
+eg_electionguard_status_t eg_element_mod_p_to_hex(eg_element_mod_p_t *handle, char **out_hex)
+{
+    try {
+        auto hex_rep = AS_TYPE(ElementModP, handle)->toHex();
+        *out_hex = dynamicCopy(hex_rep);
 
         return ELECTIONGUARD_STATUS_SUCCESS;
     } catch (const exception &e) {
@@ -218,6 +248,21 @@ eg_electionguard_status_t eg_element_mod_q_get_data(eg_element_mod_q_t *handle, 
     *out_size = (uint64_t)MAX_Q_LEN;
 
     return ELECTIONGUARD_STATUS_SUCCESS;
+}
+
+EG_API eg_electionguard_status_t eg_element_mod_q_is_in_bounds(eg_element_mod_q_t *modq,
+                                                               bool *out_value)
+{
+    try {
+        auto *q = AS_TYPE(ElementModQ, modq);
+        auto result = q->isInBounds();
+
+        *out_value = result;
+        return ELECTIONGUARD_STATUS_SUCCESS;
+    } catch (const exception &e) {
+        Log::error(__func__, e);
+        return ELECTIONGUARD_STATUS_ERROR_BAD_ALLOC;
+    }
 }
 
 eg_electionguard_status_t eg_element_mod_q_to_bytes(eg_element_mod_q_t *handle, uint8_t **out_bytes,
@@ -402,69 +447,7 @@ eg_electionguard_status_t eg_element_mod_q_constant_two_mod_q(eg_element_mod_q_t
 
 #pragma endregion
 
-#pragma region Group Math Functions
-
-eg_electionguard_status_t eg_element_mod_q_pow_mod_p(eg_element_mod_p_t *base,
-                                                     eg_element_mod_q_t *exponent,
-                                                     eg_element_mod_p_t **out_handle)
-{
-    try {
-        auto *b = AS_TYPE(ElementModP, base);
-        auto *e = AS_TYPE(ElementModQ, exponent);
-        auto result = pow_mod_p(*b, *e);
-
-        *out_handle = AS_TYPE(eg_element_mod_p_t, result.release());
-        return ELECTIONGUARD_STATUS_SUCCESS;
-    } catch (const exception &e) {
-        Log::error(__func__, e);
-        return ELECTIONGUARD_STATUS_ERROR_BAD_ALLOC;
-    }
-}
-
-EG_API eg_electionguard_status_t eg_element_long_pow_mod_p(uint64_t base, uint64_t exponent,
-                                                           eg_element_mod_p_t **out_handle)
-{
-    try {
-        auto b = ElementModP::fromUint64(base);
-        auto e = ElementModP::fromUint64(exponent);
-        auto result = pow_mod_p(*b, *e);
-
-        *out_handle = AS_TYPE(eg_element_mod_p_t, result.release());
-        return ELECTIONGUARD_STATUS_SUCCESS;
-    } catch (const exception &e) {
-        Log::error(__func__, e);
-        return ELECTIONGUARD_STATUS_ERROR_BAD_ALLOC;
-    }
-}
-
-eg_electionguard_status_t eg_element_mod_q_rand_q_new(eg_element_mod_q_t **out_handle)
-{
-    try {
-        auto random = rand_q();
-        *out_handle = AS_TYPE(eg_element_mod_q_t, random.release());
-        return ELECTIONGUARD_STATUS_SUCCESS;
-    } catch (const exception &e) {
-        Log::error(__func__, e);
-        return ELECTIONGUARD_STATUS_ERROR_BAD_ALLOC;
-    }
-}
-
-EG_API eg_electionguard_status_t eg_element_mod_q_add_mod_q(eg_element_mod_q_t *lhs,
-                                                            eg_element_mod_q_t *rhs,
-                                                            eg_element_mod_q_t **out_handle)
-{
-    try {
-        auto *l = AS_TYPE(ElementModQ, lhs);
-        auto *r = AS_TYPE(ElementModQ, rhs);
-        auto result = add_mod_q(*l, *r);
-
-        *out_handle = AS_TYPE(eg_element_mod_q_t, result.release());
-        return ELECTIONGUARD_STATUS_SUCCESS;
-    } catch (const exception &e) {
-        Log::error(__func__, e);
-        return ELECTIONGUARD_STATUS_ERROR_BAD_ALLOC;
-    }
-}
+#pragma region ElementModP Group Math Functions
 
 EG_API eg_electionguard_status_t eg_element_mod_p_add_mod_p(eg_element_mod_p_t *lhs,
                                                             eg_element_mod_p_t *rhs,
@@ -483,15 +466,121 @@ EG_API eg_electionguard_status_t eg_element_mod_p_add_mod_p(eg_element_mod_p_t *
     }
 }
 
-EG_API eg_electionguard_status_t
-eg_element_mod_q_a_plus_b_mul_c_mod_q(eg_element_mod_q_t *a, eg_element_mod_q_t *b,
-                                      eg_element_mod_q_t *c, eg_element_mod_q_t **out_handle)
+EG_API eg_electionguard_status_t eg_element_mod_p_mult_mod_p(eg_element_mod_p_t *lhs,
+                                                             eg_element_mod_p_t *rhs,
+                                                             eg_element_mod_p_t **out_handle)
 {
     try {
-        auto *a_local = AS_TYPE(ElementModQ, a);
-        auto *b_local = AS_TYPE(ElementModQ, b);
-        auto *c_local = AS_TYPE(ElementModQ, c);
-        auto result = a_plus_bc_mod_q(*a_local, *b_local, *c_local);
+        auto *l = AS_TYPE(ElementModP, lhs);
+        auto *r = AS_TYPE(ElementModP, rhs);
+        auto result = mul_mod_p(*l, *r);
+
+        *out_handle = AS_TYPE(eg_element_mod_p_t, result.release());
+        return ELECTIONGUARD_STATUS_SUCCESS;
+    } catch (const exception &e) {
+        Log::error(__func__, e);
+        return ELECTIONGUARD_STATUS_ERROR_BAD_ALLOC;
+    }
+}
+
+EG_API eg_electionguard_status_t eg_element_mod_p_div_mod_p(eg_element_mod_p_t *numerator,
+                                                            eg_element_mod_p_t *denominator,
+                                                            eg_element_mod_p_t **out_handle)
+{
+    try {
+        auto *n = AS_TYPE(ElementModP, numerator);
+        auto *d = AS_TYPE(ElementModP, denominator);
+        auto result = div_mod_p(*n, *d);
+
+        *out_handle = AS_TYPE(eg_element_mod_p_t, result.release());
+        return ELECTIONGUARD_STATUS_SUCCESS;
+    } catch (const exception &e) {
+        Log::error(__func__, e);
+        return ELECTIONGUARD_STATUS_ERROR_BAD_ALLOC;
+    }
+}
+
+EG_API eg_electionguard_status_t eg_element_mod_p_pow_mod_p(eg_element_mod_p_t *base,
+                                                            eg_element_mod_p_t *exponent,
+                                                            eg_element_mod_p_t **out_handle)
+{
+    try {
+        auto *b_local = AS_TYPE(ElementModP, base);
+        auto *e_local = AS_TYPE(ElementModP, exponent);
+        auto result = pow_mod_p(*b_local, *e_local);
+
+        *out_handle = AS_TYPE(eg_element_mod_p_t, result.release());
+        return ELECTIONGUARD_STATUS_SUCCESS;
+    } catch (const exception &e) {
+        Log::error(__func__, e);
+        return ELECTIONGUARD_STATUS_ERROR_BAD_ALLOC;
+    }
+}
+
+// TODO: rename to eg_element_mod_p_pow_mod_p_as_uints
+EG_API eg_electionguard_status_t eg_element_long_pow_mod_p(uint64_t base, uint64_t exponent,
+                                                           eg_element_mod_p_t **out_handle)
+{
+    try {
+        auto b = ElementModP::fromUint64(base);
+        auto e = ElementModP::fromUint64(exponent);
+        auto result = pow_mod_p(*b, *e);
+
+        *out_handle = AS_TYPE(eg_element_mod_p_t, result.release());
+        return ELECTIONGUARD_STATUS_SUCCESS;
+    } catch (const exception &e) {
+        Log::error(__func__, e);
+        return ELECTIONGUARD_STATUS_ERROR_BAD_ALLOC;
+    }
+}
+
+// TODO: rename to eg_element_mod_p_pow_mod_p_with_q_exp
+eg_electionguard_status_t eg_element_mod_q_pow_mod_p(eg_element_mod_p_t *base,
+                                                     eg_element_mod_q_t *exponent,
+                                                     eg_element_mod_p_t **out_handle)
+{
+    try {
+        auto *b = AS_TYPE(ElementModP, base);
+        auto *e = AS_TYPE(ElementModQ, exponent);
+        auto result = pow_mod_p(*b, *e);
+
+        *out_handle = AS_TYPE(eg_element_mod_p_t, result.release());
+        return ELECTIONGUARD_STATUS_SUCCESS;
+    } catch (const exception &e) {
+        Log::error(__func__, e);
+        return ELECTIONGUARD_STATUS_ERROR_BAD_ALLOC;
+    }
+}
+
+#pragma endregion
+
+#pragma region ElementModQ Group Math Functions
+
+EG_API eg_electionguard_status_t eg_element_mod_q_add_mod_q(eg_element_mod_q_t *lhs,
+                                                            eg_element_mod_q_t *rhs,
+                                                            eg_element_mod_q_t **out_handle)
+{
+    try {
+        auto *l = AS_TYPE(ElementModQ, lhs);
+        auto *r = AS_TYPE(ElementModQ, rhs);
+        auto result = add_mod_q(*l, *r);
+
+        *out_handle = AS_TYPE(eg_element_mod_q_t, result.release());
+        return ELECTIONGUARD_STATUS_SUCCESS;
+    } catch (const exception &e) {
+        Log::error(__func__, e);
+        return ELECTIONGUARD_STATUS_ERROR_BAD_ALLOC;
+    }
+}
+
+EG_API eg_electionguard_status_t eg_element_mod_q_sub_mod_q(eg_element_mod_q_t *lhs,
+                                                            eg_element_mod_q_t *rhs,
+                                                            eg_element_mod_q_t **out_handle)
+{
+    try {
+        auto *l = AS_TYPE(ElementModQ, lhs);
+        auto *r = AS_TYPE(ElementModQ, rhs);
+        auto result = sub_mod_q(*l, *r);
 
         *out_handle = AS_TYPE(eg_element_mod_q_t, result.release());
         return ELECTIONGUARD_STATUS_SUCCESS;
@@ -518,6 +607,23 @@ EG_API eg_electionguard_status_t eg_element_mod_q_mult_mod_q(eg_element_mod_q_t 
     }
 }
 
+EG_API eg_electionguard_status_t eg_element_mod_q_div_mod_q(eg_element_mod_q_t *numerator,
+                                                            eg_element_mod_q_t *denominator,
+                                                            eg_element_mod_q_t **out_handle)
+{
+    try {
+        auto *n = AS_TYPE(ElementModQ, numerator);
+        auto *d = AS_TYPE(ElementModQ, denominator);
+        auto result = mul_mod_q(*n, *d);
+
+        *out_handle = AS_TYPE(eg_element_mod_q_t, result.release());
+        return ELECTIONGUARD_STATUS_SUCCESS;
+    } catch (const exception &e) {
+        Log::error(__func__, e);
+        return ELECTIONGUARD_STATUS_ERROR_BAD_ALLOC;
+    }
+}
+
 EG_API eg_electionguard_status_t eg_element_mod_q_pow_mod_q(eg_element_mod_q_t *base,
                                                             eg_element_mod_q_t *exponent,
                                                             eg_element_mod_q_t **out_handle)
@@ -535,6 +641,7 @@ EG_API eg_electionguard_status_t eg_element_mod_q_pow_mod_q(eg_element_mod_q_t *
     }
 }
 
+// TODO: rename to eg_element_mod_q_pow_mod_q_with_long_exp
 EG_API eg_electionguard_status_t eg_element_long_pow_mod_q(eg_element_mod_q_t *base,
                                                            uint64_t exponent,
                                                            eg_element_mod_q_t **out_handle)
@@ -552,16 +659,17 @@ EG_API eg_electionguard_status_t eg_element_long_pow_mod_q(eg_element_mod_q_t *b
     }
 }
 
-EG_API eg_electionguard_status_t eg_element_mod_p_mult_mod_p(eg_element_mod_p_t *lhs,
-                                                             eg_element_mod_p_t *rhs,
-                                                             eg_element_mod_p_t **out_handle)
+EG_API eg_electionguard_status_t
+eg_element_mod_q_a_plus_b_mul_c_mod_q(eg_element_mod_q_t *a, eg_element_mod_q_t *b,
+                                      eg_element_mod_q_t *c, eg_element_mod_q_t **out_handle)
 {
     try {
-        auto *l = AS_TYPE(ElementModP, lhs);
-        auto *r = AS_TYPE(ElementModP, rhs);
-        auto result = mul_mod_p(*l, *r);
+        auto *a_local = AS_TYPE(ElementModQ, a);
+        auto *b_local = AS_TYPE(ElementModQ, b);
+        auto *c_local = AS_TYPE(ElementModQ, c);
+        auto result = a_plus_bc_mod_q(*a_local, *b_local, *c_local);
 
-        *out_handle = AS_TYPE(eg_element_mod_p_t, result.release());
+        *out_handle = AS_TYPE(eg_element_mod_q_t, result.release());
         return ELECTIONGUARD_STATUS_SUCCESS;
     } catch (const exception &e) {
         Log::error(__func__, e);
@@ -569,22 +677,21 @@ EG_API eg_electionguard_status_t eg_element_mod_p_mult_mod_p(eg_element_mod_p_t 
     }
 }
 
-EG_API eg_electionguard_status_t eg_element_mod_p_pow_mod_p(eg_element_mod_p_t *b,
-                                                            eg_element_mod_p_t *e,
-                                                            eg_element_mod_p_t **out_handle)
+eg_electionguard_status_t eg_element_mod_q_rand_q_new(eg_element_mod_q_t **out_handle)
 {
     try {
-        auto *b_local = AS_TYPE(ElementModP, b);
-        auto *e_local = AS_TYPE(ElementModP, e);
-        auto result = pow_mod_p(*b_local, *e_local);
-
-        *out_handle = AS_TYPE(eg_element_mod_p_t, result.release());
+        auto random = rand_q();
+        *out_handle = AS_TYPE(eg_element_mod_q_t, random.release());
         return ELECTIONGUARD_STATUS_SUCCESS;
     } catch (const exception &e) {
         Log::error(__func__, e);
         return ELECTIONGUARD_STATUS_ERROR_BAD_ALLOC;
     }
 }
+
+#pragma endregion
+
+#pragma region Group Hash Functions
 
 EG_API eg_electionguard_status_t eg_hash_elems_modp_modp(eg_element_mod_p_t *publickey,
                                                          eg_element_mod_p_t *commitment,
@@ -596,51 +703,6 @@ EG_API eg_electionguard_status_t eg_hash_elems_modp_modp(eg_element_mod_p_t *pub
         auto result = hash_elems({p, c});
 
         *out_handle = AS_TYPE(eg_element_mod_q_t, result.release());
-        return ELECTIONGUARD_STATUS_SUCCESS;
-    } catch (const exception &e) {
-        Log::error(__func__, e);
-        return ELECTIONGUARD_STATUS_ERROR_BAD_ALLOC;
-    }
-}
-
-EG_API eg_electionguard_status_t eg_element_mod_p_is_valid_residue(eg_element_mod_p_t *modp,
-                                                                   bool *out_value)
-{
-    try {
-        auto *p = AS_TYPE(ElementModP, modp);
-        auto result = p->isValidResidue();
-
-        *out_value = result;
-        return ELECTIONGUARD_STATUS_SUCCESS;
-    } catch (const exception &e) {
-        Log::error(__func__, e);
-        return ELECTIONGUARD_STATUS_ERROR_BAD_ALLOC;
-    }
-}
-
-EG_API eg_electionguard_status_t eg_element_mod_p_is_in_bounds(eg_element_mod_p_t *modp,
-                                                               bool *out_value)
-{
-    try {
-        auto *p = AS_TYPE(ElementModP, modp);
-        auto result = p->isInBounds();
-
-        *out_value = result;
-        return ELECTIONGUARD_STATUS_SUCCESS;
-    } catch (const exception &e) {
-        Log::error(__func__, e);
-        return ELECTIONGUARD_STATUS_ERROR_BAD_ALLOC;
-    }
-}
-
-EG_API eg_electionguard_status_t eg_element_mod_q_is_in_bounds(eg_element_mod_q_t *modq,
-                                                               bool *out_value)
-{
-    try {
-        auto *q = AS_TYPE(ElementModQ, modq);
-        auto result = q->isInBounds();
-
-        *out_value = result;
         return ELECTIONGUARD_STATUS_SUCCESS;
     } catch (const exception &e) {
         Log::error(__func__, e);
