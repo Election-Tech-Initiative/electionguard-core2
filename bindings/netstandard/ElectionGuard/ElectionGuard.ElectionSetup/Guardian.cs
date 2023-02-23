@@ -379,13 +379,13 @@ public class Guardian : DisposableBase
     {
         if (_otherGuardianPublicKeys is null)
         {
-            return false;
+            _otherGuardianPublicKeys = new();
         }
 
-        foreach (var guardianKey in _otherGuardianPublicKeys)
+        foreach (var guardianKey in _otherGuardianPublicKeys.Values)
         {
-            var backup = GenerateElectionPartialKeyBackup(GuardianId, _electionKeys.Polynomial, guardianKey.Value);
-            BackupsToShare[guardianKey.Key] = backup;
+            var backup = GenerateElectionPartialKeyBackup(GuardianId, _electionKeys.Polynomial, guardianKey);
+            BackupsToShare[guardianKey.OwnerId] = backup;
         }
         return true;
     }

@@ -61,13 +61,17 @@ public partial class ViewKeyCeremonyViewModel : BaseViewModel
     {
         if (value is not null)
         {
+            IsJoinVisible = (!AuthenticationService.IsAdmin && (value.State == KeyCeremonyState.PendingGuardiansJoin));
+
             _mediator = new KeyCeremonyMediator("mediator", UserName!, value);
-            _ = Task.Run(async () => await _mediator.RunKeyCeremony(IsAdmin));
+            
+            if (IsJoinVisible is false)
+            {
+                _ = Task.Run(async () => await _mediator.RunKeyCeremony(IsAdmin));
+            }
 
             // load the guardians that have joined
             _ = Task.Run(async () => Guardians = await _guardianService.GetAllByKeyCeremonyIdAsync(value.KeyCeremonyId!));
-
-            IsJoinVisible = !AuthenticationService.IsAdmin && value.State == KeyCeremonyState.PendingGuardiansJoin;
 
             JoinCommand.NotifyCanExecuteChanged();
         }
