@@ -44,6 +44,13 @@ public partial class ViewKeyCeremonyViewModel : BaseViewModel
     [ObservableProperty]
     private List<GuardianPublicKey> _guardians = new();
 
+    public override async Task OnLeavingPage()
+    {
+        _timer.Stop();
+        await Task.Yield();
+    }
+
+
     partial void OnKeyCeremonyIdChanged(string value)
     {
         _ = Task.Run(async () => KeyCeremony = await _keyCeremonyService.GetByKeyCeremonyIdAsync(value));
