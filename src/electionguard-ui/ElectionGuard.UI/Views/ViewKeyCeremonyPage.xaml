@@ -27,7 +27,7 @@
             <Label Style="{StaticResource FormLabel}" Text="{helper:Translate KeyCeremonyName}" />
             <Label Style="{StaticResource FormValue}" Text="{Binding KeyCeremony.Name, FallbackValue=''}" />
         </StackLayout>
-        <HorizontalStackLayout>
+        <toolkit:UniformItemsLayout>
             <StackLayout Style="{StaticResource FormControl}">
                 <Label Style="{StaticResource FormLabel}" Text="{helper:Translate NumberOfGuardians}" />
                 <Label Style="{StaticResource FormValue}" Text="{Binding KeyCeremony.NumberOfGuardians, FallbackValue=''}" />
@@ -36,7 +36,7 @@
                 <Label Style="{StaticResource FormLabel}" Text="{helper:Translate Quorum}" />
                 <Label Style="{StaticResource FormValue}" Text="{Binding KeyCeremony.Quorum, FallbackValue=''}" />
             </StackLayout>
-        </HorizontalStackLayout>
+        </toolkit:UniformItemsLayout>
         <Button
             Command="{Binding JoinCommand}"
             IsVisible="{Binding IsJoinVisible, Converter={StaticResource BoolToObjectConverter}}"
