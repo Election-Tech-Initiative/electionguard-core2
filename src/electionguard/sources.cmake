@@ -9,6 +9,7 @@ set(FACADES_electionguard
     ${PROJECT_SOURCE_DIR}/src/electionguard/facades/bignum4096.hpp
     ${PROJECT_SOURCE_DIR}/src/electionguard/facades/chaum_pedersen.cpp
     ${PROJECT_SOURCE_DIR}/src/electionguard/facades/collections.c
+    ${PROJECT_SOURCE_DIR}/src/electionguard/facades/discrete_log.cpp
     ${PROJECT_SOURCE_DIR}/src/electionguard/facades/election.cpp
     ${PROJECT_SOURCE_DIR}/src/electionguard/facades/elgamal.cpp
     ${PROJECT_SOURCE_DIR}/src/electionguard/facades/encrypt.cpp
@@ -18,7 +19,6 @@ set(FACADES_electionguard
 )
 
 set(SOURCES_electionguard
-    ${PROJECT_SOURCE_DIR}/src/electionguard/async.hpp
     ${PROJECT_SOURCE_DIR}/src/electionguard/ballot_code.cpp
     ${PROJECT_SOURCE_DIR}/src/electionguard/ballot_compact.cpp
     ${PROJECT_SOURCE_DIR}/src/electionguard/ballot.cpp
@@ -45,6 +45,7 @@ set(SOURCES_electionguard
 )
 
 set(INCLUDES_electionguard
+    ${PROJECT_SOURCE_DIR}/include/electionguard/async.hpp
     ${PROJECT_SOURCE_DIR}/include/electionguard/ballot_code.h
     ${PROJECT_SOURCE_DIR}/include/electionguard/ballot_code.hpp
     ${PROJECT_SOURCE_DIR}/include/electionguard/ballot_compact.h
@@ -59,6 +60,8 @@ set(INCLUDES_electionguard
     ${PROJECT_SOURCE_DIR}/include/electionguard/constants.h
     ${PROJECT_SOURCE_DIR}/include/electionguard/collections.h
     ${PROJECT_SOURCE_DIR}/include/electionguard/crypto_hashable.hpp
+    ${PROJECT_SOURCE_DIR}/include/electionguard/discrete_log.h
+    ${PROJECT_SOURCE_DIR}/include/electionguard/discrete_log.hpp
     ${PROJECT_SOURCE_DIR}/include/electionguard/election_object_base.hpp
     ${PROJECT_SOURCE_DIR}/include/electionguard/election.h
     ${PROJECT_SOURCE_DIR}/include/electionguard/election.hpp

@@ -36,19 +36,6 @@ TEST_CASE("add_mod_q for ints 1 and 1 should return q of 2")
     CHECK(result->toHex() == two->toHex());
 }
 
-TEST_CASE("g_pow_p")
-{
-    // Arrange
-    auto two = ElementModQ::fromUint64(2UL);
-
-    // Act
-    auto result = g_pow_p(*two);
-    auto test2 = mul_mod_p(G(), G());
-
-    // Assert
-    CHECK(test2->toHex() == result->toHex());
-}
-
 TEST_CASE("add_mod_q (Q + 0) % Q = 0")
 {
     // Arrange
@@ -563,6 +550,35 @@ TEST_CASE("mul_mod_p for max uint64 * max uint64 should equal hex value "
 
 #pragma endregion
 
+#pragma region div_mod_q
+
+TEST_CASE("div_mod_q 1 / 1 should equal 1")
+{
+    // Arrange
+    auto one = ElementModQ::fromUint64(1UL);
+
+    // Act
+    auto p = div_mod_q(*one, *one);
+
+    // Assert
+    CHECK(p->toHex() == one->toHex());
+}
+
+TEST_CASE("div_mod_q 2 / 1 should equal 2")
+{
+    // Arrange
+    auto two = ElementModQ::fromUint64(2UL);
+    auto one = ElementModQ::fromUint64(1UL);
+
+    // Act
+    auto p = div_mod_q(*two, *one);
+
+    // Assert
+    CHECK(p->toHex() == two->toHex());
+}
+
+#pragma endregion
+
 #pragma region pow_mod_p
 
 TEST_CASE("pow_mod_p 2 ^ 3 = 8 and 3 ^ 2 = 9")
@@ -585,6 +601,19 @@ TEST_CASE("pow_mod_p 2 ^ 3 = 8 and 3 ^ 2 = 9")
 #pragma endregion
 
 #pragma region g_pow_p
+
+TEST_CASE("g_pow_p with hex conversion")
+{
+    // Arrange
+    auto two = ElementModQ::fromUint64(2UL);
+
+    // Act
+    auto result = g_pow_p(*two);
+    auto test2 = mul_mod_p(G(), G());
+
+    // Assert
+    CHECK(test2->toHex() == result->toHex());
+}
 
 TEST_CASE("Test g_pow_p with 0, 1, and 2")
 {

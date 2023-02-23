@@ -7,6 +7,8 @@
 #include "electionguard/status.h"
 #include "variant_cast.hpp"
 
+#include <functional>
+
 extern "C" {
 #include "electionguard/elgamal.h"
 }
@@ -18,6 +20,9 @@ using electionguard::ElGamalCiphertext;
 using electionguard::ElGamalKeyPair;
 using electionguard::HashedElGamalCiphertext;
 using electionguard::Log;
+using electionguard::uint64_to_size;
+using std::make_unique;
+using std::reference_wrapper;
 
 using std::make_unique;
 
@@ -100,6 +105,27 @@ eg_electionguard_status_t eg_elgamal_keypair_get_public_key(eg_elgamal_keypair_t
 
 #pragma region ElGamalCiphertext
 
+eg_electionguard_status_t eg_elgamal_ciphertext_new(eg_element_mod_p_t *in_pad,
+                                                    eg_element_mod_p_t *in_data,
+                                                    eg_elgamal_ciphertext_t **out_handle)
+{
+    if (in_pad == nullptr || in_data == nullptr) {
+        return ELECTIONGUARD_STATUS_ERROR_INVALID_ARGUMENT;
+    }
+
+    try {
+        auto *pad = AS_TYPE(ElementModP, in_pad);
+        auto *data = AS_TYPE(ElementModP, in_data);
+        auto ciphertext = ElGamalCiphertext::make(*pad, *data);
+
+        *out_handle = AS_TYPE(eg_elgamal_ciphertext_t, ciphertext.release());
+        return ELECTIONGUARD_STATUS_SUCCESS;
+    } catch (const exception &e) {
+        Log::error(":eg_elgamal_ciphertext_new", e);
+        return ELECTIONGUARD_STATUS_ERROR_BAD_ALLOC;
+    }
+}
+
 eg_electionguard_status_t eg_elgamal_ciphertext_free(eg_elgamal_ciphertext_t *handle)
 {
     if (handle == nullptr) {
@@ -140,6 +166,20 @@ eg_electionguard_status_t eg_elgamal_ciphertext_crypto_hash(eg_elgamal_ciphertex
     }
 }
 
+eg_electionguard_status_t
+eg_elgamal_ciphertext_decrypt_known_product(eg_elgamal_ciphertext_t *handle,
+                                            eg_element_mod_p_t *in_product, uint64_t *out_plaintext)
+{
+    try {
+        auto *product = AS_TYPE(ElementModP, in_product);
+        *out_plaintext = AS_TYPE(ElGamalCiphertext, handle)->decrypt(*product);
+        return ELECTIONGUARD_STATUS_SUCCESS;
+    } catch (const exception &e) {
+        Log::error(":eg_elgamal_ciphertext_decrypt_known_product", e);
+        return ELECTIONGUARD_STATUS_ERROR_RUNTIME_ERROR;
+    }
+}
+
 eg_electionguard_status_t eg_elgamal_ciphertext_decrypt_with_secret(
   eg_elgamal_ciphertext_t *handle, eg_element_mod_q_t *in_secret_key, uint64_t *out_plaintext)
 {
@@ -153,9 +193,60 @@ eg_electionguard_status_t eg_elgamal_ciphertext_decrypt_with_secret(
     }
 }
 
+eg_electionguard_status_t
+eg_elgamal_ciphertext_decrypt_known_nonce(eg_elgamal_ciphertext_t *handle,
+                                          eg_element_mod_p_t *in_public_key,
+                                          eg_element_mod_q_t *in_nonce, uint64_t *out_plaintext)
+{
+    try {
+        auto *publicKey = AS_TYPE(ElementModP, in_public_key);
+        auto *nonce = AS_TYPE(ElementModQ, in_nonce);
+        *out_plaintext = AS_TYPE(ElGamalCiphertext, handle)->decrypt(*publicKey, *nonce);
+        return ELECTIONGUARD_STATUS_SUCCESS;
+    } catch (const exception &e) {
+        Log::error(":eg_elgamal_ciphertext_decrypt_known_nonce", e);
+        return ELECTIONGUARD_STATUS_ERROR_RUNTIME_ERROR;
+    }
+}
+
+eg_electionguard_status_t
+eg_elgamal_ciphertext_partial_decrypt(eg_elgamal_ciphertext_t *handle,
+                                      eg_element_mod_q_t *in_secret_key,
+                                      eg_element_mod_p_t **out_partial_decryption)
+{
+    try {
+        auto *secretKey = AS_TYPE(ElementModQ, in_secret_key);
+        auto partialDecryption = AS_TYPE(ElGamalCiphertext, handle)->partialDecrypt(*secretKey);
+        *out_partial_decryption = AS_TYPE(eg_element_mod_p_t, partialDecryption.release());
+        return ELECTIONGUARD_STATUS_SUCCESS;
+    } catch (const exception &e) {
+        Log::error(":eg_elgamal_ciphertext_partial_decrypt", e);
+        return ELECTIONGUARD_STATUS_ERROR_RUNTIME_ERROR;
+    }
+}
+
 #pragma endregion
 
 #pragma region ElgamalEncrypt
+
+eg_electionguard_status_t eg_elgamal_add(eg_elgamal_ciphertext_t *in_ciphertexts[],
+                                         uint64_t in_ciphertexts_size,
+                                         eg_elgamal_ciphertext_t **out_ciphertext)
+{
+    try {
+        vector<reference_wrapper<ElGamalCiphertext>> ciphertexts;
+        ciphertexts.reserve(uint64_to_size(in_ciphertexts_size));
+        for (size_t i = 0; i < in_ciphertexts_size; i++) {
+            ciphertexts.push_back(*AS_TYPE(ElGamalCiphertext, in_ciphertexts[i]));
+        }
+        auto ciphertext = elgamalAdd(ciphertexts);
+        *out_ciphertext = AS_TYPE(eg_elgamal_ciphertext_t, ciphertext.release());
+        return ELECTIONGUARD_STATUS_SUCCESS;
+    } catch (const exception &e) {
+        Log::error(":eg_elgamal_add", e);
+        return ELECTIONGUARD_STATUS_ERROR_RUNTIME_ERROR;
+    }
+}
 
 eg_electionguard_status_t eg_elgamal_encrypt(uint64_t in_plaintext, eg_element_mod_q_t *in_nonce,
                                              eg_element_mod_p_t *in_public_key,

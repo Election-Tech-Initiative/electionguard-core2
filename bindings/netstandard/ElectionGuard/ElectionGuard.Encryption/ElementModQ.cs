@@ -41,6 +41,22 @@ namespace ElectionGuard
         }
 
         /// <summary>
+        /// Create a copy of an existing `ElementModQ`
+        /// </summary>
+        /// <param name="src">Existing `ElementModQ` to copy</param>
+        public ElementModQ(ElementModQ src)
+        {
+            try
+            {
+                NewNative(src.Data);
+            }
+            catch (Exception ex)
+            {
+                throw new ElectionGuardException("construction error", ex);
+            }
+        }
+
+        /// <summary>
         /// Creates a `ElementModP` object
         /// </summary>
         /// <param name="newData">the data used to initialize the `ElementModP`</param>

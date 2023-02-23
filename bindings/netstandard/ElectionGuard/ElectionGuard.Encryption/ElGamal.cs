@@ -1,13 +1,16 @@
-﻿namespace ElectionGuard
-{
-    // Declare native types for convenience
-    using NativeElGamalCiphertext = NativeInterface.ElGamalCiphertext.ElGamalCiphertextHandle;
-    using NativeHashedElGamalCiphertext = NativeInterface.HashedElGamalCiphertext.HashedElGamalCiphertextHandle;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+// Declare native types for convenience
+using NativeElGamalCiphertext = ElectionGuard.NativeInterface.ElGamalCiphertext.ElGamalCiphertextHandle;
+using NativeHashedElGamalCiphertext = ElectionGuard.NativeInterface.HashedElGamalCiphertext.HashedElGamalCiphertextHandle;
 
+namespace ElectionGuard
+{
     /// <summary>
     /// ElGamal Functions
     /// </summary>
-    public static class Elgamal
+    public static class ElGamal
     {
         /// <summary>
         /// Encrypts a message with a given random nonce and an ElGamal public key.
@@ -22,7 +25,28 @@
         {
             var status = NativeInterface.ElGamal.Encrypt(
                     plaintext, nonce.Handle, publicKey.Handle,
-                    out NativeElGamalCiphertext ciphertext);
+                    out var ciphertext);
+            status.ThrowIfError();
+            return new ElGamalCiphertext(ciphertext);
+        }
+
+        /// <summary>
+        /// Homomorphically accumulates one or more ElGamal ciphertexts by pairwise multiplication.
+        /// The exponents of vote counters will add.
+        ///
+        /// <param name="ciphertexts"> A collection of Ciphertexts to combine</param>
+        /// <returns>A ciphertext tuple.</returns>
+        /// </summary>
+        public static ElGamalCiphertext Add(
+            IEnumerable<ElGamalCiphertext> ciphertexts)
+        {
+            var nativeCiphertexts =
+                ciphertexts.Select(c => c.Handle.Ptr);
+
+            var status = NativeInterface.ElGamal.Add(
+                    nativeCiphertexts.ToArray(), (ulong)nativeCiphertexts.Count(),
+                    out var ciphertext);
+
             status.ThrowIfError();
             return new ElGamalCiphertext(ciphertext);
         }
@@ -43,7 +67,7 @@
         /// <param name="seed"> ElGamal seed. </param>
         /// <returns>A ciphertext tuple.</returns>
         /// </summary>
-        public unsafe static HashedElGamalCiphertext Encrypt(
+        public static unsafe HashedElGamalCiphertext Encrypt(
             byte[] data, ulong length, ElementModQ nonce, ElementModP publicKey, ElementModQ seed)
         {
             fixed (byte* pointer = data)
@@ -56,6 +80,4 @@
             }
         }
     }
-
-
 }

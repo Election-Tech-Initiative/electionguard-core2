@@ -192,9 +192,15 @@ namespace electionguard
 
     bool ElementModP::operator==(const ElementModP &other) { return *pimpl == *other.pimpl; }
 
+    bool ElementModP::operator==(const ElementModP &other) const { return *pimpl == *other.pimpl; }
+
     bool ElementModP::operator!=(const ElementModP &other) { return !(*this == other); }
 
+    bool ElementModP::operator!=(const ElementModP &other) const { return !(*this == other); }
+
     bool ElementModP::operator<(const ElementModP &other) { return *pimpl < *other.pimpl; }
+
+    bool ElementModP::operator<(const ElementModP &other) const { return *pimpl < *other.pimpl; }
 
     // Property Getters
 
@@ -348,9 +354,15 @@ namespace electionguard
 
     bool ElementModQ::operator==(const ElementModQ &other) { return *pimpl == *other.pimpl; }
 
+    bool ElementModQ::operator==(const ElementModQ &other) const { return *pimpl == *other.pimpl; }
+
     bool ElementModQ::operator!=(const ElementModQ &other) { return !(*this == other); }
 
+    bool ElementModQ::operator!=(const ElementModQ &other) const { return !(*this == other); }
+
     bool ElementModQ::operator<(const ElementModQ &other) { return *pimpl < *other.pimpl; }
+
+    bool ElementModQ::operator<(const ElementModQ &other) const { return *pimpl < *other.pimpl; }
 
     // Property Getters
 
@@ -597,6 +609,17 @@ namespace electionguard
         return make_unique<ElementModP>(*product);
     }
 
+    // numerator * (denominator^-1) mod p
+    unique_ptr<ElementModP> div_mod_p(const ElementModP &numerator, const ElementModP &denominator)
+    {
+        const auto &p = P();
+        uint64_t divisor[MAX_P_LEN] = {};
+        Bignum4096::modInvPrime(p.get(), const_cast<ElementModP &>(denominator).get(),
+                                static_cast<uint64_t *>(divisor));
+        auto inverse = make_unique<ElementModP>(divisor, true);
+        return mul_mod_p(numerator, *inverse);
+    }
+
     unique_ptr<ElementModP> pow_mod_p(const ElementModP &base, const ElementModP &exponent)
     {
         // HACL's input constraints require the exponent to be greater than zero
@@ -703,6 +726,7 @@ namespace electionguard
             throw invalid_argument("must have one or more elements");
         }
 
+        // TODO: const reference
         auto result = ElementModQ::fromUint64(0UL, true);
         for (auto element : elements) {
             auto sum = add_mod_q(*result, element.get());
@@ -755,6 +779,63 @@ namespace electionguard
         return make_unique<ElementModQ>(resModQ, true);
     }
 
+    // (lhs * rhs) mod q
+    unique_ptr<ElementModQ> mul_mod_q(const ElementModQ &lhs, const ElementModQ &rhs)
+    {
+        const auto &p = Q();
+        uint64_t mulResult[MAX_Q_LEN_DOUBLE] = {};
+        Bignum256::mul(const_cast<ElementModQ &>(lhs).get(), const_cast<ElementModQ &>(rhs).get(),
+                       static_cast<uint64_t *>(mulResult));
+        uint64_t modResult[MAX_Q_LEN] = {};
+        CONTEXT_Q().mod(static_cast<uint64_t *>(mulResult), static_cast<uint64_t *>(modResult));
+        return make_unique<ElementModQ>(modResult, true);
+    }
+
+    unique_ptr<ElementModQ> mul_mod_q(const vector<ElementModQ> &elems)
+    {
+        auto product = ElementModQ::fromUint64(1UL, true);
+        for (const auto &elem : elems) {
+            auto res = mul_mod_q(*product, elem);
+            product.swap(res);
+        }
+        return make_unique<ElementModQ>(*product);
+    }
+
+    // numerator * (denominator^-1) mod q
+    std::unique_ptr<ElementModQ> div_mod_q(const ElementModQ &numerator,
+                                           const ElementModQ &denominator)
+    {
+        const auto &q = Q();
+        uint64_t result[MAX_Q_LEN] = {};
+        Bignum256::modInvPrime(q.get(), const_cast<ElementModQ &>(denominator).get(),
+                               static_cast<uint64_t *>(result));
+        auto inverse = make_unique<ElementModQ>(result, true);
+        return mul_mod_q(numerator, *inverse);
+    }
+
+    // (b^e) mod q
+    unique_ptr<ElementModQ> pow_mod_q(const ElementModQ &base, const ElementModQ &exponent)
+    {
+        // HACL's input constraints require the exponent to be greater than zero
+        if (const_cast<ElementModQ &>(exponent) == ZERO_MOD_Q()) {
+            return ElementModQ::fromUint64(1UL);
+        }
+
+        uint64_t result[MAX_Q_LEN] = {};
+        CONTEXT_Q().modExp(base.get(), MAX_Q_SIZE, exponent.get(), static_cast<uint64_t *>(result));
+        return make_unique<ElementModQ>(result, true);
+    }
+
+    unique_ptr<ElementModQ> sub_from_q(const ElementModQ &a)
+    {
+        uint64_t result[MAX_Q_LEN] = {};
+        Bignum256::sub(const_cast<ElementModQ &>(Q()).get(), const_cast<ElementModQ &>(a).get(),
+                       static_cast<uint64_t *>(result));
+        // TODO: python version doesn't perform % Q on results,
+        // but we still need to handle the overflow values between (Q, MAX_256]
+        return make_unique<ElementModQ>(result, true);
+    }
+
     unique_ptr<ElementModQ> a_plus_bc_mod_q(const ElementModQ &a, const ElementModQ &b,
                                             const ElementModQ &c)
     {
@@ -782,41 +863,6 @@ namespace electionguard
         }
 
         return make_unique<ElementModQ>(res, true);
-    }
-
-    // (lhs * rhs) mod q
-    unique_ptr<ElementModQ> mul_mod_q(const ElementModQ &lhs, const ElementModQ &rhs)
-    {
-        const auto &p = Q();
-        uint64_t mulResult[MAX_Q_LEN_DOUBLE] = {};
-        Bignum256::mul(const_cast<ElementModQ &>(lhs).get(), const_cast<ElementModQ &>(rhs).get(),
-                       static_cast<uint64_t *>(mulResult));
-        uint64_t modResult[MAX_Q_LEN] = {};
-        CONTEXT_Q().mod(static_cast<uint64_t *>(mulResult), static_cast<uint64_t *>(modResult));
-        return make_unique<ElementModQ>(modResult, true);
-    }
-
-    // (b^e) mod q
-    unique_ptr<ElementModQ> pow_mod_q(const ElementModQ &base, const ElementModQ &exponent)
-    {
-        // HACL's input constraints require the exponent to be greater than zero
-        if (const_cast<ElementModQ &>(exponent) == ZERO_MOD_Q()) {
-            return ElementModQ::fromUint64(1UL);
-        }
-
-        uint64_t result[MAX_Q_LEN] = {};
-        CONTEXT_Q().modExp(base.get(), MAX_Q_SIZE, exponent.get(), static_cast<uint64_t *>(result));
-        return make_unique<ElementModQ>(result, true);
-    }
-
-    unique_ptr<ElementModQ> sub_from_q(const ElementModQ &a)
-    {
-        uint64_t result[MAX_Q_LEN] = {};
-        Bignum256::sub(const_cast<ElementModQ &>(Q()).get(), const_cast<ElementModQ &>(a).get(),
-                       static_cast<uint64_t *>(result));
-        // TODO: python version doesn't perform % Q on results,
-        // but we still need to handle the overflow values between (Q, MAX_256]
-        return make_unique<ElementModQ>(result, true);
     }
 
     unique_ptr<ElementModP> rand_p()

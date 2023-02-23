@@ -1,7 +1,6 @@
 ﻿using CommunityToolkit.Mvvm.Input;
 using ElectionGuard.ElectionSetup;
 using ElectionGuard.UI.Helpers;
-
 namespace ElectionGuard.UI.ViewModels;
 
 [QueryProperty(CurrentKeyCeremonyParam, "KeyCeremonyId")]
@@ -44,6 +43,9 @@ public partial class ViewKeyCeremonyViewModel : BaseViewModel
     [ObservableProperty]
     private List<GuardianPublicKey> _guardians = new();
 
+    [ObservableProperty]
+    private List<GuardianPublicKey> _guardians = new();
+
     public override async Task OnLeavingPage()
     {
         _timer.Stop();
@@ -58,7 +60,7 @@ public partial class ViewKeyCeremonyViewModel : BaseViewModel
 
     private void UpdateKeyCeremony()
     {
-        if(KeyCeremonyId != string.Empty)
+        if (KeyCeremonyId != string.Empty)
         {
             OnKeyCeremonyIdChanged(KeyCeremonyId);
         }
@@ -71,7 +73,7 @@ public partial class ViewKeyCeremonyViewModel : BaseViewModel
             IsJoinVisible = (!AuthenticationService.IsAdmin && (value.State == KeyCeremonyState.PendingGuardiansJoin));
 
             _mediator = new KeyCeremonyMediator("mediator", UserName!, value);
-            
+
             if (IsJoinVisible is false)
             {
                 _ = Task.Run(async () => await _mediator.RunKeyCeremony(IsAdmin));
