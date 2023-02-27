@@ -282,4 +282,31 @@
   <data name="NoGuardians" xml:space="preserve">
     <value>¡No se han unido guardianes!</value>
   </data>
+  <data name="KeyCeremonyState" xml:space="preserve">
+    <value>¡Estado de la Ceremonia de Llaves!</value>
+  </data>
+  <data name="Complete" xml:space="preserve">
+    <value>Completo</value>
+  </data>
+  <data name="DoesNotExist" xml:space="preserve">
+    <value>¡No existe!</value>
+  </data>
+  <data name="PendingAdminAnnounce" xml:space="preserve">
+    <value>¡A la espera de que el administrador anuncie a los Guardianes!</value>
+  </data>
+  <data name="PendingAdminToPublishJointKey" xml:space="preserve">
+    <value>¡Esperando a que el administrador cree y publique la clave conjunta!</value>
+  </data>
+  <data name="PendingAdminToShareBackups" xml:space="preserve">
+    <value>¡Esperando que el administrador comparta las copias de seguridad de la clave electoral!</value>
+  </data>
+  <data name="PendingGuardianBackups" xml:space="preserve">
+    <value>¡Esperando a que los Guardianes respalden las claves electorales!</value>
+  </data>
+  <data name="PendingGuardianJoin" xml:space="preserve">
+    <value>¡Esperando a que se unan los guardianes!</value>
+  </data>
+  <data name="PendingGuardiansVerifyBackups" xml:space="preserve">
+    <value>¡Esperando a que los guardianes verifiquen las copias de seguridad!</value>
+  </data>
 </root>

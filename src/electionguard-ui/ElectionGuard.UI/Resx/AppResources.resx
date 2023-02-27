@@ -279,4 +279,31 @@
   <data name="NoGuardians" xml:space="preserve">
     <value>No guardians joined</value>
   </data>
+  <data name="Complete" xml:space="preserve">
+    <value>Complete</value>
+  </data>
+  <data name="DoesNotExist" xml:space="preserve">
+    <value>Does Not Exist</value>
+  </data>
+  <data name="KeyCeremonyState" xml:space="preserve">
+    <value>Key Ceremony State</value>
+  </data>
+  <data name="PendingAdminAnnounce" xml:space="preserve">
+    <value>Waiting for Admin to Announce the Guardians</value>
+  </data>
+  <data name="PendingAdminToPublishJointKey" xml:space="preserve">
+    <value>Waiting for Admin to Create and Publish the Joint Key</value>
+  </data>
+  <data name="PendingAdminToShareBackups" xml:space="preserve">
+    <value>Waiting for Admin to Share the Election Key Backups</value>
+  </data>
+  <data name="PendingGuardianBackups" xml:space="preserve">
+    <value>Waiting for the Guardians to Backup Election Keys</value>
+  </data>
+  <data name="PendingGuardianJoin" xml:space="preserve">
+    <value>Waiting for Guardians to Join</value>
+  </data>
+  <data name="PendingGuardiansVerifyBackups" xml:space="preserve">
+    <value>Waiting for Guardians to Verify the Backups</value>
+  </data>
 </root>

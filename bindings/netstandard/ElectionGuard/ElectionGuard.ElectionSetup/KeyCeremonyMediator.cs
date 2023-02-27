@@ -11,11 +11,12 @@ namespace ElectionGuard.ElectionSetup;
 /// </summary>
 public class KeyCeremonyMediator : DisposableBase
 {
-    public KeyCeremonyMediator(string mediatorId, string userId, CeremonyDetails ceremonyDetails)
+    public KeyCeremonyMediator(string mediatorId, string userId, KeyCeremony keyCeremony)
     {
         Id = mediatorId;
         UserId = userId;
-        CeremonyDetails = ceremonyDetails;
+        CeremonyDetails = keyCeremony;
+        _keyCeremony = keyCeremony;
         CreateAdminSteps();
         CreateGuardianSteps();
     }
@@ -26,6 +27,9 @@ public class KeyCeremonyMediator : DisposableBase
     public string UserId { get; }
     public string Id { get; }
     public CeremonyDetails CeremonyDetails { get; internal set; }
+    public KeyCeremony _keyCeremony { get; internal set; }
+
+    private object mutex = new();
 
     // From Guardians
     // Round 1
@@ -251,8 +255,6 @@ public class KeyCeremonyMediator : DisposableBase
     /// <param name="verification">Election partial key verification</param>
     private void ReceiveElectionPartialKeyVerification(ElectionPartialKeyVerification verification)
     {
-        if (verification.OwnerId == verification.DesignatedId)
-            return;
         _electionPartialKeyVerification[new GuardianPair(verification.OwnerId!, verification.DesignatedId!)] = verification;
     }
 
@@ -297,7 +299,7 @@ public class KeyCeremonyMediator : DisposableBase
     /// <returns>All election partial key verifications received</returns>
     private bool AllElectionPartialKeyVerificationsReceived()
     {
-        var requiredVerificationsPerGuardian = CeremonyDetails.NumberOfGuardians - 1;
+        var requiredVerificationsPerGuardian = CeremonyDetails.NumberOfGuardians;
         return _electionPartialKeyVerification.Count == (requiredVerificationsPerGuardian
             * CeremonyDetails.NumberOfGuardians);
     }
@@ -453,10 +455,10 @@ public class KeyCeremonyMediator : DisposableBase
         {
             if (item.GuardianId == guardianId)
             {
-                return index;
+                return index + 1;
             }
         }
-        return 0;
+        throw new ArgumentOutOfRangeException();
     }
 
     /// <summary>
@@ -465,7 +467,7 @@ public class KeyCeremonyMediator : DisposableBase
     /// <returns>True if a step was run</returns>
     public async Task RunKeyCeremony(bool isAdmin = false)
     {
-        string keyCeremonyId = CeremonyDetails.KeyCeremonyId;
+        var keyCeremonyId = CeremonyDetails.KeyCeremonyId;
 
         KeyCeremonyService keyCeremonyService = new();
         var keyCeremony = await keyCeremonyService.GetByKeyCeremonyIdAsync(keyCeremonyId);
@@ -477,6 +479,7 @@ public class KeyCeremonyMediator : DisposableBase
                 UserId,
                 $"Key Ceremony {keyCeremonyId} does not exist");
         }
+        _keyCeremony.State = keyCeremony.State;
 
         var state = keyCeremony.State;
 
@@ -484,7 +487,17 @@ public class KeyCeremonyMediator : DisposableBase
         var currentStep = steps.SingleOrDefault(s => s.State == state);
         if (currentStep != null && await currentStep.ShouldRunStep!())
         {
-            await currentStep.RunStep!();
+//            if (Monitor.TryEnter(mutex))
+            {
+                try
+                {
+                    await currentStep.RunStep!();
+                }
+                finally
+                {
+//                    Monitor.Exit(mutex);
+                }
+            }
         }
     }
 
@@ -604,7 +617,7 @@ public class KeyCeremonyMediator : DisposableBase
 
         // append guardian joined to key ceremony (db)
         GuardianPublicKeyService service = new();
-        GuardianPublicKey data = new() { KeyCeremonyId= keyCeremonyId, GuardianId = currentGuardianUserName };
+        GuardianPublicKey data = new() { KeyCeremonyId = keyCeremonyId, GuardianId = currentGuardianUserName };
         _ = await service.SaveAsync(data);
 
         // get guardian number
@@ -654,15 +667,17 @@ public class KeyCeremonyMediator : DisposableBase
         string keyCeremonyId = CeremonyDetails.KeyCeremonyId;
 
         KeyCeremonyService service = new();
-        await service.UpdateStateAsync(keyCeremonyId, KeyCeremonyState.PendingAdminAnnounce);
+        _keyCeremony.State = KeyCeremonyState.PendingAdminAnnounce;
+        await service.UpdateStateAsync(keyCeremonyId, _keyCeremony.State);
+        // notify change to guardians (signalR)    
 
         // self.log.info("all guardians have joined, announcing guardians")
         // call announce
         await Announce(keyCeremonyId);
 
         // change state to step3
-        await service.UpdateStateAsync(keyCeremonyId, KeyCeremonyState.PendingGuardianBackups);
-
+        _keyCeremony.State = KeyCeremonyState.PendingGuardianBackups;
+        await service.UpdateStateAsync(keyCeremonyId, _keyCeremony.State);
         // notify change to guardians (signalR)    
 
     }
@@ -716,6 +731,7 @@ public class KeyCeremonyMediator : DisposableBase
         // change state
         KeyCeremonyService service = new();
         await service.UpdateStateAsync(keyCeremonyId, KeyCeremonyState.PendingAdminToShareBackups);
+        // notify change to guardians (signalR)    
 
         // Announce guardians - puts data into keyceremony mediator structures
         await Announce(keyCeremonyId);
@@ -731,8 +747,7 @@ public class KeyCeremonyMediator : DisposableBase
 
         // change state
         await service.UpdateStateAsync(keyCeremonyId, KeyCeremonyState.PendingGuardiansVerifyBackups);
-
-        // notify change
+        // notify change to guardians (signalR)    
 
 
     }
@@ -756,7 +771,7 @@ public class KeyCeremonyMediator : DisposableBase
         foreach (var backup in backups!)
         {
             guardian!.SaveElectionPartialKeyBackup(backup.Backup!);
-            var verification = guardian.VerifyElectionPartialKeyBackup(backup.Backup!.OwnerId!, keyCeremonyId);
+            var verification = guardian.VerifyElectionPartialKeyBackup(backup.GuardianId!, keyCeremonyId);
             if(verification == null)
             {
                 throw new KeyCeremonyException(
@@ -785,6 +800,7 @@ public class KeyCeremonyMediator : DisposableBase
         // change state
         KeyCeremonyService service = new();
         await service.UpdateStateAsync(keyCeremonyId, KeyCeremonyState.PendingAdminToPublishJointKey);
+        // notify change to guardians (signalR)    
 
         // Announce guardians - puts data into keyceremony mediator structures
         await Announce(keyCeremonyId);
@@ -816,8 +832,7 @@ public class KeyCeremonyMediator : DisposableBase
         // save joint key to key ceremony
         // update state to complete
         await service.UpdateCompleteAsync(keyCeremonyId, jointKey);
-
-        // notify change
+        // notify change to guardians (signalR)
 
     }
 

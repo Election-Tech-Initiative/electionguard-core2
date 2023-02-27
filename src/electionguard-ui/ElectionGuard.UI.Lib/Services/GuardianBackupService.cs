@@ -37,7 +37,7 @@ public class GuardianBackupService : BaseDatabaseService<GuardianBackups>
     {
         var filterBuilder = Builders<GuardianBackups>.Filter;
         var filter = filterBuilder.And(filterBuilder.Eq(Constants.KeyCeremonyId, keyCeremonyId),
-            filterBuilder.Eq(Constants.GuardianId, DesignatedId));
+            filterBuilder.Eq(Constants.DesignatedId, DesignatedId));
 
         return await GetAllByFilterAsync(filter);
     }

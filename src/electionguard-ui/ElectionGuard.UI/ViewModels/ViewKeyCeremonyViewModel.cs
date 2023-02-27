@@ -74,7 +74,7 @@ public partial class ViewKeyCeremonyViewModel : BaseViewModel
             if (IsJoinVisible is false)
             {
                 _ = Task.Run(async () => await _mediator.RunKeyCeremony(IsAdmin));
-                _timer.Start();
+                //_timer.Start();
             }
 
             // load the guardians that have joined

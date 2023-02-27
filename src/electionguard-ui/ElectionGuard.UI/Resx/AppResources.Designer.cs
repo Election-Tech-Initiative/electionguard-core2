@@ -133,6 +133,15 @@ namespace ElectionGuard.UI.Resx {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Complete.
+        /// </summary>
+        internal static string Complete {
+            get {
+                return ResourceManager.GetString("Complete", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Contests.
         /// </summary>
         internal static string ContestsText {
@@ -192,6 +201,15 @@ namespace ElectionGuard.UI.Resx {
         internal static string DatabasePassword {
             get {
                 return ResourceManager.GetString("DatabasePassword", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Does Not Exist.
+        /// </summary>
+        internal static string DoesNotExist {
+            get {
+                return ResourceManager.GetString("DoesNotExist", resourceCulture);
             }
         }
         
@@ -322,6 +340,15 @@ namespace ElectionGuard.UI.Resx {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Key Ceremony State.
+        /// </summary>
+        internal static string KeyCeremonyState {
+            get {
+                return ResourceManager.GetString("KeyCeremonyState", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Location.
         /// </summary>
         internal static string LocationText {
@@ -426,6 +453,60 @@ namespace ElectionGuard.UI.Resx {
         internal static string PasswordDefaultPlaceholder {
             get {
                 return ResourceManager.GetString("PasswordDefaultPlaceholder", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Waiting for Admin to Announce the Guardians.
+        /// </summary>
+        internal static string PendingAdminAnnounce {
+            get {
+                return ResourceManager.GetString("PendingAdminAnnounce", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Waiting for Admin to Create and Publish the Joint Key.
+        /// </summary>
+        internal static string PendingAdminToPublishJointKey {
+            get {
+                return ResourceManager.GetString("PendingAdminToPublishJointKey", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Waiting for Admin to Share the Election Key Backups.
+        /// </summary>
+        internal static string PendingAdminToShareBackups {
+            get {
+                return ResourceManager.GetString("PendingAdminToShareBackups", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Waiting for the Guardians to Backup Election Keys.
+        /// </summary>
+        internal static string PendingGuardianBackups {
+            get {
+                return ResourceManager.GetString("PendingGuardianBackups", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Waiting for Guardians to Join.
+        /// </summary>
+        internal static string PendingGuardianJoin {
+            get {
+                return ResourceManager.GetString("PendingGuardianJoin", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Waiting for Guardians to Verify the Backups.
+        /// </summary>
+        internal static string PendingGuardiansVerifyBackups {
+            get {
+                return ResourceManager.GetString("PendingGuardiansVerifyBackups", resourceCulture);
             }
         }
         

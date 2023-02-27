@@ -51,8 +51,15 @@ public class BaseDatabaseService<T> : IDatabaseService<T> where T : DatabaseReco
     /// <returns></returns>
     virtual public async Task UpdateAsync(FilterDefinition<T> filter, UpdateDefinition<T> update, string? table = null)
     {
-        var collection = DbService.GetCollection<T>(table ?? _collection);
-        _ = await collection.UpdateOneAsync(UpdateFilter(filter), update);
+        try
+        {
+            var collection = DbService.GetCollection<T>(table ?? _collection);
+            _ = await collection.UpdateOneAsync(UpdateFilter(filter), update);
+        }
+        catch (Exception ex)
+        {
+            var d = ex.Message;
+        }
     }
 
     /// <summary>

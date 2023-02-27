@@ -223,9 +223,9 @@ public class Guardian : DisposableBase
 
 
     //    private ElectionPartialKeyBackup GenerateElectionPartialKeyBackup(ulong sequenceOrder)
-    private ElectionPartialKeyBackup GenerateElectionPartialKeyBackup(string senderGuardianId, ElectionPolynomial senderGuardianPolynomial, ElectionPublicKey receiverGuardianPublicKey)
+    private ElectionPartialKeyBackup GenerateElectionPartialKeyBackup(string senderGuardianId, ElectionPolynomial electionPolynomial, ElectionPublicKey receiverGuardianPublicKey)
     {
-        var coordinate = ComputePolynomialCoordinate(receiverGuardianPublicKey.SequenceOrder, senderGuardianPolynomial);
+        var coordinate = ComputePolynomialCoordinate(receiverGuardianPublicKey.SequenceOrder, electionPolynomial);
         using var nonce = BigMath.RandQ();
         var seed = GetBackupSeed(
                 receiverGuardianPublicKey.OwnerId,
@@ -248,19 +248,19 @@ public class Guardian : DisposableBase
         return BigMath.HashElems(ownerId, sequenceOrder ?? 0);
     }
 
-    private ElementModQ ComputePolynomialCoordinate(ulong sequenceOrder, ElectionPolynomial? polynomial = null)
+    private ElementModQ ComputePolynomialCoordinate(ulong sequenceOrder, ElectionPolynomial polynomial)
     {
         using var exponentModifierModQ = new ElementModQ(sequenceOrder);
         var computedValue = Constants.ZERO_MOD_Q; // start at 0 mod q.
 
-        var coefficients = polynomial != null ? polynomial.Coefficients : _electionKeys.Polynomial.Coefficients;
+        var coefficients = polynomial.Coefficients;
 
         foreach (var (coefficient, index) in coefficients.WithIndex())
         {
             using var exponent = BigMath.PowModQ(exponentModifierModQ, index);
             using var factor = BigMath.MultModQ(coefficient.Value, exponent);
 
-            computedValue =  BigMath.AddModQ(computedValue, factor);
+            computedValue = BigMath.AddModQ(computedValue, factor);
 
             //coordinate = GetCoordinate(sequenceOrderModQ, coordinate, coefficient, index);
         }
@@ -433,17 +433,17 @@ public class Guardian : DisposableBase
         {
             return null;
         }
-        return VerifyElectionPartialKeyBackup(guardianId, backup, publicKey, _electionKeys, keyCeremonyId);
+        return VerifyElectionPartialKeyBackup(backup?.DesignatedId!, backup, publicKey, _electionKeys, keyCeremonyId);
     }
 
-    private ElectionPartialKeyVerification VerifyElectionPartialKeyBackup(string receiverGuardianId, ElectionPartialKeyBackup? senderGuardianBackup, ElectionPublicKey? senderGuardianPublicKey, ElectionKeyPair receiverGuardianKeys, string keyCeremonyId)
+    private ElectionPartialKeyVerification VerifyElectionPartialKeyBackup(string receiverGuardianId, ElectionPartialKeyBackup? senderGuardianBackup, ElectionPublicKey? senderGuardianPublicKey, ElectionKeyPair electionKeys, string keyCeremonyId)
     {
         using var encryptionSeed = GetBackupSeed(
                 receiverGuardianId,
                 senderGuardianBackup?.DesignatedSequenceOrder
             );
 
-        var secretKey = receiverGuardianKeys.KeyPair.SecretKey;
+        var secretKey = electionKeys.KeyPair.SecretKey;
         var data = senderGuardianBackup?.EncryptedCoordinate?.Decrypt(
                 secretKey, encryptionSeed, false);
 

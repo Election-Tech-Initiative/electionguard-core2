@@ -19,6 +19,7 @@
                 x:Key="BoolToObjectConverter"
                 FalseObject="false"
                 TrueObject="true" />
+            <helper:StateConverter x:Key="StateConverter" />
         </ResourceDictionary>
     </ContentPage.Resources>
 
@@ -37,6 +38,10 @@
                 <Label Style="{StaticResource FormValue}" Text="{Binding KeyCeremony.Quorum, FallbackValue=''}" />
             </StackLayout>
         </toolkit:UniformItemsLayout>
+        <StackLayout Style="{StaticResource FormControl}">
+            <Label Style="{StaticResource FormLabel}" Text="{helper:Translate KeyCeremonyState}" />
+            <Label Style="{StaticResource FormValue}" Text="{Binding KeyCeremony.State, Converter={StaticResource StateConverter}}" />
+        </StackLayout>
         <Button
             Command="{Binding JoinCommand}"
             IsVisible="{Binding IsJoinVisible, Converter={StaticResource BoolToObjectConverter}}"
