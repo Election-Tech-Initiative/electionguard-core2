@@ -23,7 +23,7 @@ jobs:
       - name: Build
         run: make build
       - name: Upload Library (x64)
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v3
         with:
           name: win-x64
           path: |
@@ -50,7 +50,7 @@ jobs:
       - name: Build
         run: make build
       - name: Upload Library (x64)
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v3
         with:
           name: linux-x64
           path: build/libs/Linux/x64/Release/src/*.so
@@ -70,7 +70,7 @@ jobs:
       - name: Build
         run: make build
       - name: Upload Library (x64)
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v3
         with:
           name: osx-x64
           path: build/libs/Darwin/x64/Release/src/*.dylib
