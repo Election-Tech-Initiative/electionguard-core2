@@ -730,7 +730,8 @@ public class KeyCeremonyMediator : DisposableBase
 
         // change state
         KeyCeremonyService service = new();
-        await service.UpdateStateAsync(keyCeremonyId, KeyCeremonyState.PendingAdminToShareBackups);
+        _keyCeremony.State = KeyCeremonyState.PendingAdminToShareBackups;
+        await service.UpdateStateAsync(keyCeremonyId, _keyCeremony.State);
         // notify change to guardians (signalR)    
 
         // Announce guardians - puts data into keyceremony mediator structures
@@ -746,7 +747,8 @@ public class KeyCeremonyMediator : DisposableBase
         ReceiveBackups(backups!);
 
         // change state
-        await service.UpdateStateAsync(keyCeremonyId, KeyCeremonyState.PendingGuardiansVerifyBackups);
+        _keyCeremony.State = KeyCeremonyState.PendingGuardiansVerifyBackups;
+        await service.UpdateStateAsync(keyCeremonyId, _keyCeremony.State);
         // notify change to guardians (signalR)    
 
 
@@ -799,7 +801,8 @@ public class KeyCeremonyMediator : DisposableBase
 
         // change state
         KeyCeremonyService service = new();
-        await service.UpdateStateAsync(keyCeremonyId, KeyCeremonyState.PendingAdminToPublishJointKey);
+        _keyCeremony.State = KeyCeremonyState.PendingAdminToPublishJointKey;
+        await service.UpdateStateAsync(keyCeremonyId, _keyCeremony.State);
         // notify change to guardians (signalR)    
 
         // Announce guardians - puts data into keyceremony mediator structures
@@ -831,6 +834,7 @@ public class KeyCeremonyMediator : DisposableBase
 
         // save joint key to key ceremony
         // update state to complete
+        _keyCeremony.State = KeyCeremonyState.Complete;
         await service.UpdateCompleteAsync(keyCeremonyId, jointKey);
         // notify change to guardians (signalR)
 
