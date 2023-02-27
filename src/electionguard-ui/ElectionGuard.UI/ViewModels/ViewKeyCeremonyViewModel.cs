@@ -12,6 +12,8 @@ public partial class ViewKeyCeremonyViewModel : BaseViewModel
 
     private readonly IDispatcherTimer _timer;
 
+    private bool joined;
+
     public ViewKeyCeremonyViewModel(IServiceProvider serviceProvider,
                                     KeyCeremonyService keyCeremonyService,
                                     GuardianPublicKeyService guardianService,
@@ -74,7 +76,7 @@ public partial class ViewKeyCeremonyViewModel : BaseViewModel
             if (IsJoinVisible is false)
             {
                 _ = Task.Run(async () => await _mediator.RunKeyCeremony(IsAdmin));
-                //_timer.Start();
+                _timer.Start();
             }
 
             // load the guardians that have joined
@@ -87,6 +89,7 @@ public partial class ViewKeyCeremonyViewModel : BaseViewModel
     [RelayCommand(CanExecute = nameof(CanJoin))]
     public async Task Join()
     {
+        joined = true;
         // TODO: Tell the signalR hub what user has joined
         await _mediator!.RunKeyCeremony(IsAdmin);
         _timer.Start();
@@ -108,7 +111,7 @@ public partial class ViewKeyCeremonyViewModel : BaseViewModel
 
     private bool CanJoin()
     {
-        return KeyCeremony is not null && _mediator is not null;
+        return KeyCeremony is not null && _mediator is not null && joined is false;
     }
 
     private readonly KeyCeremonyService _keyCeremonyService;
