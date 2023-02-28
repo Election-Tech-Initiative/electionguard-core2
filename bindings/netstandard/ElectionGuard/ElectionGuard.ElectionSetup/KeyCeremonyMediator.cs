@@ -549,9 +549,9 @@ public class KeyCeremonyMediator : DisposableBase
 
         GuardianPublicKeyService guardianService = new();
         var guardian = await guardianService.GetByIdsAsync(keyCeremonyId, guardianId);
-        var count = await guardianService.CountAsync(keyCeremonyId);
+        var guardianCount = await guardianService.CountAsync(keyCeremonyId);
 
-        return guardian == null && count < CeremonyDetails.NumberOfGuardians;
+        return guardian == null && guardianCount < CeremonyDetails.NumberOfGuardians;
     }
 
     private async Task<bool> ShouldGuardianRunStep3()
@@ -570,7 +570,7 @@ public class KeyCeremonyMediator : DisposableBase
         GuardianBackupService backupService = new();
         var backupCount = await backupService.CountAsync(keyCeremonyId, guardianId);
 
-        return (backupCount != CeremonyDetails.NumberOfGuardians);
+        return backupCount != CeremonyDetails.NumberOfGuardians;
     }
 
     private async Task<bool> ShouldGuardianRunStep5()
@@ -591,8 +591,8 @@ public class KeyCeremonyMediator : DisposableBase
         VerificationService verificationService = new();
         var verificationCount = await verificationService.CountAsync(keyCeremonyId, guardianId);
 
-        return (backupCount == CeremonyDetails.NumberOfGuardians &&
-            verificationCount != CeremonyDetails.NumberOfGuardians);
+        return backupCount == CeremonyDetails.NumberOfGuardians &&
+            verificationCount != CeremonyDetails.NumberOfGuardians;
     }
 
 
@@ -623,9 +623,9 @@ public class KeyCeremonyMediator : DisposableBase
         {
             await service.UpdatePublicKeyAsync(keyCeremonyId, currentGuardianUserName, publicKey);
         }
-        catch (Exception ex)
+        catch (ElectionGuardException)
         {
-            Console.WriteLine(ex);
+            // need to log the error and/or display it
         }
 
         // notify change to admin (signalR)
