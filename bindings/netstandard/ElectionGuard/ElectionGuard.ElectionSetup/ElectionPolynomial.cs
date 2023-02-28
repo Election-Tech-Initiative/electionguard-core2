@@ -1,5 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using ElectionGuard.ElectionSetup.Extensions;
+using ElectionGuard.UI.Lib.Extensions;
 using ElectionGuard.UI.Lib.Models;
 
 namespace ElectionGuard.ElectionSetup;

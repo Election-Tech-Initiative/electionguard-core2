@@ -1,6 +1,4 @@
-﻿using System.ComponentModel.DataAnnotations;
-
-namespace ElectionGuard.UI.Lib.Models;
+﻿namespace ElectionGuard.UI.Lib.Models;
 
 /// <summary>
 /// A list of states for the key ceremony.

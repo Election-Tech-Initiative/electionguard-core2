@@ -1,4 +1,5 @@
 ﻿using ElectionGuard.ElectionSetup.Extensions;
+using ElectionGuard.UI.Lib.Extensions;
 using ElectionGuard.UI.Lib.Models;
 using ElectionGuard.UI.Lib.Services;
 using System.Text.Json;
@@ -614,9 +615,8 @@ public class Guardian : DisposableBase
         }
         catch (Exception ex)
         {
-            var m = ex.Message;
+            throw new ElectionGuardException("", ex);
         }
-        return null;
     }
 
     public static Guardian? Load(string guardianId, KeyCeremony keyCeremony)

@@ -58,7 +58,7 @@ public class BaseDatabaseService<T> : IDatabaseService<T> where T : DatabaseReco
         }
         catch (Exception ex)
         {
-            var d = ex.Message;
+            throw new ElectionGuardException("Error updating a record", ex);
         }
     }
 
@@ -101,8 +101,7 @@ public class BaseDatabaseService<T> : IDatabaseService<T> where T : DatabaseReco
         }
         catch (Exception ex)
         {
-            var m = ex.Message;
-            throw;
+            throw new ElectionGuardException("Error getting all by filter", ex);
         }
     }
 

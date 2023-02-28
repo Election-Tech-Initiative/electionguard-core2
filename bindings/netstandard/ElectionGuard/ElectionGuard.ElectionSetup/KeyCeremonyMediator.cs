@@ -1,8 +1,8 @@
 ﻿using ElectionGuard.ElectionSetup.Exceptions;
 using ElectionGuard.ElectionSetup.Extensions;
+using ElectionGuard.UI.Lib.Extensions;
 using ElectionGuard.UI.Lib.Models;
 using ElectionGuard.UI.Lib.Services;
-using MongoDB.Bson;
 
 namespace ElectionGuard.ElectionSetup;
 
@@ -28,8 +28,6 @@ public class KeyCeremonyMediator : DisposableBase
     public string Id { get; }
     public CeremonyDetails CeremonyDetails { get; internal set; }
     public KeyCeremony _keyCeremony { get; internal set; }
-
-    private object mutex = new();
 
     // From Guardians
     // Round 1
@@ -452,10 +450,11 @@ public class KeyCeremonyMediator : DisposableBase
         {
             if (item.GuardianId == guardianId)
             {
+                // the math functions need this to be a 1 based value instead of a 0 based value
                 return index + 1;
             }
         }
-        throw new ArgumentOutOfRangeException();
+        throw new ArgumentOutOfRangeException(nameof(guardianId));
     }
 
     /// <summary>
@@ -484,17 +483,7 @@ public class KeyCeremonyMediator : DisposableBase
         var currentStep = steps.SingleOrDefault(s => s.State == state);
         if (currentStep != null && await currentStep.ShouldRunStep!())
         {
-//            if (Monitor.TryEnter(mutex))
-            {
-                try
-                {
-                    await currentStep.RunStep!();
-                }
-                finally
-                {
-//                    Monitor.Exit(mutex);
-                }
-            }
+            await currentStep.RunStep!();
         }
     }
 
@@ -515,7 +504,7 @@ public class KeyCeremonyMediator : DisposableBase
 
     private async Task<bool> ShouldAdminStartStep4()
     {
-        string keyCeremonyId = CeremonyDetails.KeyCeremonyId;
+        var keyCeremonyId = CeremonyDetails.KeyCeremonyId;
 
         GuardianPublicKeyService guardianService = new();
         var guardianCount = await guardianService.CountAsync(keyCeremonyId);
@@ -529,7 +518,7 @@ public class KeyCeremonyMediator : DisposableBase
 
     private async Task<bool> ShouldAdminStartStep6()
     {
-        string keyCeremonyId = CeremonyDetails.KeyCeremonyId;
+        var keyCeremonyId = CeremonyDetails.KeyCeremonyId;
 
         GuardianPublicKeyService guardianService = new();
         var guardianCount = await guardianService.CountAsync(keyCeremonyId);
@@ -661,7 +650,7 @@ public class KeyCeremonyMediator : DisposableBase
     private async Task RunStep2()
     {
         // change state to step2
-        string keyCeremonyId = CeremonyDetails.KeyCeremonyId;
+        var keyCeremonyId = CeremonyDetails.KeyCeremonyId;
 
         KeyCeremonyService service = new();
         _keyCeremony.State = KeyCeremonyState.PendingAdminAnnounce;
@@ -794,7 +783,7 @@ public class KeyCeremonyMediator : DisposableBase
 
     private async Task RunStep6()
     {
-        string keyCeremonyId = CeremonyDetails.KeyCeremonyId;
+        var keyCeremonyId = CeremonyDetails.KeyCeremonyId;
 
         // change state
         KeyCeremonyService service = new();

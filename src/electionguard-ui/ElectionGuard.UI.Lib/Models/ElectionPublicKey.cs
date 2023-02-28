@@ -1,4 +1,4 @@
-﻿using ElectionGuard.ElectionSetup.Extensions;
+﻿using ElectionGuard.UI.Lib.Extensions;
 using MongoDB.Bson;
 using MongoDB.Bson.Serialization.Attributes;
 
