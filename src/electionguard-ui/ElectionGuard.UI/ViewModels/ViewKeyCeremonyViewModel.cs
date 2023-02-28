@@ -4,7 +4,6 @@ using ElectionGuard.UI.Models;
 
 namespace ElectionGuard.UI.ViewModels;
 
-
 [QueryProperty(CurrentKeyCeremonyParam, "KeyCeremonyId")]
 public partial class ViewKeyCeremonyViewModel : BaseViewModel
 {

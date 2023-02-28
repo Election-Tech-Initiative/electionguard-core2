@@ -1,8 +1,4 @@
-﻿using CommunityToolkit.Mvvm.Input;
-using ElectionGuard.UI.Lib.Models;
-using ElectionGuard.UI.Lib.Services;
-
-namespace ElectionGuard.UI.ViewModels;
+﻿namespace ElectionGuard.UI.ViewModels;
 
 public partial class GuardianHomeViewModel : BaseViewModel
 {
@@ -25,7 +21,7 @@ public partial class GuardianHomeViewModel : BaseViewModel
 
     public override async Task OnAppearing()
     {
-        //_timer.Start();
+        _timer.Start();
         PollingTimer_Tick(this, null);
     }
 

@@ -1,9 +1,8 @@
 ﻿using System.Globalization;
-using ElectionGuard.UI.Models;
 
 namespace ElectionGuard.UI.Helpers;
 
-class BadVerifyConverter : IValueConverter
+internal class BadVerifyConverter : IValueConverter
 {
 
     public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
@@ -17,7 +16,7 @@ class BadVerifyConverter : IValueConverter
     }
 }
 
-class BadVerifyTooltipConverter : IValueConverter
+internal class BadVerifyTooltipConverter : IValueConverter
 {
     public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
     {
