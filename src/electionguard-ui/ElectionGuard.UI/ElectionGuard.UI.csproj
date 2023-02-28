@@ -201,6 +201,8 @@
 	  <None Remove="Resources\Images\backup.svg" />
 	  <None Remove="Resources\Images\badverify.svg" />
 	  <None Remove="Resources\Images\key.svg" />
+	  <None Remove="Resources\Images\notbackup.svg" />
+	  <None Remove="Resources\Images\notverify.svg" />
 	  <None Remove="Resources\Images\Verify.svg" />
 	  <None Remove="Services\" />
 	</ItemGroup>

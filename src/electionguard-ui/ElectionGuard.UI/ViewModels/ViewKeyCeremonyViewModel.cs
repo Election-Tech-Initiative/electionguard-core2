@@ -30,7 +30,7 @@ public partial class ViewKeyCeremonyViewModel : BaseViewModel
 
         IsJoinVisible = !AuthenticationService.IsAdmin;
         _timer = Dispatcher.GetForCurrentThread()!.CreateTimer();
-        _timer.Interval = TimeSpan.FromSeconds(UISettings.LONG_POLLING_INTERVAL);
+        _timer.Interval = TimeSpan.FromSeconds(30);
         _timer.IsRepeating = true;
         _timer.Tick += CeremonyPollingTimer_Tick;
     }
@@ -55,7 +55,6 @@ public partial class ViewKeyCeremonyViewModel : BaseViewModel
         _timer.Stop();
         await Task.Yield();
     }
-
 
     partial void OnKeyCeremonyIdChanged(string value)
     {
@@ -84,9 +83,6 @@ public partial class ViewKeyCeremonyViewModel : BaseViewModel
                 CeremonyPollingTimer_Tick(this, null);
             }
 
-            // load the guardians that have joined
-            //            _ = Task.Run(UpdateGuardiansData);
-
             JoinCommand.NotifyCanExecuteChanged();
         }
     }
@@ -108,8 +104,11 @@ public partial class ViewKeyCeremonyViewModel : BaseViewModel
             return;
         }
         List<GuardianPublicKey> localData = new();
-        _ = Task.Run(async () => await _mediator!.RunKeyCeremony(IsAdmin));
-        _ = Task.Run(UpdateGuardiansData);
+        _ = Task.Run(async () =>
+        {
+            await _mediator!.RunKeyCeremony(IsAdmin);
+            await UpdateGuardiansData();
+        });
     }
 
     private async Task UpdateGuardiansData()
@@ -118,14 +117,13 @@ public partial class ViewKeyCeremonyViewModel : BaseViewModel
 
         foreach (var item in localData)
         {
-            if (GuardianList.Count(i => i.Name == item.GuardianId) == 0)
+            if (!GuardianList.Any(g => g.Name == item.GuardianId))
             {
                 GuardianList.Add(new GuardianItem() { Name = item.GuardianId });
             }
         }
         foreach (var guardian in GuardianList)
         {
-            var key = new GuardianPair(guardian.Name, guardian.Name);
             guardian.HasBackup = await _mediator!.HasBackup(guardian.Name);
             (guardian.HasVerified, guardian.BadVerified) = await _mediator!.HasVerified(guardian.Name);
             guardian.IsSelf = guardian.Name == UserName!;

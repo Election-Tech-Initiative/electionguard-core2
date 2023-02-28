@@ -21,6 +21,7 @@
                 FalseObject="false"
                 TrueObject="true" />
             <helper:StateConverter x:Key="StateConverter" />
+            <helper:BackupConverter x:Key="BackupConverter" />
             <helper:BadVerifyConverter x:Key="BadVerifyConverter" />
             <helper:BadVerifyTooltipConverter x:Key="BadVerifyTooltipConverter" />
             <helper:GuardianBackgroundConverter x:Key="GuardianBackgroundConverter" />
@@ -84,9 +85,14 @@
                         <Image
                             Grid.Column="2"
                             Margin="10,0,10,0"
-                            IsVisible="{Binding HasBackup}"
-                            Source="backup.png"
+                            Source="{Binding HasBackup, Converter={StaticResource BackupConverter}}"
                             ToolTipProperties.Text="{helper:Translate BackupText}"
+                            WidthRequest="32" />
+                        <Image
+                            Grid.Column="3"
+                            Margin="10,0,10,0"
+                            Source="notverify.png"
+                            ToolTipProperties.Text="{helper:Translate Verified}"
                             WidthRequest="32" />
                         <Image
                             Grid.Column="3"

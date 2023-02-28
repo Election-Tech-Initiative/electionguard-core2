@@ -1,13 +1,14 @@
 ﻿using System.Globalization;
+using ElectionGuard.UI.Models;
 
 namespace ElectionGuard.UI.Helpers;
 
 class BadVerifyConverter : IValueConverter
 {
+
     public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
     {
-        var badVerify = (bool)value;
-        return badVerify ? "badverify.png" : "verify.png";
+        return (bool)value ? "badverify.png" : "verify.png";
     }
 
     public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
