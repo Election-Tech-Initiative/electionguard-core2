@@ -615,7 +615,7 @@ public class Guardian : DisposableBase
         }
         catch (Exception ex)
         {
-            throw new ElectionGuardException("", ex);
+            throw new ElectionGuardException("Could not load guardian", ex);
         }
     }
 
