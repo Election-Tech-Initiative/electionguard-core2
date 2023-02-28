@@ -6,7 +6,7 @@ namespace ElectionGuard.UI.ViewModels;
 public partial class BaseViewModel : ObservableObject, IDisposable
 {
     [ObservableProperty]
-    private string _version;
+    private string _appVersion;
 
     [ObservableProperty]
     private string? _userName;
@@ -60,9 +60,9 @@ public partial class BaseViewModel : ObservableObject, IDisposable
         NavigationService = serviceProvider.GetInstance<INavigationService>();
         AuthenticationService = serviceProvider.GetInstance<IAuthenticationService>();
 
-        _version = ConfigurationService.GetVersion();
-        _userName = AuthenticationService.UserName;
-        _isAdmin = AuthenticationService.IsAdmin;
+        AppVersion = ConfigurationService.GetVersion();
+        UserName = AuthenticationService.UserName;
+        IsAdmin = AuthenticationService.IsAdmin;
         SetPageTitle();
 
         LocalizationService.OnLanguageChanged += OnLanguageChanged;

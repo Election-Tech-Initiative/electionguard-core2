@@ -56,12 +56,26 @@
     </Style>
 
     <Style x:Key="FormLabel" TargetType="Label">
-        <Setter Property="FontSize" Value="{StaticResource MainFontSize}" />
+        <Setter Property="FontSize" Value="Medium" />
         <Setter Property="FontAttributes" Value="Bold" />
     </Style>
 
     <Style x:Key="FormValue" TargetType="Label">
-        <Setter Property="FontSize" Value="{StaticResource MainFontSize}" />
+        <Setter Property="FontSize" Value="Medium" />
+    </Style>
+
+    <Style
+        x:Key="CenterFormLabel"
+        BasedOn="{StaticResource FormLabel}"
+        TargetType="Label">
+        <Setter Property="HorizontalOptions" Value="Center" />
+    </Style>
+
+    <Style
+        x:Key="CenterFormValue"
+        BasedOn="{StaticResource FormValue}"
+        TargetType="Label">
+        <Setter Property="HorizontalOptions" Value="Center" />
     </Style>
 
     <Style x:Key="NoContentFound" TargetType="Label">
@@ -70,7 +84,7 @@
 
     <Style x:Key="FormControl" TargetType="StackLayout">
         <Setter Property="Orientation" Value="Vertical" />
-        <Setter Property="Margin" Value="0,0,0,10" />
+        <Setter Property="Margin" Value="0,0,0,30" />
     </Style>
 
     <Style x:Key="PopupView" TargetType="Grid">
@@ -158,7 +172,7 @@
                 <Label
                     FontSize="18"
                     HorizontalOptions="End"
-                    Text="{Binding Version}"
+                    Text="{Binding AppVersion}"
                     TextColor="{StaticResource FooterTextColor}" />
             </Grid>
         </Grid>

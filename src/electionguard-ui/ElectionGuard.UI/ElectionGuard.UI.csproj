@@ -198,6 +198,10 @@
 	  </EmbeddedResource>
 	</ItemGroup>
 	<ItemGroup>
+	  <None Remove="Resources\Images\backup.svg" />
+	  <None Remove="Resources\Images\badverify.svg" />
+	  <None Remove="Resources\Images\key.svg" />
+	  <None Remove="Resources\Images\Verify.svg" />
 	  <None Remove="Services\" />
 	</ItemGroup>
 </Project>

@@ -36,10 +36,10 @@ public class KeyCeremonyMediator : DisposableBase
     private readonly Dictionary<string, ElectionPublicKey> _electionPublicKeys = new();
 
     // Round 2
-    private readonly Dictionary<GuardianPair, ElectionPartialKeyBackup> _electionPartialKeyBackups = new();
+    public readonly Dictionary<GuardianPair, ElectionPartialKeyBackup> _electionPartialKeyBackups = new();
 
     // Round 3
-    private readonly Dictionary<GuardianPair, ElectionPartialKeyVerification> _electionPartialKeyVerification = new();
+    public readonly Dictionary<GuardianPair, ElectionPartialKeyVerification> _electionPartialKeyVerification = new();
 
     private readonly Dictionary<GuardianPair, ElectionPartialKeyChallenge> _electionPartialKeyChallenges = new();
 
@@ -168,8 +168,6 @@ public class KeyCeremonyMediator : DisposableBase
     /// <param name="backup">Election partial key backup</param>
     private void ReceiveElectionPartialKeyBackup(ElectionPartialKeyBackup backup)
     {
-        if (backup.OwnerId == backup.DesignatedId)
-            return;
         _electionPartialKeyBackups[new GuardianPair(backup.OwnerId!, backup.DesignatedId!)] = backup;
     }
 
@@ -188,8 +186,7 @@ public class KeyCeremonyMediator : DisposableBase
     /// <returns>All election partial key backups for all guardians available</returns>
     private bool AllElectionPartialKeyBackupsAvailable()
     {
-        var requiredBackupsPerGuardian = CeremonyDetails.NumberOfGuardians - 1;
-        return _electionPartialKeyBackups.Count == requiredBackupsPerGuardian * CeremonyDetails.NumberOfGuardians;
+        return _electionPartialKeyBackups.Count == CeremonyDetails.NumberOfGuardians * CeremonyDetails.NumberOfGuardians;
     }
 
     /// <summary>
@@ -839,6 +836,23 @@ public class KeyCeremonyMediator : DisposableBase
         // notify change to guardians (signalR)
 
     }
+
+    public async Task<bool> HasBackup(string guardianId)
+    {
+        GuardianBackupService backupService = new();
+        var backups = await backupService.GetByKeyCeremonyIdAsync(CeremonyDetails.KeyCeremonyId);
+        var list = backups?.Where(b => b.GuardianId == guardianId);
+        return list?.Count() > 0;
+    }
+    public async Task<(bool, bool)> HasVerified(string guardianId)
+    {
+        VerificationService verificationService = new();
+        var verifications = await verificationService.GetAllByKeyCeremonyIdAsync(CeremonyDetails.KeyCeremonyId);
+        var list = verifications?.Where(v => v.DesignatedId == guardianId);
+        var notVerified = list?.Where(v => v.Verified == false);
+        return (list?.Count() > 0, notVerified?.Count() > 0);
+    }
+
 
     protected override void DisposeUnmanaged()
     {

@@ -3,6 +3,26 @@ using ElectionGuard.ElectionSetup;
 using ElectionGuard.UI.Helpers;
 namespace ElectionGuard.UI.ViewModels;
 
+
+public partial class GuardianItem : ObservableObject
+{
+    [ObservableProperty]
+    private string _name;
+
+    [ObservableProperty]
+    private bool _hasBackup;
+
+    [ObservableProperty]
+    private bool _hasVerified;
+
+    [ObservableProperty]
+    private bool _badVerified;
+
+    [ObservableProperty]
+    private bool _isSelf;
+}
+
+
 [QueryProperty(CurrentKeyCeremonyParam, "KeyCeremonyId")]
 public partial class ViewKeyCeremonyViewModel : BaseViewModel
 {
@@ -45,6 +65,9 @@ public partial class ViewKeyCeremonyViewModel : BaseViewModel
     [ObservableProperty]
     private List<GuardianPublicKey> _guardians = new();
 
+    [ObservableProperty]
+    private ObservableCollection<GuardianItem> _guardianList = new();
+
     public override async Task OnLeavingPage()
     {
         _timer.Stop();
@@ -80,7 +103,8 @@ public partial class ViewKeyCeremonyViewModel : BaseViewModel
             }
 
             // load the guardians that have joined
-            _ = Task.Run(async () => Guardians = await _guardianService.GetAllByKeyCeremonyIdAsync(value.KeyCeremonyId!));
+            CeremonyPollingTimer_Tick(this, null);
+//            _ = Task.Run(UpdateGuardiansData);
 
             JoinCommand.NotifyCanExecuteChanged();
         }
@@ -97,17 +121,36 @@ public partial class ViewKeyCeremonyViewModel : BaseViewModel
 
     private void CeremonyPollingTimer_Tick(object? sender, EventArgs e)
     {
+        if (KeyCeremony.State == KeyCeremonyState.Complete)
+        {
+            _timer.Stop();
+            return;
+        }
         List<GuardianPublicKey> localData = new();
         _ = Task.Run(async () => await _mediator!.RunKeyCeremony(IsAdmin));
-        _ = Task.Run(async () =>
-        {
-            localData = await _guardianService.GetAllByKeyCeremonyIdAsync(KeyCeremonyId);
-            if (localData.Count >= Guardians.Count)
-            {
-                Guardians = localData;
-            }
-        });
+        _ = Task.Run(UpdateGuardiansData);
     }
+
+    private async Task UpdateGuardiansData()
+    {
+        var localData = await _guardianService.GetAllByKeyCeremonyIdAsync(KeyCeremonyId);
+
+        foreach (var item in localData)
+        {
+            if (GuardianList.Count(i => i.Name == item.GuardianId) == 0)
+            {
+                GuardianList.Add(new GuardianItem() { Name = item.GuardianId });
+            }
+        }
+        foreach (var guardian in GuardianList)
+        {
+            var key = new GuardianPair(guardian.Name, guardian.Name);
+            guardian.HasBackup = await _mediator!.HasBackup(guardian.Name);
+            (guardian.HasVerified, guardian.BadVerified) = await _mediator!.HasVerified(guardian.Name);
+            guardian.IsSelf = guardian.Name == UserName!;
+        }
+    }
+
 
     private bool CanJoin()
     {
