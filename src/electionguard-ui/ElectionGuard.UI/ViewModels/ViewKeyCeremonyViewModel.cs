@@ -112,13 +112,17 @@ public partial class ViewKeyCeremonyViewModel : BaseViewModel
 
     private async Task UpdateGuardiansData()
     {
-        var localData = await _guardianService.GetAllByKeyCeremonyIdAsync(KeyCeremonyId);
-
-        foreach (var item in localData)
+        // if we have fewer than max number, see if anyone else joined
+        if (GuardianList.Count != KeyCeremony.NumberOfGuardians)
         {
-            if (!GuardianList.Any(g => g.Name == item.GuardianId))
+            var localData = await _guardianService.GetAllByKeyCeremonyIdAsync(KeyCeremonyId);
+
+            foreach (var item in localData)
             {
-                GuardianList.Add(new GuardianItem() { Name = item.GuardianId });
+                if (!GuardianList.Any(g => g.Name == item.GuardianId))
+                {
+                    GuardianList.Add(new GuardianItem() { Name = item.GuardianId });
+                }
             }
         }
         foreach (var guardian in GuardianList)
