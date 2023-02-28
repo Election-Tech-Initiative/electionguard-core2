@@ -7,10 +7,16 @@ namespace ElectionGuard.UI.Test.ViewModels
     public class ViewKeyCeremonyViewModelTest : TestBase
     {
         private readonly KeyCeremonyService _keyCeremonyService;
+        private readonly GuardianPublicKeyService _guardianPublicKeyService;
+        private readonly GuardianBackupService _guardianBackupService;
+        private readonly VerificationService _verificationService;
 
         public ViewKeyCeremonyViewModelTest()
         {
             _keyCeremonyService = Substitute.For<KeyCeremonyService>();
+            _guardianPublicKeyService = Substitute.For<GuardianPublicKeyService>();
+            _guardianBackupService = Substitute.For<GuardianBackupService>();
+            _verificationService = Substitute.For<VerificationService>();
         }
 
         [Test]
@@ -18,7 +24,11 @@ namespace ElectionGuard.UI.Test.ViewModels
         {
             // ARRANGE
             AuthenticationService.IsAdmin.Returns(true);
-            var viewKeyCeremonyViewModel = new ViewKeyCeremonyViewModel(ServiceProvider, _keyCeremonyService);
+            var viewKeyCeremonyViewModel = new ViewKeyCeremonyViewModel(ServiceProvider,
+                                                                        _keyCeremonyService,
+                                                                        _guardianPublicKeyService,
+                                                                        _guardianBackupService,
+                                                                        _verificationService);
 
             // ACT
             var isJoinVisible = viewKeyCeremonyViewModel.IsJoinVisible;
@@ -33,7 +43,11 @@ namespace ElectionGuard.UI.Test.ViewModels
         {
             // ARRANGE
             AuthenticationService.IsAdmin.Returns(false);
-            var viewKeyCeremonyViewModel = new ViewKeyCeremonyViewModel(ServiceProvider, _keyCeremonyService);
+            var viewKeyCeremonyViewModel = new ViewKeyCeremonyViewModel(ServiceProvider,
+                                                                        _keyCeremonyService,
+                                                                        _guardianPublicKeyService,
+                                                                        _guardianBackupService,
+                                                                        _verificationService);
 
             // ACT
             var isJoinVisible = viewKeyCeremonyViewModel.IsJoinVisible;
