@@ -21,7 +21,7 @@ class BadVerifyTooltipConverter : IValueConverter
     public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
     {
         var badVerify = (bool)value;
-        return badVerify ? "Bad Verification\nContact the election administrator!" : "Verified";
+        return badVerify ? $"{AppResources.BadVerified}\n{AppResources.ContactAdmin}" : AppResources.Verified;
     }
 
     public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)

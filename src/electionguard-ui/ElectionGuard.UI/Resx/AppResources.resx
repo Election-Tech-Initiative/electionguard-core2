@@ -306,4 +306,19 @@
   <data name="PendingGuardiansVerifyBackups" xml:space="preserve">
     <value>Waiting for Guardians to Verify the Backups</value>
   </data>
+  <data name="BadVerified" xml:space="preserve">
+    <value>Bad Verification</value>
+  </data>
+  <data name="Verified" xml:space="preserve">
+    <value>Verified</value>
+  </data>
+  <data name="BackupText" xml:space="preserve">
+    <value>Backup</value>
+  </data>
+  <data name="ContactAdmin" xml:space="preserve">
+    <value>Contact the election administrator!</value>
+  </data>
+  <data name="JoinedText" xml:space="preserve">
+    <value>Joined</value>
+  </data>
 </root>

@@ -1,26 +1,8 @@
 ﻿using CommunityToolkit.Mvvm.Input;
 using ElectionGuard.ElectionSetup;
-using ElectionGuard.UI.Helpers;
+using ElectionGuard.UI.Models;
+
 namespace ElectionGuard.UI.ViewModels;
-
-
-public partial class GuardianItem : ObservableObject
-{
-    [ObservableProperty]
-    private string _name;
-
-    [ObservableProperty]
-    private bool _hasBackup;
-
-    [ObservableProperty]
-    private bool _hasVerified;
-
-    [ObservableProperty]
-    private bool _badVerified;
-
-    [ObservableProperty]
-    private bool _isSelf;
-}
 
 
 [QueryProperty(CurrentKeyCeremonyParam, "KeyCeremonyId")]
@@ -98,13 +80,12 @@ public partial class ViewKeyCeremonyViewModel : BaseViewModel
 
             if (IsJoinVisible is false)
             {
-                _ = Task.Run(async () => await _mediator.RunKeyCeremony(IsAdmin));
                 _timer.Start();
+                CeremonyPollingTimer_Tick(this, null);
             }
 
             // load the guardians that have joined
-            CeremonyPollingTimer_Tick(this, null);
-//            _ = Task.Run(UpdateGuardiansData);
+            //            _ = Task.Run(UpdateGuardiansData);
 
             JoinCommand.NotifyCanExecuteChanged();
         }

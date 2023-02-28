@@ -309,4 +309,19 @@
   <data name="PendingGuardiansVerifyBackups" xml:space="preserve">
     <value>¡Esperando a que los guardianes verifiquen las copias de seguridad!</value>
   </data>
+  <data name="BadVerified" xml:space="preserve">
+    <value>Verificación incorrecta</value>
+  </data>
+  <data name="Verified" xml:space="preserve">
+    <value>Comprobado</value>
+  </data>
+  <data name="ContactAdmin" xml:space="preserve">
+    <value>Contacta con el administrador de elecciones!!</value>
+  </data>
+  <data name="BackupText" xml:space="preserve">
+    <value>Copia de seguridad</value>
+  </data>
+  <data name="JoinedText" xml:space="preserve">
+    <value>Unido</value>
+  </data>
 </root>

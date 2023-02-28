@@ -97,6 +97,24 @@ namespace ElectionGuard.UI.Resx {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Backup.
+        /// </summary>
+        internal static string BackupText {
+            get {
+                return ResourceManager.GetString("BackupText", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Bad Verification.
+        /// </summary>
+        internal static string BadVerified {
+            get {
+                return ResourceManager.GetString("BadVerified", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Ballot Count.
         /// </summary>
         internal static string BallotCountText {
@@ -138,6 +156,15 @@ namespace ElectionGuard.UI.Resx {
         internal static string Complete {
             get {
                 return ResourceManager.GetString("Complete", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Contact the election administrator!.
+        /// </summary>
+        internal static string ContactAdmin {
+            get {
+                return ResourceManager.GetString("ContactAdmin", resourceCulture);
             }
         }
         
@@ -318,6 +345,15 @@ namespace ElectionGuard.UI.Resx {
         internal static string Join {
             get {
                 return ResourceManager.GetString("Join", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Joined.
+        /// </summary>
+        internal static string JoinedText {
+            get {
+                return ResourceManager.GetString("JoinedText", resourceCulture);
             }
         }
         
@@ -606,6 +642,15 @@ namespace ElectionGuard.UI.Resx {
         internal static string UserSetup {
             get {
                 return ResourceManager.GetString("UserSetup", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Verified.
+        /// </summary>
+        internal static string Verified {
+            get {
+                return ResourceManager.GetString("Verified", resourceCulture);
             }
         }
         
