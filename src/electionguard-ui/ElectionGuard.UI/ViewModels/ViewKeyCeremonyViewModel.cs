@@ -30,7 +30,7 @@ public partial class ViewKeyCeremonyViewModel : BaseViewModel
 
         IsJoinVisible = !AuthenticationService.IsAdmin;
         _timer = Dispatcher.GetForCurrentThread()!.CreateTimer();
-        _timer.Interval = TimeSpan.FromSeconds(30);
+        _timer.Interval = TimeSpan.FromSeconds(UISettings.LONG_POLLING_INTERVAL);
         _timer.IsRepeating = true;
         _timer.Tick += CeremonyPollingTimer_Tick;
     }
