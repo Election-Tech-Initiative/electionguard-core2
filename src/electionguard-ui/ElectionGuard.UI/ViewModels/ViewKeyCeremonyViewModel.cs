@@ -77,7 +77,7 @@ public partial class ViewKeyCeremonyViewModel : BaseViewModel
 
             _mediator = new KeyCeremonyMediator("mediator", UserName!, value);
 
-            if (IsJoinVisible is false)
+            if (!IsJoinVisible)
             {
                 _timer.Start();
                 CeremonyPollingTimer_Tick(this, null);
