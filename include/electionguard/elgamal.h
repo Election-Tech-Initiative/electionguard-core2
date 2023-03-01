@@ -152,20 +152,23 @@ typedef struct eg_hashed_elgamal_ciphertext_s eg_hashed_elgamal_ciphertext_t;
 
 // no constructors defined.  use `eg_hashed_elgamal_encrypt`
 
+EG_API eg_electionguard_status_t eg_hashed_elgamal_ciphertext_new(
+  eg_element_mod_p_t *in_pad, uint8_t *in_data, uint64_t in_data_length, uint8_t *in_mac,
+  uint64_t in_mac_length, eg_hashed_elgamal_ciphertext_t **out_handle);
 EG_API eg_electionguard_status_t
 eg_hashed_elgamal_ciphertext_free(eg_hashed_elgamal_ciphertext_t *handle);
 
 EG_API eg_electionguard_status_t eg_hashed_elgamal_ciphertext_get_pad(
   eg_hashed_elgamal_ciphertext_t *handle, eg_element_mod_p_t **out_pad);
 EG_API eg_electionguard_status_t eg_hashed_elgamal_ciphertext_get_data(
-  eg_hashed_elgamal_ciphertext_t *handle, char **out_data, uint64_t *out_size);
+  eg_hashed_elgamal_ciphertext_t *handle, uint8_t **out_data, uint64_t *out_size);
 EG_API eg_electionguard_status_t eg_hashed_elgamal_ciphertext_get_mac(
-  eg_hashed_elgamal_ciphertext_t *handle, char **out_data, uint64_t *out_size);
+  eg_hashed_elgamal_ciphertext_t *handle, uint8_t **out_data, uint64_t *out_size);
 
 EG_API eg_electionguard_status_t eg_hashed_elgamal_ciphertext_crypto_hash(
   eg_hashed_elgamal_ciphertext_t *handle, eg_element_mod_q_t **out_crypto_hash);
 
-eg_electionguard_status_t eg_hashed_elgamal_ciphertext_decrypt_with_secret(
+EG_API eg_electionguard_status_t eg_hashed_elgamal_ciphertext_decrypt_with_secret(
   eg_hashed_elgamal_ciphertext_t *handle, eg_element_mod_q_t *in_secret_key,
   eg_element_mod_q_t *in_description_hash, bool in_look_for_padding, uint8_t **out_data,
   uint64_t *out_size);

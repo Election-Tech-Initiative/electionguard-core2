@@ -1,4 +1,4 @@
-using CommunityToolkit.Mvvm.Input;
+﻿using CommunityToolkit.Mvvm.Input;
 using ElectionGuard.UI.Lib.Extensions;
 
 namespace ElectionGuard.UI.ViewModels;
@@ -6,7 +6,7 @@ namespace ElectionGuard.UI.ViewModels;
 public partial class BaseViewModel : ObservableObject, IDisposable
 {
     [ObservableProperty]
-    private string _version;
+    private string _appVersion;
 
     [ObservableProperty]
     private string? _userName;
@@ -25,8 +25,17 @@ public partial class BaseViewModel : ObservableObject, IDisposable
         await Task.Yield();
     }
 
+    public virtual async Task OnLeavingPage()
+    {
+        await Task.Yield();
+    }
+
     [RelayCommand]
-    private async Task Logout() => await NavigationService.GoToPage(typeof(LoginViewModel));
+    private async Task Logout()
+    {
+        await OnLeavingPage();
+        await NavigationService.GoToPage(typeof(LoginViewModel));
+    }
 
     [RelayCommand]
     private void ChangeLanguage() => LocalizationService.ToggleLanguage();
@@ -35,7 +44,11 @@ public partial class BaseViewModel : ObservableObject, IDisposable
     private void Settings() => NavigationService.GoToModal(typeof(SettingsViewModel));
 
     [RelayCommand(CanExecute = nameof(CanGoHome))]
-    private async Task Home() => await NavigationService.GoHome();
+    private async Task Home()
+    {
+        await OnLeavingPage();
+        await NavigationService.GoHome();
+    }
 
     public BaseViewModel(
         string? pageTitleLocalizationId,
@@ -47,9 +60,9 @@ public partial class BaseViewModel : ObservableObject, IDisposable
         NavigationService = serviceProvider.GetInstance<INavigationService>();
         AuthenticationService = serviceProvider.GetInstance<IAuthenticationService>();
 
-        _version = ConfigurationService.GetVersion();
-        _userName = AuthenticationService.UserName;
-        _isAdmin = AuthenticationService.IsAdmin;
+        AppVersion = ConfigurationService.GetVersion();
+        UserName = AuthenticationService.UserName;
+        IsAdmin = AuthenticationService.IsAdmin;
         SetPageTitle();
 
         LocalizationService.OnLanguageChanged += OnLanguageChanged;
@@ -69,7 +82,7 @@ public partial class BaseViewModel : ObservableObject, IDisposable
         }
     }
 
-    protected IConfigurationService  ConfigurationService { get; }
+    protected IConfigurationService ConfigurationService { get; }
 
     protected ILocalizationService LocalizationService { get; }
 

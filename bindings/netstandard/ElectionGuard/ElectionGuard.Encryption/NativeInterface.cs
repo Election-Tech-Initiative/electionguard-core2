@@ -488,6 +488,13 @@ namespace ElectionGuard
                 }
             }
 
+            [DllImport(DllName, EntryPoint = "eg_hashed_elgamal_ciphertext_new",
+                CallingConvention = CallingConvention.Cdecl, SetLastError = true)]
+            internal static extern Status New(ElementModP.ElementModPHandle in_pad,
+                byte* in_data, ulong in_data_length,
+                byte* in_mac, ulong in_mac_length,
+                out HashedElGamalCiphertextHandle handle);
+
             [DllImport(DllName, EntryPoint = "eg_hashed_elgamal_ciphertext_free",
                 CallingConvention = CallingConvention.Cdecl, SetLastError = true)]
             internal static extern Status Free(HashedElGamalCiphertextType* handle);

@@ -17,7 +17,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ElectionGuard.ElectionSetup
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ElectionGuard.ElectionSetup.Tests", "..\..\bindings\netstandard\ElectionGuard\ElectionGuard.ElectionSetup.Tests\ElectionGuard.ElectionSetup.Tests.csproj", "{C33B995C-F2DD-4431-8D04-73A7659FFE90}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ElectionGuard.UI", "ElectionGuard.UI\ElectionGuard.UI.csproj", "{B4301667-EB87-4A9D-BE2E-5E8611F6EAAA}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ElectionGuard.UI", "ElectionGuard.UI\ElectionGuard.UI.csproj", "{B4301667-EB87-4A9D-BE2E-5E8611F6EAAA}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -71,6 +71,7 @@ Global
 		{B4301667-EB87-4A9D-BE2E-5E8611F6EAAA}.Debug|arm64.Build.0 = Debug|Any CPU
 		{B4301667-EB87-4A9D-BE2E-5E8611F6EAAA}.Debug|x64.ActiveCfg = Debug|Any CPU
 		{B4301667-EB87-4A9D-BE2E-5E8611F6EAAA}.Debug|x64.Build.0 = Debug|Any CPU
+		{B4301667-EB87-4A9D-BE2E-5E8611F6EAAA}.Debug|x64.Deploy.0 = Debug|Any CPU
 		{B4301667-EB87-4A9D-BE2E-5E8611F6EAAA}.Release|arm64.ActiveCfg = Release|Any CPU
 		{B4301667-EB87-4A9D-BE2E-5E8611F6EAAA}.Release|arm64.Build.0 = Release|Any CPU
 		{B4301667-EB87-4A9D-BE2E-5E8611F6EAAA}.Release|x64.ActiveCfg = Release|Any CPU

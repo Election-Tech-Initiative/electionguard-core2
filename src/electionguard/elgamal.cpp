@@ -382,6 +382,13 @@ namespace electionguard
 
     // Public Methods
 
+    unique_ptr<HashedElGamalCiphertext> HashedElGamalCiphertext::make(const ElementModP &pad,
+                                                                      std::vector<uint8_t> data,
+                                                                      std::vector<uint8_t> mac)
+    {
+        return make_unique<HashedElGamalCiphertext>(make_unique<ElementModP>(pad), data, mac);
+    }
+
     vector<uint8_t> HashedElGamalCiphertext::decrypt(const ElementModQ &secret_key,
                                                      const ElementModQ &encryption_seed,
                                                      bool look_for_padding)

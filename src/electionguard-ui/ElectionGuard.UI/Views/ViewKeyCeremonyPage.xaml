@@ -1,38 +1,113 @@
 <?xml version="1.0" encoding="utf-8" ?>
-<views:ContentPageBase x:TypeArguments="viewModels:ViewKeyCeremonyViewModel" xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
-                       xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
-                       xmlns:viewModels="clr-namespace:ElectionGuard.UI.ViewModels"
-                       xmlns:helper="clr-namespace:ElectionGuard.UI.Helpers"
-                       xmlns:toolkit="http://schemas.microsoft.com/dotnet/2022/maui/toolkit"
-                       xmlns:views="using:ElectionGuard.UI.Views"
-                       x:DataType="viewModels:ViewKeyCeremonyViewModel"
-                       x:Class="ElectionGuard.UI.Views.ViewKeyCeremonyPage"
-                       ControlTemplate="{StaticResource PageTemplate}">
+<views:ContentPageBase
+    x:Class="ElectionGuard.UI.Views.ViewKeyCeremonyPage"
+    xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+    xmlns:controls="clr-namespace:ElectionGuard.UI.Controls"
+    xmlns:helper="clr-namespace:ElectionGuard.UI.Helpers"
+    xmlns:model="clr-namespace:ElectionGuard.UI.Lib.Models;assembly=ElectionGuard.UI.Lib"
+    xmlns:models="clr-namespace:ElectionGuard.UI.Models"
+    xmlns:toolkit="http://schemas.microsoft.com/dotnet/2022/maui/toolkit"
+    xmlns:viewModels="clr-namespace:ElectionGuard.UI.ViewModels"
+    xmlns:views="using:ElectionGuard.UI.Views"
+    x:DataType="viewModels:ViewKeyCeremonyViewModel"
+    x:TypeArguments="viewModels:ViewKeyCeremonyViewModel"
+    ControlTemplate="{StaticResource PageTemplate}">
 
     <ContentPage.Resources>
         <ResourceDictionary>
-            <toolkit:BoolToObjectConverter x:Key="BoolToObjectConverter" FalseObject="false" TrueObject="true" />
+            <toolkit:BoolToObjectConverter
+                x:Key="BoolToObjectConverter"
+                FalseObject="false"
+                TrueObject="true" />
+            <helper:StateConverter x:Key="StateConverter" />
+            <helper:BackupConverter x:Key="BackupConverter" />
+            <helper:BadVerifyConverter x:Key="BadVerifyConverter" />
+            <helper:BadVerifyTooltipConverter x:Key="BadVerifyTooltipConverter" />
+            <helper:GuardianBackgroundConverter x:Key="GuardianBackgroundConverter" />
         </ResourceDictionary>
     </ContentPage.Resources>
 
-    <VerticalStackLayout Style="{StaticResource NarrowCenteredPage}">
-        <Grid ColumnDefinitions="*, *" RowDefinitions="auto, auto, auto">
-            <StackLayout Style="{StaticResource FormControl}" Grid.Row="0" Grid.ColumnSpan="2">
+    <Grid RowDefinitions="auto, *" Style="{StaticResource NarrowCenteredGrid}">
+        <VerticalStackLayout Grid.Row="0">
+            <StackLayout Style="{StaticResource FormControl}">
                 <Label Style="{StaticResource FormLabel}" Text="{helper:Translate KeyCeremonyName}" />
-                <Label Style="{StaticResource FormValue}" Text="{Binding KeyCeremony.Name, FallbackValue=''}" />
+                <Label
+                    Margin="15,0"
+                    Style="{StaticResource FormValue}"
+                    Text="{Binding KeyCeremony.Name, FallbackValue=''}" />
             </StackLayout>
-            <Grid></Grid>
-            <StackLayout Style="{StaticResource FormControl}" Grid.Row="1" Grid.Column="0">
-                <Label Style="{StaticResource FormLabel}" Text="{helper:Translate NumberOfGuardians}" />
-                <Label Style="{StaticResource FormValue}" Text="{Binding KeyCeremony.NumberOfGuardians, FallbackValue=''}" />
+            <toolkit:UniformItemsLayout>
+                <StackLayout Style="{StaticResource FormControl}">
+                    <Label Style="{StaticResource CenterFormLabel}" Text="{helper:Translate NumberOfGuardians}" />
+                    <Label Style="{StaticResource CenterFormValue}" Text="{Binding KeyCeremony.NumberOfGuardians, FallbackValue=''}" />
+                </StackLayout>
+                <StackLayout Style="{StaticResource FormControl}">
+                    <Label Style="{StaticResource CenterFormLabel}" Text="{helper:Translate Quorum}" />
+                    <Label Style="{StaticResource CenterFormValue}" Text="{Binding KeyCeremony.Quorum, FallbackValue=''}" />
+                </StackLayout>
+            </toolkit:UniformItemsLayout>
+            <StackLayout Margin="0,20" Style="{StaticResource FormControl}">
+                <Label Style="{StaticResource FormLabel}" Text="{helper:Translate KeyCeremonyState}" />
+                <Label
+                    Margin="15,0"
+                    Style="{StaticResource FormValue}"
+                    Text="{Binding KeyCeremony.State, Converter={StaticResource StateConverter}}" />
             </StackLayout>
-            <StackLayout Style="{StaticResource FormControl}" Grid.Row="1" Grid.Column="1">
-                <Label Style="{StaticResource FormLabel}" Text="{helper:Translate Quorum}" />
-                <Label Style="{StaticResource FormValue}" Text="{Binding KeyCeremony.Quorum, FallbackValue=''}" />
-            </StackLayout>
-            <Button Grid.Row="2" Grid.ColumnSpan="2" 
-                    Text="{helper:Translate Join}" Command="{Binding JoinCommand}" 
-                    IsVisible="{Binding IsJoinVisible, Converter={StaticResource BoolToObjectConverter}}" />
-        </Grid>
-    </VerticalStackLayout>
+            <Button
+                Command="{Binding JoinCommand}"
+                IsVisible="{Binding IsJoinVisible, Converter={StaticResource BoolToObjectConverter}}"
+                Text="{helper:Translate Join}" />
+
+            <Label Style="{StaticResource H2}" Text="{helper:Translate GuardiansText}" />
+        </VerticalStackLayout>
+
+        <ScrollView Grid.Row="1">
+            <CollectionView ItemsSource="{Binding GuardianList}" SelectionMode="None">
+                <CollectionView.EmptyView>
+                    <controls:NoContentView Text="{helper:Translate NoGuardians}" />
+                </CollectionView.EmptyView>
+                <CollectionView.ItemTemplate>
+                    <DataTemplate x:DataType="models:GuardianItem">
+                        <Grid
+                            Margin="15,5,0,5"
+                            Padding="10"
+                            BackgroundColor="{Binding IsSelf, Converter={StaticResource GuardianBackgroundConverter}}"
+                            ColumnDefinitions="*, 50, 50, 50">
+                            <Label
+                                Grid.Column="0"
+                                FontSize="Medium"
+                                Text="{Binding Name}"
+                                VerticalOptions="Center" />
+                            <Image
+                                Grid.Column="1"
+                                Margin="10,0,10,0"
+                                Source="key.png"
+                                ToolTipProperties.Text="{helper:Translate JoinedText}"
+                                WidthRequest="32" />
+                            <Image
+                                Grid.Column="2"
+                                Margin="10,0,10,0"
+                                Source="{Binding HasBackup, Converter={StaticResource BackupConverter}}"
+                                ToolTipProperties.Text="{helper:Translate BackupText}"
+                                WidthRequest="32" />
+                            <Image
+                                Grid.Column="3"
+                                Margin="10,0,10,0"
+                                Source="notverify.png"
+                                ToolTipProperties.Text="{helper:Translate Verified}"
+                                WidthRequest="32" />
+                            <Image
+                                Grid.Column="3"
+                                Margin="10,0,10,0"
+                                IsVisible="{Binding HasVerified}"
+                                Source="{Binding BadVerified, Converter={StaticResource BadVerifyConverter}}"
+                                ToolTipProperties.Text="{Binding BadVerified, Converter={StaticResource BadVerifyTooltipConverter}}"
+                                WidthRequest="32" />
+                        </Grid>
+                    </DataTemplate>
+                </CollectionView.ItemTemplate>
+            </CollectionView>
+        </ScrollView>
+    </Grid>
 </views:ContentPageBase>

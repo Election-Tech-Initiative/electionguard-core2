@@ -1,4 +1,6 @@
-﻿namespace ElectionGuard.ElectionSetup.Tests.Integration
+﻿using ElectionGuard.UI.Lib.Models;
+
+namespace ElectionGuard.ElectionSetup.Tests.Integration
 {
     internal class EndToEndElectionTest
     {
@@ -16,6 +18,8 @@
 
         private void Step1KeyCeremony()
         {
+            var keyCeremony = new KeyCeremony("testkey", NumberOfGuardians, Quorum, "adminid");
+
             for (ulong i = 1; i <= NumberOfGuardians; i++)
             {
                 var guardianId = i.ToString();
@@ -24,9 +28,7 @@
             }
 
             // Setup mediator
-            _mediator = new KeyCeremonyMediator(
-                "mediator_1", _guardians[0].GuardianId, _guardians[0].CeremonyDetails
-            );
+            _mediator = new KeyCeremonyMediator("mediator_1", _guardians[0].GuardianId, keyCeremony);
 
             // ROUND 1: Public Key Sharing
             // Announce

@@ -1,5 +1,9 @@
 ﻿using MongoDB.Driver;
 using ElectionGuard.UI.Lib.Models;
+using System.Security.Cryptography.X509Certificates;
+using MongoDB.Bson;
+using System.Text.Json;
+using MongoDB.Bson.Serialization;
 
 namespace ElectionGuard.UI.Lib.Services;
 
@@ -23,7 +27,7 @@ public class GuardianPublicKeyService : BaseDatabaseService<GuardianPublicKey>
     /// </summary>
     /// <param name="keyCeremonyId">key ceremony id to use</param>
     /// <returns></returns>
-    public async Task<List<GuardianPublicKey>> GetByKeyCeremonyIdAsync(string keyCeremonyId)
+    public async Task<List<GuardianPublicKey>> GetAllByKeyCeremonyIdAsync(string keyCeremonyId)
     {
         return await GetAllByFieldAsync(Constants.KeyCeremonyId, keyCeremonyId);
     }
@@ -39,9 +43,8 @@ public class GuardianPublicKeyService : BaseDatabaseService<GuardianPublicKey>
         var filterBuilder = Builders<GuardianPublicKey>.Filter;
         var filter = filterBuilder.And(filterBuilder.Eq(Constants.KeyCeremonyId, keyCeremonyId),
             filterBuilder.Eq(Constants.GuardianId, guardianId));
-        
-        var updateBuilder = Builders<GuardianPublicKey>.Update;
-        var update = updateBuilder.Set(Constants.PublicKey, key);
+
+        var update = Builders<GuardianPublicKey>.Update.Set(Constants.PublicKey, key!);
 
         await UpdateAsync(filter, update);
     }
@@ -60,7 +63,7 @@ public class GuardianPublicKeyService : BaseDatabaseService<GuardianPublicKey>
         var filter = filterBuilder.And(filterBuilder.Eq(Constants.KeyCeremonyId, keyCeremonyId),
             filterBuilder.Eq(Constants.GuardianId, guardianId));
 
-        var list = await GetAllByFilterAsync(Constants.KeyCeremonyId, keyCeremonyId);
+        var list = await GetAllByFilterAsync(filter);
         return list.FirstOrDefault();
     }
 

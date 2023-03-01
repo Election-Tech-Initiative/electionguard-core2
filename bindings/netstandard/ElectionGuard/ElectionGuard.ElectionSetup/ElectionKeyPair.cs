@@ -2,16 +2,60 @@
 
 namespace ElectionGuard.ElectionSetup;
 
+public class EncryptionKeyPair : DisposableBase
+{
+    public ElementModP PublicKey { get; set; }
+
+    public ElementModQ SecretKey { get; set; }
+
+    public EncryptionKeyPair()
+    {
+        PublicKey = new ElementModP(0);
+        SecretKey = new ElementModQ(0);
+    }
+    public EncryptionKeyPair(ElementModQ secretKey, ElementModP publicKey)
+    {
+        PublicKey = publicKey;
+        SecretKey = secretKey;
+    }
+
+    public static implicit operator ElGamalKeyPair(EncryptionKeyPair data)
+    {
+        return ElGamalKeyPair.FromPair(data.SecretKey, data.PublicKey);
+    }
+    public static implicit operator EncryptionKeyPair(ElGamalKeyPair data)
+    {
+        return new ElGamalKeyPair(data.SecretKey, data.PublicKey);
+    }
+    protected override void DisposeUnmanaged()
+    {
+        base.DisposeUnmanaged();
+
+        PublicKey?.Dispose();
+        SecretKey?.Dispose();
+    }
+}
+
+
+
 /// <summary>
 /// A tuple of election key pair, proof and polynomial
 /// </summary>
 public class ElectionKeyPair : DisposableBase
 {
-    public ElectionKeyPair(string guardianId, ulong sequenceOrder, ElGamalKeyPair keyPair, ElectionPolynomial polynomial)
+    public ElectionKeyPair()
     {
-        OwnerId = guardianId;
+        OwnerId = string.Empty;
+        SequenceOrder = 0;
+        KeyPair = new EncryptionKeyPair();
+        Polynomial = ElectionPolynomial.GeneratePolynomial(3);
+    }
+
+    public ElectionKeyPair(string ownerId, ulong sequenceOrder, ElGamalKeyPair keyPair, ElectionPolynomial polynomial)
+    {
+        OwnerId = ownerId;
         SequenceOrder = sequenceOrder;
-        KeyPair = keyPair;
+        KeyPair = new(keyPair.SecretKey, keyPair.PublicKey);
         Polynomial = polynomial;
     }
 
@@ -28,7 +72,7 @@ public class ElectionKeyPair : DisposableBase
     /// <summary>
     /// The pair of public and private election keys for the guardian
     /// </summary>
-    public ElGamalKeyPair KeyPair { get; set; }
+    public EncryptionKeyPair KeyPair { get; set; }
 
     /// <summary>
     /// The secret polynomial for the guardian

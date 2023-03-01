@@ -35,13 +35,13 @@
  <PropertyGroup Label="Debug|arm64" Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Debug|net7.0-maccatalyst|arm64'">
 	  <TreatWarningsAsErrors>True</TreatWarningsAsErrors>
 	  <CreatePackage>false</CreatePackage>
-		<RuntimeIdentifiers>maccatalyst-arm64</RuntimeIdentifiers>
+		<RuntimeIdentifiers>maccatalyst-arm64;maccatalyst-x64</RuntimeIdentifiers>
 	</PropertyGroup>
 
 	<PropertyGroup Label="Release|arm64" Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Release|net7.0-maccatalyst|arm64'">
 	  <TreatWarningsAsErrors>True</TreatWarningsAsErrors>
 	  <CreatePackage>false</CreatePackage>
-		<RuntimeIdentifiers>maccatalyst-arm64</RuntimeIdentifiers>
+		<RuntimeIdentifiers>maccatalyst-arm64;maccatalyst-x64</RuntimeIdentifiers>
 	</PropertyGroup>
 
 	 <PropertyGroup Label="Debug|x64" Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Debug|net7.0-maccatalyst|x64'">
@@ -198,6 +198,12 @@
 	  </EmbeddedResource>
 	</ItemGroup>
 	<ItemGroup>
+	  <None Remove="Resources\Images\backup.svg" />
+	  <None Remove="Resources\Images\badverify.svg" />
+	  <None Remove="Resources\Images\key.svg" />
+	  <None Remove="Resources\Images\notbackup.svg" />
+	  <None Remove="Resources\Images\notverify.svg" />
+	  <None Remove="Resources\Images\Verify.svg" />
 	  <None Remove="Services\" />
 	</ItemGroup>
 </Project>

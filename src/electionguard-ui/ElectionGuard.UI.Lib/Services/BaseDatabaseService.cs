@@ -51,8 +51,15 @@ public class BaseDatabaseService<T> : IDatabaseService<T> where T : DatabaseReco
     /// <returns></returns>
     virtual public async Task UpdateAsync(FilterDefinition<T> filter, UpdateDefinition<T> update, string? table = null)
     {
-        var collection = DbService.GetCollection<T>(table ?? _collection);
-        await collection.UpdateOneAsync(UpdateFilter(filter), update);
+        try
+        {
+            var collection = DbService.GetCollection<T>(table ?? _collection);
+            _ = await collection.UpdateOneAsync(UpdateFilter(filter), update);
+        }
+        catch (Exception ex)
+        {
+            throw new ElectionGuardException("Error updating a record", ex);
+        }
     }
 
     /// <summary>
@@ -62,9 +69,7 @@ public class BaseDatabaseService<T> : IDatabaseService<T> where T : DatabaseReco
     /// <returns>List of the documents found in the given collection</returns>
     public async Task<List<T>> GetAllAsync(string? table = null)
     {
-        var builder = Builders<T>.Filter;
-        var filter = builder.Eq(Constants.DataType, _type);
-        return await GetAllByFilterAsync(filter);
+        return await GetAllByFilterAsync(Builders<T>.Filter.Empty);
     }
 
     /// <summary>
@@ -77,7 +82,7 @@ public class BaseDatabaseService<T> : IDatabaseService<T> where T : DatabaseReco
     public async Task<List<T>> GetAllByFieldAsync(string fieldName, object fieldValue, string? table = null)
     {
         var builder = Builders<T>.Filter;
-        var filter = builder.And(builder.Eq(fieldName, fieldValue), builder.Eq(Constants.DataType, _type));
+        var filter = builder.Eq(fieldName, fieldValue);
         return await GetAllByFilterAsync(filter, table);
     }
 
@@ -88,9 +93,16 @@ public class BaseDatabaseService<T> : IDatabaseService<T> where T : DatabaseReco
     /// <returns>List of the documents found in the given collection</returns>
     public async Task<List<T>> GetAllByFilterAsync(FilterDefinition<T> filter, string? table = null)
     {
-        var data = DbService.GetCollection<T>(table ?? _collection);
-        var item = await data.FindAsync<T>(UpdateFilter(filter));
-        return item.ToList();
+        try
+        {
+            var data = DbService.GetCollection<T>(table ?? _collection);
+            var item = await data.FindAsync<T>(UpdateFilter(filter));
+            return item.ToList();
+        }
+        catch (Exception ex)
+        {
+            throw new ElectionGuardException("Error getting all by filter", ex);
+        }
     }
 
     /// <summary>
@@ -136,7 +148,9 @@ public class BaseDatabaseService<T> : IDatabaseService<T> where T : DatabaseReco
     public FilterDefinition<T> UpdateFilter(FilterDefinition<T> filter, bool getDeleted = false)
     {
         var builder = Builders<T>.Filter;
-        return builder.And(filter, builder.Eq(Constants.SoftDeleted, getDeleted));
+        return builder.And(filter,
+                           builder.Eq(Constants.SoftDeleted, getDeleted),
+                           builder.Eq(Constants.DataType, _type));
     }
 
     /// <summary>

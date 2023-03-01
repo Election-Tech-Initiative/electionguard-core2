@@ -1,6 +1,35 @@
-﻿using MongoDB.Driver;
+﻿using MongoDB.Bson.IO;
+using MongoDB.Bson.Serialization.Serializers;
+using MongoDB.Bson.Serialization;
+using MongoDB.Bson;
+using MongoDB.Driver;
+using System.Text.Json;
 
 namespace ElectionGuard.UI.Lib.Services;
+
+
+    public class ComplexTypeSerializer : SerializerBase<object>
+{
+    public override object Deserialize(BsonDeserializationContext context, BsonDeserializationArgs args)
+    {
+        var serializer = BsonSerializer.LookupSerializer(typeof(BsonDocument));
+        var document = serializer.Deserialize(context, args);
+
+        var bsonDocument = document.ToBsonDocument();
+
+        var result = BsonExtensionMethods.ToJson(bsonDocument);
+        return JsonSerializer.Deserialize<HashedElGamalCiphertext>(result)!;
+    }
+
+    public override void Serialize(BsonSerializationContext context, BsonSerializationArgs args, object value)
+    {
+        var jsonDocument = JsonSerializer.Serialize(value);
+        var bsonDocument = BsonSerializer.Deserialize<BsonDocument>(jsonDocument);
+
+        var serializer = BsonSerializer.LookupSerializer(typeof(BsonDocument));
+        serializer.Serialize(context, bsonDocument.AsBsonValue);
+    }
+}
 
 /// <summary>
 /// Database service class to access the mongo database
@@ -28,6 +57,8 @@ public static class DbService
 
         // Create a new MongoClient that uses the user, password, host, port and database names
         client = new MongoClient($"mongodb://{DefaultUsername}:{DbPassword}@{DbHost}:{DefaultPort}/{DefaultDatabase}?authSource=admin&keepAlive=true&poolSize=30&autoReconnect=true&socketTimeoutMS=360000&connectTimeoutMS=360000");
+
+        //BsonSerializer.RegisterSerializer(typeof(HashedElGamalCiphertext), new ComplexTypeSerializer());
     }
 
     /// <summary>

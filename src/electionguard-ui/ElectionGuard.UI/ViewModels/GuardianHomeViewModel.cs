@@ -1,8 +1,4 @@
-﻿using CommunityToolkit.Mvvm.Input;
-using ElectionGuard.UI.Lib.Models;
-using ElectionGuard.UI.Lib.Services;
-
-namespace ElectionGuard.UI.ViewModels;
+﻿namespace ElectionGuard.UI.ViewModels;
 
 public partial class GuardianHomeViewModel : BaseViewModel
 {
@@ -15,16 +11,22 @@ public partial class GuardianHomeViewModel : BaseViewModel
         _tallies.Add(new Tally { Name = "Election Test Tally #1" });
         _tallies.Add(new Tally { Name = "Election Test Tally #2" });
         _tallies.Add(new Tally { Name = "Real Election Tally" });
+
+        _timer = Dispatcher.GetForCurrentThread()!.CreateTimer();
+        _timer.Interval = TimeSpan.FromSeconds(UISettings.LONG_POLLING_INTERVAL);
+        _timer.IsRepeating = true;
+        _timer.Tick += PollingTimer_Tick;
+
     }
 
     public override async Task OnAppearing()
     {
-        var keyCeremonies = await _keyCeremonyService.GetAllAsync();
-        KeyCeremonies = new ObservableCollection<KeyCeremony>(keyCeremonies);
+        _timer.Start();
+        PollingTimer_Tick(this, null);
     }
 
     [ObservableProperty]
-    private ObservableCollection<KeyCeremony> _keyCeremonies = new ();
+    private ObservableCollection<KeyCeremony> _keyCeremonies = new();
 
     [ObservableProperty]
     private ObservableCollection<Tally> _tallies = new();
@@ -35,6 +37,14 @@ public partial class GuardianHomeViewModel : BaseViewModel
     [ObservableProperty]
     private Tally? _currentTally;
 
+    private readonly IDispatcherTimer _timer;
+
+    public override async Task OnLeavingPage()
+    {
+        _timer.Stop();
+        await Task.Yield();
+    }
+
     partial void OnCurrentKeyCeremonyChanged(KeyCeremony? value)
     {
         if (CurrentKeyCeremony == null) return;
@@ -44,5 +54,16 @@ public partial class GuardianHomeViewModel : BaseViewModel
                 { "KeyCeremonyId", CurrentKeyCeremony.KeyCeremonyId! }
             }));
     }
+
+    private async void PollingTimer_Tick(object? sender, EventArgs e)
+    {
+        var keyCeremonies = await _keyCeremonyService.GetAllNotCompleteAsync();
+        KeyCeremonies.Clear();
+        foreach (var item in keyCeremonies)
+        {
+            KeyCeremonies.Add(item);
+        }
+    }
+
 
 }

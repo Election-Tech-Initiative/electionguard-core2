@@ -1,6 +1,6 @@
 ﻿<?xml version="1.0" encoding="UTF-8" ?>
 <?xaml-comp compile="true" ?>
-<ResourceDictionary 
+<ResourceDictionary
     xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
     xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
     xmlns:helpers="using:ElectionGuard.UI.Helpers">
@@ -13,11 +13,17 @@
     </Style>
 
     <Style x:Key="H2" TargetType="Label">
-        <Setter Property="FontSize" Value="28"></Setter>
+        <Setter Property="FontSize" Value="28" />
         <Setter Property="Margin" Value="0,10,0,15" />
     </Style>
 
     <Style x:Key="NarrowCenteredPage" TargetType="VerticalStackLayout">
+        <Setter Property="HorizontalOptions" Value="Center" />
+        <Setter Property="WidthRequest" Value="500" />
+        <Setter Property="Padding" Value="0,20,0,0" />
+    </Style>
+
+    <Style x:Key="NarrowCenteredGrid" TargetType="Grid">
         <Setter Property="HorizontalOptions" Value="Center" />
         <Setter Property="WidthRequest" Value="500" />
         <Setter Property="Padding" Value="0,20,0,0" />
@@ -37,26 +43,40 @@
     </Style>
 
     <Style x:Key="ButtonishFrame" TargetType="Frame">
-        <Setter Property="CornerRadius" Value="8"/>
+        <Setter Property="CornerRadius" Value="8" />
         <Setter Property="BackgroundColor" Value="{StaticResource HeaderColor}" />
-        <Setter Property="Padding" Value="12"/>
+        <Setter Property="Padding" Value="12" />
     </Style>
 
     <Style x:Key="ButtonishLabel" TargetType="Label">
-        <Setter Property="HorizontalOptions" Value="Center"/>
-        <Setter Property="HorizontalTextAlignment" Value="Center"/>
+        <Setter Property="HorizontalOptions" Value="Center" />
+        <Setter Property="HorizontalTextAlignment" Value="Center" />
         <Setter Property="TextColor" Value="{StaticResource White}" />
-        <Setter Property="FontFamily" Value="OpenSansRegular"/>
-        <Setter Property="FontSize" Value="14"/>
+        <Setter Property="FontFamily" Value="OpenSansRegular" />
+        <Setter Property="FontSize" Value="14" />
     </Style>
 
     <Style x:Key="FormLabel" TargetType="Label">
-        <Setter Property="FontSize" Value="{StaticResource MainFontSize}" />
+        <Setter Property="FontSize" Value="Medium" />
         <Setter Property="FontAttributes" Value="Bold" />
     </Style>
 
     <Style x:Key="FormValue" TargetType="Label">
-        <Setter Property="FontSize" Value="{StaticResource MainFontSize}" />
+        <Setter Property="FontSize" Value="Medium" />
+    </Style>
+
+    <Style
+        x:Key="CenterFormLabel"
+        BasedOn="{StaticResource FormLabel}"
+        TargetType="Label">
+        <Setter Property="HorizontalOptions" Value="Center" />
+    </Style>
+
+    <Style
+        x:Key="CenterFormValue"
+        BasedOn="{StaticResource FormValue}"
+        TargetType="Label">
+        <Setter Property="HorizontalOptions" Value="Center" />
     </Style>
 
     <Style x:Key="NoContentFound" TargetType="Label">
@@ -65,7 +85,7 @@
 
     <Style x:Key="FormControl" TargetType="StackLayout">
         <Setter Property="Orientation" Value="Vertical" />
-        <Setter Property="Margin" Value="0,0,0,10" />
+        <Setter Property="Margin" Value="0,0,0,30" />
     </Style>
 
     <Style x:Key="PopupView" TargetType="Grid">
@@ -74,29 +94,55 @@
 
     <Style x:Key="Error" TargetType="Label">
         <Setter Property="TextColor" Value="Red" />
-        <Setter Property="Margin" Value="0,0,0,20"></Setter>
+        <Setter Property="Margin" Value="0,0,0,20" />
     </Style>
 
     <ControlTemplate x:Key="PageTemplate">
-        <Grid RowDefinitions="auto, *, auto" BindingContext="{Binding BindingContext, Source={RelativeSource TemplatedParent}}">
-            <Grid BackgroundColor="{StaticResource HeaderColor}" Padding="2" Grid.Row="0">
+        <Grid BindingContext="{Binding BindingContext, Source={RelativeSource TemplatedParent}}" RowDefinitions="auto, *, auto">
+            <Grid
+                Grid.Row="0"
+                Padding="2"
+                BackgroundColor="{StaticResource HeaderColor}">
                 <VerticalStackLayout>
                     <Grid Padding="10,0">
                         <HorizontalStackLayout HorizontalOptions="StartAndExpand" VerticalOptions="Center">
-                            <Image Source="logo.png" HeightRequest="48" VerticalOptions="Center" Margin="0,10,0,0">
+                            <Image
+                                Margin="0,10,0,0"
+                                HeightRequest="48"
+                                Source="logo.png"
+                                VerticalOptions="Center">
                                 <Image.GestureRecognizers>
                                     <TapGestureRecognizer Command="{Binding HomeCommand}" />
                                 </Image.GestureRecognizers>
                             </Image>
-                            <Label Text="{helpers:Translate ElectionGuardTitle}" FontSize="20" TextColor="White" VerticalOptions="Center" Margin=" 10,0,0,0">
+                            <Label
+                                Margin="10,0,0,0"
+                                FontSize="20"
+                                Text="{helpers:Translate ElectionGuardTitle}"
+                                TextColor="White"
+                                VerticalOptions="Center">
                                 <Label.GestureRecognizers>
                                     <TapGestureRecognizer Command="{Binding HomeCommand}" />
                                 </Label.GestureRecognizers>
                             </Label>
-                            <Label Text=" / " FontSize="20" TextColor="White" VerticalOptions="Center" Margin=" 10,0,10,0" />
-                            <Label Text="{Binding PageTitle}" FontSize="20" TextColor="White" VerticalOptions="Center" />
+                            <Label
+                                Margin="10,0,10,0"
+                                FontSize="20"
+                                Text=" / "
+                                TextColor="White"
+                                VerticalOptions="Center" />
+                            <Label
+                                FontSize="20"
+                                Text="{Binding PageTitle}"
+                                TextColor="White"
+                                VerticalOptions="Center" />
                         </HorizontalStackLayout>
-                        <Label Text="{Binding UserName}" VerticalOptions="Center" HorizontalOptions="EndAndExpand" FontSize="18" TextColor="White">
+                        <Label
+                            FontSize="18"
+                            HorizontalOptions="EndAndExpand"
+                            Text="{Binding UserName}"
+                            TextColor="White"
+                            VerticalOptions="Center">
                             <Label.GestureRecognizers>
                                 <TapGestureRecognizer Command="{Binding LogoutCommand}" />
                             </Label.GestureRecognizers>
@@ -105,16 +151,30 @@
                 </VerticalStackLayout>
             </Grid>
             <ContentPresenter Grid.Row="1" />
-            <Grid BackgroundColor="{StaticResource FooterColor}" Padding="10" Grid.Row="2">
+            <Grid
+                Grid.Row="2"
+                Padding="10"
+                BackgroundColor="{StaticResource FooterColor}">
                 <HorizontalStackLayout HorizontalOptions="Start">
-                    <ImageButton Source="gear.png" ToolTipProperties.Text="{helpers:Translate Settings}" 
-                                 Margin="10,0" HeightRequest="25" Command="{Binding SettingsCommand}" 
-                                 BorderWidth="0" />
-                    <ImageButton Source="world.png" ToolTipProperties.Text="{helpers:Translate SwitchLanguages}" 
-                                 Command="{Binding ChangeLanguageCommand}" BorderWidth="0" HeightRequest="25"
-                                 />
+                    <ImageButton
+                        Margin="10,0"
+                        BorderWidth="0"
+                        Command="{Binding SettingsCommand}"
+                        HeightRequest="25"
+                        Source="gear.png"
+                        ToolTipProperties.Text="{helpers:Translate Settings}" />
+                    <ImageButton
+                        BorderWidth="0"
+                        Command="{Binding ChangeLanguageCommand}"
+                        HeightRequest="25"
+                        Source="world.png"
+                        ToolTipProperties.Text="{helpers:Translate SwitchLanguages}" />
                 </HorizontalStackLayout>
-                <Label Text="{Binding Version}" TextColor="{StaticResource FooterTextColor}" FontSize="18" HorizontalOptions="End" />
+                <Label
+                    FontSize="18"
+                    HorizontalOptions="End"
+                    Text="{Binding AppVersion}"
+                    TextColor="{StaticResource FooterTextColor}" />
             </Grid>
         </Grid>
     </ControlTemplate>

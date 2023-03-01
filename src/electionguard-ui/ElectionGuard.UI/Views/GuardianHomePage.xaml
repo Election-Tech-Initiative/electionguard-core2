@@ -1,52 +1,64 @@
 <?xml version="1.0" encoding="utf-8" ?>
-<views:ContentPageBase x:TypeArguments="viewModels:GuardianHomeViewModel"
-                       xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
-                        xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
-                        x:Class="ElectionGuard.UI.Views.GuardianHomePage"
-                        xmlns:helper="clr-namespace:ElectionGuard.UI.Helpers"
-                        xmlns:model="clr-namespace:ElectionGuard.UI.Lib.Models;assembly=ElectionGuard.UI.Lib"
-                        xmlns:viewModels="clr-namespace:ElectionGuard.UI.ViewModels"
-                        xmlns:controls="clr-namespace:ElectionGuard.UI.Controls"
-                        xmlns:views="using:ElectionGuard.UI.Views"
-                        x:DataType="viewModels:GuardianHomeViewModel"
-                        ControlTemplate="{StaticResource PageTemplate}">
+<views:ContentPageBase
+    x:Class="ElectionGuard.UI.Views.GuardianHomePage"
+    xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+    xmlns:controls="clr-namespace:ElectionGuard.UI.Controls"
+    xmlns:helper="clr-namespace:ElectionGuard.UI.Helpers"
+    xmlns:model="clr-namespace:ElectionGuard.UI.Lib.Models;assembly=ElectionGuard.UI.Lib"
+    xmlns:viewModels="clr-namespace:ElectionGuard.UI.ViewModels"
+    xmlns:views="using:ElectionGuard.UI.Views"
+    x:DataType="viewModels:GuardianHomeViewModel"
+    x:TypeArguments="viewModels:GuardianHomeViewModel"
+    ControlTemplate="{StaticResource PageTemplate}">
     <VerticalStackLayout Style="{StaticResource FullWidthPage}">
         <Grid ColumnDefinitions="*,*">
-            <VerticalStackLayout Grid.Column="0" >
-                <Label Style="{StaticResource H1}" Text="{helper:Translate ElectionsText}" />
-                <CollectionView ItemsSource="{Binding KeyCeremonies}" 
-                                SelectedItem="{Binding CurrentKeyCeremony}"
-                                SelectionMode="Single">
-                    <CollectionView.EmptyView>
-                        <controls:NoContentView Text="{helper:Translate NoKeyCeremonies}"></controls:NoContentView>
-                    </CollectionView.EmptyView>
-                    <CollectionView.ItemTemplate>
-                        <DataTemplate x:DataType="model:KeyCeremony">
-                            <Frame Style="{StaticResource ButtonishFrame}">
-                                <Label Style="{StaticResource ButtonishLabel}" Text="{Binding Name}"/>
-                            </Frame>
-                        </DataTemplate>
-                    </CollectionView.ItemTemplate>
-                </CollectionView>
-            </VerticalStackLayout>
-            <VerticalStackLayout Grid.Column="1" >
-                <Label Style="{StaticResource H1}"  Text="{helper:Translate TalliesText}" />
-                <CollectionView 
-                    ItemsSource="{Binding Tallies}" 
-                    SelectedItem="{Binding CurrentTally}"
-                    SelectionMode="Single">
-                    <CollectionView.EmptyView>
-                        <controls:NoContentView Text="{helper:Translate NoTallies}"></controls:NoContentView>
-                    </CollectionView.EmptyView>
-                    <CollectionView.ItemTemplate>
-                        <DataTemplate x:DataType="model:Tally">
-                            <Frame Style="{StaticResource ButtonishFrame}">
-                                <Label Style="{StaticResource ButtonishLabel}" Text="{Binding Name}"/>
-                            </Frame>
-                        </DataTemplate>
-                    </CollectionView.ItemTemplate>
-                </CollectionView>
-            </VerticalStackLayout>
+            <Grid Grid.Column="0" RowDefinitions="auto, *">
+                <Label
+                    Grid.Row="0"
+                    Style="{StaticResource H1}"
+                    Text="{helper:Translate ElectionsText}" />
+                <ScrollView Grid.Row="1">
+                    <CollectionView
+                        ItemsSource="{Binding KeyCeremonies}"
+                        SelectedItem="{Binding CurrentKeyCeremony}"
+                        SelectionMode="Single">
+                        <CollectionView.EmptyView>
+                            <controls:NoContentView Text="{helper:Translate NoKeyCeremonies}" />
+                        </CollectionView.EmptyView>
+                        <CollectionView.ItemTemplate>
+                            <DataTemplate x:DataType="model:KeyCeremony">
+                                <Frame Style="{StaticResource ButtonishFrame}">
+                                    <Label Style="{StaticResource ButtonishLabel}" Text="{Binding Name}" />
+                                </Frame>
+                            </DataTemplate>
+                        </CollectionView.ItemTemplate>
+                    </CollectionView>
+                </ScrollView>
+            </Grid>
+            <Grid Grid.Column="1" RowDefinitions="auto, *">
+                <Label
+                    Grid.Row="0"
+                    Style="{StaticResource H1}"
+                    Text="{helper:Translate TalliesText}" />
+                <ScrollView Grid.Row="1">
+                    <CollectionView
+                        ItemsSource="{Binding Tallies}"
+                        SelectedItem="{Binding CurrentTally}"
+                        SelectionMode="Single">
+                        <CollectionView.EmptyView>
+                            <controls:NoContentView Text="{helper:Translate NoTallies}" />
+                        </CollectionView.EmptyView>
+                        <CollectionView.ItemTemplate>
+                            <DataTemplate x:DataType="model:Tally">
+                                <Frame Style="{StaticResource ButtonishFrame}">
+                                    <Label Style="{StaticResource ButtonishLabel}" Text="{Binding Name}" />
+                                </Frame>
+                            </DataTemplate>
+                        </CollectionView.ItemTemplate>
+                    </CollectionView>
+                </ScrollView>
+            </Grid>
         </Grid>
     </VerticalStackLayout>
 
