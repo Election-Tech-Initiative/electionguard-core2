@@ -1,14 +1,14 @@
-﻿using MongoDB.Bson.IO;
-using MongoDB.Bson.Serialization.Serializers;
-using MongoDB.Bson.Serialization;
+﻿using System.Text.Json;
 using MongoDB.Bson;
+using MongoDB.Bson.Serialization;
+using MongoDB.Bson.Serialization.Serializers;
 using MongoDB.Driver;
-using System.Text.Json;
+using MongoDB.Driver.Core.Servers;
 
 namespace ElectionGuard.UI.Lib.Services;
 
 
-    public class ComplexTypeSerializer : SerializerBase<object>
+public class ComplexTypeSerializer : SerializerBase<object>
 {
     public override object Deserialize(BsonDeserializationContext context, BsonDeserializationArgs args)
     {
@@ -57,7 +57,6 @@ public static class DbService
 
         // Create a new MongoClient that uses the user, password, host, port and database names
         client = new MongoClient($"mongodb://{DefaultUsername}:{DbPassword}@{DbHost}:{DefaultPort}/{DefaultDatabase}?authSource=admin&keepAlive=true&poolSize=30&autoReconnect=true&socketTimeoutMS=360000&connectTimeoutMS=360000");
-
         //BsonSerializer.RegisterSerializer(typeof(HashedElGamalCiphertext), new ComplexTypeSerializer());
     }
 
@@ -90,5 +89,37 @@ public static class DbService
     {
         var db = GetDb();
         return db.ListCollectionNames().ToList().Count > 0;
+    }
+
+    /// <summary>
+    /// Method to check the status of the data store connection
+    /// </summary>
+    /// <returns>true if connected, otherwise false</returns>
+    public static bool Ping()
+    {
+        // nothing to ping until we have a client.
+        if (client is null)
+        {
+            return false;
+        }
+
+        var db = GetDb();
+        try
+        {
+            // One of the interesting things about MongoDb driver is we don't get state
+            // information about the connection until we actually try to use it.
+            // to try to ping the server to do the smallest possible query.
+            _ = db.RunCommandAsync((Command<BsonDocument>)"{ping: 1}").Wait(1000);
+        }
+        catch (Exception)
+        {
+        }
+
+        var server = client.Cluster.Description.Servers.FirstOrDefault();
+        return (
+            server is not null &&
+            server.HeartbeatException is null &&
+            server.State == ServerState.Connected
+            );
     }
 }
