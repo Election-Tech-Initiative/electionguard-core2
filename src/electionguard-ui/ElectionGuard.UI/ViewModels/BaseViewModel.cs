@@ -20,8 +20,18 @@ public partial class BaseViewModel : ObservableObject, IDisposable
     [ObservableProperty]
     private string _pageTitle = "";
 
+    protected IDispatcherTimer _timer;
+
+    private void InitTimer()
+    {
+        _timer = Dispatcher.GetForCurrentThread()!.CreateTimer();
+        _timer.Interval = TimeSpan.FromSeconds(UISettings.LONG_POLLING_INTERVAL);
+        _timer.IsRepeating = true;
+    }
+
     public virtual async Task OnAppearing()
     {
+        _timer.Start();
         await Task.Yield();
     }
 
@@ -66,6 +76,8 @@ public partial class BaseViewModel : ObservableObject, IDisposable
         SetPageTitle();
 
         LocalizationService.OnLanguageChanged += OnLanguageChanged;
+
+        InitTimer();
     }
 
     public virtual void Dispose()
@@ -81,6 +93,13 @@ public partial class BaseViewModel : ObservableObject, IDisposable
             PageTitle = LocalizationService.GetValue(_pageTitleLocalizationId);
         }
     }
+
+    private bool IsDatabaseAvailable() =>
+    DbService.Ping();
+
+    private bool IsDatabaseUnavailable() =>
+        !IsDatabaseAvailable();
+
 
     protected IConfigurationService ConfigurationService { get; }
 

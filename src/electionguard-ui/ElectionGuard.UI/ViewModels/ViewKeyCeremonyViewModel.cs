@@ -28,10 +28,6 @@ public partial class ViewKeyCeremonyViewModel : BaseViewModel
         _verificationService = verificationService;
 
         IsJoinVisible = !AuthenticationService.IsAdmin;
-        _timer = Dispatcher.GetForCurrentThread()!.CreateTimer();
-        _timer.Interval = TimeSpan.FromSeconds(UISettings.LONG_POLLING_INTERVAL);
-        _timer.IsRepeating = true;
-        _timer.Tick += CeremonyPollingTimer_Tick;
     }
 
     [ObservableProperty]
@@ -49,10 +45,23 @@ public partial class ViewKeyCeremonyViewModel : BaseViewModel
     [ObservableProperty]
     private ObservableCollection<GuardianItem> _guardianList = new();
 
+    public override async Task OnAppearing()
+    {
+        await base.OnAppearing();
+
+        _timer.Tick += CeremonyPollingTimer_Tick;
+
+        if (!_timer.IsRunning)
+        {
+            _timer.Start();
+        }
+    }
+
     public override async Task OnLeavingPage()
     {
+        await base.OnLeavingPage();
+        _timer.Tick -= CeremonyPollingTimer_Tick;
         _timer.Stop();
-        await Task.Yield();
     }
 
     partial void OnKeyCeremonyIdChanged(string value)
