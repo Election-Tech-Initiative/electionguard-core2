@@ -12,12 +12,12 @@ public partial class LoginViewModel : BaseViewModel
 
     ~LoginViewModel()
     {
-        _timer.Tick -= HandleDbPing;
-
         if (_timer.IsRunning)
         {
             _timer.Stop();
         }
+
+        _timer.Tick -= HandleDbPing;
     }
 
     [ObservableProperty]
@@ -38,7 +38,7 @@ public partial class LoginViewModel : BaseViewModel
     private bool CanLogin()
     {
         HandleDbPing(this, EventArgs.Empty);
-        return NameHasData;
+        return NameHasData && !DbNotAvailable;
     }
 
     private bool NameHasData => Name.Trim().Length > 0;
@@ -51,7 +51,12 @@ public partial class LoginViewModel : BaseViewModel
 
     public override async Task OnLeavingPage()
     {
-        _timer.Stop();
+        if (_timer.IsRunning)
+        {
+            _timer.Stop();
+        }
+        _timer -= HandleDbPing;
+
         await base.OnLeavingPage();
     }
 
