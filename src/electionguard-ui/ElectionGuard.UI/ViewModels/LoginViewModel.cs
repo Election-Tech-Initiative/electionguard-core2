@@ -55,7 +55,7 @@ public partial class LoginViewModel : BaseViewModel
         {
             _timer.Stop();
         }
-        _timer -= HandleDbPing;
+        _timer.Tick -= HandleDbPing;
 
         await base.OnLeavingPage();
     }
