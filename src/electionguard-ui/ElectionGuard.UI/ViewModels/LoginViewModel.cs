@@ -10,16 +10,7 @@ public partial class LoginViewModel : BaseViewModel
         _timer.Start();
     }
 
-    ~LoginViewModel()
-    {
-        if (_timer.IsRunning)
-        {
-            _timer.Stop();
-        }
-
-        _timer.Tick -= HandleDbPing;
-    }
-
+    ~LoginViewModel() => UnsubscribeDbPing();
     [ObservableProperty]
     [NotifyCanExecuteChangedFor(nameof(LoginCommand))]
     private string _name = string.Empty;
@@ -49,14 +40,19 @@ public partial class LoginViewModel : BaseViewModel
         await base.OnAppearing();
     }
 
-    public override async Task OnLeavingPage()
+    private void UnsubscribeDbPing()
     {
         if (_timer.IsRunning)
         {
             _timer.Stop();
         }
-        _timer.Tick -= HandleDbPing;
 
+        _timer.Tick -= HandleDbPing;
+    }
+
+    public override async Task OnLeavingPage()
+    {
+        UnsubscribeDbPing();
         await base.OnLeavingPage();
     }
 
