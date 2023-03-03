@@ -6,38 +6,51 @@ public partial class LoginViewModel : BaseViewModel
 {
     public LoginViewModel(IServiceProvider serviceProvider) : base("UserLogin", serviceProvider)
     {
-        _timer.Tick += HandleDbPing;
-        _timer.Start();
+        SubscribeDbPing();
+        HandleDbPing(this, EventArgs.Empty);
     }
 
     ~LoginViewModel() => UnsubscribeDbPing();
+
     [ObservableProperty]
     [NotifyCanExecuteChangedFor(nameof(LoginCommand))]
     private string _name = string.Empty;
 
     [ObservableProperty]
     private bool _dbNotAvailable;
+    private bool _dbPingRan;
 
-    [RelayCommand(CanExecute = nameof(CanLogin), AllowConcurrentExecutions = true)]
+    [RelayCommand(CanExecute = nameof(CanLogin))]
     public async Task Login()
     {
-        await AuthenticationService.Login(Name);
-        // reset the UI name field
-        Name = string.Empty;
+        if (_dbPingRan && !DbNotAvailable)
+        {
+            await AuthenticationService.Login(Name);
+            // reset the UI name field
+            Name = string.Empty;
+        }
     }
 
     private bool CanLogin()
     {
-        HandleDbPing(this, EventArgs.Empty);
-        return NameHasData && !DbNotAvailable;
+        return NameHasData && _dbPingRan && !DbNotAvailable;
     }
 
     private bool NameHasData => Name.Trim().Length > 0;
 
     public override async Task OnAppearing()
     {
-        _timer.Start();
+        SubscribeDbPing();
         await base.OnAppearing();
+    }
+
+    private void SubscribeDbPing()
+    {
+        if (!_timer.IsRunning)
+        {
+            _timer.Tick += HandleDbPing;
+            _timer.Start();
+        }
     }
 
     private void UnsubscribeDbPing()
@@ -45,9 +58,8 @@ public partial class LoginViewModel : BaseViewModel
         if (_timer.IsRunning)
         {
             _timer.Stop();
+            _timer.Tick -= HandleDbPing;
         }
-
-        _timer.Tick -= HandleDbPing;
     }
 
     public override async Task OnLeavingPage()
@@ -61,6 +73,7 @@ public partial class LoginViewModel : BaseViewModel
         if (NameHasData)
         {
             DbNotAvailable = !DbService.Ping();
+            _dbPingRan = true;
         }
     }
 }
