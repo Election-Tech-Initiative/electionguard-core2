@@ -1,12 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿namespace ElectionGuard.ElectionSetup;
 
-namespace ElectionGuard.ElectionSetup
+/// <summary>
+/// Class to create and export the encryption package for the election
+/// </summary>
+public class ElectionBuilder
 {
-    public class ElectionBuilder
-    {
-    }
 }
