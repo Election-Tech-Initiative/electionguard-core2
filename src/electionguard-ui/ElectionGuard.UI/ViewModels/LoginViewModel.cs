@@ -58,8 +58,9 @@ public partial class LoginViewModel : BaseViewModel
         if (_timer.IsRunning)
         {
             _timer.Stop();
-            _timer.Tick -= HandleDbPing;
         }
+        _timer.Tick -= HandleDbPing;
+
     }
 
     public override async Task OnLeavingPage()
