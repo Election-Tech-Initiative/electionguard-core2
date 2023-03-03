@@ -324,4 +324,7 @@
   <data name="JoinedText" xml:space="preserve">
     <value>Unido</value>
   </data>
+  <data name="DatabaseUnavailable" xml:space="preserve">
+    <value>La base de datos no está disponible. Por favor, compruebe su configuración.!</value>
+  </data>
 </root>

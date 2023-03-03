@@ -232,6 +232,15 @@ namespace ElectionGuard.UI.Resx {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Database is not available. Please check your settings..
+        /// </summary>
+        internal static string DatabaseUnavailable {
+            get {
+                return ResourceManager.GetString("DatabaseUnavailable", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Does Not Exist.
         /// </summary>
         internal static string DoesNotExist {

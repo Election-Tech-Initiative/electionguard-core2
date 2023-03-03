@@ -12,14 +12,9 @@ public partial class GuardianHomeViewModel : BaseViewModel
         _tallies.Add(new Tally { Name = "Election Test Tally #2" });
         _tallies.Add(new Tally { Name = "Real Election Tally" });
 
-        _timer = Dispatcher.GetForCurrentThread()!.CreateTimer();
-        _timer.Interval = TimeSpan.FromSeconds(UISettings.LONG_POLLING_INTERVAL);
-        _timer.IsRepeating = true;
-        _timer.Tick += PollingTimer_Tick;
+}
 
-    }
-
-    public override async Task OnAppearing()
+public override async Task OnAppearing()
     {
         _timer.Start();
         PollingTimer_Tick(this, null);
@@ -37,7 +32,6 @@ public partial class GuardianHomeViewModel : BaseViewModel
     [ObservableProperty]
     private Tally? _currentTally;
 
-    private readonly IDispatcherTimer _timer;
 
     public override async Task OnLeavingPage()
     {
