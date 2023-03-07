@@ -17,23 +17,21 @@ public partial class LoginViewModel : BaseViewModel
     private string _name = string.Empty;
 
     [ObservableProperty]
+    [NotifyCanExecuteChangedFor(nameof(LoginCommand))]
     private bool _dbNotAvailable;
-    private bool _dbPingRan;
 
-    [RelayCommand(CanExecute = nameof(CanLogin))]
+    [RelayCommand(CanExecute = nameof(CanLogin), AllowConcurrentExecutions = true)]
     public async Task Login()
     {
-        if (_dbPingRan && !DbNotAvailable)
-        {
-            await AuthenticationService.Login(Name);
-            // reset the UI name field
-            Name = string.Empty;
-        }
+        await AuthenticationService.Login(Name);
+        HomeCommand.Execute(this);
+        // reset the UI name field
+        Name = string.Empty;
     }
 
     private bool CanLogin()
     {
-        return NameHasData && _dbPingRan && !DbNotAvailable;
+        return NameHasData && !DbNotAvailable;
     }
 
     private bool NameHasData => Name.Trim().Length > 0;
@@ -60,7 +58,6 @@ public partial class LoginViewModel : BaseViewModel
             _timer.Stop();
         }
         _timer.Tick -= HandleDbPing;
-
     }
 
     public override async Task OnLeavingPage()
@@ -74,7 +71,6 @@ public partial class LoginViewModel : BaseViewModel
         if (NameHasData)
         {
             DbNotAvailable = !DbService.Ping();
-            _dbPingRan = true;
         }
     }
 }
