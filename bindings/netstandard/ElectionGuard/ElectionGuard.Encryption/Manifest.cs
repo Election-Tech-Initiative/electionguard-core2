@@ -85,7 +85,7 @@ namespace ElectionGuard
             }
         }
 
-        /// <summary>
+        /// <summary> 
         /// Creates a `Manifest` object
         /// </summary>
         /// <param name="data">byte array of data describing the manifest</param>

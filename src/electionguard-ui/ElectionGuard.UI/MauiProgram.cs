@@ -27,6 +27,7 @@ public static class MauiProgram
     {
 #if DEBUG
         builder.Logging.AddDebug();
+        //builder.Logging.add();
 #endif
         return builder;
     }
@@ -62,6 +63,9 @@ public static class MauiProgram
         builder.Services.AddTransient<UserService>();
         builder.Services.AddTransient<ElectionService>();
         builder.Services.AddTransient<TallyService>();
+        builder.Services.AddTransient<ManifestService>();
+        builder.Services.AddTransient<ContextService>();
+        builder.Services.AddTransient<ConstantsService>();
 
         // setup view models
         builder.Services.AddTransient<LoginViewModel>();
@@ -71,6 +75,7 @@ public static class MauiProgram
         builder.Services.AddTransient<SettingsViewModel>();
         builder.Services.AddTransient<CreateKeyCeremonyAdminViewModel>();
         builder.Services.AddTransient<ViewKeyCeremonyViewModel>();
+        builder.Services.AddTransient<CreateElectionViewModel>();
 
         // setup views
         builder.Services.AddTransient<LoginPage>();
@@ -79,6 +84,7 @@ public static class MauiProgram
         builder.Services.AddTransient<ElectionPage>();
         builder.Services.AddTransient<CreateKeyCeremonyAdminPage>();
         builder.Services.AddTransient<ViewKeyCeremonyPage>();
+        builder.Services.AddTransient<CreateElectionAdminPage>();
 
         // popup pages
         builder.Services.AddTransient<SettingsPage>();

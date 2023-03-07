@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<views:ContentPageBase
+    x:Class="ElectionGuard.UI.Views.CreateElectionAdminPage"
+    xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+    xmlns:helper="clr-namespace:ElectionGuard.UI.Helpers"
+    xmlns:toolkit="http://schemas.microsoft.com/dotnet/2022/maui/toolkit"
+    xmlns:viewModels="clr-namespace:ElectionGuard.UI.ViewModels"
+    xmlns:views="using:ElectionGuard.UI.Views"
+    Title="{helper:Translate CreateElection}"
+    x:DataType="viewModels:CreateElectionViewModel"
+    x:TypeArguments="viewModels:CreateElectionViewModel"
+    ControlTemplate="{StaticResource PageTemplate}">
+    <ContentPage.Resources>
+        <toolkit:IsNotNullConverter x:Key="IsNotNullConverter" />
+    </ContentPage.Resources>
+
+    <VerticalStackLayout Style="{StaticResource NarrowCenteredPage}">
+        <Label
+            IsVisible="{Binding ErrorMessage, Converter={StaticResource IsNotNullConverter}}"
+            Style="{StaticResource Error}"
+            Text="{Binding ErrorMessage}" />
+        <StackLayout Style="{StaticResource FormControl}">
+            <Label Style="{StaticResource FormLabel}" Text="{helper:Translate KeyCeremonyText}" />
+            <Picker
+                ItemDisplayBinding="{Binding Name}"
+                ItemsSource="{Binding KeyCeremonies}"
+                SelectedIndexChanged="Picker_SelectedIndexChanged"
+                SelectedItem="{Binding KeyCeremony}"
+                TextColor="{StaticResource Gray950}"
+                TitleColor="{StaticResource Primary}"
+                WidthRequest="500" />
+        </StackLayout>
+        <StackLayout Style="{StaticResource FormControl}">
+            <Label Style="{StaticResource FormLabel}" Text="{helper:Translate ManifestText}" />
+            <Grid
+                Padding="0"
+                BackgroundColor="WhiteSmoke"
+                ColumnDefinitions="auto, *">
+                <Button
+                    Grid.Column="0"
+                    BackgroundColor="{StaticResource Gray200}"
+                    Command="{Binding PickManifestFilesCommand}"
+                    Text="{helper:Translate ChooseFiles}"
+                    TextColor="{StaticResource Gray950}" />
+                <Entry
+                    Grid.Column="1"
+                    IsReadOnly="True"
+                    Text="{Binding ManifestNames}"
+                    VerticalOptions="CenterAndExpand" />
+            </Grid>
+            <Label
+                IsVisible="{Binding ManifestErrorMessage, Converter={StaticResource IsNotNullConverter}}"
+                Style="{StaticResource Error}"
+                Text="{Binding ManifestErrorMessage}" />
+        </StackLayout>
+        <StackLayout Style="{StaticResource FormControl}">
+            <Label Style="{StaticResource FormLabel}" Text="{helper:Translate NameText}" />
+            <Entry IsEnabled="{Binding IsNameEnabled}" Text="{Binding ElectionName}" />
+        </StackLayout>
+        <StackLayout Style="{StaticResource FormControl}">
+            <Label Style="{StaticResource FormLabel}" Text="{helper:Translate ElectionUrl}" />
+            <Entry Text="{Binding ElectionUrl}" />
+        </StackLayout>
+        <Button Command="{Binding CreateElectionCommand}" Text="{helper:Translate CreateElection}" />
+    </VerticalStackLayout>
+</views:ContentPageBase>

@@ -8,18 +8,27 @@ namespace ElectionGuard.UI.ViewModels;
 public partial class AdminHomeViewModel : BaseViewModel
 {
     private readonly KeyCeremonyService _keyCeremonyService;
+    private readonly ElectionService _electionService;
 
-    public AdminHomeViewModel(IServiceProvider serviceProvider, KeyCeremonyService keyCeremonyService) : base("AdminHome", serviceProvider)
+    public AdminHomeViewModel(IServiceProvider serviceProvider, KeyCeremonyService keyCeremonyService, ElectionService electionService) : base("AdminHome", serviceProvider)
     {
-        _elections.Add(new Election { Name = "Pilot Election" });
         _keyCeremonyService = keyCeremonyService;
+        _electionService = electionService;
     }
 
     public override async Task OnAppearing()
     {
         var keyCeremonies = await _keyCeremonyService.GetAllNotCompleteAsync();
-        if(keyCeremonies is not null)
+        if (keyCeremonies is not null)
+        {
             KeyCeremonies = new ObservableCollection<KeyCeremony>(keyCeremonies);
+        }
+
+        var elections = await _electionService.GetAllAsync();
+        if (elections is not null)
+        {
+            Elections = new ObservableCollection<Election>(elections);
+        }
     }
 
 
@@ -52,12 +61,11 @@ public partial class AdminHomeViewModel : BaseViewModel
         await NavigationService.GoToPage(typeof(CreateKeyCeremonyAdminViewModel));
     }
 
-#pragma warning disable CA1822 // This is a stub for future use
     [RelayCommand]
-    private void CreateElection()
+    private async void CreateElection()
     {
+        await NavigationService.GoToPage(typeof(CreateElectionViewModel));
     }
-#pragma warning restore CA1822
 
     [RelayCommand(AllowConcurrentExecutions = true)]
     private async Task SelectionChanged()

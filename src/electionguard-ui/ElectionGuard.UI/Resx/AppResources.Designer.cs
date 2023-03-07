@@ -151,6 +151,15 @@ namespace ElectionGuard.UI.Resx {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Choose File(s).
+        /// </summary>
+        internal static string ChooseFiles {
+            get {
+                return ResourceManager.GetString("ChooseFiles", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Complete.
         /// </summary>
         internal static string Complete {
@@ -277,6 +286,15 @@ namespace ElectionGuard.UI.Resx {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to elections created..
+        /// </summary>
+        internal static string ElectionsCreated {
+            get {
+                return ResourceManager.GetString("ElectionsCreated", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Elections.
         /// </summary>
         internal static string ElectionsText {
@@ -291,6 +309,33 @@ namespace ElectionGuard.UI.Resx {
         internal static string ElectionUrl {
             get {
                 return ResourceManager.GetString("ElectionUrl", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Error Creating election.
+        /// </summary>
+        internal static string ErrorCreatingElection {
+            get {
+                return ResourceManager.GetString("ErrorCreatingElection", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The manifest file could not be loaded..
+        /// </summary>
+        internal static string ErrorLoadingManifest {
+            get {
+                return ResourceManager.GetString("ErrorLoadingManifest", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Error in manifest files.
+        /// </summary>
+        internal static string ErrorManifest {
+            get {
+                return ResourceManager.GetString("ErrorManifest", resourceCulture);
             }
         }
         
@@ -394,6 +439,15 @@ namespace ElectionGuard.UI.Resx {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Key Ceremony.
+        /// </summary>
+        internal static string KeyCeremonyText {
+            get {
+                return ResourceManager.GetString("KeyCeremonyText", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Location.
         /// </summary>
         internal static string LocationText {
@@ -426,6 +480,15 @@ namespace ElectionGuard.UI.Resx {
         internal static string ManifestText {
             get {
                 return ResourceManager.GetString("ManifestText", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Names will be generated from manifest names.
+        /// </summary>
+        internal static string NameFromManifest {
+            get {
+                return ResourceManager.GetString("NameFromManifest", resourceCulture);
             }
         }
         
@@ -574,11 +637,29 @@ namespace ElectionGuard.UI.Resx {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Removing files from the list.
+        /// </summary>
+        internal static string RemovingList {
+            get {
+                return ResourceManager.GetString("RemovingList", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Save.
         /// </summary>
         internal static string Save {
             get {
                 return ResourceManager.GetString("Save", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Selection one or more manifest files.
+        /// </summary>
+        internal static string SelectManifest {
+            get {
+                return ResourceManager.GetString("SelectManifest", resourceCulture);
             }
         }
         
