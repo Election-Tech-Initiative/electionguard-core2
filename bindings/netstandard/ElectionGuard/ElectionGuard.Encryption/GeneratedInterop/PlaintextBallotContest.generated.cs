@@ -48,7 +48,8 @@ namespace ElectionGuard
         /// </summary>
         public bool IsValid(
             string expectedObjectId, ulong expectedNumSelections, ulong expectedNumElected, ulong votesAllowed = 0
-        ) {
+        )
+        {
             return External.IsValid(
                 Handle, expectedObjectId, expectedNumSelections, expectedNumElected, votesAllowed);
         }
@@ -59,7 +60,8 @@ namespace ElectionGuard
         /// <param name="index">The index of the selection</param>
         public PlaintextBallotSelection GetSelectionAtIndex(
             ulong index
-        ) {
+        )
+        {
             var status = External.GetSelectionAtIndex(
                 Handle,
                 index,
@@ -83,12 +85,15 @@ namespace ElectionGuard
 
         #region Extern
 
-        internal static unsafe class External {
+        internal static unsafe class External
+        {
             internal struct PlaintextBallotContestType { };
 
             internal class PlaintextBallotContestHandle : ElectionGuardSafeHandle<PlaintextBallotContestType>
             {
+#if NETSTANDARD
                 [ReliabilityContract(Consistency.WillNotCorruptState, Cer.MayFail)]
+#endif
                 protected override bool Free()
                 {
                     // releasing the C++ memory is currently handled by a parent object e.g. ballot, see https://github.com/microsoft/electionguard-core2/issues/29
@@ -97,9 +102,9 @@ namespace ElectionGuard
             }
 
             [DllImport(
-                NativeInterface.DllName, 
+                NativeInterface.DllName,
                 EntryPoint = "eg_plaintext_ballot_contest_free",
-                CallingConvention = CallingConvention.Cdecl, 
+                CallingConvention = CallingConvention.Cdecl,
                 SetLastError = true)]
             internal static extern Status Free(PlaintextBallotContestType* handle);
 
