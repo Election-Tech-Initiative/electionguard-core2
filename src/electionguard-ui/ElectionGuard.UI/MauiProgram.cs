@@ -66,16 +66,20 @@ public static class MauiProgram
         builder.Services.AddTransient<ManifestService>();
         builder.Services.AddTransient<ContextService>();
         builder.Services.AddTransient<ConstantsService>();
+        builder.Services.AddTransient<BallotUploadService>();
+        builder.Services.AddTransient<BallotService>();
 
         // setup view models
         builder.Services.AddTransient<LoginViewModel>();
         builder.Services.AddTransient<GuardianHomeViewModel>();
         builder.Services.AddTransient<AdminHomeViewModel>();
-        builder.Services.AddTransient<ElectionViewModel>();
+        builder.Services.AddSingleton<ElectionViewModel>();
         builder.Services.AddTransient<SettingsViewModel>();
         builder.Services.AddTransient<CreateKeyCeremonyAdminViewModel>();
         builder.Services.AddTransient<ViewKeyCeremonyViewModel>();
         builder.Services.AddTransient<CreateElectionViewModel>();
+        builder.Services.AddSingleton<ManifestViewModel>();
+        builder.Services.AddTransient<BallotUploadViewModel>();
 
         // setup views
         builder.Services.AddTransient<LoginPage>();
@@ -85,6 +89,8 @@ public static class MauiProgram
         builder.Services.AddTransient<CreateKeyCeremonyAdminPage>();
         builder.Services.AddTransient<ViewKeyCeremonyPage>();
         builder.Services.AddTransient<CreateElectionAdminPage>();
+        builder.Services.AddTransient<ManifestPopup>();
+        builder.Services.AddTransient<BallotUploadPage>();
 
         // popup pages
         builder.Services.AddTransient<SettingsPage>();

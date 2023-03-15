@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Diagnostics.CodeAnalysis;
 using System.Runtime.InteropServices;
 // ReSharper disable UnusedMember.Global
@@ -238,13 +238,12 @@ namespace ElectionGuard
         /// <Summary>
         /// Export the representation as JSON
         /// </Summary>
-        [SuppressMessage("Style", "IDE0059:Unnecessary assignment of a value", Justification = "<Pending>")]
         public string ToJson()
         {
             var status = NativeInterface.CiphertextElectionContext.ToJson(
                 Handle, out IntPtr pointer, out _);
             status.ThrowIfError();
-            var json = Marshal.PtrToStringAnsi(pointer);
+            var json = pointer.PtrToStringUTF8();
             NativeInterface.Memory.FreeIntPtr(pointer);
             return json;
         }

@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentView
+    x:Class="ElectionGuard.UI.Controls.ExpanderControl"
+    xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+    xmlns:toolkit="http://schemas.microsoft.com/dotnet/2022/maui/toolkit"
+    x:Name="this">
+    <Grid BindingContext="{x:Reference this}">
+        <toolkit:Expander IsExpanded="True">
+            <toolkit:Expander.Header>
+                <Grid
+                    Margin="5"
+                    Padding="5"
+                    BackgroundColor="{StaticResource Primary}"
+                    HeightRequest="45">
+                    <Label
+                        FontAttributes="Bold"
+                        FontSize="Medium"
+                        Text="{Binding Title}" />
+                    <Image
+                        HorizontalOptions="End"
+                        Source="expand.png"
+                        VerticalOptions="Start">
+                        <Image.Triggers>
+                            <DataTrigger
+                                Binding="{Binding Source={RelativeSource AncestorType={x:Type toolkit:Expander}}, Path=IsExpanded}"
+                                TargetType="Image"
+                                Value="True">
+                                <Setter Property="Source" Value="collapse.png" />
+                            </DataTrigger>
+                        </Image.Triggers>
+                    </Image>
+                </Grid>
+            </toolkit:Expander.Header>
+            <toolkit:Expander.Content>
+                <ContentPresenter />
+            </toolkit:Expander.Content>
+        </toolkit:Expander>
+    </Grid>
+</ContentView>

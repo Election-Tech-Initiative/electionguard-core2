@@ -339,6 +339,9 @@
   <data name="ErrorManifest" xml:space="preserve">
     <value>Error in manifest files</value>
   </data>
+  <data name="InformationText" xml:space="preserve">
+    <value>Information</value>
+  </data>
   <data name="KeyCeremonyText" xml:space="preserve">
     <value>Key Ceremony</value>
   </data>
@@ -350,5 +353,56 @@
   </data>
   <data name="SelectManifest" xml:space="preserve">
     <value>Selection one or more manifest files</value>
+  </data>
+  <data name="CreatedByText" xml:space="preserve">
+    <value>Created By</value>
+  </data>
+  <data name="NoBallotUploads" xml:space="preserve">
+    <value>No Ballots Uploaded</value>
+  </data>
+  <data name="NoTalliesCreated" xml:space="preserve">
+    <value>No Tallies Created</value>
+  </data>
+  <data name="ViewManifest" xml:space="preserve">
+    <value>View Manifest</value>
+  </data>
+  <data name="AutoText" xml:space="preserve">
+    <value />
+  </data>
+  <data name="BallotFolderText" xml:space="preserve">
+    <value>Ballot Folder</value>
+  </data>
+  <data name="BallotUploadText" xml:space="preserve">
+    <value>Ballot Upload</value>
+  </data>
+  <data name="CancelText" xml:space="preserve">
+    <value>Cancel</value>
+  </data>
+  <data name="ChooseFile" xml:space="preserve">
+    <value>Choose File</value>
+  </data>
+  <data name="ChooseFolder" xml:space="preserve">
+    <value>Choose Folder</value>
+  </data>
+  <data name="DeviceFileText" xml:space="preserve">
+    <value>Device File</value>
+  </data>
+  <data name="InsertUsbText" xml:space="preserve">
+    <value>Insert an EGDrive (USB drive) containing ballots</value>
+  </data>
+  <data name="ManuelUploadText" xml:space="preserve">
+    <value>Cancel wizard and manually upload ballots</value>
+  </data>
+  <data name="NoFileText" xml:space="preserve">
+    <value>No file chosen</value>
+  </data>
+  <data name="NoFolderText" xml:space="preserve">
+    <value>No folder chosen</value>
+  </data>
+  <data name="UploadText" xml:space="preserve">
+    <value>Upload</value>
+  </data>
+  <data name="UploadWizardText" xml:space="preserve">
+    <value>Upload Wizard</value>
   </data>
 </root>

@@ -327,4 +327,82 @@
   <data name="DatabaseUnavailable" xml:space="preserve">
     <value>La base de datos no está disponible. Por favor, compruebe su configuración.!</value>
   </data>
+  <data name="KeyCeremonyText" xml:space="preserve">
+    <value>Ceremonia</value>
+  </data>
+  <data name="ChooseFiles" xml:space="preserve">
+    <value>Seleccionar archivo(s)</value>
+  </data>
+  <data name="SelectManifest" xml:space="preserve">
+    <value>Seleccione uno o más archivos de manifiesto.</value>
+  </data>
+  <data name="NameFromManifest" xml:space="preserve">
+    <value>¡Los nombres se generarán a partir de los nombres de manifiesto!</value>
+  </data>
+  <data name="ErrorLoadingManifest" xml:space="preserve">
+    <value>El archivo de fuente no se pudo cargar.</value>
+  </data>
+  <data name="ErrorCreatingElection" xml:space="preserve">
+    <value>Error al crear elecciones!</value>
+  </data>
+  <data name="ErrorManifest" xml:space="preserve">
+    <value>Error en los archivos de manifiesto!</value>
+  </data>
+  <data name="RemovingList" xml:space="preserve">
+    <value>¡Eliminando archivos de la lista!</value>
+  </data>
+  <data name="ElectionsCreated" xml:space="preserve">
+    <value>¡Elecciones creadas!</value>
+  </data>
+  <data name="InformationText" xml:space="preserve">
+    <value>Información</value>
+  </data>
+  <data name="CreatedByText" xml:space="preserve">
+    <value>Creado por</value>
+  </data>
+  <data name="NoBallotUploads" xml:space="preserve">
+    <value>¡No se han cargado boletas!</value>
+  </data>
+  <data name="NoTalliesCreated" xml:space="preserve">
+    <value>¡No se han creado recuentos!</value>
+  </data>
+  <data name="ViewManifest" xml:space="preserve">
+    <value>Ver manifiesto</value>
+  </data>
+  <data name="BallotFolderText" xml:space="preserve">
+    <value>¡Carpeta de boletas!</value>
+  </data>
+  <data name="CancelText" xml:space="preserve">
+    <value>Cancelar</value>
+  </data>
+  <data name="DeviceFileText" xml:space="preserve">
+    <value>Archivo de dispositivo</value>
+  </data>
+  <data name="InsertUsbText" xml:space="preserve">
+    <value>¡Inserte un EGDrive (unidad USB) que contenga boletas!</value>
+  </data>
+  <data name="ManuelUploadText" xml:space="preserve">
+    <value>¡Cancela el asistente y sube las papeletas manualmente!</value>
+  </data>
+  <data name="UploadText" xml:space="preserve">
+    <value>Cargar</value>
+  </data>
+  <data name="UploadWizardText" xml:space="preserve">
+    <value>Asistente de carga de archivo</value>
+  </data>
+  <data name="NoFileText" xml:space="preserve">
+    <value>Ningún archivo elegido</value>
+  </data>
+  <data name="NoFolderText" xml:space="preserve">
+    <value>¡No se ha elegido ninguna carpeta!</value>
+  </data>
+  <data name="BallotUploadText" xml:space="preserve">
+    <value>¡Sube la papeleta!</value>
+  </data>
+  <data name="ChooseFile" xml:space="preserve">
+    <value>Elegir archivo</value>
+  </data>
+  <data name="ChooseFolder" xml:space="preserve">
+    <value>Elegir carpeta</value>
+  </data>
 </root>

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Runtime.InteropServices;
+using System.Text;
 
 namespace ElectionGuard
 {
@@ -352,7 +353,7 @@ namespace ElectionGuard
             {
                 throw new ElectionGuardException($"ToJson Error Status: {status}");
             }
-            var json = Marshal.PtrToStringAnsi(pointer);
+            var json = pointer.PtrToStringUTF8();
             NativeInterface.Memory.FreeIntPtr(pointer);
             return json;
         }

@@ -1,7 +1,5 @@
-﻿using CommunityToolkit.Maui.Alerts;
-using CommunityToolkit.Maui.Core;
+﻿using CommunityToolkit.Mvvm.DependencyInjection;
 using CommunityToolkit.Mvvm.Input;
-using MongoDB.Driver.Core.Events;
 
 namespace ElectionGuard.UI.ViewModels;
 
@@ -147,7 +145,7 @@ public partial class CreateElectionViewModel : BaseViewModel
 
     private bool CanCreate()
     {
-        return ManifestErrorMessage == string.Empty && _manifestFiles.Any() && ElectionName.Any() && KeyCeremony != null;
+        return (ManifestErrorMessage == string.Empty || ManifestErrorMessage == null) && _manifestFiles.Any() && ElectionName.Any() && KeyCeremony != null;
     }
 
     [RelayCommand]
@@ -169,13 +167,15 @@ public partial class CreateElectionViewModel : BaseViewModel
         }
         _manifestFiles.Clear();
         _manifestFiles.AddRange(files);
-        ManifestErrorMessage = string.Empty;
+        ManifestErrorMessage = null;
         IsNameEnabled = _manifestFiles.Count <= 1;
         if (IsNameEnabled)
         {
             try
             {
-                using var manifest = new Manifest(File.ReadAllText(_manifestFiles.First().FullPath));
+                var data = File.ReadAllText(_manifestFiles.First().FullPath, System.Text.Encoding.UTF8);
+                using var manifest = new Manifest(data);
+
                 ElectionName = manifest.Name.GetTextAt(0).Value;
             }
             catch (Exception)
@@ -224,6 +224,14 @@ public partial class CreateElectionViewModel : BaseViewModel
             badFiles.ForEach(file => message += $"{file}, ");
             message = message.TrimEnd(trim);
             ManifestErrorMessage = $"{AppResources.ErrorManifest}: {message}\n{AppResources.RemovingList}";
+        }
+
+        if (_manifestFiles.Count == 1)
+        {
+            var vm = (ManifestViewModel)Ioc.Default.GetService(typeof(ManifestViewModel));
+            vm.ManifestFile = _manifestFiles.First().FullPath;
+
+            await NavigationService.GoToModal(typeof(ManifestViewModel));
         }
     }
 

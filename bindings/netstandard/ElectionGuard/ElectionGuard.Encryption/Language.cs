@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Runtime.InteropServices;
 using System.Text;
 
@@ -24,7 +25,7 @@ namespace ElectionGuard
                 {
                     throw new ElectionGuardException($"Language Error Value: {status}");
                 }
-                var data = Marshal.PtrToStringAnsi(value);
+                var data = value.PtrToStringUTF8();
                 NativeInterface.Memory.FreeIntPtr(value);
                 return data;
             }

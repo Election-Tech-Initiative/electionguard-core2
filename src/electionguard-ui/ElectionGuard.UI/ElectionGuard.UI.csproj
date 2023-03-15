@@ -203,10 +203,20 @@
 	<ItemGroup>
 	  <None Remove="Resources\Images\backup.svg" />
 	  <None Remove="Resources\Images\badverify.svg" />
+	  <None Remove="Resources\Images\collapse.png" />
+	  <None Remove="Resources\Images\expand.png" />
 	  <None Remove="Resources\Images\key.svg" />
 	  <None Remove="Resources\Images\notbackup.svg" />
 	  <None Remove="Resources\Images\notverify.svg" />
 	  <None Remove="Resources\Images\Verify.svg" />
 	  <None Remove="Services\" />
+	</ItemGroup>
+	<ItemGroup>
+	  <MauiXaml Update="Controls\ExpanderControl.xaml">
+	    <Generator>MSBuild:Compile</Generator>
+	  </MauiXaml>
+	  <MauiXaml Update="Controls\LabelValueControl.xaml">
+	    <Generator>MSBuild:Compile</Generator>
+	  </MauiXaml>
 	</ItemGroup>
 </Project>

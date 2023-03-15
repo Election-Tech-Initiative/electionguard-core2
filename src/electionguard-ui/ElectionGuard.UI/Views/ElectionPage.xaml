@@ -1,81 +1,121 @@
 <?xml version="1.0" encoding="utf-8" ?>
-<views:ContentPageBase x:TypeArguments="viewModels:ElectionViewModel" xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
-                       xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
-                       x:Class="ElectionGuard.UI.Views.ElectionPage"
-                       xmlns:helper="clr-namespace:ElectionGuard.UI.Helpers"
-                       xmlns:viewModels="clr-namespace:ElectionGuard.UI.ViewModels"
-                       xmlns:views="using:ElectionGuard.UI.Views"
-                       x:DataType="viewModels:ElectionViewModel"
-                       ControlTemplate="{StaticResource PageTemplate}">
-    <Grid ColumnDefinitions="2*, *, *" Margin="20">
+<views:ContentPageBase
+    x:Class="ElectionGuard.UI.Views.ElectionPage"
+    xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+    xmlns:controls="clr-namespace:ElectionGuard.UI.Controls"
+    xmlns:helper="clr-namespace:ElectionGuard.UI.Helpers"
+    xmlns:model="clr-namespace:ElectionGuard.UI.Lib.Models;assembly=ElectionGuard.UI.Lib"
+    xmlns:toolkit="http://schemas.microsoft.com/dotnet/2022/maui/toolkit"
+    xmlns:viewModels="clr-namespace:ElectionGuard.UI.ViewModels"
+    xmlns:views="using:ElectionGuard.UI.Views"
+    x:DataType="viewModels:ElectionViewModel"
+    x:TypeArguments="viewModels:ElectionViewModel"
+    ControlTemplate="{StaticResource PageTemplate}">
+    <Grid Margin="20" ColumnDefinitions="3*, 2*, *">
         <VerticalStackLayout Grid.Column="0">
-            <Label Style="{StaticResource H1}"
-                   Text="{Binding CurrentElection.Name}" />
-            <Grid ColumnDefinitions="*, *">
-                <StackLayout Style="{StaticResource FormControl}" Grid.Column="0">
-                    <Label Style="{StaticResource FormLabel}" Text="{helper:Translate GuardiansText}"></Label>
-                    <Label Style="{StaticResource FormValue}" Text="3"></Label>
-                </StackLayout>
-                <StackLayout Style="{StaticResource FormControl}" Grid.Column="1">
-                    <Label Style="{StaticResource FormLabel}" Text="{helper:Translate QuorumText}"></Label>
-                    <Label Style="{StaticResource FormValue}" Text="3"></Label>
-                </StackLayout>
+            <Label Style="{StaticResource H1}" Text="{Binding CurrentElection.Name}" />
+            <toolkit:UniformItemsLayout>
+                <controls:LabelValueControl
+                    Title="{helper:Translate GuardiansText}"
+                    HorizontalOptions="Start"
+                    Text="{Binding KeyCeremony.NumberOfGuardians}" />
+                <controls:LabelValueControl
+                    Title="{helper:Translate QuorumText}"
+                    HorizontalOptions="Start"
+                    Text="{Binding KeyCeremony.Quorum}" />
+            </toolkit:UniformItemsLayout>
+            <controls:LabelValueControl
+                Title="{helper:Translate ElectionUrl}"
+                HorizontalOptions="Start"
+                Text="{Binding CurrentElection.ElectionUrl}" />
+            <toolkit:UniformItemsLayout>
+                <controls:LabelValueControl Title="{helper:Translate CreatedText}" Text="{Binding CurrentElection.CreatedAt}" />
+                <controls:LabelValueControl Title="{helper:Translate CreatedByText}" Text="{Binding CurrentElection.CreatedBy}" />
+            </toolkit:UniformItemsLayout>
+
+            <Grid Margin="0,0,50,0">
+                <Label Style="{StaticResource H2}" Text="{helper:Translate BallotsText}" />
+                <Button
+                    Command="{Binding AddBallotsCommand}"
+                    HorizontalOptions="End"
+                    Style="{StaticResource NarrowWidth}"
+                    Text="{helper:Translate AddBallots}" />
             </Grid>
-            <StackLayout Style="{StaticResource FormControl}">
-                <Label Style="{StaticResource FormLabel}" Text="{helper:Translate ElectionUrl}"></Label>
-                <Label Style="{StaticResource FormValue}" Text="http://electionguard.vote"></Label>
-            </StackLayout>
-            <StackLayout Style="{StaticResource FormControl}">
-                <Label Style="{StaticResource FormLabel}" Text="{helper:Translate CreatedText}"></Label>
-                <Label Style="{StaticResource FormValue}" Text="Nov 28, 2022"></Label>
-            </StackLayout>
-            <Label Style="{StaticResource H2}"
-                   Text="{helper:Translate BallotsText}" />
-            <Button Text="{helper:Translate AddBallots}"
-                    Style="{StaticResource NarrowWidth}" />
-            <CollectionView />
-            <Label Style="{StaticResource H2}"
-                   Text="{helper:Translate TalliesText}" />
-            <Button Text="{helper:Translate CreateTally}"
-                    Style="{StaticResource NarrowWidth}" />
-            <CollectionView />
+            <CollectionView ItemsSource="{Binding BallotUploads}">
+                <CollectionView.EmptyView>
+                    <controls:NoContentView Text="{helper:Translate NoBallotUploads}" />
+                </CollectionView.EmptyView>
+                <CollectionView.ItemTemplate>
+                    <DataTemplate x:DataType="model:BallotUpload">
+                        <Grid ColumnDefinitions="*, *">
+                            <Label Grid.Column="0" Text="{Binding CreatedAt}" />
+                            <Label Grid.Column="1" Text="{Binding BallotCount}" />
+                        </Grid>
+                    </DataTemplate>
+                </CollectionView.ItemTemplate>
+            </CollectionView>
+
+            <Grid Margin="0,20,50,0">
+                <Label Style="{StaticResource H2}" Text="{helper:Translate TalliesText}" />
+                <Button
+                    HorizontalOptions="End"
+                    Style="{StaticResource NarrowWidth}"
+                    Text="{helper:Translate CreateTally}" />
+            </Grid>
+            <CollectionView ItemsSource="{Binding Tallies}">
+                <CollectionView.EmptyView>
+                    <controls:NoContentView Text="{helper:Translate NoTalliesCreated}" />
+                </CollectionView.EmptyView>
+                <CollectionView.ItemTemplate>
+                    <DataTemplate x:DataType="model:Tally">
+                        <HorizontalStackLayout>
+                            <Label Text="{Binding Name}" />
+                            <Label Text="{Binding CreatedAt}" />
+                        </HorizontalStackLayout>
+                    </DataTemplate>
+                </CollectionView.ItemTemplate>
+            </CollectionView>
 
         </VerticalStackLayout>
         <VerticalStackLayout Grid.Column="1">
-            <Label Style="{StaticResource H1}"
-                   Text="{helper:Translate ManifestText}" />
+            <HorizontalStackLayout>
+                <Label Style="{StaticResource H1}" Text="{helper:Translate ManifestText}" />
+                <Button
+                    Command="{Binding ViewCommand}"
+                    HorizontalOptions="End"
+                    Text="{helper:Translate ViewManifest}" />
+            </HorizontalStackLayout>
             <StackLayout Style="{StaticResource FormControl}">
-                <Label Style="{StaticResource FormValue}"
-                       Text="Sample County, 2020 General Election" />
+                <Label Style="{StaticResource FormValue}" Text="{Binding ManifestName}" />
             </StackLayout>
-            <Grid ColumnDefinitions="*, *">
-                <StackLayout Grid.Column="0" Style="{StaticResource FormControl}">
-                    <Label Style="{StaticResource FormLabel}" Text="{helper:Translate PartiesText}" />
-                    <Label Style="{StaticResource FormValue}" Text="7" />
-                </StackLayout>
-                <StackLayout Grid.Column="1" Style="{StaticResource FormControl}">
-                    <Label Style="{StaticResource FormLabel}" Text="{helper:Translate CandidatesText}" />
-                    <Label Style="{StaticResource FormValue}" Text="76" />
-                </StackLayout>
-            </Grid>
-            <Grid ColumnDefinitions="*, *">
-                <StackLayout Grid.Column="0" Style="{StaticResource FormControl}">
-                    <Label Style="{StaticResource FormLabel}" Text="{helper:Translate ContestsText}" />
-                    <Label Style="{StaticResource FormValue}" Text="15" />
-                </StackLayout>
-                <StackLayout Grid.Column="1" Style="{StaticResource FormControl}">
-                    <Label Style="{StaticResource FormLabel}" Text="{helper:Translate BallotStylesText}" />
-                    <Label Style="{StaticResource FormValue}" Text="2" />
-                </StackLayout>
-            </Grid>
-            <StackLayout Style="{StaticResource FormControl}">
-                <Label Style="{StaticResource FormLabel}" Text="{helper:Translate GeopoliticalUnitsText}" />
-                <Label Style="{StaticResource FormValue}" Text="2" />
-            </StackLayout>
+            <toolkit:UniformItemsLayout HorizontalOptions="FillAndExpand">
+                <controls:LabelValueControl
+                    Title="{helper:Translate PartiesText}"
+                    HorizontalOptions="Start"
+                    Text="{Binding Manifest.PartiesSize}" />
+                <controls:LabelValueControl
+                    Title="{helper:Translate CandidatesText}"
+                    HorizontalOptions="Start"
+                    Text="{Binding Manifest.CandidatesSize}" />
+            </toolkit:UniformItemsLayout>
+            <toolkit:UniformItemsLayout HorizontalOptions="FillAndExpand">
+                <controls:LabelValueControl
+                    Title="{helper:Translate ContestsText}"
+                    HorizontalOptions="Start"
+                    Text="{Binding Manifest.ContestsSize}" />
+                <controls:LabelValueControl
+                    Title="{helper:Translate BallotStylesText}"
+                    HorizontalOptions="Start"
+                    Text="{Binding Manifest.BallotStylesSize}" />
+            </toolkit:UniformItemsLayout>
+            <controls:LabelValueControl
+                Title="{helper:Translate GeopoliticalUnitsText}"
+                HorizontalOptions="Start"
+                Text="{Binding Manifest.GeopoliticalUnitsSize}" />
         </VerticalStackLayout>
         <VerticalStackLayout Grid.Column="2">
-            <Label Style="{StaticResource H2}"
-                Text="{helper:Translate ElectionChecklist}" />
+            <Label Style="{StaticResource H2}" Text="{helper:Translate ElectionChecklist}" />
         </VerticalStackLayout>
     </Grid>
 </views:ContentPageBase>

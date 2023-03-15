@@ -1,7 +1,4 @@
 ﻿using CommunityToolkit.Mvvm.Input;
-using ElectionGuard.UI.Lib.Models;
-using ElectionGuard.UI.Lib.Services;
-using System.Collections.ObjectModel;
 
 namespace ElectionGuard.UI.ViewModels;
 

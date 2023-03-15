@@ -29,7 +29,7 @@
                 SelectedItem="{Binding KeyCeremony}"
                 TextColor="{StaticResource Gray950}"
                 TitleColor="{StaticResource Primary}"
-                WidthRequest="500" />
+                WidthRequest="600" />
         </StackLayout>
         <StackLayout Style="{StaticResource FormControl}">
             <Label Style="{StaticResource FormLabel}" Text="{helper:Translate ManifestText}" />

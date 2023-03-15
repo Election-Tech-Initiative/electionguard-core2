@@ -1265,7 +1265,7 @@ namespace ElectionGuard
             [DllImport(DllName, EntryPoint = "eg_candidate_get_name",
                 CallingConvention = CallingConvention.Cdecl, SetLastError = true)]
             internal static extern Status GetName(
-                CandidateHandle handle, out IntPtr name);
+                CandidateHandle handle, out InternationalizedText.InternationalizedTextHandle name);
 
             [DllImport(DllName, EntryPoint = "eg_candidate_get_party_id",
                 CallingConvention = CallingConvention.Cdecl, SetLastError = true)]
