@@ -12,6 +12,11 @@
     x:DataType="viewModels:ElectionViewModel"
     x:TypeArguments="viewModels:ElectionViewModel"
     ControlTemplate="{StaticResource PageTemplate}">
+    <ContentPage.Resources>
+        <ResourceDictionary>
+            <helper:AlternateRowColorConverter x:Key="AlternateRowColorConverter" />
+        </ResourceDictionary>
+    </ContentPage.Resources>
     <Grid Margin="20" ColumnDefinitions="3*, 2*, *">
         <VerticalStackLayout Grid.Column="0">
             <Label Style="{StaticResource H1}" Text="{Binding CurrentElection.Name}" />
@@ -42,18 +47,64 @@
                     Style="{StaticResource NarrowWidth}"
                     Text="{helper:Translate AddBallots}" />
             </Grid>
-            <CollectionView ItemsSource="{Binding BallotUploads}">
+            <CollectionView x:Name="UploadCollectionView" ItemsSource="{Binding BallotUploads}">
                 <CollectionView.EmptyView>
                     <controls:NoContentView Text="{helper:Translate NoBallotUploads}" />
                 </CollectionView.EmptyView>
+                <CollectionView.Header>
+                    <Grid>
+                        <Grid ColumnDefinitions="3*, 2*, *">
+                            <Label
+                                Grid.Column="0"
+                                FontAttributes="Bold"
+                                Text="{helper:Translate UploadedText}" />
+                            <Label
+                                Grid.Column="1"
+                                FontAttributes="Bold"
+                                Text="{helper:Translate LocationText}" />
+                            <Label
+                                Grid.Column="2"
+                                FontAttributes="Bold"
+                                Text="{helper:Translate BallotCountText}" />
+                        </Grid>
+                        <Line
+                            BackgroundColor="{StaticResource Gray950}"
+                            StrokeThickness="2"
+                            VerticalOptions="End" />
+                    </Grid>
+                </CollectionView.Header>
                 <CollectionView.ItemTemplate>
                     <DataTemplate x:DataType="model:BallotUpload">
-                        <Grid ColumnDefinitions="*, *">
-                            <Label Grid.Column="0" Text="{Binding CreatedAt}" />
-                            <Label Grid.Column="1" Text="{Binding BallotCount}" />
+                        <Grid BackgroundColor="{Binding ., Converter={StaticResource AlternateRowColorConverter}, ConverterParameter={x:Reference UploadCollectionView}}}" ColumnDefinitions="3*, 2*, *">
+                            <Label
+                                Grid.Column="0"
+                                Margin="10"
+                                Text="{Binding CreatedAt}" />
+                            <Label
+                                Grid.Column="1"
+                                Margin="10"
+                                Text="{Binding Location}" />
+                            <Label
+                                Grid.Column="2"
+                                Margin="10"
+                                Text="{Binding BallotCount}" />
                         </Grid>
                     </DataTemplate>
                 </CollectionView.ItemTemplate>
+                <CollectionView.Footer>
+                    <Grid BackgroundColor="{StaticResource Gray400}" ColumnDefinitions="3*, 2*, *">
+                        <Label
+                            Grid.Column="0"
+                            Margin="10"
+                            FontAttributes="Bold,Italic"
+                            Text="{helper:Translate TotalText}" />
+                        <Label
+                            Grid.Column="2"
+                            Margin="10"
+                            FontAttributes="Bold"
+                            Text="{Binding BallotCountTotal}" />
+                    </Grid>
+                </CollectionView.Footer>
             </CollectionView>
 
             <Grid Margin="0,20,50,0">

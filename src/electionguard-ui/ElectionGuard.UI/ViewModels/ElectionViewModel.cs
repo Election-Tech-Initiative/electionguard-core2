@@ -33,6 +33,9 @@ public partial class ElectionViewModel : BaseViewModel
     private string? _manifestName;
 
     [ObservableProperty]
+    private long _ballotCountTotal = 0;
+
+    [ObservableProperty]
     private ObservableCollection<BallotUpload> _ballotUploads = new();
 
     [ObservableProperty]
@@ -48,8 +51,10 @@ public partial class ElectionViewModel : BaseViewModel
             KeyCeremony = await _keyCeremonyService.GetByKeyCeremonyIdAsync(value?.KeyCeremonyId);
             var uploads = await _uploadService.GetByElectionIdAsync(value?.ElectionId);
             _ballotUploads.Clear();
+            BallotCountTotal = 0;
             uploads.ForEach((upload) => {
                 _ballotUploads.Add(upload);
+                BallotCountTotal += upload.BallotCount;
             });
             
             _tallies.Clear();

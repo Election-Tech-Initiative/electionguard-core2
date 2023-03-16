@@ -15,6 +15,9 @@ public partial class BallotUpload : DatabaseRecord
     private string? _deviceFileContents;
 
     [ObservableProperty]
+    private string? _location;
+
+    [ObservableProperty]
     private long _ballotCount;
 
     [ObservableProperty]
@@ -23,11 +26,12 @@ public partial class BallotUpload : DatabaseRecord
     [ObservableProperty]
     private DateTime _createdAt;
 
-    public BallotUpload(string electionId, string deviceFilename, string deviceFileContents, long ballotCount, string createdBy) : base(nameof(BallotUpload))
+    public BallotUpload(string electionId, string deviceFilename, string deviceFileContents, string location, long ballotCount, string createdBy) : base(nameof(BallotUpload))
     {
         ElectionId = electionId;
         DeviceFileName = deviceFilename;
         DeviceFileContents = deviceFileContents;
+        Location = location;
         BallotCount = ballotCount;
         CreatedBy = createdBy;
         UploadId = Guid.NewGuid().ToString();

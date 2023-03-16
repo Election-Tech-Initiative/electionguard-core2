@@ -405,4 +405,7 @@
   <data name="ChooseFolder" xml:space="preserve">
     <value>Elegir carpeta</value>
   </data>
+  <data name="TotalText" xml:space="preserve">
+    <value>TOTAL</value>
+  </data>
 </root>

@@ -366,9 +366,6 @@
   <data name="ViewManifest" xml:space="preserve">
     <value>View Manifest</value>
   </data>
-  <data name="AutoText" xml:space="preserve">
-    <value />
-  </data>
   <data name="BallotFolderText" xml:space="preserve">
     <value>Ballot Folder</value>
   </data>
@@ -398,6 +395,9 @@
   </data>
   <data name="NoFolderText" xml:space="preserve">
     <value>No folder chosen</value>
+  </data>
+  <data name="TotalText" xml:space="preserve">
+    <value>Total</value>
   </data>
   <data name="UploadText" xml:space="preserve">
     <value>Upload</value>

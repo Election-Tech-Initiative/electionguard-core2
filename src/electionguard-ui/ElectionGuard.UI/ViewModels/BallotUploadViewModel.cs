@@ -1,4 +1,5 @@
-﻿using CommunityToolkit.Maui.Storage;
+﻿using System.Text.Json;
+using CommunityToolkit.Maui.Storage;
 using CommunityToolkit.Mvvm.Input;
 
 namespace ElectionGuard.UI.ViewModels;
@@ -56,10 +57,16 @@ public partial class BallotUploadViewModel : BaseViewModel
         // create the device file
         string deviceData = File.ReadAllText(DeviceFile, System.Text.Encoding.UTF8);
         EncryptionDevice device = new(deviceData);
-
+        JsonDocument deviceDocument = JsonDocument.Parse(deviceData);
+        string location = string.Empty;
+        using (var jsonDoc = JsonDocument.Parse(deviceData))
+        {
+            JsonElement dev = jsonDoc.RootElement.GetProperty("location");
+            location = dev.GetString();
+        }
         // save the ballot upload
         var ballots = Directory.GetFiles(BallotFolder);
-        BallotUpload upload = new(ElectionId, DeviceFile, deviceData, ballots.LongLength, UserName);
+        BallotUpload upload = new(ElectionId, DeviceFile, deviceData, location, ballots.LongLength, UserName);
 
         await _uploadService.SaveAsync(upload);
         

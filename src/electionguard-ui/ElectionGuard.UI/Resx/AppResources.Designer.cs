@@ -97,15 +97,6 @@ namespace ElectionGuard.UI.Resx {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to .
-        /// </summary>
-        internal static string AutoText {
-            get {
-                return ResourceManager.GetString("AutoText", resourceCulture);
-            }
-        }
-        
-        /// <summary>
         ///   Looks up a localized string similar to Backup.
         /// </summary>
         internal static string BackupText {
@@ -831,6 +822,15 @@ namespace ElectionGuard.UI.Resx {
         internal static string TalliesText {
             get {
                 return ResourceManager.GetString("TalliesText", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Total.
+        /// </summary>
+        internal static string TotalText {
+            get {
+                return ResourceManager.GetString("TotalText", resourceCulture);
             }
         }
         
