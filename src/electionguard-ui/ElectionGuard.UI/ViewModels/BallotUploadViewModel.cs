@@ -1,4 +1,6 @@
-﻿using System.Text.Json;
+﻿using System.ComponentModel;
+using System.Text.Json;
+using CommunityToolkit.Maui.Core.Primitives;
 using CommunityToolkit.Maui.Storage;
 using CommunityToolkit.Mvvm.Input;
 
@@ -37,12 +39,14 @@ public partial class BallotUploadViewModel : BaseViewModel
     private void Manual()
     {
         ShowWizard = false;
+        _timer.Stop();
     }
 
     [RelayCommand]
     private void Auto()
     {
         ShowWizard = true;
+        _timer.Start();
     }
 
     [RelayCommand]
@@ -55,30 +59,28 @@ public partial class BallotUploadViewModel : BaseViewModel
     private async Task Upload()
     {
         // create the device file
-        string deviceData = File.ReadAllText(DeviceFile, System.Text.Encoding.UTF8);
+        var deviceData = File.ReadAllText(DeviceFile, System.Text.Encoding.UTF8);
         EncryptionDevice device = new(deviceData);
-        JsonDocument deviceDocument = JsonDocument.Parse(deviceData);
-        string location = string.Empty;
+        var deviceDocument = JsonDocument.Parse(deviceData);
+        var location = string.Empty;
         using (var jsonDoc = JsonDocument.Parse(deviceData))
         {
-            JsonElement dev = jsonDoc.RootElement.GetProperty("location");
+            var dev = jsonDoc.RootElement.GetProperty("location");
             location = dev.GetString();
         }
         // save the ballot upload
         var ballots = Directory.GetFiles(BallotFolder);
-        BallotUpload upload = new(ElectionId, DeviceFile, deviceData, location, ballots.LongLength, UserName);
+        BallotUpload upload = new(ElectionId, DeviceFile, deviceData, location, ballots.LongLength, 0, 0, 0, UserName);
 
-        await _uploadService.SaveAsync(upload);
-        
         long totalCount = 0;
-        
-        Parallel.ForEach<string, long>(ballots,
+
+        _ = Parallel.ForEach<string, long>(ballots,
             () => 0,
             (currentBallot, loop, subtotal) =>
             {
                 try
                 {
-                    string filename = Path.GetFileName(currentBallot);
+                    var filename = Path.GetFileName(currentBallot);
                     var ballotData = File.ReadAllText(currentBallot);
                     SubmittedBallot ballot = new(ballotData);
                     BallotRecord ballotRecord = new(ElectionId, upload.UploadId, filename, ballotData);
@@ -86,7 +88,7 @@ public partial class BallotUploadViewModel : BaseViewModel
 
                     subtotal += 1;
                 }
-                catch(Exception ex)
+                catch (Exception ex)
                 {
 
                 }
@@ -95,6 +97,9 @@ public partial class BallotUploadViewModel : BaseViewModel
             (finalResult) => Interlocked.Add(ref totalCount, finalResult)
             );
 
+        // update totals before saving
+
+        _ = await _uploadService.SaveAsync(upload);
     }
 
     private bool CanUpload()
@@ -123,7 +128,7 @@ public partial class BallotUploadViewModel : BaseViewModel
         // check if it is a device file
         try
         {
-            string data = File.ReadAllText(file.FullPath, System.Text.Encoding.UTF8);
+            var data = File.ReadAllText(file.FullPath, System.Text.Encoding.UTF8);
             EncryptionDevice device = new(data);
             DeviceFile = file.FullPath;
         }
@@ -140,8 +145,8 @@ public partial class BallotUploadViewModel : BaseViewModel
         try
         {
             var folder = await FolderPicker.Default.PickAsync(token);
-            BallotFolder = folder.Path;
-            BallotFolderName = folder.Name;
+            BallotFolder = folder.Folder.Path;
+            BallotFolderName = folder.Folder.Name;
             FolderErrorMessage = string.Empty;
             // verify folder
         }
@@ -155,10 +160,76 @@ public partial class BallotUploadViewModel : BaseViewModel
 
     private readonly BallotUploadService _uploadService;
     private readonly BallotService _ballotService;
+    private bool _importing = false;
 
     public BallotUploadViewModel(IServiceProvider serviceProvider, BallotUploadService uploadService, BallotService ballotService) : base("BallotUploadText", serviceProvider)
     {
         _uploadService = uploadService;
         _ballotService = ballotService;
+
+        _timer.Tick += _timer_Tick;
+        _timer.Start();
     }
+
+    private void _timer_Tick(object sender, EventArgs e)
+    {
+        if (_importing)
+        {
+            return;
+        }
+        _importing = true;
+
+        // check for a usb drive
+        var drives = DriveInfo.GetDrives();
+        foreach (var drive in drives)
+        {
+            if (drive.DriveType == DriveType.Removable && drive.VolumeLabel.ToLower() == "egdrive")
+            {
+                var devicePath = Path.Combine(drive.Name, "artifacts", "encryption_devices");
+                if (!Directory.Exists(devicePath))
+                {
+                    _importing = false;
+                    return;
+                }
+                // find device file
+                var devices = Directory.GetFiles(devicePath);
+                foreach (var device in devices)
+                {
+                    try
+                    {
+                        var data = File.ReadAllText(device, System.Text.Encoding.UTF8);
+                        EncryptionDevice dev = new(data);
+                        DeviceFile = device;
+                        break;
+                    }
+                    catch (Exception ex)
+                    {
+                    }
+                }
+
+                // find submitted ballots folder
+                var ballotPath = Path.Combine(drive.Name, "artifacts", "encrypted_ballots");
+                if (!Directory.Exists(ballotPath))
+                {
+                    DeviceFile = null;
+                    _importing = false;
+                    return;
+                }
+
+                BallotFolder = ballotPath;
+
+                _ = Task.Run(Upload);
+
+                _importing = false;
+            }
+        }
+    }
+
+    public override async Task OnLeavingPage()
+    {
+        _timer.Stop();
+        _timer.Tick -= _timer_Tick;
+        await base.OnLeavingPage();
+    }
+
 }

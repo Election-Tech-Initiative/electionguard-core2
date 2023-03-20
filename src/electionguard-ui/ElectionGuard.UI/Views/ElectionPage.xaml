@@ -35,8 +35,14 @@
                 HorizontalOptions="Start"
                 Text="{Binding CurrentElection.ElectionUrl}" />
             <toolkit:UniformItemsLayout>
-                <controls:LabelValueControl Title="{helper:Translate CreatedText}" Text="{Binding CurrentElection.CreatedAt}" />
-                <controls:LabelValueControl Title="{helper:Translate CreatedByText}" Text="{Binding CurrentElection.CreatedBy}" />
+                <controls:LabelValueControl
+                    Title="{helper:Translate CreatedText}"
+                    HorizontalOptions="Start"
+                    Text="{Binding CurrentElection.CreatedAt}" />
+                <controls:LabelValueControl
+                    Title="{helper:Translate CreatedByText}"
+                    HorizontalOptions="Start"
+                    Text="{Binding CurrentElection.CreatedBy}" />
             </toolkit:UniformItemsLayout>
 
             <Grid Margin="0,0,50,0">
@@ -47,7 +53,10 @@
                     Style="{StaticResource NarrowWidth}"
                     Text="{helper:Translate AddBallots}" />
             </Grid>
-            <CollectionView x:Name="UploadCollectionView" ItemsSource="{Binding BallotUploads}">
+            <CollectionView
+                x:Name="UploadCollectionView"
+                Margin="0,0,50,0"
+                ItemsSource="{Binding BallotUploads}">
                 <CollectionView.EmptyView>
                     <controls:NoContentView Text="{helper:Translate NoBallotUploads}" />
                 </CollectionView.EmptyView>
@@ -118,12 +127,30 @@
                 <CollectionView.EmptyView>
                     <controls:NoContentView Text="{helper:Translate NoTalliesCreated}" />
                 </CollectionView.EmptyView>
+                <CollectionView.Header>
+                    <Grid>
+                        <Grid ColumnDefinitions="3*, 2*">
+                            <Label
+                                Grid.Column="0"
+                                FontAttributes="Bold"
+                                Text="{helper:Translate CreatedText}" />
+                            <Label
+                                Grid.Column="1"
+                                FontAttributes="Bold"
+                                Text="{helper:Translate NameText}" />
+                        </Grid>
+                        <Line
+                            BackgroundColor="{StaticResource Gray950}"
+                            StrokeThickness="2"
+                            VerticalOptions="End" />
+                    </Grid>
+                </CollectionView.Header>
                 <CollectionView.ItemTemplate>
                     <DataTemplate x:DataType="model:Tally">
-                        <HorizontalStackLayout>
-                            <Label Text="{Binding Name}" />
-                            <Label Text="{Binding CreatedAt}" />
-                        </HorizontalStackLayout>
+                        <Grid ColumnDefinitions="3*, 2*">
+                            <Label Grid.Column="0" Text="{Binding CreatedAt}" />
+                            <Label Grid.Column="1" Text="{Binding Name}" />
+                        </Grid>
                     </DataTemplate>
                 </CollectionView.ItemTemplate>
             </CollectionView>

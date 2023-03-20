@@ -61,10 +61,10 @@ public partial class CreateElectionViewModel : BaseViewModel
     {
         var multiple = _manifestFiles.Count > 1;
         var lastElectionId = string.Empty;
+        ErrorMessage = string.Empty;
 
-        for (var i = 0; i < _manifestFiles.Count; i++)
+        _ = Parallel.ForEachAsync(_manifestFiles, async (file, cancel) =>
         {
-            var file = _manifestFiles[i];
             // create an election for each file
             try
             {
@@ -72,7 +72,7 @@ public partial class CreateElectionViewModel : BaseViewModel
                 using var manifest = new Manifest(File.ReadAllText(file.FullPath));
                 var electionName = multiple ? manifest.Name.GetTextAt(0).Value : ElectionName;
 
-                // check if the election anme exists
+                // check if the election name exists
                 var election = new Election(KeyCeremony.KeyCeremonyId, await MakeNameUnique(electionName), ElectionUrl, UserName!);
                 lastElectionId = election.ElectionId;
 
@@ -108,7 +108,7 @@ public partial class CreateElectionViewModel : BaseViewModel
             }
         }
 
-        if (ErrorMessage == null)
+        if (string.IsNullOrEmpty(ErrorMessage))
         {
             // goto the email page or go to the home page
             if (multiple)
@@ -145,7 +145,7 @@ public partial class CreateElectionViewModel : BaseViewModel
 
     private bool CanCreate()
     {
-        return (ManifestErrorMessage == string.Empty || ManifestErrorMessage == null) && _manifestFiles.Any() && ElectionName.Any() && KeyCeremony != null;
+        return string.IsNullOrEmpty(ManifestErrorMessage) && _manifestFiles.Any() && ElectionName.Any() && KeyCeremony != null;
     }
 
     [RelayCommand]
@@ -186,7 +186,7 @@ public partial class CreateElectionViewModel : BaseViewModel
         }
         else
         {
-            _manifestFiles.ForEach(file =>
+            _ = Parallel.ForEach(_manifestFiles, (file) =>
             {
                 try
                 {
@@ -196,7 +196,7 @@ public partial class CreateElectionViewModel : BaseViewModel
                         badFiles.Add(file.FileName);
                     }
                 }
-                catch(Exception)
+                catch (Exception)
                 {
                     badFiles.Add(file.FileName);
                 }

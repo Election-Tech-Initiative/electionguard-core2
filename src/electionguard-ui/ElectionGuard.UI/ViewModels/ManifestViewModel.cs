@@ -46,7 +46,7 @@ public partial class ManifestViewModel : BaseViewModel
 
     partial void OnManifestFileChanged(string value)
     {
-        if (ManifestFile == null || ManifestFile == string.Empty)
+        if (string.IsNullOrEmpty(ManifestFile))
         {
             Manifest = null;
             return;

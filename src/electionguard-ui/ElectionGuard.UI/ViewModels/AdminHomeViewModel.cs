@@ -59,7 +59,7 @@ public partial class AdminHomeViewModel : BaseViewModel
     }
 
     [RelayCommand]
-    private async void CreateElection()
+    private async Task CreateElection()
     {
         await NavigationService.GoToPage(typeof(CreateElectionViewModel));
     }
