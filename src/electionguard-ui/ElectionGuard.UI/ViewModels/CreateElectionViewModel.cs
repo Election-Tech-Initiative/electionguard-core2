@@ -106,7 +106,7 @@ public partial class CreateElectionViewModel : BaseViewModel
             {
                 ErrorMessage += $"{AppResources.ErrorCreatingElection} - {file.FileName}\n";
             }
-        }
+        });
 
         if (string.IsNullOrEmpty(ErrorMessage))
         {
