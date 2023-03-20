@@ -808,7 +808,7 @@ eg_electionguard_status_t eg_plaintext_ballot_to_bson(eg_plaintext_ballot_t *han
 }
 
 eg_electionguard_status_t eg_plaintext_ballot_to_msg_pack(eg_plaintext_ballot_t *handle,
-                                                         uint8_t **out_data, uint64_t *out_size)
+                                                          uint8_t **out_data, uint64_t *out_size)
 {
     try {
         auto *domain_type = AS_TYPE(PlaintextBallot, handle);
@@ -865,6 +865,16 @@ eg_electionguard_status_t eg_ciphertext_ballot_get_style_id(eg_ciphertext_ballot
     } catch (const exception &e) {
         Log::error("submittedeg_ciphertext_ballot_get_style_id", e);
         return ELECTIONGUARD_STATUS_ERROR_BAD_ALLOC;
+    }
+}
+
+eg_ballot_box_state_t eg_ciphertext_ballot_get_state(eg_ciphertext_ballot_t *handle)
+{
+    try {
+        return (eg_ballot_box_state_t)AS_TYPE(CiphertextBallot, handle)->getState();
+    } catch (const exception &e) {
+        Log::error(":eg_ciphertext_ballot_get_state", e);
+        return ELECTIONGUARD_BALLOT_BOX_STATE_UNKNOWN;
     }
 }
 
@@ -1002,6 +1012,28 @@ bool eg_ciphertext_ballot_is_valid_encryption(eg_ciphertext_ballot_t *handle,
     } catch (const exception &e) {
         Log::error(":eg_ciphertext_ballot_is_valid_encryption", e);
         return false;
+    }
+}
+
+eg_electionguard_status_t eg_ciphertext_ballot_cast(eg_ciphertext_ballot_t *handle)
+{
+    try {
+        AS_TYPE(CiphertextBallot, handle)->cast();
+        return ELECTIONGUARD_STATUS_SUCCESS;
+    } catch (const exception &e) {
+        Log::error(":eg_ciphertext_ballot_cast", e);
+        return ELECTIONGUARD_STATUS_ERROR_BAD_ALLOC;
+    }
+}
+
+eg_electionguard_status_t eg_ciphertext_ballot_spoil(eg_ciphertext_ballot_t *handle)
+{
+    try {
+        AS_TYPE(CiphertextBallot, handle)->spoil();
+        return ELECTIONGUARD_STATUS_SUCCESS;
+    } catch (const exception &e) {
+        Log::error(":eg_ciphertext_ballot_spoil", e);
+        return ELECTIONGUARD_STATUS_ERROR_BAD_ALLOC;
     }
 }
 
