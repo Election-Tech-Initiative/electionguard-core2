@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Collections;
+using System.Collections.Generic;
 using System.Runtime.InteropServices;
 
 namespace ElectionGuard
@@ -9,7 +11,7 @@ namespace ElectionGuard
     /// with the rest zero, so if a voter deliberately undervotes, one or more of the placeholder counters will
     /// become one. This allows the `ConstantChaumPedersenProof` to verify correctly for undervoted contests.)
     /// </summary>
-    public class ContestDescriptionWithPlaceholders : DisposableBase
+    public class ContestDescriptionWithPlaceholders : DisposableBase, IReadOnlyList<SelectionDescription>
     {
         /// <Summary>
         /// Unique internal identifier that's used by other elements to reference this element.
@@ -422,5 +424,27 @@ namespace ElectionGuard
             }
             return new ElementModQ(value);
         }
+
+        #region IReadOnlyList implementation
+
+        public int Count => (int)SelectionsSize;
+
+        public SelectionDescription this[int index] => GetSelectionAtIndex((ulong)index);
+
+        public IEnumerator<SelectionDescription> GetEnumerator()
+        {
+            var count = (int)SelectionsSize;
+            for (var i = 0; i < count; i++)
+            {
+                yield return GetSelectionAtIndex((ulong)i);
+            }
+        }
+
+        IEnumerator IEnumerable.GetEnumerator()
+        {
+            return GetEnumerator();
+        }
+
+        #endregion
     }
 }

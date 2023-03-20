@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Collections;
+using System.Collections.Generic;
 using System.Runtime.InteropServices;
 
 namespace ElectionGuard
@@ -13,7 +15,7 @@ namespace ElectionGuard
     /// For a given election, the sequence of contests displayed to a user may be different
     /// however that information is not captured by default when encrypting a specific ballot.
     /// </summary>
-    public class ContestDescription : DisposableBase
+    public class ContestDescription : DisposableBase, IReadOnlyList<SelectionDescription>
     {
         /// <Summary>
         /// Unique internal identifier that's used by other elements to reference this element.
@@ -358,5 +360,29 @@ namespace ElectionGuard
             }
             return new ElementModQ(value);
         }
+
+        #region IReadOnlyList implementation
+
+        public int Count => (int)SelectionsSize;
+
+        public SelectionDescription this[int index] => GetSelectionAtIndex((ulong)index);
+
+
+        public IEnumerator<SelectionDescription> GetEnumerator()
+        {
+            var count = (int)SelectionsSize;
+            for (var i = 0; i < count; i++)
+            {
+                yield return GetSelectionAtIndex((ulong)i);
+            }
+        }
+
+        IEnumerator IEnumerable.GetEnumerator()
+        {
+            return GetEnumerator();
+        }
+
+        #endregion
+
     }
 }

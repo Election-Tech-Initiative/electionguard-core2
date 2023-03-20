@@ -1,3 +1,6 @@
+using System.Collections;
+using System.Collections.Generic;
+
 namespace ElectionGuard
 {
     /// <summary>
@@ -14,7 +17,7 @@ namespace ElectionGuard
     /// seed nonce, both values can be regenerated.  If the `nonce` for this contest is completely random,
     /// then it is required in order to regenerate the proof.
     /// </summary>
-    public partial class CiphertextBallotContest : DisposableBase
+    public partial class CiphertextBallotContest : DisposableBase, IReadOnlyList<CiphertextBallotSelection>
     {
         internal CiphertextBallotContest(External.CiphertextBallotContestHandle handle)
         {
@@ -24,10 +27,10 @@ namespace ElectionGuard
         /// <summary>
         /// Get a selection at a specific index.
         /// </summary>
-        public CiphertextBallotSelection GetSelectionAt(ulong index)
+        public CiphertextBallotSelection GetSelectionAtIndex(ulong index)
         {
             var status = NativeInterface.CiphertextBallotContest.GetSelectionAtIndex(
-                Handle, index, out CiphertextBallotSelection.External.CiphertextBallotSelectionHandle value);
+                Handle, index, out var value);
             status.ThrowIfError();
             return new CiphertextBallotSelection(value);
         }
@@ -45,7 +48,7 @@ namespace ElectionGuard
         public ElementModQ CryptoHashWith(ElementModQ encryptionSeed)
         {
             var status = NativeInterface.CiphertextBallotContest.CryptoHashWith(
-                Handle, encryptionSeed.Handle, out NativeInterface.ElementModQ.ElementModQHandle value);
+                Handle, encryptionSeed.Handle, out var value);
             status.ThrowIfError();
             return new ElementModQ(value);
         }
@@ -57,7 +60,7 @@ namespace ElectionGuard
         public ElementModQ AggregateNonce()
         {
             var status = NativeInterface.CiphertextBallotContest.AggregateNonce(
-                Handle, out NativeInterface.ElementModQ.ElementModQHandle value);
+                Handle, out var value);
             status.ThrowIfError();
             return new ElementModQ(value);
         }
@@ -69,7 +72,7 @@ namespace ElectionGuard
         public ElGamalCiphertext ElGamalAccumulate()
         {
             var status = NativeInterface.CiphertextBallotContest.ElGamalAccumulate(
-                Handle, out NativeInterface.ElGamalCiphertext.ElGamalCiphertextHandle value);
+                Handle, out var value);
             status.ThrowIfError();
             return new ElGamalCiphertext(value);
         }
@@ -94,5 +97,28 @@ namespace ElectionGuard
                 Handle, encryptionSeed.Handle, elGamalPublicKey.Handle,
                 cryptoExtendedBaseHash.Handle);
         }
+
+        #region IReadOnlyList implementation
+
+        public int Count => (int)SelectionsSize;
+
+        public CiphertextBallotSelection this[int index] => GetSelectionAtIndex((ulong)index);
+
+
+        public IEnumerator<CiphertextBallotSelection> GetEnumerator()
+        {
+            var count = (int)SelectionsSize;
+            for (var i = 0; i < count; i++)
+            {
+                yield return GetSelectionAtIndex((ulong)i);
+            }
+        }
+
+        IEnumerator IEnumerable.GetEnumerator()
+        {
+            return GetEnumerator();
+        }
+
+        #endregion
     }
 }

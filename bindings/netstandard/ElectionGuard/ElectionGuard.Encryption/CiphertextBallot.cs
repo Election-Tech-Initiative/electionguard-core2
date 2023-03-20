@@ -1,4 +1,5 @@
-using System;
+using System.Collections;
+using System.Collections.Generic;
 using System.Runtime.InteropServices;
 
 namespace ElectionGuard
@@ -12,8 +13,11 @@ namespace ElectionGuard
     ///
     /// Don't make this directly. Use `make_ciphertext_ballot` instead.
     /// </summary>
-    public partial class CiphertextBallot : DisposableBase
+    public partial class CiphertextBallot : DisposableBase, IReadOnlyList<CiphertextBallotContest>
     {
+        public bool IsCast => State == BallotBoxState.Cast;
+        public bool IsSpoiled => State == BallotBoxState.Spoiled;
+
         /// <summary>
         /// Get the BallotBoxState
         /// </summary>
@@ -76,12 +80,12 @@ namespace ElectionGuard
         {
             var status = withNonces
                 ? NativeInterface.CiphertextBallot.ToJsonWithNonces(
-                    Handle, out IntPtr pointer, out _)
+                    Handle, out var pointer, out _)
                 : NativeInterface.CiphertextBallot.ToJson(
                     Handle, out pointer, out _);
             status.ThrowIfError();
             var json = Marshal.PtrToStringAnsi(pointer);
-            NativeInterface.Memory.FreeIntPtr(pointer);
+            _ = NativeInterface.Memory.FreeIntPtr(pointer);
             return json;
         }
 
@@ -93,7 +97,7 @@ namespace ElectionGuard
 
             var status = withNonces
                 ? NativeInterface.CiphertextBallot.ToBsonWithNonces(
-                    Handle, out IntPtr data, out ulong size)
+                    Handle, out var data, out var size)
                 : NativeInterface.CiphertextBallot.ToBson(
                     Handle, out data, out size);
 
@@ -106,7 +110,7 @@ namespace ElectionGuard
 
             var byteArray = new byte[(int)size];
             Marshal.Copy(data, byteArray, 0, (int)size);
-            NativeInterface.Memory.DeleteIntPtr(data);
+            _ = NativeInterface.Memory.DeleteIntPtr(data);
             return byteArray;
         }
 
@@ -118,7 +122,7 @@ namespace ElectionGuard
 
             var status = withNonces
                 ? NativeInterface.CiphertextBallot.ToMsgPack(
-                    Handle, out IntPtr data, out ulong size)
+                    Handle, out var data, out var size)
                 : NativeInterface.CiphertextBallot.ToMsgPack(
                     Handle, out data, out size);
             status.ThrowIfError();
@@ -130,8 +134,31 @@ namespace ElectionGuard
 
             var byteArray = new byte[(int)size];
             Marshal.Copy(data, byteArray, 0, (int)size);
-            NativeInterface.Memory.DeleteIntPtr(data);
+            _ = NativeInterface.Memory.DeleteIntPtr(data);
             return byteArray;
         }
+
+        #region IReadOnlyList implementation
+
+        public int Count => (int)ContestsSize;
+
+        public CiphertextBallotContest this[int index] => GetContestAtIndex((ulong)index);
+
+
+        public IEnumerator<CiphertextBallotContest> GetEnumerator()
+        {
+            var count = (int)ContestsSize;
+            for (var i = 0; i < count; i++)
+            {
+                yield return GetContestAtIndex((ulong)i);
+            }
+        }
+
+        IEnumerator IEnumerable.GetEnumerator()
+        {
+            return GetEnumerator();
+        }
+
+        #endregion
     }
 }

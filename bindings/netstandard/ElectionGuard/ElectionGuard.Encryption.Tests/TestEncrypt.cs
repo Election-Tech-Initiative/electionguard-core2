@@ -147,7 +147,7 @@ namespace ElectionGuard.Encryption.Tests
 
         private static ulong? DecryptSelection(CiphertextBallotContest pismoBeach, ElGamalKeyPair keypair, int index)
         {
-            var selection = pismoBeach.GetSelectionAt((ulong)index);
+            var selection = pismoBeach.GetSelectionAtIndex((ulong)index);
             return selection.Ciphertext.Decrypt(keypair.SecretKey);
         }
 
