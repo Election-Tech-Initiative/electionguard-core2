@@ -73,7 +73,8 @@ namespace ElectionGuard
         /// </summary>
         public bool IsValid(
             string expectedObjectId
-        ) {
+        )
+        {
             return External.IsValid(
                 Handle, expectedObjectId);
         }
@@ -93,12 +94,15 @@ namespace ElectionGuard
 
         #region Extern
 
-        internal static unsafe class External {
+        internal static unsafe class External
+        {
             internal struct PlaintextBallotSelectionType { };
 
             internal class PlaintextBallotSelectionHandle : ElectionGuardSafeHandle<PlaintextBallotSelectionType>
             {
+#if NETSTANDARD
                 [ReliabilityContract(Consistency.WillNotCorruptState, Cer.MayFail)]
+#endif
                 protected override bool Free()
                 {
                     // releasing the C++ memory is currently handled by a parent object e.g. ballot, see https://github.com/microsoft/electionguard-core2/issues/29
@@ -107,9 +111,9 @@ namespace ElectionGuard
             }
 
             [DllImport(
-                NativeInterface.DllName, 
+                NativeInterface.DllName,
                 EntryPoint = "eg_plaintext_ballot_selection_free",
-                CallingConvention = CallingConvention.Cdecl, 
+                CallingConvention = CallingConvention.Cdecl,
                 SetLastError = true)]
             internal static extern Status Free(PlaintextBallotSelectionType* handle);
 

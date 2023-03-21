@@ -124,6 +124,15 @@ namespace ElectionGuard.UI.Resx {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Ballot Folder.
+        /// </summary>
+        internal static string BallotFolderText {
+            get {
+                return ResourceManager.GetString("BallotFolderText", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Ballots.
         /// </summary>
         internal static string BallotsText {
@@ -142,11 +151,56 @@ namespace ElectionGuard.UI.Resx {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Ballot Upload.
+        /// </summary>
+        internal static string BallotUploadText {
+            get {
+                return ResourceManager.GetString("BallotUploadText", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Cancel.
+        /// </summary>
+        internal static string CancelText {
+            get {
+                return ResourceManager.GetString("CancelText", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Candidates.
         /// </summary>
         internal static string CandidatesText {
             get {
                 return ResourceManager.GetString("CandidatesText", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Choose File.
+        /// </summary>
+        internal static string ChooseFile {
+            get {
+                return ResourceManager.GetString("ChooseFile", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Choose File(s).
+        /// </summary>
+        internal static string ChooseFiles {
+            get {
+                return ResourceManager.GetString("ChooseFiles", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Choose Folder.
+        /// </summary>
+        internal static string ChooseFolder {
+            get {
+                return ResourceManager.GetString("ChooseFolder", resourceCulture);
             }
         }
         
@@ -174,6 +228,15 @@ namespace ElectionGuard.UI.Resx {
         internal static string ContestsText {
             get {
                 return ResourceManager.GetString("ContestsText", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Created By.
+        /// </summary>
+        internal static string CreatedByText {
+            get {
+                return ResourceManager.GetString("CreatedByText", resourceCulture);
             }
         }
         
@@ -241,6 +304,15 @@ namespace ElectionGuard.UI.Resx {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Device File.
+        /// </summary>
+        internal static string DeviceFileText {
+            get {
+                return ResourceManager.GetString("DeviceFileText", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Does Not Exist.
         /// </summary>
         internal static string DoesNotExist {
@@ -277,6 +349,15 @@ namespace ElectionGuard.UI.Resx {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to elections created..
+        /// </summary>
+        internal static string ElectionsCreated {
+            get {
+                return ResourceManager.GetString("ElectionsCreated", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Elections.
         /// </summary>
         internal static string ElectionsText {
@@ -291,6 +372,33 @@ namespace ElectionGuard.UI.Resx {
         internal static string ElectionUrl {
             get {
                 return ResourceManager.GetString("ElectionUrl", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Error Creating election.
+        /// </summary>
+        internal static string ErrorCreatingElection {
+            get {
+                return ResourceManager.GetString("ErrorCreatingElection", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The manifest file could not be loaded..
+        /// </summary>
+        internal static string ErrorLoadingManifest {
+            get {
+                return ResourceManager.GetString("ErrorLoadingManifest", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Error in manifest files.
+        /// </summary>
+        internal static string ErrorManifest {
+            get {
+                return ResourceManager.GetString("ErrorManifest", resourceCulture);
             }
         }
         
@@ -336,6 +444,24 @@ namespace ElectionGuard.UI.Resx {
         internal static string HelloWorld {
             get {
                 return ResourceManager.GetString("HelloWorld", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Information.
+        /// </summary>
+        internal static string InformationText {
+            get {
+                return ResourceManager.GetString("InformationText", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Insert an EGDrive (USB drive) containing ballots.
+        /// </summary>
+        internal static string InsertUsbText {
+            get {
+                return ResourceManager.GetString("InsertUsbText", resourceCulture);
             }
         }
         
@@ -394,6 +520,15 @@ namespace ElectionGuard.UI.Resx {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Key Ceremony.
+        /// </summary>
+        internal static string KeyCeremonyText {
+            get {
+                return ResourceManager.GetString("KeyCeremonyText", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Location.
         /// </summary>
         internal static string LocationText {
@@ -430,6 +565,24 @@ namespace ElectionGuard.UI.Resx {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Cancel wizard and manually upload ballots.
+        /// </summary>
+        internal static string ManuelUploadText {
+            get {
+                return ResourceManager.GetString("ManuelUploadText", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Names will be generated from manifest names.
+        /// </summary>
+        internal static string NameFromManifest {
+            get {
+                return ResourceManager.GetString("NameFromManifest", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Name.
         /// </summary>
         internal static string NameText {
@@ -439,11 +592,38 @@ namespace ElectionGuard.UI.Resx {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to No Ballots Uploaded.
+        /// </summary>
+        internal static string NoBallotUploads {
+            get {
+                return ResourceManager.GetString("NoBallotUploads", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to No elections found.
         /// </summary>
         internal static string NoElections {
             get {
                 return ResourceManager.GetString("NoElections", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to No file chosen.
+        /// </summary>
+        internal static string NoFileText {
+            get {
+                return ResourceManager.GetString("NoFileText", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to No folder chosen.
+        /// </summary>
+        internal static string NoFolderText {
+            get {
+                return ResourceManager.GetString("NoFolderText", resourceCulture);
             }
         }
         
@@ -471,6 +651,15 @@ namespace ElectionGuard.UI.Resx {
         internal static string NoTallies {
             get {
                 return ResourceManager.GetString("NoTallies", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to No Tallies Created.
+        /// </summary>
+        internal static string NoTalliesCreated {
+            get {
+                return ResourceManager.GetString("NoTalliesCreated", resourceCulture);
             }
         }
         
@@ -574,11 +763,29 @@ namespace ElectionGuard.UI.Resx {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Removing files from the list.
+        /// </summary>
+        internal static string RemovingList {
+            get {
+                return ResourceManager.GetString("RemovingList", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Save.
         /// </summary>
         internal static string Save {
             get {
                 return ResourceManager.GetString("Save", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Selection one or more manifest files.
+        /// </summary>
+        internal static string SelectManifest {
+            get {
+                return ResourceManager.GetString("SelectManifest", resourceCulture);
             }
         }
         
@@ -619,11 +826,38 @@ namespace ElectionGuard.UI.Resx {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Total.
+        /// </summary>
+        internal static string TotalText {
+            get {
+                return ResourceManager.GetString("TotalText", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Uploaded.
         /// </summary>
         internal static string UploadedText {
             get {
                 return ResourceManager.GetString("UploadedText", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Upload.
+        /// </summary>
+        internal static string UploadText {
+            get {
+                return ResourceManager.GetString("UploadText", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Upload Wizard.
+        /// </summary>
+        internal static string UploadWizardText {
+            get {
+                return ResourceManager.GetString("UploadWizardText", resourceCulture);
             }
         }
         
@@ -669,6 +903,15 @@ namespace ElectionGuard.UI.Resx {
         internal static string ViewKeyCeremony {
             get {
                 return ResourceManager.GetString("ViewKeyCeremony", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to View Manifest.
+        /// </summary>
+        internal static string ViewManifest {
+            get {
+                return ResourceManager.GetString("ViewManifest", resourceCulture);
             }
         }
         

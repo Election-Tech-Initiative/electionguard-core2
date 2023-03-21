@@ -11,8 +11,6 @@ public partial class ViewKeyCeremonyViewModel : BaseViewModel
 
     private KeyCeremonyMediator? _mediator;
 
-    private readonly IDispatcherTimer _timer;
-
     private bool _joinPressed;
 
     public ViewKeyCeremonyViewModel(IServiceProvider serviceProvider,

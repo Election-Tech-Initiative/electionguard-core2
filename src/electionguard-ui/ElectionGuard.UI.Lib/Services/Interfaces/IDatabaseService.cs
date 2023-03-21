@@ -11,6 +11,10 @@ internal static class Constants
 
     public readonly static string DesignatedId = "DesignatedId";
 
+    public readonly static string ElectionId = "ElectionId";
+
+    public readonly static string UploadId = "UploadId";
+
     public readonly static string GuardianId = "GuardianId";
 
     public readonly static string Id = "Id";

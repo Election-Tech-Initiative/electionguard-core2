@@ -1265,7 +1265,7 @@ namespace ElectionGuard
             [DllImport(DllName, EntryPoint = "eg_candidate_get_name",
                 CallingConvention = CallingConvention.Cdecl, SetLastError = true)]
             internal static extern Status GetName(
-                CandidateHandle handle, out IntPtr name);
+                CandidateHandle handle, out InternationalizedText.InternationalizedTextHandle name);
 
             [DllImport(DllName, EntryPoint = "eg_candidate_get_party_id",
                 CallingConvention = CallingConvention.Cdecl, SetLastError = true)]
@@ -2355,7 +2355,9 @@ namespace ElectionGuard
             internal class CompactPlaintextBallotHandle
                 : ElectionGuardSafeHandle<CompactPlaintextBallotType>
             {
+#if NETSTANDARD
                 [ReliabilityContract(Consistency.WillNotCorruptState, Cer.MayFail)]
+#endif
                 protected override bool Free()
                 {
                     if (IsClosed) return true;
@@ -2453,7 +2455,9 @@ namespace ElectionGuard
             internal class CompactCiphertextBallotHandle
                 : ElectionGuardSafeHandle<CompactCiphertextBallotType>
             {
+#if NETSTANDARD
                 [ReliabilityContract(Consistency.WillNotCorruptState, Cer.MayFail)]
+#endif
                 protected override bool Free()
                 {
                     if (IsClosed) return true;
@@ -2499,7 +2503,9 @@ namespace ElectionGuard
             internal class SubmittedBallotHandle
                 : ElectionGuardSafeHandle<SubmittedBallotType>
             {
+#if NETSTANDARD
                 [ReliabilityContract(Consistency.WillNotCorruptState, Cer.MayFail)]
+#endif
                 protected override bool Free()
                 {
                     if (IsFreed) return true;
@@ -2642,7 +2648,9 @@ namespace ElectionGuard
             internal class EncryptionDeviceHandle
                 : ElectionGuardSafeHandle<EncryptionDeviceType>
             {
+#if NETSTANDARD
                 [ReliabilityContract(Consistency.WillNotCorruptState, Cer.MayFail)]
+#endif
                 protected override bool Free()
                 {
                     if (IsClosed) return true;
@@ -2697,7 +2705,9 @@ namespace ElectionGuard
             internal class EncryptionMediatorHandle
                 : ElectionGuardSafeHandle<EncryptionMediatorType>
             {
+#if NETSTANDARD
                 [ReliabilityContract(Consistency.WillNotCorruptState, Cer.MayFail)]
+#endif
                 protected override bool Free()
                 {
                     if (IsClosed) return true;
