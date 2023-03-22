@@ -70,23 +70,23 @@ namespace ElectionGuard.Encryption.Tests
         [Test]
         public void Test_Encrypt_Ballot_Cast_Removes_Nonces()
         {
-            // Configure the election context
-            var keypair = ElGamalKeyPair.FromSecret(Constants.TWO_MOD_Q);
-            var manifest = ManifestGenerator.GetManifestFromFile();
-            var internalManifest = new InternalManifest(manifest);
-            var context = new CiphertextElectionContext(
-                1UL, 1UL, keypair.PublicKey, Constants.TWO_MOD_Q, internalManifest.ManifestHash);
-            var device = new EncryptionDevice(12345UL, 23456UL, 34567UL, "Location");
-            var mediator = new EncryptionMediator(internalManifest, context, device);
+            // Arrange
+            var data = ElectionGenerator.GenerateFakeElectionData();
+            var mediator = new EncryptionMediator(
+                data.InternalManifest, data.Context, data.Device);
 
-            var ballot = BallotGenerator.GetFakeBallot(internalManifest);
+            var ballot = BallotGenerator.GetFakeBallot(data.InternalManifest);
 
             // Act
             var ciphertext = mediator.Encrypt(ballot);
+            ciphertext.Cast();
 
             // Assert
-            ciphertext.Cast();
             Assert.That(ciphertext.Nonce == null);
+            ciphertext.ForEachContestSelection((contest, selection) =>
+            {
+                Assert.That(selection.Nonce == null);
+            });
         }
 
         [Test]
