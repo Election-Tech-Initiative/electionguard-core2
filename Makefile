@@ -478,6 +478,7 @@ endif
 test-netstandard: build-netstandard
 	@echo 🧪 TEST NETSTANDARD $(PROCESSOR) $(TARGET)
 	dotnet test -a $(PROCESSOR) --configuration $(TARGET) ./bindings/netstandard/ElectionGuard/ElectionGuard.Encryption.Tests/ElectionGuard.Encryption.Tests.csproj
+	dotnet test -a $(PROCESSOR) --configuration $(TARGET) ./bindings/netstandard/ElectionGuard/ElectionGuard.Decryption.Tests/ElectionGuard.Decryption.Tests.csproj
 
 test-netstandard-arm64:
 	PROCESSOR=arm64 && make test-netstandard
