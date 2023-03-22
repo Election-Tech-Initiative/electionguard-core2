@@ -840,9 +840,7 @@ namespace electionguard
     /// Do not make this class directly. Use `make_ciphertext_submitted_ballot` or `from_ciphertext_ballot` instead.
     /// </summary>
 
-    class [[deprecated(
-      "This class is obsolete. Use CiphertextBallot instead.")]] EG_API SubmittedBallot
-        : public CiphertextBallot
+    class EG_API SubmittedBallot : public CiphertextBallot
     {
       public:
         SubmittedBallot(const SubmittedBallot &other);
@@ -863,8 +861,8 @@ namespace electionguard
         /// <summary>
         /// Convert a `CiphertextBallot` into a `SubmittedBallot`, with all nonces removed.
         /// </summary>
-        static std::unique_ptr<SubmittedBallot> from(
-          const CiphertextBallot &ballot, BallotBoxState state = BallotBoxState::unknown);
+        static std::unique_ptr<SubmittedBallot>
+        from(const CiphertextBallot &ballot, BallotBoxState state = BallotBoxState::unknown);
 
         /// <summary>
         /// Makes a `SubmittedBallot`, initially in the state where it's neither been cast nor spoiled.
@@ -880,13 +878,14 @@ namespace electionguard
         ///                           Will use the manifestHash if none provided</param>
         /// <param name="contests"> List of contests for this ballot</param>
         /// </summary>
-        static std::unique_ptr<SubmittedBallot> make(
-          const std::string &objectId, const std::string &styleId, const ElementModQ &manifestHash,
-          std::vector<std::unique_ptr<CiphertextBallotContest>> contests,
-          std::unique_ptr<ElementModQ> nonce = nullptr, const uint64_t timestamp = 0,
-          std::unique_ptr<ElementModQ> ballotCodeSeed = nullptr,
-          std::unique_ptr<ElementModQ> ballotCode = nullptr,
-          BallotBoxState state = BallotBoxState::unknown);
+        static std::unique_ptr<SubmittedBallot>
+        make(const std::string &objectId, const std::string &styleId,
+             const ElementModQ &manifestHash,
+             std::vector<std::unique_ptr<CiphertextBallotContest>> contests,
+             std::unique_ptr<ElementModQ> nonce = nullptr, const uint64_t timestamp = 0,
+             std::unique_ptr<ElementModQ> ballotCodeSeed = nullptr,
+             std::unique_ptr<ElementModQ> ballotCode = nullptr,
+             BallotBoxState state = BallotBoxState::unknown);
 
         /// <summary>
         /// Export the ballot representation as BSON
