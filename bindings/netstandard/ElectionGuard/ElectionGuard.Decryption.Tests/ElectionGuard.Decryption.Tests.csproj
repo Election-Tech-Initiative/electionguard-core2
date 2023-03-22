@@ -24,5 +24,6 @@
     <ProjectReference Include="..\ElectionGuard.Decryption\ElectionGuard.Decryption.csproj" />
     <ProjectReference Include="..\ElectionGuard.ElectionSetup\ElectionGuard.ElectionSetup.csproj" />
     <ProjectReference Include="..\ElectionGuard.Encryption\ElectionGuard.Encryption.csproj" />
+    <ProjectReference Include="..\ElectionGuard.Encryption.Utils\ElectionGuard.Encryption.Utils.csproj" />
   </ItemGroup>
 </Project>

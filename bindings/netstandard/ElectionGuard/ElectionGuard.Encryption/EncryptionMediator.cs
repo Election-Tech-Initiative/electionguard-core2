@@ -43,14 +43,14 @@
             if (verifyProofs)
             {
                 var status = NativeInterface.EncryptionMediator.EncryptAndVerify(
-                    Handle, plaintext.Handle, out CiphertextBallot.External.CiphertextBallotHandle ciphertext);
+                    Handle, plaintext.Handle, out var ciphertext);
                 status.ThrowIfError();
                 return new CiphertextBallot(ciphertext);
             }
             else
             {
                 var status = NativeInterface.EncryptionMediator.Encrypt(
-                    Handle, plaintext.Handle, out CiphertextBallot.External.CiphertextBallotHandle ciphertext);
+                    Handle, plaintext.Handle, out var ciphertext);
                 status.ThrowIfError();
                 return new CiphertextBallot(ciphertext);
             }
@@ -66,14 +66,14 @@
             if (verifyProofs)
             {
                 var status = NativeInterface.EncryptionMediator.CompactEncryptAndVerify(
-                    Handle, plaintext.Handle, out NativeInterface.CompactCiphertextBallot.CompactCiphertextBallotHandle ciphertext);
+                    Handle, plaintext.Handle, out var ciphertext);
                 status.ThrowIfError();
                 return new CompactCiphertextBallot(ciphertext);
             }
             else
             {
                 var status = NativeInterface.EncryptionMediator.CompactEncrypt(
-                    Handle, plaintext.Handle, out NativeInterface.CompactCiphertextBallot.CompactCiphertextBallotHandle ciphertext);
+                    Handle, plaintext.Handle, out var ciphertext);
                 status.ThrowIfError();
                 return new CompactCiphertextBallot(ciphertext);
             }
@@ -86,7 +86,11 @@
         {
             base.DisposeUnmanaged();
 
-            if (Handle == null || Handle.IsInvalid) return;
+            if (Handle == null || Handle.IsInvalid)
+            {
+                return;
+            }
+
             Handle.Dispose();
             Handle = null;
         }

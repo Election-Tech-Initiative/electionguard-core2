@@ -2,7 +2,7 @@
 
 namespace ElectionGuard.Decryption.Tests;
 
-public class Tests
+public class TestCiphertextTallySelection
 {
     private readonly ElementModQ nonce = Constants.ONE_MOD_Q;
     private readonly ElementModQ secret = Constants.TWO_MOD_Q;
@@ -28,7 +28,7 @@ public class Tests
         // Act
         var subject = new CiphertextTallySelection(
             "some_object_id", 0, Constants.ONE_MOD_Q);
-        _ = subject.ElGamalAccumulate(ciphertexts);
+        _ = subject.Accumulate(ciphertexts);
 
         // Assert
         var plaintext = subject.Ciphertext.Decrypt(keyPair.SecretKey);
