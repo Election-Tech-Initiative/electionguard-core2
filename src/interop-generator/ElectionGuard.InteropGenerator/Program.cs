@@ -14,6 +14,8 @@
  * - Make small changes
  * - Start with C# then move to C
  * - Unfortunately you'll need Visual Studio if you need to change the .tt files
+ * - When working on a mac, you might have to manually configure the template generation in visual sudio for mac
+ * - see: https://stackoverflow.com/a/68413028
  */
 
 using ElectionGuard.InteropGenerator.FileGenerators;
