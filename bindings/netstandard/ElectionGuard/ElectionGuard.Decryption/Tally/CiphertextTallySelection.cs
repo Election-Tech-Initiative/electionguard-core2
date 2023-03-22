@@ -8,7 +8,7 @@ namespace ElectionGuard.Decryption.Tally
     /// A CiphertextTallySelection is a homomorphic accumulation of ElGamalCiphertexts that represent the
     /// encrypted votes for a particular selection in a contest.
     /// </summary>
-    public class CiphertextTallySelection : DisposableBase, ICiphertextSelection
+    public class CiphertextTallySelection : DisposableBase, ICiphertextSelection, IEquatable<CiphertextTallySelection>
     {
         /// <summary>
         /// The object id of the selection
@@ -41,20 +41,20 @@ namespace ElectionGuard.Decryption.Tally
             Ciphertext = new ElGamalCiphertext(Constants.ONE_MOD_P, Constants.ONE_MOD_P);
         }
 
-        public CiphertextTallySelection(SelectionDescription selectionDescription)
+        public CiphertextTallySelection(SelectionDescription selection)
         {
-            ObjectId = selectionDescription.ObjectId;
-            SequenceOrder = selectionDescription.SequenceOrder;
-            DescriptionHash = selectionDescription.CryptoHash();
+            ObjectId = selection.ObjectId;
+            SequenceOrder = selection.SequenceOrder;
+            DescriptionHash = selection.CryptoHash();
             Ciphertext = new ElGamalCiphertext(Constants.ONE_MOD_P, Constants.ONE_MOD_P);
         }
 
         public CiphertextTallySelection(
-            SelectionDescription selectionDescription, ElGamalCiphertext ciphertext)
+            SelectionDescription selection, ElGamalCiphertext ciphertext)
         {
-            ObjectId = selectionDescription.ObjectId;
-            SequenceOrder = selectionDescription.SequenceOrder;
-            DescriptionHash = selectionDescription.CryptoHash();
+            ObjectId = selection.ObjectId;
+            SequenceOrder = selection.SequenceOrder;
+            DescriptionHash = selection.CryptoHash();
             Ciphertext = ciphertext;
         }
 
@@ -123,6 +123,7 @@ namespace ElectionGuard.Decryption.Tally
         public ElGamalCiphertext Accumulate(
             IEnumerable<ElGamalCiphertext> ciphertexts)
         {
+
             var newValue = ElGamal.Add(ciphertexts.Append(Ciphertext));
             Ciphertext.Dispose();
             Ciphertext = newValue;
@@ -145,5 +146,47 @@ namespace ElectionGuard.Decryption.Tally
             DescriptionHash.Dispose();
             Ciphertext.Dispose();
         }
+
+        # region Equality
+
+        public bool Equals(CiphertextTallySelection? other)
+        {
+            if (other is null)
+            {
+                return false;
+            }
+
+            if (ReferenceEquals(this, other))
+            {
+                return true;
+            }
+
+            return ObjectId == other.ObjectId &&
+                   SequenceOrder == other.SequenceOrder &&
+                   DescriptionHash.Equals(other.DescriptionHash) &&
+                   Ciphertext.Equals(other.Ciphertext);
+        }
+
+        public override bool Equals(object? obj)
+        {
+            return ReferenceEquals(this, obj) || (obj is CiphertextTallySelection other && Equals(other));
+        }
+
+        public override int GetHashCode()
+        {
+            return HashCode.Combine(ObjectId, SequenceOrder, DescriptionHash, Ciphertext);
+        }
+
+        public static bool operator ==(CiphertextTallySelection? left, CiphertextTallySelection? right)
+        {
+            return Equals(left, right);
+        }
+
+        public static bool operator !=(CiphertextTallySelection? left, CiphertextTallySelection? right)
+        {
+            return !Equals(left, right);
+        }
+
+        # endregion
     }
 }

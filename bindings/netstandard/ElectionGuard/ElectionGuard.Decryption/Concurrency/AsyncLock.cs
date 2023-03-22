@@ -18,9 +18,9 @@ public sealed class SemaphoreAsyncLock : DisposableBase
         var wait = _semaphore.WaitAsync(cancellationToken);
         return wait.IsCompleted ?
                     _releaser :
-                    wait.ContinueWith((_, state) => (IDisposable)state,
+                    wait.ContinueWith((_, state) => state as IDisposable,
                         _releaser.GetAwaiter().GetResult(), cancellationToken,
-        TaskContinuationOptions.ExecuteSynchronously, TaskScheduler.Default);
+        TaskContinuationOptions.ExecuteSynchronously, TaskScheduler.Default)!;
     }
 
     protected override void DisposeManaged()

@@ -17,7 +17,7 @@ public static partial class InternalManifestExtensions
 }
 
 
-public record PlaintextTally
+public record PlaintextTally : IEquatable<PlaintextTally>
 {
     public string TallyId { get; init; } = Guid.NewGuid().ToString();
     public string Name { get; init; } = default!;
@@ -45,4 +45,30 @@ public record PlaintextTally
         Name = name;
         Contests = manifest.ToPlaintextTallyContestDictionary();
     }
+
+    #region IEquatable
+
+    public virtual bool Equals(PlaintextTally? other)
+    {
+        if (other is null)
+        {
+            return false;
+        }
+
+        if (ReferenceEquals(this, other))
+        {
+            return true;
+        }
+
+        return TallyId == other.TallyId &&
+               Name == other.Name &&
+               Contests.SequenceEqual(other.Contests);
+    }
+
+    public override int GetHashCode()
+    {
+        return HashCode.Combine(TallyId, Name, Contests);
+    }
+
+    #endregion
 }

@@ -18,7 +18,7 @@ public static partial class InternalManifestExtensions
     }
 }
 
-public record CiphertextTally : DisposableRecordBase
+public record CiphertextTally : DisposableRecordBase, IEquatable<CiphertextTally>
 {
     public string TallyId { get; init; } = Guid.NewGuid().ToString();
     public string Name { get; init; } = default!;
@@ -198,4 +198,26 @@ public record CiphertextTally : DisposableRecordBase
 
         return result;
     }
+
+    #region Equality Overrides
+
+    public virtual bool Equals(CiphertextTally? other)
+    {
+        return other != null &&
+               TallyId == other.TallyId &&
+               Name == other.Name &&
+               Context.CryptoExtendedBaseHash == other.Context.CryptoExtendedBaseHash &&
+               Manifest.ManifestHash == other.Manifest.ManifestHash &&
+               CastBallotIds.SetEquals(other.CastBallotIds) &&
+               SpoiledBallotIds.SetEquals(other.SpoiledBallotIds) &&
+               CreatedAt == other.CreatedAt &&
+               Contests.SequenceEqual(other.Contests);
+    }
+
+    public override int GetHashCode()
+    {
+        return HashCode.Combine(TallyId, Name, Context, Manifest, CastBallotIds, SpoiledBallotIds, CreatedAt, Contests);
+    }
+
+    #endregion Equality Overrides
 }

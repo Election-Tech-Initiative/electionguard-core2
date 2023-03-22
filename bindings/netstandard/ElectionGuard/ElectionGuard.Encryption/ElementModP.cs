@@ -9,7 +9,7 @@ namespace ElectionGuard
     /// <summary>
     /// An element of the larger `mod p` space, i.e., in [0, P), where P is a 4096-bit prime.
     /// </summary>
-    public class ElementModP : DisposableBase
+    public class ElementModP : DisposableBase, IEquatable<ElementModP>
     {
         /// <summary>
         /// Number of 64-bit ints that make up the 4096-bit prime
@@ -194,7 +194,7 @@ namespace ElectionGuard
             var data = new long[MaxSize];
             fixed (ulong* element = new ulong[MaxSize])
             {
-                NativeInterface.ElementModP.GetData(Handle, &element, out ulong size);
+                _ = NativeInterface.ElementModP.GetData(Handle, &element, out ulong size);
                 if (size != MaxSize)
                 {
                     throw new ElectionGuardException($"wrong size, expected: {MaxSize} actual: {size}");
@@ -214,18 +214,49 @@ namespace ElectionGuard
             return data;
         }
 
+        public static bool operator ==(ElementModP a, ElementModP b)
+        {
+            if (ReferenceEquals(a, b))
+            {
+                return true;
+            }
+
+            if (a is null || b is null)
+            {
+                return false;
+            }
+
+            return a.ToHex().Equals(b.ToHex());
+        }
+
+        public static bool operator !=(ElementModP a, ElementModP b)
+        {
+            return !(a == b);
+        }
+
         /// <summary>
-        /// 
+        /// Check to see if the object is equal to the current instance 
         /// </summary>
         /// <param name="obj"></param>
         /// <returns></returns>
         public override bool Equals(object obj)
         {
-            if (obj == null)
+            return Equals(obj as ElementModP);
+        }
+
+        public bool Equals(ElementModP other)
+        {
+            if (other is null)
+            {
                 return false;
-            if (!(obj is ElementModP other))
-                return false;
-            return this.ToHex() == other.ToHex();
+            }
+
+            if (ReferenceEquals(this, other))
+            {
+                return true;
+            }
+
+            return ToHex().Equals(other.ToHex());
         }
 
         /// <summary>

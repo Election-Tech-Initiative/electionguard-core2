@@ -2,11 +2,11 @@ using ElectionGuard.Encryption.Ballot;
 
 namespace ElectionGuard.Decryption.Tally;
 
-public struct AccumulationResult
+public class AccumulationResult
 {
-    public string TallyId { get; init; } = default!;
-    public HashSet<string> Accumulated { get; init; } = default!;
-    public Dictionary<string, BallotValidationResult> Failed { get; init; } = default!;
+    public string TallyId { get; init; }
+    public HashSet<string> Accumulated { get; init; }
+    public Dictionary<string, BallotValidationResult> Failed { get; init; }
 
     public AccumulationResult(string tallyId)
     {

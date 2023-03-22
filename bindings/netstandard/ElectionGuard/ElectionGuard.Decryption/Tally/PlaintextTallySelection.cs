@@ -3,7 +3,7 @@ namespace ElectionGuard.Decryption.Tally;
 /// <summary>
 /// A plaintext Tally Selection is a decrypted selection of a contest
 /// </summary>
-public class PlaintextTallySelection
+public class PlaintextTallySelection : IEquatable<PlaintextTallySelection>
 {
     public string ObjectId { get; set; } = default!;
 
@@ -31,11 +31,11 @@ public class PlaintextTallySelection
     public ulong[]? Proof { get; set; }
 
     public PlaintextTallySelection(
-        SelectionDescription selectionDescription)
+        SelectionDescription selection)
     {
-        ObjectId = selectionDescription.ObjectId;
-        SequenceOrder = selectionDescription.SequenceOrder;
-        DescriptionHash = selectionDescription.CryptoHash();
+        ObjectId = selection.ObjectId;
+        SequenceOrder = selection.SequenceOrder;
+        DescriptionHash = selection.CryptoHash();
         Tally = 0;
         Value = Constants.ONE_MOD_P;
         Proof = null;
@@ -69,4 +69,48 @@ public class PlaintextTallySelection
         Value = value;
         Proof = proof;
     }
+
+    # region IEquatable
+
+    public bool Equals(PlaintextTallySelection? other)
+    {
+        if (other is null)
+        {
+            return false;
+        }
+
+        if (ReferenceEquals(this, other))
+        {
+            return true;
+        }
+
+        return ObjectId == other.ObjectId &&
+               SequenceOrder == other.SequenceOrder &&
+               DescriptionHash.Equals(other.DescriptionHash) &&
+               Tally == other.Tally &&
+               Value.Equals(other.Value); // &&
+                                          // TODO: Proof.SequenceEqual(other.Proof); // just a placeholder for now
+    }
+
+    public override bool Equals(object? obj)
+    {
+        return Equals(obj as PlaintextTallySelection);
+    }
+
+    public override int GetHashCode()
+    {
+        return HashCode.Combine(ObjectId, SequenceOrder, DescriptionHash.ToHex(), Tally, Value.ToHex(), Proof);
+    }
+
+    public static bool operator ==(PlaintextTallySelection? left, PlaintextTallySelection? right)
+    {
+        return Equals(left, right);
+    }
+
+    public static bool operator !=(PlaintextTallySelection? left, PlaintextTallySelection? right)
+    {
+        return !Equals(left, right);
+    }
+
+    # endregion
 }

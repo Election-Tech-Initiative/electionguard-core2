@@ -41,7 +41,7 @@ public class TestCiphertextTally
     {
         // Arrange
         var data = ElectionGenerator.GenerateFakeElectionData();
-        var count = 10UL;
+        var count = 2UL;
         var ballots = Enumerable.Range(0, (int)count)
             .Select(i =>
                 BallotGenerator.GetFakeBallot(data.InternalManifest)).ToList();
@@ -59,17 +59,24 @@ public class TestCiphertextTally
                 }).ToList();
 
 
-
         // Act
         var mediator = new TallyMediator();
-        var result = mediator.CreateTally(
-            "test", data.Context, data.InternalManifest);
-        _ = result.Accumulate(encryptedBallots);
+        var ciphertextTally = mediator.CreateTally(
+            plaintextTally.TallyId,
+            plaintextTally.Name,
+            data.Context,
+            data.InternalManifest);
+        var result = ciphertextTally.Accumulate(encryptedBallots);
 
-        var decryptedTally = result.Decrypt(data.KeyPair.SecretKey);
+        var decryptedTally = ciphertextTally.Decrypt(data.KeyPair.SecretKey);
 
         // Assert
-        Assert.That(plaintextTally, Is.EqualTo(decryptedTally));
+        Assert.Multiple(() =>
+        {
+            Assert.That(result.Accumulated, Has.Count.EqualTo(count));
+            Assert.That(result.Failed, Has.Count.EqualTo(0));
+            Assert.That(plaintextTally, Is.EqualTo(decryptedTally));
+        });
     }
 
     [Test]

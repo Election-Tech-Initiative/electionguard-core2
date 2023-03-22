@@ -4,15 +4,24 @@ using System.Text;
 
 namespace ElectionGuard.Encryption.Ballot
 {
-    public struct BallotValidationResult
+    public class BallotValidationResult
     {
-        public bool IsValid;
-        public string Message;
+        public bool IsValid { get; set; }
+        public string Message { get; set; }
 
-        public List<BallotValidationResult> Children;
+        public List<BallotValidationResult> Children { get; set; }
 
         public BallotValidationResult(
-            string message = null,
+            bool isValid,
+            List<BallotValidationResult> children = null)
+        {
+            IsValid = isValid;
+            Message = string.Empty;
+            Children = children ?? new List<BallotValidationResult>();
+        }
+
+        public BallotValidationResult(
+            string message,
             List<BallotValidationResult> children = null)
         {
             IsValid = false;
@@ -21,23 +30,13 @@ namespace ElectionGuard.Encryption.Ballot
         }
 
         public BallotValidationResult(
-            bool isValid = true,
-            string message = null,
+            bool isValid,
+            string message,
             List<BallotValidationResult> children = null)
         {
             IsValid = isValid;
             Message = message;
             Children = children ?? new List<BallotValidationResult>();
-        }
-
-        public static implicit operator BallotValidationResult(bool isValid)
-        {
-            return new BallotValidationResult() { IsValid = isValid };
-        }
-
-        public static implicit operator bool(BallotValidationResult result)
-        {
-            return result.IsValid;
         }
 
         public override string ToString()
@@ -65,18 +64,12 @@ namespace ElectionGuard.Encryption.Ballot
             this CiphertextBallotSelection selection, SelectionDescription description)
         {
             return selection.ObjectId != description.ObjectId
-                ? new BallotValidationResult()
-                {
-                    IsValid = false,
-                    Message = $"Object Ids do not match for selection {selection.ObjectId} description {description.ObjectId}"
-                }
+                ? new BallotValidationResult(
+                    $"Object Ids do not match for selection {selection.ObjectId} description {description.ObjectId}")
                 : selection.DescriptionHash != description.CryptoHash()
-                ? new BallotValidationResult()
-                {
-                    IsValid = false,
-                    Message = $"Description hashes do not match for selection {selection.ObjectId}"
-                }
-                : new BallotValidationResult() { IsValid = true };
+                ? new BallotValidationResult(
+                    $"Description hashes do not match for selection {selection.ObjectId}")
+                : new BallotValidationResult(true);
         }
 
         public static BallotValidationResult IsValid(
@@ -86,31 +79,22 @@ namespace ElectionGuard.Encryption.Ballot
             // verify the object id matches
             if (contest.ObjectId != description.ObjectId)
             {
-                return new BallotValidationResult()
-                {
-                    IsValid = false,
-                    Message = $"Object Ids do not match for contest {contest.ObjectId} description {description.ObjectId}"
-                };
+                return new BallotValidationResult(
+                    $"Object Ids do not match for contest {contest.ObjectId} description {description.ObjectId}");
             }
 
             // verify the description hash matches
             if (contest.DescriptionHash != description.CryptoHash())
             {
-                return new BallotValidationResult()
-                {
-                    IsValid = false,
-                    Message = $"Description hashes do not match for contest {contest.ObjectId}"
-                };
+                return new BallotValidationResult(
+                    $"Description hashes do not match for contest {contest.ObjectId}");
             }
 
             if (contest.Selections.Count() !=
                 (int)description.SelectionsSize + (int)description.PlaceholdersSize)
             {
-                return new BallotValidationResult()
-                {
-                    IsValid = false,
-                    Message = $"Selection counts do not match for contest {contest.ObjectId}"
-                };
+                return new BallotValidationResult(
+                    $"Selection counts do not match for contest {contest.ObjectId}");
             }
 
             // verify the selections are valid
@@ -119,14 +103,12 @@ namespace ElectionGuard.Encryption.Ballot
             {
                 // validate there's a selection description for the selection id
                 var selection = contest.Selections
-                    .FirstOrDefault(i => i.ObjectId == description.ObjectId);
+                    .FirstOrDefault(i => i.ObjectId == selectionDescription.ObjectId);
                 if (selection == null)
                 {
-                    results.Add(new BallotValidationResult()
-                    {
-                        IsValid = false,
-                        Message = $"Selection {description.ObjectId} not found in contest {contest.ObjectId}"
-                    });
+                    results.Add(new BallotValidationResult(
+                        $"Selection {selectionDescription.ObjectId} not found in contest {contest.ObjectId}"
+                    ));
                 }
 
                 // validate the selection is valid
@@ -137,7 +119,7 @@ namespace ElectionGuard.Encryption.Ballot
                 }
             }
 
-            return new BallotValidationResult() { IsValid = !results.Any(), Children = results };
+            return new BallotValidationResult(!results.Any(), results);
         }
 
         /// <summary>
@@ -148,21 +130,17 @@ namespace ElectionGuard.Encryption.Ballot
         {
             if (ballot.ManifestHash != manifest.ManifestHash)
             {
-                return new BallotValidationResult()
-                {
-                    IsValid = false,
-                    Message = $"Manifest hashes do not match for ballot {ballot.ObjectId}"
-                };
+                return new BallotValidationResult(
+                    $"Manifest hashes do not match for ballot {ballot.ObjectId}"
+                );
             }
 
             var descriptions = manifest.GetContests(ballot.StyleId);
             if (descriptions == null)
             {
-                return new BallotValidationResult()
-                {
-                    IsValid = false,
-                    Message = $"Style {ballot.StyleId} not found in manifest"
-                };
+                return new BallotValidationResult(
+                    $"Style {ballot.StyleId} not found in manifest"
+                );
             }
 
             // verify the contests are valid
@@ -174,11 +152,9 @@ namespace ElectionGuard.Encryption.Ballot
                     .FirstOrDefault(i => i.ObjectId == contestDescription.ObjectId);
                 if (contest == null)
                 {
-                    results.Add(new BallotValidationResult()
-                    {
-                        IsValid = false,
-                        Message = $"Contest {contestDescription.ObjectId} not found in ballot {ballot.ObjectId}"
-                    });
+                    results.Add(new BallotValidationResult(
+                        $"Contest {contestDescription.ObjectId} not found in ballot {ballot.ObjectId}"
+                    ));
                 }
 
                 // validate the contest is valid
@@ -189,7 +165,7 @@ namespace ElectionGuard.Encryption.Ballot
                 }
             }
 
-            return new BallotValidationResult() { IsValid = !results.Any(), Children = results };
+            return new BallotValidationResult(!results.Any(), results);
         }
 
         /// <summary>
@@ -201,11 +177,9 @@ namespace ElectionGuard.Encryption.Ballot
             var isValid = ballot.IsValid(manifest);
             if (ballot.ManifestHash != context.ManifestHash)
             {
-                isValid.Children.Add(new BallotValidationResult()
-                {
-                    IsValid = false,
-                    Message = $"Manifest hashes do not match for ballot {ballot.ObjectId}"
-                });
+                isValid.Children.Add(new BallotValidationResult(
+                    $"Manifest hashes do not match for ballot {ballot.ObjectId}"
+                ));
                 isValid.IsValid = false;
             }
 
@@ -214,11 +188,9 @@ namespace ElectionGuard.Encryption.Ballot
                 manifest.ManifestHash, context.ElGamalPublicKey, context.CryptoExtendedBaseHash);
             if (!isValidEncryption)
             {
-                isValid.Children.Add(new BallotValidationResult()
-                {
-                    IsValid = false,
-                    Message = $"Ballot {ballot.ObjectId} is not valid encryption"
-                });
+                isValid.Children.Add(new BallotValidationResult(
+                    $"Ballot {ballot.ObjectId} is not valid encryption"
+                ));
                 isValid.IsValid = false;
             }
 
