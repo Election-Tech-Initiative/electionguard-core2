@@ -1215,12 +1215,6 @@ namespace electionguard
     }
     SubmittedBallot::~SubmittedBallot() = default;
 
-    // SubmittedBallot &SubmittedBallot::operator=(SubmittedBallot other)
-    // {
-    //     swap(pimpl, other.pimpl);
-    //     return *this;
-    // }
-
     // Public Static Methods
 
     unique_ptr<SubmittedBallot>

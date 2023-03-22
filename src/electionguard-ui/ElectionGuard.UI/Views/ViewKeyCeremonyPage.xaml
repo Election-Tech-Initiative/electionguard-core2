@@ -30,30 +30,18 @@
 
     <Grid RowDefinitions="auto, *" Style="{StaticResource NarrowCenteredGrid}">
         <VerticalStackLayout Grid.Row="0">
-            <StackLayout Style="{StaticResource FormControl}">
-                <Label Style="{StaticResource FormLabel}" Text="{helper:Translate KeyCeremonyName}" />
-                <Label
-                    Margin="15,0"
-                    Style="{StaticResource FormValue}"
-                    Text="{Binding KeyCeremony.Name, FallbackValue=''}" />
-            </StackLayout>
+            <controls:LabelValueControl
+                Title="{helper:Translate KeyCeremonyName}"
+                HorizontalOptions="Start"
+                Text="{Binding KeyCeremony.Name}" />
             <toolkit:UniformItemsLayout>
-                <StackLayout Style="{StaticResource FormControl}">
-                    <Label Style="{StaticResource CenterFormLabel}" Text="{helper:Translate NumberOfGuardians}" />
-                    <Label Style="{StaticResource CenterFormValue}" Text="{Binding KeyCeremony.NumberOfGuardians, FallbackValue=''}" />
-                </StackLayout>
-                <StackLayout Style="{StaticResource FormControl}">
-                    <Label Style="{StaticResource CenterFormLabel}" Text="{helper:Translate Quorum}" />
-                    <Label Style="{StaticResource CenterFormValue}" Text="{Binding KeyCeremony.Quorum, FallbackValue=''}" />
-                </StackLayout>
+                <controls:LabelValueControl Title="{helper:Translate NumberOfGuardians}" Text="{Binding KeyCeremony.NumberOfGuardians, FallbackValue=''}" />
+                <controls:LabelValueControl Title="{helper:Translate Quorum}" Text="{Binding KeyCeremony.Quorum, FallbackValue=''}" />
             </toolkit:UniformItemsLayout>
-            <StackLayout Margin="0,20" Style="{StaticResource FormControl}">
-                <Label Style="{StaticResource FormLabel}" Text="{helper:Translate KeyCeremonyState}" />
-                <Label
-                    Margin="15,0"
-                    Style="{StaticResource FormValue}"
-                    Text="{Binding KeyCeremony.State, Converter={StaticResource StateConverter}}" />
-            </StackLayout>
+            <controls:LabelValueControl
+                Title="{helper:Translate KeyCeremonyState}"
+                HorizontalOptions="Start"
+                Text="{Binding KeyCeremony.State, Converter={StaticResource StateConverter}}" />
             <Button
                 Command="{Binding JoinCommand}"
                 IsVisible="{Binding IsJoinVisible, Converter={StaticResource BoolToObjectConverter}}"

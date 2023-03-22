@@ -87,7 +87,7 @@
     <TreatWarningsAsErrors>True</TreatWarningsAsErrors>
     <NoWarn>1701;1702</NoWarn>
     <WarningLevel>4</WarningLevel>
-    <WarningsNotAsErrors>SYSLIB0004</WarningsNotAsErrors>
+    <WarningsNotAsErrors>SYSLIB0004;CS0618</WarningsNotAsErrors>
 
     <NoStdLib>false</NoStdLib>
   </PropertyGroup>

@@ -56,19 +56,17 @@ namespace ElectionGuard
         /// <Summary>
         /// Name of the candidate
         /// </Summary>
-        public string Name
+        public InternationalizedText Name
         {
             get
             {
                 var status = NativeInterface.Candidate.GetName(
-                    Handle, out IntPtr value);
+                    Handle, out NativeInterface.InternationalizedText.InternationalizedTextHandle value);
                 if (status != Status.ELECTIONGUARD_STATUS_SUCCESS)
                 {
                     throw new ElectionGuardException($"Candidate Error Name: {status}");
                 }
-                var data = Marshal.PtrToStringAnsi(value);
-                NativeInterface.Memory.FreeIntPtr(value);
-                return data;
+                return new InternationalizedText(value);
             }
         }
 

@@ -15,5 +15,15 @@ public class ContextService : BaseDatabaseService<ContextRecord>
     /// <summary>
     /// Default constructor that sets the collection name
     /// </summary>
-    public ContextService() : base(_collection) { }
+    public ContextService() : base(_collection, nameof(ContextRecord)) { }
+
+    /// <summary>
+    /// Gets a context
+    /// </summary>
+    /// <param name="electionId">election id to search for</param>
+    public async Task<ContextRecord?> GetByElectionIdAsync(string electionId)
+    {
+        return await GetByFieldAsync(Constants.ElectionId, electionId);
+    }
+
 }

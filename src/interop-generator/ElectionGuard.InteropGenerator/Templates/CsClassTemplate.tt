@@ -37,6 +37,10 @@ namespace ElectionGuard
                 var status = External.Get<#= egProperty.Name #>(
                     Handle, out <#= egProperty.Type.NativeHandleType #> value);
                 status.ThrowIfError();
+                if (value.IsInvalid)
+                {
+                    return null;
+                }
                 return new <#= egProperty.Type.TypeCs #>(value);
 <# } else if (egProperty.Type.TypeCs == "string") { #>
                 var status = External.Get<#= egProperty.Name #>(Handle, out IntPtr value);
@@ -143,7 +147,9 @@ foreach (var p in method.Params) {
 
             internal class <#= className #>Handle : ElectionGuardSafeHandle<<#= className #>Type>
             {
+#if NETSTANDARD
                 [ReliabilityContract(Consistency.WillNotCorruptState, Cer.MayFail)]
+#endif
                 protected override bool Free()
                 {
 <#

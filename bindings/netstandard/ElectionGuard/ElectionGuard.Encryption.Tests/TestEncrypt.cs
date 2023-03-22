@@ -68,6 +68,28 @@ namespace ElectionGuard.Encryption.Tests
         }
 
         [Test]
+        public void Test_Encrypt_Ballot_Cast_Removes_Nonces()
+        {
+            // Configure the election context
+            var keypair = ElGamalKeyPair.FromSecret(Constants.TWO_MOD_Q);
+            var manifest = ManifestGenerator.GetManifestFromFile();
+            var internalManifest = new InternalManifest(manifest);
+            var context = new CiphertextElectionContext(
+                1UL, 1UL, keypair.PublicKey, Constants.TWO_MOD_Q, internalManifest.ManifestHash);
+            var device = new EncryptionDevice(12345UL, 23456UL, 34567UL, "Location");
+            var mediator = new EncryptionMediator(internalManifest, context, device);
+
+            var ballot = BallotGenerator.GetFakeBallot(internalManifest);
+
+            // Act
+            var ciphertext = mediator.Encrypt(ballot);
+
+            // Assert
+            ciphertext.Cast();
+            Assert.That(ciphertext.Nonce == null);
+        }
+
+        [Test]
         public void Test_Encrypt_Ballot_Undervote_Succeeds()
         {
             // Arrange

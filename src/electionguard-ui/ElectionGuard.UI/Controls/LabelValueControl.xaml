@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentView
+    x:Class="ElectionGuard.UI.Controls.LabelValueControl"
+    xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+    x:Name="this">
+    <VerticalStackLayout
+        Margin="0,0,0,30"
+        BindingContext="{x:Reference this}"
+        HorizontalOptions="Center">
+        <Label
+            HorizontalOptions="{Binding HorizontalOptions}"
+            Style="{StaticResource FormLabel}"
+            Text="{Binding Title}" />
+        <Label
+            HorizontalOptions="{Binding HorizontalOptions}"
+            Style="{StaticResource FormValue}"
+            Text="{Binding Text}" />
+    </VerticalStackLayout>
+</ContentView>

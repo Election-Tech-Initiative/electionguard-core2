@@ -53,6 +53,10 @@ namespace ElectionGuard
                 var status = External.GetManifestHash(
                     Handle, out NativeInterface.ElementModQ.ElementModQHandle value);
                 status.ThrowIfError();
+                if (value.IsInvalid)
+                {
+                    return null;
+                }
                 return new ElementModQ(value);
             }
         }
@@ -67,6 +71,10 @@ namespace ElectionGuard
                 var status = External.GetBallotCodeSeed(
                     Handle, out NativeInterface.ElementModQ.ElementModQHandle value);
                 status.ThrowIfError();
+                if (value.IsInvalid)
+                {
+                    return null;
+                }
                 return new ElementModQ(value);
             }
         }
@@ -92,6 +100,10 @@ namespace ElectionGuard
                 var status = External.GetBallotCode(
                     Handle, out NativeInterface.ElementModQ.ElementModQHandle value);
                 status.ThrowIfError();
+                if (value.IsInvalid)
+                {
+                    return null;
+                }
                 return new ElementModQ(value);
             }
         }
@@ -117,6 +129,10 @@ namespace ElectionGuard
                 var status = External.GetNonce(
                     Handle, out NativeInterface.ElementModQ.ElementModQHandle value);
                 status.ThrowIfError();
+                if (value.IsInvalid)
+                {
+                    return null;
+                }
                 return new ElementModQ(value);
             }
         }
@@ -131,7 +147,8 @@ namespace ElectionGuard
         /// <param name="index">The index of the contest</param>
         public CiphertextBallotContest GetContestAtIndex(
             ulong index
-        ) {
+        )
+        {
             var status = External.GetContestAtIndex(
                 Handle,
                 index,
@@ -145,7 +162,8 @@ namespace ElectionGuard
         /// </summary>
         public bool IsValidEncryption(
             ElementModQ manifestHash, ElementModP elGamalPublicKey, ElementModQ cryptoExtendedBaseHash
-        ) {
+        )
+        {
             return External.IsValidEncryption(
                 Handle, manifestHash.Handle, elGamalPublicKey.Handle, cryptoExtendedBaseHash.Handle);
         }
@@ -165,12 +183,15 @@ namespace ElectionGuard
 
         #region Extern
 
-        internal static unsafe class External {
+        internal static unsafe class External
+        {
             internal struct CiphertextBallotType { };
 
             internal class CiphertextBallotHandle : ElectionGuardSafeHandle<CiphertextBallotType>
             {
+#if NETSTANDARD
                 [ReliabilityContract(Consistency.WillNotCorruptState, Cer.MayFail)]
+#endif
                 protected override bool Free()
                 {
                     if (IsFreed) return true;
@@ -185,9 +206,9 @@ namespace ElectionGuard
             }
 
             [DllImport(
-                NativeInterface.DllName, 
+                NativeInterface.DllName,
                 EntryPoint = "eg_ciphertext_ballot_free",
-                CallingConvention = CallingConvention.Cdecl, 
+                CallingConvention = CallingConvention.Cdecl,
                 SetLastError = true)]
             internal static extern Status Free(CiphertextBallotType* handle);
 

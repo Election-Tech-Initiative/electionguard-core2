@@ -64,7 +64,8 @@ namespace ElectionGuard
         /// <param name="index">The index of the contest</param>
         public PlaintextBallotContest GetContestAtIndex(
             ulong index
-        ) {
+        )
+        {
             var status = External.GetContestAtIndex(
                 Handle,
                 index,
@@ -77,11 +78,12 @@ namespace ElectionGuard
         /// Export the ballot representation as JSON
         /// </summary>
         public string ToJson(
-            
-        ) {
+
+        )
+        {
             var status = External.ToJson(
                 Handle,
-                out IntPtr pointer, 
+                out IntPtr pointer,
                 out _
                 );
             status.ThrowIfError();
@@ -94,11 +96,12 @@ namespace ElectionGuard
         /// Export the ballot representation as BSON
         /// </summary>
         public byte[] ToBson(
-            
-        ) {
+
+        )
+        {
             var status = External.ToBson(
                 Handle,
-                out IntPtr data, 
+                out IntPtr data,
                 out ulong size
                 );
             status.ThrowIfError();
@@ -118,11 +121,12 @@ namespace ElectionGuard
         /// Export the ballot representation as MsgPack
         /// </summary>
         public byte[] ToMsgPack(
-            
-        ) {
+
+        )
+        {
             var status = External.ToMsgPack(
                 Handle,
-                out IntPtr data, 
+                out IntPtr data,
                 out ulong size
                 );
             status.ThrowIfError();
@@ -153,12 +157,15 @@ namespace ElectionGuard
 
         #region Extern
 
-        internal static unsafe class External {
+        internal static unsafe class External
+        {
             internal struct PlaintextBallotType { };
 
             internal class PlaintextBallotHandle : ElectionGuardSafeHandle<PlaintextBallotType>
             {
+#if NETSTANDARD
                 [ReliabilityContract(Consistency.WillNotCorruptState, Cer.MayFail)]
+#endif
                 protected override bool Free()
                 {
                     if (IsFreed) return true;
@@ -173,9 +180,9 @@ namespace ElectionGuard
             }
 
             [DllImport(
-                NativeInterface.DllName, 
+                NativeInterface.DllName,
                 EntryPoint = "eg_plaintext_ballot_free",
-                CallingConvention = CallingConvention.Cdecl, 
+                CallingConvention = CallingConvention.Cdecl,
                 SetLastError = true)]
             internal static extern Status Free(PlaintextBallotType* handle);
 

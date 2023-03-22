@@ -15,5 +15,15 @@ public class ConstantsService : BaseDatabaseService<ConstantsRecord>
     /// <summary>
     /// Default constructor that sets the collection name
     /// </summary>
-    public ConstantsService() : base(_collection) { }
+    public ConstantsService() : base(_collection, nameof(ConstantsRecord)) { }
+
+    /// <summary>
+    /// Gets a constants record
+    /// </summary>
+    /// <param name="electionId">election id to search for</param>
+    public async Task<ConstantsRecord?> GetByElectionIdAsync(string electionId)
+    {
+        return await GetByFieldAsync(Constants.ElectionId, electionId);
+    }
+
 }

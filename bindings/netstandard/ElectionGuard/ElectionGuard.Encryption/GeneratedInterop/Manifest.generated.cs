@@ -128,6 +128,10 @@ namespace ElectionGuard
                 var status = External.GetName(
                     Handle, out NativeInterface.InternationalizedText.InternationalizedTextHandle value);
                 status.ThrowIfError();
+                if (value.IsInvalid)
+                {
+                    return null;
+                }
                 return new InternationalizedText(value);
             }
         }
@@ -142,6 +146,10 @@ namespace ElectionGuard
                 var status = External.GetContactInfo(
                     Handle, out NativeInterface.ContactInformation.ContactInformationHandle value);
                 status.ThrowIfError();
+                if (value.IsInvalid)
+                {
+                    return null;
+                }
                 return new ContactInformation(value);
             }
         }
@@ -165,12 +173,15 @@ namespace ElectionGuard
 
         #region Extern
 
-        internal static unsafe class External {
+        internal static unsafe class External
+        {
             internal struct ManifestType { };
 
             internal class ManifestHandle : ElectionGuardSafeHandle<ManifestType>
             {
+#if NETSTANDARD
                 [ReliabilityContract(Consistency.WillNotCorruptState, Cer.MayFail)]
+#endif
                 protected override bool Free()
                 {
                     if (IsFreed) return true;
@@ -185,9 +196,9 @@ namespace ElectionGuard
             }
 
             [DllImport(
-                NativeInterface.DllName, 
+                NativeInterface.DllName,
                 EntryPoint = "eg_election_manifest_free",
-                CallingConvention = CallingConvention.Cdecl, 
+                CallingConvention = CallingConvention.Cdecl,
                 SetLastError = true)]
             internal static extern Status Free(ManifestType* handle);
 

@@ -60,6 +60,13 @@ public partial class BaseViewModel : ObservableObject, IDisposable
         await NavigationService.GoHome();
     }
 
+    [RelayCommand]
+    private async Task GoBack()
+    {
+        await OnLeavingPage();
+        await NavigationService.GoBack();
+    }
+
     public BaseViewModel(
         string? pageTitleLocalizationId,
         IServiceProvider serviceProvider)
@@ -94,11 +101,9 @@ public partial class BaseViewModel : ObservableObject, IDisposable
         }
     }
 
-    private bool IsDatabaseAvailable() =>
-    DbService.Ping();
+    private bool IsDatabaseAvailable() => DbService.Ping();
 
-    private bool IsDatabaseUnavailable() =>
-        !IsDatabaseAvailable();
+    private bool IsDatabaseUnavailable() => !IsDatabaseAvailable();
 
 
     protected IConfigurationService ConfigurationService { get; }

@@ -286,6 +286,7 @@ clean-ui:
 
 generate-interop:
 	cd ./src/interop-generator/ElectionGuard.InteropGenerator && \
+		dotnet build && \
 		dotnet run -- ./EgInteropClasses.json ../../../ && \
 		cd ../../../
 
