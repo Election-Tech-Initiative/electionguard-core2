@@ -408,4 +408,16 @@
   <data name="TotalText" xml:space="preserve">
     <value>TOTAL</value>
   </data>
+  <data name="DriveUsedText" xml:space="preserve">
+    <value>¡EGDrive ya está en uso!</value>
+  </data>
+  <data name="ImportAgainText" xml:space="preserve">
+    <value>¿Te gustaría importar desde este EGDrive de nuevo?</value>
+  </data>
+  <data name="NoText" xml:space="preserve">
+    <value>No</value>
+  </data>
+  <data name="YesText" xml:space="preserve">
+    <value>Sí</value>
+  </data>
 </root>

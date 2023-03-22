@@ -405,4 +405,25 @@
   <data name="UploadWizardText" xml:space="preserve">
     <value>Upload Wizard</value>
   </data>
+  <data name="DriveUsedText" xml:space="preserve">
+    <value>EGDrive already used</value>
+  </data>
+  <data name="ImportAgainText" xml:space="preserve">
+    <value>Would you like to import from this EGDrive again?</value>
+  </data>
+  <data name="NoText" xml:space="preserve">
+    <value>No</value>
+  </data>
+  <data name="YesText" xml:space="preserve">
+    <value>Yes</value>
+  </data>
+  <data name="AddedText" xml:space="preserve">
+    <value>Added</value>
+  </data>
+  <data name="RejectedText" xml:space="preserve">
+    <value>Rejected</value>
+  </data>
+  <data name="SpoiledText" xml:space="preserve">
+    <value>Spoiled</value>
+  </data>
 </root>

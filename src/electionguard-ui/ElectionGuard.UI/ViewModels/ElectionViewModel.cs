@@ -36,6 +36,15 @@ public partial class ElectionViewModel : BaseViewModel
     private long _ballotCountTotal = 0;
 
     [ObservableProperty]
+    private long _ballotAddedTotal = 0;
+
+    [ObservableProperty]
+    private long _ballotSpoiledTotal = 0;
+
+    [ObservableProperty]
+    private long _ballotRejectedTotal = 0;
+
+    [ObservableProperty]
     private ObservableCollection<BallotUpload> _ballotUploads = new();
 
     [ObservableProperty]
@@ -50,14 +59,20 @@ public partial class ElectionViewModel : BaseViewModel
             ManifestRecord = await _manifestService.GetByElectionIdAsync(value?.ElectionId);
             KeyCeremony = await _keyCeremonyService.GetByKeyCeremonyIdAsync(value?.KeyCeremonyId);
             var uploads = await _uploadService.GetByElectionIdAsync(value?.ElectionId);
-            _ballotUploads.Clear();
+            BallotUploads.Clear();
             BallotCountTotal = 0;
+            BallotAddedTotal = 0;
+            BallotSpoiledTotal = 0;
+            BallotRejectedTotal = 0;
             uploads.ForEach((upload) => {
-                _ballotUploads.Add(upload);
+                BallotUploads.Add(upload);
                 BallotCountTotal += upload.BallotCount;
+                BallotAddedTotal += upload.BallotImported;
+                BallotSpoiledTotal += upload.BallotSpoiled;
+                BallotRejectedTotal += upload.BallotRejected;
             });
             
-            _tallies.Clear();
+            Tallies.Clear();
 
         });
     }

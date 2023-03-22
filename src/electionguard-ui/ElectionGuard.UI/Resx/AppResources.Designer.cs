@@ -70,6 +70,15 @@ namespace ElectionGuard.UI.Resx {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Added.
+        /// </summary>
+        internal static string AddedText {
+            get {
+                return ResourceManager.GetString("AddedText", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Admin Home.
         /// </summary>
         internal static string AdminHome {
@@ -322,6 +331,15 @@ namespace ElectionGuard.UI.Resx {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to EGDrive already used.
+        /// </summary>
+        internal static string DriveUsedText {
+            get {
+                return ResourceManager.GetString("DriveUsedText", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Election Checklist.
         /// </summary>
         internal static string ElectionChecklist {
@@ -444,6 +462,15 @@ namespace ElectionGuard.UI.Resx {
         internal static string HelloWorld {
             get {
                 return ResourceManager.GetString("HelloWorld", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Would you like to import from this EGDrive again?.
+        /// </summary>
+        internal static string ImportAgainText {
+            get {
+                return ResourceManager.GetString("ImportAgainText", resourceCulture);
             }
         }
         
@@ -664,6 +691,15 @@ namespace ElectionGuard.UI.Resx {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to No.
+        /// </summary>
+        internal static string NoText {
+            get {
+                return ResourceManager.GetString("NoText", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Number of Guardians.
         /// </summary>
         internal static string NumberOfGuardians {
@@ -763,6 +799,15 @@ namespace ElectionGuard.UI.Resx {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Rejected.
+        /// </summary>
+        internal static string RejectedText {
+            get {
+                return ResourceManager.GetString("RejectedText", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Removing files from the list.
         /// </summary>
         internal static string RemovingList {
@@ -795,6 +840,15 @@ namespace ElectionGuard.UI.Resx {
         internal static string Settings {
             get {
                 return ResourceManager.GetString("Settings", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Spoiled.
+        /// </summary>
+        internal static string SpoiledText {
+            get {
+                return ResourceManager.GetString("SpoiledText", resourceCulture);
             }
         }
         
@@ -921,6 +975,15 @@ namespace ElectionGuard.UI.Resx {
         internal static string WindowTitle {
             get {
                 return ResourceManager.GetString("WindowTitle", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Yes.
+        /// </summary>
+        internal static string YesText {
+            get {
+                return ResourceManager.GetString("YesText", resourceCulture);
             }
         }
     }

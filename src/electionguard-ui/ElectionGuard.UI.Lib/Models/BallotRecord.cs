@@ -18,15 +18,14 @@ public partial class BallotRecord : DatabaseRecord
     private string? _fileName;
 
     [ObservableProperty]
+    private string? _ballotCode;
+
+    [ObservableProperty]
+    private DateTime _timeStamp;
+
+    [ObservableProperty]
     private string? _ballotData;
 
-    public BallotRecord(string electionId, string uploadId, string fileName, string ballotData) : base(nameof(BallotRecord))
-    {
-        ElectionId = electionId;
-        UploadId = uploadId;
-        FileName = fileName;
-        BallotData = ballotData;
-    }
     public BallotRecord() : base(nameof(BallotRecord))
     {
     }
