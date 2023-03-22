@@ -1,6 +1,5 @@
-﻿using System;
-using System.Collections;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
+using System.Linq;
 using System.Runtime.InteropServices;
 
 namespace ElectionGuard
@@ -42,7 +41,11 @@ namespace ElectionGuard
         /// <Summary>
         /// The collection of geopolitical units
         /// </Summary>
-        public IReadOnlyList<GeopoliticalUnit> GeopoliticalUnits => new GeopoliticalUnitEnumerator(this);
+        public IReadOnlyList<GeopoliticalUnit> GeopoliticalUnits =>
+            new ElectionGuardEnumerator<GeopoliticalUnit>(
+                () => (int)GeopoliticalUnitsSize,
+                (index) => GetGeopoliticalUnitAtIndex((ulong)index)
+            );
 
         /// <Summary>
         /// The size of the contests collection
@@ -59,7 +62,11 @@ namespace ElectionGuard
         /// <Summary>
         /// The collection of contests
         /// </Summary>
-        public IReadOnlyList<ContestDescription> Contests => new ContestDescriptionEnumerator(this);
+        public IReadOnlyList<ContestDescriptionWithPlaceholders> Contests =>
+            new ElectionGuardEnumerator<ContestDescriptionWithPlaceholders>(
+            () => (int)ContestsSize,
+            (index) => GetContestAtIndex((ulong)index)
+        );
 
         /// <Summary>
         /// The size of the ballot styles collection
@@ -76,7 +83,11 @@ namespace ElectionGuard
         /// <Summary>
         /// The collection of ballot styles
         /// </Summary>
-        public IReadOnlyList<BallotStyle> BallotStyles => new BallotStyleEnumerator(this);
+        public IReadOnlyList<BallotStyle> BallotStyles =>
+            new ElectionGuardEnumerator<BallotStyle>(
+                () => (int)BallotStylesSize,
+                (index) => GetBallotStyleAtIndex((ulong)index)
+            );
 
         internal NativeInterface.InternalManifest.InternalManifestHandle Handle;
 
@@ -140,6 +151,28 @@ namespace ElectionGuard
             Handle = null;
         }
 
+        public List<ContestDescriptionWithPlaceholders> GetContests(string ballotStyleId)
+        {
+            var ballotStyle = BallotStyles.FirstOrDefault(i => i.ObjectId == ballotStyleId);
+            if (ballotStyle == null)
+            {
+                throw new ElectionGuardException($"InternalManifest Error GetContests: BallotStyle not found");
+            }
+            if (!ballotStyle.GeopoliticalUnitIds.Any())
+            {
+                throw new ElectionGuardException($"InternalManifest Error GetContests: BallotStyle has no geopolitical units");
+            }
+
+            var gpUnits = ballotStyle.GeopoliticalUnitIds.ToList();
+
+            return Contests.Where(i => gpUnits.Contains(i.ElectoralDistrictId)).ToList();
+        }
+
+        public List<ContestDescriptionWithPlaceholders> GetContests(BallotStyle ballotStyle)
+        {
+            return GetContests(ballotStyle.ObjectId);
+        }
+
         /// <Summary>
         /// Collection of geopolitical units for this election.
         /// </Summary>
@@ -155,13 +188,13 @@ namespace ElectionGuard
         /// <Summary>
         /// Collection of contests for this election.
         /// </Summary>
-        public ContestDescription GetContestAtIndex(ulong index)
+        public ContestDescriptionWithPlaceholders GetContestAtIndex(ulong index)
         {
             var status = NativeInterface.InternalManifest.GetContestAtIndex(
                 Handle, index, out var value);
             return status != Status.ELECTIONGUARD_STATUS_SUCCESS
                 ? throw new ElectionGuardException($"InternalManifest Error GetContestAtIndex: {status}")
-                : new ContestDescription(value);
+                : new ContestDescriptionWithPlaceholders(value);
         }
 
         /// <Summary>
@@ -175,6 +208,8 @@ namespace ElectionGuard
                 ? throw new ElectionGuardException($"InternalManifest Error GetContestAtIndex: {status}")
                 : new BallotStyle(value);
         }
+
+        #region Serialization
 
         /// <Summary>
         /// Export the ballot representation as JSON
@@ -241,134 +276,7 @@ namespace ElectionGuard
             _ = NativeInterface.Memory.DeleteIntPtr(data);
             return byteArray;
         }
-    }
 
-    /// <summary>
-    /// A GeopoliticalUnitEnumerator is an IReadonlyList<GeopoliticalUnit> implementation
-    /// that can be used to enumerate the geopolitical units in an InternalManifest
-    /// </summary>
-    public class GeopoliticalUnitEnumerator : DisposableBase, IReadOnlyList<GeopoliticalUnit>
-    {
-        private readonly InternalManifest _manifest;
-
-        /// <summary>
-        /// Constructs a new GeopoliticalUnitEnumerator
-        /// </summary>
-        /// <param name="manifest">The manifest to enumerate</param>
-        public GeopoliticalUnitEnumerator(InternalManifest manifest)
-        {
-            _manifest = manifest;
-        }
-
-        /// <summary>
-        /// Gets the number of geopolitical units in the manifest
-        /// </summary>
-        public int Count => (int)_manifest.GeopoliticalUnitsSize;
-
-        /// <summary>
-        /// Gets the geopolitical unit at the specified index
-        /// </summary>
-        /// <param name="index">The index of the geopolitical unit to get</param>
-        /// <returns>The geopolitical unit at the specified index</returns>
-        public GeopoliticalUnit this[int index] => _manifest.GetGeopoliticalUnitAtIndex((ulong)index);
-
-        public IEnumerator<GeopoliticalUnit> GetEnumerator()
-        {
-            for (var i = 0; i < Count; i++)
-            {
-                yield return _manifest.GetGeopoliticalUnitAtIndex((ulong)i);
-            }
-        }
-
-        IEnumerator IEnumerable.GetEnumerator()
-        {
-            return GetEnumerator();
-        }
-    }
-
-    /// <summary>
-    /// A ContestDescriptionEnumerator is an IReadonlyList<ContestDescription> implementation
-    /// that can be used to enumerate the contest descriptions in an InternalManifest
-    /// </summary>
-    public class ContestDescriptionEnumerator : DisposableBase, IReadOnlyList<ContestDescription>
-    {
-        private readonly InternalManifest _manifest;
-
-        /// <summary>
-        /// Constructs a new ContestDescriptionEnumerator
-        /// </summary>
-        /// <param name="manifest">The manifest to enumerate</param>
-        public ContestDescriptionEnumerator(InternalManifest manifest)
-        {
-            _manifest = manifest;
-        }
-
-        /// <summary>
-        /// Gets the number of contest descriptions in the manifest
-        /// </summary>
-        public int Count => (int)_manifest.ContestsSize;
-
-        /// <summary>
-        /// Gets the contest description at the specified index
-        /// </summary>
-        /// <param name="index">The index of the contest description to get</param>
-        /// <returns>The contest description at the specified index</returns>
-        public ContestDescription this[int index] => _manifest.GetContestAtIndex((ulong)index);
-
-        public IEnumerator<ContestDescription> GetEnumerator()
-        {
-            for (var i = 0; i < Count; i++)
-            {
-                yield return _manifest.GetContestAtIndex((ulong)i);
-            }
-        }
-
-        IEnumerator IEnumerable.GetEnumerator()
-        {
-            return GetEnumerator();
-        }
-    }
-
-    /// <summary>
-    /// A BallotStyleEnumerator is an IReadonlyList<BallotStyle> implementation
-    /// that can be used to enumerate the ballot styles in an InternalManifest
-    /// </summary>
-    public class BallotStyleEnumerator : DisposableBase, IReadOnlyList<BallotStyle>
-    {
-        private readonly InternalManifest _manifest;
-
-        /// <summary>
-        /// Constructs a new BallotStyleEnumerator
-        /// </summary>
-        /// <param name="manifest">The manifest to enumerate</param>
-        public BallotStyleEnumerator(InternalManifest manifest)
-        {
-            _manifest = manifest;
-        }
-
-        /// <summary>
-        /// Gets the number of ballot styles in the manifest
-        /// </summary>
-        public int Count => (int)_manifest.BallotStylesSize;
-
-        /// <summary>
-        /// Gets the ballot style at the specified index
-        /// </summary>
-        /// <param name="index">The index of the ballot style to get</param>
-        /// <returns>The ballot style at the specified index</returns>
-        public BallotStyle this[int index] => _manifest.GetBallotStyleAtIndex((ulong)index);
-
-        public IEnumerator<BallotStyle> GetEnumerator()
-        {
-            for (var i = 0; i < Count; i++)
-            {
-                yield return _manifest.GetBallotStyleAtIndex((ulong)i);
-            }
-        }
-
-        IEnumerator IEnumerable.GetEnumerator()
-        {
-            return GetEnumerator();
-        }
+        #endregion
     }
 }

@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Linq;
 using ElectionGuard.Encryption.Utils.Generators;
 using NUnit.Framework;
@@ -25,7 +25,7 @@ namespace ElectionGuard.Encryption.Tests
         [Test]
         public void Test_Device_Serialization_From_JSON_Succeeds()
         {
-            string deviceJson = "{ \"device_id\": 91755434160, \"session_id\": 12345, \"launch_code\": 45678, \"location\": \"polling-place\" }";
+            var deviceJson = /*lang=json,strict*/ "{ \"device_id\": 91755434160, \"session_id\": 12345, \"launch_code\": 45678, \"location\": \"polling-place\" }";
             var device = new EncryptionDevice(deviceJson);
 
             var json = device.ToJson();
@@ -36,16 +36,12 @@ namespace ElectionGuard.Encryption.Tests
         [Test]
         public void Test_Encrypt_Ballot_Simple_Succeeds()
         {
-            // Configure the election context
-            var keypair = ElGamalKeyPair.FromSecret(Constants.TWO_MOD_Q);
-            var manifest = ManifestGenerator.GetManifestFromFile();
-            var internalManifest = new InternalManifest(manifest);
-            var context = new CiphertextElectionContext(
-                1UL, 1UL, keypair.PublicKey, Constants.TWO_MOD_Q, internalManifest.ManifestHash);
-            var device = new EncryptionDevice(12345UL, 23456UL, 34567UL, "Location");
-            var mediator = new EncryptionMediator(internalManifest, context, device);
+            // Arrange
+            var data = ElectionGenerator.GenerateFakeElectionData();
+            var mediator = new EncryptionMediator(
+                data.InternalManifest, data.Context, data.Device);
 
-            var ballot = BallotGenerator.GetFakeBallot(internalManifest);
+            var ballot = BallotGenerator.GetFakeBallot(data.InternalManifest);
 
             // Act
             var ciphertext = mediator.Encrypt(ballot);
@@ -54,7 +50,6 @@ namespace ElectionGuard.Encryption.Tests
 
             // a property
             Assert.That(ciphertext.ObjectId == ballot.ObjectId);
-
             Assert.That(ciphertext.BallotCode.ToHex() != null);
 
             // json serialization
@@ -70,100 +65,93 @@ namespace ElectionGuard.Encryption.Tests
             var msgPack = ciphertext.ToMsgPack();
             var fromMsgPack = new CiphertextBallot(msgPack, BinarySerializationEncoding.MsgPack);
             Assert.That(ciphertext.ObjectId == fromMsgPack.ObjectId);
-
-            // submitted ballot
-            var submitted = new SubmittedBallot(ciphertext, BallotBoxState.Cast);
-            Assert.That(ciphertext.ObjectId == submitted.ObjectId);
         }
 
         [Test]
         public void Test_Encrypt_Ballot_Undervote_Succeeds()
         {
-            // Configure the election context
-            var keypair = ElGamalKeyPair.FromSecret(Constants.TWO_MOD_Q);
-            var manifest = ManifestGenerator.GetManifestFromFile();
-            var internalManifest = new InternalManifest(manifest);
-            var context = new CiphertextElectionContext(
-                1UL, 1UL, keypair.PublicKey, Constants.TWO_MOD_Q, internalManifest.ManifestHash);
-            var device = new EncryptionDevice(12345UL, 23456UL, 34567UL, "Location");
-            var mediator = new EncryptionMediator(internalManifest, context, device);
+            // Arrange
+            var data = ElectionGenerator.GenerateFakeElectionData();
+            var mediator = new EncryptionMediator(
+                data.InternalManifest, data.Context, data.Device);
 
             // Act
-            var ballot = BallotGenerator.GetFakeBallot(internalManifest);
+            var ballot = BallotGenerator.GetFakeBallot(
+                data.InternalManifest,
+                "congress-district-7-arlington-pismo-beach",
+                (contestOrder, selectionOrder) => false);
             var ciphertext = mediator.Encrypt(ballot);
 
             // Assert
 
             // a property
-            Assert.That(ciphertext.IsValidEncryption(context.ManifestHash, keypair.PublicKey, context.CryptoExtendedBaseHash));
+            Assert.That(ciphertext.IsValidEncryption(
+                data.Context.ManifestHash,
+                data.KeyPair.PublicKey,
+                data.Context.CryptoExtendedBaseHash));
         }
 
         [Test]
         public void Test_Encrypt_Ballot_Overvote_Succeeds()
         {
-            // Configure the election context
-            var keypair = ElGamalKeyPair.FromSecret(Constants.TWO_MOD_Q);
-            var manifest = ManifestGenerator.GetManifestFromFile();
-            var internalManifest = new InternalManifest(manifest);
-            var context = new CiphertextElectionContext(
-                1UL, 1UL, keypair.PublicKey, Constants.TWO_MOD_Q, internalManifest.ManifestHash);
-            var device = new EncryptionDevice(12345UL, 23456UL, 34567UL, "Location");
-            var mediator = new EncryptionMediator(internalManifest, context, device);
+            // Arrange
+            var data = ElectionGenerator.GenerateFakeElectionData();
+            var mediator = new EncryptionMediator(
+                data.InternalManifest, data.Context, data.Device);
 
             // Act
-            var ballot = BallotGenerator.GetFakeBallot(internalManifest, 2);
+            var ballot = BallotGenerator.GetFakeBallot(
+                data.InternalManifest,
+                "congress-district-7-arlington-pismo-beach",
+                (contestOrder, selectionOrder) => true);
             var ciphertext = mediator.Encrypt(ballot);
 
-            Assert.That(ciphertext.IsValidEncryption(context.ManifestHash, keypair.PublicKey, context.CryptoExtendedBaseHash));
+            // Assert
+            Assert.That(ciphertext.IsValidEncryption(
+                data.Context.ManifestHash,
+                data.KeyPair.PublicKey,
+                data.Context.CryptoExtendedBaseHash));
         }
 
         [Test]
         public void Test_EncryptAndDecryptOfBallot_WithMultipleVotesAllowed()
         {
             // Arrange
-            var keypair = ElGamalKeyPair.FromSecret(Constants.TWO_MOD_Q);
-            var manifest = ManifestGenerator.GetManifestFromFile();
-            var internalManifest = new InternalManifest(manifest);
-            var context = new CiphertextElectionContext(
-                1UL, 1UL, keypair.PublicKey, Constants.TWO_MOD_Q, internalManifest.ManifestHash);
-            var device = new EncryptionDevice(12345UL, 23456UL, 34567UL, "Location");
-            var mediator = new EncryptionMediator(internalManifest, context, device);
+            var data = ElectionGenerator.GenerateFakeElectionData();
+            var mediator = new EncryptionMediator(data.InternalManifest, data.Context, data.Device);
             const string styleId = "congress-district-7-arlington-pismo-beach";
-            var ballot = BallotGenerator.GetFakeBallotWithContest(internalManifest, "pismo-beach-school-board-contest", 3, styleId);
+            var ballot = BallotGenerator.GetFakeBallot(
+                data.InternalManifest, styleId);
 
             // Act
             var ciphertext = mediator.Encrypt(ballot);
 
             // Assert
-            Assert.AreEqual(5, ciphertext.ContestsSize);
-            var pismoBeach = FindContestOrDefault(ciphertext, i => i.ObjectId == "pismo-beach-school-board-contest");
-            Assert.IsNotNull(pismoBeach);
-            Assert.AreEqual(1L, DecryptSelection(pismoBeach, keypair, 0));
-            Assert.AreEqual(1L, DecryptSelection(pismoBeach, keypair, 1));
-            Assert.AreEqual(1L, DecryptSelection(pismoBeach, keypair, 2));
-            Assert.AreEqual(0L, DecryptSelection(pismoBeach, keypair, 3));
-            Assert.AreEqual(0L, DecryptSelection(pismoBeach, keypair, 4));
-        }
+            Assert.AreEqual(ballot.ContestsSize, ciphertext.ContestsSize);
 
-        private static ulong? DecryptSelection(CiphertextBallotContest pismoBeach, ElGamalKeyPair keypair, int index)
-        {
-            var selection = pismoBeach.GetSelectionAtIndex((ulong)index);
-            return selection.Ciphertext.Decrypt(keypair.SecretKey);
+            ballot.ForEachContestSelection((contest, selection) =>
+            {
+                var cipheretxtContest = ciphertext.Contests.First(
+                    i => i.ObjectId == contest.ObjectId);
+
+                var ciphertextSelection = cipheretxtContest.Selections.First(
+                    i => i.ObjectId == selection.ObjectId);
+
+                var decrypted = ciphertextSelection.Ciphertext.Decrypt(data.KeyPair.SecretKey);
+
+                Assert.AreEqual(selection.Vote, decrypted);
+            });
         }
 
         [Test]
         public void Test_Compact_Encrypt_Ballot_Simple_Succeeds()
         {
             // Arrange
-            var keypair = ElGamalKeyPair.FromSecret(Constants.TWO_MOD_Q);
-            var manifest = ManifestGenerator.GetManifestFromFile();
-            var internalManifest = new InternalManifest(manifest);
-            var context = new CiphertextElectionContext(
-                1UL, 1UL, keypair.PublicKey, Constants.TWO_MOD_Q, internalManifest.ManifestHash);
-            var device = new EncryptionDevice(12345UL, 23456UL, 34567UL, "Location");
-            var mediator = new EncryptionMediator(internalManifest, context, device);
+            var data = ElectionGenerator.GenerateFakeElectionData();
+            var mediator = new EncryptionMediator(
+                data.InternalManifest, data.Context, data.Device);
 
-            var ballot = BallotGenerator.GetFakeBallot(internalManifest);
+            var ballot = BallotGenerator.GetFakeBallot(data.InternalManifest);
 
             // Act
             var compact = mediator.CompactEncrypt(ballot);
@@ -192,65 +180,51 @@ namespace ElectionGuard.Encryption.Tests
         [Test]
         public void Test_EncryptMediator_Hashes_Match()
         {
-            var keypair = ElGamalKeyPair.FromSecret(Constants.TWO_MOD_Q);
-            var manifest = ManifestGenerator.GetManifestFromFile();
-            var internalManifest = new InternalManifest(manifest);
-            var context = new CiphertextElectionContext(
-                1UL, 1UL, keypair.PublicKey, Constants.TWO_MOD_Q, internalManifest.ManifestHash);   // make a context with the correct manifesthash
-            var device = new EncryptionDevice(12345UL, 23456UL, 34567UL, "Location");
+            // Arrange
+            var data = ElectionGenerator.GenerateFakeElectionData();
+
             try
             {
-                var mediator = new EncryptionMediator(internalManifest, context, device);
-                Assert.IsNotNull(mediator);     // should not be null if it gets created
+                var mediator = new EncryptionMediator(
+                data.InternalManifest, data.Context, data.Device);
+
+                // should not be null if it gets created
+                Assert.IsNotNull(mediator);
             }
             catch (Exception)
             {
                 // if there is an exception then the manifest hash would not be equal
-                Assert.AreNotEqual(context.ManifestHash.ToHex(), internalManifest.ManifestHash.ToHex());
+                Assert.AreNotEqual(
+                    data.Context.ManifestHash.ToHex(), data.InternalManifest.ManifestHash.ToHex());
             }
         }
 
         [Test]
         public void Test_EncryptMediator_Hashes_Dont_Match()
         {
-            var keypair = ElGamalKeyPair.FromSecret(Constants.TWO_MOD_Q);
-            var manifest = ManifestGenerator.GetManifestFromFile();
-            var internalManifest = new InternalManifest(manifest);
-            var context = new CiphertextElectionContext(
-                1UL, 1UL, keypair.PublicKey, Constants.TWO_MOD_Q, Constants.ONE_MOD_Q);     // make a context with a different manifesthash
-            var device = new EncryptionDevice(12345UL, 23456UL, 34567UL, "Location");
+            // Arrange
+            var data = ElectionGenerator.GenerateFakeElectionData();
+            // create a context that has a differnt manifest hash
+            var badContext = ElectionGenerator.GetFakeContext(data.KeyPair, Constants.TWO_MOD_Q);
             try
             {
-                var mediator = new EncryptionMediator(internalManifest, context, device);
-                Assert.IsNull(mediator);    // should not be created, so null at best
+                var mediator = new EncryptionMediator(
+                data.InternalManifest, badContext, data.Device);
+
+                // should not be created, so null at best
+                Assert.IsNull(mediator);
             }
             catch (Exception)
             {
                 // if there is an exception then the manifest hash would not be equal
-                Assert.AreNotEqual(context.ManifestHash.ToHex(), internalManifest.ManifestHash.ToHex());
+                Assert.AreNotEqual(
+                    badContext.ManifestHash.ToHex(), data.InternalManifest.ManifestHash.ToHex());
             }
         }
-
-
-        private static CiphertextBallotContest FindContestOrDefault(CiphertextBallot ballot, Func<CiphertextBallotContest, bool> func)
-        {
-            var contestSize = (int)ballot.ContestsSize;
-            for (int i = 0; i < contestSize; i++)
-            {
-                var contest = ballot.GetContestAtIndex((ulong)i);
-                if (func(contest))
-                {
-                    return contest;
-                }
-            }
-
-            return null;
-        }
-
 
 
         [Test]
-        public void Test_Multiple_Submit()
+        public void Test_Multiple_Submit_Check_10k_Records_For_Memory_Leaks()
         {
             var ballotData = "{\"object_id\": \"ballot-434ab8e7-22f7-11ed-8bad-04d9f5218a21\", \"style_id\": \"e3505391-aca6-4666-aadf-4fb31357170b\", \"contests\": [{\"object_id\": \"9e5ca147-8f8a-414c-86c9-fa3b6c45754b\", \"ballot_selections\": [{\"object_id\": \"9e5ca147-8f8a-414c-86c9-fa3b6c45754b-5cf0794a-22ba-42c3-90d4-d23df7e221c1\", \"vote\": 0, \"is_placeholder_selection\": false, \"write_in\": null}, {\"object_id\": \"9e5ca147-8f8a-414c-86c9-fa3b6c45754b-8a3a7be9-fc51-4b50-b845-de268d268c0e\", \"vote\": 1, \"is_placeholder_selection\": false, \"write_in\": null}, {\"object_id\": \"9e5ca147-8f8a-414c-86c9-fa3b6c45754b-c9be49a1-1060-4318-935f-344fa96901c7\", \"vote\": 0, \"is_placeholder_selection\": false, \"write_in\": null}]}, {\"object_id\": \"716043f6-3e08-43e1-9652-a2364bb3a170\", \"ballot_selections\": [{\"object_id\": \"716043f6-3e08-43e1-9652-a2364bb3a170-5684632f-e4e9-4ce4-bddc-ff83e7835511\", \"vote\": 1, \"is_placeholder_selection\": false, \"write_in\": null}]}, {\"object_id\": \"98402323-e396-4f83-bc86-266cc583781d\", \"ballot_selections\": [{\"object_id\": \"98402323-e396-4f83-bc86-266cc583781d-016dd1a3-9099-4359-93bd-2e197d4ec424\", \"vote\": 0, \"is_placeholder_selection\": false, \"write_in\": null}, {\"object_id\": \"98402323-e396-4f83-bc86-266cc583781d-997c30fa-5e7f-46c5-ba2c-b974d099db1a\", \"vote\": 1, \"is_placeholder_selection\": false, \"write_in\": null}]}, {\"object_id\": \"a888ca92-5ae2-42b3-a342-9fb6d1a76689\", \"ballot_selections\": [{\"object_id\": \"a888ca92-5ae2-42b3-a342-9fb6d1a76689-47179eb7-d042-44d8-aed7-e8011087c591\", \"vote\": 1, \"is_placeholder_selection\": false, \"write_in\": null}, {\"object_id\": \"a888ca92-5ae2-42b3-a342-9fb6d1a76689-81b8380b-8a44-497c-a9c8-83fe8258670e\", \"vote\": 0, \"is_placeholder_selection\": false, \"write_in\": null}, {\"object_id\": \"a888ca92-5ae2-42b3-a342-9fb6d1a76689-8902f19c-0802-42d8-a532-23fa5a95bc43\", \"vote\": 0, \"is_placeholder_selection\": false, \"write_in\": null}]}, {\"object_id\": \"5347bea6-8112-4ffc-bfff-375656d45106\", \"ballot_selections\": [{\"object_id\": \"5347bea6-8112-4ffc-bfff-375656d45106-fa567121-60f7-4c08-8957-1f7f884bb460\", \"vote\": 1, \"is_placeholder_selection\": false, \"write_in\": null}, {\"object_id\": \"5347bea6-8112-4ffc-bfff-375656d45106-f89f00e0-bf97-46c6-8540-15de8e5673c4\", \"vote\": 0, \"is_placeholder_selection\": false, \"write_in\": null}]}, {\"object_id\": \"6e88c100-38cd-46a3-9298-894e3d01754f\", \"ballot_selections\": [{\"object_id\": \"6e88c100-38cd-46a3-9298-894e3d01754f-cdb63723-1db6-45d6-998c-ec798739800f\", \"vote\": 1, \"is_placeholder_selection\": false, \"write_in\": null}]}, {\"object_id\": \"58701085-2dfa-4e96-9454-7714c2de19a2\", \"ballot_selections\": [{\"object_id\": \"58701085-2dfa-4e96-9454-7714c2de19a2-bc56f808-193c-472a-bd5f-328b9d462363\", \"vote\": 1, \"is_placeholder_selection\": false, \"write_in\": null}]}, {\"object_id\": \"34e28bbf-e41a-4653-a67a-03b0c0b2e79f\", \"ballot_selections\": [{\"object_id\": \"34e28bbf-e41a-4653-a67a-03b0c0b2e79f-47a8e20d-cb61-456d-a700-2a5b58da0790\", \"vote\": 1, \"is_placeholder_selection\": false, \"write_in\": null}]}, {\"object_id\": \"171373a6-492e-44c5-ad98-60b620f6c773\", \"ballot_selections\": [{\"object_id\": \"171373a6-492e-44c5-ad98-60b620f6c773-096d55a2-578e-400d-a923-46706b0a2b09\", \"vote\": 1, \"is_placeholder_selection\": false, \"write_in\": null}]}, {\"object_id\": \"e80b3459-867d-4ad8-92d3-ecc5dc560fd8\", \"ballot_selections\": [{\"object_id\": \"e80b3459-867d-4ad8-92d3-ecc5dc560fd8-7a62f4e5-3322-41ed-a5ea-ddfab6d568b3\", \"vote\": 1, \"is_placeholder_selection\": false, \"write_in\": null}]}, {\"object_id\": \"122c0b05-eb60-46fc-9495-507bda7fa5f9\", \"ballot_selections\": [{\"object_id\": \"122c0b05-eb60-46fc-9495-507bda7fa5f9-22456db6-5c3a-49a4-8b45-638b2dce23d6\", \"vote\": 1, \"is_placeholder_selection\": false, \"write_in\": null}, {\"object_id\": \"122c0b05-eb60-46fc-9495-507bda7fa5f9-78f5903e-f686-44aa-8d38-32e3f2d55543\", \"vote\": 0, \"is_placeholder_selection\": false, \"write_in\": null}]}, {\"object_id\": \"3ab918aa-d3f0-4c40-9691-f7a3c18976d6\", \"ballot_selections\": [{\"object_id\": \"3ab918aa-d3f0-4c40-9691-f7a3c18976d6-036bffd8-cf8a-48a8-b87b-06a10f705e80\", \"vote\": 0, \"is_placeholder_selection\": false, \"write_in\": null}, {\"object_id\": \"3ab918aa-d3f0-4c40-9691-f7a3c18976d6-106dc350-a67d-4fb9-8484-16dcc4f9dc7e\", \"vote\": 1, \"is_placeholder_selection\": false, \"write_in\": null}]}, {\"object_id\": \"c9ee9824-6704-4169-a176-32ee4b260865\", \"ballot_selections\": [{\"object_id\": \"c9ee9824-6704-4169-a176-32ee4b260865-65f197b1-1bec-4d53-b886-6bb14592582c\", \"vote\": 0, \"is_placeholder_selection\": false, \"write_in\": null}, {\"object_id\": \"c9ee9824-6704-4169-a176-32ee4b260865-847b5768-d0d7-48f9-924e-b98edb2f9b92\", \"vote\": 1, \"is_placeholder_selection\": false, \"write_in\": null}]}, {\"object_id\": \"2a1c23e6-0eff-4838-9645-dbaaec8ae580\", \"ballot_selections\": [{\"object_id\": \"2a1c23e6-0eff-4838-9645-dbaaec8ae580-823efa18-9f92-4762-8067-6dd96bff5ba9\", \"vote\": 1, \"is_placeholder_selection\": false, \"write_in\": null}]}, {\"object_id\": \"6d7013e6-d6fb-463e-9236-be53d17c843c\", \"ballot_selections\": [{\"object_id\": \"6d7013e6-d6fb-463e-9236-be53d17c843c-a994232b-63ba-48bb-a433-dd2d7a0c15d4\", \"vote\": 1, \"is_placeholder_selection\": false, \"write_in\": null}]}, {\"object_id\": \"d118ded9-f448-41c2-8dad-4cedc61658dc\", \"ballot_selections\": [{\"object_id\": \"d118ded9-f448-41c2-8dad-4cedc61658dc-9aef2c20-6dca-4e0e-84d5-dba3c66c2f90\", \"vote\": 1, \"is_placeholder_selection\": false, \"write_in\": null}]}, {\"object_id\": \"814ec976-324c-4106-8a85-90caa7b86a1f\", \"ballot_selections\": [{\"object_id\": \"814ec976-324c-4106-8a85-90caa7b86a1f-00c95845-b2d7-479a-9068-cabb90bb34bb\", \"vote\": 1, \"is_placeholder_selection\": false, \"write_in\": null}]}, {\"object_id\": \"9ae1030b-6635-4168-abbb-357d56d54820\", \"ballot_selections\": [{\"object_id\": \"9ae1030b-6635-4168-abbb-357d56d54820-459bd26b-ee61-4492-b2c3-9476738774c9\", \"vote\": 1, \"is_placeholder_selection\": false, \"write_in\": null}]}, {\"object_id\": \"548a6df8-099f-41a9-9e21-fec30e00b228\", \"ballot_selections\": [{\"object_id\": \"548a6df8-099f-41a9-9e21-fec30e00b228-766447c0-977e-4ab7-b060-cfab76044725\", \"vote\": 1, \"is_placeholder_selection\": false, \"write_in\": null}]}, {\"object_id\": \"a479a090-58f2-40c0-91d9-7c86040aa434\", \"ballot_selections\": [{\"object_id\": \"a479a090-58f2-40c0-91d9-7c86040aa434-a5f05a39-2e2a-41b1-8001-dfd49c374842\", \"vote\": 1, \"is_placeholder_selection\": false, \"write_in\": null}]}, {\"object_id\": \"283805b1-f438-44a1-84d4-41a480020084\", \"ballot_selections\": [{\"object_id\": \"283805b1-f438-44a1-84d4-41a480020084-54a1bf6e-ac88-45d8-92ef-76a102af4105\", \"vote\": 1, \"is_placeholder_selection\": false, \"write_in\": null}]}, {\"object_id\": \"6a5f9bb9-e21a-419c-b672-523bfb653c7b\", \"ballot_selections\": [{\"object_id\": \"6a5f9bb9-e21a-419c-b672-523bfb653c7b-889194d1-d759-4c66-a4cd-34aa1ae4a7a0\", \"vote\": 1, \"is_placeholder_selection\": false, \"write_in\": null}]}, {\"object_id\": \"0d230c4c-f9fa-4708-8df6-5f2f0c5e4118\", \"ballot_selections\": [{\"object_id\": \"0d230c4c-f9fa-4708-8df6-5f2f0c5e4118-0fc17a46-a046-40bd-8d14-22ec6cf58d16\", \"vote\": 1, \"is_placeholder_selection\": false, \"write_in\": null}]}, {\"object_id\": \"c0a61c0e-d6b9-437e-bcac-a2c4c63d98be\", \"ballot_selections\": [{\"object_id\": \"c0a61c0e-d6b9-437e-bcac-a2c4c63d98be-d41899b1-4a1d-4bb2-8385-e1d5b08bc67a\", \"vote\": 1, \"is_placeholder_selection\": false, \"write_in\": null}]}, {\"object_id\": \"e171eedc-026c-4e23-a972-287b8ff2639d\", \"ballot_selections\": [{\"object_id\": \"e171eedc-026c-4e23-a972-287b8ff2639d-8979f102-f5c6-4fca-a85d-a254edb1959a\", \"vote\": 1, \"is_placeholder_selection\": false, \"write_in\": null}]}, {\"object_id\": \"38aafc92-3a90-4398-8c08-3132e381dcae\", \"ballot_selections\": [{\"object_id\": \"38aafc92-3a90-4398-8c08-3132e381dcae-4f3b770b-aaa0-474b-beba-61c6e8c892ea\", \"vote\": 1, \"is_placeholder_selection\": false, \"write_in\": null}]}, {\"object_id\": \"a7446e5b-e2c7-4feb-8f6a-913954110d2d\", \"ballot_selections\": [{\"object_id\": \"a7446e5b-e2c7-4feb-8f6a-913954110d2d-bc47421d-20fe-47e0-8b39-42f808a23d3f\", \"vote\": 0, \"is_placeholder_selection\": false, \"write_in\": null}, {\"object_id\": \"a7446e5b-e2c7-4feb-8f6a-913954110d2d-e2d96a91-0ab3-462a-9f8a-d0ef5de18fe2\", \"vote\": 1, \"is_placeholder_selection\": false, \"write_in\": null}]}, {\"object_id\": \"3d47bc4a-17d6-4cd3-a776-8d1bca8340be\", \"ballot_selections\": [{\"object_id\": \"3d47bc4a-17d6-4cd3-a776-8d1bca8340be-f1657af2-0eba-4350-a3ec-66e244c7a688\", \"vote\": 1, \"is_placeholder_selection\": false, \"write_in\": null}]}, {\"object_id\": \"604468ab-b05d-4fc9-9a75-8950478f12bd\", \"ballot_selections\": [{\"object_id\": \"604468ab-b05d-4fc9-9a75-8950478f12bd-e923cb22-927e-4b9d-b8ea-feae99fe7757\", \"vote\": 1, \"is_placeholder_selection\": false, \"write_in\": null}]}, {\"object_id\": \"69346544-71d2-44b9-afed-909b0063fa99\", \"ballot_selections\": [{\"object_id\": \"69346544-71d2-44b9-afed-909b0063fa99-f7e19e93-5d83-4360-a3d3-dcfa3701f7ec\", \"vote\": 1, \"is_placeholder_selection\": false, \"write_in\": null}]}, {\"object_id\": \"4184c688-b114-4d51-aaa0-5ff56c340a42\", \"ballot_selections\": [{\"object_id\": \"4184c688-b114-4d51-aaa0-5ff56c340a42-3e7df895-8f69-4683-b1a7-54e1d4ee8b04\", \"vote\": 1, \"is_placeholder_selection\": false, \"write_in\": null}]}, {\"object_id\": \"6cff94ed-274e-4617-90ed-927176dec47e\", \"ballot_selections\": [{\"object_id\": \"6cff94ed-274e-4617-90ed-927176dec47e-a6225126-f7c7-449f-9f8f-cad3da5a8730\", \"vote\": 1, \"is_placeholder_selection\": false, \"write_in\": null}]}, {\"object_id\": \"6a2971c0-7ea9-4701-a930-993c264a8fa3\", \"ballot_selections\": [{\"object_id\": \"6a2971c0-7ea9-4701-a930-993c264a8fa3-23e2f381-4dc2-45d5-87b5-994c5702ac6c\", \"vote\": 1, \"is_placeholder_selection\": false, \"write_in\": null}]}, {\"object_id\": \"f46a062b-5efe-4c2e-8e83-9db67cc35d2c\", \"ballot_selections\": [{\"object_id\": \"f46a062b-5efe-4c2e-8e83-9db67cc35d2c-972c8b84-2150-4be1-8578-446736e9d1b3\", \"vote\": 1, \"is_placeholder_selection\": false, \"write_in\": null}]}, {\"object_id\": \"59ccdf94-dd02-4c85-bf26-826e9719bbe3\", \"ballot_selections\": [{\"object_id\": \"59ccdf94-dd02-4c85-bf26-826e9719bbe3-5b131fef-e731-47ff-b626-adffa3455ae9\", \"vote\": 1, \"is_placeholder_selection\": false, \"write_in\": null}]}, {\"object_id\": \"bb85a631-995b-4ee5-8da9-f198b2a12d4d\", \"ballot_selections\": [{\"object_id\": \"bb85a631-995b-4ee5-8da9-f198b2a12d4d-daec27c7-c8d8-4dfb-b640-dde05b056b02\", \"vote\": 1, \"is_placeholder_selection\": false, \"write_in\": null}]}]}";
 

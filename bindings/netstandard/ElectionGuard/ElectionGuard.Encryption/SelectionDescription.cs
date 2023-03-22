@@ -1,5 +1,4 @@
-﻿using System;
-using System.Runtime.InteropServices;
+﻿using System.Runtime.InteropServices;
 
 namespace ElectionGuard
 {
@@ -27,13 +26,13 @@ namespace ElectionGuard
             get
             {
                 var status = NativeInterface.SelectionDescription.GetObjectId(
-                    Handle, out IntPtr value);
+                    Handle, out var value);
                 if (status != Status.ELECTIONGUARD_STATUS_SUCCESS)
                 {
                     throw new ElectionGuardException($"SelectionDescription Error ObjectId: {status}");
                 }
                 var data = Marshal.PtrToStringAnsi(value);
-                NativeInterface.Memory.FreeIntPtr(value);
+                _ = NativeInterface.Memory.FreeIntPtr(value);
                 return data;
             }
         }
@@ -46,13 +45,13 @@ namespace ElectionGuard
             get
             {
                 var status = NativeInterface.SelectionDescription.GetCandidateId(
-                    Handle, out IntPtr value);
+                    Handle, out var value);
                 if (status != Status.ELECTIONGUARD_STATUS_SUCCESS)
                 {
                     throw new ElectionGuardException($"SelectionDescription Error CandidateId: {status}");
                 }
                 var data = Marshal.PtrToStringAnsi(value);
-                NativeInterface.Memory.FreeIntPtr(value);
+                _ = NativeInterface.Memory.FreeIntPtr(value);
                 return data;
             }
         }
@@ -113,12 +112,10 @@ namespace ElectionGuard
         public ElementModQ CryptoHash()
         {
             var status = NativeInterface.SelectionDescription.CryptoHash(
-                Handle, out NativeInterface.ElementModQ.ElementModQHandle value);
-            if (status != Status.ELECTIONGUARD_STATUS_SUCCESS)
-            {
-                throw new ElectionGuardException($"CryptoHash Error Status: {status}");
-            }
-            return new ElementModQ(value);
+                Handle, out var value);
+            return status != Status.ELECTIONGUARD_STATUS_SUCCESS
+                ? throw new ElectionGuardException($"CryptoHash Error Status: {status}")
+                : new ElementModQ(value);
         }
     }
 }

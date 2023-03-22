@@ -1,4 +1,4 @@
-using System.Collections;
+using System;
 using System.Collections.Generic;
 using System.Runtime.InteropServices;
 
@@ -13,9 +13,25 @@ namespace ElectionGuard
     ///
     /// Don't make this directly. Use `make_ciphertext_ballot` instead.
     /// </summary>
-    public partial class CiphertextBallot : DisposableBase, IReadOnlyList<CiphertextBallotContest>
+    public partial class CiphertextBallot : DisposableBase
     {
+        /// <summary>
+        /// the collection of Contests for the ballot
+        /// </summary>
+        public IReadOnlyList<CiphertextBallotContest> Contests =>
+            new ElectionGuardEnumerator<CiphertextBallotContest>(
+                () => (int)ContestsSize,
+                (index) => GetContestAtIndex((ulong)index)
+            );
+
+        /// <summary>
+        /// returns true if the ballot is marked as cast
+        /// </summary>
         public bool IsCast => State == BallotBoxState.Cast;
+
+        /// <summary>
+        /// returns true if the ballot is marked as spoiled
+        /// </summary>
         public bool IsSpoiled => State == BallotBoxState.Spoiled;
 
         /// <summary>
@@ -70,6 +86,18 @@ namespace ElectionGuard
         {
             var status = NativeInterface.CiphertextBallot.Spoil(Handle);
             status.ThrowIfError();
+        }
+
+        public void ForEachContestSelection(
+            Action<CiphertextBallotContest, CiphertextBallotSelection> action)
+        {
+            foreach (var contest in Contests)
+            {
+                foreach (var selection in contest.Selections)
+                {
+                    action(contest, selection);
+                }
+            }
         }
 
         /// <Summary>
@@ -137,28 +165,5 @@ namespace ElectionGuard
             _ = NativeInterface.Memory.DeleteIntPtr(data);
             return byteArray;
         }
-
-        #region IReadOnlyList implementation
-
-        public int Count => (int)ContestsSize;
-
-        public CiphertextBallotContest this[int index] => GetContestAtIndex((ulong)index);
-
-
-        public IEnumerator<CiphertextBallotContest> GetEnumerator()
-        {
-            var count = (int)ContestsSize;
-            for (var i = 0; i < count; i++)
-            {
-                yield return GetContestAtIndex((ulong)i);
-            }
-        }
-
-        IEnumerator IEnumerable.GetEnumerator()
-        {
-            return GetEnumerator();
-        }
-
-        #endregion
     }
 }

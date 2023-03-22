@@ -1,54 +1,301 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace ElectionGuard.Encryption.Utils.Generators
 {
+    /// <summary>
+    /// A class to generate ballots for testing
+    /// </summary>
     public class BallotGenerator
     {
-        public static PlaintextBallotSelection SelectionFrom(SelectionDescription description, bool isAffirmative = false, bool isPlaceholder = false)
+        // get a selection for a description using a new random number generator
+        public static PlaintextBallotSelection SelectionFrom(
+            SelectionDescription description,
+            bool isPlaceholder = false)
         {
-            return new PlaintextBallotSelection(description.ObjectId, isAffirmative ? 1UL : 0UL, isPlaceholder);
+            return SelectionFrom(description, new Random(), isPlaceholder);
         }
 
-        public static PlaintextBallotContest ContestFrom(ContestDescription contest, Func<string, int, bool> voteResultFunc)
+        // get a selection for a description using a defined random number generator
+        public static PlaintextBallotSelection SelectionFrom(
+            SelectionDescription description,
+            Random random,
+            bool isPlaceholder = false)
         {
-            List<PlaintextBallotSelection> selections = new List<PlaintextBallotSelection>();
+            var isAffirmative = random.Next(0, 2) == 1;
+            return new PlaintextBallotSelection(
+                description.ObjectId,
+                isAffirmative ? 1UL : 0UL, isPlaceholder);
+        }
 
-            for (ulong i = 0; i < contest.SelectionsSize; i++)
+        // get a selection for a description using a vote generator function
+        public static PlaintextBallotSelection SelectionFrom(
+            SelectionDescription description,
+            Func<int, bool> voteGenerator,
+            bool isPlaceholder = false)
+        {
+            var isAffirmative = voteGenerator(
+                (int)description.SequenceOrder);
+            return new PlaintextBallotSelection(
+                description.ObjectId,
+                isAffirmative ? 1UL : 0UL, isPlaceholder);
+        }
+
+        // get a selection for a description
+        public static PlaintextBallotSelection SelectionFrom(
+            SelectionDescription description,
+            bool isAffirmative,
+            bool isPlaceholder = false)
+        {
+            return new PlaintextBallotSelection(
+                description.ObjectId,
+                isAffirmative ? 1UL : 0UL, isPlaceholder);
+        }
+
+        // get a selection for a description using a new random number generator
+        // this overload will not allow overvotes
+        public static PlaintextBallotContest ContestFrom(
+            ContestDescription contest)
+        {
+            return ContestFrom(contest, new Random());
+        }
+
+        // get a contest for a description using a defined random number generator
+        // this overload will not allow overvotes
+        public static PlaintextBallotContest ContestFrom(
+            ContestDescription contest,
+            Random random)
+        {
+            var selections = new List<PlaintextBallotSelection>();
+            var selectionsMade = 0UL;
+
+            foreach (var description in contest.Selections)
             {
-                var isAffirmative = voteResultFunc(contest.ObjectId, (int)i);
-                selections.Add(SelectionFrom(contest.GetSelectionAtIndex(i), isAffirmative));
+                var selection = selectionsMade < contest.VotesAllowed
+                    ? SelectionFrom(description, random)
+                    : SelectionFrom(description, false, false);
+                selectionsMade += selection.Vote;
+                selections.Add(selection);
             }
 
             return new PlaintextBallotContest(contest.ObjectId, selections.ToArray());
         }
 
-        public static PlaintextBallot GetFakeBallotWithContest(InternalManifest manifest, string contestId, int numberOfSelections, string styleId)
+        // get a contest for a description using a list of votes
+        public static PlaintextBallotContest ContestFrom(
+            ContestDescription contest,
+            IList<bool> votes)
         {
-            return GetFakeBallotInternal(manifest, styleId, (currentContestId, selectionId) =>
+            var selections = new List<PlaintextBallotSelection>();
+            for (var i = 0; i < contest.Selections.Count; i++)
             {
-                if (currentContestId == contestId)
-                    return selectionId < numberOfSelections;
-                return selectionId == 0;
-            });
-        }
-
-        public static PlaintextBallot GetFakeBallot(InternalManifest manifest, uint maxChoices = 1)
-        {
-            var styleId = manifest.GetBallotStyleAtIndex(0).ObjectId;
-            return GetFakeBallotInternal(manifest, styleId, (_, selectionId) => selectionId < maxChoices);
-        }
-
-        public static PlaintextBallot GetFakeBallotInternal(InternalManifest manifest, string styleId,
-            Func<string, int, bool> voteResultFunc)
-        {
-            List<PlaintextBallotContest> contests = new List<PlaintextBallotContest>();
-            for (ulong i = 0; i < manifest.ContestsSize; i++)
-            {
-                contests.Add(ContestFrom(manifest.GetContestAtIndex(i), voteResultFunc));
+                selections.Add(SelectionFrom(contest.Selections[i], votes[i]));
             }
 
-            const string ballotId = "ballot-id-123";
+            return new PlaintextBallotContest(contest.ObjectId, selections.ToArray());
+        }
+
+        // get a contest for a description using a vote generator function
+        // the generator function is invoked with the selection sequence order
+        public static PlaintextBallotContest ContestFrom(
+            ContestDescription contest,
+            Func<int, bool> voteGenerator)
+        {
+            var selections = new List<PlaintextBallotSelection>();
+            foreach (var description in contest.Selections)
+            {
+                selections.Add(SelectionFrom(description, voteGenerator));
+            }
+
+            return new PlaintextBallotContest(contest.ObjectId, selections.ToArray());
+        }
+
+        // get a contest for a description using a vote generator function
+        // the generator function is invoked with the contest and selection sequence order
+        public static PlaintextBallotContest ContestFrom(
+            ContestDescription contest,
+            Func<int, int, bool> voteGenerator)
+        {
+            var selections = new List<PlaintextBallotSelection>();
+
+            foreach (var description in contest.Selections)
+            {
+                var isAffirmative = voteGenerator(
+                    (int)contest.SequenceOrder, (int)description.SequenceOrder);
+                selections.Add(SelectionFrom(description, isAffirmative));
+            }
+
+            return new PlaintextBallotContest(contest.ObjectId, selections.ToArray());
+        }
+
+        // get a selection for a description using a new random number generator
+        // this overload will not allow overvotes
+        public static PlaintextBallotContest ContestFrom(
+            ContestDescriptionWithPlaceholders contest)
+        {
+            return ContestFrom(contest, new Random());
+        }
+
+        // get a contest for a description using a defined random number generator
+        // this overload will not allow overvotes
+        public static PlaintextBallotContest ContestFrom(
+            ContestDescriptionWithPlaceholders contest,
+            Random random)
+        {
+            var selections = new List<PlaintextBallotSelection>();
+            var selectionsMade = 0UL;
+
+            foreach (var description in contest.Selections)
+            {
+                var selection = selectionsMade < contest.VotesAllowed
+                    ? SelectionFrom(description, random)
+                    : SelectionFrom(description, false, false);
+                selectionsMade += selection.Vote;
+                selections.Add(selection);
+            }
+
+            return new PlaintextBallotContest(contest.ObjectId, selections.ToArray());
+        }
+
+        // get a contest for a description using a list of votes
+        // will explicitly assign the vodes to the selections
+        // so the number of votes must match the number of selections
+        // explicitly allows overvotes and undervotes
+        public static PlaintextBallotContest ContestFrom(
+            ContestDescriptionWithPlaceholders contest,
+            IList<bool> votes)
+        {
+            var selections = new List<PlaintextBallotSelection>();
+            for (var i = 0; i < contest.Selections.Count; i++)
+            {
+                selections.Add(SelectionFrom(contest.Selections[i], votes[i]));
+            }
+
+            return new PlaintextBallotContest(contest.ObjectId, selections.ToArray());
+        }
+
+        // get a contest for a description using a vote generator function
+        // the generator function is invoked with the selection sequence order
+        public static PlaintextBallotContest ContestFrom(
+            ContestDescriptionWithPlaceholders contest,
+            Func<int, bool> voteGenerator)
+        {
+            var selections = new List<PlaintextBallotSelection>();
+            foreach (var description in contest.Selections)
+            {
+                selections.Add(SelectionFrom(description, voteGenerator));
+            }
+            return new PlaintextBallotContest(contest.ObjectId, selections.ToArray());
+        }
+
+        // get a contest for a description using a vote generator function
+        // the generator function is invoked with the contest and selection sequence order
+        public static PlaintextBallotContest ContestFrom(
+            ContestDescriptionWithPlaceholders contest,
+            Func<int, int, bool> voteGenerator)
+        {
+            var selections = new List<PlaintextBallotSelection>();
+            foreach (var description in contest.Selections)
+            {
+                var isAffirmative = voteGenerator(
+                    (int)contest.SequenceOrder, (int)description.SequenceOrder);
+                selections.Add(SelectionFrom(description, isAffirmative));
+            }
+
+            return new PlaintextBallotContest(contest.ObjectId, selections.ToArray());
+        }
+
+        // get a fake ballot using a new random number generator
+        public static PlaintextBallot GetFakeBallot(
+            InternalManifest manifest)
+        {
+            var styleId = manifest.BallotStyles.First().ObjectId;
+            return GetFakeBallot(
+                manifest, styleId, $"fake-ballot-{Guid.NewGuid()}", new Random());
+        }
+
+        // get a fake ballot using a new random number generator
+        public static PlaintextBallot GetFakeBallot(
+            InternalManifest manifest,
+            string styleId)
+        {
+            return GetFakeBallot(
+                manifest, styleId, $"fake-ballot-{Guid.NewGuid()}", new Random());
+        }
+
+        // get a fake ballot using a defined random number generator
+        public static PlaintextBallot GetFakeBallot(
+            InternalManifest manifest,
+            string styleId,
+            string ballotId,
+            Random random)
+        {
+            var contests = new List<PlaintextBallotContest>();
+            foreach (var contest in manifest.GetContests(styleId))
+            {
+                contests.Add(ContestFrom(contest, random));
+            }
+
+            return new PlaintextBallot(ballotId, styleId, contests.ToArray());
+        }
+
+        // get a fake ballot using a list of votes
+        // the list of votes is expected to be in the same order as the contests
+        // and the selections in the contests, including placeholders (if any)
+        public static PlaintextBallot GetFakeBallot(
+            InternalManifest manifest,
+            string styleId,
+            IList<IList<bool>> votes)
+        {
+            return GetFakeBallot(
+                manifest, styleId, $"fake-ballot-{Guid.NewGuid()}", votes);
+        }
+
+        // get a fake ballot using a list of votes
+        // the list of votes is expected to be in the same order as the contests
+        // and the selections in the contests, including placeholders (if any)
+        public static PlaintextBallot GetFakeBallot(
+            InternalManifest manifest,
+            string styleId,
+            string ballotId,
+            IList<IList<bool>> votes)
+        {
+            var contests = new List<PlaintextBallotContest>();
+            var descriptions = manifest.GetContests(styleId);
+            for (var i = 0; i < descriptions.Count; i++)
+            {
+                contests.Add(ContestFrom(descriptions[i], votes[i]));
+            }
+
+            return new PlaintextBallot(ballotId, styleId, contests.ToArray());
+        }
+
+        // get a fake ballot using an external function to determine the vote result
+        // the function expects the contest id and the selection sequence order
+        public static PlaintextBallot GetFakeBallot(
+            InternalManifest manifest,
+            string styleId,
+            Func<int, int, bool> voteResultFunc)
+        {
+            return GetFakeBallot(
+                manifest, styleId, $"fake-ballot-{Guid.NewGuid()}", voteResultFunc);
+        }
+
+        // get a fake ballot using an external function to determine the vote result
+        // the function expects the contest id and the selection sequence order
+        public static PlaintextBallot GetFakeBallot(
+            InternalManifest manifest,
+            string styleId,
+            string ballotId,
+            Func<int, int, bool> voteResultFunc)
+        {
+            var contests = new List<PlaintextBallotContest>();
+            foreach (var contest in manifest.GetContests(styleId))
+            {
+                contests.Add(ContestFrom(contest, voteResultFunc));
+            }
+
             return new PlaintextBallot(ballotId, styleId, contests.ToArray());
         }
     }

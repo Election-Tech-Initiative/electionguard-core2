@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 
 namespace ElectionGuard
 {
@@ -16,6 +17,15 @@ namespace ElectionGuard
     /// </summary>
     public partial class PlaintextBallotContest : DisposableBase
     {
+        /// <summary>
+        /// the collection of Selections for the Contest
+        /// </summary>
+        public IReadOnlyList<PlaintextBallotSelection> Selections =>
+            new ElectionGuardEnumerator<PlaintextBallotSelection>(
+                () => (int)SelectionsSize,
+                (index) => GetSelectionAtIndex((ulong)index)
+            );
+
         internal PlaintextBallotContest(
             External.PlaintextBallotContestHandle handle)
         {
@@ -29,7 +39,7 @@ namespace ElectionGuard
         /// <param name="selections"></param>
         public PlaintextBallotContest(string objectId, PlaintextBallotSelection[] selections)
         {
-            IntPtr[] selectionPointers = new IntPtr[selections.Length];
+            var selectionPointers = new IntPtr[selections.Length];
             for (var i = 0; i < selections.Length; i++)
             {
                 selectionPointers[i] = selections[i].Handle.Ptr;

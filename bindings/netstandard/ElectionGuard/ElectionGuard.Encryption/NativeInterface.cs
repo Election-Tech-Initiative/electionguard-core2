@@ -1920,7 +1920,7 @@ namespace ElectionGuard
             internal static extern Status GetContestAtIndex(
                 InternalManifestHandle handle,
                 ulong index,
-                out ContestDescription.ContestDescriptionHandle contest);
+                out ContestDescriptionWithPlaceholders.ContestDescriptionWithPlaceholdersHandle contest);
 
             [DllImport(DllName, EntryPoint = "eg_internal_manifest_get_ballot_styles_size",
                 CallingConvention = CallingConvention.Cdecl, SetLastError = true)]

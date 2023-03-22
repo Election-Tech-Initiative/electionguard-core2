@@ -1,4 +1,5 @@
-﻿using System;
+﻿using System.Collections;
+using System.Collections.Generic;
 using System.Runtime.InteropServices;
 
 namespace ElectionGuard
@@ -22,16 +23,34 @@ namespace ElectionGuard
             get
             {
                 var status = NativeInterface.BallotStyle.GetObjectId(
-                    Handle, out IntPtr value);
+                    Handle, out var value);
                 if (status != Status.ELECTIONGUARD_STATUS_SUCCESS)
                 {
                     throw new ElectionGuardException($"BallotStyle Error ObjectId: {status}");
                 }
                 var data = Marshal.PtrToStringAnsi(value);
-                NativeInterface.Memory.FreeIntPtr(value);
+                _ = NativeInterface.Memory.FreeIntPtr(value);
                 return data;
             }
         }
+
+        /// <Summary>
+        /// The collection of geopolitical unit ids for this ballot style
+        /// </Summary>
+        public IReadOnlyList<string> GeopoliticalUnitIds =>
+            new ElectionGuardEnumerator<string>(
+                () => (int)GeopoliticalUnitIdsSize,
+                (index) => GetGeopoliticalUnitIdAtIndex((ulong)index)
+            );
+
+        /// <Summary>
+        /// The collection of party ids for this ballot style
+        /// </Summary>
+        public IReadOnlyList<string> PartyIds =>
+            new ElectionGuardEnumerator<string>(
+                () => (int)PartyIdsSize,
+                (index) => GetPartyIdAtIndex((ulong)index)
+            );
 
         /// <Summary>
         /// the size of the geopolitical unit id collection
@@ -87,7 +106,11 @@ namespace ElectionGuard
         {
             base.DisposeUnmanaged();
 
-            if (Handle == null || Handle.IsInvalid) return;
+            if (Handle == null || Handle.IsInvalid)
+            {
+                return;
+            }
+
             Handle.Dispose();
             Handle = null;
         }
@@ -95,32 +118,32 @@ namespace ElectionGuard
         /// <Summary>
         /// the Geopolitical Unit Id or id's that correlate to this ballot style
         /// </Summary>
-        public String GetGeopoliticalUnitIdAt(ulong index)
+        public string GetGeopoliticalUnitIdAtIndex(ulong index)
         {
             var status = NativeInterface.BallotStyle.GetGeopoliticalInitIdAtIndex(
-                Handle, index, out IntPtr value);
+                Handle, index, out var value);
             if (status != Status.ELECTIONGUARD_STATUS_SUCCESS)
             {
                 throw new ElectionGuardException($"BallotStyle Error GetGeopoliticalUnitIdAt: {status}");
             }
             var data = Marshal.PtrToStringAnsi(value);
-            NativeInterface.Memory.FreeIntPtr(value);
+            _ = NativeInterface.Memory.FreeIntPtr(value);
             return data;
         }
 
         /// <Summary>
         /// the Party Id or Id's (if any) for this ballot style
         /// </Summary>
-        public String GetPartyIdAt(ulong index)
+        public string GetPartyIdAtIndex(ulong index)
         {
             var status = NativeInterface.BallotStyle.GetPartyIdAtIndex(
-                Handle, index, out IntPtr value);
+                Handle, index, out var value);
             if (status != Status.ELECTIONGUARD_STATUS_SUCCESS)
             {
                 throw new ElectionGuardException($"BallotStyle Error GetPartyIdAt: {status}");
             }
             var data = Marshal.PtrToStringAnsi(value);
-            NativeInterface.Memory.FreeIntPtr(value);
+            _ = NativeInterface.Memory.FreeIntPtr(value);
             return data;
         }
 
@@ -130,12 +153,10 @@ namespace ElectionGuard
         public ElementModQ CryptoHash()
         {
             var status = NativeInterface.BallotStyle.CryptoHash(
-                Handle, out NativeInterface.ElementModQ.ElementModQHandle value);
-            if (status != Status.ELECTIONGUARD_STATUS_SUCCESS)
-            {
-                throw new ElectionGuardException($"CryptoHash Error Status: {status}");
-            }
-            return new ElementModQ(value);
+                Handle, out var value);
+            return status != Status.ELECTIONGUARD_STATUS_SUCCESS
+                ? throw new ElectionGuardException($"CryptoHash Error Status: {status}")
+                : new ElementModQ(value);
         }
     }
 }

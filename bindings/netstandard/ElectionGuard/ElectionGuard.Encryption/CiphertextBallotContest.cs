@@ -1,4 +1,3 @@
-using System.Collections;
 using System.Collections.Generic;
 
 namespace ElectionGuard
@@ -17,8 +16,17 @@ namespace ElectionGuard
     /// seed nonce, both values can be regenerated.  If the `nonce` for this contest is completely random,
     /// then it is required in order to regenerate the proof.
     /// </summary>
-    public partial class CiphertextBallotContest : DisposableBase, IReadOnlyList<CiphertextBallotSelection>
+    public partial class CiphertextBallotContest : DisposableBase
     {
+        /// <summary>
+        /// The collection of selections for the contest
+        /// </summary>
+        public IReadOnlyList<CiphertextBallotSelection> Selections =>
+            new ElectionGuardEnumerator<CiphertextBallotSelection>(
+                () => (int)SelectionsSize,
+                (index) => GetSelectionAtIndex((ulong)index)
+            );
+
         internal CiphertextBallotContest(External.CiphertextBallotContestHandle handle)
         {
             Handle = handle;
@@ -97,28 +105,5 @@ namespace ElectionGuard
                 Handle, encryptionSeed.Handle, elGamalPublicKey.Handle,
                 cryptoExtendedBaseHash.Handle);
         }
-
-        #region IReadOnlyList implementation
-
-        public int Count => (int)SelectionsSize;
-
-        public CiphertextBallotSelection this[int index] => GetSelectionAtIndex((ulong)index);
-
-
-        public IEnumerator<CiphertextBallotSelection> GetEnumerator()
-        {
-            var count = (int)SelectionsSize;
-            for (var i = 0; i < count; i++)
-            {
-                yield return GetSelectionAtIndex((ulong)i);
-            }
-        }
-
-        IEnumerator IEnumerable.GetEnumerator()
-        {
-            return GetEnumerator();
-        }
-
-        #endregion
     }
 }

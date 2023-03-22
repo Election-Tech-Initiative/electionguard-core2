@@ -19,26 +19,18 @@ namespace ElectionGuard.Encryption.Tests
             const string contestId = "contest-id";
             const int numberElected = 3;
             const string contestName = "test election";
-            
+
             var contestThreeVotes = new ContestDescription(
-                contestId, 
-                electoralDistrictId, 
-                sequenceOrder, 
-                VoteVariationType.NOfM, 
+                contestId,
+                electoralDistrictId,
+                sequenceOrder,
+                VoteVariationType.NOfM,
                 numberElected,
-                contestName, 
+                contestName,
                 selections);
 
             // Assert
             Assert.AreEqual(3, contestThreeVotes.VotesAllowed);
-        }
-
-
-        [Test]
-        public void Test_Can_Serialize_Sample_manifest()
-        {
-            var subject = ManifestGenerator.GetManifestFromFile();
-            Assert.That(subject.IsValid);
         }
 
         [Test]
@@ -74,14 +66,24 @@ namespace ElectionGuard.Encryption.Tests
 
             var subject = new BallotStyle("some-object-id", gpUnitIds);
 
-            var actual = subject.GetGeopoliticalUnitIdAt(0);
+            var actual = subject.GetGeopoliticalUnitIdAtIndex(0);
             Assert.That(actual == "gp-unit-1");
         }
 
         [Test]
-        public void Test_Can_Construct_InternalManifest_From_Sample_Manifest()
+        public void Test_Can_Construct_InternalManifest_From_Generated_Manifest()
         {
-            // Get a simple manifest that shows the bare minimum data required
+            // Get a slightly more complex manifest that shows including multiple ballot styles
+            var manifest = ManifestGenerator.GetFakeManifest();
+            var internalManifest = new InternalManifest(manifest);
+
+            Assert.That(manifest.CryptoHash().ToHex() == internalManifest.ManifestHash.ToHex());
+            Assert.That(manifest.IsValid());
+        }
+
+        [Test]
+        public void Test_Can_Construct_InternalManifest_From_Sample_Manifest_From_File()
+        {
             var manifest = ManifestGenerator.GetManifestFromFile();
             var internalManifest = new InternalManifest(manifest);
 
@@ -90,20 +92,9 @@ namespace ElectionGuard.Encryption.Tests
         }
 
         [Test]
-        public void Test_Can_Construct_InternalManifest_From_Manifest_MultipleBallotStyles()
+        public void Test_Can_Serialize_Generated_Manifest()
         {
-            // Get a slightly more complex manifest that shows including multiple ballot styles
-            var manifest = ManifestGenerator.GetJeffersonCountyManifest_MultipleBallotStyles();
-            var internalManifest = new InternalManifest(manifest);
-
-            Assert.That(manifest.CryptoHash().ToHex() == internalManifest.ManifestHash.ToHex());
-            Assert.That(manifest.IsValid());
-        }
-
-        [Test]
-        public void Test_Can_Serialize_Manifest_Minimal()
-        {
-            var manifest = ManifestGenerator.GetJeffersonCountyManifest_Minimal();
+            var manifest = ManifestGenerator.GetFakeManifest();
             var json = manifest.ToJson();
 
             var result = new Manifest(json);
@@ -113,37 +104,38 @@ namespace ElectionGuard.Encryption.Tests
         }
 
         [Test]
-        public void Test_Can_Serialize_Manifest_MultipleBallotStyles()
+        public void Test_Can_Serialize_Sample_Manifest_From_File()
         {
-            var manifest = ManifestGenerator.GetJeffersonCountyManifest_MultipleBallotStyles();
-            var json = manifest.ToJson();
-
-            var result = new Manifest(json);
-
-            Assert.That(manifest.CryptoHash().ToHex() == result.CryptoHash().ToHex());
-            Assert.That(result.IsValid());
+            var subject = ManifestGenerator.GetManifestFromFile();
+            Assert.That(subject.IsValid);
         }
 
-
         [Test]
-        public void Test_Can_Create_Manifest_With_Name()
+        public void Test_Can_Create_Manifest_With_Missing_Party_Name()
         {
+            // Arrange
             var language = new Language(
                 string.Format("{0},{1}", "my jurisdiction", "here"), "en");
-            List<GeopoliticalUnit> gpUnits = new List<GeopoliticalUnit>();
-            List<Party> parties = new List<Party>();
-            List<Candidate> candidates = new List<Candidate>();
-            List<ContestDescription> contests = new List<ContestDescription>();
-            List<BallotStyle> ballotStyles = new List<BallotStyle>();
+            var gpUnits = new List<GeopoliticalUnit>();
+            var parties = new List<Party>();
+            var candidates = new List<Candidate>();
+            var contests = new List<ContestDescription>();
+            var ballotStyles = new List<BallotStyle>();
 
             gpUnits.Add(new GeopoliticalUnit("mydistrict", "first unit", ReportingUnitType.City));
-            parties.Add(new Party("myparty"));
             candidates.Add(new Candidate("mycandidate", false));
-            List<SelectionDescription> selections = new List<SelectionDescription>();
-            selections.Add(new SelectionDescription("selection1", "mycandidate", 1));
-            contests.Add(new ContestDescription("firstcontest", "mydistrict", 1, VoteVariationType.NOfM, 1, "mrmayor", selections.ToArray()));
+            var selections = new List<SelectionDescription>
+            {
+                new SelectionDescription("selection1", "mycandidate", 1)
+            };
+            contests.Add(new ContestDescription(
+                "firstcontest", "mydistrict",
+                1, VoteVariationType.NOfM, 1,
+                "mrmayor", selections.ToArray()));
             string[] gps = { "mydistrict" };
             ballotStyles.Add(new BallotStyle("style1", gps));
+
+            parties.Add(new Party("myparty"));
 
             var result = new Manifest(
                 "test-manifest",
@@ -161,7 +153,9 @@ namespace ElectionGuard.Encryption.Tests
             var json = result.ToJson();
 
             Assert.IsTrue(result.IsValid());
-            Assert.IsFalse(json.Contains("\"name\":{\"text\":null"));   // check to make sure the party name serialized correctly
+
+            // check to make sure the party name serialized correctly
+            Assert.IsFalse(json.Contains("\"name\":{\"text\":null"));
         }
 
         [Test]
