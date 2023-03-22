@@ -128,6 +128,10 @@ namespace ElectionGuard
                 var status = External.GetName(
                     Handle, out NativeInterface.InternationalizedText.InternationalizedTextHandle value);
                 status.ThrowIfError();
+                if (value.IsInvalid)
+                {
+                    return null;
+                }
                 return new InternationalizedText(value);
             }
         }
@@ -142,6 +146,10 @@ namespace ElectionGuard
                 var status = External.GetContactInfo(
                     Handle, out NativeInterface.ContactInformation.ContactInformationHandle value);
                 status.ThrowIfError();
+                if (value.IsInvalid)
+                {
+                    return null;
+                }
                 return new ContactInformation(value);
             }
         }
