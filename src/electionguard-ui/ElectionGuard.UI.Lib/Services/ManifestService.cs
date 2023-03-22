@@ -15,5 +15,15 @@ public class ManifestService : BaseDatabaseService<ManifestRecord>
     /// <summary>
     /// Default constructor that sets the collection name
     /// </summary>
-    public ManifestService() : base(_collection) { }
+    public ManifestService() : base(_collection, nameof(ManifestRecord)) { }
+
+    /// <summary>
+    /// Gets a manifest
+    /// </summary>
+    /// <param name="electionId">election id to search for</param>
+    public async Task<ManifestRecord?> GetByElectionIdAsync(string electionId)
+    {
+        return await GetByFieldAsync(Constants.ElectionId, electionId);
+    }
+
 }

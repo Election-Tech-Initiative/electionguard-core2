@@ -6,6 +6,7 @@
         Task GoToModal(Type viewModel);
         Type GetCurrentViewModel();
         Task GoHome();
+        Task GoBack();
 
         bool CanGoHome();
         void RegisterRoutes();

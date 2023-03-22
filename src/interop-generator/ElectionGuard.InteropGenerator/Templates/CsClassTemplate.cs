@@ -723,14 +723,14 @@ foreach (var p in method.Params) {
             #line hidden
             
             #line 149 ""
-            this.Write("Type>\n            {\n                [ReliabilityContract(Consistency.WillNotCorru" +
-                    "ptState, Cer.MayFail)]\n                protected override bool Free()\n          " +
-                    "      {\n");
+            this.Write("Type>\n            {\n#if NETSTANDARD\n                [ReliabilityContract(Consiste" +
+                    "ncy.WillNotCorruptState, Cer.MayFail)]\n#endif\n                protected override" +
+                    " bool Free()\n                {\n");
             
             #line default
             #line hidden
             
-            #line 154 ""
+            #line 156 ""
 
 if (EgClass.NeverFree) {
 
@@ -738,7 +738,7 @@ if (EgClass.NeverFree) {
             #line default
             #line hidden
             
-            #line 157 ""
+            #line 159 ""
             this.Write("                    // releasing the C++ memory is currently handled by a parent " +
                     "object e.g. ballot, see https://github.com/microsoft/electionguard-core2/issues/" +
                     "29\n                    return true;\n");
@@ -746,7 +746,7 @@ if (EgClass.NeverFree) {
             #line default
             #line hidden
             
-            #line 159 ""
+            #line 161 ""
 
 } else {
 
@@ -754,7 +754,7 @@ if (EgClass.NeverFree) {
             #line default
             #line hidden
             
-            #line 162 ""
+            #line 164 ""
             this.Write(@"                    if (IsFreed) return true;
 
                     var status = External.Free(TypedPtr);
@@ -765,20 +765,20 @@ if (EgClass.NeverFree) {
             #line default
             #line hidden
             
-            #line 167 ""
+            #line 169 ""
             this.Write(this.ToStringHelper.ToStringWithCulture( className ));
             
             #line default
             #line hidden
             
-            #line 167 ""
+            #line 169 ""
             this.Write(" Error Free: {status}\", status);\n                    }\n                    return" +
                     " true;\n");
             
             #line default
             #line hidden
             
-            #line 170 ""
+            #line 172 ""
 
 }
 
@@ -786,39 +786,39 @@ if (EgClass.NeverFree) {
             #line default
             #line hidden
             
-            #line 173 ""
+            #line 175 ""
             this.Write("                }\n            }\n\n            [DllImport(\n                NativeIn" +
                     "terface.DllName, \n                EntryPoint = \"eg_");
             
             #line default
             #line hidden
             
-            #line 178 ""
+            #line 180 ""
             this.Write(this.ToStringHelper.ToStringWithCulture( EgClass.CFunctionPrefix ));
             
             #line default
             #line hidden
             
-            #line 178 ""
+            #line 180 ""
             this.Write("_free\",\n                CallingConvention = CallingConvention.Cdecl, \n           " +
                     "     SetLastError = true)]\n            internal static extern Status Free(");
             
             #line default
             #line hidden
             
-            #line 181 ""
+            #line 183 ""
             this.Write(this.ToStringHelper.ToStringWithCulture( className ));
             
             #line default
             #line hidden
             
-            #line 181 ""
+            #line 183 ""
             this.Write("Type* handle);\n\n");
             
             #line default
             #line hidden
             
-            #line 183 ""
+            #line 185 ""
  foreach (var egProperty in EgClass.Properties) {
         var entryPoint = egProperty.GetEntryPoint(EgClass);
         var isElectionGuardType = egProperty.IsElectionGuardType;
@@ -828,120 +828,120 @@ if (EgClass.NeverFree) {
             #line default
             #line hidden
             
-            #line 188 ""
+            #line 190 ""
             this.Write("            [DllImport(\n                NativeInterface.DllName,\n                " +
                     "EntryPoint = \"");
             
             #line default
             #line hidden
             
-            #line 190 ""
+            #line 192 ""
             this.Write(this.ToStringHelper.ToStringWithCulture( entryPoint ));
             
             #line default
             #line hidden
             
-            #line 190 ""
+            #line 192 ""
             this.Write("\",\n                CallingConvention = CallingConvention.Cdecl,\n                S" +
                     "etLastError = true)]\n            internal static extern ");
             
             #line default
             #line hidden
             
-            #line 193 ""
+            #line 195 ""
             this.Write(this.ToStringHelper.ToStringWithCulture( egProperty.GetExternalReturnType() ));
             
             #line default
             #line hidden
             
-            #line 193 ""
+            #line 195 ""
             this.Write(" Get");
             
             #line default
             #line hidden
             
-            #line 193 ""
+            #line 195 ""
             this.Write(this.ToStringHelper.ToStringWithCulture( egProperty.Name ));
             
             #line default
             #line hidden
             
-            #line 193 ""
+            #line 195 ""
             this.Write("(\n                ");
             
             #line default
             #line hidden
             
-            #line 194 ""
+            #line 196 ""
             this.Write(this.ToStringHelper.ToStringWithCulture( className ));
             
             #line default
             #line hidden
             
-            #line 194 ""
+            #line 196 ""
             this.Write("Handle handle");
             
             #line default
             #line hidden
             
-            #line 194 ""
+            #line 196 ""
  
 if (isElectionGuardType) { 
             
             #line default
             #line hidden
             
-            #line 196 ""
+            #line 198 ""
             this.Write(",\n                out ");
             
             #line default
             #line hidden
             
-            #line 197 ""
+            #line 199 ""
             this.Write(this.ToStringHelper.ToStringWithCulture( egProperty.Type.NativeHandleType ));
             
             #line default
             #line hidden
             
-            #line 197 ""
+            #line 199 ""
             this.Write(" objectId");
             
             #line default
             #line hidden
             
-            #line 197 ""
+            #line 199 ""
  
 } else if (egProperty.Type.TypeCs == "string") { 
             
             #line default
             #line hidden
             
-            #line 199 ""
+            #line 201 ""
             this.Write(",\n                out IntPtr objectId");
             
             #line default
             #line hidden
             
-            #line 200 ""
+            #line 202 ""
  
 } // end is ElectionGuard type 
             
             #line default
             #line hidden
             
-            #line 202 ""
+            #line 204 ""
             this.Write("\n                );\n\n");
             
             #line default
             #line hidden
             
-            #line 205 ""
+            #line 207 ""
  } // end foreach property 
             
             #line default
             #line hidden
             
-            #line 206 ""
+            #line 208 ""
  foreach (var method in EgClass.Methods) {
     var entryPoint = method.GetEntryPoint(EgClass);
     var returnsElectionGuardType = method.ReturnType.IsElectionGuardType;
@@ -951,151 +951,151 @@ if (isElectionGuardType) {
             #line default
             #line hidden
             
-            #line 211 ""
+            #line 213 ""
             this.Write("            [DllImport(\n                NativeInterface.DllName,\n                " +
                     "EntryPoint = \"");
             
             #line default
             #line hidden
             
-            #line 213 ""
+            #line 215 ""
             this.Write(this.ToStringHelper.ToStringWithCulture( entryPoint ));
             
             #line default
             #line hidden
             
-            #line 213 ""
+            #line 215 ""
             this.Write("\",\n                CallingConvention = CallingConvention.Cdecl,\n                S" +
                     "etLastError = true)]\n            internal static extern ");
             
             #line default
             #line hidden
             
-            #line 216 ""
+            #line 218 ""
             this.Write(this.ToStringHelper.ToStringWithCulture( isReturnTypeReferenceType ? "Status" : method.ReturnType.TypeCs ));
             
             #line default
             #line hidden
             
-            #line 216 ""
+            #line 218 ""
             this.Write(" ");
             
             #line default
             #line hidden
             
-            #line 216 ""
+            #line 218 ""
             this.Write(this.ToStringHelper.ToStringWithCulture( method.Name ));
             
             #line default
             #line hidden
             
-            #line 216 ""
+            #line 218 ""
             this.Write("(\n                ");
             
             #line default
             #line hidden
             
-            #line 217 ""
+            #line 219 ""
             this.Write(this.ToStringHelper.ToStringWithCulture( className ));
             
             #line default
             #line hidden
             
-            #line 217 ""
+            #line 219 ""
             this.Write("Handle handle");
             
             #line default
             #line hidden
             
-            #line 217 ""
+            #line 219 ""
 
 foreach (var p in method.Params) { 
             
             #line default
             #line hidden
             
-            #line 219 ""
+            #line 221 ""
             this.Write(",\n                ");
             
             #line default
             #line hidden
             
-            #line 220 ""
+            #line 222 ""
             this.Write(this.ToStringHelper.ToStringWithCulture( p.AsCppInteropParam() ));
             
             #line default
             #line hidden
             
-            #line 220 ""
+            #line 222 ""
  
 } // end foreach param 
             
             #line default
             #line hidden
             
-            #line 222 ""
+            #line 224 ""
  if (returnsElectionGuardType) { 
             
             #line default
             #line hidden
             
-            #line 223 ""
+            #line 225 ""
             this.Write(",\n                out ");
             
             #line default
             #line hidden
             
-            #line 224 ""
+            #line 226 ""
             this.Write(this.ToStringHelper.ToStringWithCulture( method.ReturnType.NativeHandleType ));
             
             #line default
             #line hidden
             
-            #line 224 ""
+            #line 226 ""
             this.Write(" objectId");
             
             #line default
             #line hidden
             
-            #line 224 ""
+            #line 226 ""
 
 } // if returnsElectionGuardType 
             
             #line default
             #line hidden
             
-            #line 226 ""
+            #line 228 ""
  if (method.ReturnType.TypeCs == "string" || method.ReturnType.TypeCs == "byte[]") { 
             
             #line default
             #line hidden
             
-            #line 227 ""
+            #line 229 ""
             this.Write(",\n                out IntPtr data,\n                out ulong size");
             
             #line default
             #line hidden
             
-            #line 229 ""
+            #line 231 ""
 
 } // if is string or byte[] 
             
             #line default
             #line hidden
             
-            #line 231 ""
+            #line 233 ""
             this.Write("\n                );\n\n");
             
             #line default
             #line hidden
             
-            #line 234 ""
+            #line 236 ""
  } 
             
             #line default
             #line hidden
             
-            #line 235 ""
+            #line 237 ""
             this.Write("        }\n        #endregion\n    }\n}\n");
             
             #line default

@@ -15,5 +15,21 @@ public class ElectionService : BaseDatabaseService<Election>
     /// <summary>
     /// Default constructor that sets the collection name
     /// </summary>
-    public ElectionService() : base(_collection) { }
+    public ElectionService() : base(_collection, nameof(Election)) { }
+
+    /// <summary>
+    /// Gets an election
+    /// </summary>
+    /// <param name="electionId">election id to search for</param>
+    public async Task<Election?> GetByElectionIdAsync(string electionId)
+    {
+        return await GetByFieldAsync(Constants.ElectionId, electionId);
+    }
+
+    public async Task<bool> ElectionNameExists(string electionName)
+    {
+        var election = await GetByNameAsync(electionName);
+        return election != null;
+    }
+
 }

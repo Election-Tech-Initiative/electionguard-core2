@@ -22,9 +22,17 @@ public partial class Election : DatabaseRecord
     [ObservableProperty]
     private DateTime _createdAt;
 
+    public Election(string keyCeremonyId, string name, string electionUrl, string createdBy) : base(nameof(Election))
+    {
+        KeyCeremonyId = keyCeremonyId;
+        ElectionUrl = electionUrl;
+        Name = name;
+        ElectionId = Guid.NewGuid().ToString();
+        CreatedAt = DateTime.UtcNow;
+        CreatedBy = createdBy;
+    }
     public Election() : base(nameof(Election))
     {
-
     }
 
 }

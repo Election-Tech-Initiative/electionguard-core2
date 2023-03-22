@@ -173,12 +173,15 @@ namespace ElectionGuard
 
         #region Extern
 
-        internal static unsafe class External {
+        internal static unsafe class External
+        {
             internal struct ManifestType { };
 
             internal class ManifestHandle : ElectionGuardSafeHandle<ManifestType>
             {
+#if NETSTANDARD
                 [ReliabilityContract(Consistency.WillNotCorruptState, Cer.MayFail)]
+#endif
                 protected override bool Free()
                 {
                     if (IsFreed) return true;
@@ -193,9 +196,9 @@ namespace ElectionGuard
             }
 
             [DllImport(
-                NativeInterface.DllName, 
+                NativeInterface.DllName,
                 EntryPoint = "eg_election_manifest_free",
-                CallingConvention = CallingConvention.Cdecl, 
+                CallingConvention = CallingConvention.Cdecl,
                 SetLastError = true)]
             internal static extern Status Free(ManifestType* handle);
 

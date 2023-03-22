@@ -1,4 +1,4 @@
-using CommunityToolkit.Maui.Views;
+﻿using CommunityToolkit.Maui.Views;
 using CommunityToolkit.Mvvm.DependencyInjection;
 using ElectionGuard.UI.Lib.Services;
 
@@ -21,6 +21,9 @@ public class NavigationService : INavigationService
         new PageType(typeof(ElectionViewModel), typeof(ElectionPage), false),
         new PageType(typeof(CreateKeyCeremonyAdminViewModel), typeof(CreateKeyCeremonyAdminPage), false),
         new PageType(typeof(ViewKeyCeremonyViewModel), typeof(ViewKeyCeremonyPage), false),
+        new PageType(typeof(CreateElectionViewModel), typeof(CreateElectionAdminPage), false),
+        new PageType(typeof(ManifestViewModel), typeof(ManifestPopup), false),
+        new PageType(typeof(BallotUploadViewModel), typeof(BallotUploadPage), false),
     };
 
     private Type _currentPage = typeof(LoginPage);
@@ -81,6 +84,11 @@ public class NavigationService : INavigationService
         _currentPage = contentPage.Page;
         var url = contentPage.IsGlobal ? $"//{_currentPage.Name}" : _currentPage.Name;
         await Shell.Current.GoToAsync(url, pageParams ?? new());
+    }
+
+    public async Task GoBack()
+    {
+        await Shell.Current.GoToAsync("..");
     }
 
     private static PageType GetPage(Type viewModel)

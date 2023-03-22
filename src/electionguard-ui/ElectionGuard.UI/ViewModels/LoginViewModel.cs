@@ -10,30 +10,26 @@ public partial class LoginViewModel : BaseViewModel
         HandleDbPing(this, EventArgs.Empty);
     }
 
-    ~LoginViewModel() => UnsubscribeDbPing();
-
     [ObservableProperty]
     [NotifyCanExecuteChangedFor(nameof(LoginCommand))]
     private string _name = string.Empty;
 
     [ObservableProperty]
+    [NotifyCanExecuteChangedFor(nameof(LoginCommand))]
     private bool _dbNotAvailable;
-    private bool _dbPingRan;
 
-    [RelayCommand(CanExecute = nameof(CanLogin))]
+    [RelayCommand(CanExecute = nameof(CanLogin), AllowConcurrentExecutions = true)]
     public async Task Login()
     {
-        if (_dbPingRan && !DbNotAvailable)
-        {
-            await AuthenticationService.Login(Name);
-            // reset the UI name field
-            Name = string.Empty;
-        }
+        await AuthenticationService.Login(Name);
+        HomeCommand.Execute(this);
+        // reset the UI name field
+        Name = string.Empty;
     }
 
     private bool CanLogin()
     {
-        return NameHasData && _dbPingRan && !DbNotAvailable;
+        return NameHasData && !DbNotAvailable;
     }
 
     private bool NameHasData => Name.Trim().Length > 0;
@@ -42,6 +38,12 @@ public partial class LoginViewModel : BaseViewModel
     {
         SubscribeDbPing();
         await base.OnAppearing();
+    }
+
+    public override async Task OnLeavingPage()
+    {
+        UnsubscribeDbPing();
+        await base.OnLeavingPage();
     }
 
     private void SubscribeDbPing()
@@ -60,13 +62,6 @@ public partial class LoginViewModel : BaseViewModel
             _timer.Stop();
         }
         _timer.Tick -= HandleDbPing;
-
-    }
-
-    public override async Task OnLeavingPage()
-    {
-        UnsubscribeDbPing();
-        await base.OnLeavingPage();
     }
 
     private void HandleDbPing(object sender, EventArgs e)
@@ -74,7 +69,6 @@ public partial class LoginViewModel : BaseViewModel
         if (NameHasData)
         {
             DbNotAvailable = !DbService.Ping();
-            _dbPingRan = true;
         }
     }
 }
