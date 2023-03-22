@@ -1,4 +1,4 @@
-.PHONY: all build build-msys2 build-android build-ios build-netstandard build-ui clean clean-netstandard clean-ui environment format memcheck sanitize sanitize-asan sanitize-tsan bench bench-netstandard test test-msys2 test-netstandard
+.PHONY: all build build-msys2 build-android build-ios build-netstandard build-ui clean clean-netstandard clean-ui environment format memcheck sanitize sanitize-asan sanitize-tsan bench bench-netstandard test test-msys2 test-netstandard test-netstandard-copy-output
 
 .EXPORT_ALL_VARIABLES:
 ELECTIONGUARD_BINDING_DIR=$(realpath .)/bindings
@@ -213,6 +213,7 @@ build-netstandard:
 	make build
 	cd ./bindings/netstandard/ElectionGuard && dotnet restore
 	dotnet build --configuration $(TARGET) ./bindings/netstandard/ElectionGuard/ElectionGuard.sln /p:Platform=$(PROCESSOR)
+	dotnet build -a $(PROCESSOR) --configuration $(TARGET) ./bindings/netstandard/ElectionGuard/ElectionGuard.ElectionSetup.Tests/ElectionGuard.ElectionSetup.Tests.csproj
 
 build-netstandard-x64:
 	PROCESSOR=x64 && make build-netstandard
@@ -477,6 +478,8 @@ endif
 
 test-netstandard: build-netstandard
 	@echo 🧪 TEST NETSTANDARD $(PROCESSOR) $(TARGET)
+	make test-netstandard-copy-output
+	dotnet test -a $(PROCESSOR) --configuration $(TARGET) ./bindings/netstandard/ElectionGuard/ElectionGuard.ElectionSetup.Tests/ElectionGuard.ElectionSetup.Tests.csproj
 	dotnet test -a $(PROCESSOR) --configuration $(TARGET) ./bindings/netstandard/ElectionGuard/ElectionGuard.Encryption.Tests/ElectionGuard.Encryption.Tests.csproj
 	dotnet test -a $(PROCESSOR) --configuration $(TARGET) ./bindings/netstandard/ElectionGuard/ElectionGuard.Decryption.Tests/ElectionGuard.Decryption.Tests.csproj
 
@@ -493,29 +496,58 @@ else
 	PROCESSOR=x86 && make test-netstandard
 endif
 
-test-ui:	
-	@echo 🧪 TEST UI $(PROCESSOR) $(TARGET)
-	dotnet build -a $(PROCESSOR) --configuration $(TARGET) ./src/electionguard-ui/electionGuard.UI.Test/ElectionGuard.UI.Test.csproj
-	dotnet build -a $(PROCESSOR) --configuration $(TARGET) ./bindings/netstandard/ElectionGuard/ElectionGuard.ElectionSetup.Tests/ElectionGuard.ElectionSetup.Tests.csproj
-	make build
+# copy the build output from the processor builds to the default build for the current platform (which enables debugging in vscode using code lens)
+test-netstandard-copy-output:
+	@echo 🧪 TEST NETSTANDARD COPY OUTPUT $(PROCESSOR) $(TARGET)
+ifeq ($(OPERATING_SYSTEM),Windows)
+	cp "build/libs/$(OPERATING_SYSTEM)/$(PROCESSOR)/$(TARGET)/src/$(TARGET)/electionguard.dll" "bindings/netstandard/ElectionGuard/ElectionGuard.Decryption.Tests/bin/$(TARGET)/net7.0/win-$(PROCESSOR)/electionguard.dll"
+	cp "build/libs/$(OPERATING_SYSTEM)/$(PROCESSOR)/$(TARGET)/src/$(TARGET)/electionguard.dll" "bindings/netstandard/ElectionGuard/ElectionGuard.ElectionSetup.Tests/bin/$(TARGET)/net7.0/win-$(PROCESSOR)/electionguard.dll"
+	cp "build/libs/$(OPERATING_SYSTEM)/$(PROCESSOR)/$(TARGET)/src/$(TARGET)/electionguard.dll" "bindings/netstandard/ElectionGuard/ElectionGuard.Encryption.Tests/bin/$(TARGET)/net7.0/win-$(PROCESSOR)/electionguard.dll"
+
+	cp "build/libs/$(OPERATING_SYSTEM)/$(PROCESSOR)/$(TARGET)/libs/hacl/$(TARGET)/hacl_cpp.dll" "bindings/netstandard/ElectionGuard/ElectionGuard.Decryption.Tests/bin/$(TARGET)/net7.0/win-$(PROCESSOR)/hacl_cpp.dll"
+	cp "build/libs/$(OPERATING_SYSTEM)/$(PROCESSOR)/$(TARGET)/libs/hacl/$(TARGET)/hacl_cpp.dll" "bindings/netstandard/ElectionGuard/ElectionGuard.ElectionSetup.Tests/bin/$(TARGET)/net7.0/win-$(PROCESSOR)/hacl_cpp.dll"
+	cp "build/libs/$(OPERATING_SYSTEM)/$(PROCESSOR)/$(TARGET)/libs/hacl/$(TARGET)/hacl_cpp.dll" "bindings/netstandard/ElectionGuard/ElectionGuard.Encryption.Tests/bin/$(TARGET)/net7.0/win-$(PROCESSOR)/hacl_cpp.dll"
+
+	cp "build/libs/$(OPERATING_SYSTEM)/$(PROCESSOR)/$(TARGET)/_deps/hacl-build/$(TARGET)/hacl.dll" "bindings/netstandard/ElectionGuard/ElectionGuard.Decryption.Tests/bin/$(TARGET)/net7.0/win-$(PROCESSOR)/hacl.dll"
+	cp "build/libs/$(OPERATING_SYSTEM)/$(PROCESSOR)/$(TARGET)/_deps/hacl-build/$(TARGET)/hacl.dll" "bindings/netstandard/ElectionGuard/ElectionGuard.ElectionSetup.Tests/bin/$(TARGET)/net7.0/win-$(PROCESSOR)/hacl.dll"
+	cp "build/libs/$(OPERATING_SYSTEM)/$(PROCESSOR)/$(TARGET)/_deps/hacl-build/$(TARGET)/hacl.dll" "bindings/netstandard/ElectionGuard/ElectionGuard.Encryption.Tests/bin/$(TARGET)/net7.0/win-$(PROCESSOR)/hacl.dll"
+endif
+ifeq ($(OPERATING_SYSTEM),Darwin)
+	cp "build/libs/$(OPERATING_SYSTEM)/$(PROCESSOR)/$(TARGET)/src/libelectionguard.dylib" "bindings/netstandard/ElectionGuard/ElectionGuard.Decryption.Tests/bin/$(TARGET)/net7.0/osx-$(PROCESSOR)/libelectionguard.dylib"
+	cp "build/libs/$(OPERATING_SYSTEM)/$(PROCESSOR)/$(TARGET)/src/libelectionguard.dylib" "bindings/netstandard/ElectionGuard/ElectionGuard.ElectionSetup.Tests/bin/$(TARGET)/net7.0/osx-$(PROCESSOR)/libelectionguard.dylib"
+	cp "build/libs/$(OPERATING_SYSTEM)/$(PROCESSOR)/$(TARGET)/src/libelectionguard.dylib" "bindings/netstandard/ElectionGuard/ElectionGuard.Encryption.Tests/bin/$(TARGET)/net7.0/osx-$(PROCESSOR)/libelectionguard.dylib"
+
+	cp "build/libs/$(OPERATING_SYSTEM)/$(PROCESSOR)/$(TARGET)/libs/hacl/libhacl_cpp.dylib" "bindings/netstandard/ElectionGuard/ElectionGuard.Decryption.Tests/bin/$(TARGET)/net7.0/osx-$(PROCESSOR)/libhacl_cpp.dylib"
+	cp "build/libs/$(OPERATING_SYSTEM)/$(PROCESSOR)/$(TARGET)/libs/hacl/libhacl_cpp.dylib" "bindings/netstandard/ElectionGuard/ElectionGuard.ElectionSetup.Tests/bin/$(TARGET)/net7.0/osx-$(PROCESSOR)/libhacl_cpp.dylib"
+	cp "build/libs/$(OPERATING_SYSTEM)/$(PROCESSOR)/$(TARGET)/libs/hacl/libhacl_cpp.dylib" "bindings/netstandard/ElectionGuard/ElectionGuard.Encryption.Tests/bin/$(TARGET)/net7.0/osx-$(PROCESSOR)/libhacl_cpp.dylib"
+
+	cp "build/libs/$(OPERATING_SYSTEM)/$(PROCESSOR)/$(TARGET)/_deps/hacl-build/libhacl.dylib" "bindings/netstandard/ElectionGuard/ElectionGuard.Decryption.Tests/bin/$(TARGET)/net7.0/osx-$(PROCESSOR)/libhacl.dylib"
+	cp "build/libs/$(OPERATING_SYSTEM)/$(PROCESSOR)/$(TARGET)/_deps/hacl-build/libhacl.dylib" "bindings/netstandard/ElectionGuard/ElectionGuard.ElectionSetup.Tests/bin/$(TARGET)/net7.0/osx-$(PROCESSOR)/libhacl.dylib"
+	cp "build/libs/$(OPERATING_SYSTEM)/$(PROCESSOR)/$(TARGET)/_deps/hacl-build/libhacl.dylib" "bindings/netstandard/ElectionGuard/ElectionGuard.Encryption.Tests/bin/$(TARGET)/net7.0/osx-$(PROCESSOR)/libhacl.dylib"
+endif
+
+test-netstandard-copy-output-ui:
+	@echo 🧪 TEST NETSTANDARD COPY UI OUTPUT $(PROCESSOR) $(TARGET)
 ifeq ($(OPERATING_SYSTEM),Windows)
 	cp "build/libs/$(OPERATING_SYSTEM)/$(PROCESSOR)/$(TARGET)/src/$(TARGET)/electionguard.dll" "src/electionguard-ui/electionGuard.UI.Test/bin/$(TARGET)/net7.0/win-$(PROCESSOR)/electionguard.dll"
-	cp "build/libs/$(OPERATING_SYSTEM)/$(PROCESSOR)/$(TARGET)/src/$(TARGET)/electionguard.dll" "bindings/netstandard/ElectionGuard/ElectionGuard.ElectionSetup.Tests/bin/$(TARGET)/net7.0/win-$(PROCESSOR)/electionguard.dll"
 	cp "build/libs/$(OPERATING_SYSTEM)/$(PROCESSOR)/$(TARGET)/libs/hacl/$(TARGET)/hacl_cpp.dll" "src/electionguard-ui/electionGuard.UI.Test/bin/$(TARGET)/net7.0/win-$(PROCESSOR)/hacl_cpp.dll"
-	cp "build/libs/$(OPERATING_SYSTEM)/$(PROCESSOR)/$(TARGET)/libs/hacl/$(TARGET)/hacl_cpp.dll" "bindings/netstandard/ElectionGuard/ElectionGuard.ElectionSetup.Tests/bin/$(TARGET)/net7.0/win-$(PROCESSOR)/hacl_cpp.dll"
 	cp "build/libs/$(OPERATING_SYSTEM)/$(PROCESSOR)/$(TARGET)/_deps/hacl-build/$(TARGET)/hacl.dll" "src/electionguard-ui/electionGuard.UI.Test/bin/$(TARGET)/net7.0/win-$(PROCESSOR)/hacl.dll"
-	cp "build/libs/$(OPERATING_SYSTEM)/$(PROCESSOR)/$(TARGET)/_deps/hacl-build/$(TARGET)/hacl.dll" "bindings/netstandard/ElectionGuard/ElectionGuard.ElectionSetup.Tests/bin/$(TARGET)/net7.0/win-$(PROCESSOR)/hacl.dll"
 endif
 ifeq ($(OPERATING_SYSTEM),Darwin)
 	cp "build/libs/$(OPERATING_SYSTEM)/$(PROCESSOR)/$(TARGET)/src/libelectionguard.dylib" "src/electionguard-ui/electionGuard.UI.Test/bin/$(TARGET)/net7.0/osx-$(PROCESSOR)/libelectionguard.dylib"
-	cp "build/libs/$(OPERATING_SYSTEM)/$(PROCESSOR)/$(TARGET)/src/libelectionguard.dylib" "bindings/netstandard/ElectionGuard/ElectionGuard.ElectionSetup.Tests/bin/$(TARGET)/net7.0/osx-$(PROCESSOR)/libelectionguard.dylib"
 	cp "build/libs/$(OPERATING_SYSTEM)/$(PROCESSOR)/$(TARGET)/libs/hacl/libhacl_cpp.dylib" "src/electionguard-ui/electionGuard.UI.Test/bin/$(TARGET)/net7.0/osx-$(PROCESSOR)/libhacl_cpp.dylib"
-	cp "build/libs/$(OPERATING_SYSTEM)/$(PROCESSOR)/$(TARGET)/libs/hacl/libhacl_cpp.dylib" "bindings/netstandard/ElectionGuard/ElectionGuard.ElectionSetup.Tests/bin/$(TARGET)/net7.0/osx-$(PROCESSOR)/libhacl_cpp.dylib"
 	cp "build/libs/$(OPERATING_SYSTEM)/$(PROCESSOR)/$(TARGET)/_deps/hacl-build/libhacl.dylib" "src/electionguard-ui/electionGuard.UI.Test/bin/$(TARGET)/net7.0/osx-$(PROCESSOR)/libhacl.dylib"
-	cp "build/libs/$(OPERATING_SYSTEM)/$(PROCESSOR)/$(TARGET)/_deps/hacl-build/libhacl.dylib" "bindings/netstandard/ElectionGuard/ElectionGuard.ElectionSetup.Tests/bin/$(TARGET)/net7.0/osx-$(PROCESSOR)/libhacl.dylib"
 endif
+
+test-ui: build-ui
+	@echo 🧪 TEST UI $(PROCESSOR) $(TARGET)
+	# dotnet build -a $(PROCESSOR) --configuration $(TARGET) ./src/electionguard-ui/electionGuard.UI.Test/ElectionGuard.UI.Test.csproj
+	
+	make build-netstandard
+	make test-netstandard-copy-output
+	make test-netstandard-copy-output-ui
+
 	dotnet test -a $(PROCESSOR) --no-build --configuration $(TARGET) ./src/electionguard-ui/ElectionGuard.UI.Test/ElectionGuard.UI.Test.csproj
-	dotnet test -a $(PROCESSOR) --no-build --configuration $(TARGET) ./bindings/netstandard/ElectionGuard/ElectionGuard.ElectionSetup.Tests/ElectionGuard.ElectionSetup.Tests.csproj
 
 # Coverage
 
