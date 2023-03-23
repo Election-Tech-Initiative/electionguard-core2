@@ -1,5 +1,4 @@
-﻿
-namespace ElectionGuard.UI.Lib.Models;
+﻿namespace ElectionGuard.UI.Lib.Models;
 
 public partial class BallotRecord : DatabaseRecord
 {
