@@ -117,7 +117,7 @@ namespace electionguard
 
                 // check if the exponent is larger than the max
                 if (exponent > DLOG_MAX_SIZE) {
-                    throw std::out_of_range("size is larger than max.");
+                    throw std::out_of_range("computeCache: size is larger than max.");
                 }
 
                 // multiply the last element by g
