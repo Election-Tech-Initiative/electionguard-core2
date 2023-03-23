@@ -1,4 +1,4 @@
-using System.Diagnostics;
+﻿using System.Diagnostics;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 using System.Text;
@@ -129,10 +129,13 @@ public partial class BallotUploadViewModel : BaseViewModel
                     };
                     _ = _ballotService.SaveAsync(ballotRecord).Result;
 
-                    _ = Interlocked.Increment(ref totalInserted);
                     if (ballot.State == BallotBoxState.Spoiled)
                     {
                         _ = Interlocked.Increment(ref totalSpoiled);
+                    }
+                    else
+                    {
+                        _ = Interlocked.Increment(ref totalInserted);
                     }
 
                 }
