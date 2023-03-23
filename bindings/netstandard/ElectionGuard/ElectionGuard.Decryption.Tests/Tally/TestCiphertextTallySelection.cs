@@ -1,6 +1,6 @@
 ﻿using ElectionGuard.Decryption.Tally;
 
-namespace ElectionGuard.Decryption.Tests;
+namespace ElectionGuard.Decryption.Tests.Tally;
 
 public class TestCiphertextTallySelection
 {
