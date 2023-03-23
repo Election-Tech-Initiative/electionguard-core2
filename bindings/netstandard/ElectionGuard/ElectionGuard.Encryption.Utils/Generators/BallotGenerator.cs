@@ -221,10 +221,31 @@ namespace ElectionGuard.Encryption.Utils.Generators
         // get a fake ballot using a new random number generator
         public static PlaintextBallot GetFakeBallot(
             InternalManifest manifest,
+            Random random)
+        {
+            // get a random ballot style
+            var index = random.Next(manifest.BallotStyles.Count);
+            var styleId = manifest.BallotStyles[index].ObjectId;
+            return GetFakeBallot(
+                manifest, styleId, $"fake-ballot-{Guid.NewGuid()}", random);
+        }
+
+        // get a fake ballot using a new random number generator
+        public static PlaintextBallot GetFakeBallot(
+            InternalManifest manifest,
             string styleId)
         {
             return GetFakeBallot(
                 manifest, styleId, $"fake-ballot-{Guid.NewGuid()}", new Random());
+        }
+
+        public static PlaintextBallot GetFakeBallot(
+            InternalManifest manifest,
+            string styleId,
+            Random random)
+        {
+            return GetFakeBallot(
+                manifest, styleId, $"fake-ballot-{Guid.NewGuid()}", random);
         }
 
         // get a fake ballot using a defined random number generator

@@ -83,5 +83,17 @@ namespace ElectionGuard
                 }
             }
         }
+
+        public PlaintextBallot Copy()
+        {
+            var json = ToJson();
+            return new PlaintextBallot(json);
+        }
+
+        public static PlaintextBallot Copy(PlaintextBallot ballot)
+        {
+            var json = ballot.ToJson();
+            return new PlaintextBallot(json);
+        }
     }
 }

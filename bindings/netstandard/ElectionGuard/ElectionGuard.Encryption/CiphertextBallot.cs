@@ -100,6 +100,18 @@ namespace ElectionGuard
             }
         }
 
+        public CiphertextBallot Copy()
+        {
+            var json = ToJson();
+            return new CiphertextBallot(json);
+        }
+
+        public static CiphertextBallot Copy(CiphertextBallot ballot)
+        {
+            var json = ballot.ToJson();
+            return new CiphertextBallot(json);
+        }
+
         /// <Summary>
         /// Export the ballot representation as JSON
         /// </Summary>
