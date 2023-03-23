@@ -408,4 +408,34 @@
   <data name="TotalText" xml:space="preserve">
     <value>TOTAL</value>
   </data>
+  <data name="DriveUsedText" xml:space="preserve">
+    <value>¡EGDrive ya está en uso!</value>
+  </data>
+  <data name="ImportAgainText" xml:space="preserve">
+    <value>¿Te gustaría importar desde este EGDrive de nuevo?</value>
+  </data>
+  <data name="NoText" xml:space="preserve">
+    <value>No</value>
+  </data>
+  <data name="YesText" xml:space="preserve">
+    <value>Sí</value>
+  </data>
+  <data name="AddedText" xml:space="preserve">
+    <value>Agregado</value>
+  </data>
+  <data name="RejectedText" xml:space="preserve">
+    <value>Rechazado</value>
+  </data>
+  <data name="SpoiledText" xml:space="preserve">
+    <value>Estropeado</value>
+  </data>
+  <data name="UploadMoreText" xml:space="preserve">
+    <value>¡Sube más boletas!</value>
+  </data>
+  <data name="SuccessText" xml:space="preserve">
+    <value>Se cargó correctamente</value>
+  </data>
+  <data name="Success2Text" xml:space="preserve">
+    <value>Votos</value>
+  </data>
 </root>

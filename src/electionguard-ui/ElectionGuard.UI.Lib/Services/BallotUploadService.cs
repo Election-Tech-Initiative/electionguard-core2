@@ -1,4 +1,5 @@
 ﻿using ElectionGuard.UI.Lib.Models;
+using MongoDB.Driver;
 
 namespace ElectionGuard.UI.Lib.Services;
 
@@ -25,4 +26,14 @@ public class BallotUploadService : BaseDatabaseService<BallotUpload>
     {
         return await GetAllByFieldAsync(Constants.ElectionId, electionId);
     }
+
+    public async Task<bool> DriveUsed(long serialNumber, string electionId)
+    {
+        var filterBuilder = Builders<BallotUpload>.Filter;
+        var filter = filterBuilder.And(filterBuilder.Eq(Constants.SerialNumber, serialNumber), filterBuilder.Eq(Constants.ElectionId, electionId));
+
+        var uploadCount = await CountByFilterAsync(filter);
+        return uploadCount > 0;
+    }
+
 }

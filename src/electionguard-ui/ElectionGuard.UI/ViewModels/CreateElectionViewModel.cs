@@ -73,7 +73,13 @@ public partial class CreateElectionViewModel : BaseViewModel
                 var electionName = multiple ? manifest.Name.GetTextAt(0).Value : ElectionName;
 
                 // check if the election name exists
-                var election = new Election(KeyCeremony.KeyCeremonyId, await MakeNameUnique(electionName), ElectionUrl, UserName!);
+                var election = new Election()
+                {
+                    KeyCeremonyId = KeyCeremony.KeyCeremonyId,
+                    Name = await MakeNameUnique(electionName),
+                    ElectionUrl = ElectionUrl,
+                    CreatedBy = UserName!
+                };
                 lastElectionId = election.ElectionId;
 
                 // create the context

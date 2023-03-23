@@ -163,4 +163,28 @@ public class BaseDatabaseService<T> : IDatabaseService<T> where T : DatabaseReco
         var data = DbService.GetCollection<T>(table ?? _collection);
         return await data.CountDocumentsAsync(UpdateFilter(filter));
     }
+
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <param name="filter">filter to use to find the item to delete</param>
+    /// <param name="deleted">Set the SoftDeleted field value</param>
+    /// <param name="table">collection to use</param>
+    public async Task MarkAsDeletedAsync(FilterDefinition<T> filter, bool deleted = true, string? table = null)
+    {
+        try
+        {
+            var collection = DbService.GetCollection<T>(table ?? _collection);
+
+            var updateBuilder = Builders<T>.Update;
+            var update = updateBuilder.Set(Constants.SoftDeleted, deleted);
+
+            _ = await collection.UpdateOneAsync(UpdateFilter(filter), update);
+        }
+        catch (Exception ex)
+        {
+            throw new ElectionGuardException("Error updating a record", ex);
+        }
+    }
+
 }

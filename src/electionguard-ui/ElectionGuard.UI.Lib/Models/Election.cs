@@ -33,6 +33,8 @@ public partial class Election : DatabaseRecord
     }
     public Election() : base(nameof(Election))
     {
+        ElectionId = Guid.NewGuid().ToString();
+        CreatedAt = DateTime.UtcNow;
     }
 
 }
