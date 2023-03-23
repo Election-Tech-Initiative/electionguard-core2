@@ -2601,9 +2601,8 @@ namespace ElectionGuard
 
             [DllImport(DllName, EntryPoint = "eg_ciphertext_ballot_get_timestamp",
                 CallingConvention = CallingConvention.Cdecl, SetLastError = true)]
-            internal static extern Status GetTimestamp(
-                SubmittedBallotHandle handle,
-                out ulong timestamp);
+            internal static extern ulong GetTimestamp(
+                SubmittedBallotHandle handle);
 
             // GetNonce is not provided
 

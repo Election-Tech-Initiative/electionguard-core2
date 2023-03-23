@@ -1,4 +1,5 @@
 ﻿using ElectionGuard.UI.Lib.Models;
+using MongoDB.Driver;
 
 namespace ElectionGuard.UI.Lib.Services;
 
@@ -34,4 +35,43 @@ public class BallotService : BaseDatabaseService<BallotRecord>
     {
         return await GetAllByFieldAsync(Constants.UploadId, uploadId);
     }
+
+    /// <summary>
+    /// Check to see if the ballot has already been included
+    /// </summary>
+    /// <param name="ballotCode">ballotcode to find</param>
+    public async Task<bool> BallotExists(string ballotCode)
+    {
+        var filterBuilder = Builders<BallotRecord>.Filter;
+        var filter = filterBuilder.And(filterBuilder.Eq(Constants.BallotCode, ballotCode));
+
+        var ballotCount = await CountByFilterAsync(filter);
+        return ballotCount > 0;
+    }
+
+    /// <summary>
+    /// Check to see if the ballot has already been included
+    /// </summary>
+    /// <param name="ballotCode">ballotcode to find</param>
+    public async Task<bool> GetByBallotCodeAsync(string ballotCode)
+    {
+        var filterBuilder = Builders<BallotRecord>.Filter;
+        var filter = filterBuilder.And(filterBuilder.Eq(Constants.BallotCode, ballotCode));
+
+        var ballotCount = await CountByFilterAsync(filter);
+        return ballotCount > 0;
+    }
+
+    /// <summary>
+    /// Check to see if the ballot has already been included
+    /// </summary>
+    /// <param name="ballotCode">ballotcode to find</param>
+    public async Task DeleteByBallotCodeAsync(string ballotCode)
+    {
+        var filterBuilder = Builders<BallotRecord>.Filter;
+        var filter = filterBuilder.And(filterBuilder.Eq(Constants.BallotCode, ballotCode));
+
+        await MarkAsDeletedAsync(filter);
+    }
+
 }

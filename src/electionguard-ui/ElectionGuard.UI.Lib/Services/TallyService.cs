@@ -16,4 +16,14 @@ public class TallyService : BaseDatabaseService<Tally>
     /// Default constructor that sets the collection name
     /// </summary>
     public TallyService() : base(_collection) { }
+
+    /// <summary>
+    /// Gets tallies for an election
+    /// </summary>
+    /// <param name="electionId">election id to search for</param>
+    public async Task<List<Tally>> GetByElectionIdAsync(string electionId)
+    {
+        return await GetAllByFieldAsync(Constants.ElectionId, electionId);
+    }
+
 }

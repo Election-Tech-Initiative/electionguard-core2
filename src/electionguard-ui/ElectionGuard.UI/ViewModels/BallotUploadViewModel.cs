@@ -1,8 +1,8 @@
-﻿using System.ComponentModel;
+﻿using System.Diagnostics;
+using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 using System.Text;
 using System.Text.Json;
-using CommunityToolkit.Maui.Core.Primitives;
 using CommunityToolkit.Maui.Storage;
 using CommunityToolkit.Mvvm.Input;
 
@@ -23,7 +23,7 @@ public partial class BallotUploadViewModel : BaseViewModel
     private string _folderErrorMessage = string.Empty;
 
     [ObservableProperty]
-    private bool _showWizard = true;
+    private BallotUploadPanel _showPanel = BallotUploadPanel.AutoUpload;
 
     [ObservableProperty]
     [NotifyCanExecuteChangedFor(nameof(UploadCommand))]
@@ -36,20 +36,26 @@ public partial class BallotUploadViewModel : BaseViewModel
     [ObservableProperty]
     private string _ballotFolderName = string.Empty;
 
+    [ObservableProperty]
+    private string _resultsText;
+
+    [ObservableProperty]
+    private string _uploadText;
+
     private uint _serialNumber;
 
 
     [RelayCommand]
     private void Manual()
     {
-        ShowWizard = false;
+        ShowPanel = BallotUploadPanel.ManualUpload;
         _timer.Stop();
     }
 
     [RelayCommand]
     private void Auto()
     {
-        ShowWizard = true;
+        ShowPanel = BallotUploadPanel.AutoUpload;
         _timer.Start();
     }
 
@@ -67,43 +73,100 @@ public partial class BallotUploadViewModel : BaseViewModel
         EncryptionDevice device = new(deviceData);
         var deviceDocument = JsonDocument.Parse(deviceData);
         var location = string.Empty;
+        long deviceId = -1;
+        long sessionId = -1;
+        long launchCode = -1;
         using (var jsonDoc = JsonDocument.Parse(deviceData))
         {
-            var dev = jsonDoc.RootElement.GetProperty("location");
-            location = dev.GetString();
+            location = jsonDoc.RootElement.GetProperty("location").GetString();
+            deviceId = jsonDoc.RootElement.GetProperty("device_id").GetInt64();
+            sessionId = jsonDoc.RootElement.GetProperty("session_id").GetInt64();
+            launchCode = jsonDoc.RootElement.GetProperty("launch_code").GetInt64();
         }
         // save the ballot upload
         var ballots = Directory.GetFiles(BallotFolder);
-        BallotUpload upload = new(ElectionId, DeviceFile, deviceData, location, ballots.LongLength, 0, 0, 0, _serialNumber, UserName);
+        BallotUpload upload = new()
+        {
+            ElectionId = ElectionId,
+            DeviceFileName = DeviceFile,
+            DeviceFileContents = deviceData,
+            Location = location,
+            DeviceId = deviceId,
+            SessionId = sessionId,
+            LaunchCode = launchCode,
+            BallotCount = ballots.LongLength,
+            BallotImported = 0,
+            BallotSpoiled = 0,
+            BallotRejected = 0,
+            SerialNumber = _serialNumber,
+            CreatedBy = UserName
+        };
 
         long totalCount = 0;
+        long totalInserted = 0;
+        long totalRejected = 0;
+        long totalSpoiled = 0;
 
-        _ = Parallel.ForEach<string, long>(ballots,
-            () => 0,
-            (currentBallot, loop, subtotal) =>
+        _ = Parallel.ForEach(ballots, (currentBallot) =>
+        {
+            try
             {
-                try
+                var filename = Path.GetFileName(currentBallot);
+                var ballotData = File.ReadAllText(currentBallot);
+                SubmittedBallot ballot = new(ballotData);
+                var exists = _ballotService.BallotExists(ballot.BallotCode.ToHex()).Result;
+                if (!exists)
                 {
-                    var filename = Path.GetFileName(currentBallot);
-                    var ballotData = File.ReadAllText(currentBallot);
-                    SubmittedBallot ballot = new(ballotData);
-                    BallotRecord ballotRecord = new(ElectionId, upload.UploadId, filename, ballotData);
+                    ulong timestamp = ballot.Timestamp;
+                    BallotRecord ballotRecord = new()
+                    {
+                        ElectionId = ElectionId,
+                        TimeStamp = DateTime.UnixEpoch.AddSeconds(timestamp),
+                        UploadId = upload.UploadId,
+                        FileName = filename,
+                        BallotCode = ballot.BallotCode.ToHex(),
+                        BallotData = ballotData
+                    };
                     _ = _ballotService.SaveAsync(ballotRecord).Result;
 
-                    subtotal += 1;
-                }
-                catch (Exception ex)
-                {
+                    if (ballot.State == BallotBoxState.Spoiled)
+                    {
+                        _ = Interlocked.Increment(ref totalSpoiled);
+                    }
+                    else
+                    {
+                        _ = Interlocked.Increment(ref totalInserted);
+                    }
 
                 }
-                return subtotal;
-            },
-            (finalResult) => Interlocked.Add(ref totalCount, finalResult)
-            );
+                else
+                {
+                    _ = Interlocked.Increment(ref totalRejected);
+                }
+                _ = Interlocked.Increment(ref totalCount);
+                UploadText = $"{AppResources.SuccessText} {totalCount} / {ballots.Length} {AppResources.Success2Text}";
+            }
+            catch (Exception ex)
+            {
+            }
+        });
 
         // update totals before saving
+        upload.BallotCount = totalCount;
+        upload.BallotImported = totalInserted;
+        upload.BallotRejected = totalRejected;
+        upload.BallotSpoiled = totalSpoiled;
 
-        _ = await _uploadService.SaveAsync(upload);
+        try
+        {
+            _ = await _uploadService.SaveAsync(upload);
+            _timer.Stop();
+            ResultsText = $"{AppResources.SuccessText} {totalCount} {AppResources.Success2Text}";
+            ShowPanel = BallotUploadPanel.Results;
+        }
+        catch (Exception ex)
+        {
+        }
     }
 
     private bool CanUpload()
@@ -132,7 +195,7 @@ public partial class BallotUploadViewModel : BaseViewModel
         // check if it is a device file
         try
         {
-            var data = File.ReadAllText(file.FullPath, System.Text.Encoding.UTF8);
+            var data = File.ReadAllText(file.FullPath, Encoding.UTF8);
             EncryptionDevice device = new(data);
             DeviceFile = file.FullPath;
         }
@@ -162,9 +225,19 @@ public partial class BallotUploadViewModel : BaseViewModel
         }
     }
 
+    [RelayCommand]
+    private void UploadMore()
+    {
+        ShowPanel = BallotUploadPanel.AutoUpload;
+        ResultsText = string.Empty;
+        _lastDrive = -1;
+        _timer.Start();
+    }
+
     private readonly BallotUploadService _uploadService;
     private readonly BallotService _ballotService;
     private bool _importing = false;
+    private long _lastDrive = -1;
 
     public BallotUploadViewModel(IServiceProvider serviceProvider, BallotUploadService uploadService, BallotService ballotService) : base("BallotUploadText", serviceProvider)
     {
@@ -304,57 +377,93 @@ public partial class BallotUploadViewModel : BaseViewModel
         }
         _importing = true;
 
-        // check for a usb drive
-        var drives = DriveInfo.GetDrives();
-        foreach (var drive in drives)
+        Task.Run(async () =>
         {
-            if (drive.DriveType == DriveType.Removable && drive.VolumeLabel.ToLower() == "egdrive")
+            // check for a usb drive
+            var drives = DriveInfo.GetDrives();
+            foreach (var drive in drives)
             {
-                _serialNumber = 0;
+                if (drive.DriveType == DriveType.Removable && drive.VolumeLabel.ToLower() == "egdrive")
+                {
+                    _serialNumber = 0;
 #if WINDOWS
-                StringBuilder f = new(32);
-                StringBuilder f2 = new(32);
-                GetVolumeInformation(drive.Name, f, 32, out _serialNumber, out _, out _, f2, 32);
+                    StringBuilder f = new(32);
+                    StringBuilder f2 = new(32);
+                    GetVolumeInformation(drive.Name, f, 32, out _serialNumber, out _, out _, f2, 32);
 #endif
+                    if (_serialNumber == _lastDrive)
+                    {
+                        _importing = false;
+                        return;
+                    }
 
-                var devicePath = Path.Combine(drive.Name, "artifacts", "encryption_devices");
-                if (!Directory.Exists(devicePath))
-                {
-                    _importing = false;
-                    return;
-                }
-                // find device file
-                var devices = Directory.GetFiles(devicePath);
-                foreach (var device in devices)
-                {
+                    var used = await _uploadService.DriveUsed(_serialNumber, ElectionId);
+                    if (used)
+                    {
+                        await Shell.Current.CurrentPage.Dispatcher.DispatchAsync(async () =>
+                        {
+                            var answer = await Shell.Current.CurrentPage.DisplayAlert(AppResources.DriveUsedText, AppResources.ImportAgainText, AppResources.YesText, AppResources.NoText);
+                            if (!answer)
+                            {
+                                _lastDrive = _serialNumber;
+                                _importing = false;
+                                return;
+                            }
+                        });
+                    }
+
+                    var devicePath = Path.Combine(drive.Name, "artifacts", "encryption_devices");
+                    if (!Directory.Exists(devicePath))
+                    {
+                        _importing = false;
+                        return;
+                    }
+
+                    // find device file
+                    var devices = Directory.GetFiles(devicePath);
+                    foreach (var device in devices)
+                    {
+                        try
+                        {
+                            var data = File.ReadAllText(device, System.Text.Encoding.UTF8);
+                            EncryptionDevice dev = new(data);
+                            DeviceFile = device;
+                            break;
+                        }
+                        catch (Exception ex)
+                        {
+                        }
+                    }
+
+                    // find submitted ballots folder
+                    var ballotPath = Path.Combine(drive.Name, "artifacts", "encrypted_ballots");
+                    if (!Directory.Exists(ballotPath))
+                    {
+                        DeviceFile = null;
+                        _importing = false;
+                        return;
+                    }
+
                     try
                     {
-                        var data = File.ReadAllText(device, System.Text.Encoding.UTF8);
-                        EncryptionDevice dev = new(data);
-                        DeviceFile = device;
-                        break;
+                        Shell.Current.CurrentPage.Dispatcher.Dispatch(() =>
+                        {
+                            BallotFolder = ballotPath;
+                        });
+                        await Task.Run(Upload).ContinueWith((i) =>
+                        {
+                            _importing = false;
+                        });
                     }
                     catch (Exception ex)
                     {
+                        throw;
                     }
+
                 }
-
-                // find submitted ballots folder
-                var ballotPath = Path.Combine(drive.Name, "artifacts", "encrypted_ballots");
-                if (!Directory.Exists(ballotPath))
-                {
-                    DeviceFile = null;
-                    _importing = false;
-                    return;
-                }
-
-                BallotFolder = ballotPath;
-
-                _ = Task.Run(Upload);
-
-                _importing = false;
             }
-        }
+            _importing = false;
+        });
     }
 
     public override async Task OnLeavingPage()
@@ -363,5 +472,4 @@ public partial class BallotUploadViewModel : BaseViewModel
         _timer.Tick -= _timer_Tick;
         await base.OnLeavingPage();
     }
-
 }
