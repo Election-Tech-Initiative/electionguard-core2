@@ -28,6 +28,7 @@ public class PlaintextTallySelection : IEquatable<PlaintextTallySelection>
     /// </summary>
     public ElementModP Value { get; set; }
 
+    // TODO: this is a placeholder for now
     public ulong[]? Proof { get; set; }
 
     public PlaintextTallySelection(
@@ -84,12 +85,13 @@ public class PlaintextTallySelection : IEquatable<PlaintextTallySelection>
             return true;
         }
 
-        return ObjectId == other.ObjectId &&
+        var equal = ObjectId == other.ObjectId &&
                SequenceOrder == other.SequenceOrder &&
                DescriptionHash.Equals(other.DescriptionHash) &&
                Tally == other.Tally &&
                Value.Equals(other.Value); // &&
                                           // TODO: Proof.SequenceEqual(other.Proof); // just a placeholder for now
+        return equal;
     }
 
     public override bool Equals(object? obj)

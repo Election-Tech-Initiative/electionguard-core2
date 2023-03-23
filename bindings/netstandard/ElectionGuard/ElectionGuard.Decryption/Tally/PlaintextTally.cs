@@ -1,3 +1,5 @@
+using System.Text;
+
 namespace ElectionGuard.Decryption.Tally;
 
 public static partial class InternalManifestExtensions
@@ -16,10 +18,19 @@ public static partial class InternalManifestExtensions
     }
 }
 
-
+/// <summary>
+/// The plaintext representation of all contests in the election.
+/// </summary>
 public record PlaintextTally : IEquatable<PlaintextTally>
 {
+    /// <summary>
+    /// The unique identifier for the tally. May be the same as the ciphertext tally id.
+    /// </summary>
     public string TallyId { get; init; } = Guid.NewGuid().ToString();
+
+    /// <summary>
+    /// The name of the tally
+    /// </summary>
     public string Name { get; init; } = default!;
 
     /// <summary>

@@ -1,49 +1,30 @@
+using System.Text;
+
 namespace ElectionGuard.Decryption.Tally;
 
-public static partial class ContestDescriptionExtensions
-{
-    public static Dictionary<string, PlaintextTallySelection> ToPlaintextTallySelectionDictionary(
-        this ContestDescription contest)
-    {
-        var selections = new Dictionary<string, PlaintextTallySelection>();
-        foreach (var selection in contest.Selections)
-        {
-            selections.Add(
-                selection.ObjectId,
-                new PlaintextTallySelection(selection));
-        }
-
-        return selections;
-    }
-
-    public static Dictionary<string, PlaintextTallySelection> ToPlaintextTallySelectionDictionary(
-        this ContestDescriptionWithPlaceholders contest)
-    {
-        var selections = new Dictionary<string, PlaintextTallySelection>();
-        foreach (var selection in contest.Selections)
-        {
-            selections.Add(
-                selection.ObjectId,
-                new PlaintextTallySelection(selection));
-        }
-
-        // placeholders
-        foreach (var placeholder in contest.Placeholders)
-        {
-            selections.Add(
-                placeholder.ObjectId,
-                new PlaintextTallySelection(placeholder));
-        }
-
-        return selections;
-    }
-}
-
+/// <summary>
+/// A plaintext Tally Contest is a collection of plaintext selections
+/// </summary>
 public class PlaintextTallyContest : IEquatable<PlaintextTallyContest>
 {
+    /// <summary>
+    /// The object id of the contest
+    /// </summary>
     public string ObjectId { get; init; } = default!;
+
+    /// <summary>
+    /// The sequence order of the contest
+    /// </summary>
     public ulong SequenceOrder { get; init; }
+
+    /// <summary>
+    /// The hash of the contest description
+    /// </summary>
     public ElementModQ DescriptionHash { get; init; } = default!;
+
+    /// <summary>
+    /// The collection of selections using the object id as the key
+    /// </summary>
     public Dictionary<string, PlaintextTallySelection> Selections { get; init; } = default!;
 
     public PlaintextTallyContest(
@@ -114,5 +95,43 @@ public class PlaintextTallyContest : IEquatable<PlaintextTallyContest>
     }
 
     #endregion
+}
 
+public static partial class ContestDescriptionExtensions
+{
+    /// <summary>
+    /// Converts a <see cref="ContestDescription"/> to a dictionary of <see cref="PlaintextTallySelection"/>
+    /// </summary>
+    public static Dictionary<string, PlaintextTallySelection> ToPlaintextTallySelectionDictionary(
+        this ContestDescription contest)
+    {
+        var selections = new Dictionary<string, PlaintextTallySelection>();
+        foreach (var selection in contest.Selections)
+        {
+            selections.Add(
+                selection.ObjectId,
+                new PlaintextTallySelection(selection));
+        }
+
+        return selections;
+    }
+
+    /// <summary>
+    /// Converts a <see cref="ContestDescriptionWithPlaceholders"/> to a dictionary of <see cref="PlaintextTallySelection"/>
+    /// </summary>
+    public static Dictionary<string, PlaintextTallySelection> ToPlaintextTallySelectionDictionary(
+        this ContestDescriptionWithPlaceholders contest)
+    {
+        var selections = new Dictionary<string, PlaintextTallySelection>();
+        foreach (var selection in contest.Selections)
+        {
+            selections.Add(
+                selection.ObjectId,
+                new PlaintextTallySelection(selection));
+        }
+
+        // Do not add placeholders
+
+        return selections;
+    }
 }

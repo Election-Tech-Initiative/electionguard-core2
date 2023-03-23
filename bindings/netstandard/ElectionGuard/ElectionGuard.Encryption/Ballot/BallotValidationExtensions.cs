@@ -4,6 +4,9 @@ using System.Text;
 
 namespace ElectionGuard.Encryption.Ballot
 {
+    /// <summary>
+    /// The result of a ballot validation operation.
+    /// </summary>
     public class BallotValidationResult
     {
         public bool IsValid { get; set; }
@@ -47,10 +50,10 @@ namespace ElectionGuard.Encryption.Ballot
             }
 
             var sb = new StringBuilder();
-            _ = sb.AppendLine($"false: {Message}");
+            _ = sb.AppendLine($"\failed: {Message}");
             foreach (var child in Children)
             {
-                _ = sb.AppendLine(child.ToString());
+                _ = sb.AppendLine($"{child}");
             }
             return sb.ToString();
         }
