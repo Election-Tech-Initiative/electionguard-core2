@@ -23,17 +23,25 @@ public static class TestCiphertextTallyExtensions
     }
 }
 
-public class TestCiphertextTally
+public class TestCiphertextTally : DisposableBase
 {
-    private readonly ElementModQ nonce = Constants.ONE_MOD_Q;
-    private readonly ElementModQ secret = Constants.TWO_MOD_Q;
+    private TestElectionData Data = default!;
+    private List<PlaintextBallot> Ballots = default!;
 
-    ElGamalKeyPair keyPair = default!;
+    private EncryptionMediator Encryptor = default!;
+
+    private static readonly int BALLOT_COUNT = 1000;
 
     [SetUp]
     public void Setup()
     {
-        keyPair = ElGamalKeyPair.FromSecret(secret);
+        Data = ElectionGenerator.GenerateFakeElectionData();
+        Ballots = Enumerable.Range(0, BALLOT_COUNT)
+            .Select(i =>
+                BallotGenerator.GetFakeBallot(Data.InternalManifest)).ToList();
+
+        Encryptor = new EncryptionMediator(
+            Data.InternalManifest, Data.Context, Data.Device);
     }
 
     [Test]
@@ -93,8 +101,19 @@ public class TestCiphertextTally
 
     [Test]
     public void Test_Accumulate_Async_Cast_And_Spoiled_Ballots_Is_Valid()
+    private PlaintextBallot Copy(PlaintextBallot ballot)
     {
-
+        var json = ballot.ToJson();
+        return new PlaintextBallot(json);
     }
 
+    protected override void DisposeUnmanaged()
+    {
+        Encryptor.Dispose();
+        foreach (var ballot in Ballots)
+        {
+            ballot.Dispose();
+        }
+        Data.Dispose();
+    }
 }

@@ -5,7 +5,7 @@ using System.Linq;
 
 namespace ElectionGuard.Encryption.Utils.Generators
 {
-    public class TestElectionData
+    public class TestElectionData : DisposableBase
     {
         public Manifest Manifest { get; set; }
         public InternalManifest InternalManifest { get; set; }
@@ -13,6 +13,15 @@ namespace ElectionGuard.Encryption.Utils.Generators
         public ElGamalKeyPair KeyPair { get; set; }
 
         public EncryptionDevice Device { get; set; }
+
+        protected override void DisposeUnmanaged()
+        {
+            Manifest?.Dispose();
+            InternalManifest?.Dispose();
+            Context?.Dispose();
+            KeyPair?.Dispose();
+            Device?.Dispose();
+        }
     }
     public class ElectionGenerator
     {
