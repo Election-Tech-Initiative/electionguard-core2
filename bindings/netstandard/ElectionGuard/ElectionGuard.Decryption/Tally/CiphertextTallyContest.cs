@@ -1,49 +1,29 @@
 namespace ElectionGuard.Decryption.Tally;
 
-public static partial class ContestDescriptionExtensions
-{
-    public static Dictionary<string, CiphertextTallySelection> ToCiphertextTallySelectionDictionary(
-        this ContestDescription contest)
-    {
-        var selections = new Dictionary<string, CiphertextTallySelection>();
-        foreach (var selectionDescription in contest.Selections)
-        {
-            selections.Add(
-                selectionDescription.ObjectId,
-                new CiphertextTallySelection(selectionDescription));
-        }
-
-        return selections;
-    }
-
-    public static Dictionary<string, CiphertextTallySelection> ToCiphertextTallySelectionDictionary(
-        this ContestDescriptionWithPlaceholders contest)
-    {
-        var selections = new Dictionary<string, CiphertextTallySelection>();
-        foreach (var selection in contest.Selections)
-        {
-            selections.Add(
-                selection.ObjectId,
-                new CiphertextTallySelection(selection));
-        }
-
-        // placeholders
-        foreach (var placeholder in contest.Placeholders)
-        {
-            selections.Add(
-                placeholder.ObjectId,
-                new CiphertextTallySelection(placeholder));
-        }
-
-        return selections;
-    }
-}
-
+/// <summary>
+/// A CiphertextTallyContest is a container for associating a collection 
+/// of CiphertextTallySelection to a specific ContestDescription
+/// </summary>
 public class CiphertextTallyContest : DisposableBase, IEquatable<CiphertextTallyContest>
 {
+    /// <summary>
+    /// The object id of the contest
+    /// </summary>
     public string ObjectId { get; init; } = default!;
+
+    /// <summary>
+    /// The sequence order of the contest
+    /// </summary>
     public ulong SequenceOrder { get; init; }
+
+    /// <summary>
+    /// The hash of the contest description
+    /// </summary>
     public ElementModQ DescriptionHash { get; init; } = default!;
+
+    /// <summary>
+    /// The collection of selections using the object id as the key
+    /// </summary>
     public Dictionary<string, CiphertextTallySelection> Selections { get; init; } = default!;
 
     public CiphertextTallyContest(
@@ -72,26 +52,57 @@ public class CiphertextTallyContest : DisposableBase, IEquatable<CiphertextTally
         Selections = contestDescription.ToCiphertextTallySelectionDictionary();
     }
 
+    /// <summary>
+    /// Accumulate a CiphertextBallotContest into the CiphertextTallyContest
+    /// </summary>
     public void Accumulate(CiphertextBallotContest contest)
     {
-        foreach (var selection in contest.Selections)
+        // check that the contest selections are 
+        // all included in the selections collection
+        // and ignore any placeholders
+        var selections = contest.Selections.Where(i => !i.IsPlaceholder);
+        if (!selections.Select(i => i.ObjectId)
+            .All(Selections.ContainsKey))
+        {
+            throw new ArgumentException("Selections do not match contest");
+        }
+        foreach (var selection in selections)
         {
             _ = Selections[selection.ObjectId].Accumulate(selection);
         }
     }
 
-    public async Task AccumulateAsync(CiphertextBallotContest contest)
+    /// <summary>
+    /// Accumulate a CiphertextBallotContest into the CiphertextTallyContest
+    /// </summary>
+    public async Task AccumulateAsync(
+        CiphertextBallotContest contest,
+        CancellationToken cancellationToken = default)
     {
+        // check that the contest selections are 
+        // all included in the selections collection
+        // and ignore any placeholders
+        var selections = contest.Selections.Where(i => !i.IsPlaceholder);
+        if (!selections.Select(i => i.ObjectId)
+            .All(Selections.ContainsKey))
+        {
+            throw new ArgumentException("Selections do not match contest");
+        }
+
         var tasks = new List<Task>();
-        foreach (var selection in contest.Selections)
+        foreach (var selection in selections)
         {
             tasks.Add(
-                Selections[selection.ObjectId].AccumulateAsync(selection)
+                Selections[selection.ObjectId].AccumulateAsync(
+                    selection, cancellationToken)
             );
         }
         await Task.WhenAll(tasks);
     }
 
+    /// <summary>
+    /// Accumulate a collection of CiphertextBallotContest into the CiphertextTallyContest
+    /// </summary>
     public void Accumulate(IEnumerable<CiphertextBallotContest> contests)
     {
         foreach (var contest in contests)
@@ -100,11 +111,16 @@ public class CiphertextTallyContest : DisposableBase, IEquatable<CiphertextTally
         }
     }
 
-    public async Task AccumulateAsync(IEnumerable<CiphertextBallotContest> contests)
+    /// <summary>
+    /// Accumulate a collection of CiphertextBallotContest into the CiphertextTallyContest
+    /// </summary>
+    public async Task AccumulateAsync(
+        IEnumerable<CiphertextBallotContest> contests,
+        CancellationToken cancellationToken = default)
     {
         foreach (var contest in contests)
         {
-            await AccumulateAsync(contest);
+            await AccumulateAsync(contest, cancellationToken);
         }
     }
 
@@ -148,4 +164,43 @@ public class CiphertextTallyContest : DisposableBase, IEquatable<CiphertextTally
     }
 
     #endregion
+}
+
+public static partial class ContestDescriptionExtensions
+{
+    /// <summary>
+    /// Converts a <see cref="ContestDescription"/> to a <see cref="CiphertextTallyContest"/>
+    /// </summary>
+    public static Dictionary<string, CiphertextTallySelection> ToCiphertextTallySelectionDictionary(
+        this ContestDescription contest)
+    {
+        var selections = new Dictionary<string, CiphertextTallySelection>();
+        foreach (var selectionDescription in contest.Selections)
+        {
+            selections.Add(
+                selectionDescription.ObjectId,
+                new CiphertextTallySelection(selectionDescription));
+        }
+
+        return selections;
+    }
+
+    /// <summary>
+    /// Converts a <see cref="ContestDescriptionWithPlaceholders"/> to a <see cref="CiphertextTallyContest"/>
+    /// </summary>
+    public static Dictionary<string, CiphertextTallySelection> ToCiphertextTallySelectionDictionary(
+        this ContestDescriptionWithPlaceholders contest)
+    {
+        var selections = new Dictionary<string, CiphertextTallySelection>();
+        foreach (var selection in contest.Selections)
+        {
+            selections.Add(
+                selection.ObjectId,
+                new CiphertextTallySelection(selection));
+        }
+
+        // Do not add placeholoders to the tally
+
+        return selections;
+    }
 }

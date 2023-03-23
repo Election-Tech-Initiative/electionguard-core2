@@ -2,34 +2,41 @@ using ElectionGuard.Encryption.Ballot;
 using ElectionGuard.ElectionSetup;
 namespace ElectionGuard.Decryption.Tally;
 
-public static partial class InternalManifestExtensions
-{
-    public static Dictionary<string, CiphertextTallyContest> ToCiphertextTallyContestDictionary(
-        this InternalManifest manifest)
-    {
-        var contests = new Dictionary<string, CiphertextTallyContest>();
-        foreach (var contestDescription in manifest.Contests)
-        {
-            contests.Add(
-                contestDescription.ObjectId,
-                new CiphertextTallyContest(contestDescription));
-        }
-        return contests;
-    }
-}
-
+/// <summary>
+/// The encrypted representation of all contests in the election.
+/// A `CiphertextTally` accepts cast and spoiled ballots and accumulates a tally on the cast ballots.
+/// </summary>
 public record CiphertextTally : DisposableRecordBase, IEquatable<CiphertextTally>
 {
+    /// <summary>
+    /// The unique identifier for the tally.
+    /// </summary>
     public string TallyId { get; init; } = Guid.NewGuid().ToString();
+
+    /// <summary>
+    /// The name of the tally.
+    /// </summary>
     public string Name { get; init; } = default!;
 
+    /// <summary>
+    /// The election context.
+    /// </summary>
     public CiphertextElectionContext Context { get; init; } = default!;
+
+    /// <summary>
+    /// The election manifest.
+    /// </summary>
     public InternalManifest Manifest { get; init; } = default!;
 
+    /// <summary>
+    /// a set of cast ballot ids cast in the election.
+    /// </summary>
     public HashSet<string> CastBallotIds { get; init; } = default!;
-    public HashSet<string> SpoiledBallotIds { get; init; } = default!;
 
-    public DateTime CreatedAt { get; init; } = DateTime.UtcNow;
+    /// <summary>
+    /// a set of spoiled ballot ids cast in the election.
+    /// </summary>
+    public HashSet<string> SpoiledBallotIds { get; init; } = default!;
 
     /// <summary>
     /// A collection of each contest and selection in an election.
@@ -81,35 +88,17 @@ public record CiphertextTally : DisposableRecordBase, IEquatable<CiphertextTally
         Contests = contests;
     }
 
-    public AccumulationResult Accumulate(CiphertextBallot ballot)
+    /// <summary>
+    /// Add a ballot to the tally and recalculate the tally.
+    /// </summary>
+    public AccumulationResult Accumulate(
+        CiphertextBallot ballot, bool skipValidation = false)
     {
-        // check for unknown state
-        if (ballot.State == BallotBoxState.Unknown)
+        // add the ballot to the cast or spoil collection
+        var addResult = TryAddBallot(ballot, skipValidation);
+        if (!addResult.IsValid)
         {
-            throw new ArgumentException("Ballot state is unknown");
-        }
-
-        // check for valid ballot
-        var isValid = ballot.IsValid(Manifest, Context);
-        if (!isValid.IsValid)
-        {
-            return new AccumulationResult(
-                TallyId,
-                ballot.ObjectId,
-                isValid);
-        }
-
-        // add the ballot to the appropriate set
-        var added = ballot.IsCast
-            ? CastBallotIds.Add(ballot.ObjectId)
-            : SpoiledBallotIds.Add(ballot.ObjectId);
-        if (!added)
-        {
-            return new AccumulationResult(
-                TallyId,
-                ballot.ObjectId,
-                new BallotValidationResult(
-                    $"Ballot {ballot.ObjectId} already added to tally {TallyId}"));
+            return new AccumulationResult(TallyId, ballot.ObjectId, addResult);
         }
 
         // accumulate the contests
@@ -124,46 +113,33 @@ public record CiphertextTally : DisposableRecordBase, IEquatable<CiphertextTally
         return new AccumulationResult(TallyId, ballot.ObjectId);
     }
 
-    public AccumulationResult Accumulate(List<CiphertextBallot> ballots)
+    /// <summary>
+    /// Add a list of ballots to the tally and recalculate the tally.
+    /// </summary>
+    public AccumulationResult Accumulate(
+        List<CiphertextBallot> ballots, bool skipValidation = false)
     {
         var result = new AccumulationResult(TallyId);
         foreach (var ballot in ballots)
         {
-            var ballotResult = Accumulate(ballot);
-            result.Add(ballotResult);
+            var ballotResult = Accumulate(ballot, skipValidation);
+            _ = result.Add(ballotResult);
         }
         return result;
     }
 
-    public async Task<AccumulationResult> AccumulateAsync(CiphertextBallot ballot)
+    /// <summary>
+    /// Add a ballot to the tally and recalculate the tally.
+    /// </summary>
+    public async Task<AccumulationResult> AccumulateAsync(
+        CiphertextBallot ballot, bool skipValidation = false,
+        CancellationToken cancellationToken = default)
     {
-        // check for unknown state
-        if (ballot.State == BallotBoxState.Unknown)
+        // add the ballot to the cast or spoil collection
+        var addResult = TryAddBallot(ballot, skipValidation);
+        if (!addResult.IsValid)
         {
-            throw new ArgumentException("Ballot state is unknown");
-        }
-
-        // check for valid ballot
-        var isValid = ballot.IsValid(Manifest, Context);
-        if (!isValid.IsValid)
-        {
-            return new AccumulationResult(
-                TallyId,
-                ballot.ObjectId,
-                isValid);
-        }
-
-        // add the ballot to the appropriate set
-        var added = ballot.IsCast
-            ? CastBallotIds.Add(ballot.ObjectId)
-            : SpoiledBallotIds.Add(ballot.ObjectId);
-        if (!added)
-        {
-            return new AccumulationResult(
-                TallyId,
-                ballot.ObjectId,
-                new BallotValidationResult(
-                    $"Ballot {ballot.ObjectId} already added to tally {TallyId}"));
+            return new AccumulationResult(TallyId, ballot.ObjectId, addResult);
         }
 
         // accumulate the contests
@@ -172,7 +148,8 @@ public record CiphertextTally : DisposableRecordBase, IEquatable<CiphertextTally
         {
             foreach (var contest in ballot.Contests)
             {
-                tasks.Add(Contests[contest.ObjectId].AccumulateAsync(contest));
+                tasks.Add(Contests[contest.ObjectId].AccumulateAsync(
+                    contest, cancellationToken));
             }
         }
         await Task.WhenAll(tasks);
@@ -180,20 +157,20 @@ public record CiphertextTally : DisposableRecordBase, IEquatable<CiphertextTally
         return new AccumulationResult(TallyId, ballot.ObjectId);
     }
 
-    public async Task<AccumulationResult> AccumulateAsync(List<CiphertextBallot> ballots)
+    /// <summary>
+    /// Add a list of ballots to the tally and recalculate the tally.
+    /// </summary>
+    public async Task<AccumulationResult> AccumulateAsync(
+        List<CiphertextBallot> ballots,
+        bool skipValidation = false,
+        CancellationToken cancellationToken = default)
     {
         var result = new AccumulationResult(TallyId);
-        var tasks = new List<Task<AccumulationResult>>();
         foreach (var ballot in ballots)
         {
-            tasks.Add(AccumulateAsync(ballot));
-        }
-
-        var taskResults = await Task.WhenAll(tasks);
-
-        foreach (var item in taskResults)
-        {
-            result.Add(item);
+            _ = result.Add(
+                await AccumulateAsync(
+                    ballot, skipValidation, cancellationToken));
         }
 
         return result;
@@ -210,14 +187,68 @@ public record CiphertextTally : DisposableRecordBase, IEquatable<CiphertextTally
                Manifest.ManifestHash == other.Manifest.ManifestHash &&
                CastBallotIds.SetEquals(other.CastBallotIds) &&
                SpoiledBallotIds.SetEquals(other.SpoiledBallotIds) &&
-               CreatedAt == other.CreatedAt &&
                Contests.SequenceEqual(other.Contests);
     }
 
     public override int GetHashCode()
     {
-        return HashCode.Combine(TallyId, Name, Context, Manifest, CastBallotIds, SpoiledBallotIds, CreatedAt, Contests);
+        return HashCode.Combine(
+            TallyId, Name, Context, Manifest, CastBallotIds, SpoiledBallotIds, Contests);
     }
 
     #endregion Equality Overrides
+
+    /// <summary>
+    /// try to add the ballot to the cast and spoiled collection 
+    /// to indicate that it is a new ballot being added to the tally
+    /// </summary>
+    private BallotValidationResult TryAddBallot(
+        CiphertextBallot ballot, bool skipValidation = false)
+    {
+        // check for unknown state
+        if (ballot.State == BallotBoxState.Unknown)
+        {
+            throw new ArgumentException("Ballot state is unknown");
+        }
+
+        // check for valid ballot
+        var isValid = skipValidation
+            ? new BallotValidationResult(true)
+            : ballot.IsValid(Manifest, Context);
+        if (!isValid.IsValid)
+        {
+            return isValid;
+        }
+
+        // add the ballot to the appropriate set
+        var added = ballot.IsCast
+            ? CastBallotIds.Add(ballot.ObjectId)
+            : SpoiledBallotIds.Add(ballot.ObjectId);
+        if (!added)
+        {
+            return new BallotValidationResult(
+                    $"Ballot {ballot.ObjectId} already added to tally {TallyId}");
+        }
+
+        return new BallotValidationResult(true);
+    }
+}
+
+public static partial class InternalManifestExtensions
+{
+    /// <summary>
+    /// Converts an internal manifest to a dictionary of CiphertextTallyContest
+    /// </summary>
+    public static Dictionary<string, CiphertextTallyContest> ToCiphertextTallyContestDictionary(
+        this InternalManifest manifest)
+    {
+        var contests = new Dictionary<string, CiphertextTallyContest>();
+        foreach (var contestDescription in manifest.Contests)
+        {
+            contests.Add(
+                contestDescription.ObjectId,
+                new CiphertextTallyContest(contestDescription));
+        }
+        return contests;
+    }
 }

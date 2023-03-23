@@ -68,6 +68,9 @@ namespace ElectionGuard.Decryption.Tally
                 : Accumulate(selection.Ciphertext);
         }
 
+        /// <summary>
+        /// Homomorphically add the specified value to the message
+        /// </summary>
         public async Task<ElGamalCiphertext> AccumulateAsync(
             CiphertextBallotSelection selection,
             CancellationToken cancellationToken = default)
