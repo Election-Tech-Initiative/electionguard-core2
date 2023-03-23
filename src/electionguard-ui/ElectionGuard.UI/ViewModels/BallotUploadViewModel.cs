@@ -23,7 +23,7 @@ public partial class BallotUploadViewModel : BaseViewModel
     private string _folderErrorMessage = string.Empty;
 
     [ObservableProperty]
-    private bool _showWizard = true;
+    private BallotUploadPanel _showPanel = BallotUploadPanel.AutoUpload;
 
     [ObservableProperty]
     [NotifyCanExecuteChangedFor(nameof(UploadCommand))]
@@ -36,20 +36,26 @@ public partial class BallotUploadViewModel : BaseViewModel
     [ObservableProperty]
     private string _ballotFolderName = string.Empty;
 
+    [ObservableProperty]
+    private string _resultsText;
+
+    [ObservableProperty]
+    private string _uploadText;
+
     private uint _serialNumber;
 
 
     [RelayCommand]
     private void Manual()
     {
-        ShowWizard = false;
+        ShowPanel = BallotUploadPanel.ManualUpload;
         _timer.Stop();
     }
 
     [RelayCommand]
     private void Auto()
     {
-        ShowWizard = true;
+        ShowPanel = BallotUploadPanel.AutoUpload;
         _timer.Start();
     }
 
@@ -135,6 +141,7 @@ public partial class BallotUploadViewModel : BaseViewModel
                     _ = Interlocked.Increment(ref totalRejected);
                 }
                 _ = Interlocked.Increment(ref totalCount);
+                UploadText = $"{AppResources.SuccessText} {totalCount} / {ballots.Length} {AppResources.Success2Text}";
             }
             catch (Exception ex)
             {
@@ -150,8 +157,11 @@ public partial class BallotUploadViewModel : BaseViewModel
         try
         {
             _ = await _uploadService.SaveAsync(upload);
+            _timer.Stop();
+            ResultsText = $"{AppResources.SuccessText} {totalCount} {AppResources.Success2Text}";
+            ShowPanel = BallotUploadPanel.Results;
         }
-        catch(Exception ex)
+        catch (Exception ex)
         {
         }
     }
@@ -182,7 +192,7 @@ public partial class BallotUploadViewModel : BaseViewModel
         // check if it is a device file
         try
         {
-            var data = File.ReadAllText(file.FullPath, System.Text.Encoding.UTF8);
+            var data = File.ReadAllText(file.FullPath, Encoding.UTF8);
             EncryptionDevice device = new(data);
             DeviceFile = file.FullPath;
         }
@@ -210,6 +220,15 @@ public partial class BallotUploadViewModel : BaseViewModel
             BallotFolderName = string.Empty;
             FolderErrorMessage = ex.Message;
         }
+    }
+
+    [RelayCommand]
+    private void UploadMore()
+    {
+        ShowPanel = BallotUploadPanel.AutoUpload;
+        ResultsText = string.Empty;
+        _lastDrive = -1;
+        _timer.Start();
     }
 
     private readonly BallotUploadService _uploadService;

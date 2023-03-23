@@ -862,6 +862,24 @@ namespace ElectionGuard.UI.Resx {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to ballots..
+        /// </summary>
+        internal static string Success2Text {
+            get {
+                return ResourceManager.GetString("Success2Text", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Successfully uploaded.
+        /// </summary>
+        internal static string SuccessText {
+            get {
+                return ResourceManager.GetString("SuccessText", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Switch Languages.
         /// </summary>
         internal static string SwitchLanguages {
@@ -894,6 +912,15 @@ namespace ElectionGuard.UI.Resx {
         internal static string UploadedText {
             get {
                 return ResourceManager.GetString("UploadedText", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Upload More Ballots.
+        /// </summary>
+        internal static string UploadMoreText {
+            get {
+                return ResourceManager.GetString("UploadMoreText", resourceCulture);
             }
         }
         

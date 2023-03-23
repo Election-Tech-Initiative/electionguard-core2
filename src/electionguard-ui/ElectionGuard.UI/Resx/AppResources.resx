@@ -426,4 +426,13 @@
   <data name="SpoiledText" xml:space="preserve">
     <value>Spoiled</value>
   </data>
+  <data name="UploadMoreText" xml:space="preserve">
+    <value>Upload More Ballots</value>
+  </data>
+  <data name="Success2Text" xml:space="preserve">
+    <value>ballots.</value>
+  </data>
+  <data name="SuccessText" xml:space="preserve">
+    <value>Successfully uploaded</value>
+  </data>
 </root>
