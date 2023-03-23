@@ -1,4 +1,4 @@
-﻿using System.Diagnostics;
+using System.Diagnostics;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 using System.Text;
@@ -397,7 +397,7 @@ public partial class BallotUploadViewModel : BaseViewModel
                     var used = await _uploadService.DriveUsed(_serialNumber, ElectionId);
                     if (used)
                     {
-                        await Shell.Current.CurrentPage.Dispatcher.DispatchAsync(async() => 
+                        await Shell.Current.CurrentPage.Dispatcher.DispatchAsync(async () =>
                         {
                             var answer = await Shell.Current.CurrentPage.DisplayAlert(AppResources.DriveUsedText, AppResources.ImportAgainText, AppResources.YesText, AppResources.NoText);
                             if (!answer)

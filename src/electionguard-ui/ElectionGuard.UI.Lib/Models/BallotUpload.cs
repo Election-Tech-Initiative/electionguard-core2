@@ -47,7 +47,7 @@ public partial class BallotUpload : DatabaseRecord
     [ObservableProperty]
     private DateTime _createdAt;
 
-    public BallotUpload() : base(nameof(BallotUpload))
+    public BallotUpload(string electionId, string deviceFilename, string deviceFileContents, string location, long ballotCount, long ballotImported, long ballotSpoiled, long ballotRejected, uint serialNumber, string createdBy) : base(nameof(BallotUpload))
     {
         UploadId = Guid.NewGuid().ToString();
         CreatedAt = DateTime.UtcNow;

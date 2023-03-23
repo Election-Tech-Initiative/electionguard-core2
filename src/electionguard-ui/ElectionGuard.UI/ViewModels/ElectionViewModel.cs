@@ -64,14 +64,15 @@ public partial class ElectionViewModel : BaseViewModel
             BallotAddedTotal = 0;
             BallotSpoiledTotal = 0;
             BallotRejectedTotal = 0;
-            uploads.ForEach((upload) => {
+            uploads.ForEach((upload) =>
+            {
                 BallotUploads.Add(upload);
                 BallotCountTotal += upload.BallotCount;
                 BallotAddedTotal += upload.BallotImported;
                 BallotSpoiledTotal += upload.BallotSpoiled;
                 BallotRejectedTotal += upload.BallotRejected;
             });
-            
+
             Tallies.Clear();
 
         });
