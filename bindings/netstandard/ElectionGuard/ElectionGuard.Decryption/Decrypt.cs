@@ -19,11 +19,20 @@ public static class DecryptExtensions
             foreach (var selection in contest.Value.Selections)
             {
                 var ciphertext = selection.Value.Ciphertext;
-                var value = ciphertext.Decrypt(secretKey);
                 var plaintextSelection = plaintextContest.Selections.First(
                     x => x.Key == selection.Key).Value;
 
-                plaintextSelection.Tally += value ?? 0;
+                try
+                {
+                    var value = ciphertext.Decrypt(secretKey);
+                    plaintextSelection.Tally += value ?? 0;
+                }
+                catch (Exception e)
+                {
+                    throw new Exception(
+                        $"Failed to decrypt selection {selection.Key} in contest {contest.Key}",
+                        e);
+                }
             }
         }
         return plaintextTally;

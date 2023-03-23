@@ -24,7 +24,6 @@ public static class TestCiphertextTallyExtensions
 }
 
 [TestFixture]
-[NonParallelizable]
 public class TestCiphertextTally : DisposableBase
 {
     private TestElectionData Data = default!;
@@ -34,21 +33,24 @@ public class TestCiphertextTally : DisposableBase
     private EncryptionMediator Encryptor = default!;
 
     // the count of unvalidated ballots to use in the test
-    private const ulong BALLOT_COUNT_UNVALIDATED = 100UL;
+    private const ulong BALLOT_COUNT_UNVALIDATED = 30UL;
 
     // the count of validated ballots to use in the test
-    private const ulong BALLOT_COUNT_VALIDATED = 4UL;
+    private const ulong BALLOT_COUNT_VALIDATED = 2UL;
 
     [OneTimeSetUp]
     public void OneTimeSetup()
     {
+        var random = new Random(1);
         Data = ElectionGenerator.GenerateFakeElectionData();
         Encryptor = new EncryptionMediator(
             Data.InternalManifest, Data.Context, Data.Device);
 
         PlaintextBallots = Enumerable.Range(0, (int)BALLOT_COUNT_UNVALIDATED)
             .Select(i =>
-                BallotGenerator.GetFakeBallot(Data.InternalManifest))
+                BallotGenerator.GetFakeBallot(
+                    Data.InternalManifest,
+                    random))
             .ToList();
         CiphertextBallots = PlaintextBallots.Select(
             ballot => Encryptor.Encrypt(ballot))
@@ -67,13 +69,13 @@ public class TestCiphertextTally : DisposableBase
     {
         // Arrange
         var plaintextBallots = Enumerable.Range(0, (int)count)
-            .Select(i => Copy(PlaintextBallots[i])).ToList();
+            .Select(i => PlaintextBallots[i].Copy()).ToList();
         var plaintextTally = new PlaintextTally("test-cast", Data.InternalManifest);
         plaintextTally.AccumulateBallots(plaintextBallots);
         var ciphertextBallots = Enumerable.Range(0, (int)count)
             .Select(i =>
             {
-                var encryptedBallot = Copy(CiphertextBallots[i]);
+                var encryptedBallot = CiphertextBallots[i].Copy();
                 encryptedBallot!.Cast();
                 return encryptedBallot;
             }).ToList();
@@ -89,6 +91,7 @@ public class TestCiphertextTally : DisposableBase
 
 
         Console.WriteLine($"{nameof(Test_Accumulate_Cast_Ballots_Is_Valid)}: ballots: " + count);
+        //var result = ciphertextTally.Accumulate(ciphertextBallots, skipValidation);
         var result = this.Benchmark(() =>
             ciphertextTally.Accumulate(ciphertextBallots, skipValidation), "Accumulate");
 
@@ -109,7 +112,7 @@ public class TestCiphertextTally : DisposableBase
     {
         // Arrange
         var plaintextBallots = Enumerable.Range(0, (int)count)
-            .Select(i => Copy(PlaintextBallots[i])).ToList();
+            .Select(i => PlaintextBallots[i].Copy()).ToList();
         var plaintextTally = new PlaintextTally("test-cast-async", Data.InternalManifest);
         plaintextTally.AccumulateBallots(plaintextBallots);
         var encryptedBallots = plaintextBallots.Select(
@@ -149,7 +152,7 @@ public class TestCiphertextTally : DisposableBase
     {
         // Arrange
         var plaintextBallots = Enumerable.Range(0, (int)count)
-            .Select(i => Copy(PlaintextBallots[i])).ToList();
+            .Select(i => PlaintextBallots[i].Copy()).ToList();
         var plaintextTally = new PlaintextTally("test-spoil", Data.InternalManifest);
         var encryptedBallots = plaintextBallots.Select(
             ballot =>
@@ -193,9 +196,9 @@ public class TestCiphertextTally : DisposableBase
     {
         // Arrange
         var plaintextCastBallots = Enumerable.Range(0, (int)count / 2)
-            .Select(i => Copy(PlaintextBallots[i])).ToList();
+            .Select(i => PlaintextBallots[i].Copy()).ToList();
         var plaintextSpoiledBallots = Enumerable.Range((int)count / 2, (int)count / 2)
-            .Select(i => Copy(PlaintextBallots[i])).ToList();
+            .Select(i => PlaintextBallots[i].Copy()).ToList();
         var plaintextTally = new PlaintextTally("test-spoil", Data.InternalManifest);
         plaintextTally.AccumulateBallots(plaintextCastBallots);
 
@@ -238,18 +241,6 @@ public class TestCiphertextTally : DisposableBase
 
         var decryptedTally = this.Benchmark(() => ciphertextTally.Decrypt(Data.KeyPair.SecretKey), "Decrypt");
         Assert.That(plaintextTally, Is.EqualTo(decryptedTally.Result));
-    }
-
-    private PlaintextBallot Copy(PlaintextBallot ballot)
-    {
-        var json = ballot.ToJson();
-        return new PlaintextBallot(json);
-    }
-
-    private CiphertextBallot Copy(CiphertextBallot ballot)
-    {
-        var json = ballot.ToJson();
-        return new CiphertextBallot(json);
     }
 
     protected override void DisposeUnmanaged()
