@@ -49,6 +49,10 @@ namespace ElectionGuard
                 var status = External.GetDescriptionHash(
                     Handle, out NativeInterface.ElementModQ.ElementModQHandle value);
                 status.ThrowIfError();
+                if (value.IsInvalid)
+                {
+                    return null;
+                }
                 return new ElementModQ(value);
             }
         }
@@ -74,6 +78,10 @@ namespace ElectionGuard
                 var status = External.GetCryptoHash(
                     Handle, out NativeInterface.ElementModQ.ElementModQHandle value);
                 status.ThrowIfError();
+                if (value.IsInvalid)
+                {
+                    return null;
+                }
                 return new ElementModQ(value);
             }
         }
@@ -88,6 +96,10 @@ namespace ElectionGuard
                 var status = External.GetNonce(
                     Handle, out NativeInterface.ElementModQ.ElementModQHandle value);
                 status.ThrowIfError();
+                if (value.IsInvalid)
+                {
+                    return null;
+                }
                 return new ElementModQ(value);
             }
         }
@@ -102,6 +114,10 @@ namespace ElectionGuard
                 var status = External.GetProof(
                     Handle, out NativeInterface.DisjunctiveChaumPedersenProof.DisjunctiveChaumPedersenProofHandle value);
                 status.ThrowIfError();
+                if (value.IsInvalid)
+                {
+                    return null;
+                }
                 return new DisjunctiveChaumPedersenProof(value);
             }
         }

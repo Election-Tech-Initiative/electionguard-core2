@@ -317,6 +317,11 @@ typedef struct eg_ciphertext_ballot_s eg_ciphertext_ballot_t;
 // no constructors defined.  use `eg_encrypt_ballot` in encrypt.h
 
 /**
+ * The state of the ballot (cast, spoiled, or unknown)
+ */
+EG_API eg_ballot_box_state_t eg_ciphertext_ballot_get_state(eg_ciphertext_ballot_t *handle);
+
+/**
  * The hash of the encrypted values on this ballot in sequence order
  * 
  * @param[out] out_hash_ref An opaque pointer to the crypto hash.  
@@ -342,6 +347,16 @@ EG_API eg_electionguard_status_t eg_ciphertext_ballot_crypto_hash_with(
   eg_element_mod_q_t **out_crypto_hash);
 
 // TODO: eg_ciphertext_ballot_make
+
+/**
+ * A helper function to mark the ballot as cast and remove sensitive values like the nonce.
+ */
+EG_API eg_electionguard_status_t eg_ciphertext_ballot_cast(eg_ciphertext_ballot_t *handle);
+
+/**
+ * A helper function to mark the ballot as spoiled and remove sensitive values like the nonce.
+ */
+EG_API eg_electionguard_status_t eg_ciphertext_ballot_spoil(eg_ciphertext_ballot_t *handle);
 
 /**
  * @brief Creates a CiphertextBallot object from a [RFC-8259](https://www.rfc-editor.org/rfc/rfc8259.html#section-8.1) UTF-8 encoded JSON string

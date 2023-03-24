@@ -362,6 +362,26 @@ TEST_CASE("Encrypt simple ballot from file succeeds")
                                         *context->getCryptoExtendedBaseHash()) == true);
 }
 
+TEST_CASE("Encrypt simple ballot from file cast is valid")
+{
+    // Arrange
+    auto secret = ElementModQ::fromHex(a_fixed_secret);
+    auto keypair = ElGamalKeyPair::fromSecret(*secret);
+    auto manifest = ManifestGenerator::getManifestFromFile(TEST_SPEC_VERSION, TEST_USE_SAMPLE);
+    auto internal = make_unique<InternalManifest>(*manifest);
+    auto context = ElectionGenerator::getFakeContext(*internal, *keypair->getPublicKey());
+    auto device = make_unique<EncryptionDevice>(12345UL, 23456UL, 34567UL, "Location");
+
+    auto ballot = BallotGenerator::getFakeBallot(*internal);
+
+    // Act
+    auto ciphertext = encryptBallot(*ballot, *internal, *context, *device->getHash());
+    ciphertext->cast();
+
+    // Assert
+    CHECK(ciphertext->getNonce() == nullptr);
+}
+
 TEST_CASE("Encrypt simple ballot from file submitted is valid")
 {
     // Arrange

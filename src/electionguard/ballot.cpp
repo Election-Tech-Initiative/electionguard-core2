@@ -69,8 +69,7 @@ namespace electionguard
 
         Impl(string objectId, uint64_t vote, bool isPlaceholderSelection /* = false */,
              string writeIn)
-            : vote(vote), isPlaceholderSelection(isPlaceholderSelection),
-              writeIn(move(writeIn))
+            : vote(vote), isPlaceholderSelection(isPlaceholderSelection), writeIn(move(writeIn))
         {
             this->object_id = move(objectId);
         }
@@ -78,8 +77,7 @@ namespace electionguard
         [[nodiscard]] unique_ptr<PlaintextBallotSelection::Impl> clone() const
         {
             return make_unique<PlaintextBallotSelection::Impl>(
-              this->object_id, this->vote, this->isPlaceholderSelection,
-              this->writeIn);
+              this->object_id, this->vote, this->isPlaceholderSelection, this->writeIn);
         }
     };
 
@@ -95,9 +93,9 @@ namespace electionguard
     {
     }
 
-    PlaintextBallotSelection::PlaintextBallotSelection(
-      string objectId, uint64_t vote, bool isPlaceholderSelection /* = false */,
-      string writeIn)
+    PlaintextBallotSelection::PlaintextBallotSelection(string objectId, uint64_t vote,
+                                                       bool isPlaceholderSelection /* = false */,
+                                                       string writeIn)
         : pimpl(new Impl(move(objectId), vote, isPlaceholderSelection, writeIn))
     {
     }
@@ -136,9 +134,8 @@ namespace electionguard
 
     std::unique_ptr<PlaintextBallotSelection> PlaintextBallotSelection::clone() const
     {
-        return make_unique<PlaintextBallotSelection>(
-          pimpl->object_id, pimpl->vote, pimpl->isPlaceholderSelection,
-          pimpl->writeIn);
+        return make_unique<PlaintextBallotSelection>(pimpl->object_id, pimpl->vote,
+                                                     pimpl->isPlaceholderSelection, pimpl->writeIn);
     }
 
 #pragma endregion
@@ -241,7 +238,7 @@ namespace electionguard
         return pimpl->cryptoHash.get();
     }
 
-    ElementModQ *CiphertextBallotSelection::getNonce() { return pimpl->nonce.get(); }
+    ElementModQ *CiphertextBallotSelection::getNonce() const { return pimpl->nonce.get(); }
 
     DisjunctiveChaumPedersenProof *CiphertextBallotSelection::getProof() const
     {
@@ -310,9 +307,8 @@ namespace electionguard
 
     unique_ptr<CiphertextBallotSelection> CiphertextBallotSelection::make_with_precomputed(
       const std::string &objectId, uint64_t sequenceOrder, const ElementModQ &descriptionHash,
-      unique_ptr<ElGamalCiphertext> ciphertext,
-      const ElementModQ &cryptoExtendedBaseHash, uint64_t plaintext,
-      unique_ptr<TwoTriplesAndAQuadruple> precomputedTwoTriplesAndAQuad,
+      unique_ptr<ElGamalCiphertext> ciphertext, const ElementModQ &cryptoExtendedBaseHash,
+      uint64_t plaintext, unique_ptr<TwoTriplesAndAQuadruple> precomputedTwoTriplesAndAQuad,
       bool isPlaceholder /* = false */, bool computeProof /* = true */,
       unique_ptr<ElementModQ> cryptoHash /* = nullptr */,
       unique_ptr<ElGamalCiphertext> extendedData /* = nullptr */)
@@ -330,14 +326,12 @@ namespace electionguard
         unique_ptr<DisjunctiveChaumPedersenProof> proof = nullptr;
         if (computeProof) {
             // always make a proof using the faster, non-deterministic method
-            proof = DisjunctiveChaumPedersenProof::make_with_precomputed(*ciphertext,
-                                                    move(precomputedTwoTriplesAndAQuad),
-                                                    cryptoExtendedBaseHash, plaintext);
+            proof = DisjunctiveChaumPedersenProof::make_with_precomputed(
+              *ciphertext, move(precomputedTwoTriplesAndAQuad), cryptoExtendedBaseHash, plaintext);
         }
 
         return make_unique<CiphertextBallotSelection>(
-          objectId, sequenceOrder, descriptionHash, move(ciphertext), isPlaceholder,
-          move(nonce),
+          objectId, sequenceOrder, descriptionHash, move(ciphertext), isPlaceholder, move(nonce),
           move(cryptoHash), move(proof), move(extendedData));
 
         return result;
@@ -376,6 +370,8 @@ namespace electionguard
         }
         return pimpl->proof->isValid(*pimpl->ciphertext, elgamalPublicKey, cryptoExtendedBaseHash);
     }
+
+    void CiphertextBallotSelection::resetNonce() const { return pimpl->nonce.reset(); }
 
     // Protected Members
 
@@ -463,10 +459,9 @@ namespace electionguard
 
     eg_valid_contest_return_type_t
     PlaintextBallotContest::isValid(const string &expectedObjectId,
-                                         uint64_t expectedNumberSelections,
-                                         uint64_t expectedNumberElected,
-                                         uint64_t votesAllowd, /* = 0 */
-                                         bool supportOvervotes /* = true */) const
+                                    uint64_t expectedNumberSelections,
+                                    uint64_t expectedNumberElected, uint64_t votesAllowd, /* = 0 */
+                                    bool supportOvervotes /* = true */) const
     {
         if (pimpl->object_id != expectedObjectId) {
             Log::info(": invalid objectId");
@@ -897,6 +892,7 @@ namespace electionguard
 
     struct CiphertextBallot::Impl : public ElectionObjectBase {
         string styleId;
+        BallotBoxState state;
         unique_ptr<ElementModQ> manifestHash;
         unique_ptr<ElementModQ> ballotCodeSeed;
         vector<unique_ptr<CiphertextBallotContest>> contests;
@@ -905,8 +901,8 @@ namespace electionguard
         unique_ptr<ElementModQ> nonce;
         unique_ptr<ElementModQ> cryptoHash;
 
-        Impl(const string &objectId, const string &styleId, unique_ptr<ElementModQ> manifestHash,
-             unique_ptr<ElementModQ> ballotCodeSeed,
+        Impl(const string &objectId, const string &styleId, BallotBoxState state,
+             unique_ptr<ElementModQ> manifestHash, unique_ptr<ElementModQ> ballotCodeSeed,
              vector<unique_ptr<CiphertextBallotContest>> contests,
              unique_ptr<ElementModQ> ballotCode, const uint64_t timestamp,
              unique_ptr<ElementModQ> nonce, unique_ptr<ElementModQ> cryptoHash)
@@ -916,6 +912,7 @@ namespace electionguard
         {
             this->object_id = objectId;
             this->styleId = styleId;
+            this->state = state;
             this->timestamp = timestamp;
         }
 
@@ -933,8 +930,8 @@ namespace electionguard
             auto _nonce = make_unique<ElementModQ>(*nonce);
             auto _cryptoHash = make_unique<ElementModQ>(*cryptoHash);
             return make_unique<CiphertextBallot::Impl>(
-              object_id, styleId, move(_manifestHash), move(_ballotCodeSeed), move(_contests),
-              move(_ballotCode), timestamp, move(_nonce), move(_cryptoHash));
+              object_id, styleId, state, move(_manifestHash), move(_ballotCodeSeed),
+              move(_contests), move(_ballotCode), timestamp, move(_nonce), move(_cryptoHash));
         }
     };
 
@@ -950,8 +947,8 @@ namespace electionguard
                                        vector<unique_ptr<CiphertextBallotContest>> contests,
                                        unique_ptr<ElementModQ> ballotCode, const uint64_t timestamp,
                                        unique_ptr<ElementModQ> nonce,
-                                       unique_ptr<ElementModQ> cryptoHash)
-        : pimpl(new Impl(objectId, styleId, make_unique<ElementModQ>(manifestHash),
+                                       unique_ptr<ElementModQ> cryptoHash, BallotBoxState state)
+        : pimpl(new Impl(objectId, styleId, state, make_unique<ElementModQ>(manifestHash),
                          move(ballotCodeSeed), move(contests), move(ballotCode), timestamp,
                          move(nonce), move(cryptoHash)))
     {
@@ -968,6 +965,7 @@ namespace electionguard
 
     string CiphertextBallot::getObjectId() const { return pimpl->object_id; }
     string CiphertextBallot::getStyleId() const { return pimpl->styleId; }
+    BallotBoxState CiphertextBallot::getState() const { return pimpl->state; }
     ElementModQ *CiphertextBallot::getManifestHash() const { return pimpl->manifestHash.get(); }
     ElementModQ *CiphertextBallot::getBallotCodeSeed() const { return pimpl->ballotCodeSeed.get(); }
 
@@ -1011,7 +1009,8 @@ namespace electionguard
       vector<unique_ptr<CiphertextBallotContest>> contests,
       unique_ptr<ElementModQ> nonce /* = nullptr */, const uint64_t timestamp /* = 0 */,
       unique_ptr<ElementModQ> ballotCodeSeed /* = nullptr */,
-      unique_ptr<ElementModQ> ballotCode /* = nullptr */)
+      unique_ptr<ElementModQ> ballotCode /* = nullptr */,
+      BallotBoxState state /* = BallotBoxState::unknown */)
     {
         if (contests.empty()) {
             Log::error(":ballot must have at least some contests");
@@ -1040,7 +1039,7 @@ namespace electionguard
 
         return make_unique<CiphertextBallot>(objectId, styleId, manifestHash, move(ballotCodeSeed),
                                              move(contests), move(ballotCode), ballotTimestamp,
-                                             move(nonce), move(cryptoHash));
+                                             move(nonce), move(cryptoHash), state);
     }
 
     unique_ptr<ElementModQ> CiphertextBallot::nonceSeed(const ElementModQ &manifestHash,
@@ -1100,6 +1099,42 @@ namespace electionguard
         return nonceSeed(*pimpl->manifestHash, pimpl->object_id, *pimpl->nonce);
     }
 
+    void CiphertextBallot::cast() const
+    {
+        if (pimpl->state == BallotBoxState::spoiled) {
+            Log::error(":ballot has already been spoiled");
+            throw invalid_argument("ballot has already been spoiled");
+        }
+
+        // iterate over the collection of contests and selections and reset the nonce
+        for (const auto &contest : this->getContests()) {
+            for (const auto &selection : contest.get().getSelections()) {
+                selection.get().resetNonce();
+            }
+        }
+
+        pimpl->nonce.reset();
+        pimpl->state = BallotBoxState::cast;
+    }
+
+    void CiphertextBallot::spoil() const
+    {
+        if (pimpl->state == BallotBoxState::cast) {
+            Log::error(":ballot has already been cast");
+            throw invalid_argument("ballot has already been cast");
+        }
+
+        // iterate over the collection of contests and selections and reset the nonce
+        for (const auto &contest : this->getContests()) {
+            for (const auto &selection : contest.get().getSelections()) {
+                selection.get().resetNonce();
+            }
+        }
+
+        pimpl->nonce.reset();
+        pimpl->state = BallotBoxState::spoiled;
+    }
+
     vector<uint8_t> CiphertextBallot::toBson(bool withNonces /* = false */) const
     {
         return CiphertextBallotSerializer::toBson(*this, withNonces);
@@ -1152,17 +1187,19 @@ namespace electionguard
 
 #pragma region SubmittedBallot
 
-    struct SubmittedBallot::Impl {
-        BallotBoxState state;
-
-        Impl(BallotBoxState state) { this->state = state; }
-    };
-
     // Lifecycle Methods
 
     SubmittedBallot::SubmittedBallot(const CiphertextBallot &other, BallotBoxState state)
-        : CiphertextBallot(other), pimpl(new Impl(state))
+        : CiphertextBallot(other)
     {
+        if (state != BallotBoxState::spoiled && state != BallotBoxState::cast) {
+            throw invalid_argument("invalid state for SubmittedBallot");
+        }
+        if (state == BallotBoxState::spoiled) {
+            this->spoil();
+        } else {
+            this->cast();
+        }
     }
 
     SubmittedBallot::SubmittedBallot(const string &objectId, const string &styleId,
@@ -1173,21 +1210,10 @@ namespace electionguard
                                      unique_ptr<ElementModQ> nonce,
                                      unique_ptr<ElementModQ> cryptoHash, BallotBoxState state)
         : CiphertextBallot(objectId, styleId, manifestHash, move(ballotCodeSeed), move(contests),
-                           move(ballotCode), timestamp, move(nonce), move(cryptoHash)),
-          pimpl(new Impl(state))
+                           move(ballotCode), timestamp, move(nonce), move(cryptoHash), state)
     {
     }
     SubmittedBallot::~SubmittedBallot() = default;
-
-    SubmittedBallot &SubmittedBallot::operator=(SubmittedBallot other)
-    {
-        swap(pimpl, other.pimpl);
-        return *this;
-    }
-
-    // Property Getters
-
-    BallotBoxState SubmittedBallot::getState() const { return pimpl->state; }
 
     // Public Static Methods
 
