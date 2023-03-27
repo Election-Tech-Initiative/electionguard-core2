@@ -215,7 +215,7 @@ namespace ElectionGuard.Encryption.Utils.Generators
             var index = random.Next(manifest.BallotStyles.Count);
             var styleId = manifest.BallotStyles[index].ObjectId;
             return GetFakeBallot(
-                manifest, styleId, $"fake-ballot-{Guid.NewGuid()}", random);
+                manifest, styleId, random, $"fake-ballot-{Guid.NewGuid()}");
         }
 
         // get a fake ballot using a new random number generator
@@ -227,7 +227,7 @@ namespace ElectionGuard.Encryption.Utils.Generators
             var index = random.Next(manifest.BallotStyles.Count);
             var styleId = manifest.BallotStyles[index].ObjectId;
             return GetFakeBallot(
-                manifest, styleId, $"fake-ballot-{Guid.NewGuid()}", random);
+                manifest, styleId, random, $"fake-ballot-{Guid.NewGuid()}");
         }
 
         // get a fake ballot using a new random number generator
@@ -236,7 +236,7 @@ namespace ElectionGuard.Encryption.Utils.Generators
             string styleId)
         {
             return GetFakeBallot(
-                manifest, styleId, $"fake-ballot-{Guid.NewGuid()}", new Random());
+                manifest, styleId, new Random(), $"fake-ballot-{Guid.NewGuid()}");
         }
 
         public static PlaintextBallot GetFakeBallot(
@@ -245,15 +245,26 @@ namespace ElectionGuard.Encryption.Utils.Generators
             Random random)
         {
             return GetFakeBallot(
-                manifest, styleId, $"fake-ballot-{Guid.NewGuid()}", random);
+                manifest, styleId, random, $"fake-ballot-{Guid.NewGuid()}");
+        }
+
+        // get a fake ballot using a defined random number generator
+        public static PlaintextBallot GetFakeBallot(
+            InternalManifest manifest,
+            Random random,
+            string ballotId)
+        {
+            var index = random.Next(manifest.BallotStyles.Count);
+            var styleId = manifest.BallotStyles[index].ObjectId;
+            return GetFakeBallot(manifest, styleId, random, ballotId);
         }
 
         // get a fake ballot using a defined random number generator
         public static PlaintextBallot GetFakeBallot(
             InternalManifest manifest,
             string styleId,
-            string ballotId,
-            Random random)
+            Random random,
+            string ballotId)
         {
             var contests = new List<PlaintextBallotContest>();
             foreach (var contest in manifest.GetContests(styleId))
