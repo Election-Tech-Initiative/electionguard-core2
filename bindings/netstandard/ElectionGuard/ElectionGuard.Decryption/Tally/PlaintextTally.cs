@@ -57,6 +57,25 @@ public record PlaintextTally : IEquatable<PlaintextTally>
         Contests = manifest.ToPlaintextTallyContestDictionary();
     }
 
+    public override string ToString()
+    {
+        var builder = new StringBuilder();
+        _ = builder.AppendLine($"TallyId: {TallyId}");
+        _ = builder.AppendLine($"Name: {Name}");
+        _ = builder.AppendLine($"Contests: {Contests.Count}");
+        foreach (var contest in Contests)
+        {
+            _ = builder.AppendLine($"  Contest: {contest.Key}");
+            _ = builder.AppendLine($"    Selections: {contest.Value.Selections.Count}");
+            foreach (var selection in contest.Value.Selections)
+            {
+                _ = builder.AppendLine($"      Selection: {selection.Key}");
+                _ = builder.AppendLine($"        Votes: {selection.Value.Tally}");
+            }
+        }
+        return builder.ToString();
+    }
+
     #region IEquatable
 
     public virtual bool Equals(PlaintextTally? other)
