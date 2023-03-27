@@ -8,10 +8,16 @@ public static class TestCiphertextTallyExtensions
     public static void AccumulateBallots(
         this PlaintextTally self, IList<PlaintextBallot> ballots)
     {
+        var contestVotes = new Dictionary<string, int>();
+        foreach (var contest in self.Contests)
+        {
+            contestVotes[contest.Key] = 0;
+        }
         foreach (var ballot in ballots)
         {
             foreach (var contest in ballot.Contests)
             {
+                contestVotes[contest.ObjectId] += 1;
                 var contestTally = self.Contests[contest.ObjectId];
                 foreach (var selection in contest.Selections)
                 {
@@ -19,6 +25,11 @@ public static class TestCiphertextTallyExtensions
                     selectionTally.Tally += selection.Vote;
                 }
             }
+        }
+
+        foreach (var item in contestVotes)
+        {
+            Console.WriteLine($"    Contest {item.Key} has {item.Value} ballots");
         }
     }
 }
@@ -50,10 +61,20 @@ public class TestCiphertextTally : DisposableBase
             .Select(i =>
                 BallotGenerator.GetFakeBallot(
                     Data.InternalManifest,
-                    random))
+                    random, $"fake-ballot-{i}"))
             .ToList();
+
+        // determioistically generate the seed and nonce
+        var seed = random.NextElementModQ();
+        var nonce = random.NextElementModQ();
+        // var seed = Constants.TWO_MOD_Q;
+        // var nonce = Constants.TWO_MOD_Q;
         CiphertextBallots = PlaintextBallots.Select(
-            ballot => Encryptor.Encrypt(ballot))
+            ballot => Encrypt.Ballot(
+                ballot,
+                Data.InternalManifest,
+                Data.Context, seed, nonce,
+                shouldVerifyProofs: false))
             .ToList();
     }
 
@@ -65,12 +86,18 @@ public class TestCiphertextTally : DisposableBase
 
     [TestCase(BALLOT_COUNT_VALIDATED, false)]
     [TestCase(BALLOT_COUNT_UNVALIDATED, true)]
-    public void Test_Accumulate_Cast_Ballots_Is_Valid(ulong count, bool skipValidation)
+    public void Test_Accumulate_Cast_Ballots_Is_Valid(
+        ulong count, bool skipValidation)
     {
+        Console.WriteLine($"--------------- {nameof(Test_Accumulate_Cast_Ballots_Is_Valid)} ------------------");
+        Console.WriteLine($"    ballots: " + count);
+        Console.WriteLine($"    skipValidation: " + skipValidation);
+
         // Arrange
         var plaintextBallots = Enumerable.Range(0, (int)count)
             .Select(i => PlaintextBallots[i].Copy()).ToList();
-        var plaintextTally = new PlaintextTally("test-cast", Data.InternalManifest);
+        var plaintextTally = new PlaintextTally("test-cast",
+            Data.InternalManifest);
         plaintextTally.AccumulateBallots(plaintextBallots);
         var ciphertextBallots = Enumerable.Range(0, (int)count)
             .Select(i =>
@@ -80,6 +107,49 @@ public class TestCiphertextTally : DisposableBase
                 return encryptedBallot;
             }).ToList();
 
+        // Act
+        var mediator = new TallyMediator();
+        var ciphertextTally = mediator.CreateTally(
+            plaintextTally.TallyId,
+            plaintextTally.Name,
+            Data.Context,
+            Data.InternalManifest);
+
+        var result = this.Benchmark(() =>
+            ciphertextTally.Accumulate(ciphertextBallots, skipValidation),
+            "Accumulate");
+
+        // Assert
+        Assert.That(result.Result.Accumulated, Has.Count.EqualTo(count));
+        Assert.That(result.Result.Failed, Has.Count.EqualTo(0));
+
+        var decryptedTally = this.Benchmark(() =>
+            ciphertextTally.Decrypt(Data.KeyPair.SecretKey), "Decrypt");
+        Assert.That(decryptedTally.Result, Is.EqualTo(plaintextTally));
+    }
+
+    //[Ignore("Not implemented")]
+    [TestCase(BALLOT_COUNT_VALIDATED, false)]
+    [TestCase(BALLOT_COUNT_UNVALIDATED, true)]
+    public async Task Test_AccumulateAsync_Cast_Ballots_Is_Valid(
+        ulong count, bool skipValidation)
+    {
+        Console.WriteLine($"--------------- {nameof(Test_AccumulateAsync_Cast_Ballots_Is_Valid)} ------------------");
+        Console.WriteLine($"    ballots: " + count);
+        Console.WriteLine($"    skipValidation: " + skipValidation);
+
+        // Arrange
+        var plaintextBallots = Enumerable.Range(0, (int)count)
+            .Select(i => PlaintextBallots[i].Copy()).ToList();
+        var plaintextTally = new PlaintextTally("test-cast-async", Data.InternalManifest);
+        plaintextTally.AccumulateBallots(plaintextBallots);
+        var ciphertextBallots = Enumerable.Range(0, (int)count)
+            .Select(i =>
+            {
+                var encryptedBallot = CiphertextBallots[i].Copy();
+                encryptedBallot!.Cast();
+                return encryptedBallot;
+            }).ToList();
 
         // Act
         var mediator = new TallyMediator();
@@ -89,14 +159,10 @@ public class TestCiphertextTally : DisposableBase
             Data.Context,
             Data.InternalManifest);
 
-
-        Console.WriteLine($"{nameof(Test_Accumulate_Cast_Ballots_Is_Valid)}: ballots: " + count);
-        //var result = ciphertextTally.Accumulate(ciphertextBallots, skipValidation);
-        var result = this.Benchmark(() =>
-            ciphertextTally.Accumulate(ciphertextBallots, skipValidation), "Accumulate");
+        var result = await this.BenchmarkAsync(
+            async () => await ciphertextTally.AccumulateAsync(ciphertextBallots, skipValidation), "AccumulateAsync");
 
         // Assert
-        Console.WriteLine($"{nameof(Test_Accumulate_Cast_Ballots_Is_Valid)}: result: {result.Result}");
         Assert.That(result.Result.Accumulated, Has.Count.EqualTo(count));
         Assert.That(result.Result.Failed, Has.Count.EqualTo(0));
 
@@ -105,24 +171,28 @@ public class TestCiphertextTally : DisposableBase
         Assert.That(plaintextTally, Is.EqualTo(decryptedTally.Result));
     }
 
-    [Ignore("Not implemented")]
+    //[Ignore("Not implemented")]
     [TestCase(BALLOT_COUNT_VALIDATED, false)]
     [TestCase(BALLOT_COUNT_UNVALIDATED, true)]
-    public async Task Test_AccumulateAsync_Cast_Ballots_Is_Valid(ulong count, bool skipValidation)
+    public void Test_Accumulate_Spoiled_Ballots_Is_Valid(
+        ulong count, bool skipValidation)
     {
+        Console.WriteLine($"--------------- {nameof(Test_Accumulate_Spoiled_Ballots_Is_Valid)} ------------------");
+        Console.WriteLine($"    ballots: " + count);
+        Console.WriteLine($"    skipValidation: " + skipValidation);
+
         // Arrange
         var plaintextBallots = Enumerable.Range(0, (int)count)
             .Select(i => PlaintextBallots[i].Copy()).ToList();
-        var plaintextTally = new PlaintextTally("test-cast-async", Data.InternalManifest);
-        plaintextTally.AccumulateBallots(plaintextBallots);
-        var encryptedBallots = plaintextBallots.Select(
-            ballot =>
-                {
-                    var encryptedBallot = Encryptor.Encrypt(ballot);
-                    encryptedBallot!.Cast();
-                    return encryptedBallot;
-                }).ToList();
-
+        var plaintextTally = new PlaintextTally("test-spoil",
+            Data.InternalManifest);
+        var ciphertextBallots = Enumerable.Range(0, (int)count)
+            .Select(i =>
+            {
+                var encryptedBallot = CiphertextBallots[i].Copy();
+                encryptedBallot!.Spoil();
+                return encryptedBallot;
+            }).ToList();
 
         // Act
         var mediator = new TallyMediator();
@@ -132,53 +202,16 @@ public class TestCiphertextTally : DisposableBase
             Data.Context,
             Data.InternalManifest);
 
-        Console.WriteLine($"{nameof(Test_AccumulateAsync_Cast_Ballots_Is_Valid)}: ballots: " + count);
-        var result = await this.BenchmarkAsync(
-            async () => await ciphertextTally.AccumulateAsync(encryptedBallots, skipValidation), "AccumulateAsync");
+        var result = this.Benchmark(() =>
+            ciphertextTally.Accumulate(ciphertextBallots, skipValidation),
+            "Accumulate");
 
         // Assert
-        Console.WriteLine($"{nameof(Test_AccumulateAsync_Cast_Ballots_Is_Valid)}: result: {result.Result}");
         Assert.That(result.Result.Accumulated, Has.Count.EqualTo(count));
         Assert.That(result.Result.Failed, Has.Count.EqualTo(0));
 
-        var decryptedTally = this.Benchmark(() => ciphertextTally.Decrypt(Data.KeyPair.SecretKey), "Decrypt");
-        Assert.That(plaintextTally, Is.EqualTo(decryptedTally.Result));
-    }
-
-    [Ignore("Not implemented")]
-    [TestCase(BALLOT_COUNT_VALIDATED, false)]
-    [TestCase(BALLOT_COUNT_UNVALIDATED, true)]
-    public void Test_Accumulate_Spoiled_Ballots_Is_Valid(ulong count, bool skipValidation)
-    {
-        // Arrange
-        var plaintextBallots = Enumerable.Range(0, (int)count)
-            .Select(i => PlaintextBallots[i].Copy()).ToList();
-        var plaintextTally = new PlaintextTally("test-spoil", Data.InternalManifest);
-        var encryptedBallots = plaintextBallots.Select(
-            ballot =>
-                {
-                    var encryptedBallot = Encryptor.Encrypt(ballot);
-                    encryptedBallot!.Spoil();
-                    return encryptedBallot;
-                }).ToList();
-
-        // Act
-        var mediator = new TallyMediator();
-        var ciphertextTally = mediator.CreateTally(
-            plaintextTally.TallyId,
-            plaintextTally.Name,
-            Data.Context,
-            Data.InternalManifest);
-
-        Console.WriteLine($"{nameof(Test_Accumulate_Spoiled_Ballots_Is_Valid)}: ballots: " + count);
-        var result = this.Benchmark(() => ciphertextTally.Accumulate(encryptedBallots, skipValidation), "Accumulate");
-
-        // Assert
-        Console.WriteLine($"{nameof(Test_Accumulate_Spoiled_Ballots_Is_Valid)}: result: {result.Result}");
-        Assert.That(result.Result.Accumulated, Has.Count.EqualTo(count));
-        Assert.That(result.Result.Failed, Has.Count.EqualTo(0));
-
-        var decryptedTally = this.Benchmark(() => ciphertextTally.Decrypt(Data.KeyPair.SecretKey), "Decrypt");
+        var decryptedTally = this.Benchmark(() =>
+            ciphertextTally.Decrypt(Data.KeyPair.SecretKey), "Decrypt");
         Assert.That(plaintextTally, Is.EqualTo(decryptedTally.Result));
     }
 
@@ -189,11 +222,16 @@ public class TestCiphertextTally : DisposableBase
 
     }
 
-    [Ignore("Not implemented")]
+    //[Ignore("Not implemented")]
     [TestCase(BALLOT_COUNT_VALIDATED, false)]
     [TestCase(BALLOT_COUNT_UNVALIDATED, true)]
-    public void Test_Accumulate_Async_Cast_And_Spoiled_Ballots_Is_Valid(ulong count, bool skipValidation)
+    public void Test_Accumulate_Async_Cast_And_Spoiled_Ballots_Is_Valid(
+        ulong count, bool skipValidation)
     {
+        Console.WriteLine($"--------------- {nameof(Test_Accumulate_Async_Cast_And_Spoiled_Ballots_Is_Valid)} ------------------");
+        Console.WriteLine($"    ballots: " + count);
+        Console.WriteLine($"    skipValidation: " + skipValidation);
+
         // Arrange
         var plaintextCastBallots = Enumerable.Range(0, (int)count / 2)
             .Select(i => PlaintextBallots[i].Copy()).ToList();
@@ -202,21 +240,21 @@ public class TestCiphertextTally : DisposableBase
         var plaintextTally = new PlaintextTally("test-spoil", Data.InternalManifest);
         plaintextTally.AccumulateBallots(plaintextCastBallots);
 
-        var ciphertextCastBallots = plaintextCastBallots.Select(
-            ballot =>
-                {
-                    var encryptedBallot = Encryptor.Encrypt(ballot);
-                    encryptedBallot!.Cast();
-                    return encryptedBallot;
-                }).ToList();
+        var ciphertextCastBallots = Enumerable.Range(0, (int)count / 2)
+            .Select(i =>
+            {
+                var encryptedBallot = CiphertextBallots[i].Copy();
+                encryptedBallot!.Cast();
+                return encryptedBallot;
+            }).ToList();
 
-        var ciphertextSpoiledBallots = plaintextSpoiledBallots.Select(
-            ballot =>
-                {
-                    var encryptedBallot = Encryptor.Encrypt(ballot);
-                    encryptedBallot!.Spoil();
-                    return encryptedBallot;
-                }).ToList();
+        var ciphertextSpoiledBallots = Enumerable.Range((int)count / 2, (int)count / 2)
+            .Select(i =>
+            {
+                var encryptedBallot = CiphertextBallots[i].Copy();
+                encryptedBallot!.Spoil();
+                return encryptedBallot;
+            }).ToList();
 
         // Act
         var mediator = new TallyMediator();
@@ -226,7 +264,6 @@ public class TestCiphertextTally : DisposableBase
             Data.Context,
             Data.InternalManifest);
 
-        Console.WriteLine($"{nameof(Test_Accumulate_Async_Cast_And_Spoiled_Ballots_Is_Valid)}: ballots: " + count);
         var result = this.Benchmark(() =>
         {
             var castResult = ciphertextTally.Accumulate(ciphertextCastBallots);
@@ -235,11 +272,11 @@ public class TestCiphertextTally : DisposableBase
         }, "Accumulate");
 
         // Assert
-        Console.WriteLine($"{nameof(Test_Accumulate_Async_Cast_And_Spoiled_Ballots_Is_Valid)}: result: {result.Result}");
         Assert.That(result.Result.Accumulated, Has.Count.EqualTo(count));
         Assert.That(result.Result.Failed, Has.Count.EqualTo(0));
 
-        var decryptedTally = this.Benchmark(() => ciphertextTally.Decrypt(Data.KeyPair.SecretKey), "Decrypt");
+        var decryptedTally = this.Benchmark(() =>
+        ciphertextTally.Decrypt(Data.KeyPair.SecretKey), "Decrypt");
         Assert.That(plaintextTally, Is.EqualTo(decryptedTally.Result));
     }
 

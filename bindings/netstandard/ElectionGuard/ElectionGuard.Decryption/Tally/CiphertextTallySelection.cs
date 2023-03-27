@@ -1,5 +1,4 @@
 using ElectionGuard.Decryption.Concurrency;
-using ElectionGuard.Encryption;
 using ElectionGuard.Encryption.Ballot;
 
 namespace ElectionGuard.Decryption.Tally
@@ -30,7 +29,8 @@ namespace ElectionGuard.Decryption.Tally
         /// </summary>
         public ElGamalCiphertext Ciphertext { get; private set; } = default!;
 
-        private readonly AsyncLock _lock = new();
+        private readonly AsyncLock _mutex = new();
+        private readonly object _lock = new();
 
         public CiphertextTallySelection(
             string objectId, ulong sequenceOrder, ElementModQ descriptionHash)
@@ -75,7 +75,7 @@ namespace ElectionGuard.Decryption.Tally
             CiphertextBallotSelection selection,
             CancellationToken cancellationToken = default)
         {
-            using (await _lock.LockAsync(cancellationToken))
+            using (await _mutex.LockAsync(cancellationToken))
             {
                 return Accumulate(selection);
             }
@@ -96,7 +96,7 @@ namespace ElectionGuard.Decryption.Tally
             List<CiphertextBallotSelection> selections,
             CancellationToken cancellationToken = default)
         {
-            using (await _lock.LockAsync(cancellationToken))
+            using (await _mutex.LockAsync(cancellationToken))
             {
                 return Accumulate(selections);
             }
@@ -107,14 +107,21 @@ namespace ElectionGuard.Decryption.Tally
         /// </summary>
         public ElGamalCiphertext Accumulate(ElGamalCiphertext ciphertext)
         {
-            return Accumulate(new[] { ciphertext });
+            lock (_lock)
+            {
+                var newValue = Ciphertext.Add(ciphertext);
+                var oldValue = Ciphertext;
+                Ciphertext = newValue;
+                oldValue.Dispose();
+                return Ciphertext;
+            }
         }
 
         public async Task<ElGamalCiphertext> AccumulateAsync(
             ElGamalCiphertext ciphertext,
             CancellationToken cancellationToken = default)
         {
-            using (await _lock.LockAsync(cancellationToken))
+            using (await _mutex.LockAsync(cancellationToken))
             {
                 return Accumulate(ciphertext);
             }
@@ -126,18 +133,21 @@ namespace ElectionGuard.Decryption.Tally
         public ElGamalCiphertext Accumulate(
             IEnumerable<ElGamalCiphertext> ciphertexts)
         {
-
-            var newValue = ElGamal.Add(ciphertexts.Append(Ciphertext));
-            Ciphertext.Dispose();
-            Ciphertext = newValue;
-            return Ciphertext;
+            lock (_lock)
+            {
+                var newValue = ElGamal.Add(ciphertexts.Append(Ciphertext));
+                var oldValue = Ciphertext;
+                Ciphertext = newValue;
+                oldValue.Dispose();
+                return Ciphertext;
+            }
         }
 
         public async Task<ElGamalCiphertext> AccumulateAsync(
             IEnumerable<ElGamalCiphertext> ciphertexts,
             CancellationToken cancellationToken = default)
         {
-            using (await _lock.LockAsync(cancellationToken))
+            using (await _mutex.LockAsync(cancellationToken))
             {
                 return Accumulate(ciphertexts);
             }
