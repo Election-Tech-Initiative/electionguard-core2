@@ -12,20 +12,22 @@
     x:TypeArguments="viewModels:BallotUploadViewModel"
     ControlTemplate="{StaticResource PageTemplate}">
     <ContentPage.Resources>
-        <toolkit:InvertedBoolConverter x:Key="InvertedBoolConverter" />
+        <helper:BallotUloadPanelConverter x:Key="BallotUloadPanelConverter" />
         <helper:IsNotEmptyConverter x:Key="IsNotEmptyConverter" />
     </ContentPage.Resources>
     <Grid Style="{StaticResource NarrowCenteredGrid}">
-        <VerticalStackLayout IsVisible="{Binding ShowWizard}">
+        <VerticalStackLayout IsVisible="{Binding ShowPanel, Converter={StaticResource BallotUloadPanelConverter}, ConverterParameter=AutoUpload}">
             <Label Style="{StaticResource H1}" Text="{helper:Translate UploadWizardText}" />
             <Label Style="{StaticResource H3}" Text="{helper:Translate InsertUsbText}" />
             <ActivityIndicator
+                Margin="10"
                 HeightRequest="100"
                 IsRunning="True"
                 WidthRequest="100" />
+            <Label HorizontalTextAlignment="Center" Text="{Binding UploadText}" />
             <Button Command="{Binding ManualCommand}" Text="{helper:Translate ManuelUploadText}" />
         </VerticalStackLayout>
-        <VerticalStackLayout IsVisible="{Binding ShowWizard, Converter={StaticResource InvertedBoolConverter}}">
+        <VerticalStackLayout IsVisible="{Binding ShowPanel, Converter={StaticResource BallotUloadPanelConverter}, ConverterParameter=ManualUpload}">
             <Label Style="{StaticResource H1}" Text="{helper:Translate UploadWizardText}" />
             <StackLayout Style="{StaticResource FormControl}">
                 <Label Style="{StaticResource FormLabel}" Text="{helper:Translate DeviceFileText}" />
@@ -75,6 +77,7 @@
                     Style="{StaticResource Error}"
                     Text="{Binding FolderErrorMessage}" />
             </StackLayout>
+            <Label HorizontalTextAlignment="Center" Text="{Binding UploadText}" />
             <Grid ColumnDefinitions="auto, auto, *">
                 <Button
                     Grid.Column="0"
@@ -90,7 +93,20 @@
                     HorizontalOptions="End"
                     Text="{helper:Translate UploadWizardText}" />
             </Grid>
-
+        </VerticalStackLayout>
+        <VerticalStackLayout IsVisible="{Binding ShowPanel, Converter={StaticResource BallotUloadPanelConverter}, ConverterParameter=Results}">
+            <Label Style="{StaticResource H1}" Text="{helper:Translate BallotUploadText}" />
+            <Label Style="{StaticResource H3}" Text="{Binding ResultsText}" />
+            <Grid ColumnDefinitions="auto, auto, *">
+                <Button
+                    Grid.Column="0"
+                    Command="{Binding UploadMoreCommand}"
+                    Text="{helper:Translate UploadMoreText}" />
+                <Button
+                    Grid.Column="1"
+                    Command="{Binding CancelCommand}"
+                    Text="{helper:Translate CancelText}" />
+            </Grid>
         </VerticalStackLayout>
     </Grid>
 </views:ContentPageBase>

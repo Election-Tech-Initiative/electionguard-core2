@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Runtime.InteropServices;
 
 namespace ElectionGuard
@@ -122,9 +122,7 @@ namespace ElectionGuard
         {
             get
             {
-                var status = NativeInterface.SubmittedBallot.GetTimestamp(
-                    Handle, out ulong value);
-                status.ThrowIfError();
+                var value = NativeInterface.SubmittedBallot.GetTimestamp(Handle);
                 return value;
             }
         }
