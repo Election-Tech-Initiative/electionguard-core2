@@ -96,6 +96,19 @@ namespace electionguard
         static std::unique_ptr<ElGamalCiphertext> make(const ElementModP &pad,
                                                        const ElementModP &data);
 
+        /// <summary>
+        /// Homomorphically accumulates other ElGamal ciphertext by pairwise multiplication
+        /// and returns the result without modifying the original.
+        /// </summary>
+        std::unique_ptr<ElGamalCiphertext> elgamalAdd(const ElGamalCiphertext &b);
+
+        /// <summary>
+        /// Homomorphically accumulates another ElGamal ciphertext by pairwise multiplication
+        /// and returns the result without modifying the original.
+        /// </summary>
+        std::unique_ptr<ElGamalCiphertext>
+        elgamalAdd(const std::vector<std::reference_wrapper<ElGamalCiphertext>> &ciphertexts);
+
         /// <Summary>
         /// Decrypts an ElGamal ciphertext with a "known product" (the blinding factor used in the encryption).
         ///
@@ -208,6 +221,13 @@ namespace electionguard
     /// </summary>
     EG_API std::unique_ptr<ElGamalCiphertext>
     elgamalAdd(const std::vector<std::reference_wrapper<ElGamalCiphertext>> &ciphertexts);
+
+    /// <summary>
+    /// Homomorphically accumulates one or more ElGamal ciphertexts by pairwise multiplication.
+    /// The exponents of vote counters will add.
+    /// </summary>
+    EG_API std::unique_ptr<ElGamalCiphertext> elgamalAdd(const ElGamalCiphertext &a,
+                                                         const ElGamalCiphertext &b);
 
 #define HASHED_CIPHERTEXT_BLOCK_LENGTH 32U
 #define HASHED_BLOCK_LENGTH_IN_BITS 256U

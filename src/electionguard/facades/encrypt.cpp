@@ -353,7 +353,7 @@ eg_electionguard_status_t eg_encrypt_ballot_with_nonce(
         unique_ptr<ElementModQ> nonce_ptr{nonce};
 
         auto ciphertext = encryptBallot(*plaintext, *manifest, *context, *code_seed,
-                                        move(nonce_ptr), 0, in_should_verify_proofs);
+                                        move(nonce_ptr), 0ULL, in_should_verify_proofs);
         *out_handle = AS_TYPE(eg_ciphertext_ballot_t, ciphertext.release());
         return ELECTIONGUARD_STATUS_SUCCESS;
     } catch (const invalid_argument &e) {

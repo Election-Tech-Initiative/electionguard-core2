@@ -59,6 +59,33 @@ EG_API eg_electionguard_status_t eg_elgamal_ciphertext_crypto_hash(
   eg_elgamal_ciphertext_t *handle, eg_element_mod_q_t **out_crypto_hash);
 
 /**
+ * @brief Homomorphically accumulates one or more ElGamal ciphertexts by pairwise multiplication. 
+ * The exponents of vote counters will add.
+ * 
+ * @param[in] handle 
+ * @param[in] in_ciphertexts 
+ * @param[in] in_ciphertexts_size 
+ * @param[out] out_ciphertext 
+ * @return eg_electionguard_status_t 
+ */
+EG_API eg_electionguard_status_t eg_elgamal_ciphertext_add_collection(
+  eg_elgamal_ciphertext_t *handle, eg_elgamal_ciphertext_t *in_ciphertexts[],
+  uint64_t in_ciphertexts_size, eg_elgamal_ciphertext_t **out_ciphertext);
+
+/**
+ * @brief Homomorphically accumulates two ElGamal ciphertexts by pairwise multiplication. 
+ * The exponents of vote counters will add.
+ * 
+ * @param[in] handle
+ * @param[in] in_ciphertext_b 
+ * @param[out] out_ciphertext 
+ * @return eg_electionguard_status_t 
+ */
+EG_API eg_electionguard_status_t
+eg_elgamal_ciphertext_add(eg_elgamal_ciphertext_t *handle, eg_elgamal_ciphertext_t *in_ciphertext_b,
+                          eg_elgamal_ciphertext_t **out_ciphertext);
+
+/**
  * @brief Decrypts an ElGamal ciphertext with a "known product" (the blinding factor used in the encryption).
  * 
  * @param[in] handle The handle to the ElGamal ciphertext.
@@ -120,8 +147,21 @@ EG_API eg_electionguard_status_t eg_elgamal_ciphertext_partial_decrypt(
  * @param[out] out_ciphertext 
  * @return eg_electionguard_status_t 
  */
-EG_API eg_electionguard_status_t eg_elgamal_add(eg_elgamal_ciphertext_t *in_ciphertexts[],
-                                                uint64_t in_ciphertexts_size,
+EG_API eg_electionguard_status_t
+eg_elgamal_add_collection(eg_elgamal_ciphertext_t *in_ciphertexts[], uint64_t in_ciphertexts_size,
+                          eg_elgamal_ciphertext_t **out_ciphertext);
+
+/**
+ * @brief Homomorphically accumulates two ElGamal ciphertexts by pairwise multiplication. 
+ * The exponents of vote counters will add.
+ * 
+ * @param[in] in_ciphertext_a 
+ * @param[in] in_ciphertext_b 
+ * @param[out] out_ciphertext 
+ * @return eg_electionguard_status_t 
+ */
+EG_API eg_electionguard_status_t eg_elgamal_add(eg_elgamal_ciphertext_t *in_ciphertext_a,
+                                                eg_elgamal_ciphertext_t *in_ciphertext_b,
                                                 eg_elgamal_ciphertext_t **out_ciphertext);
 
 /**

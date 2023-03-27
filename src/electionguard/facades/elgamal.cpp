@@ -166,6 +166,42 @@ eg_electionguard_status_t eg_elgamal_ciphertext_crypto_hash(eg_elgamal_ciphertex
     }
 }
 
+eg_electionguard_status_t eg_elgamal_ciphertext_add_collection(
+  eg_elgamal_ciphertext_t *handle, eg_elgamal_ciphertext_t *in_ciphertexts[],
+  uint64_t in_ciphertexts_size, eg_elgamal_ciphertext_t **out_ciphertext)
+{
+    try {
+        auto ciphertext = AS_TYPE(ElGamalCiphertext, handle);
+        vector<reference_wrapper<ElGamalCiphertext>> ciphertexts;
+        ciphertexts.reserve(uint64_to_size(in_ciphertexts_size));
+        for (size_t i = 0; i < in_ciphertexts_size; i++) {
+            ciphertexts.push_back(*AS_TYPE(ElGamalCiphertext, in_ciphertexts[i]));
+        }
+        auto result = ciphertext->elgamalAdd(ciphertexts);
+        *out_ciphertext = AS_TYPE(eg_elgamal_ciphertext_t, result.release());
+        return ELECTIONGUARD_STATUS_SUCCESS;
+    } catch (const exception &e) {
+        Log::error(__func__, e);
+        return ELECTIONGUARD_STATUS_ERROR_RUNTIME_ERROR;
+    }
+}
+
+eg_electionguard_status_t eg_elgamal_ciphertext_add(eg_elgamal_ciphertext_t *handle,
+                                                    eg_elgamal_ciphertext_t *in_ciphertext_b,
+                                                    eg_elgamal_ciphertext_t **out_ciphertext)
+{
+    try {
+        auto *ciphertextA = AS_TYPE(ElGamalCiphertext, handle);
+        auto *ciphertextB = AS_TYPE(ElGamalCiphertext, in_ciphertext_b);
+        auto ciphertext = ciphertextA->elgamalAdd(*ciphertextB);
+        *out_ciphertext = AS_TYPE(eg_elgamal_ciphertext_t, ciphertext.release());
+        return ELECTIONGUARD_STATUS_SUCCESS;
+    } catch (const exception &e) {
+        Log::error(__func__, e);
+        return ELECTIONGUARD_STATUS_ERROR_RUNTIME_ERROR;
+    }
+}
+
 eg_electionguard_status_t
 eg_elgamal_ciphertext_decrypt_known_product(eg_elgamal_ciphertext_t *handle,
                                             eg_element_mod_p_t *in_product, uint64_t *out_plaintext)
@@ -229,9 +265,9 @@ eg_elgamal_ciphertext_partial_decrypt(eg_elgamal_ciphertext_t *handle,
 
 #pragma region ElgamalEncrypt
 
-eg_electionguard_status_t eg_elgamal_add(eg_elgamal_ciphertext_t *in_ciphertexts[],
-                                         uint64_t in_ciphertexts_size,
-                                         eg_elgamal_ciphertext_t **out_ciphertext)
+eg_electionguard_status_t eg_elgamal_add_collection(eg_elgamal_ciphertext_t *in_ciphertexts[],
+                                                    uint64_t in_ciphertexts_size,
+                                                    eg_elgamal_ciphertext_t **out_ciphertext)
 {
     try {
         vector<reference_wrapper<ElGamalCiphertext>> ciphertexts;
@@ -240,6 +276,23 @@ eg_electionguard_status_t eg_elgamal_add(eg_elgamal_ciphertext_t *in_ciphertexts
             ciphertexts.push_back(*AS_TYPE(ElGamalCiphertext, in_ciphertexts[i]));
         }
         auto ciphertext = elgamalAdd(ciphertexts);
+        *out_ciphertext = AS_TYPE(eg_elgamal_ciphertext_t, ciphertext.release());
+        return ELECTIONGUARD_STATUS_SUCCESS;
+    } catch (const exception &e) {
+        Log::error(__func__, e);
+        return ELECTIONGUARD_STATUS_ERROR_RUNTIME_ERROR;
+    }
+}
+
+eg_electionguard_status_t eg_elgamal_add(eg_elgamal_ciphertext_t *in_ciphertext_a,
+                                         eg_elgamal_ciphertext_t *in_ciphertext_b,
+                                         eg_elgamal_ciphertext_t **out_ciphertext)
+
+{
+    try {
+        auto *ciphertextA = AS_TYPE(ElGamalCiphertext, in_ciphertext_a);
+        auto *ciphertextB = AS_TYPE(ElGamalCiphertext, in_ciphertext_b);
+        auto ciphertext = elgamalAdd(*ciphertextA, *ciphertextB);
         *out_ciphertext = AS_TYPE(eg_elgamal_ciphertext_t, ciphertext.release());
         return ELECTIONGUARD_STATUS_SUCCESS;
     } catch (const exception &e) {

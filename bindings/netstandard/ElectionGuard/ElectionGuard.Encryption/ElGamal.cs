@@ -54,6 +54,26 @@ namespace ElectionGuard
             }
             return new ElGamalCiphertext(ciphertext);
         }
+
+        public static ElGamalCiphertext Add(
+            params ElGamalCiphertext[] ciphertexts)
+        {
+            return Add(ciphertexts.AsEnumerable());
+        }
+
+        public static ElGamalCiphertext Add(
+           ElGamalCiphertext a, ElGamalCiphertext b)
+        {
+            var status = NativeInterface.ElGamal.Add(
+                    a.Handle, b.Handle,
+                    out var ciphertext);
+            status.ThrowIfError();
+            if (ciphertext.IsInvalid)
+            {
+                return null;
+            }
+            return new ElGamalCiphertext(ciphertext);
+        }
     }
 
     /// <summary>

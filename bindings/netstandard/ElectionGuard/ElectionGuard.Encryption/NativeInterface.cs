@@ -416,6 +416,23 @@ namespace ElectionGuard
                 ElGamalCiphertextHandle handle,
                 out ElementModQ.ElementModQHandle crypto_base_hash);
 
+            [DllImport(DllName, EntryPoint = "eg_elgamal_ciphertext_add_collection",
+                CallingConvention = CallingConvention.Cdecl, SetLastError = true)]
+            // ReSharper disable once MemberHidesStaticFromOuterClass
+            internal static extern Status Add(
+                ElGamalCiphertextHandle self,
+                [MarshalAs(UnmanagedType.LPArray)] IntPtr[] ciphertexts,
+                ulong ciphertextsSize,
+                out ElGamalCiphertextHandle handle);
+
+            [DllImport(DllName, EntryPoint = "eg_elgamal_ciphertext_add",
+                CallingConvention = CallingConvention.Cdecl, SetLastError = true)]
+            // ReSharper disable once MemberHidesStaticFromOuterClass
+            internal static extern Status Add(
+                ElGamalCiphertextHandle self,
+                ElGamalCiphertextHandle other,
+                out ElGamalCiphertextHandle handle);
+
             [DllImport(DllName, EntryPoint = "eg_elgamal_ciphertext_decrypt_known_product",
                 CallingConvention = CallingConvention.Cdecl, SetLastError = true)]
             internal static extern Status DecryptKnownProduct(
@@ -449,12 +466,20 @@ namespace ElectionGuard
 
         internal static class ElGamal
         {
-            [DllImport(DllName, EntryPoint = "eg_elgamal_add",
+            [DllImport(DllName, EntryPoint = "eg_elgamal_add_collection",
                 CallingConvention = CallingConvention.Cdecl, SetLastError = true)]
             // ReSharper disable once MemberHidesStaticFromOuterClass
             internal static extern Status Add(
                 [MarshalAs(UnmanagedType.LPArray)] IntPtr[] ciphertexts,
                 ulong ciphertextsSize,
+                out ElGamalCiphertext.ElGamalCiphertextHandle handle);
+
+            [DllImport(DllName, EntryPoint = "eg_elgamal_add",
+                CallingConvention = CallingConvention.Cdecl, SetLastError = true)]
+            // ReSharper disable once MemberHidesStaticFromOuterClass
+            internal static extern Status Add(
+                ElGamalCiphertext.ElGamalCiphertextHandle a,
+                ElGamalCiphertext.ElGamalCiphertextHandle b,
                 out ElGamalCiphertext.ElGamalCiphertextHandle handle);
 
             [DllImport(DllName, EntryPoint = "eg_elgamal_encrypt",
@@ -2758,7 +2783,7 @@ namespace ElectionGuard
                 CallingConvention = CallingConvention.Cdecl, SetLastError = true)]
             internal static extern Status CompactEncrypt(
                 EncryptionMediatorHandle handle,
-                ElectionGuard.PlaintextBallot.External.PlaintextBallotHandle plainutext,
+                ElectionGuard.PlaintextBallot.External.PlaintextBallotHandle plaintext,
                 out CompactCiphertextBallot.CompactCiphertextBallotHandle ciphertext);
 
             [DllImport(DllName,
@@ -2766,7 +2791,7 @@ namespace ElectionGuard
                 CallingConvention = CallingConvention.Cdecl, SetLastError = true)]
             internal static extern Status CompactEncryptAndVerify(
                 EncryptionMediatorHandle handle,
-                ElectionGuard.PlaintextBallot.External.PlaintextBallotHandle plainutext,
+                ElectionGuard.PlaintextBallot.External.PlaintextBallotHandle plaintext,
                 out CompactCiphertextBallot.CompactCiphertextBallotHandle ciphertext);
 
             [DllImport(DllName, EntryPoint = "eg_encryption_mediator_encrypt_ballot",
@@ -2774,7 +2799,7 @@ namespace ElectionGuard
             // ReSharper disable once MemberHidesStaticFromOuterClass
             internal static extern Status Encrypt(
                 EncryptionMediatorHandle handle,
-                ElectionGuard.PlaintextBallot.External.PlaintextBallotHandle plainutext,
+                ElectionGuard.PlaintextBallot.External.PlaintextBallotHandle plaintext,
                 out ElectionGuard.CiphertextBallot.External.CiphertextBallotHandle ciphertext);
 
             [DllImport(DllName,
@@ -2782,7 +2807,7 @@ namespace ElectionGuard
                 CallingConvention = CallingConvention.Cdecl, SetLastError = true)]
             internal static extern Status EncryptAndVerify(
                 EncryptionMediatorHandle handle,
-                ElectionGuard.PlaintextBallot.External.PlaintextBallotHandle plainutext,
+                ElectionGuard.PlaintextBallot.External.PlaintextBallotHandle plaintext,
                 out ElectionGuard.CiphertextBallot.External.CiphertextBallotHandle ciphertext);
         }
 

@@ -107,18 +107,23 @@ namespace ElectionGuard
         {
         }
 
+        public override string ToString()
+        {
+            return ToHex();
+        }
+
         /// <Summary>
         /// exports a hex representation of the integer value in Big Endian format
         /// </Summary>
         public string ToHex()
         {
-            var status = NativeInterface.ElementModQ.ToHex(Handle, out IntPtr pointer);
+            var status = NativeInterface.ElementModQ.ToHex(Handle, out var pointer);
             if (status != Status.ELECTIONGUARD_STATUS_SUCCESS)
             {
                 throw new ElectionGuardException($"ToHex Error Status: {status}");
             }
             var value = Marshal.PtrToStringAnsi(pointer);
-            NativeInterface.Memory.FreeIntPtr(pointer);
+            _ = NativeInterface.Memory.FreeIntPtr(pointer);
             return value;
         }
 
@@ -299,7 +304,7 @@ namespace ElectionGuard
         /// </summary>
         public bool IsInBounds()
         {
-            var status = NativeInterface.ElementModQ.IsInBounds(Handle, out bool inBounds);
+            var status = NativeInterface.ElementModQ.IsInBounds(Handle, out var inBounds);
             if (status != Status.ELECTIONGUARD_STATUS_SUCCESS)
             {
                 throw new ElectionGuardException($"IsInBounds Error Status: {status}");

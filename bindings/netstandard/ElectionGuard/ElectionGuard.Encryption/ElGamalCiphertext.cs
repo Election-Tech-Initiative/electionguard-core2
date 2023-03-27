@@ -81,7 +81,11 @@ namespace ElectionGuard
 
         public ElGamalCiphertext Add(ElGamalCiphertext other)
         {
-            return ElGamal.Add(new List<ElGamalCiphertext> { this, other });
+            var status = NativeInterface.ElGamalCiphertext.Add(
+                Handle, other.Handle, out var value);
+            status.ThrowIfError();
+            return value.IsInvalid ? null : new ElGamalCiphertext(value);
+            //return ElGamal.Add(this, other);
         }
 
         /// <Summary>
@@ -142,7 +146,16 @@ namespace ElectionGuard
             var status = NativeInterface.ElGamalCiphertext.PartialDecrypt(
                 Handle, secretKey.Handle, out var value);
             status.ThrowIfError();
+            if (value.IsInvalid)
+            {
+                return null;
+            }
             return new ElementModP(value);
+        }
+
+        public override string ToString()
+        {
+            return $"ElGamalCiphertext(Pad: {Pad}, Data: {Data}, CryptoHash: {CryptoHash})";
         }
 
 #pragma warning disable CS1591 // Missing XML comment for publicly visible type or member
