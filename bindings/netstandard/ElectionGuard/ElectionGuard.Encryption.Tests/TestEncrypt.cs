@@ -90,7 +90,7 @@ namespace ElectionGuard.Encryption.Tests
         }
 
         [Test]
-        public void Test_Encrypt_Ballot_Cast_Removes_Nonces()
+        public void Test_Encrypt_Ballot_Spoil_Removes_Nonces()
         {
             // Configure the election context
             var keypair = ElGamalKeyPair.FromSecret(Constants.TWO_MOD_Q);
@@ -107,7 +107,7 @@ namespace ElectionGuard.Encryption.Tests
             var ciphertext = mediator.Encrypt(ballot);
 
             // Assert
-            ciphertext.Cast();
+            ciphertext.Spoil();
             Assert.That(ciphertext.Nonce == null);
         }
 
