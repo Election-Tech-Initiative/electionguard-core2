@@ -23,11 +23,11 @@ namespace electionguard
     /// such as siphash (https://en.wikipedia.org/wiki/SipHash)
     /// </Summary>
     struct KeyHash {
-        std::size_t operator()(const std::unique_ptr<ElementModP> &key) const
+        std::size_t operator()(const ElementModP &key) const
         {
             std::size_t hash = 0;
             for (int i = 0; i < MAX_P_LEN; i++) {
-                hash ^= key->get()[i] + 0x9e3779b9 + (hash << 6) + (hash >> 2);
+                hash ^= key.get()[i] + 0x9e3779b9 + (hash << 6) + (hash >> 2);
             }
             return hash;
         }
@@ -37,18 +37,13 @@ namespace electionguard
     /// Key Equality comparator for looking up values in the DiscreteLogTable
     /// </Summary>
     struct KeyEqual {
-        bool operator()(const std::unique_ptr<ElementModP> &lhs,
-                        const std::unique_ptr<ElementModP> &rhs) const
-        {
-            return *lhs == *rhs;
-        }
+        bool operator()(const ElementModP &lhs, const ElementModP &rhs) const { return lhs == rhs; }
     };
 
     /// <Summary>
     /// A cache of discrete log values for the group G_q
     /// </Summary>
-    using DiscreteLogTable =
-      std::unordered_map<std::unique_ptr<ElementModP>, uint64_t, KeyHash, KeyEqual>;
+    using DiscreteLogTable = std::unordered_map<ElementModP, uint64_t, KeyHash, KeyEqual>;
 
     /// <Summary>
     /// A cache of discrete log values for the group G_q
@@ -75,64 +70,10 @@ namespace electionguard
         /// <Summary>
         /// Get the discrete log value for the given element
         /// </Summary>
-        static uint64_t getAsync(const ElementModP &element)
-        {
-            // search for the existing element and returnb it if found
-            auto iter = getInstance().cache.find(element.clone());
-            if (iter != getInstance().cache.end()) {
-                return iter->second;
-            }
-
-            {
-                // otherwise, calculate the discrete log value
-                auto cached = getInstance().computeCache(element);
-                return cached;
-            }
-        }
+        static uint64_t getAsync(const ElementModP &element);
 
       protected:
-        uint64_t computeCache(const ElementModP &element)
-        {
-            // initialize the cache with the first element
-            if (cache.empty()) {
-                cache[ONE_MOD_P().clone()] = 0;
-            }
-
-            // find the element with the largest exponent
-            // using a naive iteration over the cache
-            ElementModP &lastElement = *cache.begin()->first;
-            uint64_t exponent = cache.begin()->second;
-            for (const auto &pair : cache) {
-                if (pair.second > exponent) {
-                    lastElement = std::ref(*pair.first);
-                    exponent = pair.second;
-                }
-            }
-
-            // loop until we find the element or we reach the max size
-            auto g = G();
-            while (const_cast<ElementModP &>(element) != lastElement) {
-                // increment the exponent
-                exponent++;
-
-                // check if the exponent is larger than the max
-                if (exponent > DLOG_MAX_SIZE) {
-                    throw std::out_of_range("computeCache: size is larger than max.");
-                }
-
-                // multiply the last element by g
-                auto newElement = mul_mod_p(g, lastElement);
-
-                // update the last element
-                lastElement = *newElement;
-
-                // add the new element to the cache
-                cache[std::move(newElement)] = exponent;
-            }
-
-            // return the exponent since we already have the value
-            return exponent;
-        }
+        uint64_t computeCache(const ElementModP &element);
 
       private:
         AsyncSemaphore task_lock;
