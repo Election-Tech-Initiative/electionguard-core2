@@ -18,12 +18,12 @@ namespace ElectionGuard
         {
             get
             {
-                var status = NativeInterface.Constants.G(out NativeInterface.ElementModP.ElementModPHandle handle);
+                var status = NativeInterface.Constants.G(out var handle);
                 if (status != Status.ELECTIONGUARD_STATUS_SUCCESS)
                 {
                     throw new ElectionGuardException($"G Error Status: {status}");
                 }
-                return new ElementModP(handle);
+                return handle.IsInvalid ? null : new ElementModP(handle);
             }
         }
 
@@ -34,12 +34,12 @@ namespace ElectionGuard
         {
             get
             {
-                var status = NativeInterface.Constants.P(out NativeInterface.ElementModP.ElementModPHandle handle);
+                var status = NativeInterface.Constants.P(out var handle);
                 if (status != Status.ELECTIONGUARD_STATUS_SUCCESS)
                 {
                     throw new ElectionGuardException($"P Error Status: {status}");
                 }
-                return new ElementModP(handle);
+                return handle.IsInvalid ? null : new ElementModP(handle);
             }
         }
 
@@ -50,12 +50,12 @@ namespace ElectionGuard
         {
             get
             {
-                var status = NativeInterface.Constants.R(out NativeInterface.ElementModP.ElementModPHandle handle);
+                var status = NativeInterface.Constants.R(out var handle);
                 if (status != Status.ELECTIONGUARD_STATUS_SUCCESS)
                 {
                     throw new ElectionGuardException($"R Error Status: {status}");
                 }
-                return new ElementModP(handle);
+                return handle.IsInvalid ? null : new ElementModP(handle);
             }
         }
 
@@ -66,12 +66,12 @@ namespace ElectionGuard
         {
             get
             {
-                var status = NativeInterface.Constants.ZERO_MOD_P(out NativeInterface.ElementModP.ElementModPHandle handle);
+                var status = NativeInterface.Constants.ZERO_MOD_P(out var handle);
                 if (status != Status.ELECTIONGUARD_STATUS_SUCCESS)
                 {
                     throw new ElectionGuardException($"ZERO_MOD_P Error Status: {status}");
                 }
-                return new ElementModP(handle);
+                return handle.IsInvalid ? null : new ElementModP(handle);
             }
         }
 
@@ -82,12 +82,12 @@ namespace ElectionGuard
         {
             get
             {
-                var status = NativeInterface.Constants.ONE_MOD_P(out NativeInterface.ElementModP.ElementModPHandle handle);
+                var status = NativeInterface.Constants.ONE_MOD_P(out var handle);
                 if (status != Status.ELECTIONGUARD_STATUS_SUCCESS)
                 {
                     throw new ElectionGuardException($"ONE_MOD_P Error Status: {status}");
                 }
-                return new ElementModP(handle);
+                return handle.IsInvalid ? null : new ElementModP(handle);
             }
         }
 
@@ -98,12 +98,12 @@ namespace ElectionGuard
         {
             get
             {
-                var status = NativeInterface.Constants.TWO_MOD_P(out NativeInterface.ElementModP.ElementModPHandle handle);
+                var status = NativeInterface.Constants.TWO_MOD_P(out var handle);
                 if (status != Status.ELECTIONGUARD_STATUS_SUCCESS)
                 {
                     throw new ElectionGuardException($"TWO_MOD_P Error Status: {status}");
                 }
-                return new ElementModP(handle);
+                return handle.IsInvalid ? null : new ElementModP(handle);
             }
         }
 
@@ -114,12 +114,12 @@ namespace ElectionGuard
         {
             get
             {
-                var status = NativeInterface.Constants.Q(out NativeInterface.ElementModQ.ElementModQHandle handle);
+                var status = NativeInterface.Constants.Q(out var handle);
                 if (status != Status.ELECTIONGUARD_STATUS_SUCCESS)
                 {
                     throw new ElectionGuardException($"Q Error Status: {status}");
                 }
-                return new ElementModQ(handle);
+                return handle.IsInvalid ? null : new ElementModQ(handle);
             }
         }
 
@@ -130,12 +130,12 @@ namespace ElectionGuard
         {
             get
             {
-                var status = NativeInterface.Constants.ZERO_MOD_Q(out NativeInterface.ElementModQ.ElementModQHandle handle);
+                var status = NativeInterface.Constants.ZERO_MOD_Q(out var handle);
                 if (status != Status.ELECTIONGUARD_STATUS_SUCCESS)
                 {
                     throw new ElectionGuardException($"ZERO_MOD_Q Error Status: {status}");
                 }
-                return new ElementModQ(handle);
+                return handle.IsInvalid ? null : new ElementModQ(handle);
             }
         }
 
@@ -146,12 +146,12 @@ namespace ElectionGuard
         {
             get
             {
-                var status = NativeInterface.Constants.ONE_MOD_Q(out NativeInterface.ElementModQ.ElementModQHandle handle);
+                var status = NativeInterface.Constants.ONE_MOD_Q(out var handle);
                 if (status != Status.ELECTIONGUARD_STATUS_SUCCESS)
                 {
                     throw new ElectionGuardException($"ONE_MOD_Q Error Status: {status}");
                 }
-                return new ElementModQ(handle);
+                return handle.IsInvalid ? null : new ElementModQ(handle);
             }
         }
 
@@ -162,12 +162,12 @@ namespace ElectionGuard
         {
             get
             {
-                var status = NativeInterface.Constants.TWO_MOD_Q(out NativeInterface.ElementModQ.ElementModQHandle handle);
+                var status = NativeInterface.Constants.TWO_MOD_Q(out var handle);
                 if (status != Status.ELECTIONGUARD_STATUS_SUCCESS)
                 {
                     throw new ElectionGuardException($"TWO_MOD_Q Error Status: {status}");
                 }
-                return new ElementModQ(handle);
+                return handle.IsInvalid ? null : new ElementModQ(handle);
             }
         }
 
@@ -178,10 +178,10 @@ namespace ElectionGuard
         public static string ToJson()
         {
             var status = NativeInterface.Constants.ToJson(
-                out IntPtr pointer, out _);
+                out var pointer, out _);
             status.ThrowIfError();
             var json = Marshal.PtrToStringAnsi(pointer);
-            NativeInterface.Memory.FreeIntPtr(pointer);
+            _ = NativeInterface.Memory.FreeIntPtr(pointer);
             return json;
         }
 
