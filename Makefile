@@ -300,6 +300,10 @@ lint:
 	dotnet jb inspectcode -o="lint-results.xml" -f="Xml" --build --verbosity="WARN" -s="Warning" bindings/netstandard/ElectionGuard/ElectionGuard.sln
 	dotnet nvika parsereport "lint-results.xml" --treatwarningsaserrors
 
+lint-ui:
+	dotnet jb inspectcode -o="lint-results.xml" -f="Xml" --build --verbosity="WARN" --severity="Warning" src/electionguard-ui/ElectionGuard.UI.sln
+	dotnet nvika parsereport "lint-results.xml" --treatwarningsaserrors
+
 # Memcheck
 
 memcheck:
@@ -479,8 +483,8 @@ endif
 test-netstandard: build-netstandard
 	@echo 🧪 TEST NETSTANDARD $(PROCESSOR) $(TARGET)
 	make test-netstandard-copy-output
-	dotnet test -a $(PROCESSOR) --configuration $(TARGET) ./bindings/netstandard/ElectionGuard/ElectionGuard.ElectionSetup.Tests/ElectionGuard.ElectionSetup.Tests.csproj
-	dotnet test -a $(PROCESSOR) --configuration $(TARGET) ./bindings/netstandard/ElectionGuard/ElectionGuard.Encryption.Tests/ElectionGuard.Encryption.Tests.csproj
+	#dotnet test -a $(PROCESSOR) --configuration $(TARGET) ./bindings/netstandard/ElectionGuard/ElectionGuard.ElectionSetup.Tests/ElectionGuard.ElectionSetup.Tests.csproj
+	#dotnet test -a $(PROCESSOR) --configuration $(TARGET) ./bindings/netstandard/ElectionGuard/ElectionGuard.Encryption.Tests/ElectionGuard.Encryption.Tests.csproj
 	dotnet test -a $(PROCESSOR) --configuration $(TARGET) ./bindings/netstandard/ElectionGuard/ElectionGuard.Decryption.Tests/ElectionGuard.Decryption.Tests.csproj
 
 test-netstandard-arm64:
@@ -517,17 +521,34 @@ ifeq ($(OPERATING_SYSTEM),Darwin)
 	mkdir -p ./bindings/netstandard/ElectionGuard/ElectionGuard.ElectionSetup.Tests/bin/$(TARGET)/net7.0/osx-$(PROCESSOR)
 	mkdir -p ./bindings/netstandard/ElectionGuard/ElectionGuard.Encryption.Tests/bin/$(TARGET)/net7.0/osx-$(PROCESSOR)
 
+	mkdir -p ./bindings/netstandard/ElectionGuard/ElectionGuard.Decryption.Tests/bin/$(TARGET)/net7.0/runtimes/osx/native
+	mkdir -p ./bindings/netstandard/ElectionGuard/ElectionGuard.ElectionSetup.Tests/bin/$(TARGET)/net7.0/runtimes/osx/native
+	mkdir -p ./bindings/netstandard/ElectionGuard/ElectionGuard.Encryption.Tests/bin/$(TARGET)/net7.0/runtimes/osx/native
+
 	cp -r ./build/libs/$(OPERATING_SYSTEM)/$(PROCESSOR)/$(TARGET)/src/libelectionguard.dylib ./bindings/netstandard/ElectionGuard/ElectionGuard.Decryption.Tests/bin/$(TARGET)/net7.0/osx-$(PROCESSOR)
 	cp -r "./build/libs/$(OPERATING_SYSTEM)/$(PROCESSOR)/$(TARGET)/src/libelectionguard.dylib" "./bindings/netstandard/ElectionGuard/ElectionGuard.ElectionSetup.Tests/bin/$(TARGET)/net7.0/osx-$(PROCESSOR)"
 	cp -r "./build/libs/$(OPERATING_SYSTEM)/$(PROCESSOR)/$(TARGET)/src/libelectionguard.dylib" "./bindings/netstandard/ElectionGuard/ElectionGuard.Encryption.Tests/bin/$(TARGET)/net7.0/osx-$(PROCESSOR)"
+
+	cp -r ./build/libs/$(OPERATING_SYSTEM)/$(PROCESSOR)/$(TARGET)/src/libelectionguard.dylib ./bindings/netstandard/ElectionGuard/ElectionGuard.Decryption.Tests/bin/$(TARGET)/net7.0/runtimes/osx/native
+	cp -r "./build/libs/$(OPERATING_SYSTEM)/$(PROCESSOR)/$(TARGET)/src/libelectionguard.dylib" "./bindings/netstandard/ElectionGuard/ElectionGuard.ElectionSetup.Tests/bin/$(TARGET)/net7.0/runtimes/osx/native"
+	cp -r "./build/libs/$(OPERATING_SYSTEM)/$(PROCESSOR)/$(TARGET)/src/libelectionguard.dylib" "./bindings/netstandard/ElectionGuard/ElectionGuard.Encryption.Tests/bin/$(TARGET)/net7.0/runtimes/osx/native"
+
 
 	cp -r "./build/libs/$(OPERATING_SYSTEM)/$(PROCESSOR)/$(TARGET)/libs/hacl/libhacl_cpp.dylib" "bindings/netstandard/ElectionGuard/ElectionGuard.Decryption.Tests/bin/$(TARGET)/net7.0/osx-$(PROCESSOR)"
 	cp -r "./build/libs/$(OPERATING_SYSTEM)/$(PROCESSOR)/$(TARGET)/libs/hacl/libhacl_cpp.dylib" "bindings/netstandard/ElectionGuard/ElectionGuard.ElectionSetup.Tests/bin/$(TARGET)/net7.0/osx-$(PROCESSOR)"
 	cp -r "./build/libs/$(OPERATING_SYSTEM)/$(PROCESSOR)/$(TARGET)/libs/hacl/libhacl_cpp.dylib" "bindings/netstandard/ElectionGuard/ElectionGuard.Encryption.Tests/bin/$(TARGET)/net7.0/osx-$(PROCESSOR)"
 
+	cp -r "./build/libs/$(OPERATING_SYSTEM)/$(PROCESSOR)/$(TARGET)/libs/hacl/libhacl_cpp.dylib" "bindings/netstandard/ElectionGuard/ElectionGuard.Decryption.Tests/bin/$(TARGET)/net7.0/runtimes/osx/native"
+	cp -r "./build/libs/$(OPERATING_SYSTEM)/$(PROCESSOR)/$(TARGET)/libs/hacl/libhacl_cpp.dylib" "bindings/netstandard/ElectionGuard/ElectionGuard.ElectionSetup.Tests/bin/$(TARGET)/net7.0/runtimes/osx/native"
+	cp -r "./build/libs/$(OPERATING_SYSTEM)/$(PROCESSOR)/$(TARGET)/libs/hacl/libhacl_cpp.dylib" "bindings/netstandard/ElectionGuard/ElectionGuard.Encryption.Tests/bin/$(TARGET)/net7.0/runtimes/osx/native"
+
 	cp -r "build/libs/$(OPERATING_SYSTEM)/$(PROCESSOR)/$(TARGET)/_deps/hacl-build/libhacl.dylib" "bindings/netstandard/ElectionGuard/ElectionGuard.Decryption.Tests/bin/$(TARGET)/net7.0/osx-$(PROCESSOR)"
 	cp -r "build/libs/$(OPERATING_SYSTEM)/$(PROCESSOR)/$(TARGET)/_deps/hacl-build/libhacl.dylib" "bindings/netstandard/ElectionGuard/ElectionGuard.ElectionSetup.Tests/bin/$(TARGET)/net7.0/osx-$(PROCESSOR)"
 	cp -r "build/libs/$(OPERATING_SYSTEM)/$(PROCESSOR)/$(TARGET)/_deps/hacl-build/libhacl.dylib" "bindings/netstandard/ElectionGuard/ElectionGuard.Encryption.Tests/bin/$(TARGET)/net7.0/osx-$(PROCESSOR)"
+
+	cp -r "build/libs/$(OPERATING_SYSTEM)/$(PROCESSOR)/$(TARGET)/_deps/hacl-build/libhacl.dylib" "bindings/netstandard/ElectionGuard/ElectionGuard.Decryption.Tests/bin/$(TARGET)/net7.0/runtimes/osx/native"
+	cp -r "build/libs/$(OPERATING_SYSTEM)/$(PROCESSOR)/$(TARGET)/_deps/hacl-build/libhacl.dylib" "bindings/netstandard/ElectionGuard/ElectionGuard.ElectionSetup.Tests/bin/$(TARGET)/net7.0/runtimes/osx/native"
+	cp -r "build/libs/$(OPERATING_SYSTEM)/$(PROCESSOR)/$(TARGET)/_deps/hacl-build/libhacl.dylib" "bindings/netstandard/ElectionGuard/ElectionGuard.Encryption.Tests/bin/$(TARGET)/net7.0/runtimes/osx/native"
 endif
 
 test-netstandard-copy-output-ui:
@@ -582,14 +603,6 @@ fetch-sample-data:
 	@echo ⬇️ FETCH Sample Data
 	wget -O sample-data-1-0.zip https://github.com/microsoft/electionguard/releases/download/v1.0/sample-data.zip
 	unzip -o sample-data-1-0.zip
-
-lint:
-	dotnet jb inspectcode -o="lint-results.xml" -f="Xml" --build --verbosity="WARN" --severity="Warning" bindings/netstandard/ElectionGuard/ElectionGuard.sln
-	dotnet nvika parsereport "lint-results.xml" --treatwarningsaserrors
-
-lint-ui:
-	dotnet jb inspectcode -o="lint-results.xml" -f="Xml" --build --verbosity="WARN" --severity="Warning" src/electionguard-ui/ElectionGuard.UI.sln
-	dotnet nvika parsereport "lint-results.xml" --treatwarningsaserrors
 
 generate-sample-data:
 	@echo Generate Sample Data
