@@ -41,8 +41,6 @@ public class TestCiphertextTally : DisposableBase
     private List<PlaintextBallot> PlaintextBallots = default!;
     private List<CiphertextBallot> CiphertextBallots = default!;
 
-    private EncryptionMediator Encryptor = default!;
-
     // the count of unvalidated ballots to use in the test
     private const ulong BALLOT_COUNT_UNVALIDATED = 30UL;
 
@@ -54,9 +52,6 @@ public class TestCiphertextTally : DisposableBase
     {
         var random = new Random(1);
         Data = ElectionGenerator.GenerateFakeElectionData();
-        Encryptor = new EncryptionMediator(
-            Data.InternalManifest, Data.Context, Data.Device);
-
         PlaintextBallots = Enumerable.Range(0, (int)BALLOT_COUNT_UNVALIDATED)
             .Select(i =>
                 BallotGenerator.GetFakeBallot(
@@ -67,8 +62,6 @@ public class TestCiphertextTally : DisposableBase
         // determioistically generate the seed and nonce
         var seed = random.NextElementModQ();
         var nonce = random.NextElementModQ();
-        // var seed = Constants.TWO_MOD_Q;
-        // var nonce = Constants.TWO_MOD_Q;
         CiphertextBallots = PlaintextBallots.Select(
             ballot => Encrypt.Ballot(
                 ballot,
@@ -128,7 +121,6 @@ public class TestCiphertextTally : DisposableBase
         Assert.That(decryptedTally.Result, Is.EqualTo(plaintextTally));
     }
 
-    //[Ignore("Not implemented")]
     [TestCase(BALLOT_COUNT_VALIDATED, false)]
     [TestCase(BALLOT_COUNT_UNVALIDATED, true)]
     public async Task Test_AccumulateAsync_Cast_Ballots_Is_Valid(
@@ -171,7 +163,6 @@ public class TestCiphertextTally : DisposableBase
         Assert.That(plaintextTally, Is.EqualTo(decryptedTally.Result));
     }
 
-    //[Ignore("Not implemented")]
     [TestCase(BALLOT_COUNT_VALIDATED, false)]
     [TestCase(BALLOT_COUNT_UNVALIDATED, true)]
     public void Test_Accumulate_Spoiled_Ballots_Is_Valid(
@@ -222,7 +213,6 @@ public class TestCiphertextTally : DisposableBase
 
     }
 
-    //[Ignore("Not implemented")]
     [TestCase(BALLOT_COUNT_VALIDATED, false)]
     [TestCase(BALLOT_COUNT_UNVALIDATED, true)]
     public void Test_Accumulate_Async_Cast_And_Spoiled_Ballots_Is_Valid(
@@ -278,19 +268,5 @@ public class TestCiphertextTally : DisposableBase
         var decryptedTally = this.Benchmark(() =>
         ciphertextTally.Decrypt(Data.KeyPair.SecretKey), "Decrypt");
         Assert.That(plaintextTally, Is.EqualTo(decryptedTally.Result));
-    }
-
-    protected override void DisposeUnmanaged()
-    {
-        Encryptor.Dispose();
-        foreach (var ballot in PlaintextBallots)
-        {
-            ballot.Dispose();
-        }
-        foreach (var ballot in CiphertextBallots)
-        {
-            ballot.Dispose();
-        }
-        Data.Dispose();
     }
 }
