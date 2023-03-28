@@ -132,6 +132,27 @@ namespace ElectionGuard.Encryption.Tests
         }
 
         [Test]
+        public void Test_Encrypt_Ballot_No_Mediator_Cast_IsValid_ForElection()
+        {
+            // Arrange
+            var random = new Random(1);
+            var data = ElectionGenerator.GenerateFakeElectionData();
+            var ballot = BallotGenerator.GetFakeBallot(data.InternalManifest);
+            var seed = random.NextElementModQ();
+            var nonce = random.NextElementModQ();
+
+            // Act
+            var ciphertext = Encrypt.Ballot(
+                ballot, data.InternalManifest, data.Context,
+                seed, nonce, shouldVerifyProofs: false);
+            ciphertext.Cast();
+            var result = ciphertext.IsValid(data.InternalManifest);
+
+            // Assert
+            Assert.That(result.IsValid);
+        }
+
+        [Test]
         public void Test_Encrypt_Ballot_Undervote_Succeeds()
         {
             // Arrange
