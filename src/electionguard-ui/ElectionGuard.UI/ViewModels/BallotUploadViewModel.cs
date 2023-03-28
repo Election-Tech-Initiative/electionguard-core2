@@ -146,7 +146,7 @@ public partial class BallotUploadViewModel : BaseViewModel
                 _ = Interlocked.Increment(ref totalCount);
                 UploadText = $"{AppResources.SuccessText} {totalCount} / {ballots.Length} {AppResources.Success2Text}";
             }
-            catch (Exception ex)
+            catch (Exception)
             {
             }
         });
@@ -164,7 +164,7 @@ public partial class BallotUploadViewModel : BaseViewModel
             ResultsText = $"{AppResources.SuccessText} {totalCount} {AppResources.Success2Text}";
             ShowPanel = BallotUploadPanel.Results;
         }
-        catch (Exception ex)
+        catch (Exception)
         {
         }
     }
@@ -199,7 +199,7 @@ public partial class BallotUploadViewModel : BaseViewModel
             EncryptionDevice device = new(data);
             DeviceFile = file.FullPath;
         }
-        catch (Exception ex)
+        catch (Exception)
         {
             FileErrorMessage = "File is not a device file";
         }
@@ -430,7 +430,7 @@ public partial class BallotUploadViewModel : BaseViewModel
                             DeviceFile = device;
                             break;
                         }
-                        catch (Exception ex)
+                        catch (Exception)
                         {
                         }
                     }
@@ -455,7 +455,7 @@ public partial class BallotUploadViewModel : BaseViewModel
                             _importing = false;
                         });
                     }
-                    catch (Exception ex)
+                    catch (Exception)
                     {
                         throw;
                     }
