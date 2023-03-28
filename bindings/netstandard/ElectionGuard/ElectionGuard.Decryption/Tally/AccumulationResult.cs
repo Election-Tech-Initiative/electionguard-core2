@@ -121,12 +121,12 @@ public class AccumulationResult
     public override string ToString()
     {
         var builder = new StringBuilder();
-        _ = builder.AppendLine($"Tally {TallyId}");
-        _ = builder.AppendLine($"Accumulated {Accepted.Count} ballots");
-        _ = builder.AppendLine($"Failed {Failed.Count} ballots");
+        _ = builder.AppendLine($"   Tally {TallyId}");
+        _ = builder.AppendLine($"   Accepted {Accepted.Count} ballots");
+        _ = builder.AppendLine($"   Failed {Failed.Count} ballots");
         foreach (var (ballotId, validationResult) in Failed)
         {
-            _ = builder.AppendLine($"- Ballot {ballotId}: {validationResult}");
+            _ = builder.AppendLine($"   - Ballot {ballotId}: {validationResult}");
         }
         return builder.ToString();
     }

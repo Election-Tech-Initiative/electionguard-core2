@@ -112,6 +112,9 @@ public class TestCiphertextTally : DisposableBase
             ciphertextTally.Accumulate(ciphertextBallots, skipValidation),
             "Accumulate");
 
+        Console.WriteLine($"    result: " + result.Result);
+        Console.WriteLine($"    ciphertextTally: " + ciphertextTally);
+
         // Assert
         Assert.That(result.Result.Accepted, Has.Count.EqualTo(count));
         Assert.That(result.Result.Failed, Has.Count.EqualTo(0));
@@ -153,6 +156,9 @@ public class TestCiphertextTally : DisposableBase
 
         var result = await this.BenchmarkAsync(
             async () => await ciphertextTally.AccumulateAsync(ciphertextBallots, skipValidation), "AccumulateAsync");
+
+        Console.WriteLine($"    result: " + result.Result);
+        Console.WriteLine($"    ciphertextTally: " + ciphertextTally);
 
         // Assert
         Assert.That(result.Result.Accepted, Has.Count.EqualTo(count));
@@ -196,6 +202,9 @@ public class TestCiphertextTally : DisposableBase
         var result = this.Benchmark(() =>
             ciphertextTally.Accumulate(ciphertextBallots, skipValidation),
             "Accumulate");
+
+        Console.WriteLine($"    result: " + result.Result);
+        Console.WriteLine($"    ciphertextTally: " + ciphertextTally);
 
         // Assert
         Assert.That(result.Result.Accepted, Has.Count.EqualTo(count));
@@ -279,6 +288,9 @@ public class TestCiphertextTally : DisposableBase
             var spoiledResult = ciphertextTally.Accumulate(ciphertextSpoiledBallots);
             return castResult.Add(spoiledResult);
         }, "Accumulate");
+
+        Console.WriteLine($"    result: " + result.Result);
+        Console.WriteLine($"    ciphertextTally: " + ciphertextTally);
 
         // Assert
         Assert.That(result.Result.Accepted, Has.Count.EqualTo(count));

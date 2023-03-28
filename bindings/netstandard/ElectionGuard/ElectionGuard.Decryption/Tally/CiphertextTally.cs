@@ -1,5 +1,7 @@
 using ElectionGuard.Encryption.Ballot;
 using ElectionGuard.ElectionSetup;
+using System.Text;
+
 namespace ElectionGuard.Decryption.Tally;
 
 /// <summary>
@@ -174,6 +176,20 @@ public record CiphertextTally : DisposableRecordBase, IEquatable<CiphertextTally
         }
 
         return result;
+    }
+
+    public override string ToString()
+    {
+        var sb = new StringBuilder();
+        _ = sb.AppendLine($"    TallyId: {TallyId}");
+        _ = sb.AppendLine($"    Name: {Name}");
+
+        _ = sb.AppendLine($"    CryptoExtendedBaseHash: {Context.CryptoExtendedBaseHash}");
+        _ = sb.AppendLine($"    ManifestHash: {Manifest.ManifestHash}");
+
+        _ = sb.AppendLine($"    - CastBallotIds: {CastBallotIds.Count}");
+        _ = sb.AppendLine($"    - SpoiledBallotIds: {SpoiledBallotIds.Count}");
+        return sb.ToString();
     }
 
     #region Equality Overrides
