@@ -106,7 +106,7 @@ public record CiphertextTally : DisposableRecordBase, IEquatable<CiphertextTally
         // accumulate the contests
         if (ballot.IsCast)
         {
-            Console.WriteLine($"Accumulating ballot {ballot.ObjectId}");
+            Console.WriteLine($"Accumulating ballot {ballot.ObjectId} style: {ballot.StyleId} contests: {ballot.Contests.Count}");
             foreach (var contest in ballot.Contests)
             {
                 Contests[contest.ObjectId].Accumulate(contest);
