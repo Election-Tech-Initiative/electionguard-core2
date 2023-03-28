@@ -50,7 +50,7 @@ namespace ElectionGuard.Encryption.Ballot
             }
 
             var sb = new StringBuilder();
-            _ = sb.AppendLine($"\failed: {Message}");
+            _ = sb.AppendLine($"failed: {Message}");
             foreach (var child in Children)
             {
                 _ = sb.AppendLine($"{child}");
