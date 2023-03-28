@@ -115,17 +115,17 @@ namespace ElectionGuard
         public override string ToString()
         {
             var sb = new System.Text.StringBuilder();
-            sb.AppendLine($"CiphertextBallot: {ObjectId}");
-            sb.AppendLine($"  State: {State}");
-            sb.AppendLine($"  Ballot Style: {StyleId}");
+            _ = sb.AppendLine($"CiphertextBallot: {ObjectId}");
+            _ = sb.AppendLine($"  State: {State}");
+            _ = sb.AppendLine($"  Ballot Style: {StyleId}");
             foreach (var contest in Contests)
             {
-                sb.AppendLine($"  Contest: {contest.ObjectId}");
-                sb.AppendLine($"    Selections: {contest.Selections.Count}");
+                _ = sb.AppendLine($"  Contest: {contest.ObjectId}");
+                _ = sb.AppendLine($"    Selections: {contest.SelectionsSize}");
                 foreach (var selection in contest.Selections)
                 {
-                    sb.AppendLine($"    Selection: {selection.ObjectId}");
-                    sb.AppendLine($"      Is Placeholder Selection: {selection.IsPlaceholder}");
+                    _ = sb.AppendLine($"    Selection: {selection.ObjectId}");
+                    _ = sb.AppendLine($"      Is Placeholder Selection: {selection.IsPlaceholder}");
                 }
             }
 

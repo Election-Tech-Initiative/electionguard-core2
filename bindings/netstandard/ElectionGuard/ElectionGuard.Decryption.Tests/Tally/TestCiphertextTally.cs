@@ -96,15 +96,17 @@ public class TestCiphertextTally : DisposableBase
             .Where(i => plaintextBallots.Any(j => j.ObjectId == i.ObjectId))
             .Select(ballot =>
             {
+                Console.WriteLine($"ballot: " + ballot);
                 var encryptedBallot = ballot.Copy();
                 encryptedBallot!.Cast();
+                Console.WriteLine($"copied ballot: " + encryptedBallot);
                 return encryptedBallot;
             }).ToList();
 
-        foreach (var ballot in ciphertextBallots)
-        {
-            Console.WriteLine($"    ballot: " + ballot);
-        }
+        // foreach (var ballot in ciphertextBallots)
+        // {
+        //     Console.WriteLine($"    ballot: " + ballot);
+        // }
 
         // Act
         var mediator = new TallyMediator();

@@ -64,9 +64,12 @@ namespace ElectionGuard.Encryption.Ballot
         /// Validate the selection against the description.
         /// </summary>
         public static BallotValidationResult IsValid(
-            this CiphertextBallotSelection selection, SelectionDescription description)
+            this CiphertextBallotSelection selection,
+            SelectionDescription description,
+             bool isPlaceholder = false)
         {
             return selection.ObjectId != description.ObjectId
+                && selection.IsPlaceholder == isPlaceholder
                 ? new BallotValidationResult(
                     $"Object Ids do not match for selection {selection.ObjectId} description {description.ObjectId}")
                 : selection.DescriptionHash != description.CryptoHash()
@@ -93,7 +96,7 @@ namespace ElectionGuard.Encryption.Ballot
                     $"Description hashes do not match for contest {contest.ObjectId}");
             }
 
-            if (contest.Selections.Count() !=
+            if (contest.Selections.Count !=
                 (int)description.SelectionsSize + (int)description.PlaceholdersSize)
             {
                 return new BallotValidationResult(
@@ -113,16 +116,42 @@ namespace ElectionGuard.Encryption.Ballot
                         $"Selection {selectionDescription.ObjectId} not found in contest {contest.ObjectId}"
                     ));
                 }
-
-                // validate the selection is valid
-                var result = selection.IsValid(selectionDescription);
-                if (!result.IsValid)
+                else
                 {
-                    results.Add(result);
+                    // validate the selection is valid
+                    var result = selection.IsValid(selectionDescription);
+                    if (!result.IsValid)
+                    {
+                        results.Add(result);
+                    }
                 }
             }
 
-            return new BallotValidationResult(!results.Any(), results);
+            // Verify the placeholders are valid
+            foreach (var placeholderDescription in description.Placeholders)
+            {
+                // validate there's a selection description for the selection id
+                var selection = contest.Selections
+                    .FirstOrDefault(i => i.ObjectId == placeholderDescription.ObjectId);
+                if (selection == null)
+                {
+                    results.Add(new BallotValidationResult(
+                        $"Selection {placeholderDescription.ObjectId} not found in contest {contest.ObjectId}"
+                    ));
+                }
+                else
+                {
+                    // validate the selection is valid
+                    var result = selection.IsValid(placeholderDescription, true);
+                    if (!result.IsValid)
+                    {
+                        results.Add(result);
+                    }
+                }
+            }
+
+            return new BallotValidationResult(
+                results.Count == 0 || results.All(i => i.IsValid), results);
         }
 
         /// <summary>
@@ -159,16 +188,19 @@ namespace ElectionGuard.Encryption.Ballot
                         $"Contest {contestDescription.ObjectId} not found in ballot {ballot.ObjectId}"
                     ));
                 }
-
-                // validate the contest is valid
-                var result = contest.IsValid(contestDescription);
-                if (!result.IsValid)
+                else
                 {
-                    results.Add(result);
+                    // validate the contest is valid
+                    var result = contest.IsValid(contestDescription);
+                    if (!result.IsValid)
+                    {
+                        results.Add(result);
+                    }
                 }
             }
 
-            return new BallotValidationResult(!results.Any(), results);
+            return new BallotValidationResult(
+                results.Count == 0 || results.All(i => i.IsValid), results);
         }
 
         /// <summary>
