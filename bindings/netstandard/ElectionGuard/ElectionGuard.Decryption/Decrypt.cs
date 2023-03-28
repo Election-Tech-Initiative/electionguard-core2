@@ -26,6 +26,9 @@ public static class DecryptExtensions
                 {
                     var value = ciphertext.Decrypt(secretKey);
                     plaintextSelection.Tally += value ?? 0;
+
+                    Console.WriteLine(
+                        $"Decrypted selection {selection.Key} in contest {contest.Key} with tally {plaintextSelection.Tally} and value {value} tally: {plaintextSelection.Tally}");
                 }
                 catch (Exception e)
                 {

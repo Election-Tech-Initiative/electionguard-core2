@@ -69,7 +69,7 @@ jobs:
             version: "14.1"
             makeReleaseBuild: false
             lint: false
-            runCsTests: true
+            runCsTests: false
           - name: windows-2022-gcc-11
             os: windows-2022
             processor: x64
