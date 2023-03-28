@@ -64,6 +64,7 @@ public class CiphertextTallyContest : DisposableBase, IEquatable<CiphertextTally
         var selections = contest.Selections.Where(i => !i.IsPlaceholder);
 
         Console.WriteLine($"Accumulate Contest: selections: {selections.Count()}");
+        Console.WriteLine($"Accumulate Contest: - expected: {Selections.Count}");
         if (!selections.Select(i => i.ObjectId)
             .All(Selections.ContainsKey))
         {
