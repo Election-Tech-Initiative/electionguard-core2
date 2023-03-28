@@ -101,6 +101,11 @@ public class TestCiphertextTally : DisposableBase
                 return encryptedBallot;
             }).ToList();
 
+        foreach (var ballot in ciphertextBallots)
+        {
+            Console.WriteLine($"    ballot: " + ballot);
+        }
+
         // Act
         var mediator = new TallyMediator();
         var ciphertextTally = mediator.CreateTally(

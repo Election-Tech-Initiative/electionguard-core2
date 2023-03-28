@@ -63,8 +63,9 @@ public class CiphertextTallyContest : DisposableBase, IEquatable<CiphertextTally
         // and ignore any placeholders
         var selections = contest.Selections.Where(i => !i.IsPlaceholder);
 
-        Console.WriteLine($"Accumulate Contest: selections: {selections.Count()}");
-        Console.WriteLine($"Accumulate Contest: - expected: {Selections.Count}");
+        Console.WriteLine($"     -  inbound: {contest.Selections.Count}");
+        Console.WriteLine($"     - filtered: {selections.Count()}");
+        Console.WriteLine($"     - expected: {Selections.Count}");
         if (!selections.Select(i => i.ObjectId)
             .All(Selections.ContainsKey))
         {

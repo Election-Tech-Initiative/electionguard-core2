@@ -112,6 +112,26 @@ namespace ElectionGuard
             return new CiphertextBallot(json);
         }
 
+        public override string ToString()
+        {
+            var sb = new System.Text.StringBuilder();
+            sb.AppendLine($"CiphertextBallot: {ObjectId}");
+            sb.AppendLine($"  State: {State}");
+            sb.AppendLine($"  Ballot Style: {StyleId}");
+            foreach (var contest in Contests)
+            {
+                sb.AppendLine($"  Contest: {contest.ObjectId}");
+                sb.AppendLine($"    Selections: {contest.Selections.Count}");
+                foreach (var selection in contest.Selections)
+                {
+                    sb.AppendLine($"    Selection: {selection.ObjectId}");
+                    sb.AppendLine($"      Is Placeholder Selection: {selection.IsPlaceholder}");
+                }
+            }
+
+            return sb.ToString();
+        }
+
         /// <Summary>
         /// Export the ballot representation as JSON
         /// </Summary>
