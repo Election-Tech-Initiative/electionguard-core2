@@ -1,5 +1,6 @@
 using System;
 using System.Linq;
+using ElectionGuard.Encryption.Ballot;
 using ElectionGuard.Encryption.Utils.Generators;
 using NUnit.Framework;
 
@@ -109,6 +110,25 @@ namespace ElectionGuard.Encryption.Tests
             // Assert
             ciphertext.Spoil();
             Assert.That(ciphertext.Nonce == null);
+        }
+
+        [Test]
+        public void Test_Encrypt_Ballot_Cast_IsValid_ForElection()
+        {
+            // Arrange
+            var data = ElectionGenerator.GenerateFakeElectionData();
+            var mediator = new EncryptionMediator(
+                data.InternalManifest, data.Context, data.Device);
+
+            var ballot = BallotGenerator.GetFakeBallot(data.InternalManifest);
+
+            // Act
+            var ciphertext = mediator.Encrypt(ballot);
+            ciphertext.Cast();
+            var result = ciphertext.IsValid(data.InternalManifest);
+
+            // Assert
+            Assert.That(result.IsValid);
         }
 
         [Test]
