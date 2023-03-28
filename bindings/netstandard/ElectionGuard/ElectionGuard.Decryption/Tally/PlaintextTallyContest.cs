@@ -1,5 +1,3 @@
-using System.Text;
-
 namespace ElectionGuard.Decryption.Tally;
 
 /// <summary>
@@ -10,7 +8,7 @@ public class PlaintextTallyContest : IEquatable<PlaintextTallyContest>
     /// <summary>
     /// The object id of the contest
     /// </summary>
-    public string ObjectId { get; init; } = default!;
+    public string ObjectId { get; init; }
 
     /// <summary>
     /// The sequence order of the contest
@@ -20,12 +18,12 @@ public class PlaintextTallyContest : IEquatable<PlaintextTallyContest>
     /// <summary>
     /// The hash of the contest description
     /// </summary>
-    public ElementModQ DescriptionHash { get; init; } = default!;
+    public ElementModQ DescriptionHash { get; init; }
 
     /// <summary>
     /// The collection of selections using the object id as the key
     /// </summary>
-    public Dictionary<string, PlaintextTallySelection> Selections { get; init; } = default!;
+    public Dictionary<string, PlaintextTallySelection> Selections { get; init; }
 
     public PlaintextTallyContest(
         string objectId, ulong sequenceOrder, ElementModQ descriptionHash,

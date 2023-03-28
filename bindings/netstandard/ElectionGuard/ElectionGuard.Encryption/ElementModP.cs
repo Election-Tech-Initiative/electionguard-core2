@@ -63,7 +63,7 @@ namespace ElectionGuard
         /// <summary>
         /// Create a `ElementModP`
         /// </summary>
-        /// <param name="data">integer representing the value of the initialized data</param>
+        /// <param name="singleData">integer representing the value of the initialized data</param>
         /// <param name="uncheckedInput">if data is checked or not</param>
         public ElementModP(ulong singleData, bool uncheckedInput = false)
         {

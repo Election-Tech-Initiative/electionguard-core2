@@ -5,11 +5,6 @@ public class TallyMediator : DisposableBase
     // TODO: proper data storage, such as in the mongo database
     public Dictionary<string, CiphertextTally> Tallies { get; init; } = new Dictionary<string, CiphertextTally>();
 
-    public TallyMediator()
-    {
-
-    }
-
     public CiphertextTally CreateTally(
         string name,
         CiphertextElectionContext context,

@@ -1,5 +1,4 @@
-﻿using System.Collections.Generic;
-using NativeElGamalCiphertext = ElectionGuard.NativeInterface.ElGamalCiphertext.ElGamalCiphertextHandle;
+﻿using NativeElGamalCiphertext = ElectionGuard.NativeInterface.ElGamalCiphertext.ElGamalCiphertextHandle;
 
 namespace ElectionGuard
 {

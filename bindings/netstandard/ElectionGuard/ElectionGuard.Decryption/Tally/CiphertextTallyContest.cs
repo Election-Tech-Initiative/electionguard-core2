@@ -9,7 +9,7 @@ public class CiphertextTallyContest : DisposableBase, IEquatable<CiphertextTally
     /// <summary>
     /// The object id of the contest
     /// </summary>
-    public string ObjectId { get; init; } = default!;
+    public string ObjectId { get; init; }
 
     /// <summary>
     /// The sequence order of the contest
@@ -19,12 +19,12 @@ public class CiphertextTallyContest : DisposableBase, IEquatable<CiphertextTally
     /// <summary>
     /// The hash of the contest description
     /// </summary>
-    public ElementModQ DescriptionHash { get; init; } = default!;
+    public ElementModQ DescriptionHash { get; init; }
 
     /// <summary>
     /// The collection of selections using the object id as the key
     /// </summary>
-    public Dictionary<string, CiphertextTallySelection> Selections { get; init; } = default!;
+    public Dictionary<string, CiphertextTallySelection> Selections { get; init; }
 
     public CiphertextTallyContest(
         string objectId, ulong sequenceOrder, ElementModQ descriptionHash,
@@ -61,7 +61,7 @@ public class CiphertextTallyContest : DisposableBase, IEquatable<CiphertextTally
         // all included in the selections collection
         // and ignore any placeholders
         var ballotSelections = contest.Selections
-            .Where(i => !i.IsPlaceholder);
+            .Where(i => !i.IsPlaceholder).ToList();
 
         var contestSelectionIds = ballotSelections
             .Select(i => i.ObjectId).ToList();
@@ -86,15 +86,19 @@ public class CiphertextTallyContest : DisposableBase, IEquatable<CiphertextTally
         // check that the contest selections are 
         // all included in the selections collection
         // and ignore any placeholders
-        var selections = contest.Selections.Where(i => !i.IsPlaceholder);
-        if (!selections.Select(i => i.ObjectId)
-            .All(Selections.ContainsKey))
+        var ballotSelections = contest.Selections
+            .Where(i => !i.IsPlaceholder).ToList();
+
+        var contestSelectionIds = ballotSelections
+            .Select(i => i.ObjectId).ToList();
+
+        if (!Selections.Keys.All(contestSelectionIds.Contains))
         {
             throw new ArgumentException("Selections do not match contest");
         }
 
         var tasks = new List<Task>();
-        foreach (var selection in selections)
+        foreach (var selection in ballotSelections)
         {
             tasks.Add(
                 Selections[selection.ObjectId].AccumulateAsync(

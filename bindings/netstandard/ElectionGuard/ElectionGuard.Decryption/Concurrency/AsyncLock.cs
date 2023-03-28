@@ -62,7 +62,7 @@ public sealed class QueueAsyncLock : DisposableBase
             throw new ArgumentNullException(nameof(action));
         }
 
-        Wait(action, static closureAction => closureAction!());
+        Wait(action, static closureAction => closureAction());
     }
 
     /// <summary>

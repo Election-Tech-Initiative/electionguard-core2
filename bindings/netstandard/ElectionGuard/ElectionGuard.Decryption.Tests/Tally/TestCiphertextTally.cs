@@ -178,8 +178,6 @@ public class TestCiphertextTally : DisposableBase
         Console.WriteLine($"    skipValidation: " + skipValidation);
 
         // Arrange
-        var plaintextBallots = Enumerable.Range(0, (int)count)
-            .Select(i => PlaintextBallots[i].Copy()).ToList();
         var plaintextTally = new PlaintextTally("test-spoil",
             Data.InternalManifest);
         var ciphertextBallots = Enumerable.Range(0, (int)count)

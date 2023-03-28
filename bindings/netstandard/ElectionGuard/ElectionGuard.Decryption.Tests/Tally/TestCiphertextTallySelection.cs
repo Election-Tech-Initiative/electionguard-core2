@@ -23,7 +23,7 @@ public class TestCiphertextTallySelection
         const ulong count = 4;
         var publicKey = keyPair.PublicKey;
         var ciphertexts = Enumerable.Range(0, (int)count)
-            .Select(i => ElGamal.Encrypt(vote, nonce, publicKey));
+            .Select(_ => ElGamal.Encrypt(vote, nonce, publicKey)).ToList();
 
         // Act
         var subject = new CiphertextTallySelection(

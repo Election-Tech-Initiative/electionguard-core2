@@ -12,7 +12,7 @@ namespace ElectionGuard.Decryption.Tally
         /// <summary>
         /// The object id of the selection
         /// </summary>
-        public string ObjectId { get; init; } = default!;
+        public string ObjectId { get; init; }
 
         /// <summary>
         /// The sequence order of the selection
@@ -22,12 +22,12 @@ namespace ElectionGuard.Decryption.Tally
         /// <summary>
         /// The hash of the SelectionDescription
         /// </summary>
-        public ElementModQ DescriptionHash { get; init; } = default!;
+        public ElementModQ DescriptionHash { get; init; }
 
         /// <summary>
         /// The encrypted representation of the sum of all ballots for the selection
         /// </summary>
-        public ElGamalCiphertext Ciphertext { get; private set; } = default!;
+        public ElGamalCiphertext Ciphertext { get; private set; }
 
         private readonly AsyncLock _mutex = new();
         private readonly object _lock = new();

@@ -19,6 +19,7 @@ namespace ElectionGuard
         /// </summary>
         /// <param name="sizeResolver">The function that resolves the collection size</param>
         /// <param name="itemResolver">The function that resolves the item at the specified index</param>
+        /// </summary>
         public ElectionGuardEnumerator(
             Func<int> sizeResolver, Func<int, T> itemResolver)
         {

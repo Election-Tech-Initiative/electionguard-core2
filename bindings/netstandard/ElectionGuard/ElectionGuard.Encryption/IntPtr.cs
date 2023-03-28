@@ -1,15 +1,14 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Runtime.InteropServices;
-using System.Text;
 
 namespace ElectionGuard
 {
     public static class IntPtrExtension
     {
-        public static IntPtr Offset(this IntPtr ptr, Int64 that)
+        public static IntPtr Offset(this IntPtr ptr, long that)
         {
-            return new IntPtr(ptr.ToInt64() + (that));
+            return new IntPtr(ptr.ToInt64() + that);
         }
 
         public static string PtrToStringUTF8(this IntPtr rawPtr)
@@ -19,10 +18,10 @@ namespace ElectionGuard
                 return null;
             }
 
-            List<Byte> bytes = new List<Byte>();
+            var bytes = new List<byte>();
             while (true)
             {
-                Byte b = Marshal.ReadByte(rawPtr);
+                var b = Marshal.ReadByte(rawPtr);
                 if (b == 0)
                 {
                     break;

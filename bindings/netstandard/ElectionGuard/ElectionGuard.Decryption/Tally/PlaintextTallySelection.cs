@@ -5,7 +5,7 @@ namespace ElectionGuard.Decryption.Tally;
 /// </summary>
 public class PlaintextTallySelection : IEquatable<PlaintextTallySelection>
 {
-    public string ObjectId { get; set; } = default!;
+    public string ObjectId { get; init; }
 
     /// <summary>
     /// The sequence order of the selection
@@ -15,7 +15,7 @@ public class PlaintextTallySelection : IEquatable<PlaintextTallySelection>
     /// <summary>
     /// The hash of the SelectionDescription
     /// </summary>
-    public ElementModQ DescriptionHash { get; init; } = default!;
+    public ElementModQ DescriptionHash { get; init; }
 
     /// <summary>
     /// The decrypted representation of the sum of all ballots for the selection

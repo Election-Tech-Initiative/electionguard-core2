@@ -1,11 +1,8 @@
 ﻿using System;
 using System.Runtime.InteropServices;
-using System.Text;
 
 namespace ElectionGuard
 {
-    using NativeInternationalizedText = NativeInterface.InternationalizedText.InternationalizedTextHandle;
-    using NativeContactInformation = NativeInterface.ContactInformation.ContactInformationHandle;
     using NativeGeopoliticalUnit = NativeInterface.GeopoliticalUnit.GeopoliticalUnitHandle;
     using NativeBallotStyle = NativeInterface.BallotStyle.BallotStyleHandle;
     using NativeParty = NativeInterface.Party.PartyHandle;

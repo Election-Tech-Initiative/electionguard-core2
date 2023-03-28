@@ -42,10 +42,10 @@ namespace ElectionGuard
             IEnumerable<ElGamalCiphertext> ciphertexts)
         {
             var nativeCiphertexts =
-                ciphertexts.Select(c => c.Handle.Ptr);
+                ciphertexts.Select(c => c.Handle.Ptr).ToList();
 
             var status = NativeInterface.ElGamal.Add(
-                    nativeCiphertexts.ToArray(), (ulong)nativeCiphertexts.Count(),
+                    nativeCiphertexts.ToArray(), (ulong)nativeCiphertexts.Count,
                     out var ciphertext);
             status.ThrowIfError();
             if (ciphertext.IsInvalid)

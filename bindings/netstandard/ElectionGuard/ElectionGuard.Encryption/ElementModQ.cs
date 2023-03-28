@@ -89,7 +89,7 @@ namespace ElectionGuard
         /// <summary>
         /// Create a `ElementModQ`
         /// </summary>
-        /// <param name="data">integer representing the value of the initialized data</param>
+        /// <param name="newData">integer representing the value of the initialized data</param>
         /// <param name="uncheckedInput">if data is checked or not</param>
         public ElementModQ(ulong newData, bool uncheckedInput = false)
         {
