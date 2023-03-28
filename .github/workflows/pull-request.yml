@@ -69,7 +69,7 @@ jobs:
             version: "14.1"
             makeReleaseBuild: false
             lint: false
-            runCsTests: false
+            runCsTests: true
           - name: windows-2022-gcc-11
             os: windows-2022
             processor: x64
@@ -147,7 +147,7 @@ jobs:
           arch: amd64_x86
 
       # Environment
-      
+
       - name: Configure Environment
         run: make environment
 
@@ -167,7 +167,7 @@ jobs:
         env:
           PROCESSOR: ${{ matrix.processor }}
         if: runner.os == 'macOS'
-        run:  make test
+        run: make test
 
       - name: Run Tests (Windows)
         env:
