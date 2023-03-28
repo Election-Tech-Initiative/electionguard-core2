@@ -120,12 +120,10 @@ namespace ElectionGuard
             _ = sb.AppendLine($"  Ballot Style: {StyleId}");
             foreach (var contest in Contests)
             {
-                _ = sb.AppendLine($"  Contest: {contest.ObjectId}");
-                _ = sb.AppendLine($"    Selections: {contest.SelectionsSize}");
+                _ = sb.AppendLine($"  Contest: {contest.ObjectId} Selections: {contest.SelectionsSize}");
                 foreach (var selection in contest.Selections)
                 {
-                    _ = sb.AppendLine($"    Selection: {selection.ObjectId}");
-                    _ = sb.AppendLine($"      Is Placeholder Selection: {selection.IsPlaceholder}");
+                    _ = sb.AppendLine($"    Selection: {selection.ObjectId} IsPlaceholder: {selection.IsPlaceholder}");
                 }
             }
 

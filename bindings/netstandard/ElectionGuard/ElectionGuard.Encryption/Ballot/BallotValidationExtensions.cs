@@ -69,12 +69,14 @@ namespace ElectionGuard.Encryption.Ballot
              bool isPlaceholder = false)
         {
             return selection.ObjectId != description.ObjectId
-                && selection.IsPlaceholder == isPlaceholder
                 ? new BallotValidationResult(
                     $"Object Ids do not match for selection {selection.ObjectId} description {description.ObjectId}")
                 : selection.DescriptionHash != description.CryptoHash()
                 ? new BallotValidationResult(
                     $"Description hashes do not match for selection {selection.ObjectId}")
+                : selection.IsPlaceholder != isPlaceholder
+                ? new BallotValidationResult(
+                    $"IsPlaceholder does not match for selection {selection.ObjectId}")
                 : new BallotValidationResult(true);
         }
 
@@ -136,7 +138,7 @@ namespace ElectionGuard.Encryption.Ballot
                 if (selection == null)
                 {
                     results.Add(new BallotValidationResult(
-                        $"Selection {placeholderDescription.ObjectId} not found in contest {contest.ObjectId}"
+                        $"Placeholder {placeholderDescription.ObjectId} not found in contest {contest.ObjectId}"
                     ));
                 }
                 else

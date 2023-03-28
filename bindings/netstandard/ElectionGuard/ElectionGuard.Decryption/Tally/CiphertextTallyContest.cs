@@ -61,17 +61,21 @@ public class CiphertextTallyContest : DisposableBase, IEquatable<CiphertextTally
         // check that the contest selections are 
         // all included in the selections collection
         // and ignore any placeholders
-        var selections = contest.Selections.Where(i => !i.IsPlaceholder);
+        var ballotSelections = contest.Selections
+            .Where(i => !i.IsPlaceholder);
+
+        var contestSelectionIds = ballotSelections
+            .Select(i => i.ObjectId).ToList();
 
         Console.WriteLine($"     -  inbound: {contest.Selections.Count}");
-        Console.WriteLine($"     - filtered: {selections.Count()}");
+        Console.WriteLine($"     - filtered: {contestSelectionIds.Count}");
         Console.WriteLine($"     - expected: {Selections.Count}");
-        if (!selections.Select(i => i.ObjectId)
-            .All(Selections.ContainsKey))
+
+        if (!Selections.Keys.All(contestSelectionIds.Contains))
         {
             throw new ArgumentException("Selections do not match contest");
         }
-        foreach (var selection in selections)
+        foreach (var selection in ballotSelections)
         {
             _ = Selections[selection.ObjectId].Accumulate(selection);
         }

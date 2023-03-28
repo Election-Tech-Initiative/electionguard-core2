@@ -100,13 +100,13 @@ public record CiphertextTally : DisposableRecordBase, IEquatable<CiphertextTally
         var addResult = TryAddBallot(ballot, skipValidation);
         if (!addResult.IsValid)
         {
+            Console.WriteLine($"Ballot {ballot.ObjectId} was not added to the tally");
             return new AccumulationResult(TallyId, ballot.ObjectId, addResult);
         }
 
         // accumulate the contests
         if (ballot.IsCast)
         {
-            Console.WriteLine($"Accumulating ballot {ballot.ObjectId} style: {ballot.StyleId} contests: {ballot.Contests.Count}");
             foreach (var contest in ballot.Contests)
             {
                 Contests[contest.ObjectId].Accumulate(contest);
@@ -234,6 +234,7 @@ public record CiphertextTally : DisposableRecordBase, IEquatable<CiphertextTally
             : ballot.IsValid(Manifest, Context);
         if (!isValid.IsValid)
         {
+            Console.WriteLine($"Ballot {ballot.ObjectId} is not valid");
             return isValid;
         }
 
