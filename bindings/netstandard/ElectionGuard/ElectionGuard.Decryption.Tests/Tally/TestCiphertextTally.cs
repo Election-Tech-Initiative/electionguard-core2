@@ -96,7 +96,6 @@ public class TestCiphertextTally : DisposableBase
             .Where(i => plaintextBallots.Any(j => j.ObjectId == i.ObjectId))
             .Select(ballot =>
             {
-                Console.WriteLine($"ballot: " + ballot);
                 var encryptedBallot = ballot.Copy();
                 encryptedBallot!.Cast();
                 return encryptedBallot;
