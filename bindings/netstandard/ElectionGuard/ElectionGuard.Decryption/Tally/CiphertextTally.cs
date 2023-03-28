@@ -100,7 +100,6 @@ public record CiphertextTally : DisposableRecordBase, IEquatable<CiphertextTally
         var addResult = TryAddBallot(ballot, skipValidation);
         if (!addResult.IsValid)
         {
-            Console.WriteLine($"Ballot {ballot.ObjectId} was not added to the tally");
             return new AccumulationResult(TallyId, ballot.ObjectId, addResult);
         }
 
@@ -234,7 +233,6 @@ public record CiphertextTally : DisposableRecordBase, IEquatable<CiphertextTally
             : ballot.IsValid(Manifest, Context);
         if (!isValid.IsValid)
         {
-            Console.WriteLine($"Ballot {ballot.ObjectId} is not valid");
             return isValid;
         }
 

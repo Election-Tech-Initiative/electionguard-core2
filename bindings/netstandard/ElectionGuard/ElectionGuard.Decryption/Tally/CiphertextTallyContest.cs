@@ -57,7 +57,6 @@ public class CiphertextTallyContest : DisposableBase, IEquatable<CiphertextTally
     /// </summary>
     public void Accumulate(CiphertextBallotContest contest)
     {
-        Console.WriteLine($"Accumulate Contest: {contest.ObjectId}");
         // check that the contest selections are 
         // all included in the selections collection
         // and ignore any placeholders
@@ -66,10 +65,6 @@ public class CiphertextTallyContest : DisposableBase, IEquatable<CiphertextTally
 
         var contestSelectionIds = ballotSelections
             .Select(i => i.ObjectId).ToList();
-
-        Console.WriteLine($"     -  inbound: {contest.Selections.Count}");
-        Console.WriteLine($"     - filtered: {contestSelectionIds.Count}");
-        Console.WriteLine($"     - expected: {Selections.Count}");
 
         if (!Selections.Keys.All(contestSelectionIds.Contains))
         {
