@@ -109,9 +109,11 @@ namespace ElectionGuard.Decryption.Tally
         {
             lock (_lock)
             {
+                Console.WriteLine($"Accumulate: {ObjectId}" + ciphertext);
                 var newValue = Ciphertext.Add(ciphertext);
                 var oldValue = Ciphertext;
                 Ciphertext = newValue;
+                Console.WriteLine($"Accumulate: result" + Ciphertext);
                 oldValue.Dispose();
                 return Ciphertext;
             }
