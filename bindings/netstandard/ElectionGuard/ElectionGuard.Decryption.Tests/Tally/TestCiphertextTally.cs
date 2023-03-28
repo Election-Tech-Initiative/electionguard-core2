@@ -206,11 +206,27 @@ public class TestCiphertextTally : DisposableBase
         Assert.That(plaintextTally, Is.EqualTo(decryptedTally.Result));
     }
 
-    [Ignore("Not implemented")]
-    [Test]
-    public void Test_Accumulate_Invalid_Input_Fails()
+    [TestCase(BALLOT_COUNT_UNVALIDATED, true)]
+    public void Test_Accumulate_Invalid_Input_Fails(ulong count, bool skipValidation)
     {
+        // Arrange
+        var ciphertextBallots = Enumerable.Range(0, (int)count)
+            .Select(i => CiphertextBallots[i].Copy()).ToList();
+        var plaintextTally = new PlaintextTally("test-input", Data.InternalManifest);
 
+        // Act
+        var mediator = new TallyMediator();
+        var ciphertextTally = mediator.CreateTally(
+            plaintextTally.TallyId,
+            plaintextTally.Name,
+            Data.Context,
+            Data.InternalManifest);
+
+        // Assert
+        _ = Assert.Throws(typeof(ArgumentException), () =>
+        {
+            _ = ciphertextTally.Accumulate(ciphertextBallots, skipValidation);
+        });
     }
 
     [TestCase(BALLOT_COUNT_VALIDATED, false)]
