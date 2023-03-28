@@ -92,10 +92,11 @@ public class TestCiphertextTally : DisposableBase
         var plaintextTally = new PlaintextTally("test-cast",
             Data.InternalManifest);
         plaintextTally.AccumulateBallots(plaintextBallots);
-        var ciphertextBallots = Enumerable.Range(0, (int)count)
-            .Select(i =>
+        var ciphertextBallots = CiphertextBallots
+            .Where(i => plaintextBallots.Any(j => j.ObjectId == i.ObjectId))
+            .Select(ballot =>
             {
-                var encryptedBallot = CiphertextBallots[i].Copy();
+                var encryptedBallot = ballot.Copy();
                 encryptedBallot!.Cast();
                 return encryptedBallot;
             }).ToList();

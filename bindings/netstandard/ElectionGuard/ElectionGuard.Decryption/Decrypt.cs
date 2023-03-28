@@ -28,7 +28,7 @@ public static class DecryptExtensions
                     plaintextSelection.Tally += value ?? 0;
 
                     Console.WriteLine(
-                        $"Decrypted selection {selection.Key} in contest {contest.Key} with tally {plaintextSelection.Tally} and value {value} tally: {plaintextSelection.Tally}");
+                        $"Decrypted selection {selection.Key} in contest {contest.Key} with tally {plaintextSelection.Tally} and value {value}");
                 }
                 catch (Exception e)
                 {
