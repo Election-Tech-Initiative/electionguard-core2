@@ -128,6 +128,10 @@ namespace ElectionGuard.Encryption.Tests
             var result = ciphertext.IsValid(data.InternalManifest);
 
             // Assert
+            if (!result.IsValid)
+            {
+                Console.WriteLine(result);
+            }
             Assert.That(result.IsValid);
         }
 
@@ -149,6 +153,10 @@ namespace ElectionGuard.Encryption.Tests
             var result = ciphertext.IsValid(data.InternalManifest);
 
             // Assert
+            if (!result.IsValid)
+            {
+                Console.WriteLine(result);
+            }
             Assert.That(result.IsValid);
         }
 
