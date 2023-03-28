@@ -152,14 +152,13 @@ jobs:
 
       # Build Cache
       - name: Restore C++ Build Cache
-        uses: actions/cache@v2
+        id: restore-build-cache
+        uses: actions/cache/restore@v3
         with:
           path: |
+            .cache/
             build/
-          key: ${{ matrix.name }}-build-${{ hashFiles('.cache', 'include', 'src/electionguard') }}
-          restore-keys: |
-            ${{ matrix.name }}-build-
-            ${{ matrix.name }}-
+          key: ${{ matrix.name }}-build-${{ hashFiles('.cache', 'cmake', 'include', 'src/electionguard') }}
 
       # Lint
       - name: Lint
@@ -199,11 +198,9 @@ jobs:
 
       # Save build cache
       - name: Save C++ Build Cache
-        uses: actions/cache@v2
+        uses: actions/cache/save@v3
         with:
           path: |
+            .cache/
             build/
-          key: ${{ matrix.name }}-build-${{ hashFiles('.cache', 'include', 'src/electionguard') }}
-          restore-keys: |
-            ${{ matrix.name }}-build-
-            ${{ matrix.name }}-
+          key: ${{ steps.restore-build-cache.outputs.cache-primary-key }}

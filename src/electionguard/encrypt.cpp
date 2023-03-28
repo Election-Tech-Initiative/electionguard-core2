@@ -217,7 +217,7 @@ namespace electionguard
                 }
             }
 
-            // no selections provided for the contest, so create a placeholder contest
+            // no selections provided for the contest, so create a placeholder selection
             if (!hasSelection) {
                 selections.push_back(selectionFrom(selectionDescription));
             }
