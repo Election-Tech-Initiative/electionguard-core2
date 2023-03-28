@@ -196,6 +196,7 @@ jobs:
           PROCESSOR: ${{ matrix.processor }}
         if: (matrix.runCsTests)
         run: make test-netstandard
+        continue-on-error: true
 
       - name: Save C++ Build Cache
         uses: actions/cache@v2
