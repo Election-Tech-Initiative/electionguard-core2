@@ -15,8 +15,8 @@
 #include <cstring>
 #include <memory>
 #include <nlohmann/json.hpp>
-#include <unordered_map>
 #include <regex>
+#include <unordered_map>
 
 using electionguard::G;
 using electionguard::P;
@@ -25,9 +25,9 @@ using electionguard::R;
 using nlohmann::json;
 using std::make_unique;
 using std::reference_wrapper;
-using std::string;
 using std::regex;
 using std::regex_replace;
+using std::string;
 using std::to_string;
 using std::unique_ptr;
 using std::vector;
@@ -585,7 +585,7 @@ namespace electionguard
             static string toJson(const electionguard::Manifest &serializable)
             {
                 auto manifestStr = fromObject(serializable).dump();
-                // special characters like ú are converted to ascii escapes in C# but then 
+                // special characters like ú are converted to ascii escapes in C# but then
                 //      https://github.com/nlohmann/json has a bug where it duplicates slashes,
                 //      so this code removes the duplicates to work around the bug
                 return regex_replace(manifestStr, regex("\\\\\\\\u"), "\\u");
@@ -1139,6 +1139,7 @@ namespace electionguard
                 json result = {
                   {"object_id", serializable.getObjectId()},
                   {"style_id", serializable.getStyleId()},
+                  {"state", serializable.getState()},
                   {"manifest_hash", serializable.getManifestHash()->toHex()},
                   {"code_seed", serializable.getBallotCodeSeed()->toHex()},
                   {"contests", contests},
@@ -1155,6 +1156,7 @@ namespace electionguard
             {
                 auto object_id = j["object_id"].get<string>();
                 auto style_id = j["style_id"].get<string>();
+                auto serialized_state = j["state"].get<uint64_t>();
                 auto manifest_hash = j["manifest_hash"].get<string>();
                 auto code_seed = j["code_seed"].get<string>();
                 auto ballot_code = j["code"].get<string>();
@@ -1290,12 +1292,15 @@ namespace electionguard
 
                 auto nonce = ballot_nonce.empty() ? make_unique<ElementModQ>(ZERO_MOD_Q())
                                                   : ElementModQ::fromHex(ballot_nonce);
+                auto state = serialized_state == 0
+                               ? BallotBoxState::unknown
+                               : electionguard::BallotBoxState(serialized_state);
 
                 return make_unique<electionguard::CiphertextBallot>(
                   object_id, style_id, *ElementModQ::fromHex(manifest_hash),
                   ElementModQ::fromHex(code_seed), move(ciphertextContests),
                   ElementModQ::fromHex(ballot_code), timestamp, move(nonce),
-                  ElementModQ::fromHex(crypto_hash));
+                  ElementModQ::fromHex(crypto_hash), state);
             }
 
           public:

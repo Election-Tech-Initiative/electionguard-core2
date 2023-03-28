@@ -45,9 +45,9 @@ namespace electionguard
 
     // Lifecycle Methods
 
-    CompactPlaintextBallot::CompactPlaintextBallot(
-      const string &objectId, const string &styleId, vector<uint64_t> selections,
-      std::vector<std::string> writeins)
+    CompactPlaintextBallot::CompactPlaintextBallot(const string &objectId, const string &styleId,
+                                                   vector<uint64_t> selections,
+                                                   std::vector<std::string> writeins)
         : pimpl(new Impl(objectId, styleId, move(selections), move(writeins)))
     {
     }
@@ -66,7 +66,6 @@ namespace electionguard
 
     vector<uint64_t> CompactPlaintextBallot::getSelections() const { return pimpl->selections; }
     vector<string> CompactPlaintextBallot::getWriteIns() const { return pimpl->writeins; }
-
 
     // Public Static Methods
 
@@ -328,6 +327,12 @@ namespace electionguard
         auto ciphertext =
           encryptBallot(*plaintext, manifest, context, *compactCiphertext.getBallotCodeSeed(),
                         compactCiphertext.getNonce()->clone(), compactCiphertext.getTimestamp());
+
+        if (compactCiphertext.getBallotBoxState() == BallotBoxState::cast) {
+            ciphertext->cast();
+        } else if (compactCiphertext.getBallotBoxState() == BallotBoxState::spoiled) {
+            ciphertext->spoil();
+        }
 
         if (*ciphertext->getBallotCode() != *compactCiphertext.getBallotCode()) {
             throw runtime_error("The regenerated ballot code does not match");

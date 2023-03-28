@@ -60,6 +60,10 @@ namespace ElectionGuard
                 var status = External.GetExtendedData(
                     Handle, out NativeInterface.ExtendedData.ExtendedDataHandle value);
                 status.ThrowIfError();
+                if (value.IsInvalid)
+                {
+                    return null;
+                }
                 return new ExtendedData(value);
             }
         }

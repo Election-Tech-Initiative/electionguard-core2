@@ -15,6 +15,11 @@ namespace ElectionGuard
     public partial class CiphertextBallot : DisposableBase
     {
         /// <summary>
+        /// Get the BallotBoxState
+        /// </summary>
+        public BallotBoxState State => NativeInterface.CiphertextBallot.GetState(Handle);
+
+        /// <summary>
         /// Creates an <see cref="CiphertextBallot">CiphertextBallot</see> object from a <see href="https://www.rfc-editor.org/rfc/rfc8259.html#section-8.1">[RFC-8259]</see> UTF-8 encoded JSON string
         /// </summary>
         /// <param name="json">A UTF-8 Encoded JSON data string</param>
@@ -43,6 +48,24 @@ namespace ElectionGuard
         internal CiphertextBallot(External.CiphertextBallotHandle handle)
         {
             Handle = handle;
+        }
+
+        /// <summary>
+        /// A helper function to mark the ballot as cast and remove sensitive values like the nonce.
+        /// </summary>
+        public void Cast()
+        {
+            var status = NativeInterface.CiphertextBallot.Cast(Handle);
+            status.ThrowIfError();
+        }
+
+        /// <summary>
+        /// A helper function to mark the ballot as spoiled and remove sensitive values like the nonce.
+        /// </summary>
+        public void Spoil()
+        {
+            var status = NativeInterface.CiphertextBallot.Spoil(Handle);
+            status.ThrowIfError();
         }
 
         /// <Summary>

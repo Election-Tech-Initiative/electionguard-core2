@@ -13,6 +13,7 @@ namespace ElectionGuard
     ///
     /// Do not make this class directly. Use `make_ciphertext_submitted_ballot` or `from_ciphertext_ballot` instead.
     /// </summary>
+    [Obsolete("This class is deprecated and will be removed in a future release. Use CiphertextBallot instead.")]
     public class SubmittedBallot : DisposableBase
     {
         /// <summary>
