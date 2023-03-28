@@ -14,9 +14,10 @@ public class AccumulationResult
     public string TallyId { get; init; }
 
     /// <summary>
-    /// The set of ballot ids that were successfully accumulated
+    /// The set of ballot ids that were successfully accepted
+    /// includes both cast and spoiled records
     /// </summary>
-    public HashSet<string> Accumulated { get; init; }
+    public HashSet<string> Accepted { get; init; }
 
     /// <summary>
     /// The set of ballot ids that failed to accumulate along with the reason
@@ -26,7 +27,7 @@ public class AccumulationResult
     public AccumulationResult(string tallyId)
     {
         TallyId = tallyId;
-        Accumulated = new HashSet<string>();
+        Accepted = new HashSet<string>();
         Failed = new Dictionary<string, BallotValidationResult>();
     }
 
@@ -35,7 +36,7 @@ public class AccumulationResult
         string ballotId)
     {
         TallyId = tallyId;
-        Accumulated = new HashSet<string>() { ballotId };
+        Accepted = new HashSet<string>() { ballotId };
         Failed = new Dictionary<string, BallotValidationResult>();
     }
 
@@ -44,7 +45,7 @@ public class AccumulationResult
         HashSet<string> accumulatedBallotIds)
     {
         TallyId = tallyId;
-        Accumulated = accumulatedBallotIds;
+        Accepted = accumulatedBallotIds;
         Failed = new Dictionary<string, BallotValidationResult>();
     }
 
@@ -53,7 +54,7 @@ public class AccumulationResult
         Dictionary<string, BallotValidationResult> failedBallotIds)
     {
         TallyId = tallyId;
-        Accumulated = new HashSet<string>();
+        Accepted = new HashSet<string>();
         Failed = failedBallotIds;
     }
 
@@ -63,7 +64,7 @@ public class AccumulationResult
         Dictionary<string, BallotValidationResult> failedBallotIds)
     {
         TallyId = tallyId;
-        Accumulated = accumulatedBallotIds;
+        Accepted = accumulatedBallotIds;
         Failed = failedBallotIds;
     }
 
@@ -73,7 +74,7 @@ public class AccumulationResult
         BallotValidationResult validationResult)
     {
         TallyId = tallyId;
-        Accumulated = new HashSet<string>();
+        Accepted = new HashSet<string>();
         Failed = new Dictionary<string, BallotValidationResult>
         {
             { ballotId, validationResult }
@@ -87,7 +88,7 @@ public class AccumulationResult
         BallotValidationResult validationResult)
     {
         TallyId = tallyId;
-        Accumulated = accumulatedBallotIds;
+        Accepted = accumulatedBallotIds;
         Failed = new Dictionary<string, BallotValidationResult>
         {
             { ballotId, validationResult }
@@ -100,15 +101,15 @@ public class AccumulationResult
     public AccumulationResult Add(AccumulationResult other)
     {
         // check the other accumulated ballots and verify there are no duplicates
-        foreach (var ballotId in other.Accumulated)
+        foreach (var ballotId in other.Accepted)
         {
-            if (Accumulated.Contains(ballotId))
+            if (Accepted.Contains(ballotId))
             {
                 throw new ArgumentException($"Ballot {ballotId} already added to tally {TallyId}");
             }
         }
 
-        Accumulated.UnionWith(other.Accumulated);
+        Accepted.UnionWith(other.Accepted);
         foreach (var (ballotId, validationResult) in other.Failed)
         {
             Failed.Add(ballotId, validationResult);
@@ -121,7 +122,7 @@ public class AccumulationResult
     {
         var builder = new StringBuilder();
         _ = builder.AppendLine($"Tally {TallyId}");
-        _ = builder.AppendLine($"Accumulated {Accumulated.Count} ballots");
+        _ = builder.AppendLine($"Accumulated {Accepted.Count} ballots");
         _ = builder.AppendLine($"Failed {Failed.Count} ballots");
         foreach (var (ballotId, validationResult) in Failed)
         {
