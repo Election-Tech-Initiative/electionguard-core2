@@ -147,9 +147,19 @@ jobs:
           arch: amd64_x86
 
       # Environment
-
       - name: Configure Environment
         run: make environment
+
+      # Build Cache
+      - name: Restore C++ Build Cache
+        uses: actions/cache@v2
+        with:
+          path: |
+            build/
+          key: ${{ matrix.name }}-build-${{ hashFiles('.cache', 'include', 'src/electionguard') }}
+          restore-keys: |
+            ${{ matrix.name }}-build-
+            ${{ matrix.name }}-
 
       # Lint
       - name: Lint
@@ -186,3 +196,13 @@ jobs:
           PROCESSOR: ${{ matrix.processor }}
         if: (matrix.runCsTests)
         run: make test-netstandard
+
+      - name: Save C++ Build Cache
+        uses: actions/cache@v2
+        with:
+          path: |
+            build/
+          key: ${{ matrix.name }}-build-${{ hashFiles('.cache', 'include', 'src/electionguard') }}
+          restore-keys: |
+            ${{ matrix.name }}-build-
+            ${{ matrix.name }}-
