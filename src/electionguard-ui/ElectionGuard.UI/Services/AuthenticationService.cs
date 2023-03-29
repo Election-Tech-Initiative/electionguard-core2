@@ -16,10 +16,13 @@ public class AuthenticationService : IAuthenticationService
 
     public async Task Login(string username)
     {
-        App.CurrentUser = new();
-        App.CurrentUser.Name = username;
-        var isAdmin = username.ToLower(CultureInfo.CurrentCulture).Contains("admin");
-        App.CurrentUser.IsAdmin = isAdmin;
+        await Task.Run(() =>
+        {
+            App.CurrentUser = new();
+            App.CurrentUser.Name = username;
+            var isAdmin = username.ToLower(CultureInfo.CurrentCulture).Contains("admin");
+            App.CurrentUser.IsAdmin = isAdmin;
+        });
     }
 
     public string? UserName => App.CurrentUser.Name;

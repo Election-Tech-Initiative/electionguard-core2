@@ -18,6 +18,7 @@ public override async Task OnAppearing()
     {
         _timer.Start();
         PollingTimer_Tick(this, null);
+        await base.OnAppearing();
     }
 
     [ObservableProperty]
