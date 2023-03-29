@@ -11,7 +11,7 @@ public class BallotUploadService : BaseDatabaseService<BallotUpload>
     /// <summary>
     /// The collection name to use to get/save data into
     /// </summary>
-    private readonly static string _collection = "ballots";
+    private readonly static string _collection = Constants.TableBallots;
 
     /// <summary>
     /// Default constructor that sets the collection name

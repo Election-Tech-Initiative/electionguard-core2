@@ -15,6 +15,9 @@ public partial class Tally : DatabaseRecord
     private string? _keyCermonyId;
 
     [ObservableProperty]
+    private string _tallyId = string.Empty;
+
+    [ObservableProperty]
     private int _quorum;
 
     [ObservableProperty]
@@ -33,15 +36,18 @@ public partial class Tally : DatabaseRecord
     private DateTime _tallyEnd;
 
     [ObservableProperty]
+    private TallyState _state;
+
+    [ObservableProperty]
     private List<long> _deviceIds = new();
 
     [ObservableProperty]
     private DateTime _createdAt;
 
-
     public Tally() : base(nameof(Tally))
     {
+        TallyId = Guid.NewGuid().ToString();
+        CreatedAt = DateTime.UtcNow;
     }
-
 }
 
