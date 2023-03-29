@@ -10,7 +10,7 @@ public class ElectionService : BaseDatabaseService<Election>
     /// <summary>
     /// The collection name to use to get/save data into
     /// </summary>
-    private readonly static string _collection = "elections";
+    private readonly static string _collection = Constants.TableElections;
 
     /// <summary>
     /// Default constructor that sets the collection name
