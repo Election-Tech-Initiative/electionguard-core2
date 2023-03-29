@@ -435,4 +435,10 @@
   <data name="SuccessText" xml:space="preserve">
     <value>Successfully uploaded</value>
   </data>
+  <data name="ConnectionStringPlaceholder" xml:space="preserve">
+    <value>Connection string to get to database</value>
+  </data>
+  <data name="ConnectionStringText" xml:space="preserve">
+    <value>Connection String</value>
+  </data>
 </root>
