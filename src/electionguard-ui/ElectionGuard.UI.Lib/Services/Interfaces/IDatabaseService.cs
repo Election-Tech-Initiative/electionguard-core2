@@ -17,6 +17,8 @@ internal static class Constants
 
     public readonly static string SerialNumber = "SerialNumber";
 
+    public readonly static string TallyId = "TallyId";
+
     public readonly static string UploadId = "UploadId";
 
     public readonly static string GuardianId = "GuardianId";
@@ -33,7 +35,13 @@ internal static class Constants
 
     public readonly static string State = "State";
 
+    public readonly static string TableBallots = "ballots";
+
+    public readonly static string TableElections = "elections";
+
     public readonly static string TableKeyCeremonies = "key_ceremonies";
+
+    public readonly static string TableTallies = "tallies";
 
     public readonly static string CompletedAt = "CompletedAt";
 
