@@ -1,4 +1,5 @@
 ﻿using ElectionGuard.UI.Lib.Models;
+using MongoDB.Driver;
 
 namespace ElectionGuard.UI.Lib.Services;
 
@@ -10,7 +11,7 @@ public class TallyService : BaseDatabaseService<Tally>
     /// <summary>
     /// The collection name to use to get/save data into
     /// </summary>
-    private readonly static string _collection = "tallies";
+    private readonly static string _collection = Constants.TableTallies;
 
     /// <summary>
     /// Default constructor that sets the collection name
@@ -25,5 +26,38 @@ public class TallyService : BaseDatabaseService<Tally>
     {
         return await GetAllByFieldAsync(Constants.ElectionId, electionId);
     }
+
+    /// <summary>
+    /// Gets tallies for an election
+    /// </summary>
+    /// <param name="tallyId">tally id to search for</param>
+    public async Task<Tally?> GetByTallyIdAsync(string tallyId)
+    {
+        return await GetByFieldAsync(Constants.TallyId, tallyId);
+    }
+
+    public async Task<bool> TallyNameExists(string name)
+    {
+        var tally = await GetByNameAsync(name);
+        return tally != null;
+    }
+
+    /// <summary>
+    /// Updates the key cermeony to a completed state and sets the completed at date/time
+    /// </summary>
+    /// <param name="keyCeremonyId">key ceremony id to update</param>
+    virtual public async Task UpdateCompleteAsync(string tallyId)
+    {
+        var filterBuilder = Builders<Tally>.Filter;
+        var filter = filterBuilder.And(filterBuilder.Eq(Constants.TallyId, tallyId));
+
+        var updateBuilder = Builders<Tally>.Update;
+        var update = updateBuilder.Set(Constants.State, TallyState.Complete)
+                                    .Set(Constants.CompletedAt, DateTime.UtcNow)
+                                    .Set(Constants.UpdatedAt, DateTime.UtcNow);
+
+        await UpdateAsync(filter, update);
+    }
+
 
 }
