@@ -69,9 +69,26 @@ public static class DbService
     {
         DbConnection = connection;
 
-        // Create a new MongoClient that uses the user, password, host, port and database names
+        // Create a new MongoClient that uses connection string
         client = new MongoClient(connection);
     }
+
+    /// <summary>
+    /// Reconnects to the mongodb
+    /// </summary>
+    public static void Reconnect()
+    {
+        if (!string.IsNullOrEmpty(DbConnection))
+        {
+            client = new MongoClient(DbConnection);
+        }
+        else
+        {
+            client = new MongoClient($"mongodb://{DefaultUsername}:{DbPassword}@{DbHost}:{DefaultPort}/{DefaultDatabase}?authSource=admin&keepAlive=true&poolSize=30&autoReconnect=true&socketTimeoutMS=360000&connectTimeoutMS=360000");
+        }
+    }
+
+
 
     /// <summary>
     /// Gets an interface to the database
