@@ -10,7 +10,15 @@ public static class MauiProgram
     {
         var DbHost = Preferences.Get("DbAddress", "127.0.0.1");
         var DbPassword = Preferences.Get("DbPassword", "");
-        DbService.Init(DbHost, DbPassword);
+        var DbConnection = Preferences.Get("DbConnection", "");
+        if (!string.IsNullOrEmpty(DbConnection))
+        {
+            DbService.Init(DbConnection);
+        }
+        else
+        {
+            DbService.Init(DbHost, DbPassword);
+        }
 
         var builder = MauiApp.CreateBuilder();
         builder

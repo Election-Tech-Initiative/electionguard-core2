@@ -42,6 +42,7 @@ public static class DbService
 
     private static string DbHost = string.Empty;
     private static string DbPassword = string.Empty;
+    private static string DbConnection = string.Empty;
     private static MongoClient client = new();
 
     /// <summary>
@@ -57,8 +58,37 @@ public static class DbService
 
         // Create a new MongoClient that uses the user, password, host, port and database names
         client = new MongoClient($"mongodb://{DefaultUsername}:{DbPassword}@{DbHost}:{DefaultPort}/{DefaultDatabase}?authSource=admin&keepAlive=true&poolSize=30&autoReconnect=true&socketTimeoutMS=360000&connectTimeoutMS=360000");
-        //BsonSerializer.RegisterSerializer(typeof(HashedElGamalCiphertext), new ComplexTypeSerializer());
     }
+
+    /// <summary>
+    /// Initializes the connection to the database server
+    /// This will need to be called if the address or the password needs to be changed.
+    /// </summary>
+    /// <param name="connection">The connection string to use to address of the database</param>
+    public static void Init(string connection)
+    {
+        DbConnection = connection;
+
+        // Create a new MongoClient that uses connection string
+        client = new MongoClient(connection);
+    }
+
+    /// <summary>
+    /// Reconnects to the mongodb
+    /// </summary>
+    public static void Reconnect()
+    {
+        if (!string.IsNullOrEmpty(DbConnection))
+        {
+            client = new MongoClient(DbConnection);
+        }
+        else
+        {
+            client = new MongoClient($"mongodb://{DefaultUsername}:{DbPassword}@{DbHost}:{DefaultPort}/{DefaultDatabase}?authSource=admin&keepAlive=true&poolSize=30&autoReconnect=true&socketTimeoutMS=360000&connectTimeoutMS=360000");
+        }
+    }
+
+
 
     /// <summary>
     /// Gets an interface to the database

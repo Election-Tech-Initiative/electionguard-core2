@@ -443,5 +443,10 @@
   </data>
   <data name="DuplicateText" xml:space="preserve">
     <value>Duplicar</value>
+  <data name="ConnectionStringPlaceholder" xml:space="preserve">
+    <value>¡Cadena de conexión para llegar a la base de datos!</value>
+  </data>
+  <data name="ConnectionStringText" xml:space="preserve">
+    <value>Cadena de conexión</value>
   </data>
 </root>
