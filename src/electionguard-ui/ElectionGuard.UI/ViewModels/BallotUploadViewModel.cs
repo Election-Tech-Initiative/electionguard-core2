@@ -114,6 +114,9 @@ public partial class BallotUploadViewModel : BaseViewModel
                 var filename = Path.GetFileName(currentBallot);
                 var ballotData = File.ReadAllText(currentBallot);
                 SubmittedBallot ballot = new(ballotData);
+
+                // TODO: check if the manifest hash matches
+
                 var exists = _ballotService.BallotExists(ballot.BallotCode.ToHex()).Result;
                 if (!exists)
                 {

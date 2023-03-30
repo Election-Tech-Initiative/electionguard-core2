@@ -435,4 +435,7 @@
   <data name="SuccessText" xml:space="preserve">
     <value>Successfully uploaded</value>
   </data>
+  <data name="ExportEncryptionText" xml:space="preserve">
+    <value>Export Encryption</value>
+  </data>
 </root>
