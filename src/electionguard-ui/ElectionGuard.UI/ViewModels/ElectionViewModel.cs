@@ -20,6 +20,7 @@ public partial class ElectionViewModel : BaseViewModel
     }
 
     [ObservableProperty]
+    [NotifyCanExecuteChangedFor(nameof(AddBallotsCommand))]
     private Election? _currentElection;
 
     [ObservableProperty]
@@ -46,6 +47,9 @@ public partial class ElectionViewModel : BaseViewModel
     private long _ballotSpoiledTotal = 0;
 
     [ObservableProperty]
+    private long _ballotDuplicateTotal = 0;
+
+    [ObservableProperty]
     private long _ballotRejectedTotal = 0;
 
     [ObservableProperty]
@@ -69,6 +73,7 @@ public partial class ElectionViewModel : BaseViewModel
             BallotCountTotal = 0;
             BallotAddedTotal = 0;
             BallotSpoiledTotal = 0;
+            BallotDuplicateTotal = 0;
             BallotRejectedTotal = 0;
             uploads.ForEach((upload) =>
             {
@@ -76,6 +81,7 @@ public partial class ElectionViewModel : BaseViewModel
                 BallotCountTotal += upload.BallotCount;
                 BallotAddedTotal += upload.BallotImported;
                 BallotSpoiledTotal += upload.BallotSpoiled;
+                BallotDuplicateTotal += upload.BallotDuplicated;
                 BallotRejectedTotal += upload.BallotRejected;
             });
 
@@ -119,7 +125,7 @@ public partial class ElectionViewModel : BaseViewModel
             };
 
         // await NavigationService.GoToPage(typeof(BallotUploadViewModel), pageParams);
-        await _electionService.UpdateExportDateAsync(CurrentElection.Id, DateTime.Now);
+        await _electionService.UpdateExportDateAsync(CurrentElection.ElectionId, DateTime.Now);
 
         // this is for testing only and will be removed
         CurrentElection.ExportEncryptionDateTime = DateTime.Now;

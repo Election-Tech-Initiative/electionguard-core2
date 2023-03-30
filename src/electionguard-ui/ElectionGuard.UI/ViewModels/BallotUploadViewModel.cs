@@ -1,4 +1,5 @@
 ﻿using System.Diagnostics;
+using System.Reflection.Metadata.Ecma335;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 using System.Text;
@@ -44,6 +45,18 @@ public partial class BallotUploadViewModel : BaseViewModel
 
     private uint _serialNumber;
 
+    private ElementModQ _manifestHash;
+
+
+    partial void OnElectionIdChanged(string electionId)
+    {
+        Task.Run(async() =>
+        {
+            var record = await _manifestService.GetByElectionIdAsync(electionId);
+            using var manifest = new Manifest(record.ManifestData);
+            _manifestHash = new(manifest.CryptoHash());
+        });
+    }
 
     [RelayCommand]
     private void Manual()
@@ -97,6 +110,7 @@ public partial class BallotUploadViewModel : BaseViewModel
             BallotCount = ballots.LongLength,
             BallotImported = 0,
             BallotSpoiled = 0,
+            BallotDuplicated = 0,
             BallotRejected = 0,
             SerialNumber = _serialNumber,
             CreatedBy = UserName
@@ -104,6 +118,7 @@ public partial class BallotUploadViewModel : BaseViewModel
 
         long totalCount = 0;
         long totalInserted = 0;
+        long totalDuplicated = 0;
         long totalRejected = 0;
         long totalSpoiled = 0;
 
@@ -115,7 +130,11 @@ public partial class BallotUploadViewModel : BaseViewModel
                 var ballotData = File.ReadAllText(currentBallot);
                 SubmittedBallot ballot = new(ballotData);
 
-                // TODO: check if the manifest hash matches
+                if (ballot.ManifestHash != _manifestHash)
+                {
+                    _ = Interlocked.Increment(ref totalRejected);
+                    return;
+                }
 
                 var exists = _ballotService.BallotExists(ballot.BallotCode.ToHex()).Result;
                 if (!exists)
@@ -144,7 +163,7 @@ public partial class BallotUploadViewModel : BaseViewModel
                 }
                 else
                 {
-                    _ = Interlocked.Increment(ref totalRejected);
+                    _ = Interlocked.Increment(ref totalDuplicated);
                 }
                 _ = Interlocked.Increment(ref totalCount);
                 UploadText = $"{AppResources.SuccessText} {totalCount} / {ballots.Length} {AppResources.Success2Text}";
@@ -157,6 +176,7 @@ public partial class BallotUploadViewModel : BaseViewModel
         // update totals before saving
         upload.BallotCount = totalCount;
         upload.BallotImported = totalInserted;
+        upload.BallotDuplicated = totalDuplicated;
         upload.BallotRejected = totalRejected;
         upload.BallotSpoiled = totalSpoiled;
 
@@ -233,19 +253,22 @@ public partial class BallotUploadViewModel : BaseViewModel
     {
         ShowPanel = BallotUploadPanel.AutoUpload;
         ResultsText = string.Empty;
+        UploadText = string.Empty;
         _lastDrive = -1;
         _timer.Start();
     }
 
     private readonly BallotUploadService _uploadService;
     private readonly BallotService _ballotService;
+    private readonly ManifestService _manifestService;
     private bool _importing = false;
     private long _lastDrive = -1;
 
-    public BallotUploadViewModel(IServiceProvider serviceProvider, BallotUploadService uploadService, BallotService ballotService) : base("BallotUploadText", serviceProvider)
+    public BallotUploadViewModel(IServiceProvider serviceProvider, BallotUploadService uploadService, BallotService ballotService, ManifestService manifestService) : base("BallotUploadText", serviceProvider)
     {
         _uploadService = uploadService;
         _ballotService = ballotService;
+        _manifestService = manifestService;
 
         _timer.Tick += _timer_Tick;
         _timer.Start();

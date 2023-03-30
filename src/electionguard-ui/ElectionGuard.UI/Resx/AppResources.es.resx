@@ -441,4 +441,7 @@
   <data name="ExportEncryptionText" xml:space="preserve">
     <value>¡Exportar cifrado!</value>
   </data>
+  <data name="DuplicateText" xml:space="preserve">
+    <value>Duplicar</value>
+  </data>
 </root>

@@ -438,4 +438,7 @@
   <data name="ExportEncryptionText" xml:space="preserve">
     <value>Export Encryption</value>
   </data>
+  <data name="DuplicatedText" xml:space="preserve">
+    <value>Duplicated</value>
+  </data>
 </root>

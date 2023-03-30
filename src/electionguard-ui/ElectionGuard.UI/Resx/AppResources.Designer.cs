@@ -340,6 +340,15 @@ namespace ElectionGuard.UI.Resx {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Duplicated.
+        /// </summary>
+        internal static string DuplicatedText {
+            get {
+                return ResourceManager.GetString("DuplicatedText", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Election Checklist.
         /// </summary>
         internal static string ElectionChecklist {
