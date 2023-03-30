@@ -1,36 +1,76 @@
 <?xml version="1.0" encoding="utf-8" ?>
-<views:Popup xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
-             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
-             xmlns:helper="clr-namespace:ElectionGuard.UI.Helpers"
-             xmlns:views="http://schemas.microsoft.com/dotnet/2022/maui/toolkit"
-             x:Class="ElectionGuard.UI.Views.SettingsPage">
+<views:Popup
+    x:Class="ElectionGuard.UI.Views.SettingsPage"
+    xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+    xmlns:helper="clr-namespace:ElectionGuard.UI.Helpers"
+    xmlns:views="http://schemas.microsoft.com/dotnet/2022/maui/toolkit"
+    Size="600,350">
     <Grid>
         <VerticalStackLayout Style="{StaticResource PopupView}">
-            <Label Style="{StaticResource H1}" Text="{helper:Translate Settings}"  />
+            <Label Style="{StaticResource H1}" Text="{helper:Translate Settings}" />
             <Grid ColumnDefinitions="*,2*">
-                <Label Grid.Column="0" HorizontalTextAlignment="End" VerticalTextAlignment="Center" Text="{helper:Translate DatabaseAddress}" />
-                <Entry Grid.Column="1" HorizontalTextAlignment="Start" VerticalTextAlignment="Center" Placeholder="{helper:Translate IPAddressPlaceholder}" Text="{Binding DatabaseAddress}" />
+                <Label
+                    Grid.Column="0"
+                    Margin="0,0,10,0"
+                    HorizontalTextAlignment="End"
+                    Text="{helper:Translate DatabaseAddress}"
+                    VerticalTextAlignment="Center" />
+                <Entry
+                    Grid.Column="1"
+                    HorizontalTextAlignment="Start"
+                    Placeholder="{helper:Translate IPAddressPlaceholder}"
+                    Text="{Binding DatabaseAddress}"
+                    VerticalTextAlignment="Center" />
             </Grid>
             <Grid ColumnDefinitions="*,2*">
-                <Label Grid.Column="0" HorizontalTextAlignment="End" VerticalTextAlignment="Center" Text="{helper:Translate DatabasePassword}" />
-                <Entry Grid.Column="1" HorizontalTextAlignment="Start" VerticalTextAlignment="Center" IsPassword="True" Placeholder="{helper:Translate PasswordDefaultPlaceholder}" Text="{Binding DatabasePassword}" />
+                <Label
+                    Grid.Column="0"
+                    Margin="0,0,10,0"
+                    HorizontalTextAlignment="End"
+                    Text="{helper:Translate DatabasePassword}"
+                    VerticalTextAlignment="Center" />
+                <Entry
+                    Grid.Column="1"
+                    HorizontalTextAlignment="Start"
+                    IsPassword="True"
+                    Placeholder="{helper:Translate PasswordDefaultPlaceholder}"
+                    Text="{Binding DatabasePassword}"
+                    VerticalTextAlignment="Center" />
+            </Grid>
+            <Grid ColumnDefinitions="*,2*">
+                <Label
+                    Grid.Column="0"
+                    Margin="0,0,15,0"
+                    HorizontalTextAlignment="End"
+                    Text="{helper:Translate ConnectionStringText}"
+                    VerticalTextAlignment="Center" />
+                <Entry
+                    Grid.Column="1"
+                    HorizontalTextAlignment="Start"
+                    IsPassword="True"
+                    Placeholder="{helper:Translate ConnectionStringPlaceholder}"
+                    Text="{Binding DatabaseConnectionString}"
+                    VerticalTextAlignment="Center" />
             </Grid>
 
         </VerticalStackLayout>
-        <Button Text="{helper:Translate Save}"                     
-                HorizontalOptions="Start"
-                VerticalOptions="End"
-                Margin="10"
-                Command="{Binding SaveCommand}"
-                Clicked="Button_Clicked"/>
-        <ImageButton Source="world.png" 
-                     HorizontalOptions="End"
-                     VerticalOptions="End"
-                     Margin="10"
-                     ToolTipProperties.Text="{helper:Translate SwitchLanguages}" 
-                     HeightRequest="40" 
-                     Command="{Binding ChangeLanguageCommand}" 
-                     BorderWidth="0" 
-                     BackgroundColor="Transparent" />
+        <Button
+            Margin="10"
+            Clicked="Button_Clicked"
+            Command="{Binding SaveCommand}"
+            HorizontalOptions="Start"
+            Text="{helper:Translate Save}"
+            VerticalOptions="End" />
+        <ImageButton
+            Margin="10"
+            BackgroundColor="Transparent"
+            BorderWidth="0"
+            Command="{Binding ChangeLanguageCommand}"
+            HeightRequest="40"
+            HorizontalOptions="End"
+            Source="world.png"
+            ToolTipProperties.Text="{helper:Translate SwitchLanguages}"
+            VerticalOptions="End" />
     </Grid>
 </views:Popup>
