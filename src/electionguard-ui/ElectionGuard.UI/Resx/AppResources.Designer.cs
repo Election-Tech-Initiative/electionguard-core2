@@ -8,11 +8,10 @@
 // </auto-generated>
 //------------------------------------------------------------------------------
 
-namespace ElectionGuard.UI.Resx
-{
+namespace ElectionGuard.UI.Resx {
     using System;
-
-
+    
+    
     /// <summary>
     ///   A strongly-typed resource class, for looking up localized strings, etc.
     /// </summary>
@@ -23,1258 +22,1075 @@ namespace ElectionGuard.UI.Resx
     [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Resources.Tools.StronglyTypedResourceBuilder", "17.0.0.0")]
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
     [global::System.Runtime.CompilerServices.CompilerGeneratedAttribute()]
-    internal class AppResources
-    {
-
+    internal class AppResources {
+        
         private static global::System.Resources.ResourceManager resourceMan;
-
+        
         private static global::System.Globalization.CultureInfo resourceCulture;
-
+        
         [global::System.Diagnostics.CodeAnalysis.SuppressMessageAttribute("Microsoft.Performance", "CA1811:AvoidUncalledPrivateCode")]
-        internal AppResources()
-        {
+        internal AppResources() {
         }
-
+        
         /// <summary>
         ///   Returns the cached ResourceManager instance used by this class.
         /// </summary>
         [global::System.ComponentModel.EditorBrowsableAttribute(global::System.ComponentModel.EditorBrowsableState.Advanced)]
-        internal static global::System.Resources.ResourceManager ResourceManager
-        {
-            get
-            {
-                if (object.ReferenceEquals(resourceMan, null))
-                {
+        internal static global::System.Resources.ResourceManager ResourceManager {
+            get {
+                if (object.ReferenceEquals(resourceMan, null)) {
                     global::System.Resources.ResourceManager temp = new global::System.Resources.ResourceManager("ElectionGuard.UI.Resx.AppResources", typeof(AppResources).Assembly);
                     resourceMan = temp;
                 }
                 return resourceMan;
             }
         }
-
+        
         /// <summary>
         ///   Overrides the current thread's CurrentUICulture property for all
         ///   resource lookups using this strongly typed resource class.
         /// </summary>
         [global::System.ComponentModel.EditorBrowsableAttribute(global::System.ComponentModel.EditorBrowsableState.Advanced)]
-        internal static global::System.Globalization.CultureInfo Culture
-        {
-            get
-            {
+        internal static global::System.Globalization.CultureInfo Culture {
+            get {
                 return resourceCulture;
             }
-            set
-            {
+            set {
                 resourceCulture = value;
             }
         }
-
+        
         /// <summary>
         ///   Looks up a localized string similar to Add Ballots.
         /// </summary>
-        internal static string AddBallots
-        {
-            get
-            {
+        internal static string AddBallots {
+            get {
                 return ResourceManager.GetString("AddBallots", resourceCulture);
             }
         }
-
+        
         /// <summary>
         ///   Looks up a localized string similar to Added.
         /// </summary>
-        internal static string AddedText
-        {
-            get
-            {
+        internal static string AddedText {
+            get {
                 return ResourceManager.GetString("AddedText", resourceCulture);
             }
         }
-
+        
         /// <summary>
         ///   Looks up a localized string similar to Admin Home.
         /// </summary>
-        internal static string AdminHome
-        {
-            get
-            {
+        internal static string AdminHome {
+            get {
                 return ResourceManager.GetString("AdminHome", resourceCulture);
             }
         }
-
+        
         /// <summary>
         ///   Looks up a localized string similar to What Do You Want To Do?.
         /// </summary>
-        internal static string AdminHomePageTitle
-        {
-            get
-            {
+        internal static string AdminHomePageTitle {
+            get {
                 return ResourceManager.GetString("AdminHomePageTitle", resourceCulture);
             }
         }
-
+        
         /// <summary>
         ///   Looks up a localized string similar to already exists.  Try a different name..
         /// </summary>
-        internal static string AlreadyExists
-        {
-            get
-            {
+        internal static string AlreadyExists {
+            get {
                 return ResourceManager.GetString("AlreadyExists", resourceCulture);
             }
         }
-
+        
         /// <summary>
         ///   Looks up a localized string similar to Backup.
         /// </summary>
-        internal static string BackupText
-        {
-            get
-            {
+        internal static string BackupText {
+            get {
                 return ResourceManager.GetString("BackupText", resourceCulture);
             }
         }
-
+        
         /// <summary>
         ///   Looks up a localized string similar to Bad Verification.
         /// </summary>
-        internal static string BadVerified
-        {
-            get
-            {
+        internal static string BadVerified {
+            get {
                 return ResourceManager.GetString("BadVerified", resourceCulture);
             }
         }
-
+        
         /// <summary>
         ///   Looks up a localized string similar to Ballot Count.
         /// </summary>
-        internal static string BallotCountText
-        {
-            get
-            {
+        internal static string BallotCountText {
+            get {
                 return ResourceManager.GetString("BallotCountText", resourceCulture);
             }
         }
-
+        
         /// <summary>
         ///   Looks up a localized string similar to Ballot Folder.
         /// </summary>
-        internal static string BallotFolderText
-        {
-            get
-            {
+        internal static string BallotFolderText {
+            get {
                 return ResourceManager.GetString("BallotFolderText", resourceCulture);
             }
         }
-
+        
         /// <summary>
         ///   Looks up a localized string similar to Ballots.
         /// </summary>
-        internal static string BallotsText
-        {
-            get
-            {
+        internal static string BallotsText {
+            get {
                 return ResourceManager.GetString("BallotsText", resourceCulture);
             }
         }
-
+        
         /// <summary>
         ///   Looks up a localized string similar to Ballot Styles.
         /// </summary>
-        internal static string BallotStylesText
-        {
-            get
-            {
+        internal static string BallotStylesText {
+            get {
                 return ResourceManager.GetString("BallotStylesText", resourceCulture);
             }
         }
-
+        
         /// <summary>
         ///   Looks up a localized string similar to Ballot Upload.
         /// </summary>
-        internal static string BallotUploadText
-        {
-            get
-            {
+        internal static string BallotUploadText {
+            get {
                 return ResourceManager.GetString("BallotUploadText", resourceCulture);
             }
         }
-
+        
         /// <summary>
         ///   Looks up a localized string similar to Cancel.
         /// </summary>
-        internal static string CancelText
-        {
-            get
-            {
+        internal static string CancelText {
+            get {
                 return ResourceManager.GetString("CancelText", resourceCulture);
             }
         }
-
+        
         /// <summary>
         ///   Looks up a localized string similar to Candidates.
         /// </summary>
-        internal static string CandidatesText
-        {
-            get
-            {
+        internal static string CandidatesText {
+            get {
                 return ResourceManager.GetString("CandidatesText", resourceCulture);
             }
         }
-
+        
         /// <summary>
         ///   Looks up a localized string similar to Choose File.
         /// </summary>
-        internal static string ChooseFile
-        {
-            get
-            {
+        internal static string ChooseFile {
+            get {
                 return ResourceManager.GetString("ChooseFile", resourceCulture);
             }
         }
-
+        
         /// <summary>
         ///   Looks up a localized string similar to Choose File(s).
         /// </summary>
-        internal static string ChooseFiles
-        {
-            get
-            {
+        internal static string ChooseFiles {
+            get {
                 return ResourceManager.GetString("ChooseFiles", resourceCulture);
             }
         }
-
+        
         /// <summary>
         ///   Looks up a localized string similar to Choose Folder.
         /// </summary>
-        internal static string ChooseFolder
-        {
-            get
-            {
+        internal static string ChooseFolder {
+            get {
                 return ResourceManager.GetString("ChooseFolder", resourceCulture);
             }
         }
-
+        
         /// <summary>
         ///   Looks up a localized string similar to Complete.
         /// </summary>
-        internal static string Complete
-        {
-            get
-            {
+        internal static string Complete {
+            get {
                 return ResourceManager.GetString("Complete", resourceCulture);
             }
         }
-
+        
         /// <summary>
         ///   Looks up a localized string similar to Connection string to get to database.
         /// </summary>
-        internal static string ConnectionStringPlaceholder
-        {
-            get
-            {
+        internal static string ConnectionStringPlaceholder {
+            get {
                 return ResourceManager.GetString("ConnectionStringPlaceholder", resourceCulture);
             }
         }
-
+        
         /// <summary>
         ///   Looks up a localized string similar to Connection String.
         /// </summary>
-        internal static string ConnectionStringText
-        {
-            get
-            {
+        internal static string ConnectionStringText {
+            get {
                 return ResourceManager.GetString("ConnectionStringText", resourceCulture);
             }
         }
-
+        
         /// <summary>
         ///   Looks up a localized string similar to Contact the election administrator!.
         /// </summary>
-        internal static string ContactAdmin
-        {
-            get
-            {
+        internal static string ContactAdmin {
+            get {
                 return ResourceManager.GetString("ContactAdmin", resourceCulture);
             }
         }
-
+        
         /// <summary>
         ///   Looks up a localized string similar to Contests.
         /// </summary>
-        internal static string ContestsText
-        {
-            get
-            {
+        internal static string ContestsText {
+            get {
                 return ResourceManager.GetString("ContestsText", resourceCulture);
             }
         }
-
+        
         /// <summary>
         ///   Looks up a localized string similar to Created By.
         /// </summary>
-        internal static string CreatedByText
-        {
-            get
-            {
+        internal static string CreatedByText {
+            get {
                 return ResourceManager.GetString("CreatedByText", resourceCulture);
             }
         }
-
+        
         /// <summary>
         ///   Looks up a localized string similar to Created.
         /// </summary>
-        internal static string CreatedText
-        {
-            get
-            {
+        internal static string CreatedText {
+            get {
                 return ResourceManager.GetString("CreatedText", resourceCulture);
             }
         }
-
+        
         /// <summary>
         ///   Looks up a localized string similar to Create Election.
         /// </summary>
-        internal static string CreateElection
-        {
-            get
-            {
+        internal static string CreateElection {
+            get {
                 return ResourceManager.GetString("CreateElection", resourceCulture);
             }
         }
-
+        
         /// <summary>
         ///   Looks up a localized string similar to Create Key Ceremony.
         /// </summary>
-        internal static string CreateKeyCeremony
-        {
-            get
-            {
+        internal static string CreateKeyCeremony {
+            get {
                 return ResourceManager.GetString("CreateKeyCeremony", resourceCulture);
             }
         }
-
+        
         /// <summary>
         ///   Looks up a localized string similar to Create Tally.
         /// </summary>
-        internal static string CreateTally
-        {
-            get
-            {
+        internal static string CreateTally {
+            get {
                 return ResourceManager.GetString("CreateTally", resourceCulture);
             }
         }
-
+        
         /// <summary>
         ///   Looks up a localized string similar to Database IP Address.
         /// </summary>
-        internal static string DatabaseAddress
-        {
-            get
-            {
+        internal static string DatabaseAddress {
+            get {
                 return ResourceManager.GetString("DatabaseAddress", resourceCulture);
             }
         }
-
+        
         /// <summary>
         ///   Looks up a localized string similar to Database Password.
         /// </summary>
-        internal static string DatabasePassword
-        {
-            get
-            {
+        internal static string DatabasePassword {
+            get {
                 return ResourceManager.GetString("DatabasePassword", resourceCulture);
             }
         }
-
+        
         /// <summary>
         ///   Looks up a localized string similar to Database is not available. Please check your settings..
         /// </summary>
-        internal static string DatabaseUnavailable
-        {
-            get
-            {
+        internal static string DatabaseUnavailable {
+            get {
                 return ResourceManager.GetString("DatabaseUnavailable", resourceCulture);
             }
         }
-
+        
         /// <summary>
         ///   Looks up a localized string similar to Device File.
         /// </summary>
-        internal static string DeviceFileText
-        {
-            get
-            {
+        internal static string DeviceFileText {
+            get {
                 return ResourceManager.GetString("DeviceFileText", resourceCulture);
             }
         }
-
+        
         /// <summary>
         ///   Looks up a localized string similar to Does Not Exist.
         /// </summary>
-        internal static string DoesNotExist
-        {
-            get
-            {
+        internal static string DoesNotExist {
+            get {
                 return ResourceManager.GetString("DoesNotExist", resourceCulture);
             }
         }
-
+        
         /// <summary>
         ///   Looks up a localized string similar to EGDrive already used.
         /// </summary>
-        internal static string DriveUsedText
-        {
-            get
-            {
+        internal static string DriveUsedText {
+            get {
                 return ResourceManager.GetString("DriveUsedText", resourceCulture);
             }
         }
-
+        
         /// <summary>
         ///   Looks up a localized string similar to Duplicated.
         /// </summary>
-        internal static string DuplicatedText
-        {
-            get
-            {
+        internal static string DuplicatedText {
+            get {
                 return ResourceManager.GetString("DuplicatedText", resourceCulture);
             }
         }
-
+        
         /// <summary>
         ///   Looks up a localized string similar to Election Checklist.
         /// </summary>
-        internal static string ElectionChecklist
-        {
-            get
-            {
+        internal static string ElectionChecklist {
+            get {
                 return ResourceManager.GetString("ElectionChecklist", resourceCulture);
             }
         }
-
+        
         /// <summary>
         ///   Looks up a localized string similar to Election Details.
         /// </summary>
-        internal static string ElectionDetails
-        {
-            get
-            {
+        internal static string ElectionDetails {
+            get {
                 return ResourceManager.GetString("ElectionDetails", resourceCulture);
             }
         }
-
+        
         /// <summary>
         ///   Looks up a localized string similar to ElectionGuard.
         /// </summary>
-        internal static string ElectionGuardTitle
-        {
-            get
-            {
+        internal static string ElectionGuardTitle {
+            get {
                 return ResourceManager.GetString("ElectionGuardTitle", resourceCulture);
             }
         }
-
+        
         /// <summary>
         ///   Looks up a localized string similar to elections created..
         /// </summary>
-        internal static string ElectionsCreated
-        {
-            get
-            {
+        internal static string ElectionsCreated {
+            get {
                 return ResourceManager.GetString("ElectionsCreated", resourceCulture);
             }
         }
-
+        
         /// <summary>
         ///   Looks up a localized string similar to Elections.
         /// </summary>
-        internal static string ElectionsText
-        {
-            get
-            {
+        internal static string ElectionsText {
+            get {
                 return ResourceManager.GetString("ElectionsText", resourceCulture);
             }
         }
-
+        
         /// <summary>
         ///   Looks up a localized string similar to Election URL.
         /// </summary>
-        internal static string ElectionUrl
-        {
-            get
-            {
+        internal static string ElectionUrl {
+            get {
                 return ResourceManager.GetString("ElectionUrl", resourceCulture);
             }
         }
-
+        
         /// <summary>
         ///   Looks up a localized string similar to Error Creating election.
         /// </summary>
-        internal static string ErrorCreatingElection
-        {
-            get
-            {
+        internal static string ErrorCreatingElection {
+            get {
                 return ResourceManager.GetString("ErrorCreatingElection", resourceCulture);
             }
         }
-
+        
         /// <summary>
         ///   Looks up a localized string similar to The manifest file could not be loaded..
         /// </summary>
-        internal static string ErrorLoadingManifest
-        {
-            get
-            {
+        internal static string ErrorLoadingManifest {
+            get {
                 return ResourceManager.GetString("ErrorLoadingManifest", resourceCulture);
             }
         }
-
+        
         /// <summary>
         ///   Looks up a localized string similar to Error in manifest files.
         /// </summary>
-        internal static string ErrorManifest
-        {
-            get
-            {
+        internal static string ErrorManifest {
+            get {
                 return ResourceManager.GetString("ErrorManifest", resourceCulture);
             }
         }
-
+        
         /// <summary>
         ///   Looks up a localized string similar to Export Encryption.
         /// </summary>
-        internal static string ExportEncryptionText
-        {
-            get
-            {
+        internal static string ExportEncryptionText {
+            get {
                 return ResourceManager.GetString("ExportEncryptionText", resourceCulture);
             }
         }
-
+        
         /// <summary>
         ///   Looks up a localized string similar to Geopolitical Units.
         /// </summary>
-        internal static string GeopoliticalUnitsText
-        {
-            get
-            {
+        internal static string GeopoliticalUnitsText {
+            get {
                 return ResourceManager.GetString("GeopoliticalUnitsText", resourceCulture);
             }
         }
-
+        
         /// <summary>
         ///   Looks up a localized string similar to Create Key Ceremony.
         /// </summary>
-        internal static string GoToCreateKeyCeremonyAdmin
-        {
-            get
-            {
+        internal static string GoToCreateKeyCeremonyAdmin {
+            get {
                 return ResourceManager.GetString("GoToCreateKeyCeremonyAdmin", resourceCulture);
             }
         }
-
+        
         /// <summary>
         ///   Looks up a localized string similar to Guardian Home.
         /// </summary>
-        internal static string GuardianHome
-        {
-            get
-            {
+        internal static string GuardianHome {
+            get {
                 return ResourceManager.GetString("GuardianHome", resourceCulture);
             }
         }
-
+        
         /// <summary>
         ///   Looks up a localized string similar to Guardians.
         /// </summary>
-        internal static string GuardiansText
-        {
-            get
-            {
+        internal static string GuardiansText {
+            get {
                 return ResourceManager.GetString("GuardiansText", resourceCulture);
             }
         }
-
+        
         /// <summary>
         ///   Looks up a localized string similar to Hello, World!.
         /// </summary>
-        internal static string HelloWorld
-        {
-            get
-            {
+        internal static string HelloWorld {
+            get {
                 return ResourceManager.GetString("HelloWorld", resourceCulture);
             }
         }
-
+        
         /// <summary>
         ///   Looks up a localized string similar to Would you like to import from this EGDrive again?.
         /// </summary>
-        internal static string ImportAgainText
-        {
-            get
-            {
+        internal static string ImportAgainText {
+            get {
                 return ResourceManager.GetString("ImportAgainText", resourceCulture);
             }
         }
-
+        
         /// <summary>
         ///   Looks up a localized string similar to Information.
         /// </summary>
-        internal static string InformationText
-        {
-            get
-            {
+        internal static string InformationText {
+            get {
                 return ResourceManager.GetString("InformationText", resourceCulture);
             }
         }
-
+        
         /// <summary>
         ///   Looks up a localized string similar to Insert an EGDrive (USB drive) containing ballots.
         /// </summary>
-        internal static string InsertUsbText
-        {
-            get
-            {
+        internal static string InsertUsbText {
+            get {
                 return ResourceManager.GetString("InsertUsbText", resourceCulture);
             }
         }
-
+        
         /// <summary>
         ///   Looks up a localized string similar to IP address of the database.
         /// </summary>
-        internal static string IPAddressPlaceholder
-        {
-            get
-            {
+        internal static string IPAddressPlaceholder {
+            get {
                 return ResourceManager.GetString("IPAddressPlaceholder", resourceCulture);
             }
         }
-
+        
         /// <summary>
         ///   Looks up a localized string similar to Join.
         /// </summary>
-        internal static string Join
-        {
-            get
-            {
+        internal static string Join {
+            get {
                 return ResourceManager.GetString("Join", resourceCulture);
             }
         }
-
+        
         /// <summary>
         ///   Looks up a localized string similar to Joined.
         /// </summary>
-        internal static string JoinedText
-        {
-            get
-            {
+        internal static string JoinedText {
+            get {
                 return ResourceManager.GetString("JoinedText", resourceCulture);
             }
         }
-
+        
         /// <summary>
         ///   Looks up a localized string similar to Key Ceremonies.
         /// </summary>
-        internal static string KeyCeremoniesText
-        {
-            get
-            {
+        internal static string KeyCeremoniesText {
+            get {
                 return ResourceManager.GetString("KeyCeremoniesText", resourceCulture);
             }
         }
-
+        
         /// <summary>
         ///   Looks up a localized string similar to Key Ceremony Name.
         /// </summary>
-        internal static string KeyCeremonyName
-        {
-            get
-            {
+        internal static string KeyCeremonyName {
+            get {
                 return ResourceManager.GetString("KeyCeremonyName", resourceCulture);
             }
         }
-
+        
         /// <summary>
         ///   Looks up a localized string similar to Key Ceremony State.
         /// </summary>
-        internal static string KeyCeremonyState
-        {
-            get
-            {
+        internal static string KeyCeremonyState {
+            get {
                 return ResourceManager.GetString("KeyCeremonyState", resourceCulture);
             }
         }
-
+        
         /// <summary>
         ///   Looks up a localized string similar to Key Ceremony.
         /// </summary>
-        internal static string KeyCeremonyText
-        {
-            get
-            {
+        internal static string KeyCeremonyText {
+            get {
                 return ResourceManager.GetString("KeyCeremonyText", resourceCulture);
             }
         }
-
+        
         /// <summary>
         ///   Looks up a localized string similar to Location.
         /// </summary>
-        internal static string LocationText
-        {
-            get
-            {
+        internal static string LocationText {
+            get {
                 return ResourceManager.GetString("LocationText", resourceCulture);
             }
         }
-
+        
         /// <summary>
         ///   Looks up a localized string similar to Enter your name or other identifier.
         /// </summary>
-        internal static string LoginPlaceholder
-        {
-            get
-            {
+        internal static string LoginPlaceholder {
+            get {
                 return ResourceManager.GetString("LoginPlaceholder", resourceCulture);
             }
         }
-
+        
         /// <summary>
         ///   Looks up a localized string similar to Login.
         /// </summary>
-        internal static string LoginText
-        {
-            get
-            {
+        internal static string LoginText {
+            get {
                 return ResourceManager.GetString("LoginText", resourceCulture);
             }
         }
-
+        
         /// <summary>
         ///   Looks up a localized string similar to Manifest.
         /// </summary>
-        internal static string ManifestText
-        {
-            get
-            {
+        internal static string ManifestText {
+            get {
                 return ResourceManager.GetString("ManifestText", resourceCulture);
             }
         }
-
+        
         /// <summary>
         ///   Looks up a localized string similar to Cancel wizard and manually upload ballots.
         /// </summary>
-        internal static string ManuelUploadText
-        {
-            get
-            {
+        internal static string ManuelUploadText {
+            get {
                 return ResourceManager.GetString("ManuelUploadText", resourceCulture);
             }
         }
-
+        
         /// <summary>
         ///   Looks up a localized string similar to Names will be generated from manifest names.
         /// </summary>
-        internal static string NameFromManifest
-        {
-            get
-            {
+        internal static string NameFromManifest {
+            get {
                 return ResourceManager.GetString("NameFromManifest", resourceCulture);
             }
         }
-
+        
         /// <summary>
         ///   Looks up a localized string similar to Name.
         /// </summary>
-        internal static string NameText
-        {
-            get
-            {
+        internal static string NameText {
+            get {
                 return ResourceManager.GetString("NameText", resourceCulture);
             }
         }
-
+        
         /// <summary>
         ///   Looks up a localized string similar to No Ballots Uploaded.
         /// </summary>
-        internal static string NoBallotUploads
-        {
-            get
-            {
+        internal static string NoBallotUploads {
+            get {
                 return ResourceManager.GetString("NoBallotUploads", resourceCulture);
             }
         }
-
+        
         /// <summary>
         ///   Looks up a localized string similar to No elections found.
         /// </summary>
-        internal static string NoElections
-        {
-            get
-            {
+        internal static string NoElections {
+            get {
                 return ResourceManager.GetString("NoElections", resourceCulture);
             }
         }
-
+        
         /// <summary>
         ///   Looks up a localized string similar to No file chosen.
         /// </summary>
-        internal static string NoFileText
-        {
-            get
-            {
+        internal static string NoFileText {
+            get {
                 return ResourceManager.GetString("NoFileText", resourceCulture);
             }
         }
-
+        
         /// <summary>
         ///   Looks up a localized string similar to No folder chosen.
         /// </summary>
-        internal static string NoFolderText
-        {
-            get
-            {
+        internal static string NoFolderText {
+            get {
                 return ResourceManager.GetString("NoFolderText", resourceCulture);
             }
         }
-
+        
         /// <summary>
         ///   Looks up a localized string similar to No guardians joined.
         /// </summary>
-        internal static string NoGuardians
-        {
-            get
-            {
+        internal static string NoGuardians {
+            get {
                 return ResourceManager.GetString("NoGuardians", resourceCulture);
             }
         }
-
+        
         /// <summary>
         ///   Looks up a localized string similar to No key ceremonies found.
         /// </summary>
-        internal static string NoKeyCeremonies
-        {
-            get
-            {
+        internal static string NoKeyCeremonies {
+            get {
                 return ResourceManager.GetString("NoKeyCeremonies", resourceCulture);
             }
         }
-
+        
         /// <summary>
         ///   Looks up a localized string similar to No tallies found.
         /// </summary>
-        internal static string NoTallies
-        {
-            get
-            {
+        internal static string NoTallies {
+            get {
                 return ResourceManager.GetString("NoTallies", resourceCulture);
             }
         }
-
+        
         /// <summary>
         ///   Looks up a localized string similar to No Tallies Created.
         /// </summary>
-        internal static string NoTalliesCreated
-        {
-            get
-            {
+        internal static string NoTalliesCreated {
+            get {
                 return ResourceManager.GetString("NoTalliesCreated", resourceCulture);
             }
         }
-
+        
         /// <summary>
         ///   Looks up a localized string similar to No.
         /// </summary>
-        internal static string NoText
-        {
-            get
-            {
+        internal static string NoText {
+            get {
                 return ResourceManager.GetString("NoText", resourceCulture);
             }
         }
-
+        
         /// <summary>
         ///   Looks up a localized string similar to Number of Guardians.
         /// </summary>
-        internal static string NumberOfGuardians
-        {
-            get
-            {
+        internal static string NumberOfGuardians {
+            get {
                 return ResourceManager.GetString("NumberOfGuardians", resourceCulture);
             }
         }
-
+        
         /// <summary>
         ///   Looks up a localized string similar to Parties.
         /// </summary>
-        internal static string PartiesText
-        {
-            get
-            {
+        internal static string PartiesText {
+            get {
                 return ResourceManager.GetString("PartiesText", resourceCulture);
             }
         }
-
+        
         /// <summary>
         ///   Looks up a localized string similar to Password to use for the database.
         /// </summary>
-        internal static string PasswordDefaultPlaceholder
-        {
-            get
-            {
+        internal static string PasswordDefaultPlaceholder {
+            get {
                 return ResourceManager.GetString("PasswordDefaultPlaceholder", resourceCulture);
             }
         }
-
+        
         /// <summary>
         ///   Looks up a localized string similar to Waiting for Admin to Announce the Guardians.
         /// </summary>
-        internal static string PendingAdminAnnounce
-        {
-            get
-            {
+        internal static string PendingAdminAnnounce {
+            get {
                 return ResourceManager.GetString("PendingAdminAnnounce", resourceCulture);
             }
         }
-
+        
         /// <summary>
         ///   Looks up a localized string similar to Waiting for Admin to Create and Publish the Joint Key.
         /// </summary>
-        internal static string PendingAdminToPublishJointKey
-        {
-            get
-            {
+        internal static string PendingAdminToPublishJointKey {
+            get {
                 return ResourceManager.GetString("PendingAdminToPublishJointKey", resourceCulture);
             }
         }
-
+        
         /// <summary>
         ///   Looks up a localized string similar to Waiting for Admin to Share the Election Key Backups.
         /// </summary>
-        internal static string PendingAdminToShareBackups
-        {
-            get
-            {
+        internal static string PendingAdminToShareBackups {
+            get {
                 return ResourceManager.GetString("PendingAdminToShareBackups", resourceCulture);
             }
         }
-
+        
         /// <summary>
         ///   Looks up a localized string similar to Waiting for the Guardians to Backup Election Keys.
         /// </summary>
-        internal static string PendingGuardianBackups
-        {
-            get
-            {
+        internal static string PendingGuardianBackups {
+            get {
                 return ResourceManager.GetString("PendingGuardianBackups", resourceCulture);
             }
         }
-
+        
         /// <summary>
         ///   Looks up a localized string similar to Waiting for Guardians to Join.
         /// </summary>
-        internal static string PendingGuardianJoin
-        {
-            get
-            {
+        internal static string PendingGuardianJoin {
+            get {
                 return ResourceManager.GetString("PendingGuardianJoin", resourceCulture);
             }
         }
-
+        
         /// <summary>
         ///   Looks up a localized string similar to Waiting for Guardians to Verify the Backups.
         /// </summary>
-        internal static string PendingGuardiansVerifyBackups
-        {
-            get
-            {
+        internal static string PendingGuardiansVerifyBackups {
+            get {
                 return ResourceManager.GetString("PendingGuardiansVerifyBackups", resourceCulture);
             }
         }
-
+        
         /// <summary>
         ///   Looks up a localized string similar to Quorum.
         /// </summary>
-        internal static string Quorum
-        {
-            get
-            {
+        internal static string Quorum {
+            get {
                 return ResourceManager.GetString("Quorum", resourceCulture);
             }
         }
-
+        
         /// <summary>
         ///   Looks up a localized string similar to Quorum.
         /// </summary>
-        internal static string QuorumText
-        {
-            get
-            {
+        internal static string QuorumText {
+            get {
                 return ResourceManager.GetString("QuorumText", resourceCulture);
             }
         }
-
+        
         /// <summary>
         ///   Looks up a localized string similar to Rejected.
         /// </summary>
-        internal static string RejectedText
-        {
-            get
-            {
+        internal static string RejectedText {
+            get {
                 return ResourceManager.GetString("RejectedText", resourceCulture);
             }
         }
-
+        
         /// <summary>
         ///   Looks up a localized string similar to Removing files from the list.
         /// </summary>
-        internal static string RemovingList
-        {
-            get
-            {
+        internal static string RemovingList {
+            get {
                 return ResourceManager.GetString("RemovingList", resourceCulture);
             }
         }
-
+        
         /// <summary>
         ///   Looks up a localized string similar to Save.
         /// </summary>
-        internal static string Save
-        {
-            get
-            {
+        internal static string Save {
+            get {
                 return ResourceManager.GetString("Save", resourceCulture);
             }
         }
-
+        
         /// <summary>
         ///   Looks up a localized string similar to Selection one or more manifest files.
         /// </summary>
-        internal static string SelectManifest
-        {
-            get
-            {
+        internal static string SelectManifest {
+            get {
                 return ResourceManager.GetString("SelectManifest", resourceCulture);
             }
         }
-
+        
         /// <summary>
         ///   Looks up a localized string similar to Settings.
         /// </summary>
-        internal static string Settings
-        {
-            get
-            {
+        internal static string Settings {
+            get {
                 return ResourceManager.GetString("Settings", resourceCulture);
             }
         }
-
+        
         /// <summary>
         ///   Looks up a localized string similar to Spoiled.
         /// </summary>
-        internal static string SpoiledText
-        {
-            get
-            {
+        internal static string SpoiledText {
+            get {
                 return ResourceManager.GetString("SpoiledText", resourceCulture);
             }
         }
-
+        
         /// <summary>
         ///   Looks up a localized string similar to Start Ceremony.
         /// </summary>
-        internal static string StartCeremony
-        {
-            get
-            {
+        internal static string StartCeremony {
+            get {
                 return ResourceManager.GetString("StartCeremony", resourceCulture);
             }
         }
-
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Export the encryption package.
+        /// </summary>
+        internal static string Step1Text {
+            get {
+                return ResourceManager.GetString("Step1Text", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Upload ballots using EGDrive (1 or more).
+        /// </summary>
+        internal static string Step2Text {
+            get {
+                return ResourceManager.GetString("Step2Text", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Remove Spoiled Ballots (if needed).
+        /// </summary>
+        internal static string Step3Text {
+            get {
+                return ResourceManager.GetString("Step3Text", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Perform a tally with the guardians (1 or more).
+        /// </summary>
+        internal static string Step4Text {
+            get {
+                return ResourceManager.GetString("Step4Text", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to View and export a tally.
+        /// </summary>
+        internal static string Step5Text {
+            get {
+                return ResourceManager.GetString("Step5Text", resourceCulture);
+            }
+        }
+        
         /// <summary>
         ///   Looks up a localized string similar to ballots..
         /// </summary>
-        internal static string Success2Text
-        {
-            get
-            {
+        internal static string Success2Text {
+            get {
                 return ResourceManager.GetString("Success2Text", resourceCulture);
             }
         }
-
+        
         /// <summary>
         ///   Looks up a localized string similar to Successfully uploaded.
         /// </summary>
-        internal static string SuccessText
-        {
-            get
-            {
+        internal static string SuccessText {
+            get {
                 return ResourceManager.GetString("SuccessText", resourceCulture);
             }
         }
-
+        
         /// <summary>
         ///   Looks up a localized string similar to Switch Languages.
         /// </summary>
-        internal static string SwitchLanguages
-        {
-            get
-            {
+        internal static string SwitchLanguages {
+            get {
                 return ResourceManager.GetString("SwitchLanguages", resourceCulture);
             }
         }
-
+        
         /// <summary>
         ///   Looks up a localized string similar to Tallies.
         /// </summary>
-        internal static string TalliesText
-        {
-            get
-            {
+        internal static string TalliesText {
+            get {
                 return ResourceManager.GetString("TalliesText", resourceCulture);
             }
         }
-
+        
         /// <summary>
         ///   Looks up a localized string similar to Total.
         /// </summary>
-        internal static string TotalText
-        {
-            get
-            {
+        internal static string TotalText {
+            get {
                 return ResourceManager.GetString("TotalText", resourceCulture);
             }
         }
-
+        
         /// <summary>
         ///   Looks up a localized string similar to Uploaded.
         /// </summary>
-        internal static string UploadedText
-        {
-            get
-            {
+        internal static string UploadedText {
+            get {
                 return ResourceManager.GetString("UploadedText", resourceCulture);
             }
         }
-
+        
         /// <summary>
         ///   Looks up a localized string similar to Upload More Ballots.
         /// </summary>
-        internal static string UploadMoreText
-        {
-            get
-            {
+        internal static string UploadMoreText {
+            get {
                 return ResourceManager.GetString("UploadMoreText", resourceCulture);
             }
         }
-
+        
         /// <summary>
         ///   Looks up a localized string similar to Upload.
         /// </summary>
-        internal static string UploadText
-        {
-            get
-            {
+        internal static string UploadText {
+            get {
                 return ResourceManager.GetString("UploadText", resourceCulture);
             }
         }
-
+        
         /// <summary>
         ///   Looks up a localized string similar to Upload Wizard.
         /// </summary>
-        internal static string UploadWizardText
-        {
-            get
-            {
+        internal static string UploadWizardText {
+            get {
                 return ResourceManager.GetString("UploadWizardText", resourceCulture);
             }
         }
-
+        
         /// <summary>
         ///   Looks up a localized string similar to User ID.
         /// </summary>
-        internal static string UserID
-        {
-            get
-            {
+        internal static string UserID {
+            get {
                 return ResourceManager.GetString("UserID", resourceCulture);
             }
         }
-
+        
         /// <summary>
         ///   Looks up a localized string similar to User Login.
         /// </summary>
-        internal static string UserLogin
-        {
-            get
-            {
+        internal static string UserLogin {
+            get {
                 return ResourceManager.GetString("UserLogin", resourceCulture);
             }
         }
-
+        
         /// <summary>
         ///   Looks up a localized string similar to User Setup.
         /// </summary>
-        internal static string UserSetup
-        {
-            get
-            {
+        internal static string UserSetup {
+            get {
                 return ResourceManager.GetString("UserSetup", resourceCulture);
             }
         }
-
+        
         /// <summary>
         ///   Looks up a localized string similar to Verified.
         /// </summary>
-        internal static string Verified
-        {
-            get
-            {
+        internal static string Verified {
+            get {
                 return ResourceManager.GetString("Verified", resourceCulture);
             }
         }
-
+        
         /// <summary>
         ///   Looks up a localized string similar to View Key Ceremony.
         /// </summary>
-        internal static string ViewKeyCeremony
-        {
-            get
-            {
+        internal static string ViewKeyCeremony {
+            get {
                 return ResourceManager.GetString("ViewKeyCeremony", resourceCulture);
             }
         }
-
+        
         /// <summary>
         ///   Looks up a localized string similar to View Manifest.
         /// </summary>
-        internal static string ViewManifest
-        {
-            get
-            {
+        internal static string ViewManifest {
+            get {
                 return ResourceManager.GetString("ViewManifest", resourceCulture);
             }
         }
-
+        
         /// <summary>
         ///   Looks up a localized string similar to ElectionGuard Election Manager.
         /// </summary>
-        internal static string WindowTitle
-        {
-            get
-            {
+        internal static string WindowTitle {
+            get {
                 return ResourceManager.GetString("WindowTitle", resourceCulture);
             }
         }
-
+        
         /// <summary>
         ///   Looks up a localized string similar to Yes.
         /// </summary>
-        internal static string YesText
-        {
-            get
-            {
+        internal static string YesText {
+            get {
                 return ResourceManager.GetString("YesText", resourceCulture);
             }
         }

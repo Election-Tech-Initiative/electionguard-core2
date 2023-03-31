@@ -15,6 +15,9 @@ public partial class BallotRecord : DatabaseRecord
     private string? _ballotCode;
 
     [ObservableProperty]
+    private BallotBoxState _ballotState;
+
+    [ObservableProperty]
     private DateTime _timeStamp;
 
     [ObservableProperty]
@@ -23,5 +26,4 @@ public partial class BallotRecord : DatabaseRecord
     public BallotRecord() : base(nameof(BallotRecord))
     {
     }
-
 }

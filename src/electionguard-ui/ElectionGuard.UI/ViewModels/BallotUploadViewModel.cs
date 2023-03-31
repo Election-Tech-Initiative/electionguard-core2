@@ -147,6 +147,7 @@ public partial class BallotUploadViewModel : BaseViewModel
                         UploadId = upload.UploadId,
                         FileName = filename,
                         BallotCode = ballot.BallotCode.ToHex(),
+                        BallotState = ballot.State,
                         BallotData = ballotData
                     };
                     _ = _ballotService.SaveAsync(ballotRecord).Result;

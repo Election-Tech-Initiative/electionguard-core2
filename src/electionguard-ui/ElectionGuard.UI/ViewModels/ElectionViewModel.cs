@@ -61,6 +61,18 @@ public partial class ElectionViewModel : BaseViewModel
     [ObservableProperty]
     private DateTime _ballotsUploadedDateTime;
 
+    [ObservableProperty]
+    private bool _step1Complete;
+
+    [ObservableProperty]
+    private bool _step2Complete;
+
+    partial void OnBallotsUploadedDateTimeChanged(DateTime value)
+    {
+        Step2Complete = true;
+    }
+
+
     partial void OnCurrentElectionChanged(Election? value)
     {
         PageTitle = value?.Name ?? "";
@@ -87,6 +99,8 @@ public partial class ElectionViewModel : BaseViewModel
 
             Tallies.Clear();
 
+            Step1Complete = CurrentElection.ExportEncryptionDateTime != null;
+            Step2Complete = BallotAddedTotal + BallotSpoiledTotal > 0;
         });
     }
 
@@ -130,6 +144,7 @@ public partial class ElectionViewModel : BaseViewModel
         // this is for testing only and will be removed
         CurrentElection.ExportEncryptionDateTime = DateTime.Now;
         AddBallotsCommand.NotifyCanExecuteChanged();
+        Step1Complete = true;
     }
 
     [RelayCommand]

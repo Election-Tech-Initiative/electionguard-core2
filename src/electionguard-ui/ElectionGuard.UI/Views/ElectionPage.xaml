@@ -273,6 +273,55 @@
 
         <VerticalStackLayout Grid.RowSpan="2" Grid.Column="2">
             <Label Style="{StaticResource H2}" Text="{helper:Translate ElectionChecklist}" />
+            <HorizontalStackLayout Margin="10">
+                <Label Text="1." VerticalTextAlignment="Center" />
+                <CheckBox IsChecked="{Binding Step1Complete}" IsEnabled="False" />
+                <Label
+                    LineBreakMode="WordWrap"
+                    Text="{helper:Translate Step1Text}"
+                    VerticalTextAlignment="Center" />
+            </HorizontalStackLayout>
+            <Line Background="Black" />
+            <HorizontalStackLayout Margin="10">
+                <Label Text="2." VerticalTextAlignment="Center" />
+                <CheckBox IsEnabled="False" />
+                <Label
+                    LineBreakMode="WordWrap"
+                    Text="{helper:Translate Step2Text}"
+                    VerticalTextAlignment="Center"
+                    WidthRequest="200" />
+            </HorizontalStackLayout>
+            <Line Background="Black" />
+            <HorizontalStackLayout Margin="10">
+                <Label Text="3." VerticalTextAlignment="Center" />
+                <CheckBox IsEnabled="False" />
+                <Label
+                    LineBreakMode="WordWrap"
+                    Text="{helper:Translate Step3Text}"
+                    VerticalTextAlignment="Center"
+                    WidthRequest="200" />
+            </HorizontalStackLayout>
+            <Line Background="Black" />
+            <HorizontalStackLayout Margin="10">
+                <Label Text="4." VerticalTextAlignment="Center" />
+                <CheckBox IsEnabled="False" />
+                <Label
+                    LineBreakMode="WordWrap"
+                    Text="{helper:Translate Step4Text}"
+                    VerticalTextAlignment="Center"
+                    WidthRequest="200" />
+            </HorizontalStackLayout>
+            <Line Background="Black" />
+            <HorizontalStackLayout Margin="10">
+                <Label Text="5." VerticalTextAlignment="Center" />
+                <CheckBox IsEnabled="False" />
+                <Label
+                    LineBreakMode="WordWrap"
+                    Text="{helper:Translate Step5Text}"
+                    VerticalTextAlignment="Center"
+                    WidthRequest="200" />
+            </HorizontalStackLayout>
+            <Line Background="Black" />
         </VerticalStackLayout>
     </Grid>
 </views:ContentPageBase>
