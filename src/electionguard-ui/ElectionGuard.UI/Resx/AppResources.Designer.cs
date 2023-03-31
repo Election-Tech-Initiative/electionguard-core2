@@ -358,6 +358,15 @@ namespace ElectionGuard.UI.Resx {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Duplicated.
+        /// </summary>
+        internal static string DuplicatedText {
+            get {
+                return ResourceManager.GetString("DuplicatedText", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Election Checklist.
         /// </summary>
         internal static string ElectionChecklist {
@@ -435,6 +444,15 @@ namespace ElectionGuard.UI.Resx {
         internal static string ErrorManifest {
             get {
                 return ResourceManager.GetString("ErrorManifest", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Export Encryption.
+        /// </summary>
+        internal static string ExportEncryptionText {
+            get {
+                return ResourceManager.GetString("ExportEncryptionText", resourceCulture);
             }
         }
         
@@ -876,6 +894,51 @@ namespace ElectionGuard.UI.Resx {
         internal static string StartCeremony {
             get {
                 return ResourceManager.GetString("StartCeremony", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Export the encryption package.
+        /// </summary>
+        internal static string Step1Text {
+            get {
+                return ResourceManager.GetString("Step1Text", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Upload ballots using EGDrive (1 or more).
+        /// </summary>
+        internal static string Step2Text {
+            get {
+                return ResourceManager.GetString("Step2Text", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Remove Spoiled Ballots (if needed).
+        /// </summary>
+        internal static string Step3Text {
+            get {
+                return ResourceManager.GetString("Step3Text", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Perform a tally with the guardians (1 or more).
+        /// </summary>
+        internal static string Step4Text {
+            get {
+                return ResourceManager.GetString("Step4Text", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to View and export a tally.
+        /// </summary>
+        internal static string Step5Text {
+            get {
+                return ResourceManager.GetString("Step5Text", resourceCulture);
             }
         }
         

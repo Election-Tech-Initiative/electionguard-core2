@@ -438,10 +438,31 @@
   <data name="Success2Text" xml:space="preserve">
     <value>Votos</value>
   </data>
+  <data name="ExportEncryptionText" xml:space="preserve">
+    <value>¡Exportar cifrado!</value>
+  </data>
+  <data name="DuplicateText" xml:space="preserve">
+    <value>Duplicar</value>
+  </data>
   <data name="ConnectionStringPlaceholder" xml:space="preserve">
     <value>¡Cadena de conexión para llegar a la base de datos!</value>
   </data>
   <data name="ConnectionStringText" xml:space="preserve">
     <value>Cadena de conexión</value>
+  </data>
+  <data name="DuplicatedText" xml:space="preserve">
+    <value>Duplicado</value>
+  </data>
+  <data name="Step1Text" xml:space="preserve">
+    <value>¡Exporta el paquete de cifrado!</value>
+  </data>
+  <data name="Step2Text" xml:space="preserve">
+    <value>¡Sube boletas usando EGDrive (1 o más)!</value>
+  </data>
+  <data name="Step3Text" xml:space="preserve">
+    <value>¡Realice un recuento con los guardianes (1 o más)!</value>
+  </data>
+  <data name="Step4Text" xml:space="preserve">
+    <value>¡Ver y exportar un recuento!</value>
   </data>
 </root>

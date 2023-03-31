@@ -9,15 +9,18 @@ public partial class ElectionViewModel : BaseViewModel
     private KeyCeremonyService _keyCeremonyService;
     private ManifestService _manifestService;
     private BallotUploadService _uploadService;
+    private ElectionService _electionService;
 
-    public ElectionViewModel(IServiceProvider serviceProvider, KeyCeremonyService keyCeremonyService, ManifestService manifestService, BallotUploadService uploadService) : base(null, serviceProvider)
+    public ElectionViewModel(IServiceProvider serviceProvider, KeyCeremonyService keyCeremonyService, ManifestService manifestService, BallotUploadService uploadService, ElectionService electionService) : base(null, serviceProvider)
     {
         _keyCeremonyService = keyCeremonyService;
         _manifestService = manifestService;
         _uploadService = uploadService;
+        _electionService = electionService;
     }
 
     [ObservableProperty]
+    [NotifyCanExecuteChangedFor(nameof(AddBallotsCommand))]
     private Election? _currentElection;
 
     [ObservableProperty]
@@ -36,10 +39,15 @@ public partial class ElectionViewModel : BaseViewModel
     private long _ballotCountTotal = 0;
 
     [ObservableProperty]
+    [NotifyCanExecuteChangedFor(nameof(CreateTallyCommand))]
     private long _ballotAddedTotal = 0;
 
     [ObservableProperty]
+    [NotifyCanExecuteChangedFor(nameof(CreateTallyCommand))]
     private long _ballotSpoiledTotal = 0;
+
+    [ObservableProperty]
+    private long _ballotDuplicateTotal = 0;
 
     [ObservableProperty]
     private long _ballotRejectedTotal = 0;
@@ -49,6 +57,20 @@ public partial class ElectionViewModel : BaseViewModel
 
     [ObservableProperty]
     private ObservableCollection<Tally> _tallies = new();
+
+    [ObservableProperty]
+    private DateTime _ballotsUploadedDateTime;
+
+    [ObservableProperty]
+    private bool _step1Complete;
+
+    [ObservableProperty]
+    private bool _step2Complete;
+
+    partial void OnBallotsUploadedDateTimeChanged(DateTime value)
+    {
+        Step2Complete = true;
+    }
 
 
     partial void OnCurrentElectionChanged(Election? value)
@@ -63,6 +85,7 @@ public partial class ElectionViewModel : BaseViewModel
             BallotCountTotal = 0;
             BallotAddedTotal = 0;
             BallotSpoiledTotal = 0;
+            BallotDuplicateTotal = 0;
             BallotRejectedTotal = 0;
             uploads.ForEach((upload) =>
             {
@@ -70,15 +93,31 @@ public partial class ElectionViewModel : BaseViewModel
                 BallotCountTotal += upload.BallotCount;
                 BallotAddedTotal += upload.BallotImported;
                 BallotSpoiledTotal += upload.BallotSpoiled;
+                BallotDuplicateTotal += upload.BallotDuplicated;
                 BallotRejectedTotal += upload.BallotRejected;
             });
 
             Tallies.Clear();
 
+            Step1Complete = CurrentElection.ExportEncryptionDateTime != null;
+            Step2Complete = BallotAddedTotal + BallotSpoiledTotal > 0;
         });
     }
 
-    [RelayCommand]
+    [RelayCommand(CanExecute = nameof(CanCreateTally))]
+    private async Task CreateTally()
+    {
+        var pageParams = new Dictionary<string, object>
+            {
+                { BallotUploadViewModel.ElectionIdParam, CurrentElection.ElectionId }
+            };
+
+        // await NavigationService.GoToPage(typeof(BallotUploadViewModel), pageParams);
+    }
+
+    private bool CanCreateTally() => BallotCountTotal > 0 || BallotSpoiledTotal > 0;
+
+    [RelayCommand(CanExecute = nameof(CanUpload))]
     private async Task AddBallots()
     {
         var pageParams = new Dictionary<string, object>
@@ -89,6 +128,24 @@ public partial class ElectionViewModel : BaseViewModel
         await NavigationService.GoToPage(typeof(BallotUploadViewModel), pageParams);
     }
 
+    private bool CanUpload() => CurrentElection?.ExportEncryptionDateTime != null;
+
+    [RelayCommand]
+    private async Task ExportEncryption()
+    {
+        var pageParams = new Dictionary<string, object>
+            {
+                { BallotUploadViewModel.ElectionIdParam, CurrentElection.ElectionId }
+            };
+
+        // await NavigationService.GoToPage(typeof(BallotUploadViewModel), pageParams);
+        await _electionService.UpdateExportDateAsync(CurrentElection.ElectionId, DateTime.Now);
+
+        // this is for testing only and will be removed
+        CurrentElection.ExportEncryptionDateTime = DateTime.Now;
+        AddBallotsCommand.NotifyCanExecuteChanged();
+        Step1Complete = true;
+    }
 
     [RelayCommand]
     private async Task View()

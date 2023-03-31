@@ -17,9 +17,19 @@
             <helper:AlternateRowColorConverter x:Key="AlternateRowColorConverter" />
         </ResourceDictionary>
     </ContentPage.Resources>
-    <Grid Margin="20" ColumnDefinitions="3*, 2*, *">
-        <VerticalStackLayout Grid.Column="0">
-            <Label Style="{StaticResource H1}" Text="{Binding CurrentElection.Name}" />
+    <Grid
+        Margin="20"
+        ColumnDefinitions="3*, 2*, *"
+        RowDefinitions="auto, *">
+        <VerticalStackLayout Grid.Row="0" Grid.Column="0">
+            <Grid Margin="0,0,50,0">
+                <Label Style="{StaticResource H1}" Text="{Binding CurrentElection.Name}" />
+                <Button
+                    Command="{Binding ExportEncryptionCommand}"
+                    HeightRequest="40"
+                    HorizontalOptions="End"
+                    Text="{helper:Translate ExportEncryptionText}" />
+            </Grid>
             <toolkit:UniformItemsLayout>
                 <controls:LabelValueControl
                     Title="{helper:Translate GuardiansText}"
@@ -44,159 +54,17 @@
                     HorizontalOptions="Start"
                     Text="{Binding CurrentElection.CreatedBy}" />
             </toolkit:UniformItemsLayout>
-
-            <Grid Margin="0,0,50,0">
-                <Label Style="{StaticResource H2}" Text="{helper:Translate BallotsText}" />
-                <Button
-                    Command="{Binding AddBallotsCommand}"
-                    HorizontalOptions="End"
-                    Style="{StaticResource NarrowWidth}"
-                    Text="{helper:Translate AddBallots}" />
-            </Grid>
-            <CollectionView
-                x:Name="UploadCollectionView"
-                Margin="0,0,50,0"
-                ItemsSource="{Binding BallotUploads}">
-                <CollectionView.Header>
-                    <Grid>
-                        <Grid ColumnDefinitions="*, *, *, *, *, *">
-                            <Label
-                                Grid.Column="0"
-                                FontAttributes="Bold"
-                                Text="{helper:Translate UploadedText}" />
-                            <Label
-                                Grid.Column="1"
-                                FontAttributes="Bold"
-                                Text="{helper:Translate LocationText}" />
-                            <Label
-                                Grid.Column="2"
-                                FontAttributes="Bold"
-                                Text="{helper:Translate AddedText}" />
-                            <Label
-                                Grid.Column="3"
-                                FontAttributes="Bold"
-                                Text="{helper:Translate SpoiledText}" />
-                            <Label
-                                Grid.Column="4"
-                                FontAttributes="Bold"
-                                Text="{helper:Translate RejectedText}" />
-                            <Label
-                                Grid.Column="5"
-                                FontAttributes="Bold"
-                                Text="{helper:Translate BallotCountText}" />
-                        </Grid>
-                        <Line
-                            BackgroundColor="{StaticResource Gray950}"
-                            StrokeThickness="2"
-                            VerticalOptions="End" />
-                    </Grid>
-                </CollectionView.Header>
-                <CollectionView.ItemTemplate>
-                    <DataTemplate x:DataType="model:BallotUpload">
-                        <Grid BackgroundColor="{Binding ., Converter={StaticResource AlternateRowColorConverter}, ConverterParameter={x:Reference UploadCollectionView}}}" ColumnDefinitions="*, *, *, *, *, *">
-                            <Label
-                                Grid.Column="0"
-                                Margin="10"
-                                Text="{Binding CreatedAt}" />
-                            <Label
-                                Grid.Column="1"
-                                Margin="10"
-                                Text="{Binding Location}" />
-                            <Label
-                                Grid.Column="2"
-                                Margin="10"
-                                Text="{Binding BallotImported}" />
-                            <Label
-                                Grid.Column="3"
-                                Margin="10"
-                                Text="{Binding BallotSpoiled}" />
-                            <Label
-                                Grid.Column="4"
-                                Margin="10"
-                                Text="{Binding BallotRejected}" />
-                            <Label
-                                Grid.Column="5"
-                                Margin="10"
-                                Text="{Binding BallotCount}" />
-                        </Grid>
-                    </DataTemplate>
-                </CollectionView.ItemTemplate>
-                <CollectionView.Footer>
-                    <Grid BackgroundColor="{StaticResource Gray400}" ColumnDefinitions="2*, *, *, *, *">
-                        <Label
-                            Grid.Column="0"
-                            Margin="10"
-                            FontAttributes="Bold,Italic"
-                            Text="{helper:Translate TotalText}" />
-                        <Label
-                            Grid.Column="1"
-                            Margin="10"
-                            FontAttributes="Bold"
-                            Text="{Binding BallotAddedTotal}" />
-                        <Label
-                            Grid.Column="2"
-                            Margin="10"
-                            FontAttributes="Bold"
-                            Text="{Binding BallotSpoiledTotal}" />
-                        <Label
-                            Grid.Column="3"
-                            Margin="10"
-                            FontAttributes="Bold"
-                            Text="{Binding BallotRejectedTotal}" />
-                        <Label
-                            Grid.Column="4"
-                            Margin="10"
-                            FontAttributes="Bold"
-                            Text="{Binding BallotCountTotal}" />
-                    </Grid>
-                </CollectionView.Footer>
-            </CollectionView>
-
-            <Grid Margin="0,20,50,0">
-                <Label Style="{StaticResource H2}" Text="{helper:Translate TalliesText}" />
-                <Button
-                    HorizontalOptions="End"
-                    Style="{StaticResource NarrowWidth}"
-                    Text="{helper:Translate CreateTally}" />
-            </Grid>
-            <CollectionView Margin="0,0,50,0" ItemsSource="{Binding Tallies}">
-                <CollectionView.Header>
-                    <Grid>
-                        <Grid ColumnDefinitions="3*, 2*">
-                            <Label
-                                Grid.Column="0"
-                                FontAttributes="Bold"
-                                Text="{helper:Translate CreatedText}" />
-                            <Label
-                                Grid.Column="1"
-                                FontAttributes="Bold"
-                                Text="{helper:Translate NameText}" />
-                        </Grid>
-                        <Line
-                            BackgroundColor="{StaticResource Gray950}"
-                            StrokeThickness="2"
-                            VerticalOptions="End" />
-                    </Grid>
-                </CollectionView.Header>
-                <CollectionView.ItemTemplate>
-                    <DataTemplate x:DataType="model:Tally">
-                        <Grid ColumnDefinitions="3*, 2*">
-                            <Label Grid.Column="0" Text="{Binding CreatedAt}" />
-                            <Label Grid.Column="1" Text="{Binding Name}" />
-                        </Grid>
-                    </DataTemplate>
-                </CollectionView.ItemTemplate>
-            </CollectionView>
-
         </VerticalStackLayout>
-        <VerticalStackLayout Grid.Column="1">
-            <HorizontalStackLayout>
+
+        <VerticalStackLayout Grid.Row="0" Grid.Column="1">
+            <Grid Margin="0,0,50,0">
                 <Label Style="{StaticResource H1}" Text="{helper:Translate ManifestText}" />
                 <Button
                     Command="{Binding ViewCommand}"
+                    HeightRequest="40"
                     HorizontalOptions="End"
                     Text="{helper:Translate ViewManifest}" />
-            </HorizontalStackLayout>
+            </Grid>
             <StackLayout Style="{StaticResource FormControl}">
                 <Label Style="{StaticResource FormValue}" Text="{Binding ManifestName}" />
             </StackLayout>
@@ -225,8 +93,235 @@
                 HorizontalOptions="Start"
                 Text="{Binding Manifest.GeopoliticalUnitsSize}" />
         </VerticalStackLayout>
-        <VerticalStackLayout Grid.Column="2">
+
+        <VerticalStackLayout
+            Grid.Row="1"
+            Grid.Column="0"
+            Margin="0,0,50,0">
+            <Grid>
+                <Label Style="{StaticResource H2}" Text="{helper:Translate BallotsText}" />
+                <Button
+                    Command="{Binding AddBallotsCommand}"
+                    HorizontalOptions="End"
+                    Style="{StaticResource NarrowWidth}"
+                    Text="{helper:Translate AddBallots}" />
+            </Grid>
+            <ScrollView>
+                <CollectionView x:Name="UploadCollectionView" ItemsSource="{Binding BallotUploads}">
+                    <CollectionView.Header>
+                        <Grid>
+                            <Grid ColumnDefinitions="1.5*, 2*, *, *, *, *, *">
+                                <Label
+                                    Grid.Column="0"
+                                    FontAttributes="Bold"
+                                    Text="{helper:Translate UploadedText}" />
+                                <Label
+                                    Grid.Column="1"
+                                    FontAttributes="Bold"
+                                    Text="{helper:Translate LocationText}" />
+                                <Label
+                                    Grid.Column="2"
+                                    FontAttributes="Bold"
+                                    Text="{helper:Translate AddedText}" />
+                                <Label
+                                    Grid.Column="3"
+                                    FontAttributes="Bold"
+                                    Text="{helper:Translate SpoiledText}" />
+                                <Label
+                                    Grid.Column="4"
+                                    FontAttributes="Bold"
+                                    Text="{helper:Translate DuplicatedText}" />
+                                <Label
+                                    Grid.Column="5"
+                                    FontAttributes="Bold"
+                                    Text="{helper:Translate RejectedText}" />
+                                <Label
+                                    Grid.Column="6"
+                                    FontAttributes="Bold"
+                                    Text="{helper:Translate BallotCountText}" />
+                            </Grid>
+                            <Line
+                                BackgroundColor="{StaticResource Gray950}"
+                                StrokeThickness="2"
+                                VerticalOptions="End" />
+                        </Grid>
+                    </CollectionView.Header>
+                    <CollectionView.ItemTemplate>
+                        <DataTemplate x:DataType="model:BallotUpload">
+                            <Grid BackgroundColor="{Binding ., Converter={StaticResource AlternateRowColorConverter}, ConverterParameter={x:Reference UploadCollectionView}}}" ColumnDefinitions="1.5*, 2*, *, *, *, *, *">
+                                <Label
+                                    Grid.Column="0"
+                                    Margin="10"
+                                    Text="{Binding CreatedAt}" />
+                                <Label
+                                    Grid.Column="1"
+                                    Margin="10"
+                                    Text="{Binding Location}" />
+                                <Label
+                                    Grid.Column="2"
+                                    Margin="10"
+                                    Text="{Binding BallotImported}" />
+                                <Label
+                                    Grid.Column="3"
+                                    Margin="10"
+                                    Text="{Binding BallotSpoiled}" />
+                                <Label
+                                    Grid.Column="4"
+                                    Margin="10"
+                                    Text="{Binding BallotDuplicated}" />
+                                <Label
+                                    Grid.Column="5"
+                                    Margin="10"
+                                    Text="{Binding BallotRejected}" />
+                                <Label
+                                    Grid.Column="6"
+                                    Margin="10"
+                                    Text="{Binding BallotCount}" />
+                            </Grid>
+                        </DataTemplate>
+                    </CollectionView.ItemTemplate>
+                    <CollectionView.Footer>
+                        <Grid BackgroundColor="{StaticResource Gray400}" ColumnDefinitions="3.5*, *, *, *, *, *">
+                            <Label
+                                Grid.Column="0"
+                                Margin="10"
+                                FontAttributes="Bold,Italic"
+                                Text="{helper:Translate TotalText}" />
+                            <Label
+                                Grid.Column="1"
+                                Margin="10"
+                                FontAttributes="Bold"
+                                Text="{Binding BallotAddedTotal}" />
+                            <Label
+                                Grid.Column="2"
+                                Margin="10"
+                                FontAttributes="Bold"
+                                Text="{Binding BallotSpoiledTotal}" />
+                            <Label
+                                Grid.Column="3"
+                                Margin="10"
+                                FontAttributes="Bold"
+                                Text="{Binding BallotDuplicateTotal}" />
+                            <Label
+                                Grid.Column="4"
+                                Margin="10"
+                                FontAttributes="Bold"
+                                Text="{Binding BallotRejectedTotal}" />
+                            <Label
+                                Grid.Column="5"
+                                Margin="10"
+                                FontAttributes="Bold"
+                                Text="{Binding BallotCountTotal}" />
+                        </Grid>
+                    </CollectionView.Footer>
+                </CollectionView>
+            </ScrollView>
+        </VerticalStackLayout>
+
+        <VerticalStackLayout
+            Grid.Row="1"
+            Grid.Column="1"
+            Margin="0,0,50,0">
+            <Grid>
+                <Button
+                    Command="{Binding CreateTallyCommand}"
+                    Style="{StaticResource NarrowWidth}"
+                    Text="{helper:Translate CreateTally}" />
+                <Label
+                    HorizontalOptions="End"
+                    Style="{StaticResource H2}"
+                    Text="{helper:Translate TalliesText}" />
+            </Grid>
+            <CollectionView ItemsSource="{Binding Tallies}">
+                <CollectionView.Header>
+                    <Grid>
+                        <Grid ColumnDefinitions="3*, 2*">
+                            <Label
+                                Grid.Column="0"
+                                FontAttributes="Bold"
+                                Text="{helper:Translate CreatedText}" />
+                            <Label
+                                Grid.Column="1"
+                                FontAttributes="Bold"
+                                Text="{helper:Translate NameText}" />
+                        </Grid>
+                        <Line
+                            BackgroundColor="{StaticResource Gray950}"
+                            StrokeThickness="2"
+                            VerticalOptions="End" />
+                    </Grid>
+                </CollectionView.Header>
+                <CollectionView.ItemTemplate>
+                    <DataTemplate x:DataType="model:Tally">
+                        <Grid ColumnDefinitions="3*, 2*">
+                            <Label Grid.Column="0" Text="{Binding CreatedAt}" />
+                            <Label Grid.Column="1" Text="{Binding Name}" />
+                        </Grid>
+                    </DataTemplate>
+                </CollectionView.ItemTemplate>
+                <CollectionView.Footer>
+                    <Grid BackgroundColor="{StaticResource Gray400}">
+                        <Label
+                            Grid.Column="0"
+                            Margin="10"
+                            FontAttributes="Bold,Italic"
+                            Text=" " />
+                    </Grid>
+                </CollectionView.Footer>
+            </CollectionView>
+        </VerticalStackLayout>
+
+        <VerticalStackLayout Grid.RowSpan="2" Grid.Column="2">
             <Label Style="{StaticResource H2}" Text="{helper:Translate ElectionChecklist}" />
+            <HorizontalStackLayout Margin="10">
+                <Label Text="1." VerticalTextAlignment="Center" />
+                <CheckBox IsChecked="{Binding Step1Complete}" IsEnabled="False" />
+                <Label
+                    LineBreakMode="WordWrap"
+                    Text="{helper:Translate Step1Text}"
+                    VerticalTextAlignment="Center" />
+            </HorizontalStackLayout>
+            <Line Background="Black" />
+            <HorizontalStackLayout Margin="10">
+                <Label Text="2." VerticalTextAlignment="Center" />
+                <CheckBox IsEnabled="False" />
+                <Label
+                    LineBreakMode="WordWrap"
+                    Text="{helper:Translate Step2Text}"
+                    VerticalTextAlignment="Center"
+                    WidthRequest="200" />
+            </HorizontalStackLayout>
+            <Line Background="Black" />
+            <HorizontalStackLayout Margin="10">
+                <Label Text="3." VerticalTextAlignment="Center" />
+                <CheckBox IsEnabled="False" />
+                <Label
+                    LineBreakMode="WordWrap"
+                    Text="{helper:Translate Step3Text}"
+                    VerticalTextAlignment="Center"
+                    WidthRequest="200" />
+            </HorizontalStackLayout>
+            <Line Background="Black" />
+            <HorizontalStackLayout Margin="10">
+                <Label Text="4." VerticalTextAlignment="Center" />
+                <CheckBox IsEnabled="False" />
+                <Label
+                    LineBreakMode="WordWrap"
+                    Text="{helper:Translate Step4Text}"
+                    VerticalTextAlignment="Center"
+                    WidthRequest="200" />
+            </HorizontalStackLayout>
+            <Line Background="Black" />
+            <HorizontalStackLayout Margin="10">
+                <Label Text="5." VerticalTextAlignment="Center" />
+                <CheckBox IsEnabled="False" />
+                <Label
+                    LineBreakMode="WordWrap"
+                    Text="{helper:Translate Step5Text}"
+                    VerticalTextAlignment="Center"
+                    WidthRequest="200" />
+            </HorizontalStackLayout>
+            <Line Background="Black" />
         </VerticalStackLayout>
     </Grid>
 </views:ContentPageBase>

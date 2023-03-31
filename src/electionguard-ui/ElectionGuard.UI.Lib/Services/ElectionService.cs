@@ -1,4 +1,5 @@
 ﻿using ElectionGuard.UI.Lib.Models;
+using MongoDB.Driver;
 
 namespace ElectionGuard.UI.Lib.Services;
 
@@ -26,10 +27,30 @@ public class ElectionService : BaseDatabaseService<Election>
         return await GetByFieldAsync(Constants.ElectionId, electionId);
     }
 
+    /// <summary>
+    /// Check if an election exists
+    /// </summary>
+    /// <param name="electionName">name of the election to search for</param>
     public async Task<bool> ElectionNameExists(string electionName)
     {
         var election = await GetByNameAsync(electionName);
         return election != null;
+    }
+
+    /// <summary>
+    /// Updated the current date of the latest export
+    /// </summary>
+    /// <param name="electionId">election id to use</param>
+    /// <param name="date">date to save</param>
+    virtual public async Task UpdateExportDateAsync(string electionId, DateTime date)
+    {
+        var filterBuilder = Builders<Election>.Filter;
+        var filter = filterBuilder.And(filterBuilder.Eq(Constants.ElectionId, electionId));
+
+        var updateBuilder = Builders<Election>.Update;
+        var update = updateBuilder.Set(Constants.ExportEncryptionDateTime, date);
+
+        await UpdateAsync(filter, update);
     }
 
 }

@@ -35,6 +35,8 @@ internal static class Constants
 
     public readonly static string State = "State";
 
+    public readonly static string ExportEncryptionDateTime = "ExportEncryptionDateTime";
+
     public readonly static string TableBallots = "ballots";
 
     public readonly static string TableElections = "elections";
