@@ -6,7 +6,7 @@ namespace ElectionGuard
     /// <summary>
     /// An element of the smaller `mod q` space, i.e., in [0, Q), where Q is a 256-bit prime.
     /// </summary>
-    public class ElementModQ : DisposableBase
+    public class ElementModQ : DisposableBase, IEquatable<ElementModQ>
     {
         /// <summary>
         /// Number of 64-bit ints that make up the 256-bit prime
@@ -89,7 +89,7 @@ namespace ElectionGuard
         /// <summary>
         /// Create a `ElementModQ`
         /// </summary>
-        /// <param name="data">integer representing the value of the initialized data</param>
+        /// <param name="newData">integer representing the value of the initialized data</param>
         /// <param name="uncheckedInput">if data is checked or not</param>
         public ElementModQ(ulong newData, bool uncheckedInput = false)
         {
@@ -107,18 +107,23 @@ namespace ElectionGuard
         {
         }
 
+        public override string ToString()
+        {
+            return ToHex();
+        }
+
         /// <Summary>
         /// exports a hex representation of the integer value in Big Endian format
         /// </Summary>
         public string ToHex()
         {
-            var status = NativeInterface.ElementModQ.ToHex(Handle, out IntPtr pointer);
+            var status = NativeInterface.ElementModQ.ToHex(Handle, out var pointer);
             if (status != Status.ELECTIONGUARD_STATUS_SUCCESS)
             {
                 throw new ElectionGuardException($"ToHex Error Status: {status}");
             }
             var value = Marshal.PtrToStringAnsi(pointer);
-            NativeInterface.Memory.FreeIntPtr(pointer);
+            _ = NativeInterface.Memory.FreeIntPtr(pointer);
             return value;
         }
 
@@ -218,7 +223,7 @@ namespace ElectionGuard
             var data = new long[MaxSize];
             fixed (ulong* element = new ulong[MaxSize])
             {
-                NativeInterface.ElementModQ.GetData(Handle, &element, out ulong size);
+                _ = NativeInterface.ElementModQ.GetData(Handle, &element, out var size);
                 if (size != MaxSize)
                 {
                     throw new ElectionGuardException($"wrong size, expected: {MaxSize}, actual: {size}");
@@ -238,6 +243,25 @@ namespace ElectionGuard
             return data;
         }
 
+        public static bool operator ==(ElementModQ a, ElementModQ b)
+        {
+            if (ReferenceEquals(a, b))
+            {
+                return true;
+            }
+
+            if (a is null || b is null)
+            {
+                return false;
+            }
+
+            return a.ToHex().Equals(b.ToHex());
+        }
+
+        public static bool operator !=(ElementModQ a, ElementModQ b)
+        {
+            return !(a == b);
+        }
 
         /// <summary>
         /// 
@@ -246,17 +270,22 @@ namespace ElectionGuard
         /// <returns></returns>
         public override bool Equals(object obj)
         {
-            if (obj == null)
+            return Equals(obj as ElementModQ);
+        }
+
+        public bool Equals(ElementModQ other)
+        {
+            if (other is null)
             {
                 return false;
             }
 
-            if (!(obj is ElementModQ other))
+            if (ReferenceEquals(this, other))
             {
-                return false;
+                return true;
             }
 
-            return ToHex() == other.ToHex();
+            return ToHex().Equals(other.ToHex());
         }
 
         /// <summary>
@@ -275,7 +304,7 @@ namespace ElectionGuard
         /// </summary>
         public bool IsInBounds()
         {
-            var status = NativeInterface.ElementModQ.IsInBounds(Handle, out bool inBounds);
+            var status = NativeInterface.ElementModQ.IsInBounds(Handle, out var inBounds);
             if (status != Status.ELECTIONGUARD_STATUS_SUCCESS)
             {
                 throw new ElectionGuardException($"IsInBounds Error Status: {status}");

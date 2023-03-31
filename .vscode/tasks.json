@@ -4,7 +4,7 @@
     "version": "2.0.0",
     "tasks": [
         {
-            "label": "Build (debug)",
+            "label": "Build CPP (debug)",
             "type": "shell",
             "group": "build",
             "presentation": {
@@ -13,20 +13,25 @@
                 "focus": false,
                 "panel": "shared"
             },
+            "options": {
+                "env": {
+                    "TARGET": "Debug"
+                }
+            },
             "command": "make",
             "windows": {
                 "args": [
-                    "build-debug"
+                    "build"
                 ],
             },
             "linux": {
                 "args": [
-                    "build-debug"
+                    "build"
                 ],
             },
             "osx": {
                 "args": [
-                    "build-debug"
+                    "build"
                 ],
             },
             "problemMatcher": {
@@ -46,7 +51,7 @@
             }
         },
         {
-            "label": "Build (release)",
+            "label": "Build CPP (release)",
             "type": "shell",
             "group": "build",
             "presentation": {
@@ -55,20 +60,25 @@
                 "focus": false,
                 "panel": "shared"
             },
+            "options": {
+                "env": {
+                    "TARGET": "Release"
+                }
+            },
             "command": "make",
             "windows": {
                 "args": [
-                    "build-release"
+                    "build"
                 ],
             },
             "linux": {
                 "args": [
-                    "build-release"
+                    "build"
                 ],
             },
             "osx": {
                 "args": [
-                    "build-release"
+                    "build"
                 ],
             },
             "problemMatcher": {
@@ -88,7 +98,67 @@
             }
         },
         {
-            "label": "Test for POSIX Systems",
+            "label": "Build .Net (debug)",
+            "type": "shell",
+            "group": "build",
+            "presentation": {
+                "reveal": "silent"
+            },
+            "options": {
+                "env": {
+                    "TARGET": "Debug"
+                }
+            },
+            "command": "make",
+            "windows": {
+                "args": [
+                    "build-netstandard"
+                ],
+            },
+            "linux": {
+                "args": [
+                    "build-netstandard"
+                ],
+            },
+            "osx": {
+                "args": [
+                    "build-netstandard"
+                ],
+            },
+            "problemMatcher": "$msCompile"
+        },
+        {
+            "label": "Build .Net (release)",
+            "type": "shell",
+            "group": "build",
+            "presentation": {
+                "reveal": "silent"
+            },
+            "options": {
+                "env": {
+                    "TARGET": "Release"
+                }
+            },
+            "command": "make",
+            "windows": {
+                "args": [
+                    "build-netstandard"
+                ],
+            },
+            "linux": {
+                "args": [
+                    "build-netstandard"
+                ],
+            },
+            "osx": {
+                "args": [
+                    "build-netstandard"
+                ],
+            },
+            "problemMatcher": "$msCompile"
+        },
+        {
+            "label": "Test CPP for POSIX Systems",
             "type": "shell",
             "command": "make",
             "args": [
@@ -120,5 +190,26 @@
                 }
             }
         },
+        { 
+            "label": "Test .NET Core Encryption with debugger", 
+            "type": "process", 
+            "group": "test", 
+            "isBackground": true, 
+            "command": "dotnet", 
+            "args": [ "test" ], 
+            "options": { 
+                "cwd": "${workspaceFolder}/bindings/netstandard/ElectionGuard/ElectionGuard.Encryption.Tests", 
+                "env": { 
+                    "VSTEST_HOST_DEBUG": "1" 
+                }, 
+            },     
+            "presentation": { 
+                "echo": true,
+                "reveal": "always",
+                "focus": false,
+                "panel": "shared"
+            },
+            "problemMatcher": [] 
+        }
     ]
 }

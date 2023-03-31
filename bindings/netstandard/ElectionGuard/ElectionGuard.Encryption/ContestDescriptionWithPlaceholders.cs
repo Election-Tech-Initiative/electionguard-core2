@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Runtime.InteropServices;
 
 namespace ElectionGuard
@@ -19,13 +20,13 @@ namespace ElectionGuard
             get
             {
                 var status = NativeInterface.ContestDescriptionWithPlaceholders.GetObjectId(
-                    Handle, out IntPtr value);
+                    Handle, out var value);
                 if (status != Status.ELECTIONGUARD_STATUS_SUCCESS)
                 {
                     throw new ElectionGuardException($"ContestDescriptionWithPlaceholders Error ObjectId: {status}");
                 }
                 var data = Marshal.PtrToStringAnsi(value);
-                NativeInterface.Memory.FreeIntPtr(value);
+                _ = NativeInterface.Memory.FreeIntPtr(value);
                 return data;
             }
         }
@@ -39,13 +40,13 @@ namespace ElectionGuard
             get
             {
                 var status = NativeInterface.ContestDescriptionWithPlaceholders.GetElectoralDistrictId(
-                    Handle, out IntPtr value);
+                    Handle, out var value);
                 if (status != Status.ELECTIONGUARD_STATUS_SUCCESS)
                 {
                     throw new ElectionGuardException($"ContestDescriptionWithPlaceholders Error ElectoralDistrictId: {status}");
                 }
                 var data = Marshal.PtrToStringAnsi(value);
-                NativeInterface.Memory.FreeIntPtr(value);
+                _ = NativeInterface.Memory.FreeIntPtr(value);
                 return data;
             }
         }
@@ -109,13 +110,13 @@ namespace ElectionGuard
             get
             {
                 var status = NativeInterface.ContestDescriptionWithPlaceholders.GetName(
-                    Handle, out IntPtr value);
+                    Handle, out var value);
                 if (status != Status.ELECTIONGUARD_STATUS_SUCCESS)
                 {
                     throw new ElectionGuardException($"ContestDescriptionWithPlaceholders Error Name: {status}");
                 }
                 var data = Marshal.PtrToStringAnsi(value);
-                NativeInterface.Memory.FreeIntPtr(value);
+                _ = NativeInterface.Memory.FreeIntPtr(value);
                 return data;
             }
         }
@@ -128,12 +129,10 @@ namespace ElectionGuard
             get
             {
                 var status = NativeInterface.ContestDescriptionWithPlaceholders.GetBallotTitle(
-                    Handle, out NativeInterface.InternationalizedText.InternationalizedTextHandle value);
-                if (status != Status.ELECTIONGUARD_STATUS_SUCCESS)
-                {
-                    throw new ElectionGuardException($"ContestDescriptionWithPlaceholders Error BallotTitle: {status}");
-                }
-                return new InternationalizedText(value);
+                    Handle, out var value);
+                return status != Status.ELECTIONGUARD_STATUS_SUCCESS
+                    ? throw new ElectionGuardException($"ContestDescriptionWithPlaceholders Error BallotTitle: {status}")
+                    : new InternationalizedText(value);
             }
         }
 
@@ -145,12 +144,10 @@ namespace ElectionGuard
             get
             {
                 var status = NativeInterface.ContestDescriptionWithPlaceholders.GetBallotSubTitle(
-                    Handle, out NativeInterface.InternationalizedText.InternationalizedTextHandle value);
-                if (status != Status.ELECTIONGUARD_STATUS_SUCCESS)
-                {
-                    throw new ElectionGuardException($"ContestDescriptionWithPlaceholders Error BallotSubTitle: {status}");
-                }
-                return new InternationalizedText(value);
+                    Handle, out var value);
+                return status != Status.ELECTIONGUARD_STATUS_SUCCESS
+                    ? throw new ElectionGuardException($"ContestDescriptionWithPlaceholders Error BallotSubTitle: {status}")
+                    : new InternationalizedText(value);
             }
         }
 
@@ -167,6 +164,15 @@ namespace ElectionGuard
         }
 
         /// <Summary>
+        /// The collection of selections for this contest
+        /// </Summary>
+        public IReadOnlyList<SelectionDescription> Selections =>
+            new ElectionGuardEnumerator<SelectionDescription>(
+                () => (int)SelectionsSize,
+                (index) => GetSelectionAtIndex((ulong)index)
+            );
+
+        /// <Summary>
         /// The size of the placeholder collection
         /// </Summary>
         public ulong PlaceholdersSize
@@ -177,6 +183,15 @@ namespace ElectionGuard
                 return value;
             }
         }
+
+        /// <Summary>
+        /// The collection of placeholders for this contest
+        /// </Summary>
+        public IReadOnlyList<SelectionDescription> Placeholders =>
+            new ElectionGuardEnumerator<SelectionDescription>(
+                () => (int)PlaceholdersSize,
+                (index) => GetPlaceholderAtIndex((ulong)index)
+            );
 
         internal NativeInterface.ContestDescriptionWithPlaceholders.ContestDescriptionWithPlaceholdersHandle Handle;
 
@@ -202,14 +217,14 @@ namespace ElectionGuard
             VoteVariationType voteVariation, ulong numberElected, string name,
             SelectionDescription[] selections, SelectionDescription[] placeholders)
         {
-            IntPtr[] selectionPointers = new IntPtr[selections.Length];
+            var selectionPointers = new IntPtr[selections.Length];
             for (var i = 0; i < selections.Length; i++)
             {
                 selectionPointers[i] = selections[i].Handle.Ptr;
                 selections[i].Dispose();
             }
 
-            IntPtr[] placeholderPointers = new IntPtr[placeholders.Length];
+            var placeholderPointers = new IntPtr[placeholders.Length];
             for (var i = 0; i < placeholders.Length; i++)
             {
                 placeholderPointers[i] = placeholders[i].Handle.Ptr;
@@ -248,14 +263,14 @@ namespace ElectionGuard
             string name, InternationalizedText ballotTitle, InternationalizedText ballotSubtitle,
             SelectionDescription[] selections, SelectionDescription[] placeholders)
         {
-            IntPtr[] selectionPointers = new IntPtr[selections.Length];
+            var selectionPointers = new IntPtr[selections.Length];
             for (var i = 0; i < selections.Length; i++)
             {
                 selectionPointers[i] = selections[i].Handle.Ptr;
                 selections[i].Dispose();
             }
 
-            IntPtr[] placeholderPointers = new IntPtr[placeholders.Length];
+            var placeholderPointers = new IntPtr[placeholders.Length];
             for (var i = 0; i < placeholders.Length; i++)
             {
                 placeholderPointers[i] = placeholders[i].Handle.Ptr;
@@ -293,14 +308,14 @@ namespace ElectionGuard
             SelectionDescription[] selections, string[] primaryPartyIds,
             SelectionDescription[] placeholders)
         {
-            IntPtr[] selectionPointers = new IntPtr[selections.Length];
+            var selectionPointers = new IntPtr[selections.Length];
             for (var i = 0; i < selections.Length; i++)
             {
                 selectionPointers[i] = selections[i].Handle.Ptr;
                 selections[i].Dispose();
             }
 
-            IntPtr[] placeholderPointers = new IntPtr[placeholders.Length];
+            var placeholderPointers = new IntPtr[placeholders.Length];
             for (var i = 0; i < placeholders.Length; i++)
             {
                 placeholderPointers[i] = placeholders[i].Handle.Ptr;
@@ -342,14 +357,14 @@ namespace ElectionGuard
             SelectionDescription[] selections, string[] primaryPartyIds,
             SelectionDescription[] placeholders)
         {
-            IntPtr[] selectionPointers = new IntPtr[selections.Length];
+            var selectionPointers = new IntPtr[selections.Length];
             for (var i = 0; i < selections.Length; i++)
             {
                 selectionPointers[i] = selections[i].Handle.Ptr;
                 selections[i].Dispose();
             }
 
-            IntPtr[] placeholderPointers = new IntPtr[placeholders.Length];
+            var placeholderPointers = new IntPtr[placeholders.Length];
             for (var i = 0; i < placeholders.Length; i++)
             {
                 placeholderPointers[i] = placeholders[i].Handle.Ptr;
@@ -376,7 +391,11 @@ namespace ElectionGuard
         {
             base.DisposeUnmanaged();
 
-            if (Handle == null || Handle.IsInvalid) return;
+            if (Handle == null || Handle.IsInvalid)
+            {
+                return;
+            }
+
             Handle.Dispose();
             Handle = null;
         }
@@ -387,12 +406,10 @@ namespace ElectionGuard
         public SelectionDescription GetSelectionAtIndex(ulong index)
         {
             var status = NativeInterface.ContestDescriptionWithPlaceholders.GetSelectionAtIndex(
-                Handle, index, out NativeInterface.SelectionDescription.SelectionDescriptionHandle value);
-            if (status != Status.ELECTIONGUARD_STATUS_SUCCESS)
-            {
-                throw new ElectionGuardException($"ContestDescriptionWithPlaceholders ContestDescription GetSelectionAtIndex: {status}");
-            }
-            return new SelectionDescription(value);
+                Handle, index, out var value);
+            return status != Status.ELECTIONGUARD_STATUS_SUCCESS
+                ? throw new ElectionGuardException($"ContestDescriptionWithPlaceholders ContestDescription GetSelectionAtIndex: {status}")
+                : new SelectionDescription(value);
         }
 
         /// <Summary>
@@ -401,12 +418,10 @@ namespace ElectionGuard
         public SelectionDescription GetPlaceholderAtIndex(ulong index)
         {
             var status = NativeInterface.ContestDescriptionWithPlaceholders.GetPlaceholderAtIndex(
-                Handle, index, out NativeInterface.SelectionDescription.SelectionDescriptionHandle value);
-            if (status != Status.ELECTIONGUARD_STATUS_SUCCESS)
-            {
-                throw new ElectionGuardException($"ContestDescriptionWithPlaceholders ContestDescription GetSelectionAtIndex: {status}");
-            }
-            return new SelectionDescription(value);
+                Handle, index, out var value);
+            return status != Status.ELECTIONGUARD_STATUS_SUCCESS
+                ? throw new ElectionGuardException($"ContestDescriptionWithPlaceholders ContestDescription GetSelectionAtIndex: {status}")
+                : new SelectionDescription(value);
         }
 
         /// <Summary>
@@ -415,12 +430,10 @@ namespace ElectionGuard
         public ElementModQ CryptoHash()
         {
             var status = NativeInterface.ContestDescriptionWithPlaceholders.CryptoHash(
-                Handle, out NativeInterface.ElementModQ.ElementModQHandle value);
-            if (status != Status.ELECTIONGUARD_STATUS_SUCCESS)
-            {
-                throw new ElectionGuardException($"ContestDescriptionWithPlaceholders Error CryptoHash: {status}");
-            }
-            return new ElementModQ(value);
+                Handle, out var value);
+            return status != Status.ELECTIONGUARD_STATUS_SUCCESS
+                ? throw new ElectionGuardException($"ContestDescriptionWithPlaceholders Error CryptoHash: {status}")
+                : new ElementModQ(value);
         }
     }
 }

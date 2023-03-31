@@ -1,8 +1,8 @@
 ﻿using ElectionGuard.Decryption.Tally;
 
-namespace ElectionGuard.Decryption.Tests;
+namespace ElectionGuard.Decryption.Tests.Tally;
 
-public class Tests
+public class TestCiphertextTallySelection
 {
     private readonly ElementModQ nonce = Constants.ONE_MOD_Q;
     private readonly ElementModQ secret = Constants.TWO_MOD_Q;
@@ -23,12 +23,12 @@ public class Tests
         const ulong count = 4;
         var publicKey = keyPair.PublicKey;
         var ciphertexts = Enumerable.Range(0, (int)count)
-            .Select(i => ElGamal.Encrypt(vote, nonce, publicKey));
+            .Select(_ => ElGamal.Encrypt(vote, nonce, publicKey)).ToList();
 
         // Act
         var subject = new CiphertextTallySelection(
             "some_object_id", 0, Constants.ONE_MOD_Q);
-        _ = subject.ElGamalAccumulate(ciphertexts);
+        _ = subject.Accumulate(ciphertexts);
 
         // Assert
         var plaintext = subject.Ciphertext.Decrypt(keyPair.SecretKey);

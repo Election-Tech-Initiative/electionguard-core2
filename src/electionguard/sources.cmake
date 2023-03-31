@@ -24,6 +24,7 @@ set(SOURCES_electionguard
     ${PROJECT_SOURCE_DIR}/src/electionguard/ballot.cpp
     ${PROJECT_SOURCE_DIR}/src/electionguard/chaum_pedersen.cpp
     ${PROJECT_SOURCE_DIR}/src/electionguard/convert.cpp
+    ${PROJECT_SOURCE_DIR}/src/electionguard/discrete_log.cpp
     ${PROJECT_SOURCE_DIR}/src/electionguard/election.cpp
     ${PROJECT_SOURCE_DIR}/src/electionguard/elgamal.cpp
     ${PROJECT_SOURCE_DIR}/src/electionguard/encrypt.cpp

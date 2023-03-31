@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 
 namespace ElectionGuard
 {
@@ -15,6 +16,15 @@ namespace ElectionGuard
     /// </summary>
     public partial class PlaintextBallot : DisposableBase
     {
+        /// <summary>
+        /// the collection of Contests for the ballot
+        /// </summary>
+        public IReadOnlyList<PlaintextBallotContest> Contests =>
+            new ElectionGuardEnumerator<PlaintextBallotContest>(
+                () => (int)ContestsSize,
+                (index) => GetContestAtIndex((ulong)index)
+            );
+
         /// <summary>
         /// Creates a <see cref="PlaintextBallot">PlaintextBallot</see> object from a <see href="https://www.rfc-editor.org/rfc/rfc8259.html#section-8.1">[RFC-8259]</see> UTF-8 encoded JSON string
         /// </summary>
@@ -50,7 +60,7 @@ namespace ElectionGuard
         public PlaintextBallot(
             string objectId, string styleId, PlaintextBallotContest[] contests)
         {
-            IntPtr[] contestPointers = new IntPtr[contests.Length];
+            var contestPointers = new IntPtr[contests.Length];
             for (var i = 0; i < contests.Length; i++)
             {
                 contestPointers[i] = contests[i].Handle.Ptr;
@@ -60,6 +70,30 @@ namespace ElectionGuard
             var status = NativeInterface.PlaintextBallot.New(
                 objectId, styleId, contestPointers, (ulong)contestPointers.LongLength, out Handle);
             status.ThrowIfError();
+        }
+
+        public void ForEachContestSelection(
+            Action<PlaintextBallotContest, PlaintextBallotSelection> action)
+        {
+            foreach (var contest in Contests)
+            {
+                foreach (var selection in contest.Selections)
+                {
+                    action(contest, selection);
+                }
+            }
+        }
+
+        public PlaintextBallot Copy()
+        {
+            var json = ToJson();
+            return new PlaintextBallot(json);
+        }
+
+        public static PlaintextBallot Copy(PlaintextBallot ballot)
+        {
+            var json = ballot.ToJson();
+            return new PlaintextBallot(json);
         }
     }
 }

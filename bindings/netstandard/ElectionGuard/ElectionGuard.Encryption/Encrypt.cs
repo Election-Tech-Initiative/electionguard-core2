@@ -1,9 +1,5 @@
 ﻿namespace ElectionGuard
 {
-    using NativeCiphertextBallot = CiphertextBallot.External.CiphertextBallotHandle;
-    using NativeCiphertextBallotSelection = CiphertextBallotSelection.External.CiphertextBallotSelectionHandle;
-    using NativeCompactCiphertextBallot = NativeInterface.CompactCiphertextBallot.CompactCiphertextBallotHandle;
-
     /// <summary>
     /// Metadata for encryption
     ///
@@ -37,9 +33,9 @@
             var status = NativeInterface.Encrypt.Selection(
                     plaintext.Handle, description.Handle, elgamalPublicKey.Handle,
                     cryptoExtendedBaseHash.Handle, nonceSeed.Handle, shouldVerifyProofs,
-                    out NativeCiphertextBallotSelection ciphertext);
+                    out var ciphertext);
             status.ThrowIfError();
-            return new CiphertextBallotSelection(ciphertext);
+            return ciphertext.IsInvalid ? null : new CiphertextBallotSelection(ciphertext);
         }
 
         /// <summary>
@@ -79,7 +75,7 @@
                 out var ciphertext);
 
             status.ThrowIfError();
-            return new CiphertextBallotContest(ciphertext);
+            return ciphertext.IsInvalid ? null : new CiphertextBallotContest(ciphertext);
         }
 
         /// <summary>
@@ -114,18 +110,18 @@
                 var status = NativeInterface.Encrypt.Ballot(
                     ballot.Handle, internalManifest.Handle, context.Handle,
                     ballotCodeSeed.Handle, shouldVerifyProofs,
-                    out NativeCiphertextBallot ciphertext);
+                    out var ciphertext);
                 status.ThrowIfError();
-                return new CiphertextBallot(ciphertext);
+                return ciphertext.IsInvalid ? null : new CiphertextBallot(ciphertext);
             }
             else
             {
                 var status = NativeInterface.Encrypt.Ballot(
                     ballot.Handle, internalManifest.Handle, context.Handle,
                     ballotCodeSeed.Handle, nonce.Handle, shouldVerifyProofs,
-                    out NativeCiphertextBallot ciphertext);
+                    out var ciphertext);
                 status.ThrowIfError();
-                return new CiphertextBallot(ciphertext);
+                return ciphertext.IsInvalid ? null : new CiphertextBallot(ciphertext);
             }
         }
 
@@ -164,20 +160,19 @@
                 var status = NativeInterface.Encrypt.CompactBallot(
                     ballot.Handle, internalManifest.Handle, context.Handle,
                     ballotCodeSeed.Handle, shouldVerifyProofs,
-                    out NativeCompactCiphertextBallot ciphertext);
+                    out var ciphertext);
                 status.ThrowIfError();
-                return new CompactCiphertextBallot(ciphertext);
+                return ciphertext.IsInvalid ? null : new CompactCiphertextBallot(ciphertext);
             }
             else
             {
                 var status = NativeInterface.Encrypt.CompactBallot(
                     ballot.Handle, internalManifest.Handle, context.Handle,
                     ballotCodeSeed.Handle, nonce.Handle, shouldVerifyProofs,
-                    out NativeCompactCiphertextBallot ciphertext);
+                    out var ciphertext);
                 status.ThrowIfError();
-                return new CompactCiphertextBallot(ciphertext);
+                return ciphertext.IsInvalid ? null : new CompactCiphertextBallot(ciphertext);
             }
-
         }
     }
 }

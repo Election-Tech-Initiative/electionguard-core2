@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Collections;
+using System.Collections.Generic;
 using System.Runtime.InteropServices;
 
 namespace ElectionGuard
@@ -170,6 +172,15 @@ namespace ElectionGuard
             }
         }
 
+        /// <Summary>
+        /// The collection of selections for this contest
+        /// </Summary>
+        public IReadOnlyList<SelectionDescription> Selections =>
+            new ElectionGuardEnumerator<SelectionDescription>(
+                () => (int)SelectionsSize,
+                (index) => GetSelectionAtIndex((ulong)index)
+            );
+
         internal NativeInterface.ContestDescription.ContestDescriptionHandle Handle;
 
         internal ContestDescription(
@@ -193,7 +204,7 @@ namespace ElectionGuard
             VoteVariationType voteVariation, ulong numberElected, string name,
             SelectionDescription[] selections)
         {
-            IntPtr[] selectionPointers = new IntPtr[selections.Length];
+            var selectionPointers = new IntPtr[selections.Length];
             for (var i = 0; i < selections.Length; i++)
             {
                 selectionPointers[i] = selections[i].Handle.Ptr;
@@ -229,7 +240,7 @@ namespace ElectionGuard
             string name, InternationalizedText ballotTitle, InternationalizedText ballotSubtitle,
             SelectionDescription[] selections)
         {
-            IntPtr[] selectionPointers = new IntPtr[selections.Length];
+            var selectionPointers = new IntPtr[selections.Length];
             for (var i = 0; i < selections.Length; i++)
             {
                 selectionPointers[i] = selections[i].Handle.Ptr;
@@ -263,7 +274,7 @@ namespace ElectionGuard
             VoteVariationType voteVariation, ulong numberElected, string name,
             SelectionDescription[] selections, string[] primaryPartyIds)
         {
-            IntPtr[] selectionPointers = new IntPtr[selections.Length];
+            var selectionPointers = new IntPtr[selections.Length];
             for (var i = 0; i < selections.Length; i++)
             {
                 selectionPointers[i] = selections[i].Handle.Ptr;
@@ -301,7 +312,7 @@ namespace ElectionGuard
             string name, InternationalizedText ballotTitle, InternationalizedText ballotSubtitle,
             SelectionDescription[] selections, string[] primaryPartyIds)
         {
-            IntPtr[] selectionPointers = new IntPtr[selections.Length];
+            var selectionPointers = new IntPtr[selections.Length];
             for (var i = 0; i < selections.Length; i++)
             {
                 selectionPointers[i] = selections[i].Handle.Ptr;
@@ -326,7 +337,11 @@ namespace ElectionGuard
         {
             base.DisposeUnmanaged();
 
-            if (Handle == null || Handle.IsInvalid) return;
+            if (Handle == null || Handle.IsInvalid)
+            {
+                return;
+            }
+
             Handle.Dispose();
             Handle = null;
         }
@@ -337,12 +352,10 @@ namespace ElectionGuard
         public SelectionDescription GetSelectionAtIndex(ulong index)
         {
             var status = NativeInterface.ContestDescription.GetSelectionAtIndex(
-                Handle, index, out NativeInterface.SelectionDescription.SelectionDescriptionHandle value);
-            if (status != Status.ELECTIONGUARD_STATUS_SUCCESS)
-            {
-                throw new ElectionGuardException($"ContestDescription Error GetSelectionAtIndex: {status}");
-            }
-            return new SelectionDescription(value);
+                Handle, index, out var value);
+            return status != Status.ELECTIONGUARD_STATUS_SUCCESS
+                ? throw new ElectionGuardException($"ContestDescription Error GetSelectionAtIndex: {status}")
+                : new SelectionDescription(value);
         }
 
         /// <Summary>
@@ -351,12 +364,10 @@ namespace ElectionGuard
         public ElementModQ CryptoHash()
         {
             var status = NativeInterface.ContestDescription.CryptoHash(
-                Handle, out NativeInterface.ElementModQ.ElementModQHandle value);
-            if (status != Status.ELECTIONGUARD_STATUS_SUCCESS)
-            {
-                throw new ElectionGuardException($"CryptoHash Error Status: {status}");
-            }
-            return new ElementModQ(value);
+                Handle, out var value);
+            return status != Status.ELECTIONGUARD_STATUS_SUCCESS
+                ? throw new ElectionGuardException($"CryptoHash Error Status: {status}")
+                : new ElementModQ(value);
         }
     }
 }

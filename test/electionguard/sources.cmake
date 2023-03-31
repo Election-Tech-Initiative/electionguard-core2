@@ -35,6 +35,7 @@ set(SOURCES_electionguard_test_cpp_tests
     ${CMAKE_CURRENT_SOURCE_DIR}/electionguard/test_ballot.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/electionguard/test_chaum_pedersen.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/electionguard/test_constants.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/electionguard/test_discrete_log.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/electionguard/test_election.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/electionguard/test_elgamal.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/electionguard/test_encrypt.cpp

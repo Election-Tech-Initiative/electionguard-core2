@@ -14,8 +14,12 @@ namespace ElectionGuard
             get
             {
                 var status = NativeInterface.ElGamalKeyPair.GetPublicKey(
-                    Handle, out NativeInterface.ElementModP.ElementModPHandle value);
+                    Handle, out var value);
                 status.ThrowIfError();
+                if (value.IsInvalid)
+                {
+                    return null;
+                }
                 return new ElementModP(value);
             }
         }
@@ -28,8 +32,12 @@ namespace ElectionGuard
             get
             {
                 var status = NativeInterface.ElGamalKeyPair.GetSecretKey(
-                    Handle, out NativeInterface.ElementModQ.ElementModQHandle value);
+                    Handle, out var value);
                 status.ThrowIfError();
+                if (value.IsInvalid)
+                {
+                    return null;
+                }
                 return new ElementModQ(value);
             }
         }

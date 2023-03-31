@@ -7,19 +7,8 @@ namespace ElectionGuard.Encryption.Utils.Generators
 {
     public class ManifestGenerator
     {
-        const string TestSpecVersion = "1.0";
-        const string TestUseSample = "hamilton-general";
-
-        /// <summary>
-        /// A test manifest that is loaded from a json file
-        /// </summary>
-        public static Manifest GetJeffersonCountyManifest_FromFile()
-        {
-            var path = Path.Combine(
-                AppContext.BaseDirectory, "data", "election_manifest_jefferson_county.json");
-            var text = File.ReadAllText(path);
-            return new Manifest(text);
-        }
+        public const string TestSpecVersion = "1.0";
+        public const string TestUseSample = "hamilton-general";
 
         public static Manifest GetManifestFromFile(
             string version = TestSpecVersion, string sample = TestUseSample)
@@ -36,71 +25,13 @@ namespace ElectionGuard.Encryption.Utils.Generators
         }
 
         /// <summary>
-        /// A minimal test manifest demonstrating a single contest with two choices and a writein
-        /// </summary>
-        public static Manifest GetJeffersonCountyManifest_Minimal()
-        {
-            var gpUnits = new List<GeopoliticalUnit>
-            {
-                new GeopoliticalUnit("jefferson-county", "Jefferson County", ReportingUnitType.County)
-            };
-
-            var candidates = new List<Candidate>
-            {
-                new Candidate("benjamin-franklin", isWriteIn: false),
-                new Candidate("john-adams", isWriteIn: false),
-                new Candidate("write-in", isWriteIn: true)
-            };
-
-            var contests = new List<ContestDescription>
-            {
-                new ContestDescription(
-                    objectId: "justice-supreme-court",
-                    electoralDistrictId: gpUnits[0].ObjectId,
-                    sequenceOrder: 0,
-                    VoteVariationType.NOfM,
-                    numberElected: 1,
-                    name: "Justice of the Supreme Court",
-                    selections: new[]
-                    {
-                        new SelectionDescription(
-                            "benjamin-franklin-selection", candidates[0].CandidateId, sequenceOrder: 0),
-                        new SelectionDescription(
-                            "john-adams-selection", candidates[1].CandidateId, sequenceOrder: 1),
-                        new SelectionDescription(
-                            "write-in-selection", candidates[2].CandidateId, sequenceOrder: 2)
-                    })
-            };
-
-            var ballotStyles = new List<BallotStyle>
-            {
-                new BallotStyle(
-                    "jefferson-county-ballot-style",
-                    new[] { gpUnits[0].ObjectId })
-            };
-
-
-            return new Manifest(
-                "jefferson-county-open-primary",
-                ElectionType.Primary,
-                startDate: DateTime.UtcNow,
-                endDate: DateTime.UtcNow.AddDays(1),
-                gpUnits.ToArray(),
-                (new List<Party>()).ToArray(),
-                candidates.ToArray(),
-                contests.ToArray(),
-                ballotStyles.ToArray()
-            );
-        }
-
-        /// <summary>
         /// A test manifest demonstrating multiple ballot styles.  
         /// In the ElectionGuard data structure each contest belongs 
         /// to a Geopolitical Unit, and then each Geopolitical Unit is part of
         /// a ballot style.  This example also adds some more metadata 
         /// such as language transaltions for certain objects
         /// </summary>
-        public static Manifest GetJeffersonCountyManifest_MultipleBallotStyles()
+        public static Manifest GetFakeManifest()
         {
             var gpUnits = new List<GeopoliticalUnit>
             {
@@ -149,15 +80,15 @@ namespace ElectionGuard.Encryption.Utils.Generators
                     selections: new[]
                     {
                         new SelectionDescription(
-                            "benjamin-franklin-selection",
+                            $"{candidates[0].ObjectId}-selection",
                             candidates[0].CandidateId,          // benjamin-franklin
                             sequenceOrder: 0),
                         new SelectionDescription(
-                            "john-adams-selection",
+                            $"{candidates[1].ObjectId}-selection",
                             candidates[1].CandidateId,          // john-adams
                             sequenceOrder: 1),
                         new SelectionDescription(
-                            "write-in-selection",
+                            $"{candidates[2].ObjectId}-selection",
                             candidates[2].CandidateId,          // write-in
                             sequenceOrder: 2)
                     }),

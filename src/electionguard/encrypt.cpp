@@ -217,7 +217,7 @@ namespace electionguard
                 }
             }
 
-            // no selections provided for the contest, so create a placeholder contest
+            // no selections provided for the contest, so create a placeholder selection
             if (!hasSelection) {
                 selections.push_back(selectionFrom(selectionDescription));
             }
@@ -414,7 +414,7 @@ namespace electionguard
           description.getObjectId(), description.getSelections().size(),
           description.getNumberElected(), description.getVotesAllowed(), supportOvervotes);
         if ((is_valid_contest != SUCCESS) && (is_valid_contest != OVERVOTE)) {
-            throw invalid_argument("the plaintext contest was invalid");
+            throw invalid_argument("encryptedContest:: the plaintext contest was invalid");
         }
 
         // TODO: validate the description input
@@ -474,7 +474,7 @@ namespace electionguard
                   *cryptoExtendedBaseHash_ptr, *sharedNonce.get(), false, shouldVerifyProofs));
             } else {
                 // Should never happen since the contest is normalized by emplaceMissingValues
-                throw runtime_error("encryptedContest:: Error constructing encrypted selection");
+                throw runtime_error("Error constructing encrypted selection");
             }
         }
 
@@ -517,8 +517,8 @@ namespace electionguard
         // TODO: ISSUE #33: support other cases such as cumulative voting
         // (individual selections being an encryption of > 1)
         if (selectionCount < description.getVotesAllowed()) {
-            Log::warn(
-              "mismatching selection count: only n-of-m style elections are currently supported");
+            Log::warn("encryptedContest:: mismatching selection count: only n-of-m style elections "
+                      "are currently supported");
         }
 
         // Create the return object
@@ -529,7 +529,7 @@ namespace electionguard
           move(hashedElGamal));
 
         if (encryptedContest == nullptr || encryptedContest->getProof() == nullptr) {
-            throw runtime_error("encryptedContest:: Error constructing encrypted constest");
+            throw runtime_error("Error constructing encrypted constest");
         }
 
         // optionally, skip the verification step
@@ -543,7 +543,7 @@ namespace electionguard
             return encryptedContest;
         }
 
-        throw runtime_error("encryptContest failed validity check");
+        throw runtime_error("failed validity check");
     }
 
     vector<unique_ptr<CiphertextBallotContest>>

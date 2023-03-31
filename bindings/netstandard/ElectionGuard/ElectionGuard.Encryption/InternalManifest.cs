@@ -1,4 +1,5 @@
-﻿using System;
+﻿using System.Collections.Generic;
+using System.Linq;
 using System.Runtime.InteropServices;
 
 namespace ElectionGuard
@@ -18,12 +19,10 @@ namespace ElectionGuard
             get
             {
                 var status = NativeInterface.InternalManifest.GetManifestHash(
-                    Handle, out NativeInterface.ElementModQ.ElementModQHandle value);
-                if (status != Status.ELECTIONGUARD_STATUS_SUCCESS)
-                {
-                    throw new ElectionGuardException($"ManifestHash Error Status: {status}");
-                }
-                return new ElementModQ(value);
+                    Handle, out var value);
+                return status != Status.ELECTIONGUARD_STATUS_SUCCESS
+                    ? throw new ElectionGuardException($"ManifestHash Error Status: {status}")
+                    : new ElementModQ(value);
             }
         }
 
@@ -40,6 +39,15 @@ namespace ElectionGuard
         }
 
         /// <Summary>
+        /// The collection of geopolitical units
+        /// </Summary>
+        public IReadOnlyList<GeopoliticalUnit> GeopoliticalUnits =>
+            new ElectionGuardEnumerator<GeopoliticalUnit>(
+                () => (int)GeopoliticalUnitsSize,
+                (index) => GetGeopoliticalUnitAtIndex((ulong)index)
+            );
+
+        /// <Summary>
         /// The size of the contests collection
         /// </Summary>
         public ulong ContestsSize
@@ -52,6 +60,15 @@ namespace ElectionGuard
         }
 
         /// <Summary>
+        /// The collection of contests
+        /// </Summary>
+        public IReadOnlyList<ContestDescriptionWithPlaceholders> Contests =>
+            new ElectionGuardEnumerator<ContestDescriptionWithPlaceholders>(
+            () => (int)ContestsSize,
+            (index) => GetContestAtIndex((ulong)index)
+        );
+
+        /// <Summary>
         /// The size of the ballot styles collection
         /// </Summary>
         public ulong BallotStylesSize
@@ -62,6 +79,15 @@ namespace ElectionGuard
                 return value;
             }
         }
+
+        /// <Summary>
+        /// The collection of ballot styles
+        /// </Summary>
+        public IReadOnlyList<BallotStyle> BallotStyles =>
+            new ElectionGuardEnumerator<BallotStyle>(
+                () => (int)BallotStylesSize,
+                (index) => GetBallotStyleAtIndex((ulong)index)
+            );
 
         internal NativeInterface.InternalManifest.InternalManifestHandle Handle;
 
@@ -116,9 +142,35 @@ namespace ElectionGuard
         {
             base.DisposeUnmanaged();
 
-            if (Handle == null || Handle.IsInvalid) return;
+            if (Handle == null || Handle.IsInvalid)
+            {
+                return;
+            }
+
             Handle.Dispose();
             Handle = null;
+        }
+
+        public List<ContestDescriptionWithPlaceholders> GetContests(string ballotStyleId)
+        {
+            var ballotStyle = BallotStyles.FirstOrDefault(i => i.ObjectId == ballotStyleId);
+            if (ballotStyle == null)
+            {
+                throw new ElectionGuardException($"InternalManifest Error GetContests: BallotStyle not found");
+            }
+            if (!ballotStyle.GeopoliticalUnitIds.Any())
+            {
+                throw new ElectionGuardException($"InternalManifest Error GetContests: BallotStyle has no geopolitical units");
+            }
+
+            var gpUnits = ballotStyle.GeopoliticalUnitIds.ToList();
+
+            return Contests.Where(i => gpUnits.Contains(i.ElectoralDistrictId)).ToList();
+        }
+
+        public List<ContestDescriptionWithPlaceholders> GetContests(BallotStyle ballotStyle)
+        {
+            return GetContests(ballotStyle.ObjectId);
         }
 
         /// <Summary>
@@ -127,26 +179,22 @@ namespace ElectionGuard
         public GeopoliticalUnit GetGeopoliticalUnitAtIndex(ulong index)
         {
             var status = NativeInterface.InternalManifest.GetGeopoliticalUnitAtIndex(
-                Handle, index, out NativeInterface.GeopoliticalUnit.GeopoliticalUnitHandle value);
-            if (status != Status.ELECTIONGUARD_STATUS_SUCCESS)
-            {
-                throw new ElectionGuardException($"InternalManifest Error GetGeopoliticalUnitAtIndex: {status}");
-            }
-            return new GeopoliticalUnit(value);
+                Handle, index, out var value);
+            return status != Status.ELECTIONGUARD_STATUS_SUCCESS
+                ? throw new ElectionGuardException($"InternalManifest Error GetGeopoliticalUnitAtIndex: {status}")
+                : new GeopoliticalUnit(value);
         }
 
         /// <Summary>
         /// Collection of contests for this election.
         /// </Summary>
-        public ContestDescription GetContestAtIndex(ulong index)
+        public ContestDescriptionWithPlaceholders GetContestAtIndex(ulong index)
         {
             var status = NativeInterface.InternalManifest.GetContestAtIndex(
-                Handle, index, out NativeInterface.ContestDescription.ContestDescriptionHandle value);
-            if (status != Status.ELECTIONGUARD_STATUS_SUCCESS)
-            {
-                throw new ElectionGuardException($"InternalManifest Error GetContestAtIndex: {status}");
-            }
-            return new ContestDescription(value);
+                Handle, index, out var value);
+            return status != Status.ELECTIONGUARD_STATUS_SUCCESS
+                ? throw new ElectionGuardException($"InternalManifest Error GetContestAtIndex: {status}")
+                : new ContestDescriptionWithPlaceholders(value);
         }
 
         /// <Summary>
@@ -155,13 +203,13 @@ namespace ElectionGuard
         public BallotStyle GetBallotStyleAtIndex(ulong index)
         {
             var status = NativeInterface.InternalManifest.GetBallotStyleAtIndex(
-                Handle, index, out NativeInterface.BallotStyle.BallotStyleHandle value);
-            if (status != Status.ELECTIONGUARD_STATUS_SUCCESS)
-            {
-                throw new ElectionGuardException($"InternalManifest Error GetContestAtIndex: {status}");
-            }
-            return new BallotStyle(value);
+                Handle, index, out var value);
+            return status != Status.ELECTIONGUARD_STATUS_SUCCESS
+                ? throw new ElectionGuardException($"InternalManifest Error GetContestAtIndex: {status}")
+                : new BallotStyle(value);
         }
+
+        #region Serialization
 
         /// <Summary>
         /// Export the ballot representation as JSON
@@ -169,13 +217,13 @@ namespace ElectionGuard
         public string ToJson()
         {
             var status = NativeInterface.InternalManifest.ToJson(
-                Handle, out IntPtr pointer, out _);
+                Handle, out var pointer, out _);
             if (status != Status.ELECTIONGUARD_STATUS_SUCCESS)
             {
                 throw new ElectionGuardException($"ToJson Error Status: {status}");
             }
             var json = Marshal.PtrToStringAnsi(pointer);
-            NativeInterface.Memory.FreeIntPtr(pointer);
+            _ = NativeInterface.Memory.FreeIntPtr(pointer);
             return json;
         }
 
@@ -186,7 +234,7 @@ namespace ElectionGuard
         {
 
             var status = NativeInterface.InternalManifest.ToBson(
-                Handle, out IntPtr data, out ulong size);
+                Handle, out var data, out var size);
 
             if (status != Status.ELECTIONGUARD_STATUS_SUCCESS)
             {
@@ -200,7 +248,7 @@ namespace ElectionGuard
 
             var byteArray = new byte[(int)size];
             Marshal.Copy(data, byteArray, 0, (int)size);
-            NativeInterface.Memory.DeleteIntPtr(data);
+            _ = NativeInterface.Memory.DeleteIntPtr(data);
             return byteArray;
         }
 
@@ -211,7 +259,7 @@ namespace ElectionGuard
         {
 
             var status = NativeInterface.InternalManifest.ToMsgPack(
-                Handle, out IntPtr data, out ulong size);
+                Handle, out var data, out var size);
 
             if (status != Status.ELECTIONGUARD_STATUS_SUCCESS)
             {
@@ -225,8 +273,10 @@ namespace ElectionGuard
 
             var byteArray = new byte[(int)size];
             Marshal.Copy(data, byteArray, 0, (int)size);
-            NativeInterface.Memory.DeleteIntPtr(data);
+            _ = NativeInterface.Memory.DeleteIntPtr(data);
             return byteArray;
         }
+
+        #endregion
     }
 }

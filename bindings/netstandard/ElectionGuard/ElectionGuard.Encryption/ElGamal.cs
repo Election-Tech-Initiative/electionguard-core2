@@ -1,9 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-// Declare native types for convenience
-using NativeElGamalCiphertext = ElectionGuard.NativeInterface.ElGamalCiphertext.ElGamalCiphertextHandle;
-using NativeHashedElGamalCiphertext = ElectionGuard.NativeInterface.HashedElGamalCiphertext.HashedElGamalCiphertextHandle;
 
 namespace ElectionGuard
 {
@@ -27,6 +24,10 @@ namespace ElectionGuard
                     plaintext, nonce.Handle, publicKey.Handle,
                     out var ciphertext);
             status.ThrowIfError();
+            if (ciphertext.IsInvalid)
+            {
+                return null;
+            }
             return new ElGamalCiphertext(ciphertext);
         }
 
@@ -41,13 +42,36 @@ namespace ElectionGuard
             IEnumerable<ElGamalCiphertext> ciphertexts)
         {
             var nativeCiphertexts =
-                ciphertexts.Select(c => c.Handle.Ptr);
+                ciphertexts.Select(c => c.Handle.Ptr).ToList();
 
             var status = NativeInterface.ElGamal.Add(
-                    nativeCiphertexts.ToArray(), (ulong)nativeCiphertexts.Count(),
+                    nativeCiphertexts.ToArray(), (ulong)nativeCiphertexts.Count,
                     out var ciphertext);
-
             status.ThrowIfError();
+            if (ciphertext.IsInvalid)
+            {
+                return null;
+            }
+            return new ElGamalCiphertext(ciphertext);
+        }
+
+        public static ElGamalCiphertext Add(
+            params ElGamalCiphertext[] ciphertexts)
+        {
+            return Add(ciphertexts.AsEnumerable());
+        }
+
+        public static ElGamalCiphertext Add(
+           ElGamalCiphertext a, ElGamalCiphertext b)
+        {
+            var status = NativeInterface.ElGamal.Add(
+                    a.Handle, b.Handle,
+                    out var ciphertext);
+            status.ThrowIfError();
+            if (ciphertext.IsInvalid)
+            {
+                return null;
+            }
             return new ElGamalCiphertext(ciphertext);
         }
     }
@@ -74,8 +98,12 @@ namespace ElectionGuard
             {
                 var status = NativeInterface.HashedElGamal.Encrypt(
                     pointer, length, nonce.Handle, publicKey.Handle, seed.Handle,
-                    out NativeHashedElGamalCiphertext ciphertext);
+                    out var ciphertext);
                 status.ThrowIfError();
+                if (ciphertext.IsInvalid)
+                {
+                    return null;
+                }
                 return new HashedElGamalCiphertext(ciphertext);
             }
         }

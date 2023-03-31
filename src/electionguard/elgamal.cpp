@@ -168,35 +168,36 @@ namespace electionguard
 
     // Public Methods
 
+    std::unique_ptr<ElGamalCiphertext> ElGamalCiphertext::elgamalAdd(const ElGamalCiphertext &b)
+    {
+        auto pad = mul_mod_p(*pimpl->pad, *b.pimpl->pad);
+        auto data = mul_mod_p(*pimpl->data, *b.pimpl->data);
+        return make_unique<ElGamalCiphertext>(move(pad), move(data));
+    }
+
+    std::unique_ptr<ElGamalCiphertext> ElGamalCiphertext::elgamalAdd(
+      const std::vector<std::reference_wrapper<ElGamalCiphertext>> &ciphertexts)
+    {
+        auto resultPad = make_unique<ElementModP>(*pimpl->pad);
+        auto resultData = make_unique<ElementModP>(*pimpl->data);
+        for (auto &ciphertext : ciphertexts) {
+            auto pad = mul_mod_p(*resultPad, *ciphertext.get().pimpl->pad);
+            resultPad.swap(pad);
+            auto data = mul_mod_p(*resultData, *ciphertext.get().pimpl->data);
+            resultData.swap(data);
+        }
+        return make_unique<ElGamalCiphertext>(move(resultPad), move(resultData));
+    }
+
     uint64_t ElGamalCiphertext::decrypt(const ElementModP &product)
     {
         auto result = div_mod_p(*pimpl->data, product);
-
-        // check known values so we dont have to search for them
-        if (*result == ONE_MOD_P()) {
-            // if it is 1 it is false
-            return 0;
-        } else if (*result == G()) {
-            // if it is g, it is true
-            return 1;
-        }
-
         return DiscreteLog::getAsync(*result);
     }
 
     uint64_t ElGamalCiphertext::decrypt(const ElementModP &product) const
     {
         auto result = div_mod_p(*pimpl->data, product);
-
-        // check known values so we dont have to search for them
-        if (*result == ONE_MOD_P()) {
-            // if it is 1 it is false
-            return 0;
-        } else if (*result == G()) {
-            // if it is g, it is true
-            return 1;
-        }
-
         return DiscreteLog::getAsync(*result);
     }
 
@@ -300,6 +301,13 @@ namespace electionguard
             resultData.swap(data);
         }
         return make_unique<ElGamalCiphertext>(move(resultPad), move(resultData));
+    }
+
+    unique_ptr<ElGamalCiphertext> elgamalAdd(const ElGamalCiphertext &a, const ElGamalCiphertext &b)
+    {
+        auto pad = mul_mod_p(*a.getPad(), *b.getPad());
+        auto data = mul_mod_p(*a.getData(), *b.getData());
+        return make_unique<ElGamalCiphertext>(move(pad), move(data));
     }
 
 #pragma region HashedElGamalCiphertext

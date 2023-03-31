@@ -26,21 +26,25 @@ TEST_CASE("ElGamalKeyPair fromSecret public key is fixed base")
 
 TEST_CASE("elgamalEncrypt simple encrypt 0, with nonce 1 then publickey is g_pow_p(2)")
 {
+    // Arrange
     const auto &nonce = ONE_MOD_Q();
     const auto &secret = TWO_MOD_Q();
     auto keypair = ElGamalKeyPair::fromSecret(secret, false);
     auto *publicKey = keypair->getPublicKey();
+    auto g_pow_p_two = g_pow_p(*secret.toElementModP());
 
-    CHECK((*publicKey < P()));
+    CHECK((*publicKey == *g_pow_p_two));
 
-    auto elem = g_pow_p(ZERO_MOD_P());
-    CHECK((*elem == ONE_MOD_P())); // g^0 = 1
+    auto plaintext_exp_zero = g_pow_p(ZERO_MOD_P());
+    CHECK((*plaintext_exp_zero == ONE_MOD_P())); // g^0 = 1
 
+    // Act
     auto cipherText = elgamalEncrypt(0UL, nonce, *publicKey);
 
     CHECK((*publicKey == *cipherText->getData()));
     CHECK((const_cast<ElementModP &>(G()) == *cipherText->getPad()));
 
+    // Assert
     auto decryptedData = pow_mod_p(*cipherText->getPad(), *secret.toElementModP());
     auto calculatedData = pow_mod_p(*publicKey, *nonce.toElementModP());
     CHECK((*decryptedData == *calculatedData));
@@ -50,8 +54,9 @@ TEST_CASE("elgamalEncrypt simple encrypt 0, with nonce 1 then publickey is g_pow
     CHECK((0UL == decrypted));
 }
 
-TEST_CASE("elgamalEncrypt simple encrypt 0, with real nonce")
+TEST_CASE("elgamalEncrypt simple encrypt 0, with real nonce decrypts with secret")
 {
+    // Arrange
     unique_ptr<ElementModQ> nonce = rand_q();
     const auto &secret = TWO_MOD_Q();
     auto keypair = ElGamalKeyPair::fromSecret(secret, false);
@@ -59,14 +64,36 @@ TEST_CASE("elgamalEncrypt simple encrypt 0, with real nonce")
 
     CHECK((*publicKey < P()));
 
+    // Act
     auto cipherText = elgamalEncrypt(0UL, *nonce, *publicKey);
 
+    // Assert
     auto decrypted = cipherText->decrypt(secret);
     CHECK((0UL == decrypted));
 }
 
-TEST_CASE("elgamalEncrypt simple encrypt 0 compared with elgamalEncrypt_with_precomputed")
+TEST_CASE("elgamalEncrypt simple encrypt 0, with real nonce decrypts with nonce")
 {
+    // Arrange
+    unique_ptr<ElementModQ> nonce = rand_q();
+    const auto &secret = TWO_MOD_Q();
+    auto keypair = ElGamalKeyPair::fromSecret(secret, false);
+    auto *publicKey = keypair->getPublicKey();
+
+    CHECK((*publicKey < P()));
+
+    // Act
+    auto cipherText = elgamalEncrypt(0UL, *nonce, *publicKey);
+
+    // Assert
+    auto decrypted = cipherText->decrypt(*publicKey, *nonce);
+    CHECK((0UL == decrypted));
+}
+
+TEST_CASE("elgamalEncrypt simple encrypt 0 compared with elgamalEncrypt_with_precomputed decrypts "
+          "with secret")
+{
+    // Arrange
     const auto &secret = TWO_MOD_Q();
     auto keypair = ElGamalKeyPair::fromSecret(secret, false);
     auto *publicKey = keypair->getPublicKey();
@@ -86,6 +113,7 @@ TEST_CASE("elgamalEncrypt simple encrypt 0 compared with elgamalEncrypt_with_pre
 
     auto triple1 = precomputedTwoTriplesAndAQuad->get_triple1();
 
+    // Act
     auto cipherText1 = elgamalEncrypt(0UL, *triple1->get_exp(), *publicKey);
     auto cipherText2 =
       elgamalEncrypt_with_precomputed(0UL, *triple1->get_g_to_exp(), *triple1->get_pubkey_to_exp());
@@ -93,6 +121,7 @@ TEST_CASE("elgamalEncrypt simple encrypt 0 compared with elgamalEncrypt_with_pre
     CHECK((*cipherText1->getPad() == *cipherText2->getPad()));
     CHECK((*cipherText1->getData() == *cipherText2->getData()));
 
+    // Assert
     auto decrypted1 = cipherText1->decrypt(secret);
     CHECK((0UL == decrypted1));
     auto decrypted2 = cipherText2->decrypt(secret);
@@ -100,8 +129,9 @@ TEST_CASE("elgamalEncrypt simple encrypt 0 compared with elgamalEncrypt_with_pre
     PrecomputeBufferContext::empty_queues();
 }
 
-TEST_CASE("elgamalEncrypt_with_precomputed simple encrypt 0")
+TEST_CASE("elgamalEncrypt_with_precomputed simple encrypt 0 decrypts with secret")
 {
+    // Arrange
     const auto &secret = TWO_MOD_Q();
     auto keypair = ElGamalKeyPair::fromSecret(secret, false);
     auto *publicKey = keypair->getPublicKey();
@@ -122,9 +152,11 @@ TEST_CASE("elgamalEncrypt_with_precomputed simple encrypt 0")
     auto triple1 = precomputedTwoTriplesAndAQuad->get_triple1();
     CHECK(triple1 != nullptr);
 
+    // Act
     auto cipherText =
       elgamalEncrypt_with_precomputed(0UL, *triple1->get_g_to_exp(), *triple1->get_pubkey_to_exp());
 
+    // Assert
     auto decrypted = cipherText->decrypt(secret);
     CHECK((0UL == decrypted));
     PrecomputeBufferContext::empty_queues();
@@ -161,6 +193,21 @@ TEST_CASE("elgamalEncrypt encrypt 1 decrypts with secret")
     auto cipherText = elgamalEncrypt(1UL, *nonce, *publicKey);
     auto cipherText2 = elgamalEncrypt(1UL, *nonce, *publicKey);
     auto decrypted = cipherText->decrypt(*secret);
+    CHECK(1UL == decrypted);
+}
+
+TEST_CASE("elgamalEncrypt encrypt 1 decrypts with nonce")
+{
+    auto nonce = ElementModQ::fromHex(a_fixed_nonce);
+    auto secret = ElementModQ::fromHex(a_fixed_secret);
+    auto keypair = ElGamalKeyPair::fromSecret(*secret);
+    auto *publicKey = keypair->getPublicKey();
+
+    CHECK((*publicKey < P()));
+
+    auto cipherText = elgamalEncrypt(1UL, *nonce, *publicKey);
+    auto cipherText2 = elgamalEncrypt(1UL, *nonce, *publicKey);
+    auto decrypted = cipherText->decrypt(*publicKey, *nonce);
     CHECK(1UL == decrypted);
 }
 

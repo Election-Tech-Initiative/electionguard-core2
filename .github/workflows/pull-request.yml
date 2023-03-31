@@ -147,9 +147,18 @@ jobs:
           arch: amd64_x86
 
       # Environment
-      
       - name: Configure Environment
         run: make environment
+
+      # Build Cache
+      - name: Restore C++ Build Cache
+        id: restore-build-cache
+        uses: actions/cache/restore@v3
+        with:
+          path: |
+            .cache/
+            build/
+          key: ${{ matrix.name }}-build-${{ hashFiles('.cache', 'cmake', 'include', 'src/electionguard') }}
 
       # Lint
       - name: Lint
@@ -167,7 +176,7 @@ jobs:
         env:
           PROCESSOR: ${{ matrix.processor }}
         if: runner.os == 'macOS'
-        run:  make test
+        run: make test
 
       - name: Run Tests (Windows)
         env:
@@ -186,3 +195,12 @@ jobs:
           PROCESSOR: ${{ matrix.processor }}
         if: (matrix.runCsTests)
         run: make test-netstandard
+
+      # Save build cache
+      - name: Save C++ Build Cache
+        uses: actions/cache/save@v3
+        with:
+          path: |
+            .cache/
+            build/
+          key: ${{ steps.restore-build-cache.outputs.cache-primary-key }}
