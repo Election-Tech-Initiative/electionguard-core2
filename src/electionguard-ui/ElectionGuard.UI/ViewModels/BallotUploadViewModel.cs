@@ -48,11 +48,11 @@ public partial class BallotUploadViewModel : BaseViewModel
     private ElementModQ _manifestHash;
 
 
-    partial void OnElectionIdChanged(string electionId)
+    partial void OnElectionIdChanged(string value)
     {
         Task.Run(async() =>
         {
-            var record = await _manifestService.GetByElectionIdAsync(electionId);
+            var record = await _manifestService.GetByElectionIdAsync(value);
             using var manifest = new Manifest(record.ManifestData);
             _manifestHash = new(manifest.CryptoHash());
         });
