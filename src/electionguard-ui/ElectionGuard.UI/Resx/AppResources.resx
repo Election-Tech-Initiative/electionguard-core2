@@ -435,10 +435,31 @@
   <data name="SuccessText" xml:space="preserve">
     <value>Successfully uploaded</value>
   </data>
+  <data name="ExportEncryptionText" xml:space="preserve">
+    <value>Export Encryption</value>
+  </data>
+  <data name="DuplicatedText" xml:space="preserve">
+    <value>Duplicated</value>
+  </data>
   <data name="ConnectionStringPlaceholder" xml:space="preserve">
     <value>Connection string to get to database</value>
   </data>
   <data name="ConnectionStringText" xml:space="preserve">
     <value>Connection String</value>
+  </data>
+  <data name="Step1Text" xml:space="preserve">
+    <value>Export the encryption package</value>
+  </data>
+  <data name="Step2Text" xml:space="preserve">
+    <value>Upload ballots using EGDrive (1 or more)</value>
+  </data>
+  <data name="Step3Text" xml:space="preserve">
+    <value>Remove Spoiled Ballots (if needed)</value>
+  </data>
+  <data name="Step4Text" xml:space="preserve">
+    <value>Perform a tally with the guardians (1 or more)</value>
+  </data>
+  <data name="Step5Text" xml:space="preserve">
+    <value>View and export a tally</value>
   </data>
 </root>
