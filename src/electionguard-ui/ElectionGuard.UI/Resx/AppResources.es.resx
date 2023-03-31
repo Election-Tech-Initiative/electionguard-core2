@@ -438,4 +438,10 @@
   <data name="Success2Text" xml:space="preserve">
     <value>Votos</value>
   </data>
+  <data name="ConnectionStringPlaceholder" xml:space="preserve">
+    <value>¡Cadena de conexión para llegar a la base de datos!</value>
+  </data>
+  <data name="ConnectionStringText" xml:space="preserve">
+    <value>Cadena de conexión</value>
+  </data>
 </root>

@@ -1,4 +1,6 @@
-﻿using CommunityToolkit.Mvvm.Input;
+﻿using System.Data.Common;
+using System.Runtime.InteropServices.JavaScript;
+using CommunityToolkit.Mvvm.Input;
 
 namespace ElectionGuard.UI.ViewModels;
 
@@ -9,10 +11,22 @@ public partial class SettingsViewModel : BaseViewModel
     }
 
     [ObservableProperty]
-    private string databaseAddress = Preferences.Get("DbAddress", "127.0.0.1");
+    private string _databaseAddress = Preferences.Get("DbAddress", "127.0.0.1");
 
     [ObservableProperty]
-    private string databasePassword = Preferences.Get("DbPassword", "");
+    private string _databasePassword = Preferences.Get("DbPassword", string.Empty);
+
+    [ObservableProperty]
+    private string _databaseConnectionString = Preferences.Get("DbConnection", string.Empty);
+
+    partial void OnDatabaseConnectionStringChanged(string value)
+    {
+        if (!string.IsNullOrWhiteSpace(DatabaseConnectionString))
+        {
+            DatabaseAddress = string.Empty;
+            DatabasePassword = string.Empty;
+        }
+    }
 
     [RelayCommand]
     private void Save()
@@ -20,7 +34,16 @@ public partial class SettingsViewModel : BaseViewModel
         // save db settings and reset the db connection
         Preferences.Set("DbAddress", DatabaseAddress);
         Preferences.Set("DbPassword", DatabasePassword);
-        DbService.Init(DatabaseAddress, DatabasePassword);
+        Preferences.Set("DbConnection", DatabaseConnectionString);
+
+        if (!string.IsNullOrEmpty(DatabaseConnectionString))
+        {
+            DbService.Init(DatabaseConnectionString);
+        }
+        else
+        {
+            DbService.Init(DatabaseAddress, DatabasePassword);
+        }
     }
 
 }
