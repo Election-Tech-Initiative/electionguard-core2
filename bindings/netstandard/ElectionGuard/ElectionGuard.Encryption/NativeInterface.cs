@@ -215,6 +215,11 @@ namespace ElectionGuard
             internal static extern Status ToHex(
                 ElementModQHandle handle, out IntPtr out_hex);
 
+            [DllImport(DllName, EntryPoint = "eg_element_mod_p_from_element_mod_q",
+                CallingConvention = CallingConvention.Cdecl, SetLastError = true)]
+            internal static extern Status ToElementModP(
+                ElementModQHandle handle, out ElementModP.ElementModPHandle out_handle);
+
             [DllImport(DllName, EntryPoint = "eg_element_mod_q_from_hex",
                 CallingConvention = CallingConvention.Cdecl, SetLastError = true)]
             internal static extern Status FromHex(

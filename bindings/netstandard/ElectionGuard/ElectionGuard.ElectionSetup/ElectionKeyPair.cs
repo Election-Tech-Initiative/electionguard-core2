@@ -2,63 +2,11 @@
 
 namespace ElectionGuard.ElectionSetup;
 
-public class EncryptionKeyPair : DisposableBase
-{
-    public ElementModP PublicKey { get; set; }
-
-    public ElementModQ SecretKey { get; set; }
-
-    public EncryptionKeyPair()
-    {
-        PublicKey = new ElementModP(0);
-        SecretKey = new ElementModQ(0);
-    }
-    public EncryptionKeyPair(ElementModQ secretKey, ElementModP publicKey)
-    {
-        PublicKey = publicKey;
-        SecretKey = secretKey;
-    }
-
-    public static implicit operator ElGamalKeyPair(EncryptionKeyPair data)
-    {
-        return ElGamalKeyPair.FromPair(data.SecretKey, data.PublicKey);
-    }
-    public static implicit operator EncryptionKeyPair(ElGamalKeyPair data)
-    {
-        return new ElGamalKeyPair(data.SecretKey, data.PublicKey);
-    }
-    protected override void DisposeUnmanaged()
-    {
-        base.DisposeUnmanaged();
-
-        PublicKey?.Dispose();
-        SecretKey?.Dispose();
-    }
-}
-
-
-
 /// <summary>
 /// A tuple of election key pair, proof and polynomial
 /// </summary>
 public class ElectionKeyPair : DisposableBase
 {
-    public ElectionKeyPair()
-    {
-        OwnerId = string.Empty;
-        SequenceOrder = 0;
-        KeyPair = new EncryptionKeyPair();
-        Polynomial = ElectionPolynomial.GeneratePolynomial(3);
-    }
-
-    public ElectionKeyPair(string ownerId, ulong sequenceOrder, ElGamalKeyPair keyPair, ElectionPolynomial polynomial)
-    {
-        OwnerId = ownerId;
-        SequenceOrder = sequenceOrder;
-        KeyPair = new(keyPair.SecretKey, keyPair.PublicKey);
-        Polynomial = polynomial;
-    }
-
     /// <summary>
     /// The id of the owner guardian
     /// </summary>
@@ -72,12 +20,83 @@ public class ElectionKeyPair : DisposableBase
     /// <summary>
     /// The pair of public and private election keys for the guardian
     /// </summary>
-    public EncryptionKeyPair KeyPair { get; set; }
+    public ElGamalKeyPair KeyPair { get; set; }
 
     /// <summary>
     /// The secret polynomial for the guardian
     /// </summary>
     public ElectionPolynomial Polynomial { get; set; }
+
+    /// <summary>
+    /// Construct an Election Key Pair using a random secret key.
+    /// The polynomial is generated using the random secret key.
+    /// This override is used when the guardian generates the keypair internally.
+    /// </summary>
+    public ElectionKeyPair(
+        string ownerId,
+        ulong sequenceOrder,
+        int quorum)
+    {
+        OwnerId = ownerId;
+        SequenceOrder = sequenceOrder;
+        KeyPair = ElGamalKeyPair.FromSecret(BigMath.RandQ());
+        Polynomial = new ElectionPolynomial(quorum, KeyPair);
+    }
+
+    /// <summary>
+    /// Construct an Election Key Pair using the provided key pair.
+    /// The polynomial is generated using the provided key pair.
+    /// This override is used when the guardian generates the keypair externally.
+    /// </summary>
+    public ElectionKeyPair(
+        string ownerId,
+        ulong sequenceOrder,
+        int quorum,
+        ElGamalKeyPair keyPair)
+    {
+        OwnerId = ownerId;
+        SequenceOrder = sequenceOrder;
+        KeyPair = new(keyPair.SecretKey, keyPair.PublicKey);
+        Polynomial = new ElectionPolynomial(quorum, keyPair);
+    }
+
+    /// <summary>
+    /// Construct an Election Key Pair using the provided polynomial.
+    /// The secret key is set to the zero-index coefficient per the spec.
+    /// This override is used when the guardian generates the polynomial 
+    /// externally but does not generate the keypair.
+    /// </summary>
+    public ElectionKeyPair(
+        string ownerId,
+        ulong sequenceOrder,
+        ElectionPolynomial polynomial)
+    {
+        OwnerId = ownerId;
+        SequenceOrder = sequenceOrder;
+        Polynomial = polynomial;
+
+        // set the secret key to the zero-index coefficient
+        var ai_0 = polynomial.Coefficients[0].Value;
+        KeyPair = ElGamalKeyPair.FromSecret(ai_0);
+    }
+
+    /// <summary>
+    /// Construct an Election Key Pair using the provided key pair and polynomial.
+    /// This override is used when the guardain generates the polynomial and keypair externally.
+    /// </summary>
+    public ElectionKeyPair(
+        string ownerId,
+        ulong sequenceOrder,
+        ElGamalKeyPair keyPair,
+        ElectionPolynomial polynomial)
+    {
+        OwnerId = ownerId;
+        SequenceOrder = sequenceOrder;
+        KeyPair = new(keyPair.SecretKey, keyPair.PublicKey);
+        Polynomial = polynomial;
+
+        // TODO: verify the polynomial is valid for the keypair
+    }
 
     public ElectionPublicKey Share()
     {
@@ -85,21 +104,9 @@ public class ElectionKeyPair : DisposableBase
             OwnerId,
             SequenceOrder,
             KeyPair.PublicKey,
-            Polynomial.GetCommitments(),
-            Polynomial.GetProofs()
+            Polynomial.Commitments,
+            Polynomial.Proofs
         );
-    }
-
-    public static ElectionKeyPair GenerateElectionKeyPair(
-        string guardianId,
-        ulong sequenceOrder,
-        int quorum,
-        ElementModQ? nonce)
-    {
-        var polynomial = ElectionPolynomial.GeneratePolynomial(quorum, nonce);
-        var firstKeyPair = polynomial.Coefficients[0].KeyPair;
-
-        return new(guardianId, sequenceOrder, firstKeyPair, polynomial);
     }
 
     protected override void DisposeUnmanaged()
