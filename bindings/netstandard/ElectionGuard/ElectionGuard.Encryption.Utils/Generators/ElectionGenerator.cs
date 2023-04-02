@@ -19,6 +19,7 @@ namespace ElectionGuard.Encryption.Utils.Generators
             Device?.Dispose();
         }
     }
+
     public class ElectionGenerator
     {
         public static ElGamalKeyPair GenerateFakeKeyPair(bool useRandom = false)
