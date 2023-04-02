@@ -9,7 +9,7 @@ public class KeyCeremonyMediatorHarness : KeyCeremonyMediator
     public KeyCeremonyMediatorHarness(
         string mediatorId,
         string userId,
-        UI.Lib.Models.KeyCeremony keyCeremony)
+        UI.Lib.Models.KeyCeremonyRecord keyCeremony)
     : base(mediatorId, userId, keyCeremony)
     {
     }
@@ -55,7 +55,7 @@ public class EndToEndElectionTest : DisposableBase
     private void Step1KeyCeremony()
     {
         // setup a key ceremony
-        var keyCeremony = new UI.Lib.Models.KeyCeremony("testkey", NumberOfGuardians, Quorum, "adminid");
+        var keyCeremony = new UI.Lib.Models.KeyCeremonyRecord("testkey", NumberOfGuardians, Quorum, "adminid");
 
         // Setup guardians
         for (ulong i = 1; i <= NumberOfGuardians; i++)
