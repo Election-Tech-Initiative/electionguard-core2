@@ -94,9 +94,9 @@ public record GuardianRecord : DisposableRecordBase
 /// </summary>
 public class Guardian : DisposableBase
 {
-    private const string GuardianPrefix = "guardian_";
-    private const string PrivateKeyFolder = "gui_private_keys";
-    private const string GuardianExt = ".json";
+    internal const string GuardianPrefix = "guardian_";
+    internal const string PrivateKeyFolder = "gui_private_keys";
+    internal const string GuardianExt = ".json";
 
     private readonly ElectionKeyPair _electionKeys;
     private Dictionary<string, ElectionPublicKey>? _otherGuardianPublicKeys = new();
@@ -608,41 +608,6 @@ public class Guardian : DisposableBase
         storage.ToFile(filePath, filename, dataJson);
     }
 
-    /// <summary>
-    /// Loads the guardian from local storage device
-    /// </summary>
-    /// <param name="guardianId">guardian id</param>
-    /// <param name="keyCeremonyId">id for the key ceremony</param>
-    /// <param name="guardianCount">count of guardians</param>
-    /// <param name="quorum">minimum needed number of guardians</param>
-    /// <returns></returns>
-    public static Guardian? Load(string guardianId, string keyCeremonyId, int guardianCount, int quorum)
-    {
-        var storage = StorageService.GetInstance();
-
-        var filename = GuardianPrefix + guardianId + GuardianExt;
-        var basePath = Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData);
-        var filePath = Path.Combine(basePath, PrivateKeyFolder, keyCeremonyId, filename);
-
-        var data = storage.FromFile(filePath);
-        try
-        {
-            var privateGuardian = JsonSerializer.Deserialize<GuardianPrivateRecord>(data);
-            return privateGuardian != null ?
-                Guardian.FromPrivateRecord(privateGuardian, keyCeremonyId, guardianCount, quorum) :
-                null;
-        }
-        catch (Exception ex)
-        {
-            throw new ElectionGuardException("Could not load guardian", ex);
-        }
-    }
-
-    public static Guardian? Load(string guardianId, KeyCeremony keyCeremony)
-    {
-        return Load(guardianId, keyCeremony.KeyCeremonyId!, keyCeremony.NumberOfGuardians, keyCeremony.Quorum);
-    }
-
     // compute_tally_share
     // public DecryptionShare? ComputeTallyShare(CiphertextTally tally, CiphertextElectionContext context)
     // {
@@ -662,4 +627,42 @@ public class Guardian : DisposableBase
     // compute_compensated_ballot_shares
     // get_valid_ballot_shares
 
+}
+
+public static class GuardianExtensions
+{
+    /// <summary>
+    /// Loads the guardian from local storage device
+    /// </summary>
+    /// <param name="guardianId">guardian id</param>
+    /// <param name="keyCeremonyId">id for the key ceremony</param>
+    /// <param name="guardianCount">count of guardians</param>
+    /// <param name="quorum">minimum needed number of guardians</param>
+    /// <returns></returns>
+    public static Guardian? Load(string guardianId, string keyCeremonyId, int guardianCount, int quorum)
+    {
+        var storage = StorageService.GetInstance();
+
+        var filename = Guardian.GuardianPrefix + guardianId + Guardian.GuardianExt;
+        var basePath = Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData);
+        var filePath = Path.Combine(basePath, Guardian.PrivateKeyFolder, keyCeremonyId, filename);
+
+        var data = storage.FromFile(filePath);
+        try
+        {
+            var privateGuardian = JsonSerializer.Deserialize<GuardianPrivateRecord>(data);
+            return privateGuardian != null ?
+                Guardian.FromPrivateRecord(privateGuardian, keyCeremonyId, guardianCount, quorum) :
+                null;
+        }
+        catch (Exception ex)
+        {
+            throw new ElectionGuardException("Could not load guardian", ex);
+        }
+    }
+
+    public static Guardian? Load(string guardianId, KeyCeremonyRecord keyCeremony)
+    {
+        return Load(guardianId, keyCeremony.KeyCeremonyId!, keyCeremony.NumberOfGuardians, keyCeremony.Quorum);
+    }
 }

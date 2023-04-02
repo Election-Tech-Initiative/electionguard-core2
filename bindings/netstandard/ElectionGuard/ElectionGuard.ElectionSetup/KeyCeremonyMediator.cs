@@ -11,7 +11,7 @@ namespace ElectionGuard.ElectionSetup;
 /// </summary>
 public class KeyCeremonyMediator : DisposableBase
 {
-    public KeyCeremonyMediator(string mediatorId, string userId, KeyCeremony keyCeremony)
+    public KeyCeremonyMediator(string mediatorId, string userId, KeyCeremonyRecord keyCeremony)
     {
         Id = mediatorId;
         UserId = userId;
@@ -27,7 +27,7 @@ public class KeyCeremonyMediator : DisposableBase
     public string UserId { get; }
     public string Id { get; }
     public CeremonyDetails CeremonyDetails { get; internal set; }
-    public KeyCeremony _keyCeremony { get; internal set; }
+    public KeyCeremonyRecord _keyCeremony { get; internal set; }
 
     // From Guardians
     // Round 1
@@ -655,7 +655,7 @@ public class KeyCeremonyMediator : DisposableBase
         var keyCeremony = await service.GetByKeyCeremonyIdAsync(keyCeremonyId);
 
         // load guardian from key ceremony
-        var guardian = Guardian.Load(UserId, keyCeremony!);
+        var guardian = GuardianExtensions.Load(UserId, keyCeremony!);
 
         // load other keys
         GuardianPublicKeyService guardianService = new();
@@ -728,7 +728,7 @@ public class KeyCeremonyMediator : DisposableBase
         GuardianPublicKeyService publicKeyService = new();
         var backups = await backupService.GetByGuardianIdAsync(keyCeremonyId, UserId);
         var keyCeremony = await keyCeremonyService.GetByKeyCeremonyIdAsync(keyCeremonyId);
-        var guardian = Guardian.Load(UserId, keyCeremony!);
+        var guardian = GuardianExtensions.Load(UserId, keyCeremony!);
         var list = await publicKeyService.GetAllByKeyCeremonyIdAsync(keyCeremonyId);
         foreach (var item in list)
         {

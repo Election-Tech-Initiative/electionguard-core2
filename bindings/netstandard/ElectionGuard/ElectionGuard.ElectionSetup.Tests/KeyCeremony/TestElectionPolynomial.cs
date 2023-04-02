@@ -1,6 +1,3 @@
-using ElectionGuard.ElectionSetup;
-using ElectionGuard.Proofs;
-
 namespace ElectionGuard.ElectionSetup.Tests.KeyCeremony;
 
 public class TestElectionPolynomial
