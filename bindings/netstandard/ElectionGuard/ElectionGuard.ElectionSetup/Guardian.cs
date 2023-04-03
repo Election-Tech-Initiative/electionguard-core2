@@ -654,7 +654,7 @@ public static class GuardianStorageExtensions
     /// <summary>
     /// Saves the guardian to the local storage device
     /// </summary>
-    public static void Save(this Guardian self, KeyCeremonyRecord keyCeremony)
+    public static void Save(this Guardian self, string keyCeremonyId)
     {
         var storage = StorageService.GetInstance();
 
@@ -663,7 +663,7 @@ public static class GuardianStorageExtensions
 
         var filename = Guardian.GuardianPrefix + data.GuardianId + Guardian.GuardianExt;
         var basePath = Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData);
-        var filePath = Path.Combine(basePath, Guardian.PrivateKeyFolder, keyCeremony.Name!);
+        var filePath = Path.Combine(basePath, Guardian.PrivateKeyFolder, keyCeremonyId);
 
         storage.ToFile(filePath, filename, dataJson);
     }
