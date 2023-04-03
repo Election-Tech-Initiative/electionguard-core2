@@ -295,11 +295,29 @@ namespace ElectionGuard.UI.Resx {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Create Multiple Tallies.
+        /// </summary>
+        internal static string CreateMultipleTalliesText {
+            get {
+                return ResourceManager.GetString("CreateMultipleTalliesText", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Create Tally.
         /// </summary>
         internal static string CreateTally {
             get {
                 return ResourceManager.GetString("CreateTally", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Custom Range for Ballot Selection.
+        /// </summary>
+        internal static string CustomRangeText {
+            get {
+                return ResourceManager.GetString("CustomRangeText", resourceCulture);
             }
         }
         
@@ -331,11 +349,29 @@ namespace ElectionGuard.UI.Resx {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Dates.
+        /// </summary>
+        internal static string DatesText {
+            get {
+                return ResourceManager.GetString("DatesText", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Device File.
         /// </summary>
         internal static string DeviceFileText {
             get {
                 return ResourceManager.GetString("DeviceFileText", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Devices.
+        /// </summary>
+        internal static string DevicesText {
+            get {
+                return ResourceManager.GetString("DevicesText", resourceCulture);
             }
         }
         
@@ -853,6 +889,15 @@ namespace ElectionGuard.UI.Resx {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Review Challenge.
+        /// </summary>
+        internal static string ReviewSpoiledText {
+            get {
+                return ResourceManager.GetString("ReviewSpoiledText", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Save.
         /// </summary>
         internal static string Save {
@@ -916,7 +961,7 @@ namespace ElectionGuard.UI.Resx {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Remove Spoiled Ballots (if needed).
+        ///   Looks up a localized string similar to Review Challenge Ballots (if needed).
         /// </summary>
         internal static string Step3Text {
             get {
@@ -979,6 +1024,33 @@ namespace ElectionGuard.UI.Resx {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Tally Name.
+        /// </summary>
+        internal static string TallyNameText {
+            get {
+                return ResourceManager.GetString("TallyNameText", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Tally Process.
+        /// </summary>
+        internal static string TallyProcess {
+            get {
+                return ResourceManager.GetString("TallyProcess", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Tally.
+        /// </summary>
+        internal static string TallyText {
+            get {
+                return ResourceManager.GetString("TallyText", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Total.
         /// </summary>
         internal static string TotalText {
@@ -1020,6 +1092,15 @@ namespace ElectionGuard.UI.Resx {
         internal static string UploadWizardText {
             get {
                 return ResourceManager.GetString("UploadWizardText", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Use All Ballots For Tally.
+        /// </summary>
+        internal static string UseAllBallotsText {
+            get {
+                return ResourceManager.GetString("UseAllBallotsText", resourceCulture);
             }
         }
         

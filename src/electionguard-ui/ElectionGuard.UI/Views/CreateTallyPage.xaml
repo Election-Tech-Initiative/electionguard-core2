@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<views:ContentPageBase
+    x:Class="ElectionGuard.UI.Views.CreateTallyPage"
+    xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+    xmlns:helper="clr-namespace:ElectionGuard.UI.Helpers"
+    xmlns:model="clr-namespace:ElectionGuard.UI.Lib.Models;assembly=ElectionGuard.UI.Lib"
+    xmlns:toolkit="http://schemas.microsoft.com/dotnet/2022/maui/toolkit"
+    xmlns:viewModels="clr-namespace:ElectionGuard.UI.ViewModels"
+    xmlns:views="using:ElectionGuard.UI.Views"
+    x:DataType="viewModels:CreateTallyViewModel"
+    x:TypeArguments="viewModels:CreateTallyViewModel"
+    ControlTemplate="{StaticResource PageTemplate}">
+    <ContentPage.Resources>
+        <toolkit:InvertedBoolConverter x:Key="InvertedBoolConverter" />
+        <toolkit:IsNotNullConverter x:Key="IsNotNullConverter" />
+    </ContentPage.Resources>
+    <VerticalStackLayout Style="{StaticResource NarrowCenteredPage}">
+        <Label
+            IsVisible="{Binding ErrorMessage, Converter={StaticResource IsNotNullConverter}}"
+            Style="{StaticResource Error}"
+            Text="{Binding ErrorMessage}" />
+        <VerticalStackLayout
+            Grid.Row="0"
+            Grid.ColumnSpan="2"
+            Style="{StaticResource FormControl}">
+            <Label Style="{StaticResource FormLabel}" Text="{helper:Translate TallyNameText}" />
+            <Entry Keyboard="Numeric" Text="{Binding TallyName}" />
+        </VerticalStackLayout>
+        <VerticalStackLayout>
+            <RadioButton Content="{helper:Translate UseAllBallotsText}" IsChecked="{Binding UseAllBallots}" />
+            <RadioButton Content="{helper:Translate CustomRangeText}" />
+            <VerticalStackLayout Margin="20,0,0,0" IsEnabled="{Binding UseAllBallots, Converter={StaticResource InvertedBoolConverter}}">
+                <Grid ColumnDefinitions="*,*">
+                    <VerticalStackLayout Grid.Column="0">
+                        <Label Text="{helper:Translate DevicesText}" />
+                        <Frame
+                            Margin="10,0,20,0"
+                            BackgroundColor="Transparent"
+                            HeightRequest="250">
+                            <CollectionView ItemsSource="{Binding BallotUploads}" SelectionMode="Multiple">
+                                <CollectionView.ItemTemplate>
+                                    <DataTemplate x:DataType="model:BallotUpload">
+                                        <Label Margin="10,0,0,0" Text="{Binding Location}" />
+                                    </DataTemplate>
+                                </CollectionView.ItemTemplate>
+                            </CollectionView>
+                        </Frame>
+
+                    </VerticalStackLayout>
+                    <VerticalStackLayout Grid.Column="1">
+                        <Label Text="{helper:Translate DatesText}" />
+                        <Frame
+                            Margin="10,0,20,0"
+                            BackgroundColor="Transparent"
+                            HeightRequest="250">
+                            <CollectionView ItemsSource="{Binding DateList}" />
+                        </Frame>
+                    </VerticalStackLayout>
+                </Grid>
+            </VerticalStackLayout>
+        </VerticalStackLayout>
+        <Button
+            Margin="0,20,0,0"
+            Command="{Binding CreateTallyCommand}"
+            Text="{helper:Translate CreateTally}" />
+    </VerticalStackLayout>
+</views:ContentPageBase>

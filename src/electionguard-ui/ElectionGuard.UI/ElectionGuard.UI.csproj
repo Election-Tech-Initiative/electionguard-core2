@@ -186,6 +186,9 @@
 	  <Compile Update="Views\CreateElectionAdminPage.xaml.cs">
 	    <DependentUpon>CreateElectionAdminPage.xaml</DependentUpon>
 	  </Compile>
+	  <Compile Update="Views\TallyProcessPage.xaml.cs">
+	    <DependentUpon>TallyProcessPage.xaml</DependentUpon>
+	  </Compile>
 	  <Compile Update="Views\ViewKeyCeremonyPage.xaml.cs">
 	    <DependentUpon>ViewKeyCeremonyPage.xaml</DependentUpon>
 	  </Compile>

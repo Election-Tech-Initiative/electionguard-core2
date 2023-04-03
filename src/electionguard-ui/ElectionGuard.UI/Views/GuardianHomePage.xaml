@@ -50,7 +50,7 @@
                             <controls:NoContentView Text="{helper:Translate NoTallies}" />
                         </CollectionView.EmptyView>
                         <CollectionView.ItemTemplate>
-                            <DataTemplate x:DataType="model:Tally">
+                            <DataTemplate x:DataType="model:TallyRecord">
                                 <Frame Style="{StaticResource ButtonishFrame}">
                                     <Label Style="{StaticResource ButtonishLabel}" Text="{Binding Name}" />
                                 </Frame>
