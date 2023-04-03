@@ -591,22 +591,7 @@ public class Guardian : DisposableBase
     }
 
 
-    /// <summary>
-    /// Saves the guardian to the local storage device
-    /// </summary>
-    public void Save()
-    {
-        var storage = StorageService.GetInstance();
 
-        GuardianPrivateRecord data = this;
-        var dataJson = JsonSerializer.Serialize(data);
-
-        var filename = GuardianPrefix + data.GuardianId + GuardianExt;
-        var basePath = Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData);
-        var filePath = Path.Combine(basePath, PrivateKeyFolder, CeremonyDetails.KeyCeremonyId);
-
-        storage.ToFile(filePath, filename, dataJson);
-    }
 
     // compute_tally_share
     // public DecryptionShare? ComputeTallyShare(CiphertextTally tally, CiphertextElectionContext context)
@@ -629,7 +614,7 @@ public class Guardian : DisposableBase
 
 }
 
-public static class GuardianExtensions
+public static class GuardianStorageExtensions
 {
     /// <summary>
     /// Loads the guardian from local storage device
@@ -664,5 +649,22 @@ public static class GuardianExtensions
     public static Guardian? Load(string guardianId, KeyCeremonyRecord keyCeremony)
     {
         return Load(guardianId, keyCeremony.KeyCeremonyId!, keyCeremony.NumberOfGuardians, keyCeremony.Quorum);
+    }
+
+    /// <summary>
+    /// Saves the guardian to the local storage device
+    /// </summary>
+    public static void Save(this Guardian self, KeyCeremonyRecord keyCeremony)
+    {
+        var storage = StorageService.GetInstance();
+
+        GuardianPrivateRecord data = self;
+        var dataJson = JsonSerializer.Serialize(data);
+
+        var filename = Guardian.GuardianPrefix + data.GuardianId + Guardian.GuardianExt;
+        var basePath = Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData);
+        var filePath = Path.Combine(basePath, Guardian.PrivateKeyFolder, keyCeremony.Name!);
+
+        storage.ToFile(filePath, filename, dataJson);
     }
 }

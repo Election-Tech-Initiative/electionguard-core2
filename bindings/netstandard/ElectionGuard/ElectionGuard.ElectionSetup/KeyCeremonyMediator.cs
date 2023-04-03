@@ -592,7 +592,7 @@ public class KeyCeremonyMediator : DisposableBase
              keyCeremonyId);
 
         // save guardian to local drive / yubikey
-        guardian.Save();
+        guardian.Save(keyCeremonyId);
 
         // get public key
         var publicKey = guardian.ShareKey();
@@ -655,7 +655,7 @@ public class KeyCeremonyMediator : DisposableBase
         var keyCeremony = await service.GetByKeyCeremonyIdAsync(keyCeremonyId);
 
         // load guardian from key ceremony
-        var guardian = GuardianExtensions.Load(UserId, keyCeremony!);
+        var guardian = GuardianStorageExtensions.Load(UserId, keyCeremony!);
 
         // load other keys
         GuardianPublicKeyService guardianService = new();
@@ -728,7 +728,7 @@ public class KeyCeremonyMediator : DisposableBase
         GuardianPublicKeyService publicKeyService = new();
         var backups = await backupService.GetByGuardianIdAsync(keyCeremonyId, UserId);
         var keyCeremony = await keyCeremonyService.GetByKeyCeremonyIdAsync(keyCeremonyId);
-        var guardian = GuardianExtensions.Load(UserId, keyCeremony!);
+        var guardian = GuardianStorageExtensions.Load(UserId, keyCeremony!);
         var list = await publicKeyService.GetAllByKeyCeremonyIdAsync(keyCeremonyId);
         foreach (var item in list)
         {
