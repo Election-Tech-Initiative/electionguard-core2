@@ -18,7 +18,7 @@ public partial class AdminHomeViewModel : BaseViewModel
         var keyCeremonies = await _keyCeremonyService.GetAllNotCompleteAsync();
         if (keyCeremonies is not null)
         {
-            KeyCeremonies = new ObservableCollection<KeyCeremony>(keyCeremonies);
+            KeyCeremonies = new ObservableCollection<KeyCeremonyRecord>(keyCeremonies);
         }
 
         var elections = await _electionService.GetAllAsync();
@@ -33,13 +33,13 @@ public partial class AdminHomeViewModel : BaseViewModel
     private ObservableCollection<Election> _elections = new();
 
     [ObservableProperty]
-    private ObservableCollection<KeyCeremony> _keyCeremonies = new();
+    private ObservableCollection<KeyCeremonyRecord> _keyCeremonies = new();
 
     [ObservableProperty]
     private Election? _currentElection;
 
     [ObservableProperty]
-    private KeyCeremony? _currentKeyCeremony;
+    private KeyCeremonyRecord? _currentKeyCeremony;
 
     [RelayCommand(AllowConcurrentExecutions = true)]
     public async Task GoToKeyCeremony()

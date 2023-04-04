@@ -20,9 +20,9 @@ namespace ElectionGuard
         public static ElementModP AddModP(ElementModP lhs, ElementModP rhs)
         {
             var status = External.AddModP(lhs.Handle, rhs.Handle,
-                out NativeInterface.ElementModP.ElementModPHandle value);
+                out var value);
             status.ThrowIfError();
-            return new ElementModP(value);
+            return value.IsInvalid ? null : new ElementModP(value);
         }
 
         /// <summary>
@@ -43,9 +43,9 @@ namespace ElectionGuard
         public static ElementModP MultModP(ElementModP lhs, ElementModP rhs)
         {
             var status = External.MultModP(lhs.Handle, rhs.Handle,
-                out NativeInterface.ElementModP.ElementModPHandle value);
+                out var value);
             status.ThrowIfError();
-            return new ElementModP(value);
+            return value.IsInvalid ? null : new ElementModP(value);
         }
 
         /// <summary>
@@ -56,9 +56,9 @@ namespace ElectionGuard
         public static ElementModP DivModP(ElementModP numerator, ElementModP denominator)
         {
             var status = External.DivModP(numerator.Handle, denominator.Handle,
-                out NativeInterface.ElementModP.ElementModPHandle value);
+                out var value);
             status.ThrowIfError();
-            return new ElementModP(value);
+            return value.IsInvalid ? null : new ElementModP(value);
         }
 
         /// <summary>
@@ -69,9 +69,9 @@ namespace ElectionGuard
         public static ElementModP PowModP(ElementModP b, ElementModP e)
         {
             var status = External.PowModP(b.Handle, e.Handle,
-                out NativeInterface.ElementModP.ElementModPHandle value);
+                out var value);
             status.ThrowIfError();
-            return new ElementModP(value);
+            return value.IsInvalid ? null : new ElementModP(value);
         }
 
         /// <summary>
@@ -82,9 +82,19 @@ namespace ElectionGuard
         public static ElementModP PowModP(ElementModP b, ElementModQ e)
         {
             var status = External.QPowModP(b.Handle, e.Handle,
-                out NativeInterface.ElementModP.ElementModPHandle value);
+                out var value);
             status.ThrowIfError();
-            return new ElementModP(value);
+            return value.IsInvalid ? null : new ElementModP(value);
+        }
+
+        public static ElementModP PowModP(ElementModP b, ulong e)
+        {
+            return PowModP(b, new ElementModQ(e, true));
+        }
+
+        public static ElementModP PowModP(ElementModQ b, ulong e)
+        {
+            return PowModP(new ElementModP(b), new ElementModQ(e, true));
         }
 
         /// <summary>
@@ -95,9 +105,9 @@ namespace ElectionGuard
         public static ElementModP PowModP(ulong b, ulong e)
         {
             var status = External.LongPowModP(b, e,
-                out NativeInterface.ElementModP.ElementModPHandle value);
+                out var value);
             status.ThrowIfError();
-            return new ElementModP(value);
+            return value.IsInvalid ? null : new ElementModP(value);
         }
 
         /// <summary>
@@ -107,9 +117,9 @@ namespace ElectionGuard
         public static ElementModP GPowP(ElementModQ elementModQ)
         {
             var status = External.QPowModP(Constants.G.Handle, elementModQ.Handle,
-                out NativeInterface.ElementModP.ElementModPHandle value);
+                out var value);
             status.ThrowIfError();
-            return new ElementModP(value);
+            return value.IsInvalid ? null : new ElementModP(value);
         }
 
         #endregion
@@ -124,9 +134,9 @@ namespace ElectionGuard
         public static ElementModQ AddModQ(ElementModQ lhs, ElementModQ rhs)
         {
             var status = External.AddModQ(lhs.Handle, rhs.Handle,
-                out NativeInterface.ElementModQ.ElementModQHandle value);
+                out var value);
             status.ThrowIfError();
-            return new ElementModQ(value);
+            return value.IsInvalid ? null : new ElementModQ(value);
         }
 
         /// <summary>
@@ -147,9 +157,9 @@ namespace ElectionGuard
         public static ElementModQ SubModQ(ElementModQ lhs, ElementModQ rhs)
         {
             var status = External.SubModQ(lhs.Handle, rhs.Handle,
-                out NativeInterface.ElementModQ.ElementModQHandle value);
+                out var value);
             status.ThrowIfError();
-            return new ElementModQ(value);
+            return value.IsInvalid ? null : new ElementModQ(value);
         }
 
         /// <summary>
@@ -160,9 +170,9 @@ namespace ElectionGuard
         public static ElementModQ MultModQ(ElementModQ lhs, ElementModQ rhs)
         {
             var status = External.MultModQ(lhs.Handle, rhs.Handle,
-                out NativeInterface.ElementModQ.ElementModQHandle value);
+                out var value);
             status.ThrowIfError();
-            return new ElementModQ(value);
+            return value.IsInvalid ? null : new ElementModQ(value);
         }
 
         /// <summary>
@@ -173,9 +183,9 @@ namespace ElectionGuard
         public static ElementModQ DivModQ(ElementModQ numerator, ElementModQ denominator)
         {
             var status = External.DivModQ(numerator.Handle, denominator.Handle,
-                out NativeInterface.ElementModQ.ElementModQHandle value);
+                out var value);
             status.ThrowIfError();
-            return new ElementModQ(value);
+            return value.IsInvalid ? null : new ElementModQ(value);
         }
 
         /// <summary>
@@ -186,9 +196,9 @@ namespace ElectionGuard
         public static ElementModQ PowModQ(ElementModQ b, ElementModQ e)
         {
             var status = External.PowModQ(b.Handle, e.Handle,
-                out NativeInterface.ElementModQ.ElementModQHandle value);
+                out var value);
             status.ThrowIfError();
-            return new ElementModQ(value);
+            return value.IsInvalid ? null : new ElementModQ(value);
         }
 
         /// <summary>
@@ -199,9 +209,9 @@ namespace ElectionGuard
         public static ElementModQ PowModQ(ElementModQ b, ulong e)
         {
             var status = External.LongPowModQ(b.Handle, e,
-                out NativeInterface.ElementModQ.ElementModQHandle value);
+                out var value);
             status.ThrowIfError();
-            return new ElementModQ(value);
+            return value.IsInvalid ? null : new ElementModQ(value);
         }
 
         /// <summary>
@@ -213,9 +223,9 @@ namespace ElectionGuard
         public static ElementModQ APlusBMulCModQ(ElementModQ a, ElementModQ b, ElementModQ c)
         {
             var status = External.APlusBMulCModQ(a.Handle, b.Handle, c.Handle,
-                out NativeInterface.ElementModQ.ElementModQHandle value);
+                out var value);
             status.ThrowIfError();
-            return new ElementModQ(value);
+            return value.IsInvalid ? null : new ElementModQ(value);
         }
 
         /// <summary>
@@ -224,9 +234,9 @@ namespace ElectionGuard
         public static ElementModQ RandQ()
         {
             var status = External.RandQ(
-                out NativeInterface.ElementModQ.ElementModQHandle value);
+                out var value);
             status.ThrowIfError();
-            return new ElementModQ(value);
+            return value.IsInvalid ? null : new ElementModQ(value);
         }
 
         #endregion
@@ -241,9 +251,9 @@ namespace ElectionGuard
         public static ElementModQ HashElems(ElementModP publickey, ElementModP commitment)
         {
             var status = External.HashElems(publickey.Handle, commitment.Handle,
-                out NativeInterface.ElementModQ.ElementModQHandle value);
+                out var value);
             status.ThrowIfError();
-            return new ElementModQ(value);
+            return value.IsInvalid ? null : new ElementModQ(value);
         }
 
         /// <summary>
@@ -254,9 +264,9 @@ namespace ElectionGuard
         public static ElementModQ HashElems(string id, ulong sequence)
         {
             var status = External.HashElems(id, sequence,
-                out NativeInterface.ElementModQ.ElementModQHandle value);
+                out var value);
             status.ThrowIfError();
-            return new ElementModQ(value);
+            return value.IsInvalid ? null : new ElementModQ(value);
         }
 
         /// <summary>
@@ -265,7 +275,7 @@ namespace ElectionGuard
         /// <param name="data">List of ElementModP to hash together</param>
         public static ElementModQ HashElems(List<ElementModP> data)
         {
-            IntPtr[] dataPointers = new IntPtr[data.Count];
+            var dataPointers = new IntPtr[data.Count];
             for (var i = 0; i < data.Count; i++)
             {
                 dataPointers[i] = data[i].Handle.Ptr;
@@ -273,9 +283,9 @@ namespace ElectionGuard
             }
 
             var status = External.HashElems(dataPointers, (ulong)data.Count,
-                out NativeInterface.ElementModQ.ElementModQHandle value);
+                out var value);
             status.ThrowIfError();
-            return new ElementModQ(value);
+            return value.IsInvalid ? null : new ElementModQ(value);
         }
 
         #endregion

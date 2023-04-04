@@ -93,6 +93,9 @@ EG_API eg_electionguard_status_t eg_element_mod_p_from_uint64(uint64_t in_uint64
                                                               eg_element_mod_p_t **out_handle);
 
 EG_API eg_electionguard_status_t
+eg_element_mod_p_from_element_mod_q(eg_element_mod_q_t *in_handle, eg_element_mod_p_t **out_handle);
+
+EG_API eg_electionguard_status_t
 eg_element_mod_p_from_uint64_unchecked(uint64_t in_uint64, eg_element_mod_p_t **out_handle);
 
 // TODO: ISSUE #129: finish implementation

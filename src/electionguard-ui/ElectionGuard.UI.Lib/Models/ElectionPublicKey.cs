@@ -1,6 +1,5 @@
-﻿using ElectionGuard.UI.Lib.Extensions;
-using MongoDB.Bson;
-using MongoDB.Bson.Serialization.Attributes;
+using ElectionGuard.Proofs;
+using ElectionGuard.UI.Lib.Extensions;
 
 namespace ElectionGuard.UI.Lib.Models;
 
