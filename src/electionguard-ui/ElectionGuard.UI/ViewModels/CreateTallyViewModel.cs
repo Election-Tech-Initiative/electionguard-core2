@@ -46,7 +46,7 @@ public partial class CreateTallyViewModel : BaseViewModel
     private Election _currentElection;
 
     [ObservableProperty]
-    private KeyCeremony _currentKeyCeremony;
+    private KeyCeremonyRecord _currentKeyCeremony;
 
     [ObservableProperty]
     private Manifest _currentManifest;
