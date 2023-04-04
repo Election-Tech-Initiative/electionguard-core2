@@ -73,6 +73,15 @@ namespace ElectionGuard
             status.ThrowIfError();
         }
 
+        /// <summary>
+        /// Create a `ElementModP`
+        /// </summary>
+        public ElementModP(ElementModQ elementModQ)
+        {
+            var status = NativeInterface.ElementModQ.ToElementModP(elementModQ.Handle, out Handle);
+            status.ThrowIfError();
+        }
+
         internal ElementModP(NaiveElementModP handle)
         {
             Handle = handle;

@@ -49,7 +49,7 @@ namespace ElectionGuard
             Handle = handle;
         }
 
-        private ElGamalKeyPair(ElementModQ secretKey)
+        public ElGamalKeyPair(ElementModQ secretKey)
         {
             var status = NativeInterface.ElGamalKeyPair.New(
                 secretKey.Handle, out Handle);

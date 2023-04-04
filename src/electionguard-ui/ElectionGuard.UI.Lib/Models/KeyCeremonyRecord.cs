@@ -5,9 +5,9 @@ namespace ElectionGuard.UI.Lib.Models;
 /// <summary>
 /// Data for the key ceremony that is saved to the database
 /// </summary>
-public partial class KeyCeremony : DatabaseRecord
+public partial class KeyCeremonyRecord : DatabaseRecord
 {
-    public KeyCeremony(string name, int numberOfGuardians, int quorum, string admin) : base(nameof(KeyCeremony))
+    public KeyCeremonyRecord(string name, int numberOfGuardians, int quorum, string admin) : base(nameof(KeyCeremonyRecord))
     {
         Name = name;
         NumberOfGuardians = numberOfGuardians;
@@ -49,7 +49,7 @@ public partial class KeyCeremony : DatabaseRecord
     [ObservableProperty]
     private KeyCeremonyState _state;
 
-    public static implicit operator CeremonyDetails(KeyCeremony data)
+    public static implicit operator CeremonyDetails(KeyCeremonyRecord data)
     {
         return new(data.KeyCeremonyId!, data.NumberOfGuardians, data.Quorum);
     }

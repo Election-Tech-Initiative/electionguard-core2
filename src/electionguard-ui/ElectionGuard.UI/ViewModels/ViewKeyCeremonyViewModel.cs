@@ -29,7 +29,7 @@ public partial class ViewKeyCeremonyViewModel : BaseViewModel
     }
 
     [ObservableProperty]
-    private KeyCeremony? _keyCeremony;
+    private KeyCeremonyRecord? _keyCeremony;
 
     [ObservableProperty]
     private bool _isJoinVisible;
@@ -75,7 +75,7 @@ public partial class ViewKeyCeremonyViewModel : BaseViewModel
         }
     }
 
-    partial void OnKeyCeremonyChanged(KeyCeremony? value)
+    partial void OnKeyCeremonyChanged(KeyCeremonyRecord? value)
     {
         if (value is not null)
         {

@@ -1,4 +1,4 @@
-﻿namespace ElectionGuard.ElectionSetup
+﻿namespace ElectionGuard.Proofs
 {
     /// <summary>
     /// Usage case for proof

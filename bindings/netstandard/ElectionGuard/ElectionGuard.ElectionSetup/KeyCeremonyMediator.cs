@@ -11,7 +11,7 @@ namespace ElectionGuard.ElectionSetup;
 /// </summary>
 public class KeyCeremonyMediator : DisposableBase
 {
-    public KeyCeremonyMediator(string mediatorId, string userId, KeyCeremony keyCeremony)
+    public KeyCeremonyMediator(string mediatorId, string userId, KeyCeremonyRecord keyCeremony)
     {
         Id = mediatorId;
         UserId = userId;
@@ -27,7 +27,7 @@ public class KeyCeremonyMediator : DisposableBase
     public string UserId { get; }
     public string Id { get; }
     public CeremonyDetails CeremonyDetails { get; internal set; }
-    public KeyCeremony _keyCeremony { get; internal set; }
+    public KeyCeremonyRecord _keyCeremony { get; internal set; }
 
     // From Guardians
     // Round 1
@@ -131,7 +131,7 @@ public class KeyCeremonyMediator : DisposableBase
     /// </summary>
     /// <param name="requestingGuardianId"></param>
     /// <returns></returns>
-    private List<ElectionPublicKey>? ShareAnnounced(string? requestingGuardianId)
+    protected List<ElectionPublicKey>? ShareAnnounced(string? requestingGuardianId)
     {
         if (AllGuardiansAnnounced() is false)
             return null;
@@ -164,7 +164,7 @@ public class KeyCeremonyMediator : DisposableBase
     /// Receive election partial key backup from guardian
     /// </summary>
     /// <param name="backup">Election partial key backup</param>
-    private void ReceiveElectionPartialKeyBackup(ElectionPartialKeyBackup backup)
+    public void ReceiveElectionPartialKeyBackup(ElectionPartialKeyBackup backup)
     {
         _electionPartialKeyBackups[new GuardianPair(backup.OwnerId!, backup.DesignatedId!)] = backup;
     }
@@ -192,7 +192,7 @@ public class KeyCeremonyMediator : DisposableBase
     /// </summary>
     /// <param name="requestingGuardianId"></param>
     /// <returns></returns>
-    public List<ElectionPartialKeyBackup>? ShareBackups(string? requestingGuardianId)
+    public List<ElectionPartialKeyBackup>? ShareBackups(string? requestingGuardianId = null)
     {
         if (AllGuardiansAnnounced() == false || AllBackupsAvailable() == false)
             return null;
@@ -213,16 +213,20 @@ public class KeyCeremonyMediator : DisposableBase
     /// </summary>
     /// <param name="guardianId">Recipients guardian id</param>
     /// <returns>List of guardians designated backups</returns>
-    private List<ElectionPartialKeyBackup> ShareElectionPartialKeyBackupsToGuardian(string guardianId)
+    private List<ElectionPartialKeyBackup> ShareElectionPartialKeyBackupsToGuardian(
+        string guardianId)
     {
         List<ElectionPartialKeyBackup> backups = new();
         var announcedGuardians = GetAnnouncedGuardians();
-        var others = announcedGuardians.Where(g => g != guardianId);
+        var others = announcedGuardians;
         foreach (var currentGuardianId in others)
         {
-            _electionPartialKeyBackups.TryGetValue(new GuardianPair(currentGuardianId, guardianId), out var backup);
+            _ = _electionPartialKeyBackups.TryGetValue(
+                new GuardianPair(currentGuardianId, guardianId), out var backup);
             if (backup is not null)
+            {
                 backups.Add(backup);
+            }
         }
         return backups;
     }
@@ -248,7 +252,7 @@ public class KeyCeremonyMediator : DisposableBase
     /// Receive election partial key verification from guardian
     /// </summary>
     /// <param name="verification">Election partial key verification</param>
-    private void ReceiveElectionPartialKeyVerification(ElectionPartialKeyVerification verification)
+    public void ReceiveElectionPartialKeyVerification(ElectionPartialKeyVerification verification)
     {
         _electionPartialKeyVerification[new GuardianPair(verification.OwnerId!, verification.DesignatedId!)] = verification;
     }
@@ -295,8 +299,8 @@ public class KeyCeremonyMediator : DisposableBase
     private bool AllElectionPartialKeyVerificationsReceived()
     {
         var requiredVerificationsPerGuardian = CeremonyDetails.NumberOfGuardians;
-        return _electionPartialKeyVerification.Count == (requiredVerificationsPerGuardian
-            * CeremonyDetails.NumberOfGuardians);
+        var totalRequired = requiredVerificationsPerGuardian * CeremonyDetails.NumberOfGuardians;
+        return _electionPartialKeyVerification.Count == totalRequired;
     }
 
     // ROUND 4 (Optional): If a verification fails, guardian must issue challenge
@@ -318,54 +322,24 @@ public class KeyCeremonyMediator : DisposableBase
     /// <summary>
     /// Verify a challenge to a previous verification of a partial key backup
     /// </summary>
-    /// <param name="verifierId"></param>
-    /// <param name="challenge"></param>
+    /// <param name="verifierId">verifier of the challenge</param>
+    /// <param name="challenge">election partial key challenge</param>
     /// <returns></returns>
-    private ElectionPartialKeyVerification VerifyElectionPartialKeyChallenge(
+    private static ElectionPartialKeyVerification VerifyElectionPartialKeyChallenge(
         string verifierId, ElectionPartialKeyChallenge challenge)
     {
-        /* """
-            
-            :param verifier_id: Verifier of the challenge
-            :param challenge: Election partial key challenge
-            :return: Election partial key verification
-        """ */
         return new ElectionPartialKeyVerification()
         {
             OwnerId = challenge.OwnerId,
             DesignatedId = challenge.DesignatedId,
             VerifierId = verifierId,
-            Verified = VerifyPolynomialCoordinate(
-                challenge.Value!,
+            Verified = ElectionPolynomial.VerifyCoordinate(
                 challenge.DesignatedSequenceOrder,
+                challenge.Value!,
                 challenge.CoefficientCommitments!
             )
         };
     }
-
-    /// <summary>
-    /// Verify a polynomial coordinate value is in fact on the polynomial's curve
-    /// </summary>
-    /// <param name="coordinate">Value to be checked</param>
-    /// <param name="exponentModifier">Unique modifier (usually sequence order) for exponent</param>
-    /// <param name="commitments">Public commitments for coefficients of polynomial</param>
-    /// <returns>True if verified on polynomial</returns>
-    private bool VerifyPolynomialCoordinate(
-        ElementModQ coordinate,
-        ulong exponentModifier,
-        List<ElementModP> commitments)
-    {
-        using var commitmentOutput = Constants.ONE_MOD_P;
-        foreach (var (commitment, index) in commitments.WithIndex())
-        {
-            using var exponent = BigMath.PowModP(exponentModifier, index);
-            using var factor = BigMath.PowModP(commitment, exponent);
-            commitmentOutput.MultModP(factor);
-        }
-        using var valueOutput = BigMath.GPowP(coordinate);
-        return valueOutput.Equals(commitmentOutput);
-    }
-
 
     // FINAL: Publish joint public election key
     /// <summary>
@@ -610,10 +584,15 @@ public class KeyCeremonyMediator : DisposableBase
         var guardianNumber = await GetGuardianNumberAsync(service, keyCeremonyId, currentGuardianUserName);
 
         // make guardian
-        var guardian = Guardian.FromNonce(currentGuardianUserName, guardianNumber, CeremonyDetails.NumberOfGuardians, CeremonyDetails.Quorum, keyCeremonyId);
+        var guardian = new Guardian(
+            currentGuardianUserName,
+            guardianNumber,
+            CeremonyDetails.NumberOfGuardians,
+            CeremonyDetails.Quorum,
+             keyCeremonyId);
 
         // save guardian to local drive / yubikey
-        guardian.Save();
+        guardian.Save(keyCeremonyId);
 
         // get public key
         var publicKey = guardian.ShareKey();
@@ -676,7 +655,7 @@ public class KeyCeremonyMediator : DisposableBase
         var keyCeremony = await service.GetByKeyCeremonyIdAsync(keyCeremonyId);
 
         // load guardian from key ceremony
-        var guardian = Guardian.Load(UserId, keyCeremony!);
+        var guardian = GuardianStorageExtensions.Load(UserId, keyCeremony!);
 
         // load other keys
         GuardianPublicKeyService guardianService = new();
@@ -749,7 +728,7 @@ public class KeyCeremonyMediator : DisposableBase
         GuardianPublicKeyService publicKeyService = new();
         var backups = await backupService.GetByGuardianIdAsync(keyCeremonyId, UserId);
         var keyCeremony = await keyCeremonyService.GetByKeyCeremonyIdAsync(keyCeremonyId);
-        var guardian = Guardian.Load(UserId, keyCeremony!);
+        var guardian = GuardianStorageExtensions.Load(UserId, keyCeremony!);
         var list = await publicKeyService.GetAllByKeyCeremonyIdAsync(keyCeremonyId);
         foreach (var item in list)
         {
@@ -760,7 +739,7 @@ public class KeyCeremonyMediator : DisposableBase
         {
             guardian!.SaveElectionPartialKeyBackup(backup.Backup!);
             var verification = guardian.VerifyElectionPartialKeyBackup(backup.GuardianId!, keyCeremonyId);
-            if(verification == null)
+            if (verification == null)
             {
                 throw new KeyCeremonyException(
                     keyCeremony!.State,
@@ -809,7 +788,7 @@ public class KeyCeremonyMediator : DisposableBase
         var jointKey = PublishJointKey();
 
         // if null then throw
-        if(jointKey == null)
+        if (jointKey == null)
         {
             throw new KeyCeremonyException(
                 KeyCeremonyState.PendingAdminToPublishJointKey,

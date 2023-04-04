@@ -98,9 +98,9 @@ public partial class ManifestViewModel : BaseViewModel
             var local = Manifest.GetBallotStyleAtIndex(i);
             var gpunits = new List<string>();
             var geopoliticalUnits = local.GeopoliticalUnitIds;
-            foreach (var item in geopoliticalUnits)
+            for (ulong j = 0; j < local.GeopoliticalUnitIdsSize; j++)
             {
-                var unit = GeopoliticalUnits.FirstOrDefault(u => u.GeopoliticalUnitId == item);
+                var unit = GeopoliticalUnits.FirstOrDefault(u => u.GeopoliticalUnitId == local.GetGeopoliticalUnitIdAtIndex(j));
                 if (unit == null)
                 {
                     unit = new("", "", "");
