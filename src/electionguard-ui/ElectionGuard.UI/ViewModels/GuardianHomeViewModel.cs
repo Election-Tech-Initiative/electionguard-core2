@@ -22,13 +22,13 @@ public override async Task OnAppearing()
     }
 
     [ObservableProperty]
-    private ObservableCollection<KeyCeremony> _keyCeremonies = new();
+    private ObservableCollection<KeyCeremonyRecord> _keyCeremonies = new();
 
     [ObservableProperty]
     private ObservableCollection<Tally> _tallies = new();
 
     [ObservableProperty]
-    private KeyCeremony? _currentKeyCeremony;
+    private KeyCeremonyRecord? _currentKeyCeremony;
 
     [ObservableProperty]
     private Tally? _currentTally;
@@ -40,7 +40,7 @@ public override async Task OnAppearing()
         await Task.Yield();
     }
 
-    partial void OnCurrentKeyCeremonyChanged(KeyCeremony? value)
+    partial void OnCurrentKeyCeremonyChanged(KeyCeremonyRecord? value)
     {
         if (CurrentKeyCeremony == null) return;
         MainThread.BeginInvokeOnMainThread(async() =>

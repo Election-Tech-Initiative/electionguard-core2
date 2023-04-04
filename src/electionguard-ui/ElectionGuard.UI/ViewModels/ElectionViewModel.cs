@@ -27,7 +27,7 @@ public partial class ElectionViewModel : BaseViewModel
     private Manifest? _manifest;
 
     [ObservableProperty]
-    private KeyCeremony? _keyCeremony;
+    private KeyCeremonyRecord? _keyCeremony;
 
     [ObservableProperty]
     private ManifestRecord? _manifestRecord;

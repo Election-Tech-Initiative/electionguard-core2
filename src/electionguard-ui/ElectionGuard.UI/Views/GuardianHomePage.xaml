@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8" ?>
+﻿<?xml version="1.0" encoding="utf-8" ?>
 <views:ContentPageBase
     x:Class="ElectionGuard.UI.Views.GuardianHomePage"
     xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
@@ -27,7 +27,7 @@
                             <controls:NoContentView Text="{helper:Translate NoKeyCeremonies}" />
                         </CollectionView.EmptyView>
                         <CollectionView.ItemTemplate>
-                            <DataTemplate x:DataType="model:KeyCeremony">
+                            <DataTemplate x:DataType="model:KeyCeremonyRecord">
                                 <Frame Style="{StaticResource ButtonishFrame}">
                                     <Label Style="{StaticResource ButtonishLabel}" Text="{Binding Name}" />
                                 </Frame>

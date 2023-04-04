@@ -39,6 +39,8 @@
             Commitment = BigMath.GPowP(seed);
             Challenge = BigMath.HashElems(PublicKey, Commitment);
             Response = BigMath.APlusBMulCModQ(seed, keyPair.SecretKey, Challenge);
+
+            keyPair.Dispose();
         }
 
         /// <summary>
@@ -51,6 +53,8 @@
             Commitment = BigMath.GPowP(seed);
             Challenge = BigMath.HashElems(PublicKey, Commitment);
             Response = BigMath.APlusBMulCModQ(seed, keyPair.SecretKey, Challenge);
+
+            seed.Dispose();
         }
 
         /// <summary>
@@ -63,6 +67,8 @@
             Commitment = BigMath.GPowP(seed);
             Challenge = BigMath.HashElems(PublicKey, Commitment);
             Response = BigMath.APlusBMulCModQ(seed, keyPair.SecretKey, Challenge);
+
+            keyPair.Dispose();
         }
 
         /// <summary>

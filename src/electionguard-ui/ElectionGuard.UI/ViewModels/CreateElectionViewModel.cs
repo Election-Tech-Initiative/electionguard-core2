@@ -39,10 +39,10 @@ public partial class CreateElectionViewModel : BaseViewModel
 
     [ObservableProperty]
     [NotifyCanExecuteChangedFor(nameof(CreateElectionCommand))]
-    private KeyCeremony? _keyCeremony = null;
+    private KeyCeremonyRecord? _keyCeremony = null;
 
     [ObservableProperty]
-    private List<KeyCeremony> _keyCeremonies;
+    private List<KeyCeremonyRecord> _keyCeremonies;
 
     [ObservableProperty]
     private string _electionUrl;

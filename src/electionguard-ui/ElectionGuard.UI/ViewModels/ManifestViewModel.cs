@@ -99,7 +99,7 @@ public partial class ManifestViewModel : BaseViewModel
             var gpunits = new List<string>();
             for (ulong j = 0; j < local.GeopoliticalUnitIdsSize; j++)
             {
-                var unit = GeopoliticalUnits.FirstOrDefault(u => u.GeopoliticalUnitId == local.GetGeopoliticalUnitIdAt(j));
+                var unit = GeopoliticalUnits.FirstOrDefault(u => u.GeopoliticalUnitId == local.GetGeopoliticalUnitIdAtIndex(j));
                 if (unit == null)
                 {
                     unit = new("", "", "");

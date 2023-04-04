@@ -94,10 +94,6 @@ public record GuardianRecord : DisposableRecordBase
 /// </summary>
 public class Guardian : DisposableBase
 {
-    internal const string GuardianPrefix = "guardian_";
-    internal const string PrivateKeyFolder = "gui_private_keys";
-    internal const string GuardianExt = ".json";
-
     private readonly ElectionKeyPair _electionKeys;
     private Dictionary<string, ElectionPublicKey>? _otherGuardianPublicKeys = new();
     private Dictionary<string, ElectionPartialKeyBackup>? _otherGuardianPartialKeyBackups = new();
@@ -616,6 +612,10 @@ public class Guardian : DisposableBase
 
 public static class GuardianStorageExtensions
 {
+    internal const string GuardianPrefix = "guardian_";
+    internal const string PrivateKeyFolder = "gui_private_keys";
+    internal const string GuardianExt = ".json";
+
     /// <summary>
     /// Loads the guardian from local storage device
     /// </summary>
@@ -628,9 +628,9 @@ public static class GuardianStorageExtensions
     {
         var storage = StorageService.GetInstance();
 
-        var filename = Guardian.GuardianPrefix + guardianId + Guardian.GuardianExt;
+        var filename = GuardianPrefix + guardianId + GuardianExt;
         var basePath = Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData);
-        var filePath = Path.Combine(basePath, Guardian.PrivateKeyFolder, keyCeremonyId, filename);
+        var filePath = Path.Combine(basePath, PrivateKeyFolder, keyCeremonyId, filename);
 
         var data = storage.FromFile(filePath);
         try
@@ -661,9 +661,9 @@ public static class GuardianStorageExtensions
         GuardianPrivateRecord data = self;
         var dataJson = JsonSerializer.Serialize(data);
 
-        var filename = Guardian.GuardianPrefix + data.GuardianId + Guardian.GuardianExt;
+        var filename = GuardianPrefix + data.GuardianId + GuardianExt;
         var basePath = Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData);
-        var filePath = Path.Combine(basePath, Guardian.PrivateKeyFolder, keyCeremonyId);
+        var filePath = Path.Combine(basePath, PrivateKeyFolder, keyCeremonyId);
 
         storage.ToFile(filePath, filename, dataJson);
     }

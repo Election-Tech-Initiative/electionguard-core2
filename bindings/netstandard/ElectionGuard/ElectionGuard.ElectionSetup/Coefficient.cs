@@ -33,9 +33,9 @@ public class Coefficient : DisposableBase
     /// </summary>
     public Coefficient()
     {
-        var value = BigMath.RandQ();
+        using var value = BigMath.RandQ();
         KeyPair = ElGamalKeyPair.FromSecret(value);
-        var seed = BigMath.RandQ();
+        using var seed = BigMath.RandQ();
         Proof = new(KeyPair, seed);
     }
 
@@ -62,18 +62,18 @@ public class Coefficient : DisposableBase
     /// </summary>
     public Coefficient(ElementModQ value, SchnorrProof proof)
     {
-        KeyPair = ElGamalKeyPair.FromSecret(value);
-
         if (!proof.IsValid())
         {
             throw new ArgumentException("Invalid proof");
         }
 
-        if (!proof.PublicKey.Equals(KeyPair.PublicKey))
+        using var keyPair = ElGamalKeyPair.FromSecret(value);
+        if (!proof.PublicKey.Equals(keyPair.PublicKey))
         {
             throw new ArgumentException("Proof does not match key pair");
         }
 
+        KeyPair = keyPair;
         Proof = proof;
     }
 
