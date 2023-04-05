@@ -72,6 +72,14 @@ public partial class CreateTallyViewModel : BaseViewModel
 
             var uploads = await _ballotUploadService.GetByElectionIdAsync(value);
             BallotUploads = uploads.DistinctBy(u => u.DeviceId).ToList();
+            var startDate = uploads.Min(u => u.BallotsStart);
+            var endDate = uploads.Max(u => u.BallotsEnd);
+            DateList.Clear();
+            for (DateTime currentDate = startDate; currentDate <= endDate; currentDate = currentDate.AddDays(1))
+            {
+                DateList.Add(currentDate.ToShortDateString());
+            }
+
         });
     }
 

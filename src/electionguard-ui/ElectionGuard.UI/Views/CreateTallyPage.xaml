@@ -30,7 +30,7 @@
         <VerticalStackLayout>
             <RadioButton Content="{helper:Translate UseAllBallotsText}" IsChecked="{Binding UseAllBallots}" />
             <RadioButton Content="{helper:Translate CustomRangeText}" />
-            <VerticalStackLayout Margin="20,0,0,0" IsEnabled="{Binding UseAllBallots, Converter={StaticResource InvertedBoolConverter}}">
+            <VerticalStackLayout Margin="20,0,0,0">
                 <Grid ColumnDefinitions="*,*">
                     <VerticalStackLayout Grid.Column="0">
                         <Label Text="{helper:Translate DevicesText}" />
@@ -38,7 +38,10 @@
                             Margin="10,0,20,0"
                             BackgroundColor="Transparent"
                             HeightRequest="250">
-                            <CollectionView ItemsSource="{Binding BallotUploads}" SelectionMode="Multiple">
+                            <CollectionView
+                                IsEnabled="{Binding UseAllBallots, Converter={StaticResource InvertedBoolConverter}}"
+                                ItemsSource="{Binding BallotUploads}"
+                                SelectionMode="Multiple">
                                 <CollectionView.ItemTemplate>
                                     <DataTemplate x:DataType="model:BallotUpload">
                                         <Label Margin="10,0,0,0" Text="{Binding Location}" />
@@ -54,7 +57,17 @@
                             Margin="10,0,20,0"
                             BackgroundColor="Transparent"
                             HeightRequest="250">
-                            <CollectionView ItemsSource="{Binding DateList}" />
+                            <CollectionView
+                                IsEnabled="{Binding UseAllBallots, Converter={StaticResource InvertedBoolConverter}}"
+                                ItemsSource="{Binding DateList}"
+                                SelectionMode="Multiple">
+                                <CollectionView.ItemTemplate>
+                                    <DataTemplate>
+                                        <Label Margin="10,0,0,0" Text="{Binding .}" />
+                                    </DataTemplate>
+                                </CollectionView.ItemTemplate>
+
+                            </CollectionView>
                         </Frame>
                     </VerticalStackLayout>
                 </Grid>
