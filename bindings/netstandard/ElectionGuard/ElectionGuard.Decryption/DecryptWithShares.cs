@@ -5,42 +5,33 @@ using ElectionGuard.UI.Lib.Models;
 
 namespace ElectionGuard.Decryption;
 
-public static class DecryptExtensions
+public static class DecryptWithSharesExtensions
 {
-    /// <summary>
-    /// Decrypts a <see cref="CiphertextTally" /> using the provided <see cref="ElementModQ" /> secret key
-    /// </summary>
-    public static PlaintextTally Decrypt(
+    public static List<PlaintextTallyBallot> Decrypt(
         this CiphertextTally self,
-        ElementModQ secretKey)
+        Dictionary<string, CiphertextDecryptionBallot> ballotShares,
+        ElementModQ extendedBaseHash,
+        bool skipValidation = false)
     {
-        var plaintextTally = new PlaintextTally(
-            self.TallyId, self.Name, self.Manifest);
-
-        foreach (var contest in self.Contests)
+        var plaintextBallots = new List<PlaintextTallyBallot>();
+        foreach (var ballotShare in ballotShares)
         {
-            var plaintextContest = plaintextTally.Contests.First(
-                x => x.Key == contest.Key).Value;
-            foreach (var selection in contest.Value.Selections)
-            {
-                var ciphertext = selection.Value.Ciphertext;
-                var plaintextSelection = plaintextContest.Selections.First(
-                    x => x.Key == selection.Key).Value;
-
-                try
-                {
-                    var value = ciphertext.Decrypt(secretKey);
-                    plaintextSelection.Tally += value ?? 0;
-                }
-                catch (Exception e)
-                {
-                    throw new Exception(
-                        $"Failed to decrypt selection {selection.Key} in contest {contest.Key}",
-                        e);
-                }
-            }
+            var plaintextBallot = self.Decrypt(
+                ballotShare.Value, extendedBaseHash, skipValidation);
+            plaintextBallots.Add(plaintextBallot);
         }
-        return plaintextTally;
+
+        return plaintextBallots;
+    }
+
+    public static PlaintextTallyBallot Decrypt(
+        this CiphertextTally self,
+        CiphertextDecryptionBallot ballotShares,
+        ElementModQ extendedBaseHash,
+        bool skipValidation = false)
+    {
+        return self.Decrypt(
+            ballotShares.GetShares(), extendedBaseHash, skipValidation);
     }
 
     public static PlaintextTally Decrypt(
@@ -79,8 +70,53 @@ public static class DecryptExtensions
         return plaintextTally;
     }
 
+    public static PlaintextTallyBallot Decrypt(
+        this CiphertextTally self,
+        List<Tuple<ElectionPublicKey, CiphertextDecryptionBallotShare>> guardianShares,
+        ElementModQ extendedBaseHash,
+        bool skipValidation = false)
+    {
+        var firstShare = guardianShares.First().Item2;
+        var ballotStyleId = firstShare.StyleId;
+        var plaintextTally = new PlaintextTallyBallot(
+            self.TallyId, firstShare.BallotId, ballotStyleId, self.Manifest);
+
+        // TODO: move this up the chain
+        var lagrangeCoefficients = ComputeLagrangeCoefficients(guardianShares);
+
+        foreach (var contest in self.Contests)
+        {
+            var plaintextContest = plaintextTally.Contests.First(
+                x => x.Key == contest.Key).Value;
+
+            foreach (var selection in contest.Value.Selections)
+            {
+                var ciphertext = selection.Value;
+                var plaintextSelection = plaintextContest.Selections.First(
+                    x => x.Key == selection.Key).Value;
+
+                var selectionShares = guardianShares.Select(
+                    x => new Tuple<ElectionPublicKey, CiphertextDecryptionSelectionShare>(
+                        x.Item1, x.Item2.GetSelectionShare(contest.Key, selection.Key))).ToList();
+
+                var value = ciphertext!.Decrypt(
+                    selectionShares, lagrangeCoefficients, extendedBaseHash, skipValidation);
+                plaintextSelection.Tally += value.Tally;
+
+            }
+        }
+
+        return plaintextTally;
+    }
+
     public static Dictionary<string, ElementModQ> ComputeLagrangeCoefficients(
         List<Tuple<ElectionPublicKey, CiphertextDecryptionTallyShare>> guardianShares)
+    {
+        return ComputeLagrangeCoefficients(guardianShares.Select(x => x.Item1).ToList());
+    }
+
+    public static Dictionary<string, ElementModQ> ComputeLagrangeCoefficients(
+        List<Tuple<ElectionPublicKey, CiphertextDecryptionBallotShare>> guardianShares)
     {
         return ComputeLagrangeCoefficients(guardianShares.Select(x => x.Item1).ToList());
     }
