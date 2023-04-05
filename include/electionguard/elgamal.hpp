@@ -111,6 +111,7 @@ namespace electionguard
 
         /// <Summary>
         /// Decrypts an ElGamal ciphertext with a "known product" (the blinding factor used in the encryption).
+        /// Calculates 𝑀=𝐵⁄(∏𝑀𝑖) mod 𝑝.
         ///
         /// <param name="product">The known product (blinding factor).</param>
         /// <returns>An exponentially encoded plaintext message.</returns

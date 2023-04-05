@@ -47,9 +47,9 @@ eg_electionguard_status_t eg_elgamal_keypair_from_secret_new(eg_element_mod_q_t 
     }
 }
 
-EG_API eg_electionguard_status_t eg_elgamal_keypair_from_pair_new(eg_element_mod_q_t *in_secret_key,
-                                                                  eg_element_mod_p_t *in_public_key,
-                                                                  eg_elgamal_keypair_t **out_handle)
+eg_electionguard_status_t eg_elgamal_keypair_from_pair_new(eg_element_mod_q_t *in_secret_key,
+                                                           eg_element_mod_p_t *in_public_key,
+                                                           eg_elgamal_keypair_t **out_handle)
 {
     if (in_secret_key == nullptr || in_public_key == nullptr) {
         return ELECTIONGUARD_STATUS_ERROR_INVALID_ARGUMENT;

@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Runtime.ConstrainedExecution;
 using System.Runtime.InteropServices;
 // ReSharper disable InconsistentNaming
@@ -2080,6 +2080,20 @@ namespace ElectionGuard
             internal static extern Status GetConfiguration(
                 CiphertextElectionContextHandle handle,
                 out ContextConfiguration.ContextConfigurationHandle context_config);
+
+            [DllImport(DllName,
+                EntryPoint = "eg_ciphertext_election_context_get_number_of_guardians",
+                CallingConvention = CallingConvention.Cdecl, SetLastError = true)]
+            internal static extern Status GetNumberOfGuardians(
+                CiphertextElectionContextHandle handle,
+                ref ulong number_of_guardians);
+
+            [DllImport(DllName,
+                EntryPoint = "eg_ciphertext_election_context_get_quorum",
+                CallingConvention = CallingConvention.Cdecl, SetLastError = true)]
+            internal static extern Status GetQuorum(
+                CiphertextElectionContextHandle handle,
+                ref ulong quorum);
 
             [DllImport(DllName,
                 EntryPoint = "eg_ciphertext_election_context_get_elgamal_public_key",
