@@ -31,12 +31,6 @@ public class TestCiphertextTally : DisposableBase
             Data.InternalManifest, Data.Context, PlaintextBallots, seed, nonce);
     }
 
-    [SetUp]
-    public void Setup()
-    {
-
-    }
-
     [TestCase(BALLOT_COUNT_VALIDATED, false)]
     [TestCase(BALLOT_COUNT_UNVALIDATED, true)]
     public void Test_Accumulate_Cast_Ballots_Is_Valid(

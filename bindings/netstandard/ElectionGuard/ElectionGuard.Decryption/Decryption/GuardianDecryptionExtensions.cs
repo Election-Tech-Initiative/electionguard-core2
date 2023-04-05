@@ -1,10 +1,12 @@
-using ElectionGuard.Decryption.Decryption;
 using ElectionGuard.Decryption.Tally;
 using ElectionGuard.ElectionSetup;
 using ElectionGuard.Encryption.Ballot;
 
-namespace ElectionGuard.Decryption.KeyCeremony;
+namespace ElectionGuard.Decryption.Decryption;
 
+/// <summary>
+///     Decryption extension methods for the <see cref="Guardian" /> class
+/// </summary>
 public static class GuardianDecryptionExtensions
 {
     public static Tuple<CiphertextDecryptionTallyShare, CiphertextDecryptionBallotShares> ComputeDecryptionShares(

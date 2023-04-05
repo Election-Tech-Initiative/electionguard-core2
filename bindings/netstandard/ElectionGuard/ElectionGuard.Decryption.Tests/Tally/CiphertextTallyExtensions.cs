@@ -2,8 +2,10 @@ using ElectionGuard.Decryption.Tally;
 
 namespace ElectionGuard.Decryption.Tests.Tally;
 
-public static class TestCiphertextTallyExtensions
+public static class CiphertextTallyExtensions
 {
+    // accumulate plaintext ballots into a plaintext tally.
+    // Useful for comparisons of actual results vs expected results
     public static void AccumulateBallots(
         this PlaintextTally self, IList<PlaintextBallot> ballots)
     {

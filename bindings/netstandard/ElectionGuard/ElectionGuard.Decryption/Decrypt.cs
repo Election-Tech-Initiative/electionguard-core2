@@ -7,6 +7,9 @@ namespace ElectionGuard.Decryption;
 
 public static class DecryptExtensions
 {
+    /// <summary>
+    /// Decrypts a <see cref="CiphertextTally" /> using the provided <see cref="ElementModQ" /> secret key
+    /// </summary>
     public static PlaintextTally Decrypt(
         this CiphertextTally self,
         ElementModQ secretKey)

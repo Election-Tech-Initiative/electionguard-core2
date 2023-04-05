@@ -7,7 +7,7 @@ public class TestCiphertextTallySelection
     private readonly ElementModQ nonce = Constants.ONE_MOD_Q;
     private readonly ElementModQ secret = Constants.TWO_MOD_Q;
 
-    ElGamalKeyPair keyPair = default!;
+    private ElGamalKeyPair keyPair = default!;
 
     [SetUp]
     public void Setup()
