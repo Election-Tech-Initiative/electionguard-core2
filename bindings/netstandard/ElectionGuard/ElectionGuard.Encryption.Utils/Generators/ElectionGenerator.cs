@@ -1,4 +1,6 @@
 
+using System;
+
 namespace ElectionGuard.Encryption.Utils.Generators
 {
     public class TestElectionData : DisposableBase
@@ -80,6 +82,7 @@ namespace ElectionGuard.Encryption.Utils.Generators
             ulong quorum = 1,
             bool useRandom = false)
         {
+            Console.WriteLine($"Generating fake election data {numberOfGuardians} guardians, {quorum} quorum");
             var keyPair = GenerateFakeKeyPair(useRandom);
             var manifest = ManifestGenerator.GetManifestFromFile();
             var internalManifest = new InternalManifest(manifest);

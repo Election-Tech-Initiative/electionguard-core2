@@ -77,6 +77,7 @@ public class KeyCeremonyGenerator
         int numberOfGuardians,
         int quorum, bool runKeyCeremony = true)
     {
+        Console.WriteLine($"Generating Key Ceremony Data for {numberOfGuardians} guardians and quorum {quorum}...");
         var keyCeremony = GenerateKeyCeremony(
             numberOfGuardians,
             quorum);
@@ -100,6 +101,8 @@ public class KeyCeremonyGenerator
     public static ElectionJointKey RunKeyCeremony(
        TestKeyCeremonyData data)
     {
+        Console.WriteLine("Running Key Ceremony...");
+
         // ROUND 1: Public Key Sharing
         // Announce
         foreach (var guardian in data.Guardians)
