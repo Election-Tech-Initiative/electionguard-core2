@@ -1,6 +1,7 @@
 using ElectionGuard.Decryption.Tally;
 using ElectionGuard.ElectionSetup;
 using ElectionGuard.Encryption.Ballot;
+using ElectionGuard.UI.Lib.Models;
 
 namespace ElectionGuard.Decryption.Decryption;
 
@@ -9,16 +10,17 @@ namespace ElectionGuard.Decryption.Decryption;
 /// </summary>
 public static class GuardianDecryptionExtensions
 {
-    public static Tuple<CiphertextDecryptionTallyShare, CiphertextDecryptionBallotShares> ComputeDecryptionShares(
+    // get the tally share and the guardian's ballot shares
+    public static Tuple<CiphertextDecryptionTallyShare, Dictionary<string, CiphertextDecryptionBallotShare>> ComputeDecryptionShares(
         this Guardian guardian,
         CiphertextTally tally, List<CiphertextBallot> ballots)
     {
         var share = guardian.ComputeDecryptionShare(tally)!;
         var shares = guardian.ComputeDecryptionShares(tally.TallyId, ballots)!;
-        return new Tuple<CiphertextDecryptionTallyShare, CiphertextDecryptionBallotShares>(share, shares);
+        return new Tuple<CiphertextDecryptionTallyShare, Dictionary<string, CiphertextDecryptionBallotShare>>(share, shares);
     }
 
-    public static CiphertextDecryptionBallotShares? ComputeDecryptionShares(
+    public static Dictionary<string, CiphertextDecryptionBallotShare> ComputeDecryptionShares(
         this Guardian guardian,
         string tallyId,
         List<CiphertextBallot> ballots)
@@ -29,8 +31,7 @@ public static class GuardianDecryptionExtensions
             shares.Add(ballot.ObjectId, guardian.ComputeDecryptionShare(tallyId, ballot)!);
         }
 
-        var share = new CiphertextDecryptionBallotShares(shares);
-        return share;
+        return shares;
     }
 
     public static CiphertextDecryptionTallyShare? ComputeDecryptionShare(
@@ -61,7 +62,7 @@ public static class GuardianDecryptionExtensions
         }
 
         var share = new CiphertextDecryptionBallotShare(
-            guardian.GuardianId, tallyId, ballot.ObjectId, contests
+            guardian.GuardianId, tallyId, ballot, contests
         );
         return share;
     }

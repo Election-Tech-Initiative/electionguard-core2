@@ -15,6 +15,8 @@ public class TestDecryptionData
     public List<PlaintextBallot> PlaintextBallots { get; set; } = default!;
     public List<CiphertextBallot> CiphertextBallots { get; set; } = default!;
 
+    public Dictionary<string, ElementModQ> Nonces { get; set; } = default!;
+
     public PlaintextTally PlaintextTally { get; set; } = default!;
     public CiphertextTally CiphertextTally { get; set; } = default!;
 
@@ -46,14 +48,21 @@ public class TestDecryptionData
         var ciphertextBallots = BallotGenerator.GetFakeCiphertextBallots(
             election.InternalManifest, election.Context, plaintextBallots, random);
 
+        // hold onto the nonces so we can decrypt the ballots
+        var nonces = new Dictionary<string, ElementModQ>();
+
         // cast and spoil the ballots
         // the spoiled ballots are the last ones in the list
         Enumerable.Range(0, castBallotCount).ToList().ForEach(i =>
         {
+            var nonce = ciphertextBallots[i]!.Nonce;
+            nonces.Add(ciphertextBallots[i]!.ObjectId, new ElementModQ(nonce));
             ciphertextBallots[i]!.Cast();
         });
         Enumerable.Range(castBallotCount, spoiledBallotCount).ToList().ForEach(i =>
         {
+            var nonce = ciphertextBallots[i]!.Nonce;
+            nonces.Add(ciphertextBallots[i]!.ObjectId, new ElementModQ(nonce));
             ciphertextBallots[i]!.Spoil();
         });
 
@@ -79,6 +88,7 @@ public class TestDecryptionData
             KeyCeremony = keyCeremony,
             PlaintextBallots = plaintextBallots,
             CiphertextBallots = ciphertextBallots,
+            Nonces = nonces,
             PlaintextTally = plaintextTally,
             CiphertextTally = ciphertextTally,
         };

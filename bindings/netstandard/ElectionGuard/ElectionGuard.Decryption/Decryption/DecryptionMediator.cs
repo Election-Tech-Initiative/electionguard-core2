@@ -19,7 +19,7 @@ public class DecryptionMediator : DisposableBase
     public Dictionary<string, CiphertextTally> Tallies { get; init; } = new Dictionary<string, CiphertextTally>();
 
     // key is tally id
-    public Dictionary<string, TallyDecryption> TallyDecryptions { get; init; } = new Dictionary<string, TallyDecryption>();
+    public Dictionary<string, CiphertextDecryptionTally> TallyDecryptions { get; init; } = new Dictionary<string, CiphertextDecryptionTally>();
 
     public DecryptionMediator(string mediatorId)
     {
@@ -40,64 +40,101 @@ public class DecryptionMediator : DisposableBase
         }
     }
 
-    public bool CanDecrypt(string tallyId)
-    {
-        // TODO: implement
-        return true;
-    }
-
-    public PlaintextTally Decrypt(string tallyId)
+    public DecryptionResult CanDecrypt(string tallyId)
     {
         if (!Tallies.ContainsKey(tallyId))
         {
-            throw new ArgumentException("Tally does not exist");
+            return new DecryptionResult(tallyId, "Tally does not exist");
         }
 
         if (!TallyDecryptions.ContainsKey(tallyId))
         {
-            throw new ArgumentException("Tally decryption does not exist");
+            return new DecryptionResult(tallyId, "Tally decryption does not exist");
         }
 
         var tallyDecryption = TallyDecryptions[tallyId];
 
         if (!tallyDecryption.IsValid(Tallies[tallyId]))
         {
-            throw new ArgumentException("Tally decryption is not valid");
+            return new DecryptionResult(tallyId, "Tally decryption is not valid");
+        }
+
+        return new DecryptionResult(tallyId);
+    }
+
+    public DecryptionResult Decrypt(string tallyId)
+    {
+        var canDecrypt = CanDecrypt(tallyId);
+        if (!canDecrypt)
+        {
+            return canDecrypt;
         }
 
         var tally = Tallies[tallyId];
+        var tallyDecryption = TallyDecryptions[tallyId];
         return tallyDecryption.Decrypt(tally);
     }
 
-    // todo cleanup, more and better overrides
     public void SubmitShare(
         CiphertextDecryptionTallyShare tallyShare)
     {
-        if (!Tallies.ContainsKey(tallyShare.TallyId))
+        // TODO: validate the share
+        AddTallyDecryption(tallyShare);
+        var tallyDecryption = TallyDecryptions[tallyShare.TallyId];
+        tallyDecryption.AddShare(Guardians[tallyShare.GuardianId], tallyShare);
+    }
+
+    public void SubmitShare(CiphertextDecryptionBallotShare ballotShare)
+    {
+        // TODO: validate the share
+        AddTallyDecryption(ballotShare);
+        var tallyDecryption = TallyDecryptions[ballotShare.TallyId];
+        tallyDecryption.AddShare(Guardians[ballotShare.GuardianId], ballotShare);
+    }
+
+    public void SubmitShares(
+        Tuple<CiphertextDecryptionTallyShare, Dictionary<string, CiphertextDecryptionBallotShare>> shares
+         )
+    {
+        SubmitShare(shares.Item1);
+        SubmitShares(shares.Item2.Values.ToList());
+    }
+
+    public void SubmitShares(
+        CiphertextDecryptionTallyShare tallyShare,
+        List<CiphertextDecryptionBallotShare> ballotShares)
+    {
+        SubmitShare(tallyShare);
+        SubmitShares(ballotShares);
+    }
+
+    public void SubmitShares(List<CiphertextDecryptionBallotShare> ballotShares)
+    {
+        // TODO: validate the share
+        AddTallyDecryption(ballotShares.First());
+        var tallyDecryption = TallyDecryptions[ballotShares.First().TallyId];
+        var guardian = Guardians[ballotShares.First().GuardianId];
+        foreach (var ballotShare in ballotShares)
+        {
+            tallyDecryption.AddShare(guardian, ballotShare);
+        }
+    }
+
+    private void AddTallyDecryption(CiphertextDecryptionTallyShare share)
+    {
+        if (!Tallies.ContainsKey(share.TallyId))
         {
             throw new ArgumentException("Tally does not exist");
         }
 
-        if (!Guardians.ContainsKey(tallyShare.GuardianId))
+        if (!Guardians.ContainsKey(share.GuardianId))
         {
             throw new ArgumentException("Guardian does not exist");
         }
 
-        if (!TallyDecryptions.ContainsKey(tallyShare.TallyId))
+        if (!TallyDecryptions.ContainsKey(share.TallyId))
         {
-            TallyDecryptions.Add(tallyShare.TallyId, new TallyDecryption(tallyShare.TallyId));
-        }
-
-        var tallyDecryption = TallyDecryptions[tallyShare.TallyId];
-
-        if (!tallyDecryption.Guardians.ContainsKey(tallyShare.GuardianId))
-        {
-            tallyDecryption.Guardians.Add(tallyShare.GuardianId, Guardians[tallyShare.GuardianId]);
-        }
-
-        if (!tallyDecryption.TallyShares.ContainsKey(tallyShare.GuardianId))
-        {
-            tallyDecryption.TallyShares.Add(tallyShare.GuardianId, tallyShare);
+            TallyDecryptions.Add(share.TallyId, new CiphertextDecryptionTally(share.TallyId));
         }
     }
 }

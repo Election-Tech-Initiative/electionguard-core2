@@ -44,10 +44,10 @@ public class TestDecryptWithShares : DisposableBase
             var share = guardian.ComputeDecryptionShare(Data.CiphertextTally);
             mediator.SubmitShare(share!);
         }
-        var plaintextTally = mediator.Decrypt(Data.CiphertextTally.TallyId);
+        var result = mediator.Decrypt(Data.CiphertextTally.TallyId);
 
         // Assert
-        Assert.That(plaintextTally, Is.EqualTo(Data.PlaintextTally));
+        Assert.That(result.Tally, Is.EqualTo(Data.PlaintextTally));
     }
 
     [Test]
@@ -68,9 +68,9 @@ public class TestDecryptWithShares : DisposableBase
             var share = guardian.ComputeDecryptionShare(Data.CiphertextTally);
             mediator.SubmitShare(share!);
         }
-        var plaintextTally = mediator.Decrypt(Data.CiphertextTally.TallyId);
+        var result = mediator.Decrypt(Data.CiphertextTally.TallyId);
 
         // Assert
-        Assert.That(plaintextTally, Is.EqualTo(Data.PlaintextTally));
+        Assert.That(result.Tally, Is.EqualTo(Data.PlaintextTally));
     }
 }
