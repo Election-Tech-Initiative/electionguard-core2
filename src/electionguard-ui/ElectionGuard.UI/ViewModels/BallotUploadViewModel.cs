@@ -144,11 +144,11 @@ public partial class BallotUploadViewModel : BaseViewModel
                     var timestamp = ballot.Timestamp;
                     if (timestamp < startDate)
                     {
-                        Interlocked.Exchange(ref startDate, timestamp);
+                        _ = Interlocked.Exchange(ref startDate, timestamp);
                     }
                     if (timestamp > endDate)
                     {
-                        Interlocked.Exchange(ref endDate, timestamp);
+                        _ = Interlocked.Exchange(ref endDate, timestamp);
                     }
                     BallotRecord ballotRecord = new()
                     {
