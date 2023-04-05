@@ -595,7 +595,7 @@ public class KeyCeremonyMediator : DisposableBase
         guardian.Save(keyCeremonyId);
 
         // get public key
-        var publicKey = guardian.ShareKey();
+        var publicKey = guardian.SharePublicKey();
 
         // append to key ceremony (db)
         try

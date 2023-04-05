@@ -31,7 +31,7 @@ public class TestKeyCeremony : DisposableBase
         // Announce
         foreach (var guardian in _guardians)
         {
-            _mediator.Announce(guardian.ShareKey());
+            _mediator.Announce(guardian.SharePublicKey());
         }
 
         // Share Public keys

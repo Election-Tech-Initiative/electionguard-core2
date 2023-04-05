@@ -107,7 +107,7 @@ public class KeyCeremonyGenerator
         // Announce
         foreach (var guardian in data.Guardians)
         {
-            data.Mediator.Announce(guardian.ShareKey());
+            data.Mediator.Announce(guardian.SharePublicKey());
         }
 
         // Share Public keys

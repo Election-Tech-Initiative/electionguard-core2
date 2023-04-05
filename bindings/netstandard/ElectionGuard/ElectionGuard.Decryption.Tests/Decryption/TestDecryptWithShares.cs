@@ -128,7 +128,7 @@ public class TestDecryptWithShares : DisposableBase
         var mediator = new DecryptionMediator(
             "fake-mediator",
             data.CiphertextTally,
-            data.KeyCeremony.Guardians.Select(i => i.ShareKey()).ToList());
+            data.KeyCeremony.Guardians.Select(i => i.SharePublicKey()).ToList());
 
         // Act
         foreach (var guardian in data.KeyCeremony.Guardians)
@@ -150,7 +150,7 @@ public class TestDecryptWithShares : DisposableBase
         var mediator = new DecryptionMediator(
             "fake-mediator",
             Data.CiphertextTally,
-            Data.KeyCeremony.Guardians.Select(i => i.ShareKey()).ToList());
+            Data.KeyCeremony.Guardians.Select(i => i.SharePublicKey()).ToList());
 
         // Act
         foreach (var guardian in Data.KeyCeremony.Guardians)
