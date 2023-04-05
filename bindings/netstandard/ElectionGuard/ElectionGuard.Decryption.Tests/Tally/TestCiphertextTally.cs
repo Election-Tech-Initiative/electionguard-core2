@@ -3,72 +3,32 @@ using ElectionGuard.Encryption.Utils.Generators;
 
 namespace ElectionGuard.Decryption.Tests.Tally;
 
-public static class TestCiphertextTallyExtensions
-{
-    public static void AccumulateBallots(
-        this PlaintextTally self, IList<PlaintextBallot> ballots)
-    {
-        var contestVotes = new Dictionary<string, int>();
-        foreach (var contest in self.Contests)
-        {
-            contestVotes[contest.Key] = 0;
-        }
-        foreach (var ballot in ballots)
-        {
-            foreach (var contest in ballot.Contests)
-            {
-                contestVotes[contest.ObjectId] += 1;
-                var contestTally = self.Contests[contest.ObjectId];
-                foreach (var selection in contest.Selections)
-                {
-                    var selectionTally = contestTally.Selections[selection.ObjectId];
-                    selectionTally.Tally += selection.Vote;
-                }
-            }
-        }
-
-        foreach (var item in contestVotes)
-        {
-            Console.WriteLine($"    Contest {item.Key} has {item.Value} ballots");
-        }
-    }
-}
-
 [TestFixture]
 public class TestCiphertextTally : DisposableBase
 {
-    private TestElectionData Data = default!;
-    private List<PlaintextBallot> PlaintextBallots = default!;
-    private List<CiphertextBallot> CiphertextBallots = default!;
-
     // the count of unvalidated ballots to use in the test
     private const ulong BALLOT_COUNT_UNVALIDATED = 30UL;
 
     // the count of validated ballots to use in the test
     private const ulong BALLOT_COUNT_VALIDATED = 2UL;
 
+    private TestElectionData Data = default!;
+    private List<PlaintextBallot> PlaintextBallots = default!;
+    private List<CiphertextBallot> CiphertextBallots = default!;
+
     [OneTimeSetUp]
     public void OneTimeSetup()
     {
         var random = new Random(1);
         Data = ElectionGenerator.GenerateFakeElectionData();
-        PlaintextBallots = Enumerable.Range(0, (int)BALLOT_COUNT_UNVALIDATED)
-            .Select(i =>
-                BallotGenerator.GetFakeBallot(
-                    Data.InternalManifest,
-                    random, $"fake-ballot-{i}"))
-            .ToList();
+        PlaintextBallots = BallotGenerator.GetFakeBallots(
+            Data.InternalManifest, random, (int)BALLOT_COUNT_UNVALIDATED);
 
-        // determioistically generate the seed and nonce
+        // deterministically generate the seed and nonce
         var seed = random.NextElementModQ();
         var nonce = random.NextElementModQ();
-        CiphertextBallots = PlaintextBallots.Select(
-            ballot => Encrypt.Ballot(
-                ballot,
-                Data.InternalManifest,
-                Data.Context, seed, nonce,
-                shouldVerifyProofs: false))
-            .ToList();
+        CiphertextBallots = BallotGenerator.GetFakeCiphertextBallots(
+            Data.InternalManifest, Data.Context, PlaintextBallots, seed, nonce);
     }
 
     [SetUp]
