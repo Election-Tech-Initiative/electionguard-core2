@@ -1,4 +1,6 @@
 using System.Text;
+using ElectionGuard.Decryption.Decryption;
+using ElectionGuard.ElectionSetup;
 
 namespace ElectionGuard.Decryption.Tally;
 
@@ -16,12 +18,25 @@ public static partial class InternalManifestExtensions
         }
         return contests;
     }
+
+    public static Dictionary<string, PlaintextTallyContest> ToPlaintextTallyContestDictionary(
+        this InternalManifest manifest, string ballotStyle)
+    {
+        var contests = new Dictionary<string, PlaintextTallyContest>();
+        foreach (var contestDescription in manifest.GetContests(ballotStyle))
+        {
+            contests.Add(
+                contestDescription.ObjectId,
+                new PlaintextTallyContest(contestDescription));
+        }
+        return contests;
+    }
 }
 
 /// <summary>
 /// The plaintext representation of all contests in the election.
 /// </summary>
-public record PlaintextTally : IEquatable<PlaintextTally>
+public record PlaintextTally : DisposableRecordBase, IEquatable<PlaintextTally>
 {
     /// <summary>
     /// The unique identifier for the tally. May be the same as the ciphertext tally id.
@@ -37,7 +52,7 @@ public record PlaintextTally : IEquatable<PlaintextTally>
     /// A collection of each contest and selection in an election.
     /// Retains an encrypted representation of a tally for each selection
     /// </summary>
-    public Dictionary<string, PlaintextTallyContest> Contests { get; init; } = default!;
+    public Dictionary<string, PlaintextTallyContest> Contests { get; init; } = new();
 
     public PlaintextTally(
         string name,
@@ -55,6 +70,32 @@ public record PlaintextTally : IEquatable<PlaintextTally>
         TallyId = tallyId;
         Name = name;
         Contests = manifest.ToPlaintextTallyContestDictionary();
+    }
+
+    public PlaintextTally(
+        string tallyId,
+        string name,
+        List<ContestDescriptionWithPlaceholders> contests)
+    {
+        TallyId = tallyId;
+        Name = name;
+
+        foreach (var contestDescription in contests)
+        {
+            Contests.Add(
+                contestDescription.ObjectId,
+                new PlaintextTallyContest(contestDescription));
+        }
+    }
+
+    public static implicit operator string(PlaintextTally self)
+    {
+        return self.ToString();
+    }
+
+    public static implicit operator DecryptionResult(PlaintextTally self)
+    {
+        return new DecryptionResult(self.TallyId, self);
     }
 
     public override string ToString()
