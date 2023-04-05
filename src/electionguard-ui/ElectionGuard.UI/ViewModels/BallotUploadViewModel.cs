@@ -132,11 +132,11 @@ public partial class BallotUploadViewModel : BaseViewModel
                 var ballotData = File.ReadAllText(currentBallot);
                 SubmittedBallot ballot = new(ballotData);
 
-                //if (ballot.ManifestHash != _manifestHash)
-                //{
-                //    _ = Interlocked.Increment(ref totalRejected);
-                //    return;
-                //}
+                if (ballot.ManifestHash != _manifestHash)
+                {
+                    _ = Interlocked.Increment(ref totalRejected);
+                    return;
+                }
 
                 var exists = _ballotService.BallotExists(ballot.BallotCode.ToHex()).Result;
                 if (!exists)
