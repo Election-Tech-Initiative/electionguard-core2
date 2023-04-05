@@ -47,9 +47,9 @@ public record GuardianPrivateRecord : DisposableRecordBase
         GuardianElectionPublicKeys?.Dispose();
         GuardianElectionPartialKeyBackups?.Dispose();
     }
-
 }
 
+// TODO: remove, same as ElectionPublicKey
 public record GuardianRecord : DisposableRecordBase
 {
     public string GuardianId { get; init; }
@@ -95,6 +95,7 @@ public record GuardianRecord : DisposableRecordBase
 public class Guardian : DisposableBase
 {
     private readonly ElectionKeyPair _electionKeys;
+    private ElementModQ? _partialElectionSecretKey;
     private Dictionary<string, ElectionPublicKey>? _otherGuardianPublicKeys = new();
     private Dictionary<string, ElectionPartialKeyBackup>? _otherGuardianPartialKeyBackups = new();
     private Dictionary<string, ElectionPartialKeyVerification>? _otherGuardianPartialKeyVerification = new();
@@ -264,9 +265,10 @@ public class Guardian : DisposableBase
             privateGuardianRecord.GuardianElectionPartialKeyVerifications);
     }
 
-
-    //    private ElectionPartialKeyBackup GenerateElectionPartialKeyBackup(ulong sequenceOrder)
-    private ElectionPartialKeyBackup GenerateElectionPartialKeyBackup(string senderGuardianId, ElectionPolynomial electionPolynomial, ElectionPublicKey receiverGuardianPublicKey)
+    private ElectionPartialKeyBackup GenerateElectionPartialKeyBackup(
+        string senderGuardianId,
+        ElectionPolynomial electionPolynomial,
+        ElectionPublicKey receiverGuardianPublicKey)
     {
         var coordinate = electionPolynomial.ComputeCoordinate(receiverGuardianPublicKey.SequenceOrder);
         using var nonce = BigMath.RandQ();
@@ -275,7 +277,8 @@ public class Guardian : DisposableBase
                 receiverGuardianPublicKey.SequenceOrder);
 
         var data = coordinate.ToBytes();
-        var encryptedCoordinate = HashedElgamal.Encrypt(data, (ulong)data.Length, nonce, receiverGuardianPublicKey.Key, seed);
+        var encryptedCoordinate = HashedElgamal.Encrypt(
+            data, (ulong)data.Length, nonce, receiverGuardianPublicKey.Key, seed);
 
         return new()
         {
@@ -570,14 +573,47 @@ public class Guardian : DisposableBase
         return ElgamalCombinePublicKeys();
     }
 
+    public ElementModP PartialDecrypt(ElGamalCiphertext ciphertext)
+    {
+        if (AllGuardianKeysReceived() is false)
+        {
+            throw new InvalidOperationException("All guardian keys must be received before decrypting.");
+        }
+
+        // TODO: should we verify?
+        // if (AllElectionPartialKeyBackupsVerified() is false)
+        // {
+        //     throw new InvalidOperationException("All election partial key backups must be verified before decrypting.");
+        // }
+
+        if (_partialElectionSecretKey is null)
+        {
+            _ = CombinePrivateKeyShares();
+        }
+
+        return ciphertext.PartialDecrypt(_partialElectionSecretKey);
+    }
+
     private ElementModP ElgamalCombinePublicKeys()
     {
         var combinedKey = Constants.ONE_MOD_P;
         foreach (var item in _otherGuardianPublicKeys!.Values)
         {
-            combinedKey.MultModP(item.Key);
+            _ = combinedKey.MultModP(item.Key);
         }
         return combinedKey;
+    }
+
+    // P(i) = ∑ P_j(i) = (P1(i)+P2(i)+···+Pn(i)) mod q.
+    private ElementModQ CombinePrivateKeyShares()
+    {
+        var partialSecretKey = Constants.ZERO_MOD_Q;
+        foreach (var item in _otherGuardianPartialKeyBackups!.Values)
+        {
+            var decryptedKey = DecryptBackup(item);
+            partialSecretKey = BigMath.AddModQ(decryptedKey, partialSecretKey);
+        }
+        return _partialElectionSecretKey = partialSecretKey;
     }
 
     // share_other_guardian_key
@@ -585,31 +621,11 @@ public class Guardian : DisposableBase
     {
         return _otherGuardianPublicKeys?[guardianId];
     }
-
-
-
-
-    // compute_tally_share
-    // public DecryptionShare? ComputeTallyShare(CiphertextTally tally, CiphertextElectionContext context)
-    // {
-    //     /*
-    //     Compute the decryption share of tally.
-
-    //     :param tally: Ciphertext tally to get share of
-    //     :param context: Election context
-    //     :return: Decryption share of tally or None if failure
-    //     */
-    //     return ComputeDecryptionShare(_electionKeys, tally, context);
-    // }
-
-
-    // compute_ballot_shares
-    // compute_compensated_tally_share
-    // compute_compensated_ballot_shares
-    // get_valid_ballot_shares
-
 }
 
+/// <summary>
+/// Guardian storage extensions for working with local storage
+/// </summary>
 public static class GuardianStorageExtensions
 {
     internal const string GuardianPrefix = "guardian_";
@@ -646,6 +662,11 @@ public static class GuardianStorageExtensions
         }
     }
 
+    /// <summary>
+    /// Loads the guardian from local storage device
+    /// </summary>
+    /// <param name="guardianId">guardian id</param>
+    /// <param name="keyCeremony">key ceremony record</param>
     public static Guardian? Load(string guardianId, KeyCeremonyRecord keyCeremony)
     {
         return Load(guardianId, keyCeremony.KeyCeremonyId!, keyCeremony.NumberOfGuardians, keyCeremony.Quorum);
