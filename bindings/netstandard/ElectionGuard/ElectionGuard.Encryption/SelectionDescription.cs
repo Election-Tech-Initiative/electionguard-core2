@@ -1,4 +1,5 @@
 ﻿using System.Runtime.InteropServices;
+using ElectionGuard.Encryption.Ballot;
 
 namespace ElectionGuard
 {
@@ -16,7 +17,7 @@ namespace ElectionGuard
     /// For a given election, the sequence of selections displayed to a user may be different
     /// however that information is not captured by default when encrypting a specific ballot.
     /// </summary>
-    public class SelectionDescription : DisposableBase
+    public class SelectionDescription : DisposableBase, IElectionSelection
     {
         /// <Summary>
         /// Unique internal identifier that's used by other elements to reference this element.
@@ -69,6 +70,8 @@ namespace ElectionGuard
                 return value;
             }
         }
+
+        public ElementModQ DescriptionHash => CryptoHash();
 
         internal NativeInterface.SelectionDescription.SelectionDescriptionHandle Handle;
 

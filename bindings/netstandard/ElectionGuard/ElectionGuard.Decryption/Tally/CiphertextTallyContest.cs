@@ -1,10 +1,12 @@
+using ElectionGuard.Encryption.Ballot;
+
 namespace ElectionGuard.Decryption.Tally;
 
 /// <summary>
 /// A CiphertextTallyContest is a container for associating a collection 
 /// of CiphertextTallySelection to a specific ContestDescription
 /// </summary>
-public class CiphertextTallyContest : DisposableBase, IEquatable<CiphertextTallyContest>
+public class CiphertextTallyContest : DisposableBase, IElectionContest, IEquatable<CiphertextTallyContest>
 {
     /// <summary>
     /// The object id of the contest

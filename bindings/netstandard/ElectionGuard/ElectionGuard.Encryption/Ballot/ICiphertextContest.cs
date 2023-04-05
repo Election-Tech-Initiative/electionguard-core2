@@ -1,9 +1,9 @@
 namespace ElectionGuard.Encryption.Ballot
 {
     /// <summary>
-    /// A selection on a ballot or in a tally
+    /// A contest on a ballot or in a tally
     /// </summary>
-    public interface IElectionSelection
+    public interface IElectionContest
     {
         /// <summary>
         /// The object id
@@ -19,16 +19,5 @@ namespace ElectionGuard.Encryption.Ballot
         /// The description hash
         /// </summary>
         ElementModQ DescriptionHash { get; }
-    }
-
-    /// <summary>
-    /// A selection on a ballot or in a tally
-    /// </summary>
-    public interface ICiphertextSelection : IElectionSelection
-    {
-        /// <summary>
-        /// The ciphertext
-        /// </summary>
-        ElGamalCiphertext Ciphertext { get; }
     }
 }

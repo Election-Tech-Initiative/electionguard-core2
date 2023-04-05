@@ -1,9 +1,11 @@
+using ElectionGuard.Encryption.Ballot;
+
 namespace ElectionGuard.Decryption.Tally;
 
 /// <summary>
 /// A plaintext Tally Contest is a collection of plaintext selections
 /// </summary>
-public class PlaintextTallyContest : IEquatable<PlaintextTallyContest>
+public class PlaintextTallyContest : IElectionContest, IEquatable<PlaintextTallyContest>
 {
     /// <summary>
     /// The object id of the contest

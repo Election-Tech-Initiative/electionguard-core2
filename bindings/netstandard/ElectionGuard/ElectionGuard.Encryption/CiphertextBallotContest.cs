@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using ElectionGuard.Encryption.Ballot;
 
 namespace ElectionGuard
 {
@@ -16,7 +17,7 @@ namespace ElectionGuard
     /// seed nonce, both values can be regenerated.  If the `nonce` for this contest is completely random,
     /// then it is required in order to regenerate the proof.
     /// </summary>
-    public partial class CiphertextBallotContest : DisposableBase
+    public partial class CiphertextBallotContest : DisposableBase, IElectionContest
     {
         /// <summary>
         /// The collection of selections for the contest

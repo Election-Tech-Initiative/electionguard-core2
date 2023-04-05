@@ -1,9 +1,11 @@
+using ElectionGuard.Encryption.Ballot;
 namespace ElectionGuard.Decryption.Tally;
 
 /// <summary>
 /// A plaintext Tally Selection is a decrypted selection of a contest
 /// </summary>
-public class PlaintextTallySelection : IEquatable<PlaintextTallySelection>
+public class PlaintextTallySelection
+    : DisposableBase, IElectionSelection, IEquatable<PlaintextTallySelection>
 {
     public string ObjectId { get; init; }
 
@@ -28,31 +30,39 @@ public class PlaintextTallySelection : IEquatable<PlaintextTallySelection>
     /// </summary>
     public ElementModP Value { get; set; }
 
-    // TODO: this is a placeholder for now
-    public ulong[]? Proof { get; set; }
-
     public PlaintextTallySelection(
-        SelectionDescription selection)
+        IElectionSelection selection) : this(
+            selection.ObjectId,
+            selection.SequenceOrder,
+            selection.DescriptionHash,
+            0,
+            Constants.ONE_MOD_P)
     {
-        ObjectId = selection.ObjectId;
-        SequenceOrder = selection.SequenceOrder;
-        DescriptionHash = selection.CryptoHash();
-        Tally = 0;
-        Value = Constants.ONE_MOD_P;
-        Proof = null;
+
     }
 
     public PlaintextTallySelection(
         string objectId,
         ulong sequenceOrder,
-        ElementModQ descriptionHash)
+        ElementModQ descriptionHash) : this(
+            objectId, sequenceOrder,
+            descriptionHash,
+            0,
+            Constants.ONE_MOD_P)
     {
-        ObjectId = objectId;
-        SequenceOrder = sequenceOrder;
-        DescriptionHash = descriptionHash;
-        Tally = 0;
-        Value = Constants.ONE_MOD_P;
-        Proof = null;
+
+    }
+
+    public PlaintextTallySelection(
+        IElectionSelection selection,
+        ulong tally,
+        ElementModP value) : this(
+            selection.ObjectId,
+            selection.SequenceOrder,
+            selection.DescriptionHash,
+            tally, value)
+    {
+
     }
 
     public PlaintextTallySelection(
@@ -60,15 +70,13 @@ public class PlaintextTallySelection : IEquatable<PlaintextTallySelection>
         ulong sequenceOrder,
         ElementModQ descriptionHash,
         ulong tally,
-        ElementModP value,
-        ulong[]? proof)
+        ElementModP value)
     {
         ObjectId = objectId;
         SequenceOrder = sequenceOrder;
         DescriptionHash = descriptionHash;
         Tally = tally;
         Value = value;
-        Proof = proof;
     }
 
     # region IEquatable
@@ -89,8 +97,7 @@ public class PlaintextTallySelection : IEquatable<PlaintextTallySelection>
                SequenceOrder == other.SequenceOrder &&
                DescriptionHash.Equals(other.DescriptionHash) &&
                Tally == other.Tally &&
-               Value.Equals(other.Value); // &&
-                                          // TODO: Proof.SequenceEqual(other.Proof); // just a placeholder for now
+               Value.Equals(other.Value);
         return equal;
     }
 
@@ -101,7 +108,7 @@ public class PlaintextTallySelection : IEquatable<PlaintextTallySelection>
 
     public override int GetHashCode()
     {
-        return HashCode.Combine(ObjectId, SequenceOrder, DescriptionHash.ToHex(), Tally, Value.ToHex(), Proof);
+        return HashCode.Combine(ObjectId, SequenceOrder, DescriptionHash.ToHex(), Tally, Value.ToHex());
     }
 
     public static bool operator ==(PlaintextTallySelection? left, PlaintextTallySelection? right)
