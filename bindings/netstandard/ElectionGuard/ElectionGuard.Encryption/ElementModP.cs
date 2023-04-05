@@ -127,7 +127,7 @@ namespace ElectionGuard
         /// </Summary>
         public byte[] ToBytes()
         {
-            var status = NativeInterface.ElementModP.ToBytes(Handle, out IntPtr data, out ulong size);
+            var status = NativeInterface.ElementModP.ToBytes(Handle, out var data, out var size);
             if (status != Status.ELECTIONGUARD_STATUS_SUCCESS)
             {
                 throw new ElectionGuardException($"ToBytes Error Status: {status}");
@@ -135,7 +135,7 @@ namespace ElectionGuard
 
             var byteArray = new byte[(int)size];
             Marshal.Copy(data, byteArray, 0, (int)size);
-            NativeInterface.Memory.DeleteIntPtr(data);
+            _ = NativeInterface.Memory.DeleteIntPtr(data);
             return byteArray;
         }
 
@@ -158,8 +158,6 @@ namespace ElectionGuard
                 }
             }
         }
-
-
 
         private unsafe void NewNative(ulong[] data)
         {
@@ -228,6 +226,20 @@ namespace ElectionGuard
             return data;
         }
 
+        // TODO: ISSUE #189 - this is a temporary function to handle object reassignment and disposal
+        // this should be removed when the native library is updated to handle this behavior
+        private void Reassign(NaiveElementModP other)
+        {
+            if (other is null)
+            {
+                return;
+            }
+
+            var old = Handle; // assign the old handle to dispose
+            Handle = other; // assign the new handle to the instance member
+            old.Dispose(); // dispose of the old handle
+        }
+
         public static bool operator ==(ElementModP a, ElementModP b)
         {
             if (ReferenceEquals(a, b))
@@ -289,12 +301,10 @@ namespace ElectionGuard
         /// </summary>
         public bool IsValidResidue()
         {
-            var status = NativeInterface.ElementModP.IsValidResidue(Handle, out bool isValid);
-            if (status != Status.ELECTIONGUARD_STATUS_SUCCESS)
-            {
-                throw new ElectionGuardException($"IsValidResidue Error Status: {status}");
-            }
-            return isValid;
+            var status = NativeInterface.ElementModP.IsValidResidue(Handle, out var isValid);
+            return status != Status.ELECTIONGUARD_STATUS_SUCCESS
+                ? throw new ElectionGuardException($"IsValidResidue Error Status: {status}")
+                : isValid;
         }
 
         /// <summary>
@@ -302,37 +312,57 @@ namespace ElectionGuard
         /// </summary>
         public bool IsInBounds()
         {
-            var status = NativeInterface.ElementModP.IsInBounds(Handle, out bool inBounds);
-            if (status != Status.ELECTIONGUARD_STATUS_SUCCESS)
-            {
-                throw new ElectionGuardException($"IsInBounds Error Status: {status}");
-            }
-            return inBounds;
+            var status = NativeInterface.ElementModP.IsInBounds(Handle, out var inBounds);
+            return status != Status.ELECTIONGUARD_STATUS_SUCCESS
+                ? throw new ElectionGuardException($"IsInBounds Error Status: {status}")
+                : inBounds;
         }
 
         /// <summary>
         /// Multiply by an ElementModP value
         /// </summary>
         /// <param name="rhs">right hand side for the multiply</param>
-        public void MultModP(ElementModP rhs)
+        public ElementModP MultModP(ElementModP rhs)
         {
-            var status = NativeInterface.ElementModP.MultModP(Handle, rhs.Handle,
-                out NativeInterface.ElementModP.ElementModPHandle value);
-            Handle.Dispose();
+            var status = BigMath.External.MultModP(Handle, rhs.Handle,
+                out var value);
             status.ThrowIfError();
-            Handle = value;
+
+            // BigMath static operators reutrn null if invalid
+            // but instance functions throw an exception
+            value.ThrowIfInvalid();
+            Reassign(value);
+
+            return this;
         }
 
         /// <summary>
         /// Multiply list of ElementModP values
         /// </summary>
         /// <param name="keys">list of keys the multiply</param>
-        public void MultModP(IEnumerable<ElementModP> keys)
+        public ElementModP MultModP(IEnumerable<ElementModP> keys)
         {
             foreach (var key in keys)
             {
-                MultModP(key);
+                _ = MultModP(key);
             }
+
+            return this;
+        }
+
+        /// <summary>
+        /// Raise a ElementModP value to an ElementModP exponent
+        /// </summary>
+        /// <param name="e">exponent to raise the base by</param>
+        public ElementModP PowModP(ElementModQ e)
+        {
+            var status = BigMath.External.QPowModP(Handle, e.Handle,
+                out var value);
+            status.ThrowIfError();
+            value.ThrowIfInvalid();
+
+            Reassign(value);
+            return this;
         }
     }
 }

@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Runtime.ConstrainedExecution;
 using System.Runtime.InteropServices;
 // ReSharper disable InconsistentNaming
@@ -144,13 +144,6 @@ namespace ElectionGuard
                 CallingConvention = CallingConvention.Cdecl, SetLastError = true)]
             internal static extern Status ToBytes(
                 ElementModPHandle handle, out IntPtr data, out ulong size);
-
-            [DllImport(DllName, EntryPoint = "eg_element_mod_p_mult_mod_p",
-                CallingConvention = CallingConvention.Cdecl, SetLastError = true)]
-            internal static extern Status MultModP(
-                ElementModPHandle lhs,
-                ElementModPHandle rhs,
-                out ElementModPHandle handle);
 
             [DllImport(DllName, EntryPoint = "eg_element_mod_p_is_valid_residue",
                 CallingConvention = CallingConvention.Cdecl, SetLastError = true)]
