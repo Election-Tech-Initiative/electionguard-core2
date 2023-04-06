@@ -454,12 +454,39 @@
     <value>Upload ballots using EGDrive (1 or more)</value>
   </data>
   <data name="Step3Text" xml:space="preserve">
-    <value>Remove Spoiled Ballots (if needed)</value>
+    <value>Review Challenge Ballots (if needed)</value>
   </data>
   <data name="Step4Text" xml:space="preserve">
     <value>Perform a tally with the guardians (1 or more)</value>
   </data>
   <data name="Step5Text" xml:space="preserve">
     <value>View and export a tally</value>
+  </data>
+  <data name="CreateMultipleTalliesText" xml:space="preserve">
+    <value>Create Multiple Tallies</value>
+  </data>
+  <data name="CustomRangeText" xml:space="preserve">
+    <value>Custom Range for Ballot Selection</value>
+  </data>
+  <data name="DatesText" xml:space="preserve">
+    <value>Dates</value>
+  </data>
+  <data name="DevicesText" xml:space="preserve">
+    <value>Devices</value>
+  </data>
+  <data name="TallyNameText" xml:space="preserve">
+    <value>Tally Name</value>
+  </data>
+  <data name="TallyProcess" xml:space="preserve">
+    <value>Tally Process</value>
+  </data>
+  <data name="TallyText" xml:space="preserve">
+    <value>Tally</value>
+  </data>
+  <data name="UseAllBallotsText" xml:space="preserve">
+    <value>Use All Ballots For Tally</value>
+  </data>
+  <data name="ReviewSpoiledText" xml:space="preserve">
+    <value>Review Challenge</value>
   </data>
 </root>

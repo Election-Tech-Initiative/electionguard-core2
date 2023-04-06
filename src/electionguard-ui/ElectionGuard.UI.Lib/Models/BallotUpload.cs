@@ -50,6 +50,12 @@ public partial class BallotUpload : DatabaseRecord
     [ObservableProperty]
     private DateTime _createdAt;
 
+    [ObservableProperty]
+    private DateTime _ballotsStart;
+
+    [ObservableProperty]
+    private DateTime _ballotsEnd;
+
     public BallotUpload() : base(nameof(BallotUpload))
     {
         UploadId = Guid.NewGuid().ToString();

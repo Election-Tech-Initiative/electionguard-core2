@@ -11,22 +11,27 @@
     x:DataType="viewModels:AdminHomeViewModel"
     x:TypeArguments="viewModels:AdminHomeViewModel"
     ControlTemplate="{StaticResource PageTemplate}">
-    <Grid RowDefinitions="auto, auto, auto, *" Style="{StaticResource NarrowCenteredGrid}">
+    <Grid RowDefinitions="auto, auto, auto, auto, *" Style="{StaticResource NarrowCenteredGrid}">
         <Label
             Grid.Row="0"
             Style="{StaticResource H1}"
             Text="{helper:Translate AdminHomePageTitle}" />
+        <Button
+            Grid.Row="1"
+            Command="{Binding GoKeyCeremonyCommand}"
+            Style="{StaticResource FullWidth}"
+            Text="{helper:Translate GoToCreateKeyCeremonyAdmin}" />
         <Button
             Grid.Row="2"
             Command="{Binding CreateElectionCommand}"
             Style="{StaticResource FullWidth}"
             Text="{helper:Translate CreateElection}" />
         <Button
-            Grid.Row="1"
-            Command="{Binding GoKeyCeremonyCommand}"
+            Grid.Row="3"
+            Command="{Binding CreateMultipleTalliesCommand}"
             Style="{StaticResource FullWidth}"
-            Text="{helper:Translate GoToCreateKeyCeremonyAdmin}" />
-        <ScrollView Grid.Row="3">
+            Text="{helper:Translate CreateMultipleTalliesText}" />
+        <ScrollView Grid.Row="4">
             <VerticalStackLayout Style="{StaticResource NarrowCenteredPage}">
                 <Label Style="{StaticResource H2}" Text="{helper:Translate KeyCeremoniesText}" />
                 <CollectionView

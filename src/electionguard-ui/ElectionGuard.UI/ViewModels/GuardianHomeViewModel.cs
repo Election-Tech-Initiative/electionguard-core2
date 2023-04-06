@@ -8,10 +8,6 @@ public partial class GuardianHomeViewModel : BaseViewModel
     {
         _keyCeremonyService = keyCeremonyService;
         // create some fake tallies to add to the list
-        _tallies.Add(new Tally { Name = "Election Test Tally #1" });
-        _tallies.Add(new Tally { Name = "Election Test Tally #2" });
-        _tallies.Add(new Tally { Name = "Real Election Tally" });
-
 }
 
 public override async Task OnAppearing()
@@ -25,13 +21,13 @@ public override async Task OnAppearing()
     private ObservableCollection<KeyCeremonyRecord> _keyCeremonies = new();
 
     [ObservableProperty]
-    private ObservableCollection<Tally> _tallies = new();
+    private ObservableCollection<TallyRecord> _tallies = new();
 
     [ObservableProperty]
     private KeyCeremonyRecord? _currentKeyCeremony;
 
     [ObservableProperty]
-    private Tally? _currentTally;
+    private TallyRecord? _currentTally;
 
 
     public override async Task OnLeavingPage()

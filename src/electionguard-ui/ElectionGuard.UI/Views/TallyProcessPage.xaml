@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<views:ContentPageBase
+    x:Class="ElectionGuard.UI.Views.TallyProcessPage"
+    xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+    xmlns:controls="clr-namespace:ElectionGuard.UI.Controls"
+    xmlns:helper="clr-namespace:ElectionGuard.UI.Helpers"
+    xmlns:model="clr-namespace:ElectionGuard.UI.Lib.Models;assembly=ElectionGuard.UI.Lib"
+    xmlns:models="clr-namespace:ElectionGuard.UI.Models"
+    xmlns:toolkit="http://schemas.microsoft.com/dotnet/2022/maui/toolkit"
+    xmlns:viewModels="clr-namespace:ElectionGuard.UI.ViewModels"
+    xmlns:views="using:ElectionGuard.UI.Views"
+    x:DataType="viewModels:TallyProcessViewModel"
+    x:TypeArguments="viewModels:TallyProcessViewModel"
+    ControlTemplate="{StaticResource PageTemplate}">
+    <Grid RowDefinitions="auto, *" Style="{StaticResource NarrowCenteredGrid}">
+        <Label
+            HorizontalOptions="Center"
+            Text="Welcome to .NET MAUI!"
+            VerticalOptions="Center" />
+    </Grid>
+</views:ContentPageBase>

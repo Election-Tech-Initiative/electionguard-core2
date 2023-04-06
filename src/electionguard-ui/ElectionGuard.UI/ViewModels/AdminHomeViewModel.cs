@@ -77,4 +77,11 @@ public partial class AdminHomeViewModel : BaseViewModel
             CurrentElection = null;
         }
     }
+
+    [RelayCommand]
+    private async Task CreateMultipleTallies()
+    {
+        //await NavigationService.GoToPage(typeof(CreateElectionViewModel));
+    }
+
 }
