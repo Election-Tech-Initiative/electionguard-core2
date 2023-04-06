@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Runtime.ConstrainedExecution;
 using System.Runtime.InteropServices;
 // ReSharper disable InconsistentNaming
@@ -2342,7 +2342,7 @@ namespace ElectionGuard
                 out ElGamalCiphertext.ElGamalCiphertextHandle ciphertext_accumulation);
 
             [DllImport(DllName,
-                EntryPoint = "eg_ciphertext_ballot_selection_is_valid_encryption",
+                EntryPoint = "eg_ciphertext_ballot_contest_is_valid_encryption",
                 CallingConvention = CallingConvention.Cdecl, SetLastError = true)]
             internal static extern bool IsValidEncryption(
                 ElectionGuard.CiphertextBallotContest.External.CiphertextBallotContestHandle handle,
