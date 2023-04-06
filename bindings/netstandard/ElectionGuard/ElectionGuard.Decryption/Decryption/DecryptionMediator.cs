@@ -40,6 +40,19 @@ public class DecryptionMediator : DisposableBase
         }
     }
 
+    public void AddTally(CiphertextTally tally)
+    {
+        Tallies.Add(tally.TallyId, tally);
+    }
+
+    public void AddGuardian(ElectionPublicKey guardian)
+    {
+        Guardians.Add(guardian.OwnerId, guardian);
+    }
+
+    /// <summary>
+    /// Determine if the tally can be decrypted.
+    /// </summary>
     public DecryptionResult CanDecrypt(string tallyId)
     {
         if (!Tallies.ContainsKey(tallyId))
@@ -54,7 +67,7 @@ public class DecryptionMediator : DisposableBase
 
         var tallyDecryption = TallyDecryptions[tallyId];
 
-        if (!tallyDecryption.IsValid(Tallies[tallyId]))
+        if (!tallyDecryption.CanDecrypt(Tallies[tallyId]))
         {
             return new DecryptionResult(tallyId, "Tally decryption is not valid");
         }
@@ -62,6 +75,9 @@ public class DecryptionMediator : DisposableBase
         return new DecryptionResult(tallyId);
     }
 
+    /// <summary>
+    /// Decrypt the tally
+    /// </summary>
     public DecryptionResult Decrypt(string tallyId)
     {
         var canDecrypt = CanDecrypt(tallyId);
@@ -75,52 +91,96 @@ public class DecryptionMediator : DisposableBase
         return tallyDecryption.Decrypt(tally);
     }
 
+    /// <summary>
+    /// Submit a single tally share
+    /// </summary>
     public void SubmitShare(
         CiphertextDecryptionTallyShare tallyShare)
     {
-        // TODO: validate the share
-        AddTallyDecryption(tallyShare);
+        EnsureCiphertextDecryptionTally(tallyShare);
+
+        if (!tallyShare.IsValid(
+            Tallies[tallyShare.TallyId], Guardians[tallyShare.GuardianId]))
+        {
+            throw new Exception("Tally share is not valid");
+        }
+
         var tallyDecryption = TallyDecryptions[tallyShare.TallyId];
-        tallyDecryption.AddShare(Guardians[tallyShare.GuardianId], tallyShare);
+        tallyDecryption.AddTallyShare(Guardians[tallyShare.GuardianId], tallyShare);
     }
 
-    public void SubmitShare(CiphertextDecryptionBallotShare ballotShare)
+    /// <summary>
+    /// Submit a single ballot share
+    /// </summary>
+    public void SubmitShare(CiphertextDecryptionBallotShare ballotShare, CiphertextBallot ballot)
     {
-        // TODO: validate the share
-        AddTallyDecryption(ballotShare);
+        EnsureCiphertextDecryptionTally(ballotShare);
+
+        if (!ballotShare.IsValid(
+            ballot,
+            Guardians[ballotShare.GuardianId],
+            Tallies[ballotShare.TallyId]))
+        {
+            throw new Exception("Tally share is not valid");
+        }
+
         var tallyDecryption = TallyDecryptions[ballotShare.TallyId];
-        tallyDecryption.AddShare(Guardians[ballotShare.GuardianId], ballotShare);
+        tallyDecryption.AddBallotShare(Guardians[ballotShare.GuardianId], ballotShare, ballot);
     }
 
+    /// <summary>
+    /// Submit a tally share and a list of ballot shares
+    /// </summary>
     public void SubmitShares(
-        Tuple<CiphertextDecryptionTallyShare, Dictionary<string, CiphertextDecryptionBallotShare>> shares
+        Tuple<CiphertextDecryptionTallyShare, Dictionary<string, CiphertextDecryptionBallotShare>> shares,
+        List<CiphertextBallot> ballots
          )
     {
         SubmitShare(shares.Item1);
-        SubmitShares(shares.Item2.Values.ToList());
+        SubmitShares(shares.Item2.Values.ToList(), ballots);
     }
 
+    /// <summary>
+    /// Submit a list of tally shares and a list of ballot shares
+    /// </summary>
     public void SubmitShares(
         CiphertextDecryptionTallyShare tallyShare,
-        List<CiphertextDecryptionBallotShare> ballotShares)
+        List<CiphertextDecryptionBallotShare> ballotShares,
+        List<CiphertextBallot> ballots)
     {
         SubmitShare(tallyShare);
-        SubmitShares(ballotShares);
+        SubmitShares(ballotShares, ballots);
     }
 
-    public void SubmitShares(List<CiphertextDecryptionBallotShare> ballotShares)
+    /// <summary>
+    /// Submit a list of ballot shares
+    /// </summary>
+    public void SubmitShares(
+        List<CiphertextDecryptionBallotShare> ballotShares, List<CiphertextBallot> ballots)
     {
-        // TODO: validate the share
-        AddTallyDecryption(ballotShares.First());
+        EnsureCiphertextDecryptionTally(ballotShares.First());
+
+        foreach (var ballotShare in ballotShares)
+        {
+            if (!ballotShare.IsValid(
+                ballots.First(i => i.ObjectId == ballotShare.BallotId),
+                 Guardians[ballotShare.GuardianId],
+                 Tallies[ballotShare.TallyId]))
+            {
+                throw new Exception("Tally share is not valid");
+            }
+        }
+
         var tallyDecryption = TallyDecryptions[ballotShares.First().TallyId];
         var guardian = Guardians[ballotShares.First().GuardianId];
         foreach (var ballotShare in ballotShares)
         {
-            tallyDecryption.AddShare(guardian, ballotShare);
+            tallyDecryption.AddBallotShare(
+                guardian, ballotShare, ballots.First(i => i.ObjectId == ballotShare.BallotId));
         }
     }
 
-    private void AddTallyDecryption(CiphertextDecryptionTallyShare share)
+    private void EnsureCiphertextDecryptionTally(CiphertextDecryptionTallyShare share)
     {
         if (!Tallies.ContainsKey(share.TallyId))
         {
@@ -134,7 +194,8 @@ public class DecryptionMediator : DisposableBase
 
         if (!TallyDecryptions.ContainsKey(share.TallyId))
         {
-            TallyDecryptions.Add(share.TallyId, new CiphertextDecryptionTally(share.TallyId));
+            TallyDecryptions.Add(
+                share.TallyId, new CiphertextDecryptionTally(Tallies[share.TallyId]));
         }
     }
 }

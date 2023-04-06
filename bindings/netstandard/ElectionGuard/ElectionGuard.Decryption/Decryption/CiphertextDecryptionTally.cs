@@ -7,179 +7,183 @@ namespace ElectionGuard.Decryption.Decryption;
 // a container for the decryption state of a single tally
 public record class CiphertextDecryptionTally : DisposableRecordBase
 {
-    public string TallyId { get; init; }
+    private readonly CiphertextTally _tally;
+
+    public string TallyId => _tally.TallyId;
 
     // the guardians participating in this decryption
-    public Dictionary<string, ElectionPublicKey> Guardians { get; init; } = new Dictionary<string, ElectionPublicKey>();
+    private readonly Dictionary<string, ElectionPublicKey> _guardians = new();
 
-    // key is the guardian id
-    // public Dictionary<string, ElementModQ> LaGrangeCoefficients { get; private set; } = new Dictionary<string, ElementModQ>();
+    // ballots which will be individually decrypted.
+    // spoiled ballots in most cases but sometimes individual ballots from the record can be decrypted
+    // key is ballotid
+    private readonly Dictionary<string, CiphertextBallot> _ballots = new();
 
     // key is guardianid
-    public Dictionary<string, CiphertextDecryptionTallyShare> TallyShares { get; init; } = new Dictionary<string, CiphertextDecryptionTallyShare>();
+    private readonly Dictionary<string, CiphertextDecryptionTallyShare> _tallyShares = new();
 
     // key is ballotid
-    public Dictionary<string, CiphertextDecryptionBallot> BallotShares { get; init; } = new Dictionary<string, CiphertextDecryptionBallot>();
-
-    public CiphertextDecryptionTally(string tallyId)
-    {
-        TallyId = tallyId;
-    }
+    private readonly Dictionary<string, CiphertextDecryptionBallot> _ballotShares = new();
 
     public CiphertextDecryptionTally(CiphertextTally tally)
     {
-        TallyId = tally.TallyId;
+        _tally = tally;
     }
 
-    public void AddShare(
-        ElectionPublicKey guardian, CiphertextDecryptionTallyShare tallyShare)
+    public CiphertextDecryptionTally(
+        CiphertextTally tally,
+        List<ElectionPublicKey> guardians,
+        List<CiphertextBallot> ballots)
     {
-        if (!Guardians.ContainsKey(guardian.OwnerId))
+        _tally = tally;
+
+        foreach (var guardian in guardians)
         {
-            Guardians.Add(guardian.OwnerId, guardian);
+            _guardians.Add(guardian.OwnerId, guardian);
         }
 
+        foreach (var ballot in ballots)
+        {
+            AddBallot(ballot);
+        }
+    }
+
+    public void AddTallyShare(
+        ElectionPublicKey guardian,
+        CiphertextDecryptionTallyShare tallyShare)
+    {
+        if (!tallyShare.IsValid(_tally, guardian))
+        {
+            throw new ArgumentException("Invalid tally share");
+        }
+
+        AddGuardian(guardian);
         AddShare(tallyShare);
     }
 
-    public void AddShare(
-        ElectionPublicKey guardian, CiphertextDecryptionBallotShare ballotShare)
+    public void AddBallotShare(
+        ElectionPublicKey guardian,
+        CiphertextDecryptionBallotShare ballotShare,
+        CiphertextBallot ballot)
     {
-        if (!Guardians.ContainsKey(guardian.OwnerId))
+        if (!_tally.HasBallot(ballot.ObjectId))
         {
-            Guardians.Add(guardian.OwnerId, guardian);
+            throw new ArgumentException("Tally does not contain ballot");
         }
 
+        if (!ballotShare.IsValid(ballot, guardian, _tally.Context.CryptoExtendedBaseHash))
+        {
+            throw new ArgumentException("Invalid ballot share");
+        }
+
+        AddGuardian(guardian);
+        AddBallot(ballot);
         AddShare(ballotShare);
     }
 
-    private void AddShare(CiphertextDecryptionTallyShare tallyshare)
+    public bool CanDecrypt(CiphertextTally tally)
     {
-        if (!TallyShares.ContainsKey(tallyshare.GuardianId))
-        {
-            TallyShares.Add(tallyshare.GuardianId, tallyshare);
-        }
-    }
-
-    private void AddShare(CiphertextDecryptionBallotShare ballotShare)
-    {
-        if (!Guardians.ContainsKey(ballotShare.GuardianId))
-        {
-            throw new ArgumentException("Guardian does not exist");
-        }
-
-        if (!BallotShares.ContainsKey(ballotShare.BallotId))
-        {
-            BallotShares.Add(
-                ballotShare.BallotId,
-                new CiphertextDecryptionBallot(
-                    ballotShare, Guardians[ballotShare.GuardianId]));
-            return;
-        }
-
-        BallotShares[ballotShare.BallotId].AddShare(
-            ballotShare, Guardians[ballotShare.GuardianId]);
-    }
-
-    public bool IsValid(CiphertextTally tally)
-    {
-        // There are not enough guardains to decrypt the tally
-        if (Guardians.Count < (int)tally.Context.Quorum)
+        // There are not enough guardians to decrypt the tally
+        if (_guardians.Count < (int)tally.Context.Quorum)
         {
             return false;
         }
 
         // some guardian shares have not been submitted, or there are too many
-        if (Guardians.Count != TallyShares.Count)
+        if (_guardians.Count != _tallyShares.Count)
         {
             return false;
         }
 
         // check that all the shares are valid
-        foreach (var share in TallyShares.Values)
+        foreach (var (guardian, share) in GetGuardianShares())
         {
-            if (!share.IsValid(tally))
+            if (!share.IsValid(tally, guardian))
             {
                 return false;
             }
         }
 
-        // TODO: more checks, like ballot shares
+        // check that the ballot shares are valid
+        foreach (var (ballotId, share) in _ballotShares)
+        {
+            if (!share.IsValid(_ballots[ballotId], _tally.Context.CryptoExtendedBaseHash))
+            {
+                return false;
+            }
+        }
 
         return true;
     }
 
     public DecryptionResult Decrypt(CiphertextTally tally, bool skipValidation = false)
     {
-        if (!skipValidation && !IsValid(tally))
+        if (!skipValidation && !CanDecrypt(tally))
         {
             return new DecryptionResult("Tally is not valid");
         }
 
-        //var lagrangeCoefficients = ComputeLagrangeCoefficients();
-
         var guardianShares = GetGuardianShares();
+        var lagrangeCoefficients = guardianShares.ComputeLagrangeCoefficients();
 
-        var plaintextTally = tally.Decrypt(guardianShares, tally.Context.CryptoExtendedBaseHash, skipValidation);
-        var plaintextBallots = tally.Decrypt(BallotShares, tally.Context.CryptoExtendedBaseHash, skipValidation);
+        var plaintextTally = tally.Decrypt(
+            guardianShares, lagrangeCoefficients, skipValidation);
+        var plaintextBallots = _ballots.Decrypt(
+            _ballotShares, lagrangeCoefficients, tally, skipValidation);
 
         return new DecryptionResult(tally.TallyId, plaintextTally, plaintextBallots);
+    }
+
+    private void AddBallot(CiphertextBallot ballot)
+    {
+        if (!_ballots.ContainsKey(ballot.ObjectId))
+        {
+            _ballots.Add(ballot.ObjectId, ballot);
+        }
+    }
+
+    private void AddGuardian(ElectionPublicKey guardian)
+    {
+        if (!_guardians.ContainsKey(guardian.OwnerId))
+        {
+            _guardians.Add(guardian.OwnerId, guardian);
+        }
+    }
+
+    private void AddShare(CiphertextDecryptionTallyShare tallyshare)
+    {
+        if (!_tallyShares.ContainsKey(tallyshare.GuardianId))
+        {
+            _tallyShares.Add(tallyshare.GuardianId, tallyshare);
+        }
+    }
+
+    private void AddShare(CiphertextDecryptionBallotShare ballotShare)
+    {
+        if (!_ballotShares.ContainsKey(ballotShare.BallotId))
+        {
+            _ballotShares.Add(
+                ballotShare.BallotId,
+                new CiphertextDecryptionBallot(
+                    ballotShare, _guardians[ballotShare.GuardianId]));
+            return;
+        }
+
+        _ballotShares[ballotShare.BallotId].AddShare(
+            ballotShare, _guardians[ballotShare.GuardianId]);
     }
 
     private List<Tuple<ElectionPublicKey, CiphertextDecryptionTallyShare>> GetGuardianShares()
     {
         var guardianShares = new List<Tuple<ElectionPublicKey, CiphertextDecryptionTallyShare>>();
-        foreach (var guardian in Guardians.Values)
+        foreach (var guardian in _guardians.Values)
         {
-            var share = TallyShares[guardian.OwnerId];
+            var share = _tallyShares[guardian.OwnerId];
             guardianShares.Add(new Tuple<ElectionPublicKey, CiphertextDecryptionTallyShare>(guardian, share));
         }
         return guardianShares;
     }
 
-    // private List<Tuple<ElectionPublicKey, CiphertextDecryptionBallotShare>> GetGuardianBallotShares(string ballotId)
-    // {
-    //     var guardianShares = new List<Tuple<ElectionPublicKey, CiphertextDecryptionBallotShare>>();
-    //     foreach (var guardian in Guardians.Values)
-    //     {
-    //         var share = BallotShares[ballotId].BallotShares[guardian.OwnerId];
-    //         guardianShares.Add(new Tuple<ElectionPublicKey, CiphertextDecryptionBallotShare>(guardian, share));
-    //     }
-    //     return guardianShares;
-    // }
-
-    // private Dictionary<string, ElementModQ> ComputeLagrangeCoefficients()
-    // {
-    //     var lagrangeCoefficients = new Dictionary<string, ElementModQ>();
-    //     foreach (var guardian in Guardians.Values)
-    //     {
-    //         var otherSequenceOrders = Guardians.Values
-    //             .Where(i => i.OwnerId != guardian.OwnerId)
-    //             .Select(x => x.SequenceOrder).ToList();
-    //         var lagrangeCoefficient = Polynomial.Interpolate(
-    //             guardian.SequenceOrder, otherSequenceOrders
-    //             );
-    //         lagrangeCoefficients.Add(guardian.OwnerId, lagrangeCoefficient);
-    //     }
-    //     return lagrangeCoefficients;
-    // }
-
-    // private Dictionary<string, ElementModQ> ComputeLagrangeCoefficients(
-    //     List<Tuple<ElectionPublicKey, CiphertextDecryptionTallyShare>> guardianShares)
-    // {
-    //     var lagrangeCoefficients = new Dictionary<string, ElementModQ>();
-    //     foreach (var guardian in Guardians.Values)
-    //     {
-    //         var otherSequenceOrders = guardianShares
-    //             .Where(i => i.Item1.OwnerId != guardian.OwnerId)
-    //             .Select(x => x.Item1.SequenceOrder).ToList();
-    //         var lagrangeCoefficient = Polynomial.Interpolate(
-    //             guardian.SequenceOrder, otherSequenceOrders
-    //             );
-    //         lagrangeCoefficients.Add(guardian.OwnerId, lagrangeCoefficient);
-    //     }
-    //     return lagrangeCoefficients;
-    // }
 
     // public PlaintextBallot DecryptBallot(CiphertextBallot ballot, bool skipValidation = false)
     // {

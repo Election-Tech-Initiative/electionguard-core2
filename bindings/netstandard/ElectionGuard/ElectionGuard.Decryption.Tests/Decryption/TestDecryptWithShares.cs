@@ -2,6 +2,7 @@
 using ElectionGuard.Encryption.Utils.Generators;
 using ElectionGuard.ElectionSetup.Tests.Generators;
 using ElectionGuard.Decryption.Decryption;
+using ElectionGuard.Decryption.Tests.Tally;
 
 namespace ElectionGuard.Decryption.Tests.Decryption;
 
@@ -72,5 +73,39 @@ public class TestDecryptWithShares : DisposableBase
 
         // Assert
         Assert.That(result.Tally, Is.EqualTo(Data.PlaintextTally));
+    }
+
+    // TODO: fix this test
+    [Test]
+    public void Test_Decrypt_Ballot_With_All_Guardians_Present_Simple()
+    {
+        // Arrange
+        var guardians = Data.KeyCeremony.Guardians
+                .ToList();
+
+        var mediator = new DecryptionMediator(
+            "fake-mediator",
+            Data.CiphertextTally,
+            guardians.Select(i => i.SharePublicKey()).ToList());
+
+        // Act
+        var spoiledBallots = Data.CiphertextBallots.Where(i => i.IsSpoiled).ToList();
+        var nonce = spoiledBallots.First().Nonce;
+        foreach (var guardian in guardians)
+        {
+            var shares = guardian.ComputeDecryptionShares(
+                Data.CiphertextTally, spoiledBallots);
+            mediator.SubmitShares(shares, spoiledBallots);
+        }
+        var result = mediator.Decrypt(Data.CiphertextTally.TallyId);
+
+        var plaintextSpoiledBallots = Data.PlaintextBallots
+            .Where(i => Data.CiphertextTally.SpoiledBallotIds.Contains(i.ObjectId))
+            .Select(i => i.ToTallyBallot(Data.CiphertextTally)).ToList();
+
+        // Assert
+        Assert.That(result.Tally, Is.EqualTo(Data.PlaintextTally));
+        Assert.That(result.SpoiledBallots!.Count, Is.EqualTo(plaintextSpoiledBallots.Count));
+        Assert.That(result.SpoiledBallots, Is.EqualTo(plaintextSpoiledBallots));
     }
 }
