@@ -350,7 +350,7 @@ eg_electionguard_status_t eg_encrypt_ballot_with_nonce(
         auto *context = AS_TYPE(CiphertextElectionContext, in_context);
         auto *code_seed = AS_TYPE(ElementModQ, in_ballot_code_seed);
         auto *nonce = AS_TYPE(ElementModQ, in_nonce);
-        unique_ptr<ElementModQ> nonce_ptr{nonce};
+        auto nonce_ptr = nonce->clone();
 
         auto ciphertext = encryptBallot(*plaintext, *manifest, *context, *code_seed,
                                         move(nonce_ptr), 0ULL, in_should_verify_proofs);
@@ -413,7 +413,7 @@ eg_electionguard_status_t eg_encrypt_compact_ballot_with_nonce(
         auto *context = AS_TYPE(CiphertextElectionContext, in_context);
         auto *code_seed = AS_TYPE(ElementModQ, in_ballot_code_seed);
         auto *nonce = AS_TYPE(ElementModQ, in_nonce);
-        unique_ptr<ElementModQ> nonce_ptr{nonce};
+        auto nonce_ptr = nonce->clone();
 
         auto ciphertext = encryptCompactBallot(*plaintext, *manifest, *context, *code_seed,
                                                move(nonce_ptr), 0, in_should_verify_proofs);
