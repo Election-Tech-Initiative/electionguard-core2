@@ -13,7 +13,8 @@ public static class GuardianDecryptionExtensions
     // get the tally share and the guardian's ballot shares
     public static Tuple<CiphertextDecryptionTallyShare, Dictionary<string, CiphertextDecryptionBallotShare>> ComputeDecryptionShares(
         this Guardian guardian,
-        CiphertextTally tally, List<CiphertextBallot> ballots)
+        CiphertextTally tally,
+        List<CiphertextBallot> ballots)
     {
         var share = guardian.ComputeDecryptionShare(tally)!;
         var shares = guardian.ComputeDecryptionShares(tally.TallyId, ballots)!;
@@ -28,7 +29,8 @@ public static class GuardianDecryptionExtensions
         var shares = new Dictionary<string, CiphertextDecryptionBallotShare>();
         foreach (var ballot in ballots)
         {
-            shares.Add(ballot.ObjectId, guardian.ComputeDecryptionShare(tallyId, ballot)!);
+            shares.Add(
+                ballot.ObjectId, guardian.ComputeDecryptionShare(tallyId, ballot)!);
         }
 
         return shares;
@@ -58,7 +60,8 @@ public static class GuardianDecryptionExtensions
         var contests = new Dictionary<string, CiphertextDecryptionContestShare>();
         foreach (var contest in ballot.Contests)
         {
-            contests.Add(contest.ObjectId, guardian.ComputeDecryptionShare(contest)!);
+            contests.Add(
+                contest.ObjectId, guardian.ComputeDecryptionShare(contest)!);
         }
 
         var share = new CiphertextDecryptionBallotShare(
@@ -74,7 +77,8 @@ public static class GuardianDecryptionExtensions
         var selections = new Dictionary<string, CiphertextDecryptionSelectionShare>();
         foreach (var selection in contest.Selections.Values)
         {
-            selections.Add(selection.ObjectId, guardian.ComputeDecryptionShare(selection)!);
+            selections.Add(
+                selection.ObjectId, guardian.ComputeDecryptionShare(selection)!);
         }
 
         var share = new CiphertextDecryptionContestShare(
@@ -89,7 +93,8 @@ public static class GuardianDecryptionExtensions
         var selections = new Dictionary<string, CiphertextDecryptionSelectionShare>();
         foreach (var selection in contest.Selections)
         {
-            selections.Add(selection.ObjectId, guardian.ComputeDecryptionShare(selection)!);
+            selections.Add(
+                selection.ObjectId, guardian.ComputeDecryptionShare(selection)!);
         }
 
         var share = new CiphertextDecryptionContestShare(
@@ -102,11 +107,17 @@ public static class GuardianDecryptionExtensions
         ICiphertextSelection selection)
     {
         var partial = guardian.PartialDecrypt(selection.Ciphertext);
+
         // TODO: real proof
         var proof = new ChaumPedersenProof();
 
         var share = new CiphertextDecryptionSelectionShare(
-            selection, guardian.GuardianId, partial, proof);
+            selection,
+            guardian.GuardianId,
+            partial,
+            proof);
         return share;
     }
+
+    // TODO: compute decryption share proof
 }

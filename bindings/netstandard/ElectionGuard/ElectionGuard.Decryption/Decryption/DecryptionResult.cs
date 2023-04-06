@@ -2,17 +2,34 @@ using ElectionGuard.Decryption.Tally;
 
 namespace ElectionGuard.Decryption.Decryption;
 
+/// <summary>   
+/// The result of a decryption operation
+/// </summary>
 public class DecryptionResult
 {
     /// <summary>
     /// The id of the tally
     /// </summary>
     public string TallyId { get; init; }
+
+    /// <summary>
+    /// Whether the decryption was successful
+    /// </summary>
     public bool IsValid { get; set; }
+
+    /// <summary>
+    /// The message if the decryption was not successful
+    /// </summary>
     public string? Message { get; set; }
 
+    /// <summary>
+    /// The result of the decryption
+    /// </summary>
     public PlaintextTally? Tally { get; set; }
 
+    /// <summary>
+    /// The result of decrypting the spoiled ballots
+    /// </summary>
     public List<PlaintextTallyBallot>? SpoiledBallots { get; set; }
 
     public DecryptionResult(string tallyId, bool isValid = true)
