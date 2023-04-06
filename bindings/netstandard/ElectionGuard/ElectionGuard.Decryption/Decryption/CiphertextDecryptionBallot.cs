@@ -49,7 +49,10 @@ public record class CiphertextDecryptionBallot : DisposableRecordBase, IEquatabl
 
     public void AddShare(CiphertextDecryptionBallotShare share, ElectionPublicKey guardianPublicKey)
     {
-        // TODO: validate that the share is for the same ballot
+        if (!IsValid(share, guardianPublicKey))
+        {
+            throw new ArgumentException("Invalid share");
+        }
 
         if (!GuardianPublicKeys.ContainsKey(guardianPublicKey.OwnerId))
         {
@@ -73,6 +76,60 @@ public record class CiphertextDecryptionBallot : DisposableRecordBase, IEquatabl
             GuardianPublicKeys[guardianId],
             Shares[guardianId]
         );
+    }
+
+    // check if the share is valid for submission
+    public bool IsValid(
+        CiphertextDecryptionBallotShare share,
+        ElectionPublicKey guardianPublicKey)
+    {
+        if (share.BallotId != BallotId)
+        {
+            return false;
+        }
+
+        if (share.StyleId != StyleId)
+        {
+            return false;
+        }
+
+        if (!share.ManifestHash.Equals(ManifestHash))
+        {
+            return false;
+        }
+
+        return share.GuardianId == guardianPublicKey.OwnerId;
+    }
+
+    // check if this class is valid for the ballot
+    public bool IsValid(
+        CiphertextBallot ballot,
+        ElementModQ extendedBaseHash)
+    {
+        if (ballot.ObjectId != BallotId)
+        {
+            return false;
+        }
+
+        if (ballot.StyleId != StyleId)
+        {
+            return false;
+        }
+
+        if (!ballot.ManifestHash.Equals(ManifestHash))
+        {
+            return false;
+        }
+
+        foreach (var share in Shares)
+        {
+            if (!share.Value.IsValid(ballot, GuardianPublicKeys[share.Key], extendedBaseHash))
+            {
+                return false;
+            }
+        }
+
+        return true;
     }
 
     private void AddShare(CiphertextDecryptionBallotShare share)

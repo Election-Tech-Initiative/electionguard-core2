@@ -72,19 +72,28 @@ public class CiphertextDecryptionSelectionShare
     }
 
     public bool IsValid(
-        ElGamalCiphertext message, ElectionPublicKey guardian, CiphertextElectionContext context)
+        ICiphertextSelection message,
+        ElectionPublicKey guardian,
+        ElementModQ extendedBaseHash)
     {
-        return IsValid(
-            message,
-            guardian.Key,
-            context.CryptoExtendedBaseHash);
-    }
+        if (guardian.OwnerId != GuardianId)
+        {
+            return false;
+        }
 
-    public bool IsValid(
-        ElGamalCiphertext message, ElectionPublicKey guardian, ElementModQ extendedBaseHash)
-    {
-        return IsValid(
-            message,
+        if (message.ObjectId != ObjectId)
+        {
+            return false;
+        }
+
+        if (message.DescriptionHash is null
+            || !message.DescriptionHash.Equals(DescriptionHash))
+        {
+            return false;
+        }
+
+        return IsValidEncryption(
+            message.Ciphertext,
             guardian.Key,
             extendedBaseHash);
     }
@@ -93,8 +102,10 @@ public class CiphertextDecryptionSelectionShare
     /// Verify that this CiphertextDecryptionSelection is valid for a 
     /// specific ciphertext, guardian public key, and extended base hash.
     /// </summary>
-    public bool IsValid(
-        ElGamalCiphertext message, ElementModP guardianPublicKey, ElementModQ extendedBaseHash)
+    public bool IsValidEncryption(
+        ElGamalCiphertext message,
+        ElementModP guardianPublicKey,
+        ElementModQ extendedBaseHash)
     {
         var proofIsValid = Proof.IsValid(
             message,

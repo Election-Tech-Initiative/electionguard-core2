@@ -1,5 +1,7 @@
+using ElectionGuard.Decryption.Tally;
 using ElectionGuard.ElectionSetup;
 using ElectionGuard.Encryption.Ballot;
+using ElectionGuard.UI.Lib.Models;
 
 namespace ElectionGuard.Decryption.Decryption;
 
@@ -42,5 +44,57 @@ public record CiphertextDecryptionContestShare
         SequenceOrder = contest.SequenceOrder;
         DescriptionHash = contest.DescriptionHash;
         Selections = selections;
+    }
+
+    public bool IsValid(
+        CiphertextBallotContest contest,
+        ElectionPublicKey guardian,
+        ElementModQ extendedBaseHash)
+    {
+        if (contest.ObjectId != ObjectId)
+        {
+            return false;
+        }
+
+        foreach (var selection in contest.Selections)
+        {
+            if (!Selections.ContainsKey(selection.ObjectId))
+            {
+                return false;
+            }
+
+            if (!Selections[selection.ObjectId].IsValid(
+                selection, guardian, extendedBaseHash))
+            {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    public bool IsValid(
+        CiphertextTallyContest contest,
+        ElectionPublicKey guardian,
+        ElementModQ extendedBaseHash)
+    {
+        if (contest.ObjectId != ObjectId)
+        {
+            return false;
+        }
+
+        foreach (var selection in contest.Selections)
+        {
+            if (!Selections.ContainsKey(selection.Key))
+            {
+                return false;
+            }
+
+            if (!Selections[selection.Key].IsValid(
+                selection.Value, guardian, extendedBaseHash))
+            {
+                return false;
+            }
+        }
+        return true;
     }
 }
