@@ -100,11 +100,17 @@
             Margin="0,0,50,0">
             <Grid>
                 <Label Style="{StaticResource H2}" Text="{helper:Translate BallotsText}" />
-                <Button
-                    Command="{Binding AddBallotsCommand}"
-                    HorizontalOptions="End"
-                    Style="{StaticResource NarrowWidth}"
-                    Text="{helper:Translate AddBallots}" />
+                <HorizontalStackLayout HorizontalOptions="End">
+                    <Button
+                        Margin="0,0,5,0"
+                        Command="{Binding ReviewChallengedCommand}"
+                        Style="{StaticResource NarrowWidth}"
+                        Text="{helper:Translate ReviewSpoiledText}" />
+                    <Button
+                        Command="{Binding AddBallotsCommand}"
+                        Style="{StaticResource NarrowWidth}"
+                        Text="{helper:Translate AddBallots}" />
+                </HorizontalStackLayout>
             </Grid>
             <ScrollView>
                 <CollectionView x:Name="UploadCollectionView" ItemsSource="{Binding BallotUploads}">
@@ -232,10 +238,14 @@
                     Style="{StaticResource H2}"
                     Text="{helper:Translate TalliesText}" />
             </Grid>
-            <CollectionView ItemsSource="{Binding Tallies}">
+            <CollectionView
+                x:Name="TallyCollectionView"
+                ItemsSource="{Binding Tallies}"
+                SelectedItem="{Binding CurrentTally}"
+                SelectionMode="Single">
                 <CollectionView.Header>
                     <Grid>
-                        <Grid ColumnDefinitions="3*, 2*">
+                        <Grid ColumnDefinitions="*, 3*">
                             <Label
                                 Grid.Column="0"
                                 FontAttributes="Bold"
@@ -252,10 +262,16 @@
                     </Grid>
                 </CollectionView.Header>
                 <CollectionView.ItemTemplate>
-                    <DataTemplate x:DataType="model:Tally">
-                        <Grid ColumnDefinitions="3*, 2*">
-                            <Label Grid.Column="0" Text="{Binding CreatedAt}" />
-                            <Label Grid.Column="1" Text="{Binding Name}" />
+                    <DataTemplate x:DataType="model:TallyRecord">
+                        <Grid BackgroundColor="{Binding ., Converter={StaticResource AlternateRowColorConverter}, ConverterParameter={x:Reference TallyCollectionView}}}" ColumnDefinitions="*, 3*">
+                            <Label
+                                Grid.Column="0"
+                                Margin="10"
+                                Text="{Binding CreatedAt}" />
+                            <Label
+                                Grid.Column="1"
+                                Margin="10"
+                                Text="{Binding Name}" />
                         </Grid>
                     </DataTemplate>
                 </CollectionView.ItemTemplate>
@@ -284,7 +300,7 @@
             <Line Background="Black" />
             <HorizontalStackLayout Margin="10">
                 <Label Text="2." VerticalTextAlignment="Center" />
-                <CheckBox IsEnabled="False" />
+                <CheckBox IsChecked="{Binding Step2Complete}" IsEnabled="False" />
                 <Label
                     LineBreakMode="WordWrap"
                     Text="{helper:Translate Step2Text}"
@@ -294,7 +310,7 @@
             <Line Background="Black" />
             <HorizontalStackLayout Margin="10">
                 <Label Text="3." VerticalTextAlignment="Center" />
-                <CheckBox IsEnabled="False" />
+                <CheckBox IsChecked="{Binding Step3Complete}" IsEnabled="False" />
                 <Label
                     LineBreakMode="WordWrap"
                     Text="{helper:Translate Step3Text}"
@@ -304,7 +320,7 @@
             <Line Background="Black" />
             <HorizontalStackLayout Margin="10">
                 <Label Text="4." VerticalTextAlignment="Center" />
-                <CheckBox IsEnabled="False" />
+                <CheckBox IsChecked="{Binding Step4Complete}" IsEnabled="False" />
                 <Label
                     LineBreakMode="WordWrap"
                     Text="{helper:Translate Step4Text}"
@@ -314,7 +330,7 @@
             <Line Background="Black" />
             <HorizontalStackLayout Margin="10">
                 <Label Text="5." VerticalTextAlignment="Center" />
-                <CheckBox IsEnabled="False" />
+                <CheckBox IsChecked="{Binding Step5Complete}" IsEnabled="False" />
                 <Label
                     LineBreakMode="WordWrap"
                     Text="{helper:Translate Step5Text}"

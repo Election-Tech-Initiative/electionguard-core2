@@ -1,6 +1,6 @@
 ﻿namespace ElectionGuard.UI.Lib.Models;
 
-public partial class Tally : DatabaseRecord
+public partial class TallyRecord : DatabaseRecord
 {
     [ObservableProperty]
     private string? _name;
@@ -9,10 +9,7 @@ public partial class Tally : DatabaseRecord
     private string? _electionId;
 
     [ObservableProperty]
-    private string? _electionName;
-
-    [ObservableProperty]
-    private string? _keyCermonyId;
+    private string? _keyCeremonyId;
 
     [ObservableProperty]
     private string _tallyId = string.Empty;
@@ -30,21 +27,21 @@ public partial class Tally : DatabaseRecord
     private long _ballotUploadCount;
 
     [ObservableProperty]
-    private DateTime _tallyStart;
-
-    [ObservableProperty]
-    private DateTime _tallyEnd;
-
-    [ObservableProperty]
     private TallyState _state;
+
+    [ObservableProperty]
+    private DateTime? _lastExport = null;
 
     [ObservableProperty]
     private List<long> _deviceIds = new();
 
     [ObservableProperty]
+    private List<long> _dates = new();
+
+    [ObservableProperty]
     private DateTime _createdAt;
 
-    public Tally() : base(nameof(Tally))
+    public TallyRecord() : base(nameof(TallyRecord))
     {
         TallyId = Guid.NewGuid().ToString();
         CreatedAt = DateTime.UtcNow;

@@ -441,9 +441,6 @@
   <data name="ExportEncryptionText" xml:space="preserve">
     <value>¡Exportar cifrado!</value>
   </data>
-  <data name="DuplicateText" xml:space="preserve">
-    <value>Duplicar</value>
-  </data>
   <data name="ConnectionStringPlaceholder" xml:space="preserve">
     <value>¡Cadena de conexión para llegar a la base de datos!</value>
   </data>
@@ -459,10 +456,40 @@
   <data name="Step2Text" xml:space="preserve">
     <value>¡Sube boletas usando EGDrive (1 o más)!</value>
   </data>
-  <data name="Step3Text" xml:space="preserve">
-    <value>¡Realice un recuento con los guardianes (1 o más)!</value>
-  </data>
   <data name="Step4Text" xml:space="preserve">
     <value>¡Ver y exportar un recuento!</value>
+  </data>
+  <data name="Step3Text" xml:space="preserve">
+    <value>¡Revise las boletas de desafío (si es necesario)!</value>
+  </data>
+  <data name="Step5Text" xml:space="preserve">
+    <value>¡Ver y exportar un recuento!</value>
+  </data>
+  <data name="CreateMultipleTalliesText" xml:space="preserve">
+    <value>¡Crea varios recuentos!</value>
+  </data>
+  <data name="CustomRangeText" xml:space="preserve">
+    <value>¡Rango personalizado para la selección de boletas!</value>
+  </data>
+  <data name="DatesText" xml:space="preserve">
+    <value>Fechas</value>
+  </data>
+  <data name="DevicesText" xml:space="preserve">
+    <value>Dispositivos:</value>
+  </data>
+  <data name="TallyNameText" xml:space="preserve">
+    <value>Conteo</value>
+  </data>
+  <data name="TallyProcess" xml:space="preserve">
+    <value>¡Proceso de recuento!</value>
+  </data>
+  <data name="TallyText" xml:space="preserve">
+    <value>Recuento</value>
+  </data>
+  <data name="UseAllBallotsText" xml:space="preserve">
+    <value>¡Utilice todas las boletas para el recuento!</value>
+  </data>
+  <data name="ReviewSpoiledText" xml:space="preserve">
+    <value>¡Revisa el desafío!</value>
   </data>
 </root>

@@ -6,7 +6,7 @@ namespace ElectionGuard.UI.Lib.Services;
 /// <summary>
 /// Data Service for Tallies
 /// </summary>
-public class TallyService : BaseDatabaseService<Tally>
+public class TallyService : BaseDatabaseService<TallyRecord>
 {
     /// <summary>
     /// The collection name to use to get/save data into
@@ -16,13 +16,13 @@ public class TallyService : BaseDatabaseService<Tally>
     /// <summary>
     /// Default constructor that sets the collection name
     /// </summary>
-    public TallyService() : base(_collection) { }
+    public TallyService() : base(_collection, nameof(TallyRecord)) { }
 
     /// <summary>
     /// Gets tallies for an election
     /// </summary>
     /// <param name="electionId">election id to search for</param>
-    public async Task<List<Tally>> GetByElectionIdAsync(string electionId)
+    public async Task<List<TallyRecord>> GetByElectionIdAsync(string electionId)
     {
         return await GetAllByFieldAsync(Constants.ElectionId, electionId);
     }
@@ -31,7 +31,7 @@ public class TallyService : BaseDatabaseService<Tally>
     /// Gets tallies for an election
     /// </summary>
     /// <param name="tallyId">tally id to search for</param>
-    public async Task<Tally?> GetByTallyIdAsync(string tallyId)
+    public async Task<TallyRecord?> GetByTallyIdAsync(string tallyId)
     {
         return await GetByFieldAsync(Constants.TallyId, tallyId);
     }
@@ -48,10 +48,10 @@ public class TallyService : BaseDatabaseService<Tally>
     /// <param name="keyCeremonyId">key ceremony id to update</param>
     virtual public async Task UpdateCompleteAsync(string tallyId)
     {
-        var filterBuilder = Builders<Tally>.Filter;
+        var filterBuilder = Builders<TallyRecord>.Filter;
         var filter = filterBuilder.And(filterBuilder.Eq(Constants.TallyId, tallyId));
 
-        var updateBuilder = Builders<Tally>.Update;
+        var updateBuilder = Builders<TallyRecord>.Update;
         var update = updateBuilder.Set(Constants.State, TallyState.Complete)
                                     .Set(Constants.CompletedAt, DateTime.UtcNow)
                                     .Set(Constants.UpdatedAt, DateTime.UtcNow);
