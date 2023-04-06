@@ -525,15 +525,14 @@ ifeq ($(OPERATING_SYSTEM),Windows)
 	xcopy "build/libs/$(OPERATING_SYSTEM)/$(PROCESSOR)/$(TARGET)/_deps/hacl-build/$(TARGET)/hacl.dll" "bindings/netstandard/ElectionGuard/ElectionGuard.Encryption.Tests/bin/$(TARGET)/net7.0/win-$(PROCESSOR)/hacl.dll" /s 
 endif
 ifeq ($(OPERATING_SYSTEM),Darwin)
-	TARGET_FOLDERS = "./bindings/netstandard/ElectionGuard/ElectionGuard.Decryption.Tests/bin/$(TARGET)/net7.0/osx-$(PROCESSOR) ./bindings/netstandard/ElectionGuard/ElectionGuard.ElectionSetup.Tests/bin/$(TARGET)/net7.0/osx-$(PROCESSOR) ./bindings/netstandard/ElectionGuard/ElectionGuard.Encryption.Tests/bin/$(TARGET)/net7.0/osx-$(PROCESSOR)"
-	NATIVE_FOLDERS = "./bindings/netstandard/ElectionGuard/ElectionGuard.Decryption.Tests/bin/$(TARGET)/net7.0/runtimes/osx/native ./bindings/netstandard/ElectionGuard/ElectionGuard.ElectionSetup.Tests/bin/$(TARGET)/net7.0/runtimes/osx/native ./bindings/netstandard/ElectionGuard/ElectionGuard.Encryption.Tests/bin/$(TARGET)/net7.0/runtimes/osx/native"
-	ALL_FOLDERS = $(TARGET_FOLDERS) $(NATIVE_FOLDERS)
-	xargs mkdir -p < $(ALL_FOLDERS)
+	TARGET_FOLDERS="./bindings/netstandard/ElectionGuard/ElectionGuard.Decryption.Tests/bin/$(TARGET)/net7.0/osx-$(PROCESSOR) ./bindings/netstandard/ElectionGuard/ElectionGuard.ElectionSetup.Tests/bin/$(TARGET)/net7.0/osx-$(PROCESSOR) ./bindings/netstandard/ElectionGuard/ElectionGuard.Encryption.Tests/bin/$(TARGET)/net7.0/osx-$(PROCESSOR)"
+	NATIVE_FOLDERS="./bindings/netstandard/ElectionGuard/ElectionGuard.Decryption.Tests/bin/$(TARGET)/net7.0/runtimes/osx/native ./bindings/netstandard/ElectionGuard/ElectionGuard.ElectionSetup.Tests/bin/$(TARGET)/net7.0/runtimes/osx/native ./bindings/netstandard/ElectionGuard/ElectionGuard.Encryption.Tests/bin/$(TARGET)/net7.0/runtimes/osx/native"
+	ALL_FOLDERS=$(TARGET_FOLDERS) $(NATIVE_FOLDERS)
+	echo $(ALL_FOLDERS) | xargs -n 1 mkdir -p
 
-	xargs cp -r "./build/libs/$(OPERATING_SYSTEM)/$(PROCESSOR)/$(TARGET)/src/libelectionguard.dylib" \
+	echo $(ALL_FOLDERS) | xargs cp -n 1 -r "./build/libs/$(OPERATING_SYSTEM)/$(PROCESSOR)/$(TARGET)/src/libelectionguard.dylib" \
 		"./build/libs/$(OPERATING_SYSTEM)/$(PROCESSOR)/$(TARGET)/libs/hacl/libhacl_cpp.dylib" \
-		"./build/libs/$(OPERATING_SYSTEM)/$(PROCESSOR)/$(TARGET)/_deps/hacl-build/libhacl.dylib" \
-		< $(ALL_FOLDERS)
+		"./build/libs/$(OPERATING_SYSTEM)/$(PROCESSOR)/$(TARGET)/_deps/hacl-build/libhacl.dylib" 
 endif
 
 test-netstandard-copy-output-ui:

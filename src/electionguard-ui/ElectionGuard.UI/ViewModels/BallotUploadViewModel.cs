@@ -121,6 +121,8 @@ public partial class BallotUploadViewModel : BaseViewModel
         long totalDuplicated = 0;
         long totalRejected = 0;
         long totalSpoiled = 0;
+        ulong startDate = ulong.MaxValue;
+        ulong endDate = ulong.MinValue;
 
         _ = Parallel.ForEach(ballots, (currentBallot) =>
         {
@@ -139,7 +141,15 @@ public partial class BallotUploadViewModel : BaseViewModel
                 var exists = _ballotService.BallotExists(ballot.BallotCode.ToHex()).Result;
                 if (!exists)
                 {
-                    ulong timestamp = ballot.Timestamp;
+                    var timestamp = ballot.Timestamp;
+                    if (timestamp < startDate)
+                    {
+                        _ = Interlocked.Exchange(ref startDate, timestamp);
+                    }
+                    if (timestamp > endDate)
+                    {
+                        _ = Interlocked.Exchange(ref endDate, timestamp);
+                    }
                     BallotRecord ballotRecord = new()
                     {
                         ElectionId = ElectionId,
@@ -180,6 +190,8 @@ public partial class BallotUploadViewModel : BaseViewModel
         upload.BallotDuplicated = totalDuplicated;
         upload.BallotRejected = totalRejected;
         upload.BallotSpoiled = totalSpoiled;
+        upload.BallotsStart = DateTime.UnixEpoch.AddSeconds(startDate);
+        upload.BallotsEnd = DateTime.UnixEpoch.AddSeconds(endDate);
 
         try
         {

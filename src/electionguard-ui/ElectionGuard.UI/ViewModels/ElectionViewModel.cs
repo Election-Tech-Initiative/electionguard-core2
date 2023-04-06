@@ -1,4 +1,5 @@
-﻿using CommunityToolkit.Mvvm.DependencyInjection;
+﻿using System.Linq;
+using CommunityToolkit.Mvvm.DependencyInjection;
 using CommunityToolkit.Mvvm.Input;
 
 namespace ElectionGuard.UI.ViewModels;
@@ -10,13 +11,15 @@ public partial class ElectionViewModel : BaseViewModel
     private ManifestService _manifestService;
     private BallotUploadService _uploadService;
     private ElectionService _electionService;
+    private TallyService _tallyService;
 
-    public ElectionViewModel(IServiceProvider serviceProvider, KeyCeremonyService keyCeremonyService, ManifestService manifestService, BallotUploadService uploadService, ElectionService electionService) : base(null, serviceProvider)
+    public ElectionViewModel(IServiceProvider serviceProvider, KeyCeremonyService keyCeremonyService, ManifestService manifestService, BallotUploadService uploadService, ElectionService electionService, TallyService tallyService) : base(null, serviceProvider)
     {
         _keyCeremonyService = keyCeremonyService;
         _manifestService = manifestService;
         _uploadService = uploadService;
         _electionService = electionService;
+        _tallyService = tallyService;
     }
 
     [ObservableProperty]
@@ -44,6 +47,7 @@ public partial class ElectionViewModel : BaseViewModel
 
     [ObservableProperty]
     [NotifyCanExecuteChangedFor(nameof(CreateTallyCommand))]
+    [NotifyCanExecuteChangedFor(nameof(ReviewChallengedCommand))]
     private long _ballotSpoiledTotal = 0;
 
     [ObservableProperty]
@@ -56,7 +60,7 @@ public partial class ElectionViewModel : BaseViewModel
     private ObservableCollection<BallotUpload> _ballotUploads = new();
 
     [ObservableProperty]
-    private ObservableCollection<Tally> _tallies = new();
+    private ObservableCollection<TallyRecord> _tallies = new();
 
     [ObservableProperty]
     private DateTime _ballotsUploadedDateTime;
@@ -67,6 +71,19 @@ public partial class ElectionViewModel : BaseViewModel
     [ObservableProperty]
     private bool _step2Complete;
 
+    [ObservableProperty]
+    private bool _step3Complete;
+
+    [ObservableProperty]
+    private bool _step4Complete;
+
+    [ObservableProperty]
+    private bool _step5Complete;
+
+    [ObservableProperty]
+    private TallyRecord? _currentTally;
+
+
     partial void OnBallotsUploadedDateTimeChanged(DateTime value)
     {
         Step2Complete = true;
@@ -76,31 +93,44 @@ public partial class ElectionViewModel : BaseViewModel
     partial void OnCurrentElectionChanged(Election? value)
     {
         PageTitle = value?.Name ?? "";
-        _ = Task.Run(async () =>
+        _ = Shell.Current.CurrentPage.Dispatcher.DispatchAsync(async () =>
         {
-            ManifestRecord = await _manifestService.GetByElectionIdAsync(value?.ElectionId);
-            KeyCeremony = await _keyCeremonyService.GetByKeyCeremonyIdAsync(value?.KeyCeremonyId);
-            var uploads = await _uploadService.GetByElectionIdAsync(value?.ElectionId);
-            BallotUploads.Clear();
-            BallotCountTotal = 0;
-            BallotAddedTotal = 0;
-            BallotSpoiledTotal = 0;
-            BallotDuplicateTotal = 0;
-            BallotRejectedTotal = 0;
-            uploads.ForEach((upload) =>
+            try
             {
-                BallotUploads.Add(upload);
-                BallotCountTotal += upload.BallotCount;
-                BallotAddedTotal += upload.BallotImported;
-                BallotSpoiledTotal += upload.BallotSpoiled;
-                BallotDuplicateTotal += upload.BallotDuplicated;
-                BallotRejectedTotal += upload.BallotRejected;
-            });
+                ManifestRecord = await _manifestService.GetByElectionIdAsync(value?.ElectionId);
+                KeyCeremony = await _keyCeremonyService.GetByKeyCeremonyIdAsync(value?.KeyCeremonyId);
+                var uploads = await _uploadService.GetByElectionIdAsync(value?.ElectionId);
+                BallotUploads.Clear();
+                BallotCountTotal = 0;
+                BallotAddedTotal = 0;
+                BallotSpoiledTotal = 0;
+                BallotDuplicateTotal = 0;
+                BallotRejectedTotal = 0;
+                uploads.ForEach((upload) =>
+                {
+                    BallotUploads.Add(upload);
+                    BallotCountTotal += upload.BallotCount;
+                    BallotAddedTotal += upload.BallotImported;
+                    BallotSpoiledTotal += upload.BallotSpoiled;
+                    BallotDuplicateTotal += upload.BallotDuplicated;
+                    BallotRejectedTotal += upload.BallotRejected;
+                });
 
-            Tallies.Clear();
+                Tallies.Clear();
+                var tallies = await _tallyService.GetByElectionIdAsync(value?.ElectionId);
+                foreach (var item in tallies)
+                {
+                    Tallies.Add(item);
+                }
 
-            Step1Complete = CurrentElection.ExportEncryptionDateTime != null;
-            Step2Complete = BallotAddedTotal + BallotSpoiledTotal > 0;
+                Step1Complete = CurrentElection.ExportEncryptionDateTime != null;
+                Step2Complete = BallotAddedTotal + BallotSpoiledTotal > 0;
+                Step4Complete = Tallies.Count > 0;
+                Step5Complete = Tallies.Count(t => t.LastExport != null) > 0;
+            }
+            catch (Exception ex)
+            {
+            }
         });
     }
 
@@ -109,10 +139,10 @@ public partial class ElectionViewModel : BaseViewModel
     {
         var pageParams = new Dictionary<string, object>
             {
-                { BallotUploadViewModel.ElectionIdParam, CurrentElection.ElectionId }
+                { CreateTallyViewModel.ElectionIdParam, CurrentElection.ElectionId }
             };
 
-        // await NavigationService.GoToPage(typeof(BallotUploadViewModel), pageParams);
+        await NavigationService.GoToPage(typeof(CreateTallyViewModel), pageParams);
     }
 
     private bool CanCreateTally() => BallotCountTotal > 0 || BallotSpoiledTotal > 0;
@@ -129,6 +159,16 @@ public partial class ElectionViewModel : BaseViewModel
     }
 
     private bool CanUpload() => CurrentElection?.ExportEncryptionDateTime != null;
+
+
+    [RelayCommand(CanExecute = nameof(CanReview))]
+    private async Task ReviewChallenged()
+    {
+        // add code to go to the Challenged ballot page
+    }
+
+    private bool CanReview() => BallotSpoiledTotal > 0;
+
 
     [RelayCommand]
     private async Task ExportEncryption()
