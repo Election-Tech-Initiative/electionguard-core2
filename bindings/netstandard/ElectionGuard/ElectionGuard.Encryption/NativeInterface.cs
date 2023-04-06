@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Runtime.ConstrainedExecution;
 using System.Runtime.InteropServices;
 // ReSharper disable InconsistentNaming
@@ -2444,6 +2444,14 @@ namespace ElectionGuard
                 ElectionGuard.CiphertextBallot.External.CiphertextBallotHandle handle,
                 ElementModQ.ElementModQHandle manifest_hash,
                 out ElementModQ.ElementModQHandle crypto_hash);
+
+            [DllImport(DllName, EntryPoint = "eg_ciphertext_ballot_nonce_seed",
+                CallingConvention = CallingConvention.Cdecl, SetLastError = true)]
+            internal static extern Status NonceSeed(
+                ElementModQ.ElementModQHandle manifestHash,
+                [MarshalAs(UnmanagedType.LPStr)] string objectId,
+                ElementModQ.ElementModQHandle nonce,
+                out ElementModQ.ElementModQHandle nonceSeed);
 
             [DllImport(DllName,
                 EntryPoint = "eg_ciphertext_ballot_cast",

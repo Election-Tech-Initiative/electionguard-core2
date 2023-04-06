@@ -997,6 +997,24 @@ eg_ciphertext_ballot_crypto_hash_with(eg_ciphertext_ballot_t *handle,
     }
 }
 
+eg_electionguard_status_t eg_ciphertext_ballot_nonce_seed(eg_element_mod_q_t *in_manifest_hash,
+                                                          const char *in_object_id,
+                                                          eg_element_mod_q_t *in_nonce,
+                                                          eg_element_mod_q_t **out_nonce_seed)
+{
+    try {
+        auto *manifestHash = AS_TYPE(ElementModQ, in_manifest_hash);
+        auto objectId = string(in_object_id);
+        auto *nonce = AS_TYPE(ElementModQ, in_nonce);
+        auto result = CiphertextBallot::nonceSeed(*manifestHash, objectId, *nonce);
+        *out_nonce_seed = AS_TYPE(eg_element_mod_q_t, result.release());
+        return ELECTIONGUARD_STATUS_SUCCESS;
+    } catch (const exception &e) {
+        Log::error(":eg_ciphertext_ballot_nonce_seed", e);
+        return ELECTIONGUARD_STATUS_ERROR_BAD_ALLOC;
+    }
+}
+
 bool eg_ciphertext_ballot_is_valid_encryption(eg_ciphertext_ballot_t *handle,
                                               eg_element_mod_q_t *in_encryption_seed,
                                               eg_element_mod_p_t *in_public_key,

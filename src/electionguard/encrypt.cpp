@@ -8,7 +8,7 @@
 #include "electionguard/precompute_buffers.hpp"
 #include "facades/bignum4096.hpp"
 #include "log.hpp"
-#include "nonces.hpp"
+#include "electionguard/nonces.hpp"
 #include "serialize.hpp"
 #include "utils.hpp"
 

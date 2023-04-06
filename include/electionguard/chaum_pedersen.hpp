@@ -130,10 +130,10 @@ namespace electionguard
         ///          usually the election extended base hash (𝑄')</param>
         /// <returns>A unique pointer</returns>
         /// </Summary>
-        static std::unique_ptr<DisjunctiveChaumPedersenProof>
-        make_with_precomputed(const ElGamalCiphertext &message,
-                            std::unique_ptr<TwoTriplesAndAQuadruple> precomputedTwoTriplesAndAQuad,
-                            const ElementModQ &q, uint64_t plaintext);
+        static std::unique_ptr<DisjunctiveChaumPedersenProof> make_with_precomputed(
+          const ElGamalCiphertext &message,
+          std::unique_ptr<TwoTriplesAndAQuadruple> precomputedTwoTriplesAndAQuad,
+          const ElementModQ &q, uint64_t plaintext);
 
         /// <Summary>
         /// Validates a "disjunctive" Chaum-Pedersen (zero or one) proof.
@@ -155,10 +155,10 @@ namespace electionguard
         make_zero(const ElGamalCiphertext &message, const ElementModQ &r, const ElementModP &k,
                   const ElementModQ &q, const ElementModQ &seed);
 
-        static std::unique_ptr<DisjunctiveChaumPedersenProof>
-        make_zero_with_precomputed(const ElGamalCiphertext &message, 
-                  std::unique_ptr<TwoTriplesAndAQuadruple> precomputedTwoTriplesAndAQuad,
-                  const ElementModQ &q);
+        static std::unique_ptr<DisjunctiveChaumPedersenProof> make_zero_with_precomputed(
+          const ElGamalCiphertext &message,
+          std::unique_ptr<TwoTriplesAndAQuadruple> precomputedTwoTriplesAndAQuad,
+          const ElementModQ &q);
 
         static std::unique_ptr<DisjunctiveChaumPedersenProof>
         make_one(const ElGamalCiphertext &message, const ElementModQ &r, const ElementModP &k,
@@ -167,10 +167,10 @@ namespace electionguard
         make_one(const ElGamalCiphertext &message, const ElementModQ &r, const ElementModP &k,
                  const ElementModQ &q, const ElementModQ &seed);
 
-        static std::unique_ptr<DisjunctiveChaumPedersenProof>
-        make_one_with_precomputed(const ElGamalCiphertext &message, 
-                 std::unique_ptr<TwoTriplesAndAQuadruple> precomputedTwoTriplesAndAQuad,
-                 const ElementModQ &q);
+        static std::unique_ptr<DisjunctiveChaumPedersenProof> make_one_with_precomputed(
+          const ElGamalCiphertext &message,
+          std::unique_ptr<TwoTriplesAndAQuadruple> precomputedTwoTriplesAndAQuad,
+          const ElementModQ &q);
 
       private:
         class Impl;

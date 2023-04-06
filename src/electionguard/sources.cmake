@@ -16,6 +16,7 @@ set(FACADES_electionguard
     ${PROJECT_SOURCE_DIR}/src/electionguard/facades/group.cpp
     ${PROJECT_SOURCE_DIR}/src/electionguard/facades/hash.cpp
     ${PROJECT_SOURCE_DIR}/src/electionguard/facades/manifest.cpp
+    ${PROJECT_SOURCE_DIR}/src/electionguard/facades/nonces.cpp
     ${PROJECT_SOURCE_DIR}/src/electionguard/facades/polynomial.cpp
 )
 
@@ -37,7 +38,6 @@ set(SOURCES_electionguard
     ${PROJECT_SOURCE_DIR}/src/electionguard/lookup_table.hpp
     ${PROJECT_SOURCE_DIR}/src/electionguard/manifest.cpp
     ${PROJECT_SOURCE_DIR}/src/electionguard/nonces.cpp
-    ${PROJECT_SOURCE_DIR}/src/electionguard/nonces.hpp
     ${PROJECT_SOURCE_DIR}/src/electionguard/precompute_buffers.cpp
     ${PROJECT_SOURCE_DIR}/src/electionguard/convert.hpp
     ${PROJECT_SOURCE_DIR}/src/electionguard/random.cpp
@@ -78,6 +78,8 @@ set(INCLUDES_electionguard
     ${PROJECT_SOURCE_DIR}/include/electionguard/hash.hpp
     ${PROJECT_SOURCE_DIR}/include/electionguard/manifest.h
     ${PROJECT_SOURCE_DIR}/include/electionguard/manifest.hpp
+    ${PROJECT_SOURCE_DIR}/include/electionguard/nonces.h
+    ${PROJECT_SOURCE_DIR}/include/electionguard/nonces.hpp
     ${PROJECT_SOURCE_DIR}/include/electionguard/precompute_buffers.hpp
     ${PROJECT_SOURCE_DIR}/include/electionguard/polynomial.h
     ${PROJECT_SOURCE_DIR}/include/electionguard/polynomial.hpp

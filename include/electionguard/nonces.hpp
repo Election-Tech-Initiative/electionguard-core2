@@ -1,8 +1,9 @@
 #ifndef __ELECTIONGUARD_CPP_NONCES_HPP_INCLUDED__
 #define __ELECTIONGUARD_CPP_NONCES_HPP_INCLUDED__
 
-#include <electionguard/export.h>
-#include <electionguard/group.hpp>
+#include "export.h"
+#include "group.hpp"
+
 #include <memory>
 #include <variant>
 #include <vector>
@@ -11,7 +12,7 @@ namespace electionguard
 {
     using NoncesHeaderType = std::variant<ElementModP *, ElementModQ *, std::string>;
 
-    class EG_INTERNAL_API Nonces
+    class EG_API Nonces
     {
       public:
         Nonces(const Nonces &other);

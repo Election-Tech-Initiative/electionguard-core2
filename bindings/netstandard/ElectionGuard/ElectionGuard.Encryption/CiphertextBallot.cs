@@ -70,6 +70,16 @@ namespace ElectionGuard
             Handle = handle;
         }
 
+        public static ElementModQ NonceSeed(
+            ElementModQ manifestHash,
+            string objectId, ElementModQ nonce)
+        {
+            var status = NativeInterface.CiphertextBallot.NonceSeed(
+                manifestHash.Handle, objectId, nonce.Handle, out var value);
+            status.ThrowIfError();
+            return value.IsInvalid ? null : new ElementModQ(value);
+        }
+
         /// <summary>
         /// A helper function to mark the ballot as cast and remove sensitive values like the nonce.
         /// </summary>

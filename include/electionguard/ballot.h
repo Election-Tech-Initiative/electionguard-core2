@@ -349,6 +349,18 @@ EG_API eg_electionguard_status_t eg_ciphertext_ballot_crypto_hash_with(
 // TODO: eg_ciphertext_ballot_make
 
 /**
+ * @brief A static helper method to derive the nonceSeed used to encrypt the ballot
+ * @param[in] in_manifest_hash A pointer to the `eg_element_mod_q_t` opaque instance
+ * @param[out] out_nonce_seed A pointer to the output Nonce.  The value is a reference and is not owned by the caller.
+ * @return eg_electionguard_status_t indicating success or failure
+ * @retval ELECTIONGUARD_STATUS_SUCCESS The function was successfully executed
+ * @retval ELECTIONGUARD_STATUS_ERROR_BAD_ALLOC The function was unable to allocate memory
+ */
+EG_API eg_electionguard_status_t
+eg_ciphertext_ballot_nonce_seed(eg_element_mod_q_t *in_manifest_hash, const char *in_object_id,
+                                eg_element_mod_q_t *nonce, eg_element_mod_q_t **out_nonce_seed);
+
+/**
  * A helper function to mark the ballot as cast and remove sensitive values like the nonce.
  */
 EG_API eg_electionguard_status_t eg_ciphertext_ballot_cast(eg_ciphertext_ballot_t *handle);
