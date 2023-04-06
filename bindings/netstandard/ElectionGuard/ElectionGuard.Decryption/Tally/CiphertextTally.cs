@@ -178,6 +178,12 @@ public record CiphertextTally : DisposableRecordBase, IEquatable<CiphertextTally
         return result;
     }
 
+    public bool HasBallot(string ballotId)
+    {
+        return CastBallotIds.Contains(ballotId) ||
+               SpoiledBallotIds.Contains(ballotId);
+    }
+
     public override string ToString()
     {
         var sb = new StringBuilder();

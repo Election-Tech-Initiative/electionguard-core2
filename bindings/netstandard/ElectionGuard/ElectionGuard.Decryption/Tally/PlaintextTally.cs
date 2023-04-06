@@ -31,6 +31,19 @@ public static partial class InternalManifestExtensions
         }
         return contests;
     }
+
+    public static Dictionary<string, PlaintextTallyContest> ToPlaintextTallyContestDictionary(
+       this CiphertextBallot ballot)
+    {
+        var contests = new Dictionary<string, PlaintextTallyContest>();
+        foreach (var contest in ballot.Contests)
+        {
+            contests.Add(
+                contest.ObjectId,
+                new PlaintextTallyContest(contest));
+        }
+        return contests;
+    }
 }
 
 /// <summary>
@@ -70,6 +83,15 @@ public record PlaintextTally : DisposableRecordBase, IEquatable<PlaintextTally>
         TallyId = tallyId;
         Name = name;
         Contests = manifest.ToPlaintextTallyContestDictionary();
+    }
+
+    public PlaintextTally(
+        string tallyId,
+        CiphertextBallot ballot)
+    {
+        TallyId = tallyId;
+        Name = ballot.ObjectId;
+        Contests = ballot.ToPlaintextTallyContestDictionary();
     }
 
     public PlaintextTally(

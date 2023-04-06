@@ -38,6 +38,15 @@ public class PlaintextTallyContest : IElectionContest, IEquatable<PlaintextTally
     }
 
     public PlaintextTallyContest(
+        CiphertextBallotContest contest)
+    {
+        ObjectId = contest.ObjectId;
+        SequenceOrder = contest.SequenceOrder;
+        DescriptionHash = contest.DescriptionHash;
+        Selections = contest.ToPlaintextTallySelectionDictionary();
+    }
+
+    public PlaintextTallyContest(
         ContestDescription contest)
     {
         ObjectId = contest.ObjectId;
@@ -124,6 +133,25 @@ public static partial class ContestDescriptionExtensions
     {
         var selections = new Dictionary<string, PlaintextTallySelection>();
         foreach (var selection in contest.Selections)
+        {
+            selections.Add(
+                selection.ObjectId,
+                new PlaintextTallySelection(selection));
+        }
+
+        // Do not add placeholders
+
+        return selections;
+    }
+
+    /// <summary>
+    /// Converts a <see cref="ContestDescriptionWithPlaceholders"/> to a dictionary of <see cref="PlaintextTallySelection"/>
+    /// </summary>
+    public static Dictionary<string, PlaintextTallySelection> ToPlaintextTallySelectionDictionary(
+        this CiphertextBallotContest contest)
+    {
+        var selections = new Dictionary<string, PlaintextTallySelection>();
+        foreach (var selection in contest.Selections.Where(x => x.IsPlaceholder == false))
         {
             selections.Add(
                 selection.ObjectId,
