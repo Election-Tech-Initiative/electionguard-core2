@@ -81,7 +81,7 @@ public class TestDecryptWithSharesSimple : DisposableBase
         Assert.That(plaintextTally.Tally, Is.EqualTo(data.PlaintextTally));
     }
 
-    [Test, Category("SingleTest")]
+    [Test]
     public void Test_Decrypt_Ballot_With_All_Guardians_Present_Simple()
     {
         // Arrange
@@ -95,14 +95,17 @@ public class TestDecryptWithSharesSimple : DisposableBase
 
         var guardians = data.KeyCeremony.Guardians
                 .ToList();
-
+        var spoiledBallots = data.CiphertextBallots.Where(i => i.IsSpoiled).ToList();
         var mediator = new DecryptionMediator(
             "fake-mediator",
             data.CiphertextTally,
             guardians.Select(i => i.SharePublicKey()).ToList());
 
+        var plaintextSpoiledBallots = data.PlaintextBallots
+            .Where(i => data.CiphertextTally.SpoiledBallotIds.Contains(i.ObjectId))
+            .Select(i => i.ToTallyBallot(data.CiphertextTally)).ToList();
+
         // Act
-        var spoiledBallots = data.CiphertextBallots.Where(i => i.IsSpoiled).ToList();
         foreach (var guardian in guardians)
         {
             var shares = guardian.ComputeDecryptionShares(
@@ -111,10 +114,6 @@ public class TestDecryptWithSharesSimple : DisposableBase
         }
 
         var result = mediator.Decrypt(data.CiphertextTally.TallyId);
-
-        var plaintextSpoiledBallots = data.PlaintextBallots
-            .Where(i => data.CiphertextTally.SpoiledBallotIds.Contains(i.ObjectId))
-            .Select(i => i.ToTallyBallot(data.CiphertextTally)).ToList();
 
         // Assert
         Assert.That(result.Tally, Is.EqualTo(data.PlaintextTally));

@@ -52,7 +52,7 @@ public class TestDecryptWithShares : DisposableBase
     }
 
     [Test]
-    public void Test_Decrypt_Ballot_With_Quorum_Guardians_Present()
+    public void Test_Decrypt_Tally_With_Quorum_Guardians_Present()
     {
         // Arrange
         var guardians = Data.KeyCeremony.Guardians
@@ -75,9 +75,8 @@ public class TestDecryptWithShares : DisposableBase
         Assert.That(result.Tally, Is.EqualTo(Data.PlaintextTally));
     }
 
-    // TODO: fix this test
     [Test]
-    public void Test_Decrypt_Ballot_With_All_Guardians_Present_Simple()
+    public void Test_Decrypt_Ballot_With_All_Guardians_Present()
     {
         // Arrange
         var guardians = Data.KeyCeremony.Guardians
@@ -87,10 +86,12 @@ public class TestDecryptWithShares : DisposableBase
             "fake-mediator",
             Data.CiphertextTally,
             guardians.Select(i => i.SharePublicKey()).ToList());
+        var spoiledBallots = Data.CiphertextBallots.Where(i => i.IsSpoiled).ToList();
+        var plaintextSpoiledBallots = Data.PlaintextBallots
+            .Where(i => Data.CiphertextTally.SpoiledBallotIds.Contains(i.ObjectId))
+            .Select(i => i.ToTallyBallot(Data.CiphertextTally)).ToList();
 
         // Act
-        var spoiledBallots = Data.CiphertextBallots.Where(i => i.IsSpoiled).ToList();
-        var nonce = spoiledBallots.First().Nonce;
         foreach (var guardian in guardians)
         {
             var shares = guardian.ComputeDecryptionShares(
@@ -99,9 +100,37 @@ public class TestDecryptWithShares : DisposableBase
         }
         var result = mediator.Decrypt(Data.CiphertextTally.TallyId);
 
+        // Assert
+        Assert.That(result.Tally, Is.EqualTo(Data.PlaintextTally));
+        Assert.That(result.SpoiledBallots!.Count, Is.EqualTo(plaintextSpoiledBallots.Count));
+        Assert.That(result.SpoiledBallots, Is.EqualTo(plaintextSpoiledBallots));
+    }
+
+    [Test]
+    public void Test_Decrypt_Ballot_With_Quorum_Guardians_Present()
+    {
+        // Arrange
+        var guardians = Data.KeyCeremony.Guardians
+                .GetRange(0, QUORUM)
+                .ToList();
+
+        var mediator = new DecryptionMediator(
+            "fake-mediator",
+            Data.CiphertextTally,
+            guardians.Select(i => i.SharePublicKey()).ToList());
+        var spoiledBallots = Data.CiphertextBallots.Where(i => i.IsSpoiled).ToList();
         var plaintextSpoiledBallots = Data.PlaintextBallots
             .Where(i => Data.CiphertextTally.SpoiledBallotIds.Contains(i.ObjectId))
             .Select(i => i.ToTallyBallot(Data.CiphertextTally)).ToList();
+
+        // Act
+        foreach (var guardian in guardians)
+        {
+            var shares = guardian.ComputeDecryptionShares(
+                Data.CiphertextTally, spoiledBallots);
+            mediator.SubmitShares(shares, spoiledBallots);
+        }
+        var result = mediator.Decrypt(Data.CiphertextTally.TallyId);
 
         // Assert
         Assert.That(result.Tally, Is.EqualTo(Data.PlaintextTally));
