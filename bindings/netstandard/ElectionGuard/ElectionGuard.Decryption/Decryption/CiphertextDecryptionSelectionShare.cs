@@ -39,6 +39,7 @@ public class CiphertextDecryptionSelectionShare
     /// <summary>
     /// The proof that the share was decrypted correctly.
     /// </summary>
+    // TODO: only store commitment and response, not the full proof
     public ChaumPedersenProof Proof { get; init; }
 
     public CiphertextDecryptionSelectionShare(

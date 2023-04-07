@@ -90,6 +90,9 @@ public static class GuardianDecryptionExtensions
         this Guardian guardian,
         CiphertextBallotContest contest)
     {
+        var extendedData = guardian.PartialDecrypt(contest.ExtendedData);
+        ElGamalCiphertext? commitment = null;
+
         var selections = new Dictionary<string, CiphertextDecryptionSelectionShare>();
         foreach (var selection in contest.Selections)
         {
@@ -98,7 +101,7 @@ public static class GuardianDecryptionExtensions
         }
 
         var share = new CiphertextDecryptionContestShare(
-            contest, selections);
+            contest, extendedData, commitment, selections);
         return share;
     }
 

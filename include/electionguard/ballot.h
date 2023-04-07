@@ -198,6 +198,17 @@ EG_API eg_electionguard_status_t eg_ciphertext_ballot_contest_get_ciphertext_acc
   eg_elgamal_ciphertext_t **out_ciphertext_accumulation_ref);
 
 /**
+ * @brief The hashed elgamal ciphertext is the encrypted extended data (overvote information
+ *        and writeins).
+ * 
+ * @param[in] handle 
+ * @param[out] out_extended_data An opaque pointer to the nonce.  
+ *                               The caller is responsible for lifecycle.
+ */
+EG_API eg_electionguard_status_t eg_ciphertext_ballot_contest_get_extended_data(
+  eg_ciphertext_ballot_contest_t *handle, eg_hashed_elgamal_ciphertext_t **out_extended_data);
+
+/**
  * Given an encrypted Ballotcontest, generates a hash, suitable for rolling up
  * into a hash / tracking code for an entire ballot. Of note, this particular hash examines
  * the `encryptionSeed` and `ballot_selections`, but not the proof.

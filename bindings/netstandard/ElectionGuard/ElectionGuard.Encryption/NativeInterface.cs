@@ -556,7 +556,14 @@ namespace ElectionGuard
                 out IntPtr data,
                 out ulong size);
 
+            [DllImport(DllName, EntryPoint = "eg_hashed_elgamal_ciphertext_partial_decrypt",
+                CallingConvention = CallingConvention.Cdecl, SetLastError = true)]
+            internal static extern Status PartialDecrypt(
+                HashedElGamalCiphertextHandle handle,
+                ElementModQ.ElementModQHandle secret_key,
+                out ElementModP.ElementModPHandle partial_decryption);
         }
+
         internal static class HashedElGamal
         {
             [DllImport(DllName, EntryPoint = "eg_hashed_elgamal_encrypt",
@@ -569,7 +576,6 @@ namespace ElectionGuard
                 ElementModQ.ElementModQHandle seed,
                 out HashedElGamalCiphertext.HashedElGamalCiphertextHandle handle);
         }
-
 
         #endregion
 
@@ -2326,6 +2332,13 @@ namespace ElectionGuard
                 ElectionGuard.CiphertextBallotContest.External.CiphertextBallotContestHandle handle,
                 ElementModQ.ElementModQHandle encryption_seed,
                 out ElementModQ.ElementModQHandle crypto_hash);
+
+            [DllImport(DllName,
+                EntryPoint = "eg_ciphertext_ballot_contest_get_extended_data",
+                CallingConvention = CallingConvention.Cdecl, SetLastError = true)]
+            internal static extern Status GetExtendedData(
+                ElectionGuard.CiphertextBallotContest.External.CiphertextBallotContestHandle handle,
+                out HashedElGamalCiphertext.HashedElGamalCiphertextHandle extendedData);
 
             [DllImport(DllName,
                 EntryPoint = "eg_ciphertext_ballot_contest_aggregate_nonce",

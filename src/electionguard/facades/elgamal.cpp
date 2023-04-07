@@ -429,6 +429,23 @@ eg_electionguard_status_t eg_hashed_elgamal_ciphertext_decrypt_with_secret(
     }
 }
 
+eg_electionguard_status_t
+eg_hashed_elgamal_ciphertext_partial_decrypt(eg_hashed_elgamal_ciphertext_t *handle,
+                                             eg_element_mod_q_t *in_secret_key,
+                                             eg_element_mod_p_t **out_partial_decryption)
+{
+    try {
+        auto *secretKey = AS_TYPE(ElementModQ, in_secret_key);
+        auto partialDecryption =
+          AS_TYPE(HashedElGamalCiphertext, handle)->partialDecrypt(*secretKey);
+        *out_partial_decryption = AS_TYPE(eg_element_mod_p_t, partialDecryption.release());
+        return ELECTIONGUARD_STATUS_SUCCESS;
+    } catch (const exception &e) {
+        Log::error(__func__, e);
+        return ELECTIONGUARD_STATUS_ERROR_RUNTIME_ERROR;
+    }
+}
+
 #pragma endregion
 
 #pragma region HashedElgamalEncrypt

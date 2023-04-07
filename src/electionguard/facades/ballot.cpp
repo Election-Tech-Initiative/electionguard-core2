@@ -29,6 +29,7 @@ using electionguard::dynamicCopy;
 using electionguard::ElementModP;
 using electionguard::ElementModQ;
 using electionguard::ExtendedData;
+using electionguard::HashedElGamalCiphertext;
 using electionguard::Log;
 using electionguard::PlaintextBallot;
 using electionguard::PlaintextBallotContest;
@@ -569,6 +570,20 @@ eg_ciphertext_ballot_contest_get_proof(eg_ciphertext_ballot_selection_t *handle,
         return ELECTIONGUARD_STATUS_SUCCESS;
     } catch (const exception &e) {
         Log::error("eg_ciphertext_ballot_contest_get_proof", e);
+        return ELECTIONGUARD_STATUS_ERROR_BAD_ALLOC;
+    }
+}
+
+eg_electionguard_status_t
+eg_ciphertext_ballot_contest_get_extended_data(eg_ciphertext_ballot_contest_t *handle,
+                                               eg_hashed_elgamal_ciphertext_t **out_extended_data)
+{
+    try {
+        auto reference = AS_TYPE(CiphertextBallotContest, handle)->getHashedElGamalCiphertext();
+        *out_extended_data = AS_TYPE(eg_hashed_elgamal_ciphertext_t, reference.release());
+        return ELECTIONGUARD_STATUS_SUCCESS;
+    } catch (const exception &e) {
+        Log::error("eg_ciphertext_ballot_contest_get_extended_data", e);
         return ELECTIONGUARD_STATUS_ERROR_BAD_ALLOC;
     }
 }

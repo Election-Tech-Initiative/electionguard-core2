@@ -18,9 +18,9 @@ namespace ElectionGuard
             get
             {
                 var status = NativeInterface.HashedElGamalCiphertext.GetPad(
-                    Handle, out NativeInterface.ElementModP.ElementModPHandle value);
+                    Handle, out var value);
                 status.ThrowIfError();
-                return new ElementModP(value);
+                return value.IsInvalid ? null : new ElementModP(value);
             }
         }
 
@@ -32,11 +32,11 @@ namespace ElectionGuard
             get
             {
                 var status = NativeInterface.HashedElGamalCiphertext.GetData(
-                    Handle, out IntPtr data, out ulong size);
+                    Handle, out var data, out var size);
                 status.ThrowIfError();
                 var byteArray = new byte[(int)size];
                 Marshal.Copy(data, byteArray, 0, (int)size);
-                NativeInterface.Memory.DeleteIntPtr(data);
+                _ = NativeInterface.Memory.DeleteIntPtr(data);
                 return byteArray;
             }
         }
@@ -48,11 +48,11 @@ namespace ElectionGuard
             get
             {
                 var status = NativeInterface.HashedElGamalCiphertext.GetMac(
-                    Handle, out IntPtr data, out ulong size);
+                    Handle, out var data, out var size);
                 status.ThrowIfError();
                 var byteArray = new byte[(int)size];
                 Marshal.Copy(data, byteArray, 0, (int)size);
-                NativeInterface.Memory.DeleteIntPtr(data);
+                _ = NativeInterface.Memory.DeleteIntPtr(data);
                 return byteArray;
             }
         }
@@ -65,9 +65,9 @@ namespace ElectionGuard
             get
             {
                 var status = NativeInterface.HashedElGamalCiphertext.GetCryptoHash(
-                    Handle, out NativeInterface.ElementModQ.ElementModQHandle value);
+                    Handle, out var value);
                 status.ThrowIfError();
-                return new ElementModQ(value);
+                return value.IsInvalid ? null : new ElementModQ(value);
             }
         }
 
@@ -106,14 +106,30 @@ namespace ElectionGuard
         public byte[] Decrypt(ElementModQ secretKey, ElementModQ descriptionHash, bool lookForPadding)
         {
             var status = NativeInterface.HashedElGamalCiphertext.Decrypt(
-                Handle, secretKey.Handle, descriptionHash.Handle, lookForPadding, out IntPtr data, out ulong size);
+                Handle, secretKey.Handle, descriptionHash.Handle, lookForPadding, out var data, out var size);
             status.ThrowIfError();
 
             var byteArray = new byte[(int)size];
             Marshal.Copy(data, byteArray, 0, (int)size);
-            NativeInterface.Memory.DeleteIntPtr(data);
+            _ = NativeInterface.Memory.DeleteIntPtr(data);
 
             return byteArray;
+        }
+
+        /// <Summary>
+        /// Partially Decrypts an ElGamal ciphertext with a known ElGamal secret key.
+        ///
+        /// 𝑀_i = C0^𝑠𝑖 mod 𝑝 in the spec
+        ///
+        /// This is a convenience accessor useful for some use cases.
+        /// This method should be used by consumers operating in live secret ballot elections.
+        /// </Summary>
+        public ElementModP PartialDecrypt(ElementModQ secretKey)
+        {
+            var status = NativeInterface.HashedElGamalCiphertext.PartialDecrypt(
+                Handle, secretKey.Handle, out var value);
+            status.ThrowIfError();
+            return value.IsInvalid ? null : new ElementModP(value);
         }
 
 #pragma warning disable CS1591 // Missing XML comment for publicly visible type or member
@@ -122,7 +138,11 @@ namespace ElectionGuard
         {
             base.DisposeUnmanaged();
 
-            if (Handle == null || Handle.IsInvalid) return;
+            if (Handle == null || Handle.IsInvalid)
+            {
+                return;
+            }
+
             Handle.Dispose();
             Handle = null;
         }

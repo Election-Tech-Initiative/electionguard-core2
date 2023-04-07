@@ -28,6 +28,27 @@ public partial class Guardian
         return ciphertext.PartialDecrypt(_partialElectionSecretKey);
     }
 
+    public ElementModP PartialDecrypt(HashedElGamalCiphertext ciphertext)
+    {
+        if (AllGuardianKeysReceived is false)
+        {
+            throw new InvalidOperationException("All guardian keys must be received before decrypting.");
+        }
+
+        // TODO: should we verify?
+        // if (AllElectionPartialKeyBackupsVerified() is false)
+        // {
+        //     throw new InvalidOperationException("All election partial key backups must be verified before decrypting.");
+        // }
+
+        if (_partialElectionSecretKey is null)
+        {
+            _ = CombinePrivateKeyShares();
+        }
+
+        return ciphertext.PartialDecrypt(_partialElectionSecretKey);
+    }
+
     // P(i) = ∑ P_j(i) = (P1(i)+P2(i)+···+Pn(i)) mod q.
     private ElementModQ CombinePrivateKeyShares()
     {

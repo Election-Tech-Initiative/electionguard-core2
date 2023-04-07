@@ -23,26 +23,35 @@ public record CiphertextDecryptionContestShare
     /// </summary>
     public ElementModQ DescriptionHash { get; init; }
 
+    // partial decryption of extended data for the contest
+    public ElementModP? ExtendedData { get; init; } = default!;
+
+    // TODO: commitment for generating the cp proof as part of decryption
+    public ElGamalCiphertext? Commitment { get; init; } = default!;
+
     public Dictionary<string, CiphertextDecryptionSelectionShare> Selections { get; init; } = default!;
 
     public CiphertextDecryptionContestShare(
-        string objectId,
-        ulong sequenceOrder,
-        ElementModQ descriptionHash,
+        IElectionContest contest,
         Dictionary<string, CiphertextDecryptionSelectionShare> selections)
-    {
-        ObjectId = objectId;
-        SequenceOrder = sequenceOrder;
-        DescriptionHash = descriptionHash;
-        Selections = selections;
-    }
-
-    public CiphertextDecryptionContestShare(IElectionContest contest,
-    Dictionary<string, CiphertextDecryptionSelectionShare> selections)
     {
         ObjectId = contest.ObjectId;
         SequenceOrder = contest.SequenceOrder;
         DescriptionHash = contest.DescriptionHash;
+        Selections = selections;
+    }
+
+    public CiphertextDecryptionContestShare(
+        IElectionContest contest,
+        ElementModP extendedData,
+        ElGamalCiphertext? commitment, // TODO: non-nullable?
+        Dictionary<string, CiphertextDecryptionSelectionShare> selections)
+    {
+        ObjectId = contest.ObjectId;
+        SequenceOrder = contest.SequenceOrder;
+        DescriptionHash = contest.DescriptionHash;
+        ExtendedData = extendedData;
+        Commitment = commitment;
         Selections = selections;
     }
 
