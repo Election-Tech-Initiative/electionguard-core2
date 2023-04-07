@@ -13,6 +13,8 @@ using electionguard::ElementModQ;
 using electionguard::Log;
 using electionguard::Polynomial;
 
+using std::vector;
+
 #pragma region Polynomial
 
 eg_electionguard_status_t eg_polynomial_interpolate(eg_element_mod_q_t *in_coordinate,
@@ -27,7 +29,7 @@ eg_electionguard_status_t eg_polynomial_interpolate(eg_element_mod_q_t *in_coord
 
     try {
         auto *coordinate = AS_TYPE(ElementModQ, in_coordinate);
-        std::vector<ElementModQ> degrees;
+        vector<ElementModQ> degrees;
         for (uint64_t i = 0; i < in_degrees_size; i++) {
             degrees.push_back(*AS_TYPE(ElementModQ, in_degrees[i]));
         }
