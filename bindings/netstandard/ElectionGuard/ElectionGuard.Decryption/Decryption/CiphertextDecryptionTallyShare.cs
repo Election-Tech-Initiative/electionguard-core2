@@ -4,7 +4,9 @@ using ElectionGuard.UI.Lib.Models;
 
 namespace ElectionGuard.Decryption.Decryption;
 
-// a share of a guardian's decryption of a collection of contests (usually the tally)
+/// <summary>
+/// a share of a guardian's decryption of a collection of contests that have been accumulated into a tally
+/// </summary>
 public record CiphertextDecryptionTallyShare : DisposableRecordBase, IEquatable<CiphertextDecryptionTallyShare>
 {
     public string GuardianId { get; init; }

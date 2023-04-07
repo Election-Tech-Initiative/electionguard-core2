@@ -139,7 +139,7 @@ public static class DecryptWithSharesExtensions
     }
 
     /// <summary>
-    /// Use the Ciphertext Tally to decrypt the provided ballot shares.
+    /// Decrypt a single ballot using the provided ballot shares
     /// </summary>
     public static PlaintextTallyBallot Decrypt(
         this CiphertextBallot self,
@@ -153,6 +153,9 @@ public static class DecryptWithSharesExtensions
             ballotShares.GetShares(), lagrangeCoefficients, tallyId, extendedBaseHash, skipValidation);
     }
 
+    /// <summary>
+    /// Decrypt a single ballot using the provided ballot shares
+    /// </summary>
     public static PlaintextTallyBallot Decrypt(
         this CiphertextBallot self,
         List<Tuple<ElectionPublicKey, CiphertextDecryptionBallotShare>> guardianShares,
@@ -167,6 +170,9 @@ public static class DecryptWithSharesExtensions
         );
     }
 
+    /// <summary>
+    /// Decrypt a single ballot using the provided ballot shares
+    /// </summary>
     public static PlaintextTallyBallot Decrypt(
         this CiphertextBallot self,
         List<Tuple<ElectionPublicKey, CiphertextDecryptionBallotShare>> guardianShares,
@@ -206,11 +212,13 @@ public static class DecryptWithSharesExtensions
             var plaintextContest = plaintextTally.Contests.First(
                 x => x.Key == contest.ObjectId).Value;
 
+            // iterate over the selections from the contest
             foreach (var selection in contest.Selections.Where(x => x.IsPlaceholder == false))
             {
                 var plaintextSelection = plaintextContest.Selections.First(
                     x => x.Key == selection.ObjectId).Value;
 
+                // get the selection shares from the guardian shares
                 var selectionShares = guardianShares
                     .Select(
                     x => x.Item2.GetSelectionShare(
@@ -229,6 +237,9 @@ public static class DecryptWithSharesExtensions
         return plaintextTally;
     }
 
+    /// <summary>
+    /// Decrypt a single selection using the provided selection shares
+    /// </summary>
     public static PlaintextTallySelection Decrypt(
         this CiphertextTallySelection self,
         List<Tuple<ElectionPublicKey, CiphertextDecryptionSelectionShare>> guardianShares,
@@ -244,6 +255,9 @@ public static class DecryptWithSharesExtensions
             skipValidation);
     }
 
+    /// <summary>
+    /// Decrypt a single selection using the provided selection shares
+    /// </summary>
     public static PlaintextTallySelection Decrypt(
         this ICiphertextSelection self,
         List<Tuple<ElectionPublicKey, CiphertextDecryptionSelectionShare>> guardianShares,

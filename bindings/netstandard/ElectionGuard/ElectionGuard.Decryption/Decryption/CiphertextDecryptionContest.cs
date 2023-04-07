@@ -3,6 +3,9 @@ using ElectionGuard.Encryption.Ballot;
 
 namespace ElectionGuard.Decryption.Decryption;
 
+/// <summary>
+/// The Decryption of a contest used when publishing the results of an election.
+/// </summary>
 public record CiphertextDecryptionContest
     : DisposableRecordBase, IElectionContest, IEquatable<CiphertextDecryptionContest>
 {

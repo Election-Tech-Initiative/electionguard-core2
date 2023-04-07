@@ -3,19 +3,31 @@ using ElectionGuard.UI.Lib.Models;
 
 namespace ElectionGuard.Decryption.Decryption;
 
-// a share of several guardian's decryption of a ballot (usually a spoiled ballot)
+/// <summary>
+/// A representation of the dectyptin of a ballot. This object is used by the Decryption Mediator
+/// to coordinate the decryption of a ballot.
+/// </summary>
 public record class CiphertextDecryptionBallot : DisposableRecordBase, IEquatable<CiphertextDecryptionBallot>
 {
     public string BallotId { get; init; }
     public string StyleId { get; init; }
     public ElementModQ ManifestHash { get; init; }
 
-    // key is guardian id
+    /// <summary>
+    /// A collection of partial decryptions submitted by guardians
+    /// key is guardian id
+    /// </summary>
     public Dictionary<string, CiphertextDecryptionBallotShare> Shares { get; init; } = new();
 
-    // key is guardian id
+    /// <summary>
+    /// A collection of public keys for guardians that have submitted shares
+    /// key is guardian id
+    /// </summary>
     public Dictionary<string, ElectionPublicKey> GuardianPublicKeys { get; init; } = new();
 
+    /// <summary>
+    /// Create a new instance of a CiphertextDecryptionBallot
+    /// </summary>
     public CiphertextDecryptionBallot(
         string ballotId,
         string styleId,
@@ -27,8 +39,12 @@ public record class CiphertextDecryptionBallot : DisposableRecordBase, IEquatabl
         ManifestHash = manifestHash;
     }
 
+    /// <summary>
+    /// Create a new instance of a CiphertextDecryptionBallot begining with a single share
+    /// </summary>
     public CiphertextDecryptionBallot(
-        CiphertextDecryptionBallotShare share, ElectionPublicKey guardianPublicKey)
+        CiphertextDecryptionBallotShare share,
+        ElectionPublicKey guardianPublicKey)
     {
         BallotId = share.BallotId;
         StyleId = share.StyleId;
@@ -36,6 +52,9 @@ public record class CiphertextDecryptionBallot : DisposableRecordBase, IEquatabl
         AddShare(share, guardianPublicKey);
     }
 
+    /// <summary>
+    /// Create a new instance of a CiphertextDecryptionBallot begining with a collection of shares
+    /// </summary>
     public CiphertextDecryptionBallot(
         Dictionary<string, CiphertextDecryptionBallotShare> shares,
         Dictionary<string, ElectionPublicKey> guardianPublicKeys)
@@ -47,6 +66,9 @@ public record class CiphertextDecryptionBallot : DisposableRecordBase, IEquatabl
         GuardianPublicKeys = guardianPublicKeys;
     }
 
+    /// <summary>
+    /// Add a new share to the collection of shares
+    /// </summary>
     public void AddShare(CiphertextDecryptionBallotShare share, ElectionPublicKey guardianPublicKey)
     {
         if (!IsValid(share, guardianPublicKey))
@@ -62,6 +84,9 @@ public record class CiphertextDecryptionBallot : DisposableRecordBase, IEquatabl
         AddShare(share);
     }
 
+    /// <summary>
+    /// A convenience accessor to get the collection of shares zipped with the public keys
+    /// </summary>
     public List<Tuple<ElectionPublicKey, CiphertextDecryptionBallotShare>> GetShares()
     {
         return Shares.Select(x => new Tuple<ElectionPublicKey, CiphertextDecryptionBallotShare>(
@@ -70,6 +95,9 @@ public record class CiphertextDecryptionBallot : DisposableRecordBase, IEquatabl
         )).ToList();
     }
 
+    /// <summary>
+    /// A convenience accessor to get a single share zipped with the public key
+    /// </summary>
     public Tuple<ElectionPublicKey, CiphertextDecryptionBallotShare> GetShare(string guardianId)
     {
         return new Tuple<ElectionPublicKey, CiphertextDecryptionBallotShare>(
@@ -78,7 +106,9 @@ public record class CiphertextDecryptionBallot : DisposableRecordBase, IEquatabl
         );
     }
 
-    // check if the share is valid for submission
+    /// <summary>
+    /// check if the share is valid for submission. Used when adding a new share.
+    /// </summary>
     public bool IsValid(
         CiphertextDecryptionBallotShare share,
         ElectionPublicKey guardianPublicKey)
@@ -101,7 +131,9 @@ public record class CiphertextDecryptionBallot : DisposableRecordBase, IEquatabl
         return share.GuardianId == guardianPublicKey.OwnerId;
     }
 
-    // check if this class is valid for the ballot
+    /// <summary>
+    /// check if this class is valid for the ballot. Used when computing decryption.
+    /// </summary>
     public bool IsValid(
         CiphertextBallot ballot,
         ElementModQ extendedBaseHash)

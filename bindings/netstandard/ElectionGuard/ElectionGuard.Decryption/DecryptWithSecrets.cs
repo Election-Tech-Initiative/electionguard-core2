@@ -1,14 +1,15 @@
-
-using ElectionGuard.Decryption.Decryption;
 using ElectionGuard.Decryption.Tally;
-using ElectionGuard.UI.Lib.Models;
 
 namespace ElectionGuard.Decryption;
 
+/// <summary>
+/// Decryption methods for decrypting with known secret values.
+/// </summary>
 public static class DecryptWithSecretsExtensions
 {
     /// <summary>
-    /// Decrypts a <see cref="CiphertextTally" /> using the provided <see cref="ElementModQ" /> secret key
+    /// Decrypts a <see cref="CiphertextTally" /> using the provided <see cref="ElementModQ" /> secret key.
+    /// This method is primarily for testing purposes and should not be used in production.
     /// </summary>
     public static PlaintextTally Decrypt(
         this CiphertextTally self,
@@ -34,7 +35,10 @@ public static class DecryptWithSecretsExtensions
         return plaintextTally;
     }
 
-    // should not be uised in production
+    /// <summary>
+    /// Decrypts a <see cref="CiphertextBallot" /> using the provided <see cref="ElementModQ" /> secret key.
+    /// This method is primarily for testing purposes and should not be used in production.
+    /// </summary>
     public static PlaintextTallyBallot Decrypt(
         this CiphertextBallot self,
         InternalManifest manifest,
@@ -61,6 +65,10 @@ public static class DecryptWithSecretsExtensions
         return plaintextBallot;
     }
 
+    /// <summary>
+    /// Decrypts a <see cref="CiphertextBallot" /> using the provided <see cref="ElementModQ" /> nonce value.
+    /// This override can be used to decrypt a single ballot.
+    /// </summary>
     public static PlaintextBallot Decrypt(
         this CiphertextBallot self,
         InternalManifest manifest,
@@ -78,6 +86,10 @@ public static class DecryptWithSecretsExtensions
             removePlaceholders);
     }
 
+    /// <summary>
+    /// Decrypts a <see cref="CiphertextBallot" /> using the provided <see cref="ElementModQ" /> nonce value.
+    /// This override can be used to decrypt a single ballot.
+    /// </summary>
     public static PlaintextBallot Decrypt(
         this CiphertextBallot self,
         InternalManifest manifest,
@@ -89,6 +101,7 @@ public static class DecryptWithSecretsExtensions
     {
         if (skipValidation == false)
         {
+            // check the enctyption validation
             var isValid = self.IsValidEncryption(
                 manifest.ManifestHash, publicKey, extendedBaseHash);
             if (isValid == false)
@@ -99,13 +112,14 @@ public static class DecryptWithSecretsExtensions
 
         if (nonceSeed is null)
         {
-            // TODO: this is different
+            // if the nonce seed is not provided, then we need to calculate it from the ballot
             nonceSeed = self.Nonce != null
                 ? CiphertextBallot.NonceSeed(manifest.ManifestHash, self.ObjectId, self.Nonce)
                 : null;
         }
         else
         {
+            // calculate the nonce using the provided seed
             nonceSeed = CiphertextBallot.NonceSeed(manifest.ManifestHash, self.ObjectId, nonceSeed);
         }
 
@@ -114,6 +128,7 @@ public static class DecryptWithSecretsExtensions
             throw new Exception($"nonce is null");
         }
 
+        // iterate over the ballot contests and decrypt each one
         var plaintextContests = new List<PlaintextBallotContest>();
         foreach (var contest in self.Contests)
         {
@@ -121,6 +136,8 @@ public static class DecryptWithSecretsExtensions
                 x => x.ObjectId == contest.ObjectId);
             var plaintext = contest.Decrypt(
                 description, publicKey, extendedBaseHash, nonceSeed, skipValidation, removePlaceholders);
+
+            // only decrypt the actual selections on the ballot
             if (plaintext.Selections.Any(x => x.IsPlaceholder == false || removePlaceholders == false))
             {
                 plaintextContests.Add(plaintext);
@@ -131,6 +148,10 @@ public static class DecryptWithSecretsExtensions
             self.ObjectId, self.StyleId, plaintextContests.ToArray());
     }
 
+    /// <summary>
+    /// Decrypts a <see cref="CiphertextBallotContest" /> using the provided <see cref="ElementModQ" /> nonce value.
+    /// This override can be used to decrypt a single ballot contest.
+    /// </summary>
     public static PlaintextBallotContest Decrypt(
         this CiphertextBallotContest self,
         ContestDescriptionWithPlaceholders description,
@@ -142,6 +163,7 @@ public static class DecryptWithSecretsExtensions
     {
         if (skipValidation == false)
         {
+            // check the enctyption validation
             var isValid = self.IsValidEncryption(
                 description.DescriptionHash, publicKey, extendedBaseHash);
             if (isValid == false)
@@ -156,6 +178,7 @@ public static class DecryptWithSecretsExtensions
         }
         else
         {
+            // calculate the nonce using the provided seed
             var sequence = new Nonces(description.DescriptionHash, nonceSeed);
             nonceSeed = sequence.Get(description.SequenceOrder);
         }
@@ -170,6 +193,7 @@ public static class DecryptWithSecretsExtensions
             throw new Exception($"nonce mismatch");
         }
 
+        // iterate over the ballot selections and decrypt each one
         var plaintextSelections = new List<PlaintextBallotSelection>();
         foreach (var selection in self.Selections.Where(x => x.IsPlaceholder == false))
         {
@@ -187,7 +211,10 @@ public static class DecryptWithSecretsExtensions
             self.ObjectId, plaintextSelections.ToArray());
     }
 
-
+    /// <summary>
+    /// Decrypts a <see cref="CiphertextBallotSelection" /> using the provided <see cref="ElementModQ" /> nonce value.
+    /// This override can be used to decrypt a single ballot selection.
+    /// </summary>
     public static PlaintextBallotSelection Decrypt(
         this CiphertextBallotSelection self,
         SelectionDescription description,
@@ -214,6 +241,7 @@ public static class DecryptWithSecretsExtensions
         }
         else
         {
+            // calculate the nonce using the provided seed
             var sequence = new Nonces(description.DescriptionHash, nonceSeed);
             nonce = sequence.Get(description.SequenceOrder);
         }

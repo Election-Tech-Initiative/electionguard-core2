@@ -4,7 +4,10 @@ using ElectionGuard.UI.Lib.Models;
 
 namespace ElectionGuard.Decryption.Decryption;
 
-// a container for the decryption state of a single tally
+/// <summary>
+/// A container for the decryption state of a single tally. This object is designed to be hydrated from
+/// a database and used by the Decryption Mediator to coordinate the decryption of a tally.
+/// </summary>
 public record class CiphertextDecryptionTally : DisposableRecordBase
 {
     private readonly CiphertextTally _tally;
@@ -48,6 +51,9 @@ public record class CiphertextDecryptionTally : DisposableRecordBase
         }
     }
 
+    /// <summary>
+    /// add a tally share to the decryption tally
+    /// </summary>
     public void AddTallyShare(
         ElectionPublicKey guardian,
         CiphertextDecryptionTallyShare tallyShare)
@@ -61,6 +67,9 @@ public record class CiphertextDecryptionTally : DisposableRecordBase
         AddShare(tallyShare);
     }
 
+    /// <summary>
+    /// add a ballot share to the decryption tally
+    /// </summary>
     public void AddBallotShare(
         ElectionPublicKey guardian,
         CiphertextDecryptionBallotShare ballotShare,
@@ -81,6 +90,9 @@ public record class CiphertextDecryptionTally : DisposableRecordBase
         AddShare(ballotShare);
     }
 
+    /// <summary>
+    /// determine if the tally can be decrypted
+    /// </summary>
     public bool CanDecrypt(CiphertextTally tally)
     {
         // There are not enough guardians to decrypt the tally
@@ -116,6 +128,9 @@ public record class CiphertextDecryptionTally : DisposableRecordBase
         return true;
     }
 
+    /// <summary>
+    /// decrypt the tally.
+    /// </summary>
     public DecryptionResult Decrypt(CiphertextTally tally, bool skipValidation = false)
     {
         if (!skipValidation && !CanDecrypt(tally))

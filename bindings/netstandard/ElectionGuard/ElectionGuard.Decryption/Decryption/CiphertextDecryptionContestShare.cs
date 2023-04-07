@@ -5,6 +5,10 @@ using ElectionGuard.UI.Lib.Models;
 
 namespace ElectionGuard.Decryption.Decryption;
 
+/// <summary>
+/// A Guardian's Partial Decryption of a contest. 
+/// This object is used both for Tally's and Ballot partial decryptions.
+/// </summary>
 public record CiphertextDecryptionContestShare
     : DisposableRecordBase, IElectionContest, IEquatable<CiphertextDecryptionContestShare>
 {
@@ -29,6 +33,10 @@ public record CiphertextDecryptionContestShare
     // TODO: commitment for generating the cp proof as part of decryption
     public ElGamalCiphertext? Commitment { get; init; } = default!;
 
+    /// <summary>
+    /// Collection of Selection Shares
+    /// the key is the selection object id
+    /// </summary>
     public Dictionary<string, CiphertextDecryptionSelectionShare> Selections { get; init; } = default!;
 
     public CiphertextDecryptionContestShare(
@@ -55,6 +63,9 @@ public record CiphertextDecryptionContestShare
         Selections = selections;
     }
 
+    /// <summary>
+    /// Verify the validity of the contest share against a ballot.
+    /// </summary>
     public bool IsValid(
         CiphertextBallotContest contest,
         ElectionPublicKey guardian,
@@ -65,6 +76,9 @@ public record CiphertextDecryptionContestShare
             return false;
         }
 
+        // TODO: verify the extended data
+
+        // validate each selection
         foreach (var selection in contest.Selections)
         {
             if (!Selections.ContainsKey(selection.ObjectId))
@@ -81,6 +95,9 @@ public record CiphertextDecryptionContestShare
         return true;
     }
 
+    /// <summary>
+    /// Verify the validity of the contest share against a tally.
+    /// </summary>
     public bool IsValid(
         CiphertextTallyContest contest,
         ElectionPublicKey guardian,
@@ -91,6 +108,7 @@ public record CiphertextDecryptionContestShare
             return false;
         }
 
+        // validate each selection
         foreach (var selection in contest.Selections)
         {
             if (!Selections.ContainsKey(selection.Key))

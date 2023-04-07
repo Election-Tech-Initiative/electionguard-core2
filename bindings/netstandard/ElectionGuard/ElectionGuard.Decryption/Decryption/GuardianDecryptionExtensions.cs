@@ -1,16 +1,18 @@
 using ElectionGuard.Decryption.Tally;
 using ElectionGuard.ElectionSetup;
 using ElectionGuard.Encryption.Ballot;
-using ElectionGuard.UI.Lib.Models;
 
 namespace ElectionGuard.Decryption.Decryption;
 
 /// <summary>
-///     Decryption extension methods for the <see cref="Guardian" /> class
+/// Decryption extension methods for the <see cref="Guardian" /> class
 /// </summary>
 public static class GuardianDecryptionExtensions
 {
-    // get the tally share and the guardian's ballot shares
+    /// <summary>
+    /// Conmpute decryption shares for a tally and a list of ballots. 
+    /// Usially the list of ballots is the spoiled ballots in the tally.
+    /// </summary>
     public static Tuple<CiphertextDecryptionTallyShare, Dictionary<string, CiphertextDecryptionBallotShare>> ComputeDecryptionShares(
         this Guardian guardian,
         CiphertextTally tally,
@@ -21,6 +23,9 @@ public static class GuardianDecryptionExtensions
         return new Tuple<CiphertextDecryptionTallyShare, Dictionary<string, CiphertextDecryptionBallotShare>>(share, shares);
     }
 
+    /// <summary>
+    /// Compute decryption shares for a list of ballots.
+    /// </summary>
     public static Dictionary<string, CiphertextDecryptionBallotShare> ComputeDecryptionShares(
         this Guardian guardian,
         string tallyId,
@@ -36,6 +41,9 @@ public static class GuardianDecryptionExtensions
         return shares;
     }
 
+    /// <summary>
+    /// Compute a decryption share for a tally
+    /// </summary>
     public static CiphertextDecryptionTallyShare? ComputeDecryptionShare(
         this Guardian guardian,
         CiphertextTally tally)
@@ -52,6 +60,9 @@ public static class GuardianDecryptionExtensions
         return share;
     }
 
+    /// <summary>
+    /// Compute a decryption share for a ballot
+    /// </summary>
     public static CiphertextDecryptionBallotShare? ComputeDecryptionShare(
         this Guardian guardian,
         string tallyId,
@@ -70,6 +81,9 @@ public static class GuardianDecryptionExtensions
         return share;
     }
 
+    /// <summary>
+    /// Compute a decryption share for a contest on a tally
+    /// </summary>
     public static CiphertextDecryptionContestShare ComputeDecryptionShare(
         this Guardian guardian,
         CiphertextTallyContest contest)
@@ -86,6 +100,9 @@ public static class GuardianDecryptionExtensions
         return share;
     }
 
+    /// <summary>
+    /// Compute a decryption share for a contest on a ballot
+    /// </summary>
     public static CiphertextDecryptionContestShare ComputeDecryptionShare(
         this Guardian guardian,
         CiphertextBallotContest contest)
@@ -105,6 +122,9 @@ public static class GuardianDecryptionExtensions
         return share;
     }
 
+    /// <summary>
+    /// Compute a decryption share for a selection on a tally or a ballot.
+    /// </summary>
     public static CiphertextDecryptionSelectionShare ComputeDecryptionShare(
         this Guardian guardian,
         ICiphertextSelection selection)

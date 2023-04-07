@@ -3,7 +3,9 @@ using ElectionGuard.UI.Lib.Models;
 
 namespace ElectionGuard.Decryption.Decryption;
 
-// a share of a guardian's decryption of a collection of contests for a specific ballot (usually a spoiled ballot)
+/// <summary>
+/// a share of a guardian's decryption of a collection of contests for a specific ballot (usually a spoiled ballot)
+/// </summary>
 public record CiphertextDecryptionBallotShare : CiphertextDecryptionTallyShare, IEquatable<CiphertextDecryptionTallyShare>
 {
     public string BallotId { get; init; }
@@ -22,6 +24,9 @@ public record CiphertextDecryptionBallotShare : CiphertextDecryptionTallyShare, 
         ManifestHash = ballot.ManifestHash;
     }
 
+    /// <summary>
+    /// Check the validity of the share against the ballot and tally.
+    /// </summary>
     public bool IsValid(
         CiphertextBallot ballot,
         ElectionPublicKey guardian,
@@ -30,7 +35,10 @@ public record CiphertextDecryptionBallotShare : CiphertextDecryptionTallyShare, 
         return IsValid(ballot, guardian, tally.Context.CryptoExtendedBaseHash);
     }
 
-    // check the validity of the share with the ciphertext information
+
+    /// <summary>
+    /// Check the validity of the share against the ballot and election.
+    /// </summary>
     public bool IsValid(
         CiphertextBallot ballot,
         ElectionPublicKey guardian,
@@ -74,9 +82,11 @@ public record CiphertextDecryptionBallotShare : CiphertextDecryptionTallyShare, 
         return true;
     }
 
-    // override of the tally base class validity check
-    // that only checks the tally id and guardian id
-    // because we do not have the ciphertext information
+    /// <summary>
+    /// override of the tally base class validity check
+    /// that only checks the tally id and guardian id
+    /// because we do not have the ciphertext information
+    /// </summary>
     public override bool IsValid(
         CiphertextTally tally, ElectionPublicKey guardian)
     {
@@ -116,7 +126,9 @@ public record CiphertextDecryptionBallotShare : CiphertextDecryptionTallyShare, 
         return true;
     }
 
-    // check the validity of the share without the ciphertext information
+    /// <summary>
+    /// Check the validity of the share without the ciphertext information
+    // </summary>
     public bool IsValid(
         string ballotId,
         string styleId,

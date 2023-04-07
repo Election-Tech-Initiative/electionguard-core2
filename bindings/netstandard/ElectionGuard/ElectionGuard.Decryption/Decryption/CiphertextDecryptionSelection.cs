@@ -3,7 +3,10 @@ using ElectionGuard.UI.Lib.Models;
 
 namespace ElectionGuard.Decryption.Decryption;
 
-// accumulated collection of all guardian shares for a given selection
+/// <summary>
+/// accumulated collection of all guardian shares for a given selection.
+/// This object is used to compute the final selection value.
+/// </summary>
 public class CiphertextDecryptionSelection : DisposableBase, IElectionSelection
 {
     /// <summary>
@@ -21,9 +24,14 @@ public class CiphertextDecryptionSelection : DisposableBase, IElectionSelection
     /// </summary>
     public ElementModQ DescriptionHash { get; init; }
 
-    // M-bar in the spec
+    /// <summary>
+    /// The accumulated value of the selection. `M-bar` in the spec
+    /// </summary>
     public ElementModP Value { get; private set; }
 
+    /// <summary>
+    /// The proof that the accumulated value is correct.
+    /// </summary>
     public ChaumPedersenProof? Proof { get; private set; }
 
     // TODO: hashset
@@ -49,12 +57,17 @@ public class CiphertextDecryptionSelection : DisposableBase, IElectionSelection
         Value = Constants.ONE_MOD_P;
     }
 
-    // TODO: this tuple is awkward
+    /// <summary>
+    /// Accumulate a share into the selection.
+    /// </summary>
     public void Accumulate(
         List<Tuple<ElectionPublicKey, CiphertextDecryptionSelectionShare>> guardianShares,
         bool skipValidation = false)
     {
-        // TODO: validation
+        if (!skipValidation)
+        {
+            // TODO: validation
+        }
 
         foreach (var (guardian, share) in guardianShares)
         {
@@ -68,12 +81,18 @@ public class CiphertextDecryptionSelection : DisposableBase, IElectionSelection
         }
     }
 
+    /// <summary>
+    /// Accumulate a share into the selection.
+    /// </summary>
     public void Accumulate(
         List<Tuple<ElectionPublicKey, CiphertextDecryptionSelectionShare>> guardianShares,
         Dictionary<string, ElementModQ> lagrangeCoefficients,
         bool skipValidation = false)
     {
-        // TODO: validation
+        if (!skipValidation)
+        {
+            // TODO: validation
+        }
 
         foreach (var (guardian, share) in guardianShares)
         {
@@ -81,32 +100,19 @@ public class CiphertextDecryptionSelection : DisposableBase, IElectionSelection
         }
     }
 
-    public void Accumulate(
-        Dictionary<string, CiphertextDecryptionSelectionShare> shares,
-        Dictionary<string, ElementModQ> lagrangeCoefficients,
-        bool skipValidation = false)
-    {
-        foreach (var (guardianId, share) in shares)
-        {
-            Accumulate(share, lagrangeCoefficients[guardianId]);
-        }
-
-    }
-
-    public void Accumulate(
-        List<CiphertextDecryptionSelectionShare> shares,
-        List<ElementModQ> lagrangeCoefficients)
-    {
-        for (var i = 0; i < shares.Count; i++)
-        {
-            Accumulate(shares[i], lagrangeCoefficients[i]);
-        }
-    }
-
+    /// <summary>
+    /// Accumulate a share into the selection.
+    /// </summary>
     public void Accumulate(
         CiphertextDecryptionSelectionShare share,
-        ElementModQ lagrangeCoefficient)
+        ElementModQ lagrangeCoefficient,
+        bool skipValidation = false)
     {
+        if (!skipValidation)
+        {
+            // TODO: validation
+        }
+
         Shares.Add(share);
         Accumulate(share.Share, lagrangeCoefficient);
     }

@@ -1,5 +1,3 @@
-using ElectionGuard.Decryption.Tally;
-using ElectionGuard.ElectionSetup;
 using ElectionGuard.Encryption.Ballot;
 using ElectionGuard.UI.Lib.Models;
 
@@ -72,6 +70,12 @@ public class CiphertextDecryptionSelectionShare
         Proof = proof;
     }
 
+    /// <summary>
+    /// Verify that this CiphertextDecryptionSelection is valid for a
+    /// specific guardian, and extended base hash. We allow any ICiphertextSelection
+    /// to be passed in, so that we can use this method to verify either
+    /// a ballot or a tally.
+    /// </summary>
     public bool IsValid(
         ICiphertextSelection message,
         ElectionPublicKey guardian,
