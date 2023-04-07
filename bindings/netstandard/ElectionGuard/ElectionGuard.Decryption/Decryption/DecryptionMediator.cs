@@ -7,7 +7,9 @@ using ElectionGuard.Decryption.Tally;
 
 namespace ElectionGuard.Decryption.Decryption;
 
-
+/// <summary>
+/// A mediator for coordinating decryption
+/// </summary>
 public class DecryptionMediator : DisposableBase
 {
     public string Id { get; }
