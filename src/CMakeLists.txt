@@ -34,7 +34,8 @@ include(${PROJECT_SOURCE_DIR}/src/electionguard/sources.cmake)
 set(PROJECT_SOURCE_FILES
     ${FACADES_electionguard}
     ${SOURCES_electionguard}
-    ${INCLUDES_electionguard}
+    ${INCLUDES_electionguard_hpp}
+    ${INCLUDES_electionguard_h}
 )
 
 add_library(${META_PROJECT_TARGET} ${PROJECT_SOURCE_FILES})
@@ -82,12 +83,12 @@ endif()
 # if the target is being exported or installed
 target_include_directories(${META_PROJECT_TARGET}
     SYSTEM PUBLIC
-        $<INSTALL_INTERFACE:include/${META_PROJECT_EXPORT}/${PROJECT_VERSION}>
+    $<INSTALL_INTERFACE:include/${META_PROJECT_EXPORT}/${PROJECT_VERSION}>
 
-        # Headers used from /build
-        $<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/include>
+    # Headers used from /build
+    $<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/include>
     PRIVATE
-        ${PROJECT_SOURCE_DIR}/src/${META_PROJECT_TARGET}
+    ${PROJECT_SOURCE_DIR}/src/${META_PROJECT_TARGET}
 )
 
 # ---- Dependencies ----
@@ -95,23 +96,23 @@ target_include_directories(${META_PROJECT_TARGET}
 # Include the karamel sources from hacl directly in the library
 # since some of the headers are still referenced directly
 # the rest of hacl is loaded as part of the libs/hacl cpp module
-target_include_directories(${META_PROJECT_TARGET} 
+target_include_directories(${META_PROJECT_TARGET}
     PRIVATE
-        ${hacl_SOURCE_DIR}/karamel/include
-        ${hacl_SOURCE_DIR}/karamel/krmllib/dist/minimal
+    ${hacl_SOURCE_DIR}/karamel/include
+    ${hacl_SOURCE_DIR}/karamel/krmllib/dist/minimal
 )
 
 add_library(nlohmann_json INTERFACE IMPORTED)
 target_include_directories(nlohmann_json INTERFACE ${nlohmann_json_SOURCE_DIR}/include)
 
 if(MINGW)
-    target_link_libraries(${META_PROJECT_TARGET} 
-        PRIVATE 
-            date::date 
-            hacl::hacl 
-            nlohmann_json 
-            spdlog::spdlog_header_only
-            Threads::Threads)
+    target_link_libraries(${META_PROJECT_TARGET}
+        PRIVATE
+        date::date
+        hacl::hacl
+        nlohmann_json
+        spdlog::spdlog_header_only
+        Threads::Threads)
 
     # Statically link in libstdc++
     set(CMAKE_EXE_LINKER_FLAGS " -static")
@@ -119,11 +120,11 @@ if(MINGW)
 else()
     target_link_libraries(${META_PROJECT_TARGET}
         PRIVATE
-            date::date
-            hacl::hacl
-            nlohmann_json
-            spdlog::spdlog_header_only
-            Threads::Threads)
+        date::date
+        hacl::hacl
+        nlohmann_json
+        spdlog::spdlog_header_only
+        Threads::Threads)
 endif()
 
 # ---- Install ----

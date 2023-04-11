@@ -5,6 +5,7 @@
 #include "variant_cast.hpp"
 
 using std::make_unique;
+using std::move;
 using std::string;
 using std::unique_ptr;
 

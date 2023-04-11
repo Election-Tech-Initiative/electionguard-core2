@@ -32,6 +32,7 @@ using std::get;
 using std::holds_alternative;
 using std::invalid_argument;
 using std::make_unique;
+using std::move;
 using std::out_of_range;
 using std::overflow_error;
 using std::reference_wrapper;
