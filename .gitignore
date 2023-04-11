@@ -159,3 +159,7 @@ bindings/netstandard/ElectionGuard/*.user
 lint-results.xml
 
 database/
+
+node_modules/
+
+dist/
