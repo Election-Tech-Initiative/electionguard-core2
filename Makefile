@@ -1,4 +1,4 @@
-.PHONY: all build build-msys2 build-android build-ios build-netstandard build-ui clean clean-netstandard clean-ui environment format memcheck sanitize sanitize-asan sanitize-tsan bench bench-netstandard test test-msys2 test-netstandard test-netstandard-copy-output
+.PHONY: all build build-msys2 build-android build-ios build-netstandard build-ui build-wasm clean clean-netstandard clean-ui environment format memcheck sanitize sanitize-asan sanitize-tsan bench bench-netstandard test test-msys2 test-netstandard test-netstandard-copy-output
 
 .EXPORT_ALL_VARIABLES:
 ELECTIONGUARD_BINDING_DIR=$(realpath .)/bindings
@@ -224,6 +224,21 @@ build-ui: build-netstandard
 	cd ./src/electionguard-ui && dotnet restore
 	dotnet build --configuration $(TARGET) ./src/electionguard-ui/ElectionGuard.UI.sln /p:Platform=$(PROCESSOR)
 
+build-wasm:
+	@echo 🖥️ BUILD WASM $(OPERATING_SYSTEM) $(PROCESSOR) $(TARGET)
+ifeq ($(OPERATING_SYSTEM),Windows)
+	echo "wasm builds are only supported on MacOS and Linux"
+else
+	cmake -S . -B $(ELECTIONGUARD_BUILD_LIBS_DIR)/wasm/$(TARGET) \
+		-DCMAKE_BUILD_TYPE=$(TARGET) \
+		-DDISABLE_VALE=$(TEMP_DISABLE_VALE) \
+		-DCPM_SOURCE_CACHE=$(CPM_SOURCE_CACHE) \
+		-DCMAKE_TOOLCHAIN_FILE=$(EMSDK)/upstream/emscripten/cmake/Modules/Platform/Emscripten.cmake
+	cmake --build $(ELECTIONGUARD_BUILD_LIBS_DIR)/wasm/$(TARGET)
+	#npx tsembind $(ELECTIONGUARD_BUILD_LIBS_DIR)/wasm/$(TARGET)/src/electionguard/wasm/electionguard.wasm.js
+	cp $(ELECTIONGUARD_BUILD_LIBS_DIR)/wasm/$(TARGET)/src/electionguard/wasm/electionguard.wasm.js ./bindings/typescript/src/wasm/electionguard.wasm.js
+	npm run build
+endif
 
 # Clean
 
@@ -559,6 +574,10 @@ test-ui: build-ui
 	make test-netstandard-copy-output-ui
 
 	dotnet test -a $(PROCESSOR) --no-build --configuration $(TARGET) ./src/electionguard-ui/ElectionGuard.UI.Test/ElectionGuard.UI.Test.csproj
+
+test-wasm: build-wasm
+	@echo 🧪 TEST WASM $(PROCESSOR) $(TARGET)
+	npm run test
 
 # Coverage
 
