@@ -165,6 +165,20 @@ uint64_t eg_plaintext_ballot_selection_get_vote(eg_plaintext_ballot_selection_t 
     }
 }
 
+eg_electionguard_status_t
+eg_plaintext_ballot_selection_get_extended_data(eg_plaintext_ballot_selection_t *handle,
+                                                eg_extended_data_t **out_extended_data)
+{
+    try {
+        auto result = AS_TYPE(PlaintextBallotSelection, handle)->getExtendedData();
+        *out_extended_data = AS_TYPE(eg_extended_data_t, result);
+        return ELECTIONGUARD_STATUS_SUCCESS;
+    } catch (const exception &e) {
+        Log::error("eg_plaintext_ballot_selection_get_extended_data", e);
+        return ELECTIONGUARD_STATUS_ERROR_BAD_ALLOC;
+    }
+}
+
 bool eg_plaintext_ballot_selection_get_is_placeholder(eg_plaintext_ballot_selection_t *handle)
 {
     return AS_TYPE(PlaintextBallotSelection, handle)->getIsPlaceholder();
