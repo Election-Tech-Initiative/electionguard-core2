@@ -1,6 +1,6 @@
 ﻿namespace ElectionGuard.UI.Lib.Models;
 
-public class GuardianBackups : DatabaseRecord
+public class GuardianBackups : DatabaseRecord, IDisposable
 {
     public string? KeyCeremonyId { get; set; }
 
@@ -12,5 +12,10 @@ public class GuardianBackups : DatabaseRecord
 
     public GuardianBackups() : base(nameof(GuardianBackups))
     {
+    }
+
+    public void Dispose()
+    {
+        Backup?.Dispose();
     }
 }
