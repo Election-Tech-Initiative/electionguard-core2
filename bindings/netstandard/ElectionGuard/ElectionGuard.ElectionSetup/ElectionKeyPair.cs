@@ -1,4 +1,6 @@
-﻿using ElectionGuard.UI.Lib.Models;
+﻿using System.Security.Cryptography.X509Certificates;
+using System.Text.Json.Serialization;
+using ElectionGuard.UI.Lib.Models;
 
 namespace ElectionGuard.ElectionSetup;
 
@@ -20,12 +22,16 @@ public class ElectionKeyPair : DisposableBase
     /// <summary>
     /// The pair of public and private election keys for the guardian
     /// </summary>
-    public ElGamalKeyPair KeyPair { get; set; }
-
+    public EncryptionKeyPair KeyPair { get; set; }
+    
     /// <summary>
     /// The secret polynomial for the guardian
     /// </summary>
     public ElectionPolynomial Polynomial { get; set; }
+
+    public ElectionKeyPair() : this(string.Empty, 0, 3)
+    {
+    }
 
     /// <summary>
     /// Construct an Election Key Pair using a random secret key.
@@ -39,7 +45,9 @@ public class ElectionKeyPair : DisposableBase
     {
         OwnerId = ownerId;
         SequenceOrder = sequenceOrder;
-        KeyPair = ElGamalKeyPair.FromSecret(BigMath.RandQ());
+        using var randQ = BigMath.RandQ();
+        using var pair = ElGamalKeyPair.FromSecret(randQ);
+        KeyPair = new(pair.SecretKey, pair.PublicKey);
         Polynomial = new ElectionPolynomial(quorum, KeyPair);
     }
 
