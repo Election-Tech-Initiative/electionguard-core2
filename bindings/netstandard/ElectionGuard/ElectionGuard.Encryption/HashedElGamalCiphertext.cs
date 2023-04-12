@@ -73,6 +73,9 @@ namespace ElectionGuard
 
         internal NativeInterface.HashedElGamalCiphertext.HashedElGamalCiphertextHandle Handle;
 
+        public HashedElGamalCiphertext(HashedElGamalCiphertext that) : this(that.Pad, that.Data, that.Mac)
+        {
+        }
 
         public unsafe HashedElGamalCiphertext(ElementModP pad, byte[] data, byte[] mac)
         {
