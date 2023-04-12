@@ -923,11 +923,6 @@ namespace electionguard
         /// <summary>
         /// Export the representation as JSON
         /// </summary>
-        std::string toJson();
-
-        /// <summary>
-        /// Export the representation as JSON
-        /// </summary>
         std::string toJson() const;
 
         /// <summary>
@@ -1031,11 +1026,6 @@ namespace electionguard
         /// Export the representation as MsgPack
         /// </summary>
         std::vector<uint8_t> toMsgPack() const;
-
-        /// <summary>
-        /// Export the ballot representation as JSON
-        /// </summary>
-        std::string toJson();
 
         /// <summary>
         /// Export the ballot representation as JSON

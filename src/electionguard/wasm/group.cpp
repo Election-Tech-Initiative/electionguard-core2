@@ -6,11 +6,9 @@
 #include <emscripten/html5.h>
 #include <iostream>
 
-using electionguard::add_mod_q;
-using electionguard::ElementModQ;
-using electionguard::Log;
-
 using namespace emscripten;
+using namespace electionguard;
+using namespace std;
 
 class GroupFunctions
 {
@@ -28,6 +26,11 @@ class GroupFunctions
 
 EMSCRIPTEN_BINDINGS(electionguard)
 {
+    class_<ElementModP>("ElementModP")
+      .function("toHex", &ElementModP::toHex)
+      .class_function("fromHex", &ElementModP::fromHex)
+      .class_function("fromUint64", &ElementModP::fromUint64);
+
     class_<ElementModQ>("ElementModQ")
       //   .constructor<const std::vector<uint64_t>, bool>()
       // .smart_ptr<std::unique_ptr<ElementModQ>>("std::unique_ptr<ElementModQ>")
