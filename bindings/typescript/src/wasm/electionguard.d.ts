@@ -32,7 +32,10 @@ export declare type EncryptionMediator = {
     device: EncryptionDevice
   ): EncryptionMediator;
 
-  encrypt(ballot: PlaintextBallot, shouldVerifyProofs: boolean);
+  encrypt(
+    ballot: PlaintextBallot,
+    shouldVerifyProofs: boolean
+  ): CiphertextBallot;
 };
 
 export declare type ElementModP = {

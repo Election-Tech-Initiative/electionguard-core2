@@ -12,7 +12,8 @@
       "declaration": true,
       "forceConsistentCasingInFileNames": true,
     },
-    "include": [ "./bindings/typescript/src", "./bindings/typescript/test"],
+    "include": [ "./bindings/typescript/src/**/*.ts", 
+    "./bindings/typescript/src/**/*.d.ts"],
     "exclude": ["node_modules", "dist"],
   }
   

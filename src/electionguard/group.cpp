@@ -640,6 +640,9 @@ namespace electionguard
             return ElementModP::fromUint64(1UL);
         }
 
+// TODO: reenable fixed base math lookup table
+#ifndef __EMSCRIPTEN__
+
         // check if we have a lookup table initialized for this element
         if (base.isFixedBase()) {
             // TODO: use a smaller key
@@ -649,7 +652,7 @@ namespace electionguard
 
             return make_unique<ElementModP>(result, true);
         }
-
+#endif
         // if none exists, execute the modular exponentiation directly
         return pow_mod_p(base, *exponent.toElementModP());
     }

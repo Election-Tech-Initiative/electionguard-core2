@@ -25,8 +25,6 @@ describe("PlaintextBallotConverter Tests", () => {
 
 describe("CiphertextBallotConverter Tests", () => {
   const expected = JSON.stringify(ciphertextBallots[0]);
-  console.log(expected);
-
   it("should convert from json", () => {
     const result = CiphertextBallotConverter.fromJson(expected);
     assert.isTrue(
