@@ -49,9 +49,12 @@ target_compile_features(${META_PROJECT_TARGET} PRIVATE cxx_std_17)
 target_compile_options(${META_PROJECT_TARGET} PUBLIC "$<$<BOOL:${MSVC}>:/permissive->")
 
 # define dll export markers
-if(BUILD_SHARED_LIBS)
+if(BUILD_SHARED_LIBS AND NOT EMSCRIPTEN)
     message("++ Building Shared Libs")
     add_compile_definitions(ELECTIONGUARD_BUILD_SHARED)
+else()
+    message("++ Building Static Libs")
+    add_compile_definitions(ELECTIONGUARD_BUILD_STATIC)
 endif()
 
 if(WIN32 AND CMAKE_SYSTEM_PROCESSOR MATCHES "x86" AND NOT USE_32BIT_MATH)
@@ -161,6 +164,24 @@ install(
     DESTINATION lib/cmake/${META_PROJECT_EXPORT}/${PROJECT_VERSION}
 )
 
+# Compiler configuration
+if(MSVC)
+    message("++ Configuring compile options for MSVC")
+endif()
+
+if(CMAKE_CXX_COMPILER_ID MATCHES "Clang|GNU")
+    message("++ Configuring compile options for Clang|GNU")
+endif()
+
+if(CMAKE_CXX_COMPILER_ID MATCHES "Clang")
+    message("++ Configuring compile options for Clang")
+elseif(CMAKE_CXX_COMPILER_ID MATCHES "GNU")
+    message("++ Configuring compile options for GNU")
+
+    # TODO: qualify all calls to move as std::move
+    target_compile_options(${META_PROJECT_TARGET} PUBLIC -Wno-unqualified-std-cast-call)
+endif()
+
 # ---- Test ----
 if(OPTION_ENABLE_TESTS)
     message("++ Building for tests")
@@ -172,14 +193,17 @@ if(OPTION_ENABLE_TESTS)
     )
 
     # When running tests, set some specific compiler flags
+    # which are different from compiling in release mode
     if(MSVC)
+        message("++ Configuring TEST compile options for MSVC")
+
         # TODO: renenable warnings as errors when the correct ones are defined
         # target_compile_options(${META_PROJECT_TARGET} PUBLIC /W4 /WX)C5059
         target_compile_options(${META_PROJECT_TARGET} PUBLIC /Zi) # Generates complete debugging information.
     endif()
 
     if(CMAKE_CXX_COMPILER_ID MATCHES "Clang|GNU")
-        message("++ Configuring compile options for Clang|GNU")
+        message("++ Configuring TEST compile options for Clang|GNU")
         target_compile_options(${META_PROJECT_TARGET} PUBLIC -Wall)
 
         # TODO: target_compile_options(${META_PROJECT_TARGET} PUBLIC -Werror)
@@ -195,11 +219,11 @@ if(OPTION_ENABLE_TESTS)
     endif()
 
     if(CMAKE_CXX_COMPILER_ID MATCHES "Clang")
-        message("++ Configuring compile options for Clang")
+        message("++ Configuring TEST compile options for Clang")
         target_compile_options(${META_PROJECT_TARGET} PUBLIC -Wno-static-in-inline)
         target_compile_options(${META_PROJECT_TARGET} PUBLIC -Wno-vla-extension)
     elseif(CMAKE_CXX_COMPILER_ID MATCHES "GNU")
-        message("++ Configuring compile options for GNU")
+        message("++ Configuring TEST compile options for GNU")
         target_compile_options(${META_PROJECT_TARGET} PUBLIC -Wno-effc++)
         target_compile_options(${META_PROJECT_TARGET} PUBLIC -Wno-old-style-cast)
         target_compile_options(${META_PROJECT_TARGET} PUBLIC -Wno-unused-but-set-parameter)
