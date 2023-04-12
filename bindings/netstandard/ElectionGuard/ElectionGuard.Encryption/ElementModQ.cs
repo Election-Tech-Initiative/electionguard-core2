@@ -82,7 +82,7 @@ namespace ElectionGuard
         {
             var status = uncheckedInput ?
                 NativeInterface.ElementModQ.FromHexUnchecked(hex, out Handle)
-                : NativeInterface.ElementModQ.FromHex(hex, out Handle);
+                : NativeInterface.ElementModQ.FromHexChecked(hex, out Handle);
             status.ThrowIfError();
         }
 
@@ -132,7 +132,7 @@ namespace ElectionGuard
         /// </Summary>
         public byte[] ToBytes()
         {
-            var status = NativeInterface.ElementModQ.ToBytes(Handle, out IntPtr data, out ulong size);
+            var status = NativeInterface.ElementModQ.ToBytes(Handle, out var data, out var size);
             if (status != Status.ELECTIONGUARD_STATUS_SUCCESS)
             {
                 throw new ElectionGuardException($"ToBytes Error Status: {status}");
@@ -140,7 +140,7 @@ namespace ElectionGuard
 
             var byteArray = new byte[(int)size];
             Marshal.Copy(data, byteArray, 0, (int)size);
-            NativeInterface.Memory.DeleteIntPtr(data);
+            _ = NativeInterface.Memory.DeleteIntPtr(data);
             return byteArray;
         }
 
