@@ -1,5 +1,4 @@
 import { assert } from "chai";
-import simpleBallot from "../../../data/ballot_in_simple.json";
 import test_data from "../../../data/test/test-data.json";
 import { ElectionContextConverter } from "../src/election";
 
