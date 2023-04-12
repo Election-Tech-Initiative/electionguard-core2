@@ -1,8 +1,14 @@
+using System;
+using System.IO;
 
+using ElectionGuard.Decryption.Decryption;
 using ElectionGuard.Decryption.Tally;
 using ElectionGuard.Decryption.Tests.Tally;
 using ElectionGuard.ElectionSetup.Tests.Generators;
 using ElectionGuard.Encryption.Utils.Generators;
+using ElectionGuard.Encryption.Utils.Converters;
+using Newtonsoft.Json;
+
 
 namespace ElectionGuard.Decryption.Tests.Decryption;
 
@@ -92,5 +98,22 @@ public class TestDecryptionData
             PlaintextTally = plaintextTally,
             CiphertextTally = ciphertextTally,
         };
+    }
+
+    public static void SaveToFile(TestDecryptionData data, DecryptionResult result)
+    {
+
+
+        var path = Path.Combine(AppContext.BaseDirectory, "data");
+        var directoryPath = Path.GetDirectoryName(path);
+        _ = Directory.CreateDirectory(directoryPath!);
+
+        var testData = JsonConvert.SerializeObject(data,
+            SerializationSettings.NewtonsoftSettings());
+        File.WriteAllText(Path.Combine(path, "test-data.json"), testData);
+
+        var testResult = JsonConvert.SerializeObject(result,
+            SerializationSettings.NewtonsoftSettings());
+        File.WriteAllText(Path.Combine(path, "test-result.json"), testResult);
     }
 }

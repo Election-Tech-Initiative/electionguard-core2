@@ -141,4 +141,7 @@
     <None Name="Linux" Visible="false" Include="$(ElectionGuardLibs)\Linux\$(PlatformTarget)\$(Configuration)\src\*.so" CopyToOutputDirectory="Always" />
     <None Name="Linux HACL" Visible="false" Include="$(ElectionGuardLibs)\Linux\$(PlatformTarget)\$(Configuration)\libs\hacl\*.so" CopyToOutputDirectory="Always" />
   </ItemGroup>
+  <ItemGroup>
+    <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
+  </ItemGroup>
 </Project>

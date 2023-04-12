@@ -137,4 +137,34 @@ public class TestDecryptWithShares : DisposableBase
         Assert.That(result.SpoiledBallots!.Count, Is.EqualTo(plaintextSpoiledBallots.Count));
         Assert.That(result.SpoiledBallots, Is.EqualTo(plaintextSpoiledBallots));
     }
+
+    [Test, Category("SingleTest")]
+    public void Test_Save_TestDataOutput()
+    {
+        // Arrange
+        var guardians = Data.KeyCeremony.Guardians
+                .GetRange(0, QUORUM)
+                .ToList();
+
+        var mediator = new DecryptionMediator(
+            "fake-mediator",
+            Data.CiphertextTally,
+            guardians.Select(i => i.SharePublicKey()).ToList());
+        var spoiledBallots = Data.CiphertextBallots.Where(i => i.IsSpoiled).ToList();
+        var plaintextSpoiledBallots = Data.PlaintextBallots
+            .Where(i => Data.CiphertextTally.SpoiledBallotIds.Contains(i.ObjectId))
+            .Select(i => i.ToTallyBallot(Data.CiphertextTally)).ToList();
+
+        // Act
+        foreach (var guardian in guardians)
+        {
+            var shares = guardian.ComputeDecryptionShares(
+                Data.CiphertextTally, spoiledBallots);
+            mediator.SubmitShares(shares, spoiledBallots);
+        }
+        var result = mediator.Decrypt(Data.CiphertextTally.TallyId);
+
+        // Assert
+        TestDecryptionData.SaveToFile(Data, result);
+    }
 }
