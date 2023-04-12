@@ -285,6 +285,7 @@
                     </Grid>
                 </CollectionView.Footer>
             </CollectionView>
+            <controls:ContestControl Contest="{Binding CurrentContest}" Manifest="{Binding Manifest}" TotalVotes="100" />
         </VerticalStackLayout>
 
         <VerticalStackLayout Grid.RowSpan="2" Grid.Column="2">

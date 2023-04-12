@@ -36,6 +36,9 @@ public partial class ElectionViewModel : BaseViewModel
     private ManifestRecord? _manifestRecord;
 
     [ObservableProperty]
+    private PlaintextBallotContest _CurrentContest = new("contest", null);
+
+    [ObservableProperty]
     private string? _manifestName;
 
     [ObservableProperty]

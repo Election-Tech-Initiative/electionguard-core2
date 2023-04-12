@@ -187,6 +187,15 @@ namespace ElectionGuard.UI.Resx {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Choice.
+        /// </summary>
+        internal static string ChoiceText {
+            get {
+                return ResourceManager.GetString("ChoiceText", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Choose File.
         /// </summary>
         internal static string ChooseFile {
@@ -790,6 +799,15 @@ namespace ElectionGuard.UI.Resx {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Party.
+        /// </summary>
+        internal static string PartyText {
+            get {
+                return ResourceManager.GetString("PartyText", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Password to use for the database.
         /// </summary>
         internal static string PasswordDefaultPlaceholder {
@@ -849,6 +867,15 @@ namespace ElectionGuard.UI.Resx {
         internal static string PendingGuardiansVerifyBackups {
             get {
                 return ResourceManager.GetString("PendingGuardiansVerifyBackups", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to %.
+        /// </summary>
+        internal static string PercentText {
+            get {
+                return ResourceManager.GetString("PercentText", resourceCulture);
             }
         }
         
@@ -1155,6 +1182,15 @@ namespace ElectionGuard.UI.Resx {
         internal static string ViewManifest {
             get {
                 return ResourceManager.GetString("ViewManifest", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Votes.
+        /// </summary>
+        internal static string VotesText {
+            get {
+                return ResourceManager.GetString("VotesText", resourceCulture);
             }
         }
         

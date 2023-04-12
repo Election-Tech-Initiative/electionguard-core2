@@ -489,4 +489,16 @@
   <data name="ReviewSpoiledText" xml:space="preserve">
     <value>Review Challenge</value>
   </data>
+  <data name="ChoiceText" xml:space="preserve">
+    <value>Choice</value>
+  </data>
+  <data name="PartyText" xml:space="preserve">
+    <value>Party</value>
+  </data>
+  <data name="PercentText" xml:space="preserve">
+    <value>%</value>
+  </data>
+  <data name="VotesText" xml:space="preserve">
+    <value>Votes</value>
+  </data>
 </root>

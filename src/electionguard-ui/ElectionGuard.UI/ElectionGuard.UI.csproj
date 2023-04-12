@@ -178,6 +178,9 @@
 	</ItemGroup>
 
 	<ItemGroup>
+	  <Compile Update="Controls\ContestControl.xaml.cs">
+	    <DependentUpon>ContestControl.xaml</DependentUpon>
+	  </Compile>
 	  <Compile Update="Resx\AppResources.Designer.cs">
 	    <DesignTime>True</DesignTime>
 	    <AutoGen>True</AutoGen>
@@ -216,6 +219,9 @@
 	</ItemGroup>
 	<ItemGroup>
 	  <MauiXaml Update="Controls\ExpanderControl.xaml">
+	    <Generator>MSBuild:Compile</Generator>
+	  </MauiXaml>
+	  <MauiXaml Update="Controls\ContestControl.xaml">
 	    <Generator>MSBuild:Compile</Generator>
 	  </MauiXaml>
 	  <MauiXaml Update="Controls\LabelValueControl.xaml">
