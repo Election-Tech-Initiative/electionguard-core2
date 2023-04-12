@@ -15,8 +15,11 @@ namespace ElectionGuard.Encryption.Utils.Converters
                 }
             };
             settings.Converters.Add(new CiphertextBallotConverter());
+            settings.Converters.Add(new CiphertextElectionContextConverter());
             settings.Converters.Add(new ElementModPConverter());
             settings.Converters.Add(new ElementModQConverter());
+            settings.Converters.Add(new InternalManifestConverter());
+            settings.Converters.Add(new ManifestConverter());
             settings.Converters.Add(new PlaintextBallotConverter());
             return settings;
         }
