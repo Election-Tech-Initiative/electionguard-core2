@@ -1,17 +1,18 @@
 export declare type PlaintextBallot = {
-  object_id: string;
-  style_id: string;
+  getObjectId(): string;
+  getStyleId(): string;
 
   toJson(): string;
   //fromJson(json: string): PlaintextBallot;
 };
 
 export declare type CiphertextBallot = {
-  object_id: string;
-  style_id: string;
+  getObjectId(): string;
+  getStyleId(): string;
 
-  toJson(): string;
-  //fromJson(json: string): CiphertextBallot;
+  cast(): void;
+  spoil(): void;
+  toJson(withNonces: bool): string;
 };
 
 export declare type CiphertextElectionContext = {
@@ -42,8 +43,6 @@ export declare type ElementModP = {
 
 export declare type ElementModQ = {
   toHex(): string;
-  //fromHex(hex: string): ElementModQ;
-  //fromUnit64(value: BigInt, unchecked: boolean): ElementModQ;
 };
 
 export declare type Manifest = {

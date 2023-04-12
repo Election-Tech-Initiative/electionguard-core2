@@ -16,18 +16,28 @@ describe("PlaintextBallotConverter Tests", () => {
     const result = PlaintextBallotConverter.fromJson(expected);
     assert.isTrue(result.toJson().includes(simpleBallot.object_id));
   });
-  it("should convert complex ballot from json", () => {
+  it("should convert from json", () => {
     const expected = JSON.stringify(plaintextBallots[0]);
     const result = PlaintextBallotConverter.fromJson(expected);
     assert.isTrue(result.toJson().includes(plaintextBallots[0].object_id));
   });
 });
 
-// describe("CiphertextBallotConverter Tests", () => {
-//   it("should convert complex ballot from json", () => {
-//     const expected = JSON.stringify(ciphertextBallots[0]);
-//     console.log(expected);
-//     const result = CiphertextBallotConverter.fromJson(expected);
-//     assert.isTrue(result.toJson().includes(ciphertextBallots[0].object_id));
-//   });
-// });
+describe("CiphertextBallotConverter Tests", () => {
+  const expected = JSON.stringify(ciphertextBallots[0]);
+  console.log(expected);
+
+  it("should convert from json", () => {
+    const result = CiphertextBallotConverter.fromJson(expected);
+    assert.isTrue(
+      result.toJson(false).includes(ciphertextBallots[0].object_id)
+    );
+  });
+
+  it("should have same object id", () => {
+    const result = CiphertextBallotConverter.fromJson(expected);
+    assert.isTrue(
+      result.getObjectId().includes(ciphertextBallots[0].object_id)
+    );
+  });
+});
