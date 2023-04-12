@@ -30,18 +30,16 @@
 
         public SchnorrProof()
         {
-            var randQ = BigMath.RandQ();
-            var keyPair = ElGamalKeyPair.FromSecret(randQ);
-            var seed = BigMath.RandQ();
+            using (var randQ = BigMath.RandQ())
+            using (var keyPair = ElGamalKeyPair.FromSecret(randQ))
+            using (var seed = BigMath.RandQ())
+            {
 
-            PublicKey = keyPair.PublicKey;
-            Commitment = BigMath.GPowP(seed);
-            Challenge = BigMath.HashElems(PublicKey, Commitment);
-            Response = BigMath.APlusBMulCModQ(seed, keyPair.SecretKey, Challenge);
-
-            keyPair.Dispose();
-            randQ.Dispose();
-            seed.Dispose();
+                PublicKey = keyPair.PublicKey;
+                Commitment = BigMath.GPowP(seed);
+                Challenge = BigMath.HashElems(PublicKey, Commitment);
+                Response = BigMath.APlusBMulCModQ(seed, keyPair.SecretKey, Challenge);
+            }
         }
 
         /// <summary>
@@ -49,16 +47,14 @@
         /// </summary>
         public SchnorrProof(ElementModQ secretKey)
         {
-            var keyPair = ElGamalKeyPair.FromSecret(secretKey);
-            var seed = BigMath.RandQ();
-
-            PublicKey = keyPair.PublicKey;
-            Commitment = BigMath.GPowP(seed);
-            Challenge = BigMath.HashElems(PublicKey, Commitment);
-            Response = BigMath.APlusBMulCModQ(seed, keyPair.SecretKey, Challenge);
-
-            keyPair.Dispose();
-            seed.Dispose();
+            using (var keyPair = ElGamalKeyPair.FromSecret(secretKey))
+            using (var seed = BigMath.RandQ())
+            {
+                PublicKey = keyPair.PublicKey;
+                Commitment = BigMath.GPowP(seed);
+                Challenge = BigMath.HashElems(PublicKey, Commitment);
+                Response = BigMath.APlusBMulCModQ(seed, keyPair.SecretKey, Challenge);
+            }
         }
 
         /// <summary>
@@ -66,14 +62,14 @@
         /// </summary>
         public SchnorrProof(ElGamalKeyPair keyPair)
         {
-            var seed = BigMath.RandQ();
+            using (var seed = BigMath.RandQ())
+            {
 
-            PublicKey = keyPair.PublicKey;
-            Commitment = BigMath.GPowP(seed);
-            Challenge = BigMath.HashElems(PublicKey, Commitment);
-            Response = BigMath.APlusBMulCModQ(seed, keyPair.SecretKey, Challenge);
-
-            seed.Dispose();
+                PublicKey = keyPair.PublicKey;
+                Commitment = BigMath.GPowP(seed);
+                Challenge = BigMath.HashElems(PublicKey, Commitment);
+                Response = BigMath.APlusBMulCModQ(seed, keyPair.SecretKey, Challenge);
+            }
         }
 
         /// <summary>
@@ -81,14 +77,14 @@
         /// </summary>
         public SchnorrProof(ElementModQ secretKey, ElementModQ seed)
         {
-            var keyPair = ElGamalKeyPair.FromSecret(secretKey);
+            using (var keyPair = ElGamalKeyPair.FromSecret(secretKey))
+            {
 
-            PublicKey = keyPair.PublicKey;
-            Commitment = BigMath.GPowP(seed);
-            Challenge = BigMath.HashElems(PublicKey, Commitment);
-            Response = BigMath.APlusBMulCModQ(seed, keyPair.SecretKey, Challenge);
-
-            keyPair.Dispose();
+                PublicKey = keyPair.PublicKey;
+                Commitment = BigMath.GPowP(seed);
+                Challenge = BigMath.HashElems(PublicKey, Commitment);
+                Response = BigMath.APlusBMulCModQ(seed, keyPair.SecretKey, Challenge);
+            }
         }
 
         /// <summary>
@@ -114,39 +110,39 @@
             var inBoundsH = h.IsInBounds();
             var inBoundsU = u.IsInBounds();
 
-            var c = BigMath.HashElems(k, h);
-            var gp = BigMath.GPowP(u);
-            var pp = BigMath.PowModP(k, c);
-            var mp = BigMath.MultModP(h, pp);
-
-            var validChallenge = c.Equals(Challenge);
-            var validProof = gp.Equals(mp);
-
-            var success = validPublicKey && inBoundsH && inBoundsU && validChallenge && validProof;
-            if (success is false)
+#pragma warning disable IDE0063 // Use simple 'using' statement. Need to support Net Standard 2.0, which doesn't have this.
+            using (var c = BigMath.HashElems(k, h))
+            using (var gp = BigMath.GPowP(u))
+            using (var pp = BigMath.PowModP(k, c))
+            using (var mp = BigMath.MultModP(h, pp))
+#pragma warning restore IDE0063
             {
-                // TODO: result
-                //log_warning(
-                //    "found an invalid Schnorr proof: %s",
-                //    str(
-                //            {
-                //    "in_bounds_h": in_bounds_h,
-                //                "in_bounds_u": in_bounds_u,
-                //                "valid_public_key": valid_public_key,
-                //                "valid_challenge": valid_challenge,
-                //                "valid_proof": valid_proof,
-                //                "proof": self,
-                //            }
-                //        ),
-                //    )
+
+                var validChallenge = c.Equals(Challenge);
+                var validProof = gp.Equals(mp);
+
+                var success = validPublicKey && inBoundsH && inBoundsU && validChallenge && validProof;
+                if (success is false)
+                {
+                    #region commented Code
+                    // TODO: result
+                    //log_warning(
+                    //    "found an invalid Schnorr proof: %s",
+                    //    str(
+                    //            {
+                    //    "in_bounds_h": in_bounds_h,
+                    //                "in_bounds_u": in_bounds_u,
+                    //                "valid_public_key": valid_public_key,
+                    //                "valid_challenge": valid_challenge,
+                    //                "valid_proof": valid_proof,
+                    //                "proof": self,
+                    //            }
+                    //        ),
+                    //    )
+                    #endregion
+                }
+                return success;
             }
-
-            c.Dispose();
-            gp.Dispose();
-            pp.Dispose();
-            mp.Dispose();
-
-            return success;
         }
 
         protected override void DisposeUnmanaged()
