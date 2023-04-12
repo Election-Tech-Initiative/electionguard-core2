@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Runtime.InteropServices;
 
@@ -70,6 +70,19 @@ namespace ElectionGuard
             var status = uncheckedInput ?
                 NativeInterface.ElementModP.FromUint64Unchecked(singleData, out Handle)
                 : NativeInterface.ElementModP.FromUint64(singleData, out Handle);
+            status.ThrowIfError();
+        }
+
+        /// <summary>
+        /// Create a `ElementModP`
+        /// </summary>
+        /// <param name="hex">string representing the hex bytes of the initialized data</param>
+        /// <param name="uncheckedInput">if data is checked or not</param>
+        public ElementModP(string hex, bool uncheckedInput = false)
+        {
+            var status = uncheckedInput ?
+                NativeInterface.ElementModP.FromHexUnchecked(hex, out Handle)
+                : NativeInterface.ElementModP.FromHexChecked(hex, out Handle);
             status.ThrowIfError();
         }
 
