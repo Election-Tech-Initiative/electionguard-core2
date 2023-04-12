@@ -23,7 +23,7 @@ namespace ElectionGuard.Encryption.Utils.Converters
         {
             var obj = (ElementModQ)value;
             var json = obj.ToHex();
-            writer.WriteRawValue(json);
+            writer.WriteValue(json);
         }
     }
 }

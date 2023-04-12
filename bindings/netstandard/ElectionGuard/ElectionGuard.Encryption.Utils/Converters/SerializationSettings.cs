@@ -1,4 +1,5 @@
 using Newtonsoft.Json;
+using Newtonsoft.Json.Serialization;
 
 namespace ElectionGuard.Encryption.Utils.Converters
 {
@@ -6,10 +7,17 @@ namespace ElectionGuard.Encryption.Utils.Converters
     {
         public static JsonSerializerSettings NewtonsoftSettings()
         {
-            var settings = new JsonSerializerSettings();
+            var settings = new JsonSerializerSettings
+            {
+                ContractResolver = new DefaultContractResolver
+                {
+                    NamingStrategy = new SnakeCaseNamingStrategy()
+                }
+            };
             settings.Converters.Add(new CiphertextBallotConverter());
             settings.Converters.Add(new ElementModPConverter());
             settings.Converters.Add(new ElementModQConverter());
+            settings.Converters.Add(new PlaintextBallotConverter());
             return settings;
         }
     }
