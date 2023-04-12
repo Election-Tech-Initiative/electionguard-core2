@@ -82,6 +82,23 @@ namespace ElectionGuard
             status.ThrowIfError();
         }
 
+        /// <summary>
+        /// Create a copy of an existing `ElementModP`
+        /// </summary>
+        /// <param name="src">Existing `ElementModP` to copy</param>
+        public ElementModP(ElementModP src)
+        {
+            try
+            {
+                NewNative(src.Data);
+            }
+            catch (Exception ex)
+            {
+                throw new ElectionGuardException("construction error", ex);
+            }
+        }
+
+
         internal ElementModP(NaiveElementModP handle)
         {
             Handle = handle;

@@ -1,4 +1,5 @@
 ﻿using System.ComponentModel.DataAnnotations;
+using System.Text.Json.Serialization;
 using ElectionGuard.ElectionSetup.Extensions;
 using ElectionGuard.Proofs;
 using ElectionGuard.UI.Lib.Extensions;
@@ -82,6 +83,7 @@ public class ElectionPolynomial : DisposableBase
     /// Generates a polynomial for sharing election keys.
     /// Each coefficient is an exponential order for the polynomial and the guardian secret key is the 0-index coefficient.
     /// </summary>
+    [JsonConstructor]
     public ElectionPolynomial(List<Coefficient> coefficients)
     {
         if (coefficients.Any(i => !i.IsValid()))

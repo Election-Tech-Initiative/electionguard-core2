@@ -28,6 +28,22 @@
 
         public ProofUsage Usage = ProofUsage.SecretValue;
 
+        public SchnorrProof()
+        {
+            var randQ = BigMath.RandQ();
+            var keyPair = ElGamalKeyPair.FromSecret(randQ);
+            var seed = BigMath.RandQ();
+
+            PublicKey = keyPair.PublicKey;
+            Commitment = BigMath.GPowP(seed);
+            Challenge = BigMath.HashElems(PublicKey, Commitment);
+            Response = BigMath.APlusBMulCModQ(seed, keyPair.SecretKey, Challenge);
+
+            keyPair.Dispose();
+            randQ.Dispose();
+            seed.Dispose();
+        }
+
         /// <summary>
         /// Create a new instance of a Schnorr proof using the provided secret and a random seed.
         /// </summary>
@@ -35,12 +51,14 @@
         {
             var keyPair = ElGamalKeyPair.FromSecret(secretKey);
             var seed = BigMath.RandQ();
+
             PublicKey = keyPair.PublicKey;
             Commitment = BigMath.GPowP(seed);
             Challenge = BigMath.HashElems(PublicKey, Commitment);
             Response = BigMath.APlusBMulCModQ(seed, keyPair.SecretKey, Challenge);
 
             keyPair.Dispose();
+            seed.Dispose();
         }
 
         /// <summary>
@@ -49,6 +67,7 @@
         public SchnorrProof(ElGamalKeyPair keyPair)
         {
             var seed = BigMath.RandQ();
+
             PublicKey = keyPair.PublicKey;
             Commitment = BigMath.GPowP(seed);
             Challenge = BigMath.HashElems(PublicKey, Commitment);
@@ -63,6 +82,7 @@
         public SchnorrProof(ElementModQ secretKey, ElementModQ seed)
         {
             var keyPair = ElGamalKeyPair.FromSecret(secretKey);
+
             PublicKey = keyPair.PublicKey;
             Commitment = BigMath.GPowP(seed);
             Challenge = BigMath.HashElems(PublicKey, Commitment);
