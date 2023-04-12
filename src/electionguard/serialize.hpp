@@ -749,7 +749,7 @@ namespace electionguard
             }
         };
 
-        class CiphertextelectionContext
+        class CiphertextElectionContext
         {
           private:
             static json fromObject(const electionguard::CiphertextElectionContext &serializable)
@@ -811,13 +811,13 @@ namespace electionguard
                         extendedDataMap.emplace(key, value);
                     }
 
-                    return make_unique<CiphertextElectionContext>(
+                    return make_unique<electionguard::CiphertextElectionContext>(
                       number_of_guardians, quorum, move(elGamalPublicKey), move(commitmentHash),
                       move(manifestHash), move(cryptoBaseHash), move(cryptoExtendedBaseHash),
                       move(config), move(extendedDataMap));
                 }
 
-                return make_unique<CiphertextElectionContext>(
+                return make_unique<electionguard::CiphertextElectionContext>(
                   number_of_guardians, quorum, move(elGamalPublicKey), move(commitmentHash),
                   move(manifestHash), move(cryptoBaseHash), move(cryptoExtendedBaseHash),
                   move(config));
