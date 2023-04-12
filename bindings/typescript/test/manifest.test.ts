@@ -16,10 +16,10 @@ describe("ManifestConverter Tests", () => {
   });
 });
 
-// describe("InternalManifestConverter Tests", () => {
-//   it("should convert from json", () => {
-//     const expected = JSON.stringify(internalManifest);
-//     const result = InternalManifestConverter.fromJson(expected);
-//     assert.isTrue(result.toJson().includes(internalManifest.manifest_hash));
-//   });
-// });
+describe("InternalManifestConverter Tests", () => {
+  it("should convert from json", () => {
+    const expected = JSON.stringify(internalManifest);
+    const result = InternalManifestConverter.fromJson(expected);
+    assert.isTrue(result.toJson().includes(internalManifest.manifest_hash));
+  });
+});

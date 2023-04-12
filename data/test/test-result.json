@@ -1,9 +1,9 @@
 {
-    "tally_id": "20c72663-2a27-46ec-b07f-c1f760d2e529",
+    "tally_id": "5280d2b1-3e31-44ea-aa9c-be18f3ac904f",
     "is_valid": true,
     "message": null,
     "tally": {
-        "tally_id": "20c72663-2a27-46ec-b07f-c1f760d2e529",
+        "tally_id": "5280d2b1-3e31-44ea-aa9c-be18f3ac904f",
         "name": "test-decrypt-with-shares",
         "contests": {
             "president-vice-president-contest": {
@@ -542,7 +542,7 @@
     },
     "spoiled_ballots": [
         {
-            "tally_id": "20c72663-2a27-46ec-b07f-c1f760d2e529",
+            "tally_id": "5280d2b1-3e31-44ea-aa9c-be18f3ac904f",
             "name": "fake-ballot-30",
             "contests": {
                 "president-vice-president-contest": {
@@ -947,7 +947,7 @@
             }
         },
         {
-            "tally_id": "20c72663-2a27-46ec-b07f-c1f760d2e529",
+            "tally_id": "5280d2b1-3e31-44ea-aa9c-be18f3ac904f",
             "name": "fake-ballot-31",
             "contests": {
                 "president-vice-president-contest": {

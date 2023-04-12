@@ -51,6 +51,7 @@ export declare type Manifest = {
 };
 
 export declare type InternalManifest = {
+  new (manifest: Manifest): InternalManifest;
   toJson(): string;
   //fromJson(json: string): InternalManifest;
 };

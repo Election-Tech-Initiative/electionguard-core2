@@ -17,6 +17,7 @@ EMSCRIPTEN_BINDINGS(electionguard)
     ;
 
     class_<InternalManifest>("InternalManifest")
+      .constructor<const Manifest &>()
       .function("toJson", &InternalManifest::toJson)
       .class_function("fromJson", &InternalManifest::fromJson);
     ;
