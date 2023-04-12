@@ -78,6 +78,7 @@ TARGET?=Release
 ifeq ($(OPERATING_SYSTEM),Darwin)
 ANDROID_NDK_PATH?=/Users/$(USER)/Library/Android/sdk/ndk/25.1.8937393
 DOTNET_PATH?=/usr/local/share/dotnet
+EMSCRIPTEN_PATH?=/usr/local/share/emsdk
 endif
 ifeq ($(OPERATING_SYSTEM),Linux)
 ANDROID_NDK_PATH?=/usr/local/lib/android/sdk/ndk/25.1.8937393
@@ -103,6 +104,7 @@ ifeq ($(OPERATING_SYSTEM),Darwin)
 	brew install llvm
 	brew install ninja
 	test -f /usr/local/bin/clang-tidy || sudo ln -s "$(shell brew --prefix llvm)/bin/clang-tidy" "/usr/local/bin/clang-tidy"
+	npm install
 endif
 ifeq ($(OPERATING_SYSTEM),Linux)
 	@echo 🐧 LINUX INSTALL
@@ -117,6 +119,7 @@ ifeq ($(OPERATING_SYSTEM),Linux)
 	sudo apt install -y clang-tidy
 	sudo apt install -y ninja-build
 	sudo apt install -y valgrind
+	npm install
 endif
 ifeq ($(OPERATING_SYSTEM),Windows)
 	@echo 🏁 WINDOWS INSTALL
@@ -129,7 +132,6 @@ endif
 	wget -O cmake/CPM.cmake https://github.com/cpm-cmake/CPM.cmake/releases/download/v0.35.5/CPM.cmake
 	make fetch-sample-data
 	dotnet tool restore
-	npm install
 
 environment-ui: environment
 ifeq ($(OPERATING_SYSTEM),Windows)
