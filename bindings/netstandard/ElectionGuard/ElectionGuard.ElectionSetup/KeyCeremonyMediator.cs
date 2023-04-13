@@ -458,23 +458,21 @@ public class KeyCeremonyMediator : DisposableBase
 
         var steps = isAdmin ? _adminSteps : _guardianSteps;
         var currentStep = steps.SingleOrDefault(s => s.State == state);
-        if (currentStep != null && await currentStep.ShouldRunStep!())
+        if (currentStep != null && !IsRunning && await currentStep.ShouldRunStep!())
         {
+            IsRunning = true;
             await currentStep.RunStep!();
+            IsRunning = false;
         }
     }
 
     private async Task<bool> AlwaysRun()
     {
-        if (IsRunning) return await Task.FromResult(false);
-
         return await Task.FromResult(true);
     }
 
     private async Task<bool> ShouldAdminStartStep2()
     {
-        if (IsRunning) return false;
-
         string keyCeremonyId = CeremonyDetails.KeyCeremonyId;
 
         GuardianPublicKeyService guardianService = new();
@@ -485,8 +483,6 @@ public class KeyCeremonyMediator : DisposableBase
 
     private async Task<bool> ShouldAdminStartStep4()
     {
-        if (IsRunning) return false;
-
         var keyCeremonyId = CeremonyDetails.KeyCeremonyId;
 
         GuardianPublicKeyService guardianService = new();
@@ -501,8 +497,6 @@ public class KeyCeremonyMediator : DisposableBase
 
     private async Task<bool> ShouldAdminStartStep6()
     {
-        if (IsRunning) return false;
-
         var keyCeremonyId = CeremonyDetails.KeyCeremonyId;
 
         GuardianPublicKeyService guardianService = new();
@@ -529,8 +523,6 @@ public class KeyCeremonyMediator : DisposableBase
 
     private async Task<bool> ShouldGuardianRunStep1()
     {
-        if (IsRunning) return false;
-
         var keyCeremonyId = CeremonyDetails.KeyCeremonyId;
         var guardianId = UserId;
 
@@ -543,8 +535,6 @@ public class KeyCeremonyMediator : DisposableBase
 
     private async Task<bool> ShouldGuardianRunStep3()
     {
-        if (IsRunning) return false;
-
         var keyCeremonyId = CeremonyDetails.KeyCeremonyId;
         var guardianId = UserId;
 
@@ -565,8 +555,6 @@ public class KeyCeremonyMediator : DisposableBase
 
     private async Task<bool> ShouldGuardianRunStep5()
     {
-        if (IsRunning) return false;
-
         var keyCeremonyId = CeremonyDetails.KeyCeremonyId;
         var guardianId = UserId;
 
@@ -647,8 +635,6 @@ public class KeyCeremonyMediator : DisposableBase
     private async Task RunStep2()
     {
 
-        IsRunning = true;
-
         // change state to step2
         var keyCeremonyId = CeremonyDetails.KeyCeremonyId;
 
@@ -665,14 +651,10 @@ public class KeyCeremonyMediator : DisposableBase
         _keyCeremony.State = KeyCeremonyState.PendingGuardianBackups;
         await service.UpdateStateAsync(keyCeremonyId, _keyCeremony.State);
         // notify change to guardians (signalR)    
-
-        IsRunning = false;
     }
 
     private async Task RunStep3()
     {
-        IsRunning = true;
-
         var keyCeremonyId = CeremonyDetails.KeyCeremonyId;
 
         KeyCeremonyService service = new();
@@ -712,13 +694,10 @@ public class KeyCeremonyMediator : DisposableBase
         }
 
         // notify change to admin (signalR)
-        IsRunning = false;
     }
 
     private async Task RunStep4()
     {
-        IsRunning = true;
-
         var keyCeremonyId = CeremonyDetails.KeyCeremonyId;
 
         // change state
@@ -743,14 +722,10 @@ public class KeyCeremonyMediator : DisposableBase
         _keyCeremony.State = KeyCeremonyState.PendingGuardiansVerifyBackups;
         await service.UpdateStateAsync(keyCeremonyId, _keyCeremony.State);
         // notify change to guardians (signalR)    
-
-        IsRunning = false;
     }
 
     private async Task RunStep5()
     {
-        IsRunning = true;
-
         var keyCeremonyId = CeremonyDetails.KeyCeremonyId;
 
         KeyCeremonyService keyCeremonyService = new();
@@ -787,13 +762,10 @@ public class KeyCeremonyMediator : DisposableBase
         }
 
         // notify change to admin (signalR)
-        IsRunning = false;
     }
 
     private async Task RunStep6()
     {
-        IsRunning = true;
-
         var keyCeremonyId = CeremonyDetails.KeyCeremonyId;
 
         // change state
@@ -834,8 +806,6 @@ public class KeyCeremonyMediator : DisposableBase
         _keyCeremony.State = KeyCeremonyState.Complete;
         await service.UpdateCompleteAsync(keyCeremonyId, jointKey);
         // notify change to guardians (signalR)
-
-        IsRunning = false;
     }
 
     public async Task<bool> HasBackup(string guardianId)
