@@ -1021,7 +1021,7 @@ eg_electionguard_status_t eg_ciphertext_ballot_cast(eg_ciphertext_ballot_t *hand
         AS_TYPE(CiphertextBallot, handle)->cast();
         return ELECTIONGUARD_STATUS_SUCCESS;
     } catch (const exception &e) {
-        Log::error(":eg_ciphertext_ballot_cast", e);
+        Log::error(__func__, e);
         return ELECTIONGUARD_STATUS_ERROR_BAD_ALLOC;
     }
 }
@@ -1032,7 +1032,18 @@ eg_electionguard_status_t eg_ciphertext_ballot_spoil(eg_ciphertext_ballot_t *han
         AS_TYPE(CiphertextBallot, handle)->spoil();
         return ELECTIONGUARD_STATUS_SUCCESS;
     } catch (const exception &e) {
-        Log::error(":eg_ciphertext_ballot_spoil", e);
+        Log::error(__func__, e);
+        return ELECTIONGUARD_STATUS_ERROR_BAD_ALLOC;
+    }
+}
+
+eg_electionguard_status_t eg_ciphertext_ballot_challenge(eg_ciphertext_ballot_t *handle)
+{
+    try {
+        AS_TYPE(CiphertextBallot, handle)->challenge();
+        return ELECTIONGUARD_STATUS_SUCCESS;
+    } catch (const exception &e) {
+        Log::error(__func__, e);
         return ELECTIONGUARD_STATUS_ERROR_BAD_ALLOC;
     }
 }
