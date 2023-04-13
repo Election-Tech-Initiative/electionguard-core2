@@ -67,7 +67,7 @@ public class Coefficient : DisposableBase
             throw new ArgumentException("Invalid proof");
         }
 
-        using var keyPair = ElGamalKeyPair.FromSecret(value);
+        var keyPair = ElGamalKeyPair.FromSecret(value);
         if (!proof.PublicKey.Equals(keyPair.PublicKey))
         {
             throw new ArgumentException("Proof does not match key pair");

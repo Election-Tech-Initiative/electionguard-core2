@@ -99,7 +99,8 @@ public class ElectionPolynomial : DisposableBase
     /// <param name="degree">The exponential degree of the polynomial (usually the sequence order)</param>
     public ElementModQ ComputeCoordinate(ulong degree)
     {
-        return ComputeCoordinate(new ElementModQ(degree));
+        using var degreeQ = new ElementModQ(degree);
+        return ComputeCoordinate(degreeQ);
     }
 
     /// <summary>
@@ -128,7 +129,8 @@ public class ElectionPolynomial : DisposableBase
     /// <param name="coordinate">The coordinate value of the polynomial at the given degree</param>
     public bool VerifyCoordinate(ulong degree, ElementModQ coordinate)
     {
-        return VerifyCoordinate(new ElementModQ(degree), coordinate);
+        using var degreeQ = new ElementModQ(degree);
+        return VerifyCoordinate(degreeQ, coordinate);
     }
 
     /// <summary>
@@ -149,7 +151,8 @@ public class ElectionPolynomial : DisposableBase
     /// <param name="commitments">The commitments of the coefficients of the polynomial</param>
     public static bool VerifyCoordinate(ulong degree, ElementModQ coordinate, List<ElementModP> commitments)
     {
-        return VerifyCoordinate(new ElementModQ(degree), coordinate, commitments);
+        using var degreeQ = new ElementModQ(degree);
+        return VerifyCoordinate(degreeQ, coordinate, commitments);
     }
 
     /// <summary>

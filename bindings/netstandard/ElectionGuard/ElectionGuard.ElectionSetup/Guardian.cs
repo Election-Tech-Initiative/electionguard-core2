@@ -268,7 +268,7 @@ public class Guardian : DisposableBase
     //    private ElectionPartialKeyBackup GenerateElectionPartialKeyBackup(ulong sequenceOrder)
     private ElectionPartialKeyBackup GenerateElectionPartialKeyBackup(string senderGuardianId, ElectionPolynomial electionPolynomial, ElectionPublicKey receiverGuardianPublicKey)
     {
-        var coordinate = electionPolynomial.ComputeCoordinate(receiverGuardianPublicKey.SequenceOrder);
+        using var coordinate = electionPolynomial.ComputeCoordinate(receiverGuardianPublicKey.SequenceOrder);
         using var nonce = BigMath.RandQ();
         var seed = GetBackupSeed(
                 receiverGuardianPublicKey.OwnerId,
