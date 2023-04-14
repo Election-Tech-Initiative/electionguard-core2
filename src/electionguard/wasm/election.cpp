@@ -19,6 +19,14 @@ EMSCRIPTEN_BINDINGS(electionguard)
       .class_function("make", &ContextConfiguration::make);
 
     class_<CiphertextElectionContext>("CiphertextElectionContext")
+      .function("getNumberOfGuardians", &CiphertextElectionContext::getNumberOfGuardians)
+      .function("getQuorum", &CiphertextElectionContext::getQuorum)
+      .function("getElGamalPublicKey", &CiphertextElectionContext::getElGamalPublicKey,
+                allow_raw_pointers())
+      .function("getManifestHash", &CiphertextElectionContext::getManifestHash,
+                allow_raw_pointers())
+      .function("getCryptoExtendedBaseHash", &CiphertextElectionContext::getCryptoExtendedBaseHash,
+                allow_raw_pointers())
       .function("toJson", &CiphertextElectionContext::toJson)
       .class_function("fromJson", &CiphertextElectionContext::fromJson);
 }

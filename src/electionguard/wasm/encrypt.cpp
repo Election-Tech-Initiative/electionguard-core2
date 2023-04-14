@@ -30,6 +30,11 @@ EMSCRIPTEN_BINDINGS(electionguard)
 {
     class_<EncryptionDevice>("EncryptionDevice")
       .constructor<const uint64_t, const uint64_t, const uint64_t, const string>()
+      .function("getTimestamp", &EncryptionDevice::getTimestamp)
+      .function("getDeviceUuid", &EncryptionDevice::getDeviceUuid)
+      .function("getSessionUuid", &EncryptionDevice::getSessionUuid)
+      .function("getLaunchCode", &EncryptionDevice::getLaunchCode)
+      .function("getLocation", &EncryptionDevice::getLocation)
       .function("toJson", &EncryptionDevice::toJson)
       .class_function("fromJson", &EncryptionDevice::fromJson);
     ;

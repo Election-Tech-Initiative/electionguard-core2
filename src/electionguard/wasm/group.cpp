@@ -24,6 +24,7 @@ EMSCRIPTEN_BINDINGS(electionguard)
 {
     class_<ElementModP>("ElementModP")
       .function("toHex", &ElementModP::toHex)
+      .function("clone", &ElementModQ::clone)
       .class_function("fromHex", &ElementModP::fromHex)
       .class_function("fromUint64", &ElementModP::fromUint64);
 
@@ -33,9 +34,9 @@ EMSCRIPTEN_BINDINGS(electionguard)
       //   .function("get", &ElementModQ::get, allow_raw_pointers())
       //   .function("length", &ElementModQ::length)
       //   .function("isInBounds", &ElementModQ::isInBounds)
-      //   .function("toBytes", &ElementModQ::toBytes)
+      // .function("toBytes", &ElementModQ::toBytes)
       .function("toHex", &ElementModQ::toHex)
-      //   .function("clone", &ElementModQ::clone)
+      .function("clone", &ElementModQ::clone)
       .class_function("fromHex", &ElementModQ::fromHex)
       .class_function("fromUint64", &ElementModQ::fromUint64);
 
