@@ -11,6 +11,7 @@
       "outDir": "dist",
       "skipLibCheck": true,
       "declaration": true,
+      "sourceMap": true,
       "forceConsistentCasingInFileNames": true,
     },
     "include": [ "./bindings/typescript/src/**/*.ts", 

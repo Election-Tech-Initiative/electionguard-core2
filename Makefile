@@ -241,7 +241,7 @@ else
 	cp $(ELECTIONGUARD_BUILD_LIBS_DIR)/wasm/$(TARGET)/src/electionguard/wasm/electionguard.wasm.js ./bindings/typescript/src/wasm/electionguard.wasm.js
 endif
 
-build-node:
+build-npm:
 	@echo 🖥️ BUILD NPM $(OPERATING_SYSTEM) $(PROCESSOR) $(TARGET)
 	npm run build
 	#cd ./bindings/typescript && npm install
