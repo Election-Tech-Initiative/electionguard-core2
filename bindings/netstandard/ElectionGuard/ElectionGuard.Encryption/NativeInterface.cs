@@ -2452,6 +2452,13 @@ namespace ElectionGuard
             internal static extern Status Spoil(
                 ElectionGuard.CiphertextBallot.External.CiphertextBallotHandle handle);
 
+            [DllImport(DllName,
+                EntryPoint = "eg_ciphertext_ballot_challenge",
+                CallingConvention = CallingConvention.Cdecl,
+                SetLastError = true)]
+            internal static extern Status Challenge(
+                ElectionGuard.CiphertextBallot.External.CiphertextBallotHandle handle);
+
             [DllImport(DllName, EntryPoint = "eg_ciphertext_ballot_from_json",
                 CallingConvention = CallingConvention.Cdecl, SetLastError = true)]
             internal static extern Status FromJson(
