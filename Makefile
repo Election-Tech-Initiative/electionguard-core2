@@ -239,8 +239,14 @@ else
 	cmake --build $(ELECTIONGUARD_BUILD_LIBS_DIR)/wasm/$(TARGET)
 	#npx tsembind $(ELECTIONGUARD_BUILD_LIBS_DIR)/wasm/$(TARGET)/src/electionguard/wasm/electionguard.wasm.js
 	cp $(ELECTIONGUARD_BUILD_LIBS_DIR)/wasm/$(TARGET)/src/electionguard/wasm/electionguard.wasm.js ./bindings/typescript/src/wasm/electionguard.wasm.js
-	npm run build
 endif
+
+build-node:
+	@echo 🖥️ BUILD NPM $(OPERATING_SYSTEM) $(PROCESSOR) $(TARGET)
+	npm run build
+	#cd ./bindings/typescript && npm install
+	#cd ./bindings/typescript && npm run build
+	
 
 # Clean
 
