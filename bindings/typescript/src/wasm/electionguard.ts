@@ -15,6 +15,15 @@ export type CiphertextBallotHandle = {
   getObjectId(): string;
   getStyleId(): string;
 
+  getManifestHash(): ElementModQHandle;
+  getBallotCode(): ElementModQHandle;
+
+  isValidEncryption(
+    manifestHash: ElementModQHandle,
+    publicKey: ElementModPHandle,
+    extendedHash: ElementModQHandle
+  ): boolean;
+
   cast(): void;
   spoil(): void;
   toJson(withNonces: boolean): string;
@@ -25,6 +34,11 @@ export type CiphertextBallotStatic = {
 };
 
 export type CiphertextElectionContextHandle = {
+  getNumberOfGuardians(): number;
+  getQuorum(): number;
+  getElGamalPublicKey(): ElementModPHandle;
+  getManifestHash(): ElementModQHandle;
+  getCryptoExtendedBaseHash(): ElementModQHandle;
   toJson(): string;
 };
 
@@ -33,6 +47,11 @@ export type CiphertextElectionContextStatic = {
 };
 
 export type EncryptionDeviceHandle = {
+  getTimestamp(): number;
+  getDeviceUuid(): number;
+  getSessionUuid(): number;
+  getLaunchCode(): number;
+  getLocation(): string;
   toJson(): string;
 };
 
@@ -54,6 +73,7 @@ export type EncryptionMediatorHandle = {
 };
 
 export type ElementModPHandle = {
+  clone(): ElementModPHandle;
   toHex(): string;
 };
 
@@ -63,6 +83,7 @@ export type ElementModPStatic = {
 };
 
 export type ElementModQHandle = {
+  clone(): ElementModQHandle;
   toHex(): string;
 };
 

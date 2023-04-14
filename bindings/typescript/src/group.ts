@@ -1,40 +1,63 @@
 import { ElementModPHandle, ElementModQHandle, getInstance } from "./wasm";
 
-export class ElementModPConverter {
-  static async fromNumber(a: number): Promise<ElementModPHandle> {
-    var result = await ElementModPConverter.fromBigInt(BigInt(a));
+export class ElementModP {
+  _handle: ElementModPHandle;
+
+  constructor(handle: ElementModPHandle) {
+    this._handle = handle;
+  }
+
+  toHex(): string {
+    return this._handle.toHex();
+  }
+
+  static async fromNumber(a: number): Promise<ElementModP> {
+    var result = await this.fromBigInt(BigInt(a));
     return result;
   }
-  static async fromBigInt(a: BigInt): Promise<ElementModPHandle> {
+  static async fromBigInt(a: BigInt): Promise<ElementModP> {
     var result = (await getInstance()).ElementModP.fromUint64(a, false);
-    return result;
+    return new ElementModP(result);
   }
-  static async fromHex(a: string): Promise<ElementModPHandle> {
+  static async fromHex(a: string): Promise<ElementModP> {
     var result = (await getInstance()).ElementModP.fromHex(a, false);
-    return result;
+    return new ElementModP(result);
   }
 }
 
-export class ElementModQConverter {
-  static async fromNumber(a: number): Promise<ElementModQHandle> {
-    var result = await ElementModQConverter.fromBigInt(BigInt(a));
+export class ElementModQ {
+  _handle: ElementModQHandle;
+
+  constructor(handle: ElementModQHandle) {
+    this._handle = handle;
+  }
+
+  toHex(): string {
+    return this._handle.toHex();
+  }
+
+  static async fromNumber(a: number): Promise<ElementModQ> {
+    var result = await this.fromBigInt(BigInt(a));
     return result;
   }
-  static async fromBigInt(a: BigInt): Promise<ElementModQHandle> {
+  static async fromBigInt(a: BigInt): Promise<ElementModQ> {
     var result = (await getInstance()).ElementModQ.fromUint64(a, false);
-    return result;
+    return new ElementModQ(result);
   }
-  static async fromHex(a: string): Promise<ElementModQHandle> {
+  static async fromHex(a: string): Promise<ElementModQ> {
     var result = (await getInstance()).ElementModQ.fromHex(a, false);
-    return result;
+    return new ElementModQ(result);
   }
 }
 
 export class GroupFunctions {
   static async addModQ(a: number, b: number): Promise<BigInt> {
-    var elem1 = await ElementModQConverter.fromNumber(a);
-    var elem2 = await ElementModQConverter.fromNumber(b);
-    var result = (await getInstance()).GroupFunctions.addModQ(elem1, elem2);
+    var elem1 = await ElementModQ.fromNumber(a);
+    var elem2 = await ElementModQ.fromNumber(b);
+    var result = (await getInstance()).GroupFunctions.addModQ(
+      elem1._handle,
+      elem2._handle
+    );
     return BigInt("0x" + result.toHex());
   }
 }

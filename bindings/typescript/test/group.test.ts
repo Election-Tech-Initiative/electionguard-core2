@@ -1,21 +1,17 @@
 require("./setup");
 import { assert } from "chai";
-import {
-  ElementModPConverter,
-  ElementModQConverter,
-  GroupFunctions,
-} from "../src/group";
+import { ElementModP, ElementModQ, GroupFunctions } from "../src/group";
 
-describe("ElementModPConverter Tests", () => {
+describe("ElementModP Tests", () => {
   it("should convert from a hex string", async () => {
-    const result = await ElementModPConverter.fromHex("0x05");
+    const result = await ElementModP.fromHex("0x05");
     assert.equal(result.toHex(), "05");
   });
 });
 
-describe("ElementModQConverter Tests", () => {
+describe("ElementModQ Tests", () => {
   it("should convert from a hex string", async () => {
-    const result = await ElementModQConverter.fromHex("0x05");
+    const result = await ElementModQ.fromHex("0x05");
     assert.equal(result.toHex(), "05");
   });
 });
