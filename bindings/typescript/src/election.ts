@@ -1,11 +1,10 @@
-import Module from "./wasm/electionguard.wasm";
-import { CiphertextElectionContext } from "./wasm/electionguard";
-
-// TODO: wrap the library in a promise
+import { CiphertextElectionContextHandle, getInstance } from "./wasm";
 
 export class ElectionContextConverter {
-  static fromJson(json: string): CiphertextElectionContext {
-    var result = Module.CiphertextElectionContext.fromJson(json);
+  static async fromJson(
+    json: string
+  ): Promise<CiphertextElectionContextHandle> {
+    var result = (await getInstance()).CiphertextElectionContext.fromJson(json);
     return result;
   }
 }

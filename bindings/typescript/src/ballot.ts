@@ -1,18 +1,44 @@
-import Module from "./wasm/electionguard.wasm";
-import { CiphertextBallot, PlaintextBallot } from "./wasm/electionguard";
+import {
+  CiphertextBallotHandle,
+  PlaintextBallotHandle,
+  getInstance,
+} from "./wasm";
 
-// TODO: wrap the library in a promise
+export class PlaintextBallot {
+  _handle: PlaintextBallotHandle;
+
+  constructor(handle: PlaintextBallotHandle) {
+    this._handle = handle;
+  }
+
+  get objectId(): string {
+    return this._handle.getObjectId();
+  }
+
+  get styleId(): string {
+    return this._handle.getObjectId();
+  }
+
+  toJson(): string {
+    return this._handle.toJson();
+  }
+
+  static async fromJson(json: string): Promise<PlaintextBallot> {
+    var result = (await getInstance()).PlaintextBallot.fromJson(json);
+    return new PlaintextBallot(result);
+  }
+}
 
 export class PlaintextBallotConverter {
-  static fromJson(json: string): PlaintextBallot {
-    var result = Module.PlaintextBallot.fromJson(json);
-    return result;
+  static async fromJson(json: string): Promise<PlaintextBallot> {
+    var result = (await getInstance()).PlaintextBallot.fromJson(json);
+    return new PlaintextBallot(result);
   }
 }
 
 export class CiphertextBallotConverter {
-  static fromJson(json: string): CiphertextBallot {
-    var result = Module.CiphertextBallot.fromJson(json);
+  static async fromJson(json: string): Promise<CiphertextBallotHandle> {
+    var result = (await getInstance()).CiphertextBallot.fromJson(json);
     return result;
   }
 }

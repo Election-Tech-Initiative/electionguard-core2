@@ -1,3 +1,4 @@
+require("./setup");
 import { assert } from "chai";
 import test_data from "../../../data/test/test-data.json";
 import { PlaintextBallotConverter } from "../src/ballot";
@@ -23,31 +24,35 @@ const testDevice = {
 };
 
 describe("EncryptionDeviceConverter Tests", () => {
-  it("should convert from json", () => {
+  it("should convert from json", async () => {
     const expected = JSON.stringify(testDevice);
-    const result = EncryptionDeviceConverter.fromJson(expected);
+    const result = await EncryptionDeviceConverter.fromJson(expected);
     assert.isTrue(result.toJson().includes(testDevice.device_id.toString()));
   });
 });
 
 describe("EncryptionMediatorConverter Tests", () => {
-  it("should encrypt a ballot", () => {
-    const context = ElectionContextConverter.fromJson(
+  it("should encrypt a ballot", async () => {
+    const context = await ElectionContextConverter.fromJson(
       JSON.stringify(ciphertextElectionContext)
     );
-    const manifest = InternalManifestConverter.fromJson(
+    const manifest = await InternalManifestConverter.fromJson(
       JSON.stringify(internalManifest)
     );
-    const device = EncryptionDeviceConverter.fromJson(
+    const device = await EncryptionDeviceConverter.fromJson(
       JSON.stringify(testDevice)
     );
-    const data = PlaintextBallotConverter.fromJson(
+    const data = await PlaintextBallotConverter.fromJson(
       JSON.stringify(plaintextBallots[0])
     );
-    const subject = EncryptionMediatorConverter.make(manifest, context, device);
-    const result = subject.encrypt(data, false);
+    const subject = await EncryptionMediatorConverter.make(
+      manifest,
+      context,
+      device
+    );
+    const result = subject.encrypt(data._handle, false);
 
-    assert.isTrue(result.getObjectId().includes(data.getObjectId()));
+    assert.isTrue(result.getObjectId().includes(data.objectId));
     // TODO: reasonable timoeut for this test when optimizatiosn enabled
   }).timeout(100000); // 100 seconds :-(
 });

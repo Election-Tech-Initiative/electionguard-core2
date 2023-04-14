@@ -1,27 +1,25 @@
-import Module from "./wasm/electionguard.wasm";
 import {
-  CiphertextElectionContext,
-  EncryptionDevice,
-  EncryptionMediator,
-  InternalManifest,
-} from "./wasm/electionguard";
-
-// TODO: wrap the library in a promise
+  CiphertextElectionContextHandle,
+  EncryptionDeviceHandle,
+  EncryptionMediatorHandle,
+  InternalManifestHandle,
+  getInstance,
+} from "./wasm";
 
 export class EncryptionDeviceConverter {
-  static fromJson(json: string): EncryptionDevice {
-    var result = Module.EncryptionDevice.fromJson(json);
+  static async fromJson(json: string): Promise<EncryptionDeviceHandle> {
+    var result = (await getInstance()).EncryptionDevice.fromJson(json);
     return result;
   }
 }
 
 export class EncryptionMediatorConverter {
-  static make(
-    internalManifest: InternalManifest,
-    contest: CiphertextElectionContext,
-    device: EncryptionDevice
-  ): EncryptionMediator {
-    var result = new Module.EncryptionMediator(
+  static async make(
+    internalManifest: InternalManifestHandle,
+    contest: CiphertextElectionContextHandle,
+    device: EncryptionDeviceHandle
+  ): Promise<EncryptionMediatorHandle> {
+    var result = new (await getInstance()).EncryptionMediator(
       internalManifest,
       contest,
       device

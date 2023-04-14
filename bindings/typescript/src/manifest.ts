@@ -1,18 +1,15 @@
-import Module from "./wasm/electionguard.wasm";
-import { InternalManifest, Manifest } from "./wasm/electionguard";
-
-// TODO: wrap the library in a promise
+import { InternalManifestHandle, ManifestHandle, getInstance } from "./wasm";
 
 export class ManifestConverter {
-  static fromJson(json: string): Manifest {
-    var result = Module.Manifest.fromJson(json);
+  static async fromJson(json: string): Promise<ManifestHandle> {
+    var result = (await getInstance()).Manifest.fromJson(json);
     return result;
   }
 }
 
 export class InternalManifestConverter {
-  static fromJson(json: string): InternalManifest {
-    var result = Module.InternalManifest.fromJson(json);
+  static async fromJson(json: string): Promise<InternalManifestHandle> {
+    var result = (await getInstance()).InternalManifest.fromJson(json);
     return result;
   }
 }
