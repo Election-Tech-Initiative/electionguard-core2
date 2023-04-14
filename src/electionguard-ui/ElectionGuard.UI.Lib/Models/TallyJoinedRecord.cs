@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace ElectionGuard.UI.Lib.Models
+﻿namespace ElectionGuard.UI.Lib.Models
 {
     public partial class TallyJoinedRecord : DatabaseRecord
     {
@@ -16,10 +10,7 @@ namespace ElectionGuard.UI.Lib.Models
 
         [ObservableProperty]
         private DateTime _joined = DateTime.UtcNow;
-        
 
-        public TallyJoinedRecord() : base(nameof(TallyJoinedRecord))
-        {
-        }
+        public TallyJoinedRecord() : base(nameof(TallyJoinedRecord)) { }
     }
 }
