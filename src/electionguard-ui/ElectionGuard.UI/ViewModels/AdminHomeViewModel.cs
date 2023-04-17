@@ -58,7 +58,7 @@ public partial class AdminHomeViewModel : BaseViewModel
         await NavigationService.GoToPage(typeof(CreateKeyCeremonyAdminViewModel));
     }
 
-    [RelayCommand]
+    [RelayCommand(AllowConcurrentExecutions = true)]
     private async Task CreateElection()
     {
         await NavigationService.GoToPage(typeof(CreateElectionViewModel));
@@ -78,10 +78,10 @@ public partial class AdminHomeViewModel : BaseViewModel
         }
     }
 
-    [RelayCommand]
+    [RelayCommand(AllowConcurrentExecutions = true)]
     private async Task CreateMultipleTallies()
     {
-        //await NavigationService.GoToPage(typeof(CreateElectionViewModel));
+        await NavigationService.GoToPage(typeof(CreateMultiTallyViewModel));
     }
 
 }

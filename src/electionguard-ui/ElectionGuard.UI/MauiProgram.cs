@@ -89,6 +89,7 @@ public static class MauiProgram
         builder.Services.AddSingleton<ManifestViewModel>();
         builder.Services.AddTransient<BallotUploadViewModel>();
         builder.Services.AddTransient<CreateTallyViewModel>();
+        builder.Services.AddTransient<CreateMultiTallyViewModel>();
         builder.Services.AddTransient<TallyProcessViewModel>();
 
         // setup views
@@ -102,6 +103,7 @@ public static class MauiProgram
         builder.Services.AddTransient<ManifestPopup>();
         builder.Services.AddTransient<BallotUploadPage>();
         builder.Services.AddTransient<CreateTallyPage>();
+        builder.Services.AddTransient<CreateMultiTallyPage>();
         builder.Services.AddTransient<TallyProcessPage>();
 
         // popup pages

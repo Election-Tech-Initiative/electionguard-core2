@@ -295,11 +295,38 @@ namespace ElectionGuard.UI.Resx {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Select the elections to make tallies.
+        /// </summary>
+        internal static string CreateMultiInstructionsText {
+            get {
+                return ResourceManager.GetString("CreateMultiInstructionsText", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Create Multiple Tallies.
         /// </summary>
         internal static string CreateMultipleTalliesText {
             get {
                 return ResourceManager.GetString("CreateMultipleTalliesText", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Create Multiple Tallies.
+        /// </summary>
+        internal static string CreateMultiTally {
+            get {
+                return ResourceManager.GetString("CreateMultiTally", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Create Tallies.
+        /// </summary>
+        internal static string CreateTallies {
+            get {
+                return ResourceManager.GetString("CreateTallies", resourceCulture);
             }
         }
         
@@ -588,6 +615,24 @@ namespace ElectionGuard.UI.Resx {
         internal static string JoinedText {
             get {
                 return ResourceManager.GetString("JoinedText", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Select the tallies to join.
+        /// </summary>
+        internal static string JoinMultiInstructionsText {
+            get {
+                return ResourceManager.GetString("JoinMultiInstructionsText", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Join Tallies.
+        /// </summary>
+        internal static string JoinTallies {
+            get {
+                return ResourceManager.GetString("JoinTallies", resourceCulture);
             }
         }
         

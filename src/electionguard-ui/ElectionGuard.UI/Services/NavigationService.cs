@@ -25,6 +25,7 @@ public class NavigationService : INavigationService
         new PageType(typeof(ManifestViewModel), typeof(ManifestPopup), false),
         new PageType(typeof(BallotUploadViewModel), typeof(BallotUploadPage), false),
         new PageType(typeof(CreateTallyViewModel), typeof(CreateTallyPage), false),
+        new PageType(typeof(CreateMultiTallyViewModel), typeof(CreateMultiTallyPage), false),
         new PageType(typeof(TallyProcessViewModel), typeof(TallyProcessPage), false),
     };
 

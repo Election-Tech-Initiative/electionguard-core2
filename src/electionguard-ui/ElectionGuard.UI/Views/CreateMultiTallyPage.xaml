@@ -1,0 +1,174 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<views:ContentPageBase
+    x:Class="ElectionGuard.UI.Views.CreateMultiTallyPage"
+    xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+    xmlns:helper="clr-namespace:ElectionGuard.UI.Helpers"
+    xmlns:model="clr-namespace:ElectionGuard.UI.Lib.Models;assembly=ElectionGuard.UI.Lib"
+    xmlns:toolkit="http://schemas.microsoft.com/dotnet/2022/maui/toolkit"
+    xmlns:viewModels="clr-namespace:ElectionGuard.UI.ViewModels"
+    xmlns:views="using:ElectionGuard.UI.Views"
+    x:DataType="viewModels:CreateMultiTallyViewModel"
+    x:TypeArguments="viewModels:CreateMultiTallyViewModel"
+    ControlTemplate="{StaticResource PageTemplate}">
+    <ContentPage.Resources>
+        <toolkit:InvertedBoolConverter x:Key="InvertedBoolConverter" />
+        <toolkit:IsNotNullConverter x:Key="IsNotNullConverter" />
+    </ContentPage.Resources>
+    <VerticalStackLayout Style="{StaticResource NarrowCenteredPage}">
+        <Label
+            IsVisible="{Binding ErrorMessage, Converter={StaticResource IsNotNullConverter}}"
+            Style="{StaticResource Error}"
+            Text="{Binding ErrorMessage}" />
+        <Label Style="{StaticResource FormLabel}" Text="{helper:Translate KeyCeremoniesText}" />
+        <Picker
+            ItemDisplayBinding="{Binding Name}"
+            ItemsSource="{Binding KeyCeremonies}"
+            SelectedItem="{Binding SelectedKeyCeremony}"
+            TextColor="{StaticResource Gray950}"
+            TitleColor="{StaticResource Primary}"
+            WidthRequest="600" />
+        <Grid Margin="0,20,0,0" IsVisible="{Binding IsAdmin}">
+            <Label
+                HorizontalOptions="StartAndExpand"
+                Style="{StaticResource FormLabel}"
+                Text="{helper:Translate CreateMultiInstructionsText}" />
+            <Button
+                Command="{Binding CreateTalliesCommand}"
+                HorizontalOptions="End"
+                Text="{helper:Translate CreateTallies}" />
+        </Grid>
+        <Grid Margin="0,20,0,0" IsVisible="{Binding IsAdmin, Converter={StaticResource InvertedBoolConverter}}">
+            <Label
+                HorizontalOptions="StartAndExpand"
+                Style="{StaticResource FormLabel}"
+                Text="{helper:Translate JoinMultiInstructionsText}" />
+            <Button
+                Command="{Binding JoinTalliesCommand}"
+                HorizontalOptions="End"
+                Text="{helper:Translate JoinTallies}" />
+        </Grid>
+        <CollectionView ItemsSource="{Binding Elections}" SelectionMode="Multiple">
+            <CollectionView.ItemTemplate>
+                <DataTemplate x:DataType="model:ElectionItem">
+                    <VerticalStackLayout>
+                        <Label Text="{Binding Election.Name}" />
+                        <CollectionView
+                            Margin="50,0"
+                            ItemsSource="{Binding BallotUploads}"
+                            SelectionMode="None">
+                            <CollectionView.Header>
+                                <Grid>
+                                    <Grid ColumnDefinitions="1.5*, 2*, *, *, *, *, *">
+                                        <Label
+                                            Grid.Column="0"
+                                            FontAttributes="Bold"
+                                            Text="{helper:Translate UploadedText}" />
+                                        <Label
+                                            Grid.Column="1"
+                                            FontAttributes="Bold"
+                                            Text="{helper:Translate LocationText}" />
+                                        <Label
+                                            Grid.Column="2"
+                                            FontAttributes="Bold"
+                                            Text="{helper:Translate AddedText}" />
+                                        <Label
+                                            Grid.Column="3"
+                                            FontAttributes="Bold"
+                                            Text="{helper:Translate SpoiledText}" />
+                                        <Label
+                                            Grid.Column="4"
+                                            FontAttributes="Bold"
+                                            Text="{helper:Translate DuplicatedText}" />
+                                        <Label
+                                            Grid.Column="5"
+                                            FontAttributes="Bold"
+                                            Text="{helper:Translate RejectedText}" />
+                                        <Label
+                                            Grid.Column="6"
+                                            FontAttributes="Bold"
+                                            Text="{helper:Translate BallotCountText}" />
+                                    </Grid>
+                                    <Line
+                                        BackgroundColor="{StaticResource Gray950}"
+                                        StrokeThickness="2"
+                                        VerticalOptions="End" />
+                                </Grid>
+                            </CollectionView.Header>
+                            <CollectionView.ItemTemplate>
+                                <DataTemplate x:DataType="model:BallotUpload">
+                                    <Grid BackgroundColor="{Binding ., Converter={StaticResource AlternateRowColorConverter}, ConverterParameter={x:Reference UploadCollectionView}}}" ColumnDefinitions="1.5*, 2*, *, *, *, *, *">
+                                        <Label
+                                            Grid.Column="0"
+                                            Margin="10"
+                                            Text="{Binding CreatedAt}" />
+                                        <Label
+                                            Grid.Column="1"
+                                            Margin="10"
+                                            Text="{Binding Location}" />
+                                        <Label
+                                            Grid.Column="2"
+                                            Margin="10"
+                                            Text="{Binding BallotImported}" />
+                                        <Label
+                                            Grid.Column="3"
+                                            Margin="10"
+                                            Text="{Binding BallotSpoiled}" />
+                                        <Label
+                                            Grid.Column="4"
+                                            Margin="10"
+                                            Text="{Binding BallotDuplicated}" />
+                                        <Label
+                                            Grid.Column="5"
+                                            Margin="10"
+                                            Text="{Binding BallotRejected}" />
+                                        <Label
+                                            Grid.Column="6"
+                                            Margin="10"
+                                            Text="{Binding BallotCount}" />
+                                    </Grid>
+                                </DataTemplate>
+                            </CollectionView.ItemTemplate>
+                            <!--<CollectionView.Footer>
+                                <Grid BackgroundColor="{StaticResource Gray400}" ColumnDefinitions="3.5*, *, *, *, *, *">
+                                    <Label
+                                        Grid.Column="0"
+                                        Margin="10"
+                                        FontAttributes="Bold,Italic"
+                                        Text="{helper:Translate TotalText}" />
+                                    <Label
+                                        Grid.Column="1"
+                                        Margin="10"
+                                        FontAttributes="Bold"
+                                        Text="{Binding BallotAddedTotal}" />
+                                    <Label
+                                        Grid.Column="2"
+                                        Margin="10"
+                                        FontAttributes="Bold"
+                                        Text="{Binding BallotSpoiledTotal}" />
+                                    <Label
+                                        Grid.Column="3"
+                                        Margin="10"
+                                        FontAttributes="Bold"
+                                        Text="{Binding BallotDuplicateTotal}" />
+                                    <Label
+                                        Grid.Column="4"
+                                        Margin="10"
+                                        FontAttributes="Bold"
+                                        Text="{Binding BallotRejectedTotal}" />
+                                    <Label
+                                        Grid.Column="5"
+                                        Margin="10"
+                                        FontAttributes="Bold"
+                                        Text="{Binding BallotCountTotal}" />
+                                </Grid>
+                            </CollectionView.Footer>-->
+                        </CollectionView>
+                    </VerticalStackLayout>
+                </DataTemplate>
+            </CollectionView.ItemTemplate>
+
+        </CollectionView>
+
+    </VerticalStackLayout>
+</views:ContentPageBase>

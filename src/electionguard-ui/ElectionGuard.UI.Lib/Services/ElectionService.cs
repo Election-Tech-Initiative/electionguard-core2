@@ -1,5 +1,6 @@
 ﻿using ElectionGuard.UI.Lib.Models;
 using MongoDB.Driver;
+using MongoDB.Driver.Core.Clusters;
 
 namespace ElectionGuard.UI.Lib.Services;
 
@@ -51,6 +52,28 @@ public class ElectionService : BaseDatabaseService<Election>
         var update = updateBuilder.Set(Constants.ExportEncryptionDateTime, date);
 
         await UpdateAsync(filter, update);
+    }
+
+    /// <summary>
+    /// Gets count of elections that use a key ceremony
+    /// </summary>
+    /// <param name="keyCeremonyId">key ceremony id to search for</param>
+    public async Task<long> CountByKeyCeremonyIdAsync(string keyCeremonyId)
+    {
+        var filterBuilder = Builders<Election>.Filter;
+        var filter = filterBuilder.Eq(Constants.KeyCeremonyId, keyCeremonyId);
+        return await CountByFilterAsync(filter);
+    }
+
+    /// <summary>
+    /// Gets all elections that use a key ceremony
+    /// </summary>
+    /// <param name="keyCeremonyId">key ceremony id to search for</param>
+    public async Task<List<Election>> GetAllByKeyCeremonyIdAsync(string keyCeremonyId)
+    {
+        var filterBuilder = Builders<Election>.Filter;
+        var filter = filterBuilder.Eq(Constants.KeyCeremonyId, keyCeremonyId);
+        return await GetAllByFilterAsync(filter);
     }
 
 }

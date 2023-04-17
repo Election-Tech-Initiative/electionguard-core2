@@ -489,4 +489,19 @@
   <data name="ReviewSpoiledText" xml:space="preserve">
     <value>Review Challenge</value>
   </data>
+  <data name="CreateMultiInstructionsText" xml:space="preserve">
+    <value>Select the elections to make tallies</value>
+  </data>
+  <data name="CreateMultiTally" xml:space="preserve">
+    <value>Create Multiple Tallies</value>
+  </data>
+  <data name="CreateTallies" xml:space="preserve">
+    <value>Create Tallies</value>
+  </data>
+  <data name="JoinMultiInstructionsText" xml:space="preserve">
+    <value>Select the tallies to join</value>
+  </data>
+  <data name="JoinTallies" xml:space="preserve">
+    <value>Join Tallies</value>
+  </data>
 </root>
