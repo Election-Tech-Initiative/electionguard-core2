@@ -94,6 +94,23 @@ public class ElectionPolynomial : DisposableBase
     }
 
     /// <summary>
+    /// Generates a polynomial for sharing election keys.
+    /// Each coefficient is an exponential order for the polynomial and the guardian secret key is the 0-index coefficient.
+    /// </summary>
+    public ElectionPolynomial(ElectionPolynomial that)
+    {
+        if (that.Coefficients.Any(i => !i.IsValid()))
+        {
+            throw new ArgumentException("Invalid coefficients provided");
+        }
+        Coefficients = new List<Coefficient>();
+        for (var i = 0; i < that.Coefficients.Count; i++)
+        {
+            Coefficients.Add(new Coefficient(that.Coefficients[i]));
+        }
+    }
+
+    /// <summary>
     /// Compute the single coordinate value of the polynomial at a given degree for use in sharing election keys.
     /// </summary>
     /// <param name="degree">The exponential degree of the polynomial (usually the sequence order)</param>
@@ -151,8 +168,20 @@ public class ElectionPolynomial : DisposableBase
     /// <param name="commitments">The commitments of the coefficients of the polynomial</param>
     public static bool VerifyCoordinate(ulong degree, ElementModQ coordinate, List<ElementModP> commitments)
     {
-        using var degreeQ = new ElementModQ(degree);
-        return VerifyCoordinate(degreeQ, coordinate, commitments);
+        //        using var degreeQ = new ElementModQ(degree);
+        //        return VerifyCoordinate(degreeQ, coordinate, commitments);
+
+        using var calculated = Constants.ONE_MOD_P; // start at 1 mod p.
+        foreach (var (commitment, index) in commitments.WithIndex())
+        {
+            using var exponent = BigMath.PowModP(degree, index);
+            using var factor = BigMath.PowModP(commitment, exponent);
+            calculated.MultModP(factor);
+        }
+
+        using var value = BigMath.GPowP(coordinate);
+        return value.Equals(calculated);
+
     }
 
     /// <summary>
@@ -164,7 +193,7 @@ public class ElectionPolynomial : DisposableBase
     public static bool VerifyCoordinate(
         ElementModQ degree, ElementModQ coordinate, List<ElementModP> commitments)
     {
-        var calculated = Constants.ONE_MOD_P; // start at 1 mod p.
+        using var calculated = Constants.ONE_MOD_P; // start at 1 mod p.
         foreach (var (commitment, index) in commitments.WithIndex())
         {
             using var exponent = BigMath.PowModP(degree, index);

@@ -440,29 +440,39 @@ public class KeyCeremonyMediator : DisposableBase
     /// <returns>True if a step was run</returns>
     public async Task RunKeyCeremony(bool isAdmin = false)
     {
-        var keyCeremonyId = CeremonyDetails.KeyCeremonyId;
-
-        KeyCeremonyService keyCeremonyService = new();
-        var keyCeremony = await keyCeremonyService.GetByKeyCeremonyIdAsync(keyCeremonyId);
-        if (keyCeremony == null)
+        if (!IsRunning)
         {
-            throw new KeyCeremonyException(
-                KeyCeremonyState.DoesNotExist,
-                keyCeremonyId,
-                UserId,
-                $"Key Ceremony {keyCeremonyId} does not exist");
-        }
-        _keyCeremony.State = keyCeremony.State;
+            var keyCeremonyId = CeremonyDetails.KeyCeremonyId;
 
-        var state = keyCeremony.State;
+            KeyCeremonyService keyCeremonyService = new();
+            var keyCeremony = await keyCeremonyService.GetByKeyCeremonyIdAsync(keyCeremonyId);
+            if (keyCeremony == null)
+            {
+                throw new KeyCeremonyException(
+                    KeyCeremonyState.DoesNotExist,
+                    keyCeremonyId,
+                    UserId,
+                    $"Key Ceremony {keyCeremonyId} does not exist");
+            }
+            _keyCeremony.State = keyCeremony.State;
 
-        var steps = isAdmin ? _adminSteps : _guardianSteps;
-        var currentStep = steps.SingleOrDefault(s => s.State == state);
-        if (currentStep != null && !IsRunning && await currentStep.ShouldRunStep!())
-        {
-            IsRunning = true;
-            await currentStep.RunStep!();
-            IsRunning = false;
+            var state = keyCeremony.State;
+
+            var steps = isAdmin ? _adminSteps : _guardianSteps;
+            var currentStep = steps.SingleOrDefault(s => s.State == state);
+            if (currentStep != null && await currentStep.ShouldRunStep!())
+            {
+                IsRunning = true;
+                try
+                {
+                    await currentStep.RunStep!();
+                }
+                catch (Exception ex)
+                {
+                    string message = ex.Message;
+                }
+                IsRunning = false;
+            }
         }
     }
 
@@ -681,6 +691,9 @@ public class KeyCeremonyMediator : DisposableBase
         GuardianBackupService backupService = new();
         foreach (var item in backups)
         {
+            guardian!.SaveElectionPartialKeyBackup(item!);
+            var verificationowner = guardian.VerifyElectionPartialKeyBackup(item.OwnerId!, keyCeremonyId);
+            var verificationdes = guardian.VerifyElectionPartialKeyBackup(item.DesignatedId!, keyCeremonyId);
             using GuardianBackups data = new()
             {
                 KeyCeremonyId = keyCeremonyId,
@@ -689,7 +702,7 @@ public class KeyCeremonyMediator : DisposableBase
                 Backup = new(item),
             };
 
-            _ = await backupService.SaveAsync(data);
+            //_ = await backupService.SaveAsync(data);
 
         }
 
@@ -758,7 +771,7 @@ public class KeyCeremonyMediator : DisposableBase
         VerificationService verificationService = new();
         foreach (var verification in verifications)
         {
-            await verificationService.SaveAsync(verification);
+            _ = await verificationService.SaveAsync(verification);
         }
 
         // notify change to admin (signalR)

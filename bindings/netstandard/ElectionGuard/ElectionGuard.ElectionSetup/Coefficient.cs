@@ -93,6 +93,11 @@ public class Coefficient : DisposableBase
         Proof = proof;
     }
 
+    public Coefficient(Coefficient that) : this(new ElGamalKeyPair(that.KeyPair), new SchnorrProof(that.Proof))
+    {
+    }
+
+
     public bool IsValid()
     {
         return Proof.IsValid() && Proof.PublicKey.Equals(KeyPair.PublicKey);

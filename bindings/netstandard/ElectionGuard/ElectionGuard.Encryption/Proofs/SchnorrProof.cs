@@ -98,6 +98,15 @@
             Response = BigMath.APlusBMulCModQ(seed, keyPair.SecretKey, Challenge);
         }
 
+        public SchnorrProof(SchnorrProof that)
+        {
+            PublicKey = new ElementModP(that.PublicKey);
+            Commitment = new ElementModP(that.Commitment);
+            Challenge = new ElementModQ(that.Challenge);
+            Response = new ElementModQ(that.Response);
+        }
+
+
         /// <summary>
         /// Check validity of the `proof` for proving possession of the secret key corresponding to the public key
         /// </summary>     

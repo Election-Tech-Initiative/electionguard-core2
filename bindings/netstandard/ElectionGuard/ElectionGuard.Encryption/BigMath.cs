@@ -32,7 +32,10 @@ namespace ElectionGuard
         /// <param name="rhs">Second parameter to add</param>
         public static ElementModP AddModP(ElementModP lhs, ulong rhs)
         {
-            return AddModP(lhs, new ElementModP(rhs, true));
+            var rhsP = new ElementModP(rhs, true);
+            var ret = AddModP(lhs, rhsP);
+            rhsP.Dispose();
+            return ret;
         }
 
         /// <summary>
@@ -89,12 +92,20 @@ namespace ElectionGuard
 
         public static ElementModP PowModP(ElementModP b, ulong e)
         {
-            return PowModP(b, new ElementModQ(e, true));
+            var eQ = new ElementModQ(e, true);
+            var ret = PowModP(b, eQ);
+            eQ.Dispose();
+            return ret;
         }
 
         public static ElementModP PowModP(ElementModQ b, ulong e)
         {
-            return PowModP(new ElementModP(b), new ElementModQ(e, true));
+            var bP = new ElementModP(b);
+            var eQ = new ElementModQ(e, true);
+            var ret = PowModP(bP, eQ);
+            eQ.Dispose();
+            bP.Dispose();
+            return ret;
         }
 
         /// <summary>
@@ -146,7 +157,10 @@ namespace ElectionGuard
         /// <param name="rhs">Second parameter to add</param>
         public static ElementModQ AddModQ(ElementModQ lhs, ulong rhs)
         {
-            return AddModQ(lhs, new ElementModQ(rhs, true));
+            var rhsQ = new ElementModQ(rhs, true);
+            var ret = AddModQ(lhs, rhsQ);
+            rhsQ.Dispose();
+            return ret;
         }
 
         /// <summary>

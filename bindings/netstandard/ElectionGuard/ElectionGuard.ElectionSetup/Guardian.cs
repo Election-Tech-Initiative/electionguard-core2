@@ -196,25 +196,25 @@ public class Guardian : DisposableBase
         Dictionary<string, ElectionPartialKeyVerification>? guardianElectionPartialKeyVerifications = null
         )
     {
-        _electionKeys = keyPair;
+        _electionKeys = new(keyPair);
         GuardianId = keyPair.OwnerId;
         SequenceOrder = keyPair.SequenceOrder;
-        CeremonyDetails = ceremonyDetails;
+        CeremonyDetails = new(ceremonyDetails.KeyCeremonyId, ceremonyDetails.NumberOfGuardians, ceremonyDetails.Quorum);
 
-        _otherGuardianPublicKeys = otherGuardianPublicKeys;
-        _otherGuardianPartialKeyBackups = otherGuardianPartialKeyBackups;
+        //_otherGuardianPublicKeys = otherGuardianPublicKeys;
+        //_otherGuardianPartialKeyBackups = otherGuardianPartialKeyBackups;
 
-        if (partialKeyBackup != null)
-        {
-            BackupsToShare = partialKeyBackup;
-        }
+        //if (partialKeyBackup != null)
+        //{
+        //    BackupsToShare = partialKeyBackup;
+        //}
 
-        if (guardianElectionPartialKeyVerifications != null)
-        {
-            _otherGuardianPartialKeyVerification = guardianElectionPartialKeyVerifications;
-        }
+        //if (guardianElectionPartialKeyVerifications != null)
+        //{
+        //    _otherGuardianPartialKeyVerification = guardianElectionPartialKeyVerifications;
+        //}
 
-        SaveGuardianKey(_electionKeys.Share());
+        //SaveGuardianKey(_electionKeys.Share());
     }
 
     protected override void DisposeUnmanaged()
@@ -313,6 +313,11 @@ public class Guardian : DisposableBase
         if (_otherGuardianPublicKeys is null)
         {
             _otherGuardianPublicKeys = new();
+        }
+
+        if (_otherGuardianPublicKeys.ContainsKey(key.OwnerId))
+        {
+            _otherGuardianPublicKeys[key.OwnerId]?.Dispose();
         }
 
         _otherGuardianPublicKeys[key.OwnerId] = key;
@@ -433,6 +438,12 @@ public class Guardian : DisposableBase
         {
             _otherGuardianPartialKeyBackups = new();
         }
+
+        if (_otherGuardianPartialKeyBackups.ContainsKey(backup.OwnerId!))
+        {
+            _otherGuardianPartialKeyBackups[backup.OwnerId!]?.Dispose();
+        }
+
         _otherGuardianPartialKeyBackups[backup.OwnerId!] = backup;
     }
 
@@ -635,7 +646,7 @@ public static class GuardianStorageExtensions
         var data = storage.FromFile(filePath);
         try
         {
-            var privateGuardian = JsonSerializer.Deserialize<GuardianPrivateRecord>(data);
+            using var privateGuardian = JsonSerializer.Deserialize<GuardianPrivateRecord>(data);
             return privateGuardian != null ?
                 Guardian.FromPrivateRecord(privateGuardian, keyCeremonyId, guardianCount, quorum) :
                 null;
@@ -658,7 +669,7 @@ public static class GuardianStorageExtensions
     {
         var storage = StorageService.GetInstance();
 
-        GuardianPrivateRecord data = self;
+        using GuardianPrivateRecord data = self;
         var dataJson = JsonSerializer.Serialize(data);
 
         var filename = GuardianPrefix + data.GuardianId + GuardianExt;

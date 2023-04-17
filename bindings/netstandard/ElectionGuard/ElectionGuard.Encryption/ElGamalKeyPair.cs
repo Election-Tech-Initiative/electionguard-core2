@@ -63,6 +63,10 @@ namespace ElectionGuard
             status.ThrowIfError();
         }
 
+        public ElGamalKeyPair(ElGamalKeyPair that) : this(that.SecretKey, that.PublicKey)
+        {
+        }
+
         /// <Summary>
         /// Make an elgamal key pair from a secret.
         /// </Summary>

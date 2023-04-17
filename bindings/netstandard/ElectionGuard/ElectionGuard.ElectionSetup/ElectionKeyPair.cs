@@ -106,6 +106,16 @@ public class ElectionKeyPair : DisposableBase
         // TODO: verify the polynomial is valid for the keypair
     }
 
+    public ElectionKeyPair(ElectionKeyPair that)
+    {
+        OwnerId = that.OwnerId;
+        SequenceOrder = that.SequenceOrder;
+        KeyPair = new(that.KeyPair.SecretKey, that.KeyPair.PublicKey);
+        Polynomial = new(that.Polynomial);
+
+        // TODO: verify the polynomial is valid for the keypair
+    }
+
     public ElectionPublicKey Share()
     {
         return new(
