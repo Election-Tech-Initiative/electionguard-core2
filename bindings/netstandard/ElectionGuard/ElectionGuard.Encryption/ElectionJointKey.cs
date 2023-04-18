@@ -17,6 +17,25 @@
         /// </summary>
         public ElementModQ CommitmentHash { get; set; }
 
+
+        public ElectionJointKey()
+        {
+
+        }
+
+        public ElectionJointKey(
+            ElementModP jointPublicKey, ElementModQ commitmentHash)
+        {
+            JointPublicKey = new ElementModP(jointPublicKey);
+            CommitmentHash = new ElementModQ(commitmentHash);
+        }
+
+        public ElectionJointKey(ElectionJointKey other)
+        {
+            JointPublicKey = new ElementModP(other.JointPublicKey);
+            CommitmentHash = new ElementModQ(other.CommitmentHash);
+        }
+
         protected override void DisposeUnmanaged()
         {
             base.DisposeUnmanaged();

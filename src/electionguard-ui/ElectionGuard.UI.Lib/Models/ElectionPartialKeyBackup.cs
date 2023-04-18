@@ -13,6 +13,18 @@ public class ElectionPartialKeyBackup : DisposableBase
 
     public HashedElGamalCiphertext? EncryptedCoordinate { get; set; } = default;
 
+    public ElectionPartialKeyBackup()
+    {
+    }
+
+    public ElectionPartialKeyBackup(ElectionPartialKeyBackup that)
+    {
+        OwnerId = that.OwnerId;
+        DesignatedId = that.DesignatedId;
+        DesignatedSequenceOrder = that.DesignatedSequenceOrder;
+        EncryptedCoordinate = new(that.EncryptedCoordinate);
+    }
+
     protected override void DisposeUnmanaged()
     {
         base.DisposeUnmanaged();

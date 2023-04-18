@@ -73,6 +73,10 @@ namespace ElectionGuard
 
         internal NativeInterface.HashedElGamalCiphertext.HashedElGamalCiphertextHandle Handle;
 
+        public HashedElGamalCiphertext(HashedElGamalCiphertext that) : this(
+            new ElementModP(that.Pad), that.Data, that.Mac)
+        {
+        }
 
         public unsafe HashedElGamalCiphertext(ElementModP pad, byte[] data, byte[] mac)
         {
@@ -105,6 +109,9 @@ namespace ElectionGuard
         /// </Summary>
         public byte[] Decrypt(ElementModQ secretKey, ElementModQ descriptionHash, bool lookForPadding)
         {
+            // Console.WriteLine($"Decrypting  bytes");
+            Console.WriteLine($"Decrypt: secretKey: {secretKey.ToHex()}");
+            // Console.WriteLine($"descriptionHash: {descriptionHash.ToHex()}");
             var status = NativeInterface.HashedElGamalCiphertext.Decrypt(
                 Handle, secretKey.Handle, descriptionHash.Handle, lookForPadding, out var data, out var size);
             status.ThrowIfError();

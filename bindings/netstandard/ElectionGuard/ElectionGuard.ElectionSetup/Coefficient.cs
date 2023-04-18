@@ -1,4 +1,5 @@
-﻿using ElectionGuard.Proofs;
+﻿using System.Text.Json.Serialization;
+using ElectionGuard.Proofs;
 
 namespace ElectionGuard.ElectionSetup;
 
@@ -11,7 +12,7 @@ public class Coefficient : DisposableBase
     /// The key pair associated with the coefficient
     /// </summary>
     /// <value></value>
-    public ElGamalKeyPair KeyPair { get; private set; }
+    public EncryptionKeyPair KeyPair { get; private set; } = default!;
 
     /// <summary>
     /// The secret coefficient `a_ij` 
@@ -26,17 +27,20 @@ public class Coefficient : DisposableBase
     /// <summary>
     /// A proof of possession of the private key for the secret coefficient
     /// </summary>
-    public SchnorrProof Proof { get; private set; }
+    public SchnorrProof Proof { get; private set; } = default!;
 
     /// <summary>
     /// Generate a random coefficient
     /// </summary>
+    //[JsonConstructor]
     public Coefficient()
     {
-        using var value = BigMath.RandQ();
-        KeyPair = ElGamalKeyPair.FromSecret(value);
-        using var seed = BigMath.RandQ();
-        Proof = new(KeyPair, seed);
+        // var value = BigMath.RandQ();
+        // KeyPair = ElGamalKeyPair.FromSecret(value);
+        // var seed = BigMath.RandQ();
+        // Proof = new(KeyPair, seed);
+        Console.WriteLine("-------!!!!!!! WRONG CONSTRUCTOR Coefficient() !!!!!!!-------");
+
     }
 
     /// <summary>
@@ -44,8 +48,9 @@ public class Coefficient : DisposableBase
     /// </summary>
     public Coefficient(ElementModQ value)
     {
-        KeyPair = ElGamalKeyPair.FromSecret(value);
-        Proof = new SchnorrProof(KeyPair);
+        var keyPair = ElGamalKeyPair.FromSecret(value);
+        Proof = new SchnorrProof(keyPair);
+        KeyPair = new EncryptionKeyPair(keyPair);
     }
 
     /// <summary>
@@ -53,8 +58,9 @@ public class Coefficient : DisposableBase
     /// </summary>
     public Coefficient(ElementModQ value, ElementModQ seed)
     {
-        KeyPair = ElGamalKeyPair.FromSecret(value);
-        Proof = new SchnorrProof(KeyPair, seed);
+        var keyPair = ElGamalKeyPair.FromSecret(value);
+        Proof = new SchnorrProof(keyPair, seed);
+        KeyPair = new EncryptionKeyPair(keyPair);
     }
 
     /// <summary>
@@ -67,14 +73,14 @@ public class Coefficient : DisposableBase
             throw new ArgumentException("Invalid proof");
         }
 
-        using var keyPair = ElGamalKeyPair.FromSecret(value);
+        var keyPair = ElGamalKeyPair.FromSecret(value);
         if (!proof.PublicKey.Equals(keyPair.PublicKey))
         {
             throw new ArgumentException("Proof does not match key pair");
         }
 
-        KeyPair = keyPair;
-        Proof = proof;
+        KeyPair = new EncryptionKeyPair(keyPair);
+        Proof = new(proof);
     }
 
     public Coefficient(ElGamalKeyPair keyPair, SchnorrProof proof)
@@ -89,8 +95,15 @@ public class Coefficient : DisposableBase
             throw new ArgumentException("Proof does not match key pair");
         }
 
-        KeyPair = keyPair;
-        Proof = proof;
+        KeyPair = new EncryptionKeyPair(keyPair);
+        Proof = new(proof);
+    }
+
+    public Coefficient(Coefficient that)
+
+    {
+        KeyPair = new EncryptionKeyPair(that.KeyPair);
+        Proof = new SchnorrProof(that.Proof);
     }
 
     public bool IsValid()

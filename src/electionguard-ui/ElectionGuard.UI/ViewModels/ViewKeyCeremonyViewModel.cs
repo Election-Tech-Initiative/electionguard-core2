@@ -112,8 +112,8 @@ public partial class ViewKeyCeremonyViewModel : BaseViewModel
         List<GuardianPublicKey> localData = new();
         _ = Task.Run(async () =>
         {
-            await _mediator!.RunKeyCeremony(IsAdmin);
             await UpdateGuardiansData();
+            await _mediator!.RunKeyCeremony(IsAdmin);
         });
     }
 

@@ -6,23 +6,17 @@ using Newtonsoft.Json.Linq;
 
 namespace ElectionGuard.Encryption.Utils.Converters
 {
-    public class ElementModQConverter : JsonConverter
+    public class ElementModQConverter : JsonConverter<ElementModQ>
     {
-        public override bool CanConvert(Type objectType)
+        public override ElementModQ ReadJson(JsonReader reader, Type objectType, ElementModQ existingValue, bool hasExistingValue, JsonSerializer serializer)
         {
-            return objectType == typeof(ElementModQ);
+            var value = (string)reader.Value;
+            return new ElementModQ(value);
         }
 
-        public override object ReadJson(JsonReader reader, Type objectType, object existingValue, JsonSerializer serializer)
+        public override void WriteJson(JsonWriter writer, ElementModQ value, JsonSerializer serializer)
         {
-            var obj = JObject.Load(reader);
-            return new ElementModQ(obj.ToString());
-        }
-
-        public override void WriteJson(JsonWriter writer, object value, JsonSerializer serializer)
-        {
-            var obj = (ElementModQ)value;
-            var json = obj.ToHex();
+            var json = value.ToHex();
             writer.WriteValue(json);
         }
     }

@@ -1,4 +1,5 @@
 ﻿using System.ComponentModel.DataAnnotations;
+using System.Text.Json.Serialization;
 using ElectionGuard.ElectionSetup.Extensions;
 using ElectionGuard.Proofs;
 using ElectionGuard.UI.Lib.Extensions;
@@ -33,6 +34,11 @@ public class ElectionPolynomial : DisposableBase
             .Select(i => i.Proof)
             .ToList();
 
+    public ElectionPolynomial()
+    {
+        Coefficients = new List<Coefficient>();
+    }
+
     /// <summary>
     /// Generates a polynomial for sharing election keys. 
     /// Each coefficient is an exponential order for polynomial and the guardian secret key is the 0-index coefficient.
@@ -44,7 +50,7 @@ public class ElectionPolynomial : DisposableBase
         Coefficients = new List<Coefficient>();
         for (var i = 0; i < numberOfCoefficients; i++)
         {
-            Coefficients.Add(new Coefficient());
+            Coefficients.Add(new Coefficient(BigMath.RandQ()));
         }
     }
 
@@ -59,7 +65,7 @@ public class ElectionPolynomial : DisposableBase
         Coefficients = new List<Coefficient> { new(secretKey) };
         for (var i = 1; i < numberOfCoefficients; i++)
         {
-            Coefficients.Add(new Coefficient());
+            Coefficients.Add(new Coefficient(BigMath.RandQ()));
         }
     }
 
@@ -74,7 +80,22 @@ public class ElectionPolynomial : DisposableBase
         Coefficients = new List<Coefficient> { new(keyPair.SecretKey) };
         for (var i = 1; i < numberOfCoefficients; i++)
         {
-            Coefficients.Add(new Coefficient());
+            Coefficients.Add(new Coefficient(BigMath.RandQ()));
+        }
+    }
+
+    /// <summary>
+    /// Generates a polynomial for sharing election keys using the provided key pair as the zero-index coefficient.
+    /// Each coefficient is an exponential order for the polynomial and the guardian secret key is the 0-index coefficient.
+    /// </summary>
+    /// <param name="numberOfCoefficients">Number of coefficients of polynomial, typically the quorum count of guardians</param>
+    public ElectionPolynomial(
+        [Range(1, int.MaxValue)] int numberOfCoefficients, ElGamalKeyPair keyPair, Random random)
+    {
+        Coefficients = new List<Coefficient> { new(keyPair.SecretKey) };
+        for (var i = 1; i < numberOfCoefficients; i++)
+        {
+            Coefficients.Add(new Coefficient(random.NextElementModQ(), random.NextElementModQ()));
         }
     }
 
@@ -92,12 +113,31 @@ public class ElectionPolynomial : DisposableBase
     }
 
     /// <summary>
+    /// Generates a polynomial for sharing election keys.
+    /// Each coefficient is an exponential order for the polynomial and the guardian secret key is the 0-index coefficient.
+    /// </summary>
+    public ElectionPolynomial(ElectionPolynomial that)
+    {
+
+        if (that.Coefficients.Any(i => !i.IsValid()))
+        {
+            throw new ArgumentException("Invalid coefficients provided");
+        }
+        Coefficients = new List<Coefficient>();
+        for (var i = 0; i < that.Coefficients.Count; i++)
+        {
+            Coefficients.Add(new Coefficient(that.Coefficients[i]));
+        }
+    }
+
+    /// <summary>
     /// Compute the single coordinate value of the polynomial at a given degree for use in sharing election keys.
     /// </summary>
     /// <param name="degree">The exponential degree of the polynomial (usually the sequence order)</param>
     public ElementModQ ComputeCoordinate(ulong degree)
     {
-        return ComputeCoordinate(new ElementModQ(degree));
+        using var degreeQ = new ElementModQ(degree);
+        return ComputeCoordinate(degreeQ);
     }
 
     /// <summary>
@@ -126,7 +166,8 @@ public class ElectionPolynomial : DisposableBase
     /// <param name="coordinate">The coordinate value of the polynomial at the given degree</param>
     public bool VerifyCoordinate(ulong degree, ElementModQ coordinate)
     {
-        return VerifyCoordinate(new ElementModQ(degree), coordinate);
+        using var degreeQ = new ElementModQ(degree);
+        return VerifyCoordinate(degreeQ, coordinate);
     }
 
     /// <summary>
@@ -147,7 +188,23 @@ public class ElectionPolynomial : DisposableBase
     /// <param name="commitments">The commitments of the coefficients of the polynomial</param>
     public static bool VerifyCoordinate(ulong degree, ElementModQ coordinate, List<ElementModP> commitments)
     {
-        return VerifyCoordinate(new ElementModQ(degree), coordinate, commitments);
+        //        using var degreeQ = new ElementModQ(degree);
+        //        return VerifyCoordinate(degreeQ, coordinate, commitments);
+
+        Console.WriteLine($"degree: {degree} coordinate: {coordinate.ToHex()}");
+
+        using var calculated = Constants.ONE_MOD_P; // start at 1 mod p.
+        foreach (var (commitment, index) in commitments.WithIndex())
+        {
+            Console.WriteLine($"commitment: {commitment.ToHex()}");
+            using var exponent = BigMath.PowModP(degree, index);
+            using var factor = BigMath.PowModP(commitment, exponent);
+            calculated.MultModP(factor);
+        }
+
+        using var value = BigMath.GPowP(coordinate);
+        return value.Equals(calculated);
+
     }
 
     /// <summary>
@@ -159,7 +216,7 @@ public class ElectionPolynomial : DisposableBase
     public static bool VerifyCoordinate(
         ElementModQ degree, ElementModQ coordinate, List<ElementModP> commitments)
     {
-        var calculated = Constants.ONE_MOD_P; // start at 1 mod p.
+        using var calculated = Constants.ONE_MOD_P; // start at 1 mod p.
         foreach (var (commitment, index) in commitments.WithIndex())
         {
             using var exponent = BigMath.PowModP(degree, index);
