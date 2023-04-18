@@ -50,9 +50,9 @@ public class CiphertextDecryptionSelectionShare
     {
         ObjectId = objectId;
         SequenceOrder = sequenceOrder;
-        DescriptionHash = descriptionHash;
+        DescriptionHash = new(descriptionHash);
         GuardianId = guardianId;
-        Share = share;
+        Share = new(share);
         Proof = proof;
     }
 
@@ -64,10 +64,21 @@ public class CiphertextDecryptionSelectionShare
     {
         ObjectId = selection.ObjectId;
         SequenceOrder = selection.SequenceOrder;
-        DescriptionHash = selection.DescriptionHash;
+        DescriptionHash = new(selection.DescriptionHash);
         GuardianId = guardianId;
-        Share = share;
+        Share = new(share);
         Proof = proof;
+    }
+
+    public CiphertextDecryptionSelectionShare(
+        CiphertextDecryptionSelectionShare share)
+    {
+        ObjectId = share.ObjectId;
+        SequenceOrder = share.SequenceOrder;
+        DescriptionHash = new(share.DescriptionHash);
+        GuardianId = share.GuardianId;
+        Share = new(share.Share);
+        Proof = share.Proof;
     }
 
     /// <summary>

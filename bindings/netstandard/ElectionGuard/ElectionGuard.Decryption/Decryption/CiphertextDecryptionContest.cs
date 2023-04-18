@@ -35,8 +35,8 @@ public record CiphertextDecryptionContest
     {
         ObjectId = objectId;
         SequenceOrder = sequenceOrder;
-        DescriptionHash = descriptionHash;
-        Selections = selections;
+        DescriptionHash = new(descriptionHash);
+        Selections = selections.Select(x => new CiphertextDecryptionSelection(x.Value)).ToDictionary(x => x.ObjectId);
     }
 
     public CiphertextDecryptionContest(IElectionContest contest,
@@ -44,8 +44,8 @@ public record CiphertextDecryptionContest
     {
         ObjectId = contest.ObjectId;
         SequenceOrder = contest.SequenceOrder;
-        DescriptionHash = contest.DescriptionHash;
-        Selections = selections;
+        DescriptionHash = new(contest.DescriptionHash);
+        Selections = selections.Select(x => new CiphertextDecryptionSelection(x.Value)).ToDictionary(x => x.ObjectId);
     }
 
     protected override void DisposeUnmanaged()

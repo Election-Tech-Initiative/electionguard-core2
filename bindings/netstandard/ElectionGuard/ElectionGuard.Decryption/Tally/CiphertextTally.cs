@@ -91,6 +91,19 @@ public record CiphertextTally : DisposableRecordBase, IEquatable<CiphertextTally
         Contests = contests;
     }
 
+    public CiphertextTally(CiphertextTally other) : base(other)
+    {
+        TallyId = other.TallyId;
+        Name = other.Name;
+        Context = other.Context;
+        Manifest = other.Manifest;
+        CastBallotIds = new HashSet<string>(other.CastBallotIds);
+        SpoiledBallotIds = new HashSet<string>(other.SpoiledBallotIds);
+        Contests = other.Contests.ToDictionary(
+            entry => entry.Key,
+            entry => new CiphertextTallyContest(entry.Value));
+    }
+
     /// <summary>
     /// Add a ballot to the tally and recalculate the tally.
     /// </summary>

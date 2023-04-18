@@ -38,7 +38,7 @@ namespace ElectionGuard.Decryption.Tally
         {
             ObjectId = objectId;
             SequenceOrder = sequenceOrder;
-            DescriptionHash = descriptionHash;
+            DescriptionHash = new(descriptionHash);
             Ciphertext = new ElGamalCiphertext(Constants.ONE_MOD_P, Constants.ONE_MOD_P);
         }
 
@@ -46,7 +46,7 @@ namespace ElectionGuard.Decryption.Tally
         {
             ObjectId = selection.ObjectId;
             SequenceOrder = selection.SequenceOrder;
-            DescriptionHash = selection.CryptoHash();
+            DescriptionHash = new(selection.CryptoHash());
             Ciphertext = new ElGamalCiphertext(Constants.ONE_MOD_P, Constants.ONE_MOD_P);
         }
 
@@ -55,8 +55,16 @@ namespace ElectionGuard.Decryption.Tally
         {
             ObjectId = selection.ObjectId;
             SequenceOrder = selection.SequenceOrder;
-            DescriptionHash = selection.CryptoHash();
-            Ciphertext = ciphertext;
+            DescriptionHash = new(selection.CryptoHash());
+            Ciphertext = new(ciphertext);
+        }
+
+        public CiphertextTallySelection(CiphertextTallySelection other)
+        {
+            ObjectId = other.ObjectId;
+            SequenceOrder = other.SequenceOrder;
+            DescriptionHash = new(other.DescriptionHash);
+            Ciphertext = new(other.Ciphertext);
         }
 
         /// <summary>

@@ -39,7 +39,7 @@ public record class CiphertextDecryptionTally : DisposableRecordBase
         List<ElectionPublicKey> guardians,
         List<CiphertextBallot> ballots)
     {
-        _tally = tally;
+        _tally = new(tally);
 
         foreach (var guardian in guardians)
         {

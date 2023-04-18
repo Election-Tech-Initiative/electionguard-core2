@@ -45,8 +45,8 @@ public record CiphertextDecryptionContestShare
     {
         ObjectId = contest.ObjectId;
         SequenceOrder = contest.SequenceOrder;
-        DescriptionHash = contest.DescriptionHash;
-        Selections = selections;
+        DescriptionHash = new(contest.DescriptionHash);
+        Selections = selections.Select(x => new CiphertextDecryptionSelectionShare(x.Value)).ToDictionary(x => x.ObjectId);
     }
 
     public CiphertextDecryptionContestShare(
@@ -57,10 +57,20 @@ public record CiphertextDecryptionContestShare
     {
         ObjectId = contest.ObjectId;
         SequenceOrder = contest.SequenceOrder;
-        DescriptionHash = contest.DescriptionHash;
-        ExtendedData = extendedData;
-        Commitment = commitment;
-        Selections = selections;
+        DescriptionHash = new(contest.DescriptionHash);
+        ExtendedData = new(extendedData);
+        Commitment = new(commitment);
+        Selections = selections.Select(x => new CiphertextDecryptionSelectionShare(x.Value)).ToDictionary(x => x.ObjectId);
+    }
+
+    public CiphertextDecryptionContestShare(CiphertextDecryptionContestShare other) : base(other)
+    {
+        ObjectId = other.ObjectId;
+        SequenceOrder = other.SequenceOrder;
+        DescriptionHash = new(other.DescriptionHash);
+        ExtendedData = new(other.ExtendedData);
+        Commitment = new(other.Commitment);
+        Selections = other.Selections.Select(x => new CiphertextDecryptionSelectionShare(x.Value)).ToDictionary(x => x.ObjectId);
     }
 
     /// <summary>

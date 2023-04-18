@@ -55,6 +55,14 @@ public class CiphertextTallyContest : DisposableBase, IElectionContest, IEquatab
         Selections = contestDescription.ToCiphertextTallySelectionDictionary();
     }
 
+    public CiphertextTallyContest(CiphertextTallyContest other)
+    {
+        ObjectId = other.ObjectId;
+        SequenceOrder = other.SequenceOrder;
+        DescriptionHash = new(other.DescriptionHash);
+        Selections = other.Selections.Select(x => new CiphertextTallySelection(x.Value)).ToDictionary(x => x.ObjectId);
+    }
+
     /// <summary>
     /// Accumulate a CiphertextBallotContest into the CiphertextTallyContest
     /// </summary>

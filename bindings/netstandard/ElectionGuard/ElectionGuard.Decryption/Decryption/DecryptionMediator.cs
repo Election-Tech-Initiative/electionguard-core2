@@ -35,21 +35,21 @@ public class DecryptionMediator : DisposableBase
     {
         Id = mediatorId;
 
-        Tallies.Add(tally.TallyId, tally);
+        Tallies.Add(tally.TallyId, new(tally));
         foreach (var guardian in guardians)
         {
-            Guardians.Add(guardian.OwnerId, guardian);
+            Guardians.Add(guardian.OwnerId, new(guardian));
         }
     }
 
     public void AddTally(CiphertextTally tally)
     {
-        Tallies.Add(tally.TallyId, tally);
+        Tallies.Add(tally.TallyId, new(tally));
     }
 
     public void AddGuardian(ElectionPublicKey guardian)
     {
-        Guardians.Add(guardian.OwnerId, guardian);
+        Guardians.Add(guardian.OwnerId, new(guardian));
     }
 
     /// <summary>
@@ -108,7 +108,7 @@ public class DecryptionMediator : DisposableBase
         }
 
         var tallyDecryption = TallyDecryptions[tallyShare.TallyId];
-        tallyDecryption.AddTallyShare(Guardians[tallyShare.GuardianId], tallyShare);
+        tallyDecryption.AddTallyShare(Guardians[tallyShare.GuardianId], new(tallyShare));
     }
 
     /// <summary>

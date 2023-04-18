@@ -73,6 +73,18 @@ namespace ElectionGuard
             Handle = handle;
         }
 
+        public ElGamalCiphertext(ElGamalCiphertext other)
+        {
+            using (var pad = new ElementModP(other.Pad))
+            using (var data = new ElementModP(other.Data))
+            {
+                var status = NativeInterface.ElGamalCiphertext.New(
+                    pad.Handle, data.Handle, out var handle);
+                status.ThrowIfError();
+                Handle = handle;
+            }
+        }
+
         internal ElGamalCiphertext(NativeElGamalCiphertext handle)
         {
             Handle = handle;

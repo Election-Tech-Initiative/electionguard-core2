@@ -22,7 +22,16 @@ public record CiphertextDecryptionTallyShare : DisposableRecordBase, IEquatable<
     {
         GuardianId = guardianId;
         TallyId = tallyId;
-        Contests = contests;
+        Contests = contests.Select(
+            x => new KeyValuePair<string, CiphertextDecryptionContestShare>(x.Key, new(x.Value))).ToDictionary(x => x.Key, x => x.Value);
+    }
+
+    public CiphertextDecryptionTallyShare(CiphertextDecryptionTallyShare other) : base(other)
+    {
+        GuardianId = other.GuardianId;
+        TallyId = other.TallyId;
+        Contests = other.Contests.Select(
+            x => new KeyValuePair<string, CiphertextDecryptionContestShare>(x.Key, new(x.Value))).ToDictionary(x => x.Key, x => x.Value);
     }
 
     public virtual bool IsValid(
