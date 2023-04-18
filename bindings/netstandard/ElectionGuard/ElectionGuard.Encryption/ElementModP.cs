@@ -127,7 +127,12 @@ namespace ElectionGuard
         {
             base.DisposeUnmanaged();
 
-            if (Handle == null || Handle.IsInvalid) return;
+            if (Handle == null || Handle.IsInvalid)
+            {
+                Handle = null;
+                return;
+            }
+
             Handle.Dispose();
             Handle = null;
         }
@@ -142,6 +147,14 @@ namespace ElectionGuard
         /// </Summary>
         public string ToHex()
         {
+            if (IsDisposed)
+            {
+                throw new ObjectDisposedException(nameof(ElementModP));
+            }
+            if (Handle == null || Handle.IsInvalid)
+            {
+                throw new ElectionGuardException("Handle is null or invalid");
+            }
             var status = NativeInterface.ElementModP.ToHex(Handle, out var pointer);
             if (status != Status.ELECTIONGUARD_STATUS_SUCCESS)
             {

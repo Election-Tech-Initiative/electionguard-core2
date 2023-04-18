@@ -84,8 +84,10 @@ namespace ElectionGuard
         public static unsafe HashedElGamalCiphertext Encrypt(
             ElementModQ coordinate, ElementModQ nonce, ElementModP publicKey, ElementModQ seed)
         {
-            // Console.WriteLine($"Encrypting {length} bytes");
-            Console.WriteLine($"Encrypt coordinate: {coordinate}");
+            if (coordinate == null || !coordinate.IsInBounds())
+            {
+                throw new ArgumentNullException(nameof(coordinate));
+            }
             var data = coordinate.ToBytes();
             return Encrypt(data, (ulong)data.Length, nonce, publicKey, seed);
         }
@@ -103,10 +105,27 @@ namespace ElectionGuard
         public static unsafe HashedElGamalCiphertext Encrypt(
             byte[] data, ulong length, ElementModQ nonce, ElementModP publicKey, ElementModQ seed)
         {
-            // Console.WriteLine($"Encrypting {length} bytes");
-            Console.WriteLine($"Encrypt Nonce: {nonce}");
-            Console.WriteLine($"Encrypt Public Key: {publicKey}");
-            Console.WriteLine($"Encrypt Seed: {seed}");
+            if (data == null)
+            {
+                throw new ArgumentNullException(nameof(data));
+            }
+            if (nonce == null || !nonce.IsInBounds())
+            {
+                throw new ArgumentNullException(nameof(nonce));
+            }
+            if (publicKey == null || !publicKey.IsInBounds())
+            {
+                throw new ArgumentNullException(nameof(publicKey));
+            }
+            if (seed == null || !seed.IsInBounds())
+            {
+                throw new ArgumentNullException(nameof(seed));
+            }
+
+            Console.WriteLine($"HashedElGamalCiphertext Encrypting {length} bytes");
+            // Console.WriteLine($"Encrypt Nonce: {nonce}");
+            // Console.WriteLine($"Encrypt Public Key: {publicKey}");
+            // Console.WriteLine($"Encrypt Seed: {seed}");
             fixed (byte* pointer = data)
             {
                 var status = NativeInterface.HashedElGamal.Encrypt(

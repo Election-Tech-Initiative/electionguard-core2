@@ -99,7 +99,7 @@ public class CiphertextDecryptionSelectionShare
 
         return IsValidEncryption(
             message.Ciphertext,
-            guardian.Key,
+            guardian.Key!,
             extendedBaseHash);
     }
 

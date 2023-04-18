@@ -1,3 +1,4 @@
+using ElectionGuard.ElectionSetup.Concurrency;
 using ElectionGuard.UI.Lib.Models;
 using ElectionGuard.UI.Lib.Services;
 
@@ -5,6 +6,8 @@ namespace ElectionGuard.ElectionSetup.Tests.Mocks;
 
 public class MockKeyCeremonyService : MockBaseDatabaseServiceBase<KeyCeremonyRecord>, IKeyCeremonyService
 {
+    private readonly AsyncLock _lock = new();
+
     public Task<List<KeyCeremonyRecord>?> GetAllCompleteAsync()
     {
         throw new NotImplementedException();
@@ -31,20 +34,25 @@ public class MockKeyCeremonyService : MockBaseDatabaseServiceBase<KeyCeremonyRec
         return Task.CompletedTask;
     }
 
-    public Task UpdateStateAsync(string keyCeremonyId, KeyCeremonyState state)
+    public async Task UpdateStateAsync(string keyCeremonyId, KeyCeremonyState state)
     {
-        Console.WriteLine($"UpdateStateAsync {keyCeremonyId} {state}");
-        var record = Collection[keyCeremonyId];
-        record.State = state;
-        record.UpdatedAt = DateTime.Now;
-        Collection[keyCeremonyId] = record;
-        return Task.CompletedTask;
+        using (await _lock.LockAsync())
+        {
+            Console.WriteLine($"UpdateStateAsync {keyCeremonyId} {state}");
+            var record = Collection[keyCeremonyId];
+            record.State = state;
+            record.UpdatedAt = DateTime.Now;
+            Collection[keyCeremonyId] = record;
+        }
     }
 
-    public override Task<KeyCeremonyRecord> SaveAsync(KeyCeremonyRecord data, string? table = null)
+    public override async Task<KeyCeremonyRecord> SaveAsync(KeyCeremonyRecord data, string? table = null)
     {
-        data.Id ??= Guid.NewGuid().ToString();
-        Collection[data.Id] = new(data);
-        return Task.FromResult(data);
+        using (await _lock.LockAsync())
+        {
+            data.Id ??= Guid.NewGuid().ToString();
+            Collection[data.Id] = new(data);
+            return data;
+        }
     }
 }

@@ -108,6 +108,7 @@ public class KeyCeremonyGenerator
         mediators.Add(adminMediator);
         foreach (var i in Enumerable.Range(1, numberOfGuardians))
         {
+            Console.WriteLine($"Generating mediator for guardian {i}...");
             var mediator = new KeyCeremonyMediatorHarness(
                 $"mediator_guardian_{i}",
                 $"guardian_{i}",

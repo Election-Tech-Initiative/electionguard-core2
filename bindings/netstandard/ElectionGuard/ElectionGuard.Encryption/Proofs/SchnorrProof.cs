@@ -1,4 +1,6 @@
-﻿namespace ElectionGuard.Proofs
+﻿using Newtonsoft.Json;
+
+namespace ElectionGuard.Proofs
 {
 
     /// <summary>
@@ -28,18 +30,17 @@
 
         public ProofUsage Usage = ProofUsage.SecretValue;
 
-        public SchnorrProof()
+        [JsonConstructor]
+        public SchnorrProof(
+            ElementModP publicKey,
+            ElementModP commitment,
+            ElementModQ challenge,
+            ElementModQ response)
         {
-            using (var randQ = BigMath.RandQ())
-            using (var keyPair = ElGamalKeyPair.FromSecret(randQ))
-            using (var seed = BigMath.RandQ())
-            {
-
-                PublicKey = new ElementModP(keyPair.PublicKey);
-                Commitment = BigMath.GPowP(seed);
-                Challenge = BigMath.HashElems(PublicKey, Commitment);
-                Response = BigMath.APlusBMulCModQ(seed, keyPair.SecretKey, Challenge);
-            }
+            PublicKey = new ElementModP(publicKey);
+            Commitment = new ElementModP(commitment);
+            Challenge = new ElementModQ(challenge);
+            Response = new ElementModQ(response);
         }
 
         /// <summary>
@@ -97,14 +98,13 @@
             Response = BigMath.APlusBMulCModQ(seed, keyPair.SecretKey, Challenge);
         }
 
-        public SchnorrProof(SchnorrProof that)
+        public SchnorrProof(SchnorrProof other)
         {
-            PublicKey = new ElementModP(that.PublicKey);
-            Commitment = new ElementModP(that.Commitment);
-            Challenge = new ElementModQ(that.Challenge);
-            Response = new ElementModQ(that.Response);
+            PublicKey = new ElementModP(other.PublicKey);
+            Commitment = new ElementModP(other.Commitment);
+            Challenge = new ElementModQ(other.Challenge);
+            Response = new ElementModQ(other.Response);
         }
-
 
         /// <summary>
         /// Check validity of the `proof` for proving possession of the secret key corresponding to the public key

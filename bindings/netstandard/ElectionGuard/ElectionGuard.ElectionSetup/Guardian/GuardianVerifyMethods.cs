@@ -34,7 +34,6 @@ public partial class Guardian
     // save_election_partial_key_verification
     public void SaveElectionPartialKeyVerification(ElectionPartialKeyVerification verification)
     {
-        _otherGuardianPartialKeyVerification ??= new();
         _otherGuardianPartialKeyVerification[verification.DesignatedId!] = verification;
     }
 
@@ -42,8 +41,8 @@ public partial class Guardian
     public ElectionPartialKeyVerification? VerifyElectionPartialKeyBackup(
         string guardianId, string keyCeremonyId)
     {
-        var backup = _otherGuardianPartialKeyBackups?[guardianId];
-        var publicKey = _otherGuardianPublicKeys?[guardianId];
+        var backup = _otherGuardianPartialKeyBackups[guardianId];
+        var publicKey = _otherGuardianPublicKeys[guardianId];
 
         // TODO: throw exception instead of returning null
         if (backup is null)
@@ -55,31 +54,32 @@ public partial class Guardian
             return null;
         }
         return VerifyElectionPartialKeyBackup(
-            backup?.DesignatedId!, backup, publicKey, _electionKeys, keyCeremonyId);
+            backup?.DesignatedId!, backup!, publicKey, _electionKeys, keyCeremonyId);
     }
 
     private static ElectionPartialKeyVerification VerifyElectionPartialKeyBackup(
         string receiverGuardianId,
-        ElectionPartialKeyBackup? senderGuardianBackup,
-        ElectionPublicKey? senderGuardianPublicKey,
+        ElectionPartialKeyBackup senderGuardianBackup,
+        ElectionPublicKey senderGuardianPublicKey,
         ElectionKeyPair electionKeys, string keyCeremonyId)
     {
         using var encryptionSeed = GetBackupSeed(
                 receiverGuardianId,
-                senderGuardianBackup?.DesignatedSequenceOrder
+                senderGuardianBackup.DesignatedSequenceOrder
             );
 
         var secretKey = electionKeys.KeyPair.SecretKey;
-        var data = senderGuardianBackup?.EncryptedCoordinate?.Decrypt(
+        var data = senderGuardianBackup.EncryptedCoordinate.Decrypt(
                 secretKey, encryptionSeed, false);
 
         using var coordinateData = new ElementModQ(data);
 
         var verified = ElectionPolynomial.VerifyCoordinate(
-                senderGuardianBackup!.DesignatedSequenceOrder,
+                senderGuardianBackup.DesignatedSequenceOrder,
                 coordinateData,
-                senderGuardianPublicKey!.CoefficientCommitments
+                senderGuardianPublicKey.CoefficientCommitments
             );
+        Console.WriteLine($"VerifyElectionPartialKeyBackup: {receiverGuardianId} -> {senderGuardianBackup.OwnerId} {senderGuardianBackup.DesignatedSequenceOrder} {verified}");
         return new()
         {
             KeyCeremonyId = keyCeremonyId,

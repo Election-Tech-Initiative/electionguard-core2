@@ -1,4 +1,4 @@
-using System.Text.Json;
+using ElectionGuard.ElectionSetup.Concurrency;
 using ElectionGuard.UI.Lib.Models;
 using ElectionGuard.UI.Lib.Services;
 
@@ -6,6 +6,8 @@ namespace ElectionGuard.ElectionSetup.Tests.Mocks;
 
 public class MockGuardianPublicKeyService : MockBaseDatabaseServiceBase<GuardianPublicKey>, IGuardianPublicKeyService
 {
+    private readonly AsyncLock _lock = new();
+
     public Task<long> CountAsync(string keyCeremonyId)
     {
         var count = Collection.Values.Count(x => x.KeyCeremonyId == keyCeremonyId);
@@ -26,30 +28,34 @@ public class MockGuardianPublicKeyService : MockBaseDatabaseServiceBase<Guardian
         return Task.FromResult(record);
     }
 
-    public Task UpdatePublicKeyAsync(string keyCeremonyId, string guardianId, ElectionPublicKey? key)
+    public async Task UpdatePublicKeyAsync(string keyCeremonyId, string guardianId, ElectionPublicKey? key)
     {
-        var record = Collection.Values.FirstOrDefault(
-            x => x.KeyCeremonyId == keyCeremonyId && x.GuardianId == guardianId);
-        if (record != null)
+        using (await _lock.LockAsync())
         {
-            Console.WriteLine(
-            $"UpdatePublicKeyAsync existing {keyCeremonyId} {guardianId}");
-            //Console.WriteLine(JsonSerializer.Serialize(key));
-            record.PublicKey = key != null ? new(key) : null;
-            Collection[record.Id] = record;
-        }
-        else
-        {
-            var newRecord = new GuardianPublicKey
+            var record = Collection.Values.FirstOrDefault(
+                x => x.KeyCeremonyId == keyCeremonyId
+                && x.GuardianId == guardianId);
+            if (record != null)
             {
-                KeyCeremonyId = keyCeremonyId,
-                GuardianId = guardianId,
-                PublicKey = key != null ? new(key) : null
-            };
-            Collection[newRecord.Id] = newRecord;
-        }
+                Console.WriteLine(
+                    $"UpdatePublicKeyAsync update existing {keyCeremonyId} {guardianId}");
+                record.PublicKey = key != null ? new(key) : null;
+                Collection[record.Id] = record;
+            }
+            else
+            {
+                Console.WriteLine(
+                    $"UpdatePublicKeyAsync create new {keyCeremonyId} {guardianId}");
+                var newRecord = new GuardianPublicKey
+                {
+                    KeyCeremonyId = keyCeremonyId,
+                    GuardianId = guardianId,
+                    PublicKey = key != null ? new(key) : null
+                };
+                Collection[newRecord.Id] = newRecord;
+            }
 
-        return Task.CompletedTask;
+        }
     }
 
     public override Task<GuardianPublicKey> SaveAsync(GuardianPublicKey data, string? table = null)

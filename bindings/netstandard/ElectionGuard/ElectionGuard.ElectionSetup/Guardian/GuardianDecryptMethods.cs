@@ -77,14 +77,15 @@ public partial class Guardian
     /// <param name="guardianBackup">Missing guardian's backup</param>
     /// <param name="keyPair">The present guardian's key pair that will be used to decrypt the backup</param>
     /// <returns>coordinatedata of the decryption and its proof</returns>
-    private static ElementModQ? DecryptBackup(ElectionPartialKeyBackup guardianBackup, ElectionKeyPair keyPair)
+    private static ElementModQ? DecryptBackup(
+        ElectionPartialKeyBackup guardianBackup, ElectionKeyPair keyPair)
     {
         var encryptionSeed = GetBackupSeed(
             keyPair.OwnerId,
             keyPair.SequenceOrder
         );
 
-        var bytesOptional = guardianBackup.EncryptedCoordinate?.Decrypt(
+        var bytesOptional = guardianBackup.EncryptedCoordinate.Decrypt(
             keyPair.KeyPair.SecretKey, encryptionSeed, false);
 
         if (bytesOptional is null)

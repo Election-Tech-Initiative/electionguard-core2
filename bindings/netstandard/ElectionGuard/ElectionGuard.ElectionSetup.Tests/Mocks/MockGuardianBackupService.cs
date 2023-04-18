@@ -1,4 +1,4 @@
-using System.Text.Json;
+using ElectionGuard.ElectionSetup.Concurrency;
 using ElectionGuard.UI.Lib.Models;
 using ElectionGuard.UI.Lib.Services;
 
@@ -6,6 +6,7 @@ namespace ElectionGuard.ElectionSetup.Tests.Mocks;
 
 public class MockGuardianBackupService : MockBaseDatabaseServiceBase<GuardianBackups>, IGuardianBackupService
 {
+    private readonly AsyncLock _lock = new();
     public Task<long> CountAsync(string keyCeremonyId)
     {
         var count = Collection.Values.Count(x => x.KeyCeremonyId == keyCeremonyId);
@@ -33,12 +34,21 @@ public class MockGuardianBackupService : MockBaseDatabaseServiceBase<GuardianBac
         return Task.FromResult(backups ?? null);
     }
 
-    public override Task<GuardianBackups> SaveAsync(GuardianBackups data, string? table = null)
+    public override async Task<GuardianBackups> SaveAsync(
+        GuardianBackups data, string? table = null)
     {
-        //Console.WriteLine($"MockGuardianBackupService.SaveAsync {JsonSerializer.Serialize(data.Backup)}");
-        data.Id ??= Guid.NewGuid().ToString();
-        Collection[data.Id] = new(data);
-        return Task.FromResult(data);
+        using (await _lock.LockAsync())
+        {
+            Console.WriteLine($"MockGuardianBackupService.SaveAsync {data.GuardianId} -> {data.DesignatedId}");
+            data.Id ??= Guid.NewGuid().ToString();
+            Collection[data.Id] = new(data);
+            return data;
+        }
     }
 
+    protected override void DisposeManaged()
+    {
+        base.DisposeManaged();
+        _lock.Dispose();
+    }
 }

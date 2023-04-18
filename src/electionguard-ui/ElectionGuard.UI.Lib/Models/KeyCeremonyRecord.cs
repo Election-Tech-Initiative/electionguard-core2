@@ -1,6 +1,4 @@
-﻿using System.Text.Json.Serialization;
-
-namespace ElectionGuard.UI.Lib.Models;
+﻿namespace ElectionGuard.UI.Lib.Models;
 
 /// <summary>
 /// Data for the key ceremony that is saved to the database

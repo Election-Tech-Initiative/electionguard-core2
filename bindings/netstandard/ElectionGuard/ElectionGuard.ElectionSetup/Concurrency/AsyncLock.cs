@@ -1,4 +1,4 @@
-namespace ElectionGuard.Decryption.Concurrency;
+namespace ElectionGuard.ElectionSetup.Concurrency;
 
 /// <summary>
 /// http://www.hanselman.com/blog/ComparingTwoTechniquesInNETAsynchronousCoordinationPrimitives.aspx 

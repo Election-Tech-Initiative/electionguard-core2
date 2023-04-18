@@ -1,6 +1,6 @@
-using System.Text.Json.Serialization;
 using ElectionGuard.Proofs;
 using ElectionGuard.UI.Lib.Extensions;
+using Newtonsoft.Json;
 
 namespace ElectionGuard.UI.Lib.Models;
 
@@ -20,8 +20,10 @@ public class ElectionPublicKey : DisposableBase
         OwnerId = ownerId;
         SequenceOrder = sequenceOrder;
         Key = new(key);
-        CoefficientCommitments = coefficientCommitments.Select(x => new ElementModP(x)).ToList();
-        CoefficientProofs = coefficientProofs.Select(x => new SchnorrProof(x)).ToList();
+        CoefficientCommitments = coefficientCommitments
+            .Select(x => new ElementModP(x)).ToList();
+        CoefficientProofs = coefficientProofs
+            .Select(x => new SchnorrProof(x)).ToList();
     }
 
     public ElectionPublicKey(ElectionPublicKey other)
@@ -29,8 +31,10 @@ public class ElectionPublicKey : DisposableBase
         OwnerId = other.OwnerId;
         SequenceOrder = other.SequenceOrder;
         Key = new(other.Key);
-        CoefficientCommitments = other.CoefficientCommitments.Select(x => new ElementModP(x)).ToList();
-        CoefficientProofs = other.CoefficientProofs.Select(x => new SchnorrProof(x)).ToList();
+        CoefficientCommitments = other.CoefficientCommitments
+            .Select(x => new ElementModP(x)).ToList();
+        CoefficientProofs = other.CoefficientProofs
+            .Select(x => new SchnorrProof(x)).ToList();
     }
 
     /// <summary>
@@ -47,7 +51,7 @@ public class ElectionPublicKey : DisposableBase
     /// The election public for the guardian
     /// Note: This is the same as the first coefficient commitment
     /// </summary>
-    public ElementModP? Key { get; init; }
+    public ElementModP Key { get; init; }
 
     /// <summary>
     /// The commitments for the coefficients in the secret polynomial
@@ -63,7 +67,7 @@ public class ElectionPublicKey : DisposableBase
     {
         base.DisposeUnmanaged();
 
-        Key?.Dispose();
+        Key.Dispose();
         CoefficientCommitments.Dispose();
         CoefficientProofs.Dispose();
     }

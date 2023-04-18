@@ -1,4 +1,4 @@
-using ElectionGuard.Decryption.Concurrency;
+using ElectionGuard.ElectionSetup.Concurrency;
 using ElectionGuard.Encryption.Ballot;
 
 namespace ElectionGuard.Decryption.Tally
@@ -7,7 +7,8 @@ namespace ElectionGuard.Decryption.Tally
     /// A CiphertextTallySelection is a homomorphic accumulation of ElGamalCiphertexts that represent the
     /// encrypted votes for a particular selection in a contest.
     /// </summary>
-    public class CiphertextTallySelection : DisposableBase, ICiphertextSelection, IEquatable<CiphertextTallySelection>
+    public class CiphertextTallySelection : DisposableBase,
+        ICiphertextSelection, IEquatable<CiphertextTallySelection>
     {
         /// <summary>
         /// The object id of the selection

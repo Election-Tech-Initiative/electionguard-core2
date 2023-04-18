@@ -4,7 +4,7 @@ using MongoDB.Driver;
 
 namespace ElectionGuard.ElectionSetup.Tests.Mocks;
 
-public abstract class MockBaseDatabaseServiceBase<T> : IDatabaseService<T> where T : DatabaseRecord
+public abstract class MockBaseDatabaseServiceBase<T> : DisposableBase, IDatabaseService<T> where T : DatabaseRecord
 {
     protected readonly Dictionary<string, T> Collection = new();
 

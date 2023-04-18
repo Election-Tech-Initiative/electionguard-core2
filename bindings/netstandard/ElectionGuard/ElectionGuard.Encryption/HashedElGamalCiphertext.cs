@@ -73,8 +73,8 @@ namespace ElectionGuard
 
         internal NativeInterface.HashedElGamalCiphertext.HashedElGamalCiphertextHandle Handle;
 
-        public HashedElGamalCiphertext(HashedElGamalCiphertext that) : this(
-            new ElementModP(that.Pad), that.Data, that.Mac)
+        public HashedElGamalCiphertext(HashedElGamalCiphertext other) : this(
+            new ElementModP(other.Pad), other.Data, other.Mac)
         {
         }
 
@@ -96,7 +96,8 @@ namespace ElectionGuard
         }
 
 
-        internal HashedElGamalCiphertext(NativeInterface.HashedElGamalCiphertext.HashedElGamalCiphertextHandle handle)
+        internal HashedElGamalCiphertext(
+            NativeInterface.HashedElGamalCiphertext.HashedElGamalCiphertextHandle handle)
         {
             Handle = handle;
         }
@@ -109,11 +110,24 @@ namespace ElectionGuard
         /// </Summary>
         public byte[] Decrypt(ElementModQ secretKey, ElementModQ descriptionHash, bool lookForPadding)
         {
-            // Console.WriteLine($"Decrypting  bytes");
-            Console.WriteLine($"Decrypt: secretKey: {secretKey.ToHex()}");
-            // Console.WriteLine($"descriptionHash: {descriptionHash.ToHex()}");
+            if (Handle == null || Handle.IsInvalid)
+            {
+                throw new ObjectDisposedException(nameof(HashedElGamalCiphertext));
+            }
+
+            if (secretKey == null || !secretKey.IsInBounds())
+            {
+                throw new ArgumentNullException(nameof(secretKey));
+            }
+            if (descriptionHash == null || !descriptionHash.IsInBounds())
+            {
+                throw new ArgumentNullException(nameof(descriptionHash));
+            }
+
+            Console.WriteLine($"HashedElGamalCiphertext Decrypting");
             var status = NativeInterface.HashedElGamalCiphertext.Decrypt(
-                Handle, secretKey.Handle, descriptionHash.Handle, lookForPadding, out var data, out var size);
+                Handle, secretKey.Handle, descriptionHash.Handle,
+                lookForPadding, out var data, out var size);
             status.ThrowIfError();
 
             var byteArray = new byte[(int)size];

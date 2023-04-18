@@ -15,7 +15,8 @@ public class TestKeyCeremony : DisposableBase
         KeyCeremonyMediatorHarness? mediator;
 
         // setup a key ceremony
-        var keyCeremony = KeyCeremonyGenerator.GenerateKeyCeremony(numberOfGuardians, quorum);
+        var keyCeremony = KeyCeremonyGenerator.GenerateKeyCeremony(
+            numberOfGuardians, quorum);
 
         // Setup guardians
         for (ulong sequenceOrder = 1; sequenceOrder <= (ulong)numberOfGuardians; sequenceOrder++)
@@ -36,7 +37,7 @@ public class TestKeyCeremony : DisposableBase
         // Announce
         foreach (var guardian in guardians)
         {
-            _mediator.Announce(guardian.SharePublicKey());
+            mediator.Announce(guardian.SharePublicKey());
         }
 
         // Share Public keys

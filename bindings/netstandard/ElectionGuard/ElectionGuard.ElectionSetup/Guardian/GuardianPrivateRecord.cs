@@ -32,11 +32,11 @@ public record GuardianPrivateRecord : DisposableRecordBase
         Dictionary<string, ElectionPartialKeyVerification>? guardianElectionPartialKeyVerifications)
     {
         GuardianId = guardianId;
-        ElectionKeys = electionKeys;
+        ElectionKeys = new(electionKeys);
         BackupsToShare = backupsToShare;
-        GuardianElectionPublicKeys = guardianElectionPublicKeys;
-        GuardianElectionPartialKeyBackups = guardianElectionPartialKeyBackups;
-        GuardianElectionPartialKeyVerifications = guardianElectionPartialKeyVerifications;
+        GuardianElectionPublicKeys = guardianElectionPublicKeys ?? new();
+        GuardianElectionPartialKeyBackups = guardianElectionPartialKeyBackups ?? new();
+        GuardianElectionPartialKeyVerifications = guardianElectionPartialKeyVerifications ?? new();
     }
 
     protected override void DisposeUnmanaged()
