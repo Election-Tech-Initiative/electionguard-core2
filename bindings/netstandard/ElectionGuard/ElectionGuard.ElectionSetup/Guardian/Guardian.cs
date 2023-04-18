@@ -208,13 +208,7 @@ public partial class Guardian : DisposableBase
     // export_private_data
     public static implicit operator GuardianPrivateRecord(Guardian data)
     {
-        return new(
-            data.GuardianId,
-            data._electionKeys,
-            data.BackupsToShare,
-            data._otherGuardianPublicKeys,
-            data._otherGuardianPartialKeyBackups,
-            data._otherGuardianPartialKeyVerification);
+        return new(data.GuardianId, data._electionKeys);
     }
 
     // all_guardian_keys_received

@@ -1,4 +1,4 @@
-using ElectionGuard.Encryption.Utils.Converters;
+﻿using ElectionGuard.Encryption.Utils.Converters;
 using ElectionGuard.UI.Lib.Models;
 using ElectionGuard.UI.Lib.Services;
 using Newtonsoft.Json;
@@ -22,11 +22,7 @@ public static class GuardianStorageExtensions
     {
         return new(
             privateGuardianRecord.ElectionKeys,
-            new(keyCeremonyId, numberOfGuardians, quorum),
-            privateGuardianRecord.GuardianElectionPublicKeys,
-            privateGuardianRecord.GuardianElectionPartialKeyBackups,
-            privateGuardianRecord.BackupsToShare,
-            privateGuardianRecord.GuardianElectionPartialKeyVerifications);
+            new(keyCeremonyId, numberOfGuardians, quorum));
     }
 
     /// <summary>

@@ -1,4 +1,4 @@
-
+﻿
 using ElectionGuard.ElectionSetup.Extensions;
 using ElectionGuard.UI.Lib.Models;
 
@@ -15,28 +15,12 @@ public record GuardianPrivateRecord : DisposableRecordBase
 
     public ElectionKeyPair ElectionKeys { get; init; }
 
-    public Dictionary<string, ElectionPartialKeyBackup>? BackupsToShare { get; init; }
-
-    public Dictionary<string, ElectionPublicKey>? GuardianElectionPublicKeys { get; init; }
-
-    public Dictionary<string, ElectionPartialKeyBackup>? GuardianElectionPartialKeyBackups { get; init; }
-
-    public Dictionary<string, ElectionPartialKeyVerification>? GuardianElectionPartialKeyVerifications { get; init; }
-
     public GuardianPrivateRecord(
         string guardianId,
-        ElectionKeyPair electionKeys,
-        Dictionary<string, ElectionPartialKeyBackup>? backupsToShare,
-        Dictionary<string, ElectionPublicKey>? guardianElectionPublicKeys,
-        Dictionary<string, ElectionPartialKeyBackup>? guardianElectionPartialKeyBackups,
-        Dictionary<string, ElectionPartialKeyVerification>? guardianElectionPartialKeyVerifications)
+        ElectionKeyPair electionKeys)
     {
         GuardianId = guardianId;
         ElectionKeys = new(electionKeys);
-        BackupsToShare = backupsToShare;
-        GuardianElectionPublicKeys = guardianElectionPublicKeys ?? new();
-        GuardianElectionPartialKeyBackups = guardianElectionPartialKeyBackups ?? new();
-        GuardianElectionPartialKeyVerifications = guardianElectionPartialKeyVerifications ?? new();
     }
 
     protected override void DisposeUnmanaged()
@@ -44,8 +28,5 @@ public record GuardianPrivateRecord : DisposableRecordBase
         base.DisposeUnmanaged();
 
         ElectionKeys.Dispose();
-        BackupsToShare?.Dispose();
-        GuardianElectionPublicKeys?.Dispose();
-        GuardianElectionPartialKeyBackups?.Dispose();
     }
 }
