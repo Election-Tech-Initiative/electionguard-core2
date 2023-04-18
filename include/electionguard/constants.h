@@ -8,8 +8,8 @@ extern "C" {
 #include <stdint.h>
 
 enum MAX_IDENIFIER_LENGTH { MAX_IDENIFIER_LENGTH = 256 };
-enum MAX_P_LEN { MAX_P_LEN = 64 };
-enum MAX_Q_LEN { MAX_Q_LEN = 4 };
+enum MAX_P_LEN { MAX_P_LEN = 64, MAX_P_LEN_32 = 128 };
+enum MAX_Q_LEN { MAX_Q_LEN = 4, MAX_Q_LEN_32 = 8 };
 
 // values used for fixed-base exponentiation tables
 static const uint64_t LUT_WINDOW_SIZE = 8;

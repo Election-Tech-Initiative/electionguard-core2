@@ -165,6 +165,12 @@ install(
 )
 
 # Compiler configuration
+if(EMSCRIPTEN)
+    message("++ Configuring compile options for Emscripten")
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -pthread")
+    target_compile_options(${META_PROJECT_TARGET} PUBLIC -Wno-unqualified-std-cast-call)
+endif()
+
 if(MSVC)
     message("++ Configuring compile options for MSVC")
 endif()
@@ -175,11 +181,11 @@ endif()
 
 if(CMAKE_CXX_COMPILER_ID MATCHES "Clang")
     message("++ Configuring compile options for Clang")
+
 elseif(CMAKE_CXX_COMPILER_ID MATCHES "GNU")
     message("++ Configuring compile options for GNU")
-
-    # TODO: qualify all calls to move as std::move
-    target_compile_options(${META_PROJECT_TARGET} PUBLIC -Wno-unqualified-std-cast-call)
+else()
+    message("++ Configuring compile options for unknown compiler" CMAKE_CXX_COMPILER_ID)
 endif()
 
 # ---- Test ----

@@ -233,12 +233,14 @@ ifeq ($(OPERATING_SYSTEM),Windows)
 else
 	cmake -S . -B $(ELECTIONGUARD_BUILD_LIBS_DIR)/wasm/$(TARGET) \
 		-DCMAKE_BUILD_TYPE=$(TARGET) \
+		-DUSE_32BIT_MATH=ON \
 		-DDISABLE_VALE=$(TEMP_DISABLE_VALE) \
 		-DCPM_SOURCE_CACHE=$(CPM_SOURCE_CACHE) \
 		-DCMAKE_TOOLCHAIN_FILE=$(EMSDK)/upstream/emscripten/cmake/Modules/Platform/Emscripten.cmake
 	cmake --build $(ELECTIONGUARD_BUILD_LIBS_DIR)/wasm/$(TARGET)
 	#npx tsembind $(ELECTIONGUARD_BUILD_LIBS_DIR)/wasm/$(TARGET)/src/electionguard/wasm/electionguard.wasm.js
 	cp $(ELECTIONGUARD_BUILD_LIBS_DIR)/wasm/$(TARGET)/src/electionguard/wasm/electionguard.wasm.js ./bindings/typescript/src/wasm/electionguard.wasm.js
+	cp $(ELECTIONGUARD_BUILD_LIBS_DIR)/wasm/$(TARGET)/src/electionguard/wasm/electionguard.wasm.wasm ./bindings/typescript/src/wasm/electionguard.wasm.wasm
 endif
 
 build-npm:

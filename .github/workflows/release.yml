@@ -126,3 +126,10 @@ jobs:
       - name: Push to Nuget.org
         working-directory: bindings/netstandard/ElectionGuard/ElectionGuard.Encryption
         run: dotnet nuget push "**/*.nupkg" --api-key ${{ secrets.NUGET_API_KEY}} --source https://api.nuget.org/v3/index.json --skip-duplicate
+      - name: Publish to NPM
+        working-directory: dist/generated/public/typescript/@frogland/backend
+        run: |
+          echo "//registry.npmjs.org/:_authToken=${{ secrets.NPM_REGISTRY_TOKEN }}" > .npmrc
+          echo $GITHUB_REF
+          npm package
+          npm publish
