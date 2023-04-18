@@ -190,7 +190,6 @@ public class ElectionPolynomial : DisposableBase
         using var calculated = new ElementModP(Constants.ONE_MOD_P); // start at 1 mod p.
         foreach (var (commitment, index) in commitments.WithIndex())
         {
-            Console.WriteLine($"commitment: {commitment.ToHex()}");
             using var exponent = BigMath.PowModP(degree, index);
             using var factor = BigMath.PowModP(commitment, exponent);
             _ = calculated.MultModP(factor);

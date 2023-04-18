@@ -63,7 +63,7 @@ public class TestDecryptWithSharesSimple : DisposableBase
                 .GetRange(0, QUORUM)
                 .ToList();
 
-        var mediator = new DecryptionMediator(
+        using var mediator = new DecryptionMediator(
             "fake-mediator",
             data.CiphertextTally,
             guardians.Select(i => i.SharePublicKey()).ToList()
@@ -72,7 +72,7 @@ public class TestDecryptWithSharesSimple : DisposableBase
         // Act
         foreach (var guardian in guardians)
         {
-            var share = guardian.ComputeDecryptionShare(data.CiphertextTally);
+            using var share = guardian.ComputeDecryptionShare(data.CiphertextTally);
             mediator.SubmitShare(share!);
         }
         var plaintextTally = mediator.Decrypt(data.CiphertextTally.TallyId);
@@ -96,7 +96,7 @@ public class TestDecryptWithSharesSimple : DisposableBase
         var guardians = data.KeyCeremony.Guardians
                 .ToList();
         var spoiledBallots = data.CiphertextBallots.Where(i => i.IsSpoiled).ToList();
-        var mediator = new DecryptionMediator(
+        using var mediator = new DecryptionMediator(
             "fake-mediator",
             data.CiphertextTally,
             guardians.Select(i => i.SharePublicKey()).ToList());

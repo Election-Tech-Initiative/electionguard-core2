@@ -121,6 +121,13 @@ public class CiphertextDecryptionSelectionShare
         return proofIsValid;
     }
 
+    protected override void DisposeUnmanaged()
+    {
+        base.DisposeUnmanaged();
+        DescriptionHash.Dispose();
+        Share.Dispose();
+    }
+
     #region Equality
 
     public bool Equals(CiphertextDecryptionSelectionShare? other)

@@ -124,4 +124,16 @@ public record CiphertextDecryptionContestShare
         }
         return true;
     }
+
+    protected override void DisposeUnmanaged()
+    {
+        base.DisposeUnmanaged();
+        ExtendedData?.Dispose();
+        Commitment?.Dispose();
+        foreach (var selection in Selections.Values)
+        {
+            selection.Dispose();
+        }
+        DescriptionHash.Dispose();
+    }
 }

@@ -117,6 +117,13 @@ public class CiphertextDecryptionSelection : DisposableBase, IElectionSelection
         Accumulate(share.Share, lagrangeCoefficient);
     }
 
+    protected override void DisposeUnmanaged()
+    {
+        base.DisposeUnmanaged();
+        Value.Dispose();
+        DescriptionHash.Dispose();
+    }
+
     private void Accumulate(
         ElementModP share,
         ElementModQ lagrangeCoefficient)

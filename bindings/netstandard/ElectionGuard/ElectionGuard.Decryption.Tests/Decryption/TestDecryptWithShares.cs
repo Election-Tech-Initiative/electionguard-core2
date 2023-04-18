@@ -33,7 +33,7 @@ public class TestDecryptWithShares : DisposableBase
     {
         // Arrange
         var guardians = Data.KeyCeremony.Guardians
-                .ToList();
+               .ToList();
         var mediator = new DecryptionMediator(
             "fake-mediator",
             Data.CiphertextTally,
@@ -42,7 +42,7 @@ public class TestDecryptWithShares : DisposableBase
         // Act
         foreach (var guardian in guardians)
         {
-            var share = guardian.ComputeDecryptionShare(Data.CiphertextTally);
+            using var share = guardian.ComputeDecryptionShare(Data.CiphertextTally);
             mediator.SubmitShare(share!);
         }
         var result = mediator.Decrypt(Data.CiphertextTally.TallyId);
@@ -58,7 +58,7 @@ public class TestDecryptWithShares : DisposableBase
         var guardians = Data.KeyCeremony.Guardians
                 .GetRange(0, QUORUM)
                 .ToList();
-        var mediator = new DecryptionMediator(
+        using var mediator = new DecryptionMediator(
             "fake-mediator",
             Data.CiphertextTally,
             guardians.Select(i => i.SharePublicKey()).ToList());
@@ -66,7 +66,7 @@ public class TestDecryptWithShares : DisposableBase
         // Act
         foreach (var guardian in guardians)
         {
-            var share = guardian.ComputeDecryptionShare(Data.CiphertextTally);
+            using var share = guardian.ComputeDecryptionShare(Data.CiphertextTally);
             mediator.SubmitShare(share!);
         }
         var result = mediator.Decrypt(Data.CiphertextTally.TallyId);
@@ -82,7 +82,7 @@ public class TestDecryptWithShares : DisposableBase
         var guardians = Data.KeyCeremony.Guardians
                 .ToList();
 
-        var mediator = new DecryptionMediator(
+        using var mediator = new DecryptionMediator(
             "fake-mediator",
             Data.CiphertextTally,
             guardians.Select(i => i.SharePublicKey()).ToList());
@@ -114,7 +114,7 @@ public class TestDecryptWithShares : DisposableBase
                 .GetRange(0, QUORUM)
                 .ToList();
 
-        var mediator = new DecryptionMediator(
+        using var mediator = new DecryptionMediator(
             "fake-mediator",
             Data.CiphertextTally,
             guardians.Select(i => i.SharePublicKey()).ToList());
@@ -146,7 +146,7 @@ public class TestDecryptWithShares : DisposableBase
                 .GetRange(0, QUORUM)
                 .ToList();
 
-        var mediator = new DecryptionMediator(
+        using var mediator = new DecryptionMediator(
             "fake-mediator",
             Data.CiphertextTally,
             guardians.Select(i => i.SharePublicKey()).ToList());

@@ -1,4 +1,5 @@
 using ElectionGuard.ElectionSetup;
+using ElectionGuard.ElectionSetup.Extensions;
 using ElectionGuard.UI.Lib.Models;
 
 namespace ElectionGuard.Decryption.Decryption;
@@ -162,6 +163,17 @@ public record class CiphertextDecryptionBallot : DisposableRecordBase, IEquatabl
         }
 
         return true;
+    }
+
+    protected override void DisposeUnmanaged()
+    {
+        base.DisposeUnmanaged();
+        ManifestHash.Dispose();
+        GuardianPublicKeys.Dispose();
+        foreach (var share in Shares)
+        {
+            share.Value.Dispose();
+        }
     }
 
     private void AddShare(CiphertextDecryptionBallotShare share)

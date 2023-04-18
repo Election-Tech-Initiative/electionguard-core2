@@ -110,6 +110,15 @@ public record PlaintextTally : DisposableRecordBase, IEquatable<PlaintextTally>
         }
     }
 
+    protected override void DisposeUnmanaged()
+    {
+        foreach (var contest in Contests.Values)
+        {
+            contest.Dispose();
+        }
+        base.DisposeUnmanaged();
+    }
+
     public static implicit operator string(PlaintextTally self)
     {
         return self.ToString();

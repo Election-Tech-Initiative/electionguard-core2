@@ -1,4 +1,5 @@
 using ElectionGuard.ElectionSetup;
+using ElectionGuard.ElectionSetup.Extensions;
 using ElectionGuard.Encryption.Ballot;
 
 namespace ElectionGuard.Decryption.Decryption;
@@ -45,5 +46,12 @@ public record CiphertextDecryptionContest
         SequenceOrder = contest.SequenceOrder;
         DescriptionHash = contest.DescriptionHash;
         Selections = selections;
+    }
+
+    protected override void DisposeUnmanaged()
+    {
+        Selections.Dispose();
+        DescriptionHash.Dispose();
+        base.DisposeUnmanaged();
     }
 }

@@ -72,4 +72,13 @@ public record CiphertextDecryptionTallyShare : DisposableRecordBase, IEquatable<
             ? throw new ArgumentException($"GuardianId {guardianId} does not match {GuardianId}")
             : Contests[contestId].Selections[selectionId];
     }
+
+    protected override void DisposeUnmanaged()
+    {
+        foreach (var contest in Contests.Values)
+        {
+            contest.Dispose();
+        }
+        base.DisposeUnmanaged();
+    }
 }

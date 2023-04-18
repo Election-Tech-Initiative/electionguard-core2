@@ -182,6 +182,23 @@ public class DecryptionMediator : DisposableBase
         }
     }
 
+    protected override void DisposeUnmanaged()
+    {
+        base.DisposeUnmanaged();
+        foreach (var tallyDecryption in TallyDecryptions.Values)
+        {
+            tallyDecryption.Dispose();
+        }
+        foreach (var guardian in Guardians.Values)
+        {
+            guardian.Dispose();
+        }
+        foreach (var tally in Tallies.Values)
+        {
+            tally.Dispose();
+        }
+    }
+
     private void EnsureCiphertextDecryptionTally(CiphertextDecryptionTallyShare share)
     {
         if (!Tallies.ContainsKey(share.TallyId))

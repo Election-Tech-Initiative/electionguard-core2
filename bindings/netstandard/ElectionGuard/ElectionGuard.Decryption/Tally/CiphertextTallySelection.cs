@@ -159,6 +159,7 @@ namespace ElectionGuard.Decryption.Tally
             base.DisposeUnmanaged();
             DescriptionHash.Dispose();
             Ciphertext.Dispose();
+            _mutex.Dispose();
         }
 
         # region Equality

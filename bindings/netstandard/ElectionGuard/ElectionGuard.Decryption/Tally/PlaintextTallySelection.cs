@@ -79,6 +79,13 @@ public class PlaintextTallySelection
         Value = value;
     }
 
+    protected override void DisposeUnmanaged()
+    {
+        base.DisposeManaged();
+        DescriptionHash.Dispose();
+        Value.Dispose();
+    }
+
     # region IEquatable
 
     public bool Equals(PlaintextTallySelection? other)

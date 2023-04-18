@@ -1,3 +1,4 @@
+using ElectionGuard.ElectionSetup.Extensions;
 using ElectionGuard.Encryption.Ballot;
 
 namespace ElectionGuard.Decryption.Tally;
@@ -132,6 +133,14 @@ public class CiphertextTallyContest : DisposableBase, IElectionContest, IEquatab
         {
             await AccumulateAsync(contest, cancellationToken);
         }
+    }
+
+    protected override void DisposeUnmanaged()
+    {
+        base.DisposeUnmanaged();
+        Selections.Dispose();
+        Selections.Clear();
+        DescriptionHash.Dispose();
     }
 
     #region IEquatable
