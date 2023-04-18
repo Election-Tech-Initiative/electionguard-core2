@@ -1,5 +1,4 @@
 ﻿using ElectionGuard.UI.Lib.Models;
-using Newtonsoft.Json;
 
 namespace ElectionGuard.ElectionSetup;
 
@@ -40,7 +39,7 @@ public class ElectionKeyPair : DisposableBase
     {
         OwnerId = ownerId;
         SequenceOrder = sequenceOrder;
-        var randQ = BigMath.RandQ();
+        using var randQ = BigMath.RandQ();
         KeyPair = ElGamalKeyPair.FromSecret(randQ);
         Polynomial = new ElectionPolynomial(quorum, KeyPair);
     }

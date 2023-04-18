@@ -55,13 +55,14 @@ namespace ElectionGuard
                 var status = NativeInterface.ElGamalCiphertext.GetCryptoHash(
                     Handle, out var value);
                 status.ThrowIfError();
-                if (value.IsInvalid)
-                {
-                    return null;
-                }
-                return new ElementModQ(value);
+                return value.IsInvalid ? null : new ElementModQ(value);
             }
         }
+
+        /// <summary>
+        /// Determines if the element is valid and has not been cleaned up
+        /// </summary>
+        public bool IsAddressable => Handle != null && !Handle.IsInvalid && !IsDisposed;
 
         internal NativeElGamalCiphertext Handle;
 
@@ -70,23 +71,22 @@ namespace ElectionGuard
             var status = NativeInterface.ElGamalCiphertext.New(
                 pad.Handle, data.Handle, out var handle);
             status.ThrowIfError();
+            handle.ThrowIfInvalid();
             Handle = handle;
         }
 
         public ElGamalCiphertext(ElGamalCiphertext other)
         {
-            using (var pad = new ElementModP(other.Pad))
-            using (var data = new ElementModP(other.Data))
-            {
-                var status = NativeInterface.ElGamalCiphertext.New(
-                    pad.Handle, data.Handle, out var handle);
-                status.ThrowIfError();
-                Handle = handle;
-            }
+            var status = NativeInterface.ElGamalCiphertext.New(
+                other.Pad.Handle, other.Data.Handle, out var handle);
+            status.ThrowIfError();
+            handle.ThrowIfInvalid();
+            Handle = handle;
         }
 
         internal ElGamalCiphertext(NativeElGamalCiphertext handle)
         {
+            handle.ThrowIfInvalid();
             Handle = handle;
         }
 
@@ -157,11 +157,7 @@ namespace ElectionGuard
             var status = NativeInterface.ElGamalCiphertext.PartialDecrypt(
                 Handle, secretKey.Handle, out var value);
             status.ThrowIfError();
-            if (value.IsInvalid)
-            {
-                return null;
-            }
-            return new ElementModP(value);
+            return value.IsInvalid ? null : new ElementModP(value);
         }
 
         public override string ToString()

@@ -146,9 +146,9 @@ public class CiphertextTallyContest : DisposableBase, IElectionContest, IEquatab
     protected override void DisposeUnmanaged()
     {
         base.DisposeUnmanaged();
-        Selections.Dispose();
-        Selections.Clear();
-        DescriptionHash.Dispose();
+        Selections?.Dispose();
+        Selections?.Clear();
+        DescriptionHash?.Dispose();
     }
 
     #region IEquatable

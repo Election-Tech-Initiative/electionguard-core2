@@ -67,8 +67,8 @@ public class PlaintextTallyContest : DisposableBase, IElectionContest, IEquatabl
 
     protected override void DisposeUnmanaged()
     {
-        Selections.Dispose();
-        Selections.Clear();
+        Selections?.Dispose();
+        Selections?.Clear();
         base.DisposeUnmanaged();
     }
 
