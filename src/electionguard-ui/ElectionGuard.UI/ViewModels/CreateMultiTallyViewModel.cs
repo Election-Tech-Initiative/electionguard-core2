@@ -43,7 +43,28 @@ public partial class CreateMultiTallyViewModel : BaseViewModel
             foreach (var item in allElections)
             {
                 var allUploads = await _ballotUploadService.GetByElectionIdAsync(item.ElectionId);
-                var election = new ElectionItem { Election = item, BallotUploads = allUploads };
+                var ballotCountTotal = 0L;
+                var ballotAddedTotal = 0L;
+                var ballotSpoiledTotal = 0L;
+                var ballotDuplicateTotal = 0L;
+                var ballotRejectedTotal = 0L;
+
+                allUploads.ForEach((upload) =>
+                {
+                    ballotCountTotal += upload.BallotCount;
+                    ballotAddedTotal += upload.BallotImported;
+                    ballotSpoiledTotal += upload.BallotSpoiled;
+                    ballotDuplicateTotal += upload.BallotDuplicated;
+                    ballotRejectedTotal += upload.BallotRejected;
+                });
+                var election = new ElectionItem { 
+                    Election = item,
+                    BallotUploads = allUploads,
+                    BallotAddedTotal = ballotAddedTotal,
+                    BallotDuplicateTotal = ballotDuplicateTotal,
+                    BallotRejectedTotal = ballotDuplicateTotal,
+                    BallotSpoiledTotal = ballotSpoiledTotal,
+                    BallotCountTotal = ballotCountTotal };
                 Elections.Add(election);
             }
         });

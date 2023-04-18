@@ -129,7 +129,7 @@
                                     </Grid>
                                 </DataTemplate>
                             </CollectionView.ItemTemplate>
-                            <!--<CollectionView.Footer>
+                            <CollectionView.Footer>
                                 <Grid BackgroundColor="{StaticResource Gray400}" ColumnDefinitions="3.5*, *, *, *, *, *">
                                     <Label
                                         Grid.Column="0"
@@ -162,7 +162,7 @@
                                         FontAttributes="Bold"
                                         Text="{Binding BallotCountTotal}" />
                                 </Grid>
-                            </CollectionView.Footer>-->
+                            </CollectionView.Footer>
                         </CollectionView>
                     </VerticalStackLayout>
                 </DataTemplate>
