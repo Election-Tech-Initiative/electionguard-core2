@@ -4,6 +4,7 @@ using ElectionGuard.UI.Lib.Extensions;
 using ElectionGuard.UI.Lib.Models;
 using ElectionGuard.UI.Lib.Services;
 using System.Text.Json;
+using System.Text.Json.Serialization;
 
 namespace ElectionGuard.ElectionSetup;
 
@@ -31,23 +32,22 @@ public record GuardianPrivateRecord : DisposableRecordBase
         Dictionary<string, ElectionPartialKeyVerification>? guardianElectionPartialKeyVerifications)
     {
         GuardianId = guardianId;
-        ElectionKeys = electionKeys;
-        BackupsToShare = backupsToShare;
-        GuardianElectionPublicKeys = guardianElectionPublicKeys;
-        GuardianElectionPartialKeyBackups = guardianElectionPartialKeyBackups;
-        GuardianElectionPartialKeyVerifications = guardianElectionPartialKeyVerifications;
+        ElectionKeys = new(electionKeys);
+        BackupsToShare = backupsToShare ?? new();
+        GuardianElectionPublicKeys = guardianElectionPublicKeys ?? new();
+        GuardianElectionPartialKeyBackups = guardianElectionPartialKeyBackups ?? new();
+        GuardianElectionPartialKeyVerifications = guardianElectionPartialKeyVerifications ?? new();
     }
 
     protected override void DisposeUnmanaged()
     {
         base.DisposeUnmanaged();
 
-        ElectionKeys.Dispose();
+        ElectionKeys?.Dispose();
         BackupsToShare?.Dispose();
         GuardianElectionPublicKeys?.Dispose();
         GuardianElectionPartialKeyBackups?.Dispose();
     }
-
 }
 
 public record GuardianRecord : DisposableRecordBase
@@ -123,6 +123,24 @@ public class Guardian : DisposableBase
         SaveGuardianKey(_electionKeys.Share());
     }
 
+    public Guardian(
+        string guardianId,
+        ulong sequenceOrder,
+        int numberOfGuardians,
+        int quorum,
+        string keyCeremonyId,
+        Random random)
+    {
+        GuardianId = guardianId;
+        SequenceOrder = sequenceOrder;
+
+        var keyPair = new ElGamalKeyPair(random.NextElementModQ());
+        _electionKeys = new(guardianId, sequenceOrder, quorum, keyPair, random);
+        CeremonyDetails = new(keyCeremonyId, numberOfGuardians, quorum);
+
+        SaveGuardianKey(_electionKeys.Share());
+    }
+
     /// <summary>
     /// Initialize a guardian with the specified arguments.
     /// </summary>
@@ -170,7 +188,7 @@ public class Guardian : DisposableBase
         CeremonyDetails ceremonyDetails
         )
     {
-        _electionKeys = keyPair;
+        _electionKeys = new(keyPair);
         GuardianId = keyPair.OwnerId;
         SequenceOrder = keyPair.SequenceOrder;
         CeremonyDetails = ceremonyDetails;
@@ -201,20 +219,20 @@ public class Guardian : DisposableBase
         SequenceOrder = keyPair.SequenceOrder;
         CeremonyDetails = new(ceremonyDetails.KeyCeremonyId, ceremonyDetails.NumberOfGuardians, ceremonyDetails.Quorum);
 
-        //_otherGuardianPublicKeys = otherGuardianPublicKeys;
-        //_otherGuardianPartialKeyBackups = otherGuardianPartialKeyBackups;
+        _otherGuardianPublicKeys = otherGuardianPublicKeys;
+        _otherGuardianPartialKeyBackups = otherGuardianPartialKeyBackups;
 
-        //if (partialKeyBackup != null)
-        //{
-        //    BackupsToShare = partialKeyBackup;
-        //}
+        if (partialKeyBackup != null)
+        {
+            BackupsToShare = partialKeyBackup;
+        }
 
-        //if (guardianElectionPartialKeyVerifications != null)
-        //{
-        //    _otherGuardianPartialKeyVerification = guardianElectionPartialKeyVerifications;
-        //}
+        if (guardianElectionPartialKeyVerifications != null)
+        {
+            _otherGuardianPartialKeyVerification = guardianElectionPartialKeyVerifications;
+        }
 
-        //SaveGuardianKey(_electionKeys.Share());
+        SaveGuardianKey(_electionKeys.Share());
     }
 
     protected override void DisposeUnmanaged()
@@ -266,16 +284,18 @@ public class Guardian : DisposableBase
 
 
     //    private ElectionPartialKeyBackup GenerateElectionPartialKeyBackup(ulong sequenceOrder)
-    private ElectionPartialKeyBackup GenerateElectionPartialKeyBackup(string senderGuardianId, ElectionPolynomial electionPolynomial, ElectionPublicKey receiverGuardianPublicKey)
+    private ElectionPartialKeyBackup GenerateElectionPartialKeyBackup(
+        string senderGuardianId, ElectionPolynomial electionPolynomial, ElectionPublicKey receiverGuardianPublicKey)
     {
         using var coordinate = electionPolynomial.ComputeCoordinate(receiverGuardianPublicKey.SequenceOrder);
-        using var nonce = BigMath.RandQ();
+        using var nonce = Constants.ONE_MOD_Q;// BigMath.RandQ();
         var seed = GetBackupSeed(
                 receiverGuardianPublicKey.OwnerId,
                 receiverGuardianPublicKey.SequenceOrder);
 
         var data = coordinate.ToBytes();
-        var encryptedCoordinate = HashedElgamal.Encrypt(data, (ulong)data.Length, nonce, receiverGuardianPublicKey.Key, seed);
+        var encryptedCoordinate = HashedElgamal.Encrypt(
+            coordinate, nonce, receiverGuardianPublicKey.Key, seed);
 
         return new()
         {
@@ -286,9 +306,9 @@ public class Guardian : DisposableBase
         };
     }
 
-    private ElementModQ GetBackupSeed(string ownerId, ulong? sequenceOrder)
+    private ElementModQ GetBackupSeed(string ownerId, ulong sequenceOrder)
     {
-        return BigMath.HashElems(ownerId, sequenceOrder ?? 0);
+        return BigMath.HashElems(ownerId, sequenceOrder);
     }
 
     private static ElementModQ GetCoordinate(
@@ -330,7 +350,7 @@ public class Guardian : DisposableBase
         return new(
             key.OwnerId,
             key.SequenceOrder,
-            key.Key,
+            key.Key!,
             key.CoefficientCommitments,
             key.CoefficientProofs);
     }
@@ -467,32 +487,38 @@ public class Guardian : DisposableBase
         {
             return null;
         }
-        return VerifyElectionPartialKeyBackup(backup?.DesignatedId!, backup, publicKey, _electionKeys, keyCeremonyId);
+        return VerifyElectionPartialKeyBackup(backup?.DesignatedId!, backup!, publicKey, _electionKeys, keyCeremonyId);
     }
 
     private ElectionPartialKeyVerification VerifyElectionPartialKeyBackup(
         string receiverGuardianId,
-        ElectionPartialKeyBackup? senderGuardianBackup,
-        ElectionPublicKey? senderGuardianPublicKey,
+        ElectionPartialKeyBackup senderGuardianBackup,
+        ElectionPublicKey senderGuardianPublicKey,
         ElectionKeyPair electionKeys, string keyCeremonyId)
     {
         using var encryptionSeed = GetBackupSeed(
                 receiverGuardianId,
-                senderGuardianBackup?.DesignatedSequenceOrder
+                senderGuardianBackup.DesignatedSequenceOrder
             );
 
+        Console.WriteLine(
+            $"Guardian: {receiverGuardianId} DesignatedSequence: {senderGuardianBackup.DesignatedSequenceOrder} Seed: {encryptionSeed.ToHex()}");
+
         var secretKey = electionKeys.KeyPair.SecretKey;
-        var data = senderGuardianBackup?.EncryptedCoordinate?.Decrypt(
+        var data = senderGuardianBackup!.EncryptedCoordinate!.Decrypt(
                 secretKey, encryptionSeed, false);
 
         using var coordinateData = new ElementModQ(data);
 
         var verified = ElectionPolynomial.VerifyCoordinate(
-                senderGuardianBackup!.DesignatedSequenceOrder,
+                senderGuardianBackup.DesignatedSequenceOrder,
                 coordinateData,
                 senderGuardianPublicKey!.CoefficientCommitments
             );
-        return new()
+
+        Console.WriteLine($"Guardian: {GuardianId} Other: {senderGuardianBackup.OwnerId} Verified: {verified}");
+
+        var result = new ElectionPartialKeyVerification()
         {
             KeyCeremonyId = keyCeremonyId,
             OwnerId = senderGuardianBackup.OwnerId,
@@ -500,6 +526,7 @@ public class Guardian : DisposableBase
             VerifierId = receiverGuardianId,
             Verified = verified
         };
+        return result;
     }
 
     // publish_election_backup_challenge
@@ -676,6 +703,23 @@ public static class GuardianStorageExtensions
         var basePath = Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData);
         var filePath = Path.Combine(basePath, PrivateKeyFolder, keyCeremonyId);
 
+        Console.WriteLine($"Saving guardian to {filePath} {filename}");
         storage.ToFile(filePath, filename, dataJson);
     }
+
+    //  public class ElementModPJsonConverter : JsonConverter<ElementModP>
+    // {
+    //     public override ElGamalKeyPair Read(
+    //         ref Utf8JsonReader reader,
+    //         Type typeToConvert,
+    //         JsonSerializerOptions options) =>
+    //             ElGamalKeyPair(reader.GetString()!);
+
+    //     public override void Write(
+    //         Utf8JsonWriter writer,
+    //         ElGamalKeyPair dateTimeValue,
+    //         JsonSerializerOptions options) =>
+    //             writer.WriteStringValue(dateTimeValue.ToString(
+    //                 "MM/dd/yyyy", CultureInfo.InvariantCulture));
+    // }
 }
