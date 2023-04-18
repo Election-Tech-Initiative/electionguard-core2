@@ -34,6 +34,11 @@ public class ElectionPolynomial : DisposableBase
             .Select(i => i.Proof)
             .ToList();
 
+    public ElectionPolynomial()
+    {
+        Coefficients = new List<Coefficient>();
+    }
+
     /// <summary>
     /// Generates a polynomial for sharing election keys. 
     /// Each coefficient is an exponential order for polynomial and the guardian secret key is the 0-index coefficient.
@@ -45,7 +50,7 @@ public class ElectionPolynomial : DisposableBase
         Coefficients = new List<Coefficient>();
         for (var i = 0; i < numberOfCoefficients; i++)
         {
-            Coefficients.Add(new Coefficient());
+            Coefficients.Add(new Coefficient(BigMath.RandQ()));
         }
     }
 
@@ -60,7 +65,7 @@ public class ElectionPolynomial : DisposableBase
         Coefficients = new List<Coefficient> { new(secretKey) };
         for (var i = 1; i < numberOfCoefficients; i++)
         {
-            Coefficients.Add(new Coefficient());
+            Coefficients.Add(new Coefficient(BigMath.RandQ()));
         }
     }
 
@@ -75,7 +80,22 @@ public class ElectionPolynomial : DisposableBase
         Coefficients = new List<Coefficient> { new(keyPair.SecretKey) };
         for (var i = 1; i < numberOfCoefficients; i++)
         {
-            Coefficients.Add(new Coefficient());
+            Coefficients.Add(new Coefficient(BigMath.RandQ()));
+        }
+    }
+
+    /// <summary>
+    /// Generates a polynomial for sharing election keys using the provided key pair as the zero-index coefficient.
+    /// Each coefficient is an exponential order for the polynomial and the guardian secret key is the 0-index coefficient.
+    /// </summary>
+    /// <param name="numberOfCoefficients">Number of coefficients of polynomial, typically the quorum count of guardians</param>
+    public ElectionPolynomial(
+        [Range(1, int.MaxValue)] int numberOfCoefficients, ElGamalKeyPair keyPair, Random random)
+    {
+        Coefficients = new List<Coefficient> { new(keyPair.SecretKey) };
+        for (var i = 1; i < numberOfCoefficients; i++)
+        {
+            Coefficients.Add(new Coefficient(random.NextElementModQ(), random.NextElementModQ()));
         }
     }
 
@@ -83,7 +103,6 @@ public class ElectionPolynomial : DisposableBase
     /// Generates a polynomial for sharing election keys.
     /// Each coefficient is an exponential order for the polynomial and the guardian secret key is the 0-index coefficient.
     /// </summary>
-    [JsonConstructor]
     public ElectionPolynomial(List<Coefficient> coefficients)
     {
         if (coefficients.Any(i => !i.IsValid()))
@@ -99,6 +118,7 @@ public class ElectionPolynomial : DisposableBase
     /// </summary>
     public ElectionPolynomial(ElectionPolynomial that)
     {
+
         if (that.Coefficients.Any(i => !i.IsValid()))
         {
             throw new ArgumentException("Invalid coefficients provided");
@@ -171,9 +191,12 @@ public class ElectionPolynomial : DisposableBase
         //        using var degreeQ = new ElementModQ(degree);
         //        return VerifyCoordinate(degreeQ, coordinate, commitments);
 
+        Console.WriteLine($"degree: {degree} coordinate: {coordinate.ToHex()}");
+
         using var calculated = Constants.ONE_MOD_P; // start at 1 mod p.
         foreach (var (commitment, index) in commitments.WithIndex())
         {
+            Console.WriteLine($"commitment: {commitment.ToHex()}");
             using var exponent = BigMath.PowModP(degree, index);
             using var factor = BigMath.PowModP(commitment, exponent);
             calculated.MultModP(factor);

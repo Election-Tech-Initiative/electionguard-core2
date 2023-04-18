@@ -17,6 +17,24 @@ public class ElectionJointKey : DisposableBase
     /// </summary>
     public ElementModQ? CommitmentHash { get; init; }
 
+    public ElectionJointKey()
+    {
+
+    }
+
+    public ElectionJointKey(
+        ElementModP jointPublicKey, ElementModQ commitmentHash)
+    {
+        JointPublicKey = new(jointPublicKey);
+        CommitmentHash = new(commitmentHash);
+    }
+
+    public ElectionJointKey(ElectionJointKey other)
+    {
+        JointPublicKey = new(other.JointPublicKey);
+        CommitmentHash = new(other.CommitmentHash);
+    }
+
     protected override void DisposeUnmanaged()
     {
         base.DisposeUnmanaged();

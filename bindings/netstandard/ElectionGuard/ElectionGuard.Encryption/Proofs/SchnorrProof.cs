@@ -35,7 +35,7 @@
             using (var seed = BigMath.RandQ())
             {
 
-                PublicKey = keyPair.PublicKey;
+                PublicKey = new ElementModP(keyPair.PublicKey);
                 Commitment = BigMath.GPowP(seed);
                 Challenge = BigMath.HashElems(PublicKey, Commitment);
                 Response = BigMath.APlusBMulCModQ(seed, keyPair.SecretKey, Challenge);
@@ -50,7 +50,7 @@
             using (var keyPair = ElGamalKeyPair.FromSecret(secretKey))
             using (var seed = BigMath.RandQ())
             {
-                PublicKey = keyPair.PublicKey;
+                PublicKey = new ElementModP(keyPair.PublicKey);
                 Commitment = BigMath.GPowP(seed);
                 Challenge = BigMath.HashElems(PublicKey, Commitment);
                 Response = BigMath.APlusBMulCModQ(seed, keyPair.SecretKey, Challenge);
@@ -64,8 +64,7 @@
         {
             using (var seed = BigMath.RandQ())
             {
-
-                PublicKey = keyPair.PublicKey;
+                PublicKey = new ElementModP(keyPair.PublicKey);
                 Commitment = BigMath.GPowP(seed);
                 Challenge = BigMath.HashElems(PublicKey, Commitment);
                 Response = BigMath.APlusBMulCModQ(seed, keyPair.SecretKey, Challenge);
@@ -80,7 +79,7 @@
             using (var keyPair = ElGamalKeyPair.FromSecret(secretKey))
             {
 
-                PublicKey = keyPair.PublicKey;
+                PublicKey = new ElementModP(keyPair.PublicKey);
                 Commitment = BigMath.GPowP(seed);
                 Challenge = BigMath.HashElems(PublicKey, Commitment);
                 Response = BigMath.APlusBMulCModQ(seed, keyPair.SecretKey, Challenge);
@@ -92,7 +91,7 @@
         /// </summary>
         public SchnorrProof(ElGamalKeyPair keyPair, ElementModQ seed)
         {
-            PublicKey = keyPair.PublicKey;
+            PublicKey = new ElementModP(keyPair.PublicKey);
             Commitment = BigMath.GPowP(seed);
             Challenge = BigMath.HashElems(PublicKey, Commitment);
             Response = BigMath.APlusBMulCModQ(seed, keyPair.SecretKey, Challenge);

@@ -19,6 +19,20 @@ public partial class KeyCeremonyRecord : DatabaseRecord
         CreatedBy = admin;
     }
 
+    public KeyCeremonyRecord(KeyCeremonyRecord other) : base(nameof(KeyCeremonyRecord))
+    {
+        KeyCeremonyId = other.KeyCeremonyId;
+        Name = other.Name;
+        Quorum = other.Quorum;
+        NumberOfGuardians = other.NumberOfGuardians;
+        JointKey = other.JointKey != null ? new(other.JointKey) : null;
+        CreatedBy = other.CreatedBy;
+        CreatedAt = other.CreatedAt;
+        CompletedAt = other.CompletedAt;
+        UpdatedAt = other.UpdatedAt;
+        State = other.State;
+    }
+
     [ObservableProperty]
     private string? _keyCeremonyId;
 

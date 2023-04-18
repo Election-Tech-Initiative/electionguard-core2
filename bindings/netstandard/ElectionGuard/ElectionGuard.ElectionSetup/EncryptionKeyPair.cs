@@ -18,20 +18,25 @@ public class EncryptionKeyPair : DisposableBase
         PublicKey = new ElementModP(0);
         SecretKey = new ElementModQ(0);
     }
+
+    public EncryptionKeyPair(EncryptionKeyPair keyPair)
+    {
+        PublicKey = new(keyPair.PublicKey);
+        SecretKey = new(keyPair.SecretKey);
+    }
+
     public EncryptionKeyPair(ElementModQ secretKey, ElementModP publicKey)
     {
         PublicKey = new(publicKey);
         SecretKey = new(secretKey);
     }
 
-    public static implicit operator ElGamalKeyPair(EncryptionKeyPair data)
+    public EncryptionKeyPair(ElGamalKeyPair keyPair)
     {
-        return ElGamalKeyPair.FromPair(data.SecretKey, data.PublicKey);
+        PublicKey = new(keyPair.PublicKey);
+        SecretKey = new(keyPair.SecretKey);
     }
-    public static implicit operator EncryptionKeyPair(ElGamalKeyPair data)
-    {
-        return new ElGamalKeyPair(data.SecretKey, data.PublicKey);
-    }
+
     protected override void DisposeUnmanaged()
     {
         base.DisposeUnmanaged();

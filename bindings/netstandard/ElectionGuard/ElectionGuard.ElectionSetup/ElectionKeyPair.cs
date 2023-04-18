@@ -23,7 +23,7 @@ public class ElectionKeyPair : DisposableBase
     /// The pair of public and private election keys for the guardian
     /// </summary>
     public EncryptionKeyPair KeyPair { get; set; }
-    
+
     /// <summary>
     /// The secret polynomial for the guardian
     /// </summary>
@@ -45,10 +45,10 @@ public class ElectionKeyPair : DisposableBase
     {
         OwnerId = ownerId;
         SequenceOrder = sequenceOrder;
-        using var randQ = BigMath.RandQ();
-        using var pair = ElGamalKeyPair.FromSecret(randQ);
-        KeyPair = new(pair.SecretKey, pair.PublicKey);
-        Polynomial = new ElectionPolynomial(quorum, KeyPair);
+        var randQ = BigMath.RandQ();
+        var pair = ElGamalKeyPair.FromSecret(randQ);
+        Polynomial = new ElectionPolynomial(quorum, pair);
+        KeyPair = new(pair);
     }
 
     /// <summary>
@@ -68,6 +68,19 @@ public class ElectionKeyPair : DisposableBase
         Polynomial = new ElectionPolynomial(quorum, keyPair);
     }
 
+    public ElectionKeyPair(
+        string ownerId,
+        ulong sequenceOrder,
+        int quorum,
+        ElGamalKeyPair keyPair,
+        Random random)
+    {
+        OwnerId = ownerId;
+        SequenceOrder = sequenceOrder;
+        KeyPair = new(keyPair.SecretKey, keyPair.PublicKey);
+        Polynomial = new ElectionPolynomial(quorum, keyPair, random);
+    }
+
     /// <summary>
     /// Construct an Election Key Pair using the provided polynomial.
     /// The secret key is set to the zero-index coefficient per the spec.
@@ -81,11 +94,12 @@ public class ElectionKeyPair : DisposableBase
     {
         OwnerId = ownerId;
         SequenceOrder = sequenceOrder;
-        Polynomial = polynomial;
+        Polynomial = new(polynomial);
 
         // set the secret key to the zero-index coefficient
         var ai_0 = polynomial.Coefficients[0].Value;
-        KeyPair = ElGamalKeyPair.FromSecret(ai_0);
+        var keyPair = ElGamalKeyPair.FromSecret(ai_0);
+        KeyPair = new EncryptionKeyPair(keyPair);
     }
 
     /// <summary>
@@ -101,7 +115,7 @@ public class ElectionKeyPair : DisposableBase
         OwnerId = ownerId;
         SequenceOrder = sequenceOrder;
         KeyPair = new(keyPair.SecretKey, keyPair.PublicKey);
-        Polynomial = polynomial;
+        Polynomial = new(polynomial);
 
         // TODO: verify the polynomial is valid for the keypair
     }
@@ -121,7 +135,7 @@ public class ElectionKeyPair : DisposableBase
         return new(
             OwnerId,
             SequenceOrder,
-            KeyPair.PublicKey,
+            new(KeyPair.PublicKey),
             Polynomial.Commitments,
             Polynomial.Proofs
         );

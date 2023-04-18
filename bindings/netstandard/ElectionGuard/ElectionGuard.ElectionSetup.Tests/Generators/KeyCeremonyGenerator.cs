@@ -1,6 +1,7 @@
 
 using ElectionGuard.UI.Lib.Models;
 using ElectionGuard.ElectionSetup.Tests.KeyCeremony;
+using ElectionGuard.ElectionSetup.Tests.Mocks;
 
 namespace ElectionGuard.ElectionSetup.Tests.Generators;
 
@@ -30,10 +31,11 @@ public class TestKeyCeremonyData : DisposableBase
 
 public class KeyCeremonyGenerator
 {
+    public const string DEFAULT_ADMIN_ID = "default-admin-id";
     public static KeyCeremonyRecord GenerateKeyCeremony(
         int numberOfGuardians,
         int quorum,
-        string adminId = "default-admin-id",
+        string adminId = DEFAULT_ADMIN_ID,
         string name = "test-key-ceremony")
     {
         var keyCeremony = new KeyCeremonyRecord(
@@ -45,32 +47,78 @@ public class KeyCeremonyGenerator
     public static List<Guardian> GenerateGuardians(
         KeyCeremonyRecord keyCeremony)
     {
+
         var guardians = new List<Guardian>();
         for (ulong sequenceOrder = 1;
             sequenceOrder <= (ulong)keyCeremony.NumberOfGuardians;
             sequenceOrder++)
         {
+            var random = new Random((int)sequenceOrder);
             var guardianId = sequenceOrder.ToString();
             var guardian = new Guardian(
-                guardianId,
+                $"guardian_{guardianId}",
                 sequenceOrder,
                 keyCeremony.NumberOfGuardians,
                 keyCeremony.Quorum,
-                keyCeremony.Id);
+                keyCeremony.Id,
+                random);
             guardians.Add(guardian);
         }
         return guardians;
     }
 
+    // generate a single mediator for the key ceremony
     public static KeyCeremonyMediatorHarness GenerateMediator(
         KeyCeremonyRecord keyCeremony,
         List<Guardian> guardians)
     {
+        var service = new MockKeyCeremonyService();
+        var publicKeys = new MockGuardianPublicKeyService();
+        var verification = new MockVerificationService();
+        var backups = new MockGuardianBackupService();
         var mediator = new KeyCeremonyMediatorHarness(
-            "mediator_1",
+            "mediator_guardian_1",
             guardians[0].GuardianId,
-            keyCeremony);
+            keyCeremony,
+            service,
+            backups,
+            publicKeys,
+            verification);
         return mediator;
+    }
+
+    // generate individual mediators for each admin and guardian
+    public static List<KeyCeremonyMediatorHarness> GenerateMediators(
+        KeyCeremonyRecord keyCeremony,
+        int numberOfGuardians)
+    {
+        var service = new MockKeyCeremonyService();
+        var publicKeys = new MockGuardianPublicKeyService();
+        var verification = new MockVerificationService();
+        var backups = new MockGuardianBackupService();
+        List<KeyCeremonyMediatorHarness> mediators = new();
+        var adminMediator = new KeyCeremonyMediatorHarness(
+            "mediator_admin",
+            DEFAULT_ADMIN_ID,
+            keyCeremony,
+            service,
+            backups,
+            publicKeys,
+            verification);
+        mediators.Add(adminMediator);
+        foreach (var i in Enumerable.Range(1, numberOfGuardians))
+        {
+            var mediator = new KeyCeremonyMediatorHarness(
+                $"mediator_guardian_{i}",
+                $"guardian_{i}",
+                keyCeremony,
+                service,
+                backups,
+                publicKeys,
+                verification);
+            mediators.Add(mediator);
+        }
+        return mediators;
     }
 
     public static TestKeyCeremonyData GenerateKeyCeremonyData(
@@ -123,14 +171,12 @@ public class KeyCeremonyGenerator
             _ = guardian.GenerateElectionPartialKeyBackups();
             var backups = guardian.ShareElectionPartialKeyBackups();
             data.Mediator.ReceiveBackups(
-                backups.Select(b => new GuardianBackups()
-                {
-                    KeyCeremonyId = data.KeyCeremony.Id,
-                    GuardianId = guardian.GuardianId,
-                    DesignatedId = b.DesignatedId,
-                    Backup = b
-                }).ToList()
-            );
+                backups.Select(b => new GuardianBackups(
+                    data.KeyCeremony.Id,
+                    guardian.GuardianId,
+                    b.DesignatedId!,
+                    b)
+            ).ToList());
         }
 
         // Receive backups
@@ -152,6 +198,8 @@ public class KeyCeremonyGenerator
                 data.Mediator.ReceiveElectionPartialKeyVerification(verification!);
             });
         }
+        Assert.That(data.Mediator.AllBackupsVerified(), data.Mediator.GetVerificationState().ToString());
+
         // Publish
         var jointKey = data.Mediator.PublishJointKey();
         return jointKey!;
