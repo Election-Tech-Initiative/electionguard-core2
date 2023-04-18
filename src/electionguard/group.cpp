@@ -169,6 +169,8 @@ namespace electionguard
 
     ElementModP::ElementModP(const ElementModP &other) : pimpl(other.pimpl->clone()) {}
 
+    ElementModP::ElementModP(ElementModP &&other) = default;
+
     ElementModP::ElementModP(const vector<uint64_t> &elem, bool unchecked /* = false */,
                              bool fixedBase /* = false */)
         : pimpl(new Impl(elem, unchecked, fixedBase))
@@ -333,6 +335,8 @@ namespace electionguard
     // Lifecycle Methods
 
     ElementModQ::ElementModQ(const ElementModQ &other) : pimpl(other.pimpl->clone()) {}
+
+    ElementModQ::ElementModQ(ElementModQ &&other) = default;
 
     ElementModQ::ElementModQ(const vector<uint64_t> &elem, bool unchecked /* = false */)
         : pimpl(new Impl(elem, unchecked))
