@@ -20,7 +20,7 @@ public class TestDecryptWithSharesSimple : DisposableBase
     public void Test_Decrypt_Tally_With_All_Guardians_Present_Simple()
     {
         // Arrange
-        var data = TestDecryptionData.ConfigureTestCase(
+        using var data = TestDecryptionData.ConfigureTestCase(
             KeyCeremonyGenerator.GenerateKeyCeremonyData(
             NUMBER_OF_GUARDIANS,
             QUORUM, runKeyCeremony: true),
@@ -30,7 +30,7 @@ public class TestDecryptWithSharesSimple : DisposableBase
 
         var guardians = data.KeyCeremony.Guardians.ToList();
 
-        var mediator = new DecryptionMediator(
+        using var mediator = new DecryptionMediator(
             "fake-mediator",
             data.CiphertextTally,
             guardians.Select(i => i.SharePublicKey()).ToList());
@@ -51,7 +51,7 @@ public class TestDecryptWithSharesSimple : DisposableBase
     public void Test_Decrypt_Tally_With_Quorum_Guardians_Present_Simple()
     {
         // Arrange
-        var data = TestDecryptionData.ConfigureTestCase(
+        using var data = TestDecryptionData.ConfigureTestCase(
             KeyCeremonyGenerator.GenerateKeyCeremonyData(
             NUMBER_OF_GUARDIANS,
             QUORUM, runKeyCeremony: true),
@@ -72,7 +72,7 @@ public class TestDecryptWithSharesSimple : DisposableBase
         // Act
         foreach (var guardian in guardians)
         {
-            using var share = guardian.ComputeDecryptionShare(data.CiphertextTally);
+            var share = guardian.ComputeDecryptionShare(data.CiphertextTally);
             mediator.SubmitShare(share!);
         }
         var plaintextTally = mediator.Decrypt(data.CiphertextTally.TallyId);
@@ -85,7 +85,7 @@ public class TestDecryptWithSharesSimple : DisposableBase
     public void Test_Decrypt_Ballot_With_All_Guardians_Present_Simple()
     {
         // Arrange
-        var data = TestDecryptionData.ConfigureTestCase(
+        using var data = TestDecryptionData.ConfigureTestCase(
             KeyCeremonyGenerator.GenerateKeyCeremonyData(
             NUMBER_OF_GUARDIANS,
             QUORUM, runKeyCeremony: true),

@@ -34,7 +34,7 @@ public class PlaintextTallyContest : DisposableBase, IElectionContest, IEquatabl
     {
         ObjectId = objectId;
         SequenceOrder = sequenceOrder;
-        DescriptionHash = descriptionHash;
+        DescriptionHash = new(descriptionHash);
         Selections = selections;
     }
 
@@ -43,7 +43,7 @@ public class PlaintextTallyContest : DisposableBase, IElectionContest, IEquatabl
     {
         ObjectId = contest.ObjectId;
         SequenceOrder = contest.SequenceOrder;
-        DescriptionHash = contest.DescriptionHash;
+        DescriptionHash = new(contest.DescriptionHash);
         Selections = contest.ToPlaintextTallySelectionDictionary();
     }
 
@@ -52,7 +52,7 @@ public class PlaintextTallyContest : DisposableBase, IElectionContest, IEquatabl
     {
         ObjectId = contest.ObjectId;
         SequenceOrder = contest.SequenceOrder;
-        DescriptionHash = contest.CryptoHash();
+        DescriptionHash = new(contest.CryptoHash());
         Selections = contest.ToPlaintextTallySelectionDictionary();
     }
 
@@ -61,7 +61,7 @@ public class PlaintextTallyContest : DisposableBase, IElectionContest, IEquatabl
     {
         ObjectId = contest.ObjectId;
         SequenceOrder = contest.SequenceOrder;
-        DescriptionHash = contest.CryptoHash();
+        DescriptionHash = new(contest.CryptoHash());
         Selections = contest.ToPlaintextTallySelectionDictionary();
     }
 

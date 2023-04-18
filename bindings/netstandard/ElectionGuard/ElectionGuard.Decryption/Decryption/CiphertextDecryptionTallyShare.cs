@@ -84,10 +84,14 @@ public record CiphertextDecryptionTallyShare : DisposableRecordBase, IEquatable<
 
     protected override void DisposeUnmanaged()
     {
-        foreach (var contest in Contests.Values)
-        {
-            contest.Dispose();
-        }
         base.DisposeUnmanaged();
+        if (Contests is not null)
+        {
+            foreach (var contest in Contests)
+            {
+                contest.Value.Dispose();
+            }
+            Contests.Clear();
+        }
     }
 }

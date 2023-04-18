@@ -127,7 +127,7 @@ public class DecryptionMediator : DisposableBase
         }
 
         var tallyDecryption = TallyDecryptions[ballotShare.TallyId];
-        tallyDecryption.AddBallotShare(Guardians[ballotShare.GuardianId], ballotShare, ballot);
+        tallyDecryption.AddBallotShare(Guardians[ballotShare.GuardianId], new(ballotShare), new(ballot));
     }
 
     /// <summary>
@@ -139,7 +139,9 @@ public class DecryptionMediator : DisposableBase
          )
     {
         SubmitShare(shares.Item1);
-        SubmitShares(shares.Item2.Values.ToList(), ballots);
+        SubmitShares(shares.Item2.Values
+            .Select(i => new CiphertextDecryptionBallotShare(i)).ToList(),
+            ballots.Select(i => new CiphertextBallot(i)).ToList());
     }
 
     /// <summary>

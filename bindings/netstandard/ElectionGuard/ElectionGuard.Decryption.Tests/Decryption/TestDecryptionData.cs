@@ -8,12 +8,12 @@ using ElectionGuard.ElectionSetup.Tests.Generators;
 using ElectionGuard.Encryption.Utils.Generators;
 using ElectionGuard.Encryption.Utils.Converters;
 using Newtonsoft.Json;
-
+using ElectionGuard.UI.Lib.Extensions;
 
 namespace ElectionGuard.Decryption.Tests.Decryption;
 
 // common elements used when running decryption tests
-public class TestDecryptionData
+public class TestDecryptionData : DisposableBase
 {
     public TestElectionData Election { get; set; } = default!;
     public TestKeyCeremonyData KeyCeremony { get; set; } = default!;
@@ -98,6 +98,21 @@ public class TestDecryptionData
             PlaintextTally = plaintextTally,
             CiphertextTally = ciphertextTally,
         };
+    }
+
+    protected override void DisposeUnmanaged()
+    {
+        base.DisposeUnmanaged();
+        Election.Dispose();
+        KeyCeremony.Dispose();
+        PlaintextBallots.Dispose();
+        CiphertextBallots.Dispose();
+        foreach (var nonce in Nonces.Values)
+        {
+            nonce.Dispose();
+        }
+        PlaintextTally.Dispose();
+        CiphertextTally.Dispose();
     }
 
     public static void SaveToFile(TestDecryptionData data, DecryptionResult result)

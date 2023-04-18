@@ -3,6 +3,7 @@ using ElectionGuard.Encryption.Utils.Generators;
 using ElectionGuard.ElectionSetup.Tests.Generators;
 using ElectionGuard.Decryption.Decryption;
 using ElectionGuard.Decryption.Tests.Tally;
+using ElectionGuard.UI.Lib.Extensions;
 
 namespace ElectionGuard.Decryption.Tests.Decryption;
 
@@ -28,13 +29,19 @@ public class TestDecryptWithShares : DisposableBase
             BALLOT_COUNT_SPOILED);
     }
 
+    [OneTimeTearDown]
+    public void OneTimeTearDown()
+    {
+        Data.Dispose();
+    }
+
     [Test]
     public void Test_Decrypt_Tally_With_All_Guardians_Present()
     {
         // Arrange
         var guardians = Data.KeyCeremony.Guardians
                .ToList();
-        var mediator = new DecryptionMediator(
+        using var mediator = new DecryptionMediator(
             "fake-mediator",
             Data.CiphertextTally,
             guardians.Select(i => i.SharePublicKey()).ToList());
@@ -42,7 +49,7 @@ public class TestDecryptWithShares : DisposableBase
         // Act
         foreach (var guardian in guardians)
         {
-            using var share = guardian.ComputeDecryptionShare(Data.CiphertextTally);
+            var share = guardian.ComputeDecryptionShare(Data.CiphertextTally);
             mediator.SubmitShare(share!);
         }
         var result = mediator.Decrypt(Data.CiphertextTally.TallyId);
@@ -66,7 +73,7 @@ public class TestDecryptWithShares : DisposableBase
         // Act
         foreach (var guardian in guardians)
         {
-            using var share = guardian.ComputeDecryptionShare(Data.CiphertextTally);
+            var share = guardian.ComputeDecryptionShare(Data.CiphertextTally);
             mediator.SubmitShare(share!);
         }
         var result = mediator.Decrypt(Data.CiphertextTally.TallyId);

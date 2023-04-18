@@ -46,7 +46,9 @@ public record CiphertextDecryptionContestShare
         ObjectId = contest.ObjectId;
         SequenceOrder = contest.SequenceOrder;
         DescriptionHash = new(contest.DescriptionHash);
-        Selections = selections.Select(x => new CiphertextDecryptionSelectionShare(x.Value)).ToDictionary(x => x.ObjectId);
+        Selections = selections.Select(
+            x => new CiphertextDecryptionSelectionShare(x.Value))
+            .ToDictionary(x => x.ObjectId);
     }
 
     public CiphertextDecryptionContestShare(
@@ -59,8 +61,10 @@ public record CiphertextDecryptionContestShare
         SequenceOrder = contest.SequenceOrder;
         DescriptionHash = new(contest.DescriptionHash);
         ExtendedData = new(extendedData);
-        Commitment = new(commitment);
-        Selections = selections.Select(x => new CiphertextDecryptionSelectionShare(x.Value)).ToDictionary(x => x.ObjectId);
+        Commitment = commitment != null ? new(commitment) : null;
+        Selections = selections.Select(
+            x => new CiphertextDecryptionSelectionShare(x.Value))
+            .ToDictionary(x => x.ObjectId);
     }
 
     public CiphertextDecryptionContestShare(CiphertextDecryptionContestShare other) : base(other)
@@ -68,9 +72,11 @@ public record CiphertextDecryptionContestShare
         ObjectId = other.ObjectId;
         SequenceOrder = other.SequenceOrder;
         DescriptionHash = new(other.DescriptionHash);
-        ExtendedData = new(other.ExtendedData);
-        Commitment = new(other.Commitment);
-        Selections = other.Selections.Select(x => new CiphertextDecryptionSelectionShare(x.Value)).ToDictionary(x => x.ObjectId);
+        ExtendedData = other.ExtendedData != null ? new(other.ExtendedData) : null;
+        Commitment = other.Commitment != null ? new(other.Commitment) : null;
+        Selections = other.Selections.Select(
+            x => new CiphertextDecryptionSelectionShare(x.Value))
+            .ToDictionary(x => x.ObjectId);
     }
 
     /// <summary>
@@ -140,10 +146,14 @@ public record CiphertextDecryptionContestShare
         base.DisposeUnmanaged();
         ExtendedData?.Dispose();
         Commitment?.Dispose();
-        foreach (var selection in Selections.Values)
-        {
-            selection.Dispose();
-        }
         DescriptionHash.Dispose();
+        if (Selections != null)
+        {
+            foreach (var selection in Selections.Values)
+            {
+                selection.Dispose();
+            }
+            Selections.Clear();
+        }
     }
 }

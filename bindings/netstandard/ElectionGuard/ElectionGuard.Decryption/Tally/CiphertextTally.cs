@@ -53,8 +53,8 @@ public record CiphertextTally : DisposableRecordBase, IEquatable<CiphertextTally
         InternalManifest manifest)
     {
         Name = name;
-        Context = context;
-        Manifest = manifest;
+        Context = new(context);
+        Manifest = new(manifest);
         CastBallotIds = new HashSet<string>();
         SpoiledBallotIds = new HashSet<string>();
         Contests = manifest.ToCiphertextTallyContestDictionary();
@@ -68,8 +68,8 @@ public record CiphertextTally : DisposableRecordBase, IEquatable<CiphertextTally
     {
         TallyId = tallyId;
         Name = name;
-        Context = context;
-        Manifest = manifest;
+        Context = new(context);
+        Manifest = new(manifest);
         CastBallotIds = new HashSet<string>();
         SpoiledBallotIds = new HashSet<string>();
         Contests = manifest.ToCiphertextTallyContestDictionary();
@@ -84,22 +84,30 @@ public record CiphertextTally : DisposableRecordBase, IEquatable<CiphertextTally
     {
         TallyId = tallyId;
         Name = name;
-        Context = context;
-        Manifest = manifest;
+        Context = new(context);
+        Manifest = new(manifest);
         CastBallotIds = new HashSet<string>();
         SpoiledBallotIds = new HashSet<string>();
-        Contests = contests;
+        Contests = contests.Select(
+            entry => new KeyValuePair<string, CiphertextTallyContest>(
+                entry.Key,
+                new CiphertextTallyContest(entry.Value))).ToDictionary(
+                    entry => entry.Key,
+                    entry => entry.Value);
     }
 
     public CiphertextTally(CiphertextTally other) : base(other)
     {
         TallyId = other.TallyId;
         Name = other.Name;
-        Context = other.Context;
-        Manifest = other.Manifest;
+        Context = new(other.Context);
+        Manifest = new(other.Manifest);
         CastBallotIds = new HashSet<string>(other.CastBallotIds);
         SpoiledBallotIds = new HashSet<string>(other.SpoiledBallotIds);
-        Contests = other.Contests.ToDictionary(
+        Contests = other.Contests.Select(
+            x => new KeyValuePair<string, CiphertextTallyContest>(
+                x.Key, new CiphertextTallyContest(x.Value)))
+                .ToDictionary(
             entry => entry.Key,
             entry => new CiphertextTallyContest(entry.Value));
     }
@@ -215,10 +223,10 @@ public record CiphertextTally : DisposableRecordBase, IEquatable<CiphertextTally
     protected override void DisposeUnmanaged()
     {
         base.DisposeUnmanaged();
-        Manifest.Dispose();
-        Context.Dispose();
-        Contests.Dispose();
-        Contests.Clear();
+        Manifest?.Dispose();
+        Context?.Dispose();
+        Contests?.Dispose();
+        Contests?.Clear();
     }
 
     #region Equality Overrides

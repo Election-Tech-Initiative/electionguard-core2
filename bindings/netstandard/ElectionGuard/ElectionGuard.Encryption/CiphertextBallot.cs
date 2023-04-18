@@ -65,6 +65,11 @@ namespace ElectionGuard
             }
         }
 
+        public CiphertextBallot(CiphertextBallot other) : this(other.ToJson())
+        {
+
+        }
+
         internal CiphertextBallot(External.CiphertextBallotHandle handle)
         {
             Handle = handle;
