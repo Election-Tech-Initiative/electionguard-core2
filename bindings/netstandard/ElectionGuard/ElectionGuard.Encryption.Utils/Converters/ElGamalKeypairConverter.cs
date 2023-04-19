@@ -1,5 +1,3 @@
-
-
 using System;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
@@ -16,7 +14,6 @@ namespace ElectionGuard.Encryption.Utils.Converters
 
             return new ElGamalKeyPair(new ElementModQ(secretKey), new ElementModP(publicKey));
         }
-
 
         public override void WriteJson(JsonWriter writer, ElGamalKeyPair value, JsonSerializer serializer)
         {
