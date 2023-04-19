@@ -289,13 +289,12 @@ else
 	if [ ! -d "$(ELECTIONGUARD_BUILD_LIBS_DIR)/Linux" ]; then mkdir $(ELECTIONGUARD_BUILD_LIBS_DIR)/Linux; fi
 	if [ ! -d "$(ELECTIONGUARD_BUILD_LIBS_DIR)/Windows" ]; then mkdir $(ELECTIONGUARD_BUILD_LIBS_DIR)/Windows; fi
 	if [ ! -d "$(ELECTIONGUARD_BUILD_LIBS_DIR)/Wasm" ]; then mkdir $(ELECTIONGUARD_BUILD_LIBS_DIR)/Wasm; fi
-endif
-	dotnet clean ./bindings/netstandard/ElectionGuard/ElectionGuard.sln
-	dotnet clean ./src/electionguard-ui/ElectionGuard.UI.sln
+endif	
 
 clean-netstandard:
 	@echo 🗑️ CLEAN NETSTANDARD
 	dotnet clean ./bindings/netstandard/ElectionGuard/ElectionGuard.sln
+	dotnet clean ./src/electionguard-ui/ElectionGuard.UI.sln
 
 clean-ui:
 	@echo 🗑️ CLEAN UI
