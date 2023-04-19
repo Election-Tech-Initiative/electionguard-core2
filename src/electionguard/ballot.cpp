@@ -16,6 +16,7 @@
 using std::invalid_argument;
 using std::make_unique;
 using std::map;
+using std::move;
 using std::ref;
 using std::reference_wrapper;
 using std::string;
@@ -65,6 +66,7 @@ namespace electionguard
     struct PlaintextBallotSelection::Impl : public ElectionObjectBase {
         uint64_t vote;
         bool isPlaceholderSelection;
+        unique_ptr<ExtendedData> extendedData;
         string writeIn;
 
         Impl(string objectId, uint64_t vote, bool isPlaceholderSelection /* = false */,
@@ -72,6 +74,7 @@ namespace electionguard
             : vote(vote), isPlaceholderSelection(isPlaceholderSelection), writeIn(move(writeIn))
         {
             this->object_id = move(objectId);
+            this->extendedData = make_unique<ExtendedData>(writeIn, writeIn.length());
         }
 
         [[nodiscard]] unique_ptr<PlaintextBallotSelection::Impl> clone() const
@@ -115,6 +118,10 @@ namespace electionguard
     bool PlaintextBallotSelection::getIsPlaceholder() const
     {
         return pimpl->isPlaceholderSelection;
+    }
+    ExtendedData *PlaintextBallotSelection::getExtendedData() const
+    {
+        return pimpl->extendedData.get();
     }
     string PlaintextBallotSelection::getWriteIn() const { return pimpl->writeIn; }
 
@@ -1163,7 +1170,7 @@ namespace electionguard
         }
 
         pimpl->nonce.reset();
-        pimpl->state = BallotBoxState::spoiled;
+        pimpl->state = BallotBoxState::challenged;
     }
 
     vector<uint8_t> CiphertextBallot::toBson(bool withNonces /* = false */) const

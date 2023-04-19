@@ -3,10 +3,18 @@ using ElectionGuard.UI.Lib.Models;
 
 namespace ElectionGuard.UI.Lib.Services;
 
+public interface IGuardianBackupService : IDatabaseService<GuardianBackups>
+{
+    Task<long> CountAsync(string keyCeremonyId);
+    Task<long> CountAsync(string keyCeremonyId, string guardianId);
+    Task<List<GuardianBackups>?> GetByGuardianIdAsync(string keyCeremonyId, string DesignatedId);
+    Task<List<GuardianBackups>?> GetByKeyCeremonyIdAsync(string keyCeremonyId);
+}
+
 /// <summary>
 /// Data Service for Key Ceremonies
 /// </summary>
-public class GuardianBackupService : BaseDatabaseService<GuardianBackups>
+public class GuardianBackupService : BaseDatabaseService<GuardianBackups>, IGuardianBackupService
 {
     /// <summary>
     /// The collection name to use to get/save data into

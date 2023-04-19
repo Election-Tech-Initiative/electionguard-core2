@@ -11,4 +11,11 @@ public class GuardianPublicKey : DatabaseRecord
     public GuardianPublicKey() : base(nameof(GuardianPublicKey))
     {
     }
+
+    public GuardianPublicKey(GuardianPublicKey other) : base(nameof(GuardianPublicKey))
+    {
+        KeyCeremonyId = other.KeyCeremonyId;
+        GuardianId = other.GuardianId;
+        PublicKey = other.PublicKey != null ? new(other.PublicKey) : null;
+    }
 }

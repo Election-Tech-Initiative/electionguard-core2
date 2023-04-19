@@ -1,10 +1,13 @@
+using ElectionGuard.ElectionSetup.Extensions;
+using ElectionGuard.Encryption.Ballot;
+
 namespace ElectionGuard.Decryption.Tally;
 
 /// <summary>
 /// A CiphertextTallyContest is a container for associating a collection 
 /// of CiphertextTallySelection to a specific ContestDescription
 /// </summary>
-public class CiphertextTallyContest : DisposableBase, IEquatable<CiphertextTallyContest>
+public class CiphertextTallyContest : DisposableBase, IElectionContest, IEquatable<CiphertextTallyContest>
 {
     /// <summary>
     /// The object id of the contest
@@ -50,6 +53,14 @@ public class CiphertextTallyContest : DisposableBase, IEquatable<CiphertextTally
         SequenceOrder = contestDescription.SequenceOrder;
         DescriptionHash = contestDescription.CryptoHash();
         Selections = contestDescription.ToCiphertextTallySelectionDictionary();
+    }
+
+    public CiphertextTallyContest(CiphertextTallyContest other)
+    {
+        ObjectId = other.ObjectId;
+        SequenceOrder = other.SequenceOrder;
+        DescriptionHash = new(other.DescriptionHash);
+        Selections = other.Selections.Select(x => new CiphertextTallySelection(x.Value)).ToDictionary(x => x.ObjectId);
     }
 
     /// <summary>
@@ -130,6 +141,14 @@ public class CiphertextTallyContest : DisposableBase, IEquatable<CiphertextTally
         {
             await AccumulateAsync(contest, cancellationToken);
         }
+    }
+
+    protected override void DisposeUnmanaged()
+    {
+        base.DisposeUnmanaged();
+        Selections?.Dispose();
+        Selections?.Clear();
+        DescriptionHash?.Dispose();
     }
 
     #region IEquatable

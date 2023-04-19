@@ -32,6 +32,7 @@ using std::get;
 using std::holds_alternative;
 using std::invalid_argument;
 using std::make_unique;
+using std::move;
 using std::out_of_range;
 using std::overflow_error;
 using std::reference_wrapper;
@@ -167,6 +168,8 @@ namespace electionguard
     // Lifecycle Methods
 
     ElementModP::ElementModP(const ElementModP &other) : pimpl(other.pimpl->clone()) {}
+
+    ElementModP::ElementModP(ElementModP &&other) = default;
 
     ElementModP::ElementModP(const vector<uint64_t> &elem, bool unchecked /* = false */,
                              bool fixedBase /* = false */)
@@ -332,6 +335,8 @@ namespace electionguard
     // Lifecycle Methods
 
     ElementModQ::ElementModQ(const ElementModQ &other) : pimpl(other.pimpl->clone()) {}
+
+    ElementModQ::ElementModQ(ElementModQ &&other) = default;
 
     ElementModQ::ElementModQ(const vector<uint64_t> &elem, bool unchecked /* = false */)
         : pimpl(new Impl(elem, unchecked))
@@ -639,6 +644,9 @@ namespace electionguard
             return ElementModP::fromUint64(1UL);
         }
 
+// TODO: reenable fixed base math lookup table
+#ifndef __EMSCRIPTEN__
+
         // check if we have a lookup table initialized for this element
         if (base.isFixedBase()) {
             // TODO: use a smaller key
@@ -648,7 +656,7 @@ namespace electionguard
 
             return make_unique<ElementModP>(result, true);
         }
-
+#endif
         // if none exists, execute the modular exponentiation directly
         return pow_mod_p(base, *exponent.toElementModP());
     }

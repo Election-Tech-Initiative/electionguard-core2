@@ -1,5 +1,4 @@
 #include "../../src/electionguard/log.hpp"
-#include "../../src/electionguard/nonces.hpp"
 #include "utils/constants.hpp"
 
 #include <doctest/doctest.h>
@@ -7,6 +6,7 @@
 #include <electionguard/convert.hpp>
 #include <electionguard/elgamal.hpp>
 #include <electionguard/group.hpp>
+#include <electionguard/nonces.hpp>
 #include <electionguard/precompute_buffers.hpp>
 #include <stdexcept>
 

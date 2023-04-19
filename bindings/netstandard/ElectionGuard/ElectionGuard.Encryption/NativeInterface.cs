@@ -140,17 +140,22 @@ namespace ElectionGuard
             internal static extern Status ToHex(
                 ElementModPHandle handle, out IntPtr data);
 
+            [DllImport(DllName, EntryPoint = "eg_element_mod_p_from_hex_checked",
+                CallingConvention = CallingConvention.Cdecl, SetLastError = true)]
+            internal static extern Status FromHexChecked(
+                [MarshalAs(UnmanagedType.LPStr)] string hex,
+                out ElementModPHandle handle);
+
+            [DllImport(DllName, EntryPoint = "eg_element_mod_p_from_hex_unchecked",
+                CallingConvention = CallingConvention.Cdecl, SetLastError = true)]
+            internal static extern Status FromHexUnchecked(
+                [MarshalAs(UnmanagedType.LPStr)] string hex,
+                out ElementModPHandle handle);
+
             [DllImport(DllName, EntryPoint = "eg_element_mod_p_to_bytes",
                 CallingConvention = CallingConvention.Cdecl, SetLastError = true)]
             internal static extern Status ToBytes(
                 ElementModPHandle handle, out IntPtr data, out ulong size);
-
-            [DllImport(DllName, EntryPoint = "eg_element_mod_p_mult_mod_p",
-                CallingConvention = CallingConvention.Cdecl, SetLastError = true)]
-            internal static extern Status MultModP(
-                ElementModPHandle lhs,
-                ElementModPHandle rhs,
-                out ElementModPHandle handle);
 
             [DllImport(DllName, EntryPoint = "eg_element_mod_p_is_valid_residue",
                 CallingConvention = CallingConvention.Cdecl, SetLastError = true)]
@@ -220,9 +225,9 @@ namespace ElectionGuard
             internal static extern Status ToElementModP(
                 ElementModQHandle handle, out ElementModP.ElementModPHandle out_handle);
 
-            [DllImport(DllName, EntryPoint = "eg_element_mod_q_from_hex",
+            [DllImport(DllName, EntryPoint = "eg_element_mod_q_from_hex_checked",
                 CallingConvention = CallingConvention.Cdecl, SetLastError = true)]
-            internal static extern Status FromHex(
+            internal static extern Status FromHexChecked(
                 [MarshalAs(UnmanagedType.LPStr)] string hex,
                 out ElementModQHandle handle);
 
@@ -563,7 +568,14 @@ namespace ElectionGuard
                 out IntPtr data,
                 out ulong size);
 
+            [DllImport(DllName, EntryPoint = "eg_hashed_elgamal_ciphertext_partial_decrypt",
+                CallingConvention = CallingConvention.Cdecl, SetLastError = true)]
+            internal static extern Status PartialDecrypt(
+                HashedElGamalCiphertextHandle handle,
+                ElementModQ.ElementModQHandle secret_key,
+                out ElementModP.ElementModPHandle partial_decryption);
         }
+
         internal static class HashedElGamal
         {
             [DllImport(DllName, EntryPoint = "eg_hashed_elgamal_encrypt",
@@ -576,7 +588,6 @@ namespace ElectionGuard
                 ElementModQ.ElementModQHandle seed,
                 out HashedElGamalCiphertext.HashedElGamalCiphertextHandle handle);
         }
-
 
         #endregion
 
@@ -2082,6 +2093,20 @@ namespace ElectionGuard
                 out ContextConfiguration.ContextConfigurationHandle context_config);
 
             [DllImport(DllName,
+                EntryPoint = "eg_ciphertext_election_context_get_number_of_guardians",
+                CallingConvention = CallingConvention.Cdecl, SetLastError = true)]
+            internal static extern Status GetNumberOfGuardians(
+                CiphertextElectionContextHandle handle,
+                ref ulong number_of_guardians);
+
+            [DllImport(DllName,
+                EntryPoint = "eg_ciphertext_election_context_get_quorum",
+                CallingConvention = CallingConvention.Cdecl, SetLastError = true)]
+            internal static extern Status GetQuorum(
+                CiphertextElectionContextHandle handle,
+                ref ulong quorum);
+
+            [DllImport(DllName,
                 EntryPoint = "eg_ciphertext_election_context_get_elgamal_public_key",
                 CallingConvention = CallingConvention.Cdecl, SetLastError = true)]
             internal static extern Status GetElGamalPublicKey(
@@ -2321,6 +2346,13 @@ namespace ElectionGuard
                 out ElementModQ.ElementModQHandle crypto_hash);
 
             [DllImport(DllName,
+                EntryPoint = "eg_ciphertext_ballot_contest_get_extended_data",
+                CallingConvention = CallingConvention.Cdecl, SetLastError = true)]
+            internal static extern Status GetExtendedData(
+                ElectionGuard.CiphertextBallotContest.External.CiphertextBallotContestHandle handle,
+                out HashedElGamalCiphertext.HashedElGamalCiphertextHandle extendedData);
+
+            [DllImport(DllName,
                 EntryPoint = "eg_ciphertext_ballot_contest_aggregate_nonce",
                 CallingConvention = CallingConvention.Cdecl, SetLastError = true)]
             internal static extern Status AggregateNonce(
@@ -2335,7 +2367,7 @@ namespace ElectionGuard
                 out ElGamalCiphertext.ElGamalCiphertextHandle ciphertext_accumulation);
 
             [DllImport(DllName,
-                EntryPoint = "eg_ciphertext_ballot_selection_is_valid_encryption",
+                EntryPoint = "eg_ciphertext_ballot_contest_is_valid_encryption",
                 CallingConvention = CallingConvention.Cdecl, SetLastError = true)]
             internal static extern bool IsValidEncryption(
                 ElectionGuard.CiphertextBallotContest.External.CiphertextBallotContestHandle handle,
@@ -2437,6 +2469,14 @@ namespace ElectionGuard
                 ElectionGuard.CiphertextBallot.External.CiphertextBallotHandle handle,
                 ElementModQ.ElementModQHandle manifest_hash,
                 out ElementModQ.ElementModQHandle crypto_hash);
+
+            [DllImport(DllName, EntryPoint = "eg_ciphertext_ballot_nonce_seed",
+                CallingConvention = CallingConvention.Cdecl, SetLastError = true)]
+            internal static extern Status NonceSeed(
+                ElementModQ.ElementModQHandle manifestHash,
+                [MarshalAs(UnmanagedType.LPStr)] string objectId,
+                ElementModQ.ElementModQHandle nonce,
+                out ElementModQ.ElementModQHandle nonceSeed);
 
             [DllImport(DllName,
                 EntryPoint = "eg_ciphertext_ballot_cast",

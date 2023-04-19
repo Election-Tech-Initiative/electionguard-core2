@@ -49,6 +49,14 @@ namespace ElectionGuard
 
         public IntPtr Ptr => handle;
 
+        public void ThrowIfInvalid()
+        {
+            if (IsInvalid)
+            {
+                throw new ElectionGuardException($"{nameof(T)} ERROR Invalid Handle");
+            }
+        }
+
         protected bool IsFreed = false;
 
         protected abstract bool Free();

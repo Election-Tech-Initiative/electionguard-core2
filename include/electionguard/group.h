@@ -44,6 +44,12 @@ EG_API eg_electionguard_status_t eg_element_mod_p_to_bytes(eg_element_mod_p_t *h
 EG_API eg_electionguard_status_t eg_element_mod_p_to_hex(eg_element_mod_p_t *handle,
                                                          char **out_hex);
 
+EG_API eg_electionguard_status_t eg_element_mod_p_from_hex_checked(char *in_hex,
+                                                                   eg_element_mod_p_t **out_handle);
+
+EG_API eg_electionguard_status_t
+eg_element_mod_p_from_hex_unchecked(char *in_hex, eg_element_mod_p_t **out_handle);
+
 // TODO: ISSUE #129: finish implementation
 
 #endif
@@ -71,14 +77,11 @@ EG_API eg_electionguard_status_t eg_element_mod_q_is_in_bounds(eg_element_mod_q_
 EG_API eg_electionguard_status_t eg_element_mod_q_to_hex(eg_element_mod_q_t *handle,
                                                          char **out_hex);
 
-EG_API eg_electionguard_status_t eg_element_mod_q_from_hex(char *in_hex,
-                                                           eg_element_mod_q_t **out_handle);
-
 EG_API eg_electionguard_status_t eg_element_mod_q_to_bytes(eg_element_mod_q_t *handle,
                                                            uint8_t **out_bytes, uint64_t *out_size);
 
-EG_API eg_electionguard_status_t
-eg_element_mod_q_from_hex_unchecked(char *in_hex, eg_element_mod_q_t **out_handle);
+EG_API eg_electionguard_status_t eg_element_mod_q_from_hex_checked(char *in_hex,
+                                                                   eg_element_mod_q_t **out_handle);
 
 EG_API eg_electionguard_status_t
 eg_element_mod_q_from_hex_unchecked(char *in_hex, eg_element_mod_q_t **out_handle);

@@ -482,6 +482,31 @@ namespace electionguard
         return plaintext;
     }
 
+    /// <Summary>
+    /// Partially Decrypts an ElGamal ciphertext with a known ElGamal secret key.
+    /// 𝑀_i = C0^P𝑖 mod 𝑝 in the spec
+    ///
+    /// <param name="secretKey">The corresponding ElGamal secret key.</param>
+    /// <returns>A partial decryption of the plaintext value</returns
+    /// </Summary>
+    unique_ptr<ElementModP> HashedElGamalCiphertext::partialDecrypt(const ElementModQ &secretKey)
+    {
+        return pow_mod_p(*pimpl->pad, secretKey);
+    }
+
+    /// <Summary>
+    /// Partially Decrypts an ElGamal ciphertext with a known ElGamal secret key.
+    /// 𝑀_i = C0^P𝑖 mod 𝑝 in the spec
+    ///
+    /// <param name="secretKey">The corresponding ElGamal secret key.</param>
+    /// <returns>A partial decryption of the plaintext value</returns
+    /// </Summary>
+    unique_ptr<ElementModP>
+    HashedElGamalCiphertext::partialDecrypt(const ElementModQ &secretKey) const
+    {
+        return pow_mod_p(*pimpl->pad, secretKey);
+    }
+
     unique_ptr<HashedElGamalCiphertext> HashedElGamalCiphertext::clone() const
     {
         return make_unique<HashedElGamalCiphertext>(pimpl->pad->clone(), pimpl->data, pimpl->mac);

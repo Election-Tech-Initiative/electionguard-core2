@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using ElectionGuard.Encryption.Ballot;
 
 namespace ElectionGuard
 {
@@ -16,7 +17,7 @@ namespace ElectionGuard
     /// seed nonce, both values can be regenerated.  If the `nonce` for this contest is completely random,
     /// then it is required in order to regenerate the proof.
     /// </summary>
-    public partial class CiphertextBallotContest : DisposableBase
+    public partial class CiphertextBallotContest : DisposableBase, IElectionContest
     {
         /// <summary>
         /// The collection of selections for the contest
@@ -26,6 +27,21 @@ namespace ElectionGuard
                 () => (int)SelectionsSize,
                 (index) => GetSelectionAtIndex((ulong)index)
             );
+
+        /// <summary>
+        /// The hashed elgamal ciphertext is the encrypted extended data (overvote information
+        /// and writeins).
+        /// </summary>
+        public HashedElGamalCiphertext ExtendedData
+        {
+            get
+            {
+                var status = NativeInterface.CiphertextBallotContest.GetExtendedData(
+                    Handle, out var value);
+                status.ThrowIfError();
+                return value.IsInvalid ? null : new HashedElGamalCiphertext(value);
+            }
+        }
 
         internal CiphertextBallotContest(External.CiphertextBallotContestHandle handle)
         {
@@ -40,7 +56,7 @@ namespace ElectionGuard
             var status = NativeInterface.CiphertextBallotContest.GetSelectionAtIndex(
                 Handle, index, out var value);
             status.ThrowIfError();
-            return new CiphertextBallotSelection(value);
+            return value.IsInvalid ? null : new CiphertextBallotSelection(value);
         }
 
         /// <summary>
@@ -58,7 +74,7 @@ namespace ElectionGuard
             var status = NativeInterface.CiphertextBallotContest.CryptoHashWith(
                 Handle, encryptionSeed.Handle, out var value);
             status.ThrowIfError();
-            return new ElementModQ(value);
+            return value.IsInvalid ? null : new ElementModQ(value);
         }
 
         /// <summary>
@@ -70,7 +86,7 @@ namespace ElectionGuard
             var status = NativeInterface.CiphertextBallotContest.AggregateNonce(
                 Handle, out var value);
             status.ThrowIfError();
-            return new ElementModQ(value);
+            return value.IsInvalid ? null : new ElementModQ(value);
         }
 
         /// <summary>
@@ -82,7 +98,7 @@ namespace ElectionGuard
             var status = NativeInterface.CiphertextBallotContest.ElGamalAccumulate(
                 Handle, out var value);
             status.ThrowIfError();
-            return new ElGamalCiphertext(value);
+            return value.IsInvalid ? null : new ElGamalCiphertext(value);
         }
 
         /// <summary>

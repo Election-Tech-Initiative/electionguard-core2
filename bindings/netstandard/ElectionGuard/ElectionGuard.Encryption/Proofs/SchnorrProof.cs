@@ -1,4 +1,6 @@
-﻿namespace ElectionGuard.Proofs
+using Newtonsoft.Json;
+
+namespace ElectionGuard.Proofs
 {
 
     /// <summary>
@@ -28,18 +30,17 @@
 
         public ProofUsage Usage = ProofUsage.SecretValue;
 
-        public SchnorrProof()
+        [JsonConstructor]
+        public SchnorrProof(
+            ElementModP publicKey,
+            ElementModP commitment,
+            ElementModQ challenge,
+            ElementModQ response)
         {
-            using (var randQ = BigMath.RandQ())
-            using (var keyPair = ElGamalKeyPair.FromSecret(randQ))
-            using (var seed = BigMath.RandQ())
-            {
-
-                PublicKey = keyPair.PublicKey;
-                Commitment = BigMath.GPowP(seed);
-                Challenge = BigMath.HashElems(PublicKey, Commitment);
-                Response = BigMath.APlusBMulCModQ(seed, keyPair.SecretKey, Challenge);
-            }
+            PublicKey = new ElementModP(publicKey);
+            Commitment = new ElementModP(commitment);
+            Challenge = new ElementModQ(challenge);
+            Response = new ElementModQ(response);
         }
 
         /// <summary>
@@ -50,7 +51,7 @@
             using (var keyPair = ElGamalKeyPair.FromSecret(secretKey))
             using (var seed = BigMath.RandQ())
             {
-                PublicKey = keyPair.PublicKey;
+                PublicKey = new ElementModP(keyPair.PublicKey);
                 Commitment = BigMath.GPowP(seed);
                 Challenge = BigMath.HashElems(PublicKey, Commitment);
                 Response = BigMath.APlusBMulCModQ(seed, keyPair.SecretKey, Challenge);
@@ -64,8 +65,7 @@
         {
             using (var seed = BigMath.RandQ())
             {
-
-                PublicKey = keyPair.PublicKey;
+                PublicKey = new ElementModP(keyPair.PublicKey);
                 Commitment = BigMath.GPowP(seed);
                 Challenge = BigMath.HashElems(PublicKey, Commitment);
                 Response = BigMath.APlusBMulCModQ(seed, keyPair.SecretKey, Challenge);
@@ -80,7 +80,7 @@
             using (var keyPair = ElGamalKeyPair.FromSecret(secretKey))
             {
 
-                PublicKey = keyPair.PublicKey;
+                PublicKey = new ElementModP(keyPair.PublicKey);
                 Commitment = BigMath.GPowP(seed);
                 Challenge = BigMath.HashElems(PublicKey, Commitment);
                 Response = BigMath.APlusBMulCModQ(seed, keyPair.SecretKey, Challenge);
@@ -92,10 +92,18 @@
         /// </summary>
         public SchnorrProof(ElGamalKeyPair keyPair, ElementModQ seed)
         {
-            PublicKey = keyPair.PublicKey;
+            PublicKey = new ElementModP(keyPair.PublicKey);
             Commitment = BigMath.GPowP(seed);
             Challenge = BigMath.HashElems(PublicKey, Commitment);
             Response = BigMath.APlusBMulCModQ(seed, keyPair.SecretKey, Challenge);
+        }
+
+        public SchnorrProof(SchnorrProof other)
+        {
+            PublicKey = new ElementModP(other.PublicKey);
+            Commitment = new ElementModP(other.Commitment);
+            Challenge = new ElementModQ(other.Challenge);
+            Response = new ElementModQ(other.Response);
         }
 
         /// <summary>

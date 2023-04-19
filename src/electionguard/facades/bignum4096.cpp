@@ -83,7 +83,6 @@ namespace electionguard::facades
     // Sub
     uint32_t Bignum4096::sub(uint32_t *a, uint32_t *b, uint32_t *res)
     {
-
         return hacl::Bignum4096_32::sub(a, b, res);
     }
     uint64_t Bignum4096::sub(uint64_t *a, uint64_t *b, uint64_t *res)
@@ -188,6 +187,9 @@ namespace electionguard::facades
     }
     uint64_t Bignum4096::lessThan(uint64_t *a, uint64_t *b)
     {
+        if (use32BitMath) {
+            return lessThan(reinterpret_cast<uint32_t *>(a), reinterpret_cast<uint32_t *>(b));
+        }
         return hacl::Bignum4096::lessThan(a, b);
     }
 

@@ -38,7 +38,12 @@ endif()
 # ---- Library Sources ----
 include(${PROJECT_SOURCE_DIR}/libs/hacl/sources.cmake)
 
-add_library(${HACL_CPP_TARGET_NAME} SHARED ${SOURCES_hacl_cpp})
+if(ELECTIONGUARD_BUILD_SHARED)
+    add_library(${HACL_CPP_TARGET_NAME} SHARED ${SOURCES_hacl_cpp})
+else()
+    add_library(${HACL_CPP_TARGET_NAME} STATIC ${SOURCES_hacl_cpp})
+endif()
+
 add_library(${HACL_CPP_ALIAS_NAME} ALIAS ${HACL_CPP_TARGET_NAME})
 set_target_properties(${HACL_CPP_TARGET_NAME} PROPERTIES
     VERSION ${hacl_VERSION}
@@ -67,7 +72,11 @@ else()
     )
 endif()
 
-target_link_libraries(${HACL_CPP_TARGET_NAME} PRIVATE hacl)
+if(ELECTIONGUARD_BUILD_SHARED)
+    target_link_libraries(${HACL_CPP_TARGET_NAME} PRIVATE hacl)
+else()
+    target_link_libraries(${HACL_CPP_TARGET_NAME} PRIVATE hacl_static)
+endif()
 
 # Export
 install(
