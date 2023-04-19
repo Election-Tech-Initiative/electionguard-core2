@@ -122,10 +122,6 @@ namespace ElectionGuard
                 throw new ArgumentNullException(nameof(seed));
             }
 
-            Console.WriteLine($"HashedElGamalCiphertext Encrypting {length} bytes");
-            // Console.WriteLine($"Encrypt Nonce: {nonce}");
-            // Console.WriteLine($"Encrypt Public Key: {publicKey}");
-            // Console.WriteLine($"Encrypt Seed: {seed}");
             fixed (byte* pointer = data)
             {
                 var status = NativeInterface.HashedElGamal.Encrypt(

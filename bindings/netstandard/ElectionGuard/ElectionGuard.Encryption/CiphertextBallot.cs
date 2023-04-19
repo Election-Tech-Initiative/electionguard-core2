@@ -103,6 +103,15 @@ namespace ElectionGuard
             status.ThrowIfError();
         }
 
+        /// <summary>
+        /// A helper function to mark the ballot as challenged and remove sensitive values like the nonce.
+        /// </summary>
+        public void Challenge()
+        {
+            var status = NativeInterface.CiphertextBallot.Challenge(Handle);
+            status.ThrowIfError();
+        }
+
         public void ForEachContestSelection(
             Action<CiphertextBallotContest, CiphertextBallotSelection> action)
         {

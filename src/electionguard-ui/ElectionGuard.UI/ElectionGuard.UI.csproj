@@ -112,7 +112,7 @@
 	  <NoStdLib></NoStdLib>
 	  <PlatformTarget></PlatformTarget>
 	  <WarningsNotAsErrors></WarningsNotAsErrors>
-	  <Nullable></Nullable>
+	  <Nullable>enable</Nullable>
 	</PropertyGroup>
 	<PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
 	  <IntermediateOutputPath></IntermediateOutputPath>
@@ -140,7 +140,7 @@
 	  <NoStdLib></NoStdLib>
 	  <PlatformTarget>anycpu</PlatformTarget>
 	  <WarningsNotAsErrors></WarningsNotAsErrors>
-	  <Nullable></Nullable>
+	  <Nullable>enable</Nullable>
 	</PropertyGroup>
 	<ItemGroup>
 		<!-- App Icon -->

@@ -2,7 +2,6 @@
 using ElectionGuard.ElectionSetup.Extensions;
 using ElectionGuard.Proofs;
 using ElectionGuard.UI.Lib.Extensions;
-using Newtonsoft.Json;
 
 namespace ElectionGuard.ElectionSetup;
 

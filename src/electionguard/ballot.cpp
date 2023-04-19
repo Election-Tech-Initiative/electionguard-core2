@@ -1112,6 +1112,10 @@ namespace electionguard
             Log::error(":ballot has already been spoiled");
             throw invalid_argument("ballot has already been spoiled");
         }
+        if (pimpl->state == BallotBoxState::challenged) {
+            Log::error(":ballot has already been challenged");
+            throw invalid_argument("ballot has already been challenged");
+        }
 
         // iterate over the collection of contests and selections and reset the nonce
         for (const auto &contest : this->getContests()) {
@@ -1129,6 +1133,33 @@ namespace electionguard
         if (pimpl->state == BallotBoxState::cast) {
             Log::error(":ballot has already been cast");
             throw invalid_argument("ballot has already been cast");
+        }
+        if (pimpl->state == BallotBoxState::challenged) {
+            Log::error(":ballot has already been challenged");
+            throw invalid_argument("ballot has already been challenged");
+        }
+
+        // iterate over the collection of contests and selections and reset the nonce
+        for (const auto &contest : this->getContests()) {
+            for (const auto &selection : contest.get().getSelections()) {
+                selection.get().resetNonce();
+            }
+        }
+
+        pimpl->nonce.reset();
+        pimpl->state = BallotBoxState::spoiled;
+    }
+
+    void CiphertextBallot::challenge() const
+    {
+        if (pimpl->state == BallotBoxState::cast) {
+            Log::error(":ballot has already been cast");
+            throw invalid_argument("ballot has already been cast");
+        }
+
+        if (pimpl->state == BallotBoxState::spoiled) {
+            Log::error(":ballot has already been spoiled");
+            throw invalid_argument("ballot has already been spoiled");
         }
 
         // iterate over the collection of contests and selections and reset the nonce
