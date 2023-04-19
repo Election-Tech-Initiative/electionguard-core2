@@ -1,3 +1,4 @@
+using System.Diagnostics;
 using ElectionGuard.UI.Lib.Models;
 
 namespace ElectionGuard.ElectionSetup;
@@ -15,12 +16,12 @@ public partial class Guardian
         get
         {
             var required = CeremonyDetails.NumberOfGuardians - 1;
-            if (_partialoVerifications?.Count != required)
+            if (_partialVerifications?.Count != required)
             {
                 return false;
             }
 
-            foreach (var verification in _partialoVerifications.Values)
+            foreach (var verification in _partialVerifications.Values)
             {
                 if (verification.Verified is false)
                 {
@@ -34,7 +35,7 @@ public partial class Guardian
     // save_election_partial_key_verification
     public void SaveElectionPartialKeyVerification(ElectionPartialKeyVerification verification)
     {
-        _partialoVerifications[verification.DesignatedId!] = verification;
+        _partialVerifications[verification.DesignatedId!] = verification;
     }
 
     // verify_election_partial_key_backup
@@ -79,7 +80,7 @@ public partial class Guardian
                 coordinateData,
                 senderGuardianPublicKey.CoefficientCommitments
             );
-        Console.WriteLine($"VerifyElectionPartialKeyBackup: {receiverGuardianId} -> {senderGuardianBackup.OwnerId} {senderGuardianBackup.DesignatedSequenceOrder} {verified}");
+        Debug.WriteLine($"VerifyElectionPartialKeyBackup: {receiverGuardianId} -> {senderGuardianBackup.OwnerId} {senderGuardianBackup.DesignatedSequenceOrder} {verified}");
         return new()
         {
             KeyCeremonyId = keyCeremonyId,
