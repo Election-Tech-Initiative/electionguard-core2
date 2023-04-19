@@ -11,6 +11,7 @@ using hacl::HMACAlgorithm;
 using hacl::Lib;
 using std::get;
 using std::make_unique;
+using std::move;
 using std::nullptr_t;
 using std::out_of_range;
 using std::reference_wrapper;

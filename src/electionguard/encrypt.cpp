@@ -5,10 +5,10 @@
 #include "electionguard/ballot_code.hpp"
 #include "electionguard/elgamal.hpp"
 #include "electionguard/hash.hpp"
+#include "electionguard/nonces.hpp"
 #include "electionguard/precompute_buffers.hpp"
 #include "facades/bignum4096.hpp"
 #include "log.hpp"
-#include "nonces.hpp"
 #include "serialize.hpp"
 #include "utils.hpp"
 
@@ -19,6 +19,7 @@
 
 using std::invalid_argument;
 using std::make_unique;
+using std::move;
 using std::runtime_error;
 using std::to_string;
 using std::unique_ptr;

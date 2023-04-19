@@ -1,6 +1,4 @@
-﻿using System.Text.Json.Serialization;
-
-namespace ElectionGuard.UI.Lib.Models;
+﻿namespace ElectionGuard.UI.Lib.Models;
 
 /// <summary>
 /// Data for the key ceremony that is saved to the database
@@ -17,6 +15,20 @@ public partial class KeyCeremonyRecord : DatabaseRecord
         CompletedAt = null;
         State = KeyCeremonyState.PendingGuardiansJoin;
         CreatedBy = admin;
+    }
+
+    public KeyCeremonyRecord(KeyCeremonyRecord other) : base(nameof(KeyCeremonyRecord))
+    {
+        KeyCeremonyId = other.KeyCeremonyId;
+        Name = other.Name;
+        Quorum = other.Quorum;
+        NumberOfGuardians = other.NumberOfGuardians;
+        JointKey = other.JointKey != null ? new(other.JointKey) : null;
+        CreatedBy = other.CreatedBy;
+        CreatedAt = other.CreatedAt;
+        CompletedAt = other.CompletedAt;
+        UpdatedAt = other.UpdatedAt;
+        State = other.State;
     }
 
     [ObservableProperty]

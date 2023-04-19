@@ -15,6 +15,7 @@
 using std::invalid_argument;
 using std::make_unique;
 using std::map;
+using std::move;
 using std::ref;
 using std::reference_wrapper;
 using std::runtime_error;

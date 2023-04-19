@@ -1,6 +1,9 @@
 using ElectionGuard.Encryption.Ballot;
 using ElectionGuard.ElectionSetup;
 using System.Text;
+using ElectionGuard.ElectionSetup.Extensions;
+using System.Diagnostics;
+using Newtonsoft.Json;
 
 namespace ElectionGuard.Decryption.Tally;
 
@@ -33,12 +36,14 @@ public record CiphertextTally : DisposableRecordBase, IEquatable<CiphertextTally
     /// <summary>
     /// a set of cast ballot ids cast in the election.
     /// </summary>
-    public HashSet<string> CastBallotIds { get; init; } = default!;
+    public HashSet<string> CastBallotIds { get; init; } = new HashSet<string>();
 
     /// <summary>
     /// a set of spoiled ballot ids cast in the election.
     /// </summary>
-    public HashSet<string> SpoiledBallotIds { get; init; } = default!;
+    public HashSet<string> ChallengedBallotIds { get; init; } = new HashSet<string>();
+
+    public HashSet<string> SpoiledBallotIds { get; init; } = new HashSet<string>();
 
     /// <summary>
     /// A collection of each contest and selection in an election.
@@ -52,10 +57,8 @@ public record CiphertextTally : DisposableRecordBase, IEquatable<CiphertextTally
         InternalManifest manifest)
     {
         Name = name;
-        Context = context;
-        Manifest = manifest;
-        CastBallotIds = new HashSet<string>();
-        SpoiledBallotIds = new HashSet<string>();
+        Context = new(context);
+        Manifest = new(manifest);
         Contests = manifest.ToCiphertextTallyContestDictionary();
     }
 
@@ -67,27 +70,52 @@ public record CiphertextTally : DisposableRecordBase, IEquatable<CiphertextTally
     {
         TallyId = tallyId;
         Name = name;
-        Context = context;
-        Manifest = manifest;
-        CastBallotIds = new HashSet<string>();
-        SpoiledBallotIds = new HashSet<string>();
+        Context = new(context);
+        Manifest = new(manifest);
         Contests = manifest.ToCiphertextTallyContestDictionary();
     }
 
+    [JsonConstructor]
     public CiphertextTally(
         string tallyId,
         string name,
         CiphertextElectionContext context,
         InternalManifest manifest,
+        HashSet<string> castBallotIds,
+        HashSet<string> challengedBallotIds,
+        HashSet<string> spoiledBallotIds,
         Dictionary<string, CiphertextTallyContest> contests)
     {
         TallyId = tallyId;
         Name = name;
-        Context = context;
-        Manifest = manifest;
-        CastBallotIds = new HashSet<string>();
-        SpoiledBallotIds = new HashSet<string>();
-        Contests = contests;
+        Context = new(context);
+        Manifest = new(manifest);
+        CastBallotIds = new HashSet<string>(castBallotIds);
+        ChallengedBallotIds = new HashSet<string>(challengedBallotIds);
+        SpoiledBallotIds = new HashSet<string>(spoiledBallotIds);
+        Contests = contests.Select(
+            entry => new KeyValuePair<string, CiphertextTallyContest>(
+                entry.Key,
+                new CiphertextTallyContest(entry.Value))).ToDictionary(
+                    entry => entry.Key,
+                    entry => entry.Value);
+    }
+
+    public CiphertextTally(CiphertextTally other) : base(other)
+    {
+        TallyId = other.TallyId;
+        Name = other.Name;
+        Context = new(other.Context);
+        Manifest = new(other.Manifest);
+        CastBallotIds = new HashSet<string>(other.CastBallotIds);
+        ChallengedBallotIds = new HashSet<string>(other.ChallengedBallotIds);
+        SpoiledBallotIds = new HashSet<string>(other.SpoiledBallotIds);
+        Contests = other.Contests.Select(
+            x => new KeyValuePair<string, CiphertextTallyContest>(
+                x.Key, new CiphertextTallyContest(x.Value)))
+                .ToDictionary(
+            entry => entry.Key,
+            entry => new CiphertextTallyContest(entry.Value));
     }
 
     /// <summary>
@@ -178,6 +206,13 @@ public record CiphertextTally : DisposableRecordBase, IEquatable<CiphertextTally
         return result;
     }
 
+    public bool HasBallot(string ballotId)
+    {
+        return CastBallotIds.Contains(ballotId) ||
+               ChallengedBallotIds.Contains(ballotId) ||
+               SpoiledBallotIds.Contains(ballotId);
+    }
+
     public override string ToString()
     {
         var sb = new StringBuilder();
@@ -188,8 +223,18 @@ public record CiphertextTally : DisposableRecordBase, IEquatable<CiphertextTally
         _ = sb.AppendLine($"    ManifestHash: {Manifest.ManifestHash}");
 
         _ = sb.AppendLine($"    - CastBallotIds: {CastBallotIds.Count}");
+        _ = sb.AppendLine($"    - ChallengedBallotIds: {ChallengedBallotIds.Count}");
         _ = sb.AppendLine($"    - SpoiledBallotIds: {SpoiledBallotIds.Count}");
         return sb.ToString();
+    }
+
+    protected override void DisposeUnmanaged()
+    {
+        base.DisposeUnmanaged();
+        Manifest?.Dispose();
+        Context?.Dispose();
+        Contests?.Dispose();
+        Contests?.Clear();
     }
 
     #region Equality Overrides
@@ -202,6 +247,7 @@ public record CiphertextTally : DisposableRecordBase, IEquatable<CiphertextTally
                Context.CryptoExtendedBaseHash == other.Context.CryptoExtendedBaseHash &&
                Manifest.ManifestHash == other.Manifest.ManifestHash &&
                CastBallotIds.SetEquals(other.CastBallotIds) &&
+               ChallengedBallotIds.SetEquals(other.ChallengedBallotIds) &&
                SpoiledBallotIds.SetEquals(other.SpoiledBallotIds) &&
                Contests.SequenceEqual(other.Contests);
     }
@@ -209,7 +255,9 @@ public record CiphertextTally : DisposableRecordBase, IEquatable<CiphertextTally
     public override int GetHashCode()
     {
         return HashCode.Combine(
-            TallyId, Name, Context, Manifest, CastBallotIds, SpoiledBallotIds, Contests);
+            TallyId, Name, Context, Manifest,
+            CastBallotIds, ChallengedBallotIds, SpoiledBallotIds,
+            Contests);
     }
 
     #endregion Equality Overrides
@@ -221,32 +269,27 @@ public record CiphertextTally : DisposableRecordBase, IEquatable<CiphertextTally
     private BallotValidationResult TryAddBallot(
         CiphertextBallot ballot, bool skipValidation = false)
     {
-        // check for unknown state
-        if (ballot.State == BallotBoxState.Unknown)
-        {
-            throw new ArgumentException("Ballot state is unknown");
-        }
-
         // check for valid ballot
         var isValid = skipValidation
             ? new BallotValidationResult(true)
             : ballot.IsValid(Manifest, Context);
         if (!isValid.IsValid)
         {
+            Debug.WriteLine($"Ballot {ballot.ObjectId} is not valid");
             return isValid;
         }
-
-        // add the ballot to the appropriate set
-        var added = ballot.IsCast
-            ? CastBallotIds.Add(ballot.ObjectId)
-            : SpoiledBallotIds.Add(ballot.ObjectId);
-        if (!added)
+        var added = ballot.State switch
         {
-            return new BallotValidationResult(
-                    $"Ballot {ballot.ObjectId} already added to tally {TallyId}");
-        }
+            BallotBoxState.Spoiled => SpoiledBallotIds.Add(ballot.ObjectId),
+            BallotBoxState.Challenged => ChallengedBallotIds.Add(ballot.ObjectId),
+            BallotBoxState.Cast => CastBallotIds.Add(ballot.ObjectId),
+            _ => throw new ArgumentException($"Incorrect ballot state {ballot.State}"),
+        };
 
-        return new BallotValidationResult(true);
+        return !added
+            ? new BallotValidationResult(
+                    $"Ballot {ballot.ObjectId} already added to tally {TallyId}")
+            : new BallotValidationResult(true);
     }
 }
 

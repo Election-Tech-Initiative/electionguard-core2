@@ -16,14 +16,14 @@ set(SOURCES_std
 	${PROJECT_SOURCE_DIR}/src/msvc/Hacl_Streaming_Blake2.c
 	${PROJECT_SOURCE_DIR}/src/msvc/Hacl_Bignum.c
 	${PROJECT_SOURCE_DIR}/src/msvc/Hacl_Bignum256.c
-    ${PROJECT_SOURCE_DIR}/src/msvc/Hacl_Bignum256_32.c
+	${PROJECT_SOURCE_DIR}/src/msvc/Hacl_Bignum256_32.c
 	${PROJECT_SOURCE_DIR}/src/msvc/Hacl_Bignum32.c
-    ${PROJECT_SOURCE_DIR}/src/msvc/Hacl_Bignum4096.c
+	${PROJECT_SOURCE_DIR}/src/msvc/Hacl_Bignum4096.c
 	${PROJECT_SOURCE_DIR}/src/msvc/Hacl_GenericField64.c
 	${PROJECT_SOURCE_DIR}/src/msvc/Hacl_Bignum4096_32.c
-    ${PROJECT_SOURCE_DIR}/src/msvc/Hacl_Bignum64.c
+	${PROJECT_SOURCE_DIR}/src/msvc/Hacl_Bignum64.c
 	${PROJECT_SOURCE_DIR}/src/msvc/Hacl_GenericField32.c
-    ${PROJECT_SOURCE_DIR}/src/msvc/Hacl_GenericField64.c
+	${PROJECT_SOURCE_DIR}/src/msvc/Hacl_GenericField64.c
 	${PROJECT_SOURCE_DIR}/src/msvc/Hacl_Chacha20Poly1305_32.c
 	${PROJECT_SOURCE_DIR}/src/msvc/Hacl_Chacha20.c
 	${PROJECT_SOURCE_DIR}/src/msvc/Hacl_Streaming_Poly1305_32.c
@@ -91,7 +91,6 @@ set(SOURCES_vec128
 	${PROJECT_SOURCE_DIR}/src/msvc/Hacl_HPKE_P256_CP128_SHA256.c
 )
 set(SOURCES_m32
-	
 )
 set(SOURCES_vale
 	${PROJECT_SOURCE_DIR}/src/msvc/Hacl_Curve25519_64.c

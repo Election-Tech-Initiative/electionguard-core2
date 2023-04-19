@@ -8,6 +8,7 @@ using MongoDB.Driver.Core.Servers;
 namespace ElectionGuard.UI.Lib.Services;
 
 
+[Obsolete("use newtonsoft")]
 public class ComplexTypeSerializer : SerializerBase<object>
 {
     public override object Deserialize(BsonDeserializationContext context, BsonDeserializationArgs args)

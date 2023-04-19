@@ -12,6 +12,7 @@
   <ItemGroup>
     <ProjectReference Include="..\..\..\..\src\electionguard-ui\ElectionGuard.UI.Lib\ElectionGuard.UI.Lib.csproj" />
     <ProjectReference Include="..\ElectionGuard.Encryption\ElectionGuard.Encryption.csproj" />
+    <ProjectReference Include="..\ElectionGuard.Encryption.Utils\ElectionGuard.Encryption.Utils.csproj" />
   </ItemGroup>
 
   <PropertyGroup Label="Library Paths">

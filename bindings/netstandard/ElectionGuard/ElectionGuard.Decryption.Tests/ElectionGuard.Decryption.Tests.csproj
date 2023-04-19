@@ -9,10 +9,10 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.3.2" />
+    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.4.1" />
     <PackageReference Include="NUnit" Version="3.13.3" />
-    <PackageReference Include="NUnit3TestAdapter" Version="4.2.1" />
-    <PackageReference Include="NUnit.Analyzers" Version="3.3.0" />
+    <PackageReference Include="NUnit3TestAdapter" Version="4.3.1" />
+    <PackageReference Include="NUnit.Analyzers" Version="3.5.0" />
     <PackageReference Include="coverlet.collector" Version="3.1.2" />
     <PackageReference Include="Microsoft.Bcl.HashCode" Version="1.1.1" />
   </ItemGroup>
@@ -23,11 +23,13 @@
   <ItemGroup>
     <ProjectReference Include="..\ElectionGuard.Decryption\ElectionGuard.Decryption.csproj" />
     <ProjectReference Include="..\ElectionGuard.ElectionSetup\ElectionGuard.ElectionSetup.csproj" />
+    <ProjectReference Include="..\ElectionGuard.ElectionSetup.Tests\ElectionGuard.ElectionSetup.Tests.csproj" />
     <ProjectReference Include="..\ElectionGuard.Encryption\ElectionGuard.Encryption.csproj" />
     <ProjectReference Include="..\ElectionGuard.Encryption.Utils\ElectionGuard.Encryption.Utils.csproj" />
   </ItemGroup>
 
    <PropertyGroup Label="Library Paths">
+    <ElectionGuardData>..\..\..\..\data</ElectionGuardData>
     <ElectionGuardLibs>..\..\..\..\build\libs</ElectionGuardLibs>
   </PropertyGroup>
 
@@ -135,7 +137,11 @@
 
     <NoStdLib>false</NoStdLib>
   </PropertyGroup>
-
+   <ItemGroup>
+    <Content Include="$(ElectionGuardData)\**" LinkBase="data">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>  
+  </ItemGroup>
   <ItemGroup Label="C++ Built Libraries">
     <None Name="Windows (MSVC)" Visible="false" Include="$(ElectionGuardLibs)\Windows\$(PlatformTarget)\$(Configuration)\src\$(Configuration)\*.dll*">
       <CopyToOutputDirectory Condition="'$(OS)' == 'Windows_NT'">Always</CopyToOutputDirectory>

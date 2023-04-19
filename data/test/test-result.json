@@ -1,0 +1,1278 @@
+{
+    "tally_id": "5280d2b1-3e31-44ea-aa9c-be18f3ac904f",
+    "is_valid": true,
+    "message": null,
+    "tally": {
+        "tally_id": "5280d2b1-3e31-44ea-aa9c-be18f3ac904f",
+        "name": "test-decrypt-with-shares",
+        "contests": {
+            "president-vice-president-contest": {
+                "object_id": "president-vice-president-contest",
+                "sequence_order": 0,
+                "description_hash": "1597AD20EDD1BBADEFA79D667B5A807F16D3B16A67D05EDC67CD5E4E678FA99C",
+                "selections": {
+                    "barchi-hallaren-selection": {
+                        "object_id": "barchi-hallaren-selection",
+                        "sequence_order": 0,
+                        "description_hash": "5105D7CF4FA6BC327DA744A7462249530A5CD126F56E67FBAD30B0339E501177",
+                        "tally": 10,
+                        "value": "01"
+                    },
+                    "cramer-vuocolo-selection": {
+                        "object_id": "cramer-vuocolo-selection",
+                        "sequence_order": 1,
+                        "description_hash": "1BD0201B8292857B900088ED0B0417E4DA9758556B9250D73B14B562C6D254C4",
+                        "tally": 6,
+                        "value": "01"
+                    },
+                    "court-blumhardt-selection": {
+                        "object_id": "court-blumhardt-selection",
+                        "sequence_order": 2,
+                        "description_hash": "1C495683D1B32030D3914802487E1B6F224780C80A46F2E2687972F439683465",
+                        "tally": 8,
+                        "value": "01"
+                    },
+                    "boone-lian-selection": {
+                        "object_id": "boone-lian-selection",
+                        "sequence_order": 3,
+                        "description_hash": "C672C2AE80779AB5D1EA7891ADF5089E9ECB18E1B7A0B908F16F49422541758B",
+                        "tally": 2,
+                        "value": "01"
+                    },
+                    "hildebrand-garritty-selection": {
+                        "object_id": "hildebrand-garritty-selection",
+                        "sequence_order": 4,
+                        "description_hash": "7984C11FE00A44E237B54D692085B19C9DD5E2A25CB4A93E40FF15E6D31FD5CF",
+                        "tally": 3,
+                        "value": "01"
+                    },
+                    "patterson-lariviere-selection": {
+                        "object_id": "patterson-lariviere-selection",
+                        "sequence_order": 5,
+                        "description_hash": "CF818A24F4D2E9A99A8FA17ED0DF6E812C608E65DA229F4B813D54AF141B1930",
+                        "tally": 0,
+                        "value": "01"
+                    },
+                    "write-in-selection-president": {
+                        "object_id": "write-in-selection-president",
+                        "sequence_order": 6,
+                        "description_hash": "BB0ABD0A8B212BC213E9CD37921ECDD40C243773305E7F2F870D0F3152847E75",
+                        "tally": 0,
+                        "value": "01"
+                    }
+                }
+            },
+            "ozark-governor": {
+                "object_id": "ozark-governor",
+                "sequence_order": 1,
+                "description_hash": "FB3952A7FFE6CD78AE6FAEE2096435079B440E9B1766BD6E32E52D5066A6C75C",
+                "selections": {
+                    "franz-selection": {
+                        "object_id": "franz-selection",
+                        "sequence_order": 0,
+                        "description_hash": "2274EC158CE8845E59106082D6F6F9C22C23BAEEB7F1AFC67BA8E98559C38632",
+                        "tally": 10,
+                        "value": "01"
+                    },
+                    "harris-selection": {
+                        "object_id": "harris-selection",
+                        "sequence_order": 1,
+                        "description_hash": "061AF13CA4C0353CDE2AEE1A73C040CC4232389EE328A833443B2F9D93CBE2FB",
+                        "tally": 14,
+                        "value": "01"
+                    },
+                    "bargmann-selection": {
+                        "object_id": "bargmann-selection",
+                        "sequence_order": 2,
+                        "description_hash": "B24E2DF621A9010BA4BE3A30908BCF9C0EB93922F18021440B320938DF3B801E",
+                        "tally": 6,
+                        "value": "01"
+                    },
+                    "abcock-selection": {
+                        "object_id": "abcock-selection",
+                        "sequence_order": 3,
+                        "description_hash": "C97B903AB4DBF9FEF6548FEF48181338284D13DAB65A65CD3BC721F5C01CD689",
+                        "tally": 0,
+                        "value": "01"
+                    },
+                    "steel-loy-selection": {
+                        "object_id": "steel-loy-selection",
+                        "sequence_order": 4,
+                        "description_hash": "22D76479A95414D5CF6AD18F1F736DFA418435A427E68ED3D41071CC5F5AA806",
+                        "tally": 0,
+                        "value": "01"
+                    },
+                    "sharp-selection": {
+                        "object_id": "sharp-selection",
+                        "sequence_order": 5,
+                        "description_hash": "DED085AD07B15C4A08C0409F86F12941A22F4EBDD9F68A80701A6C014AB9FE9D",
+                        "tally": 0,
+                        "value": "01"
+                    },
+                    "walace-selection": {
+                        "object_id": "walace-selection",
+                        "sequence_order": 6,
+                        "description_hash": "956461B7C7E12D15977EBF96A68E351E08D498F177CD155770D48804E2E9D68A",
+                        "tally": 0,
+                        "value": "01"
+                    },
+                    "williams-selection": {
+                        "object_id": "williams-selection",
+                        "sequence_order": 7,
+                        "description_hash": "84963958C97EAAE7DFA86DF2D8BF6E38559876175B55782AAD1C8A1EBD4CBF27",
+                        "tally": 0,
+                        "value": "01"
+                    },
+                    "alpern-selection": {
+                        "object_id": "alpern-selection",
+                        "sequence_order": 9,
+                        "description_hash": "6A1DB9A4C4E15AAB6CA162DFC5FF7C2D335D9FF73BB1EF8D1A40054AA3A539A4",
+                        "tally": 0,
+                        "value": "01"
+                    },
+                    "windbeck-selection": {
+                        "object_id": "windbeck-selection",
+                        "sequence_order": 10,
+                        "description_hash": "E67F4CEAEFEDB7F36CAC1666EA35F1EAD5569B2D1451E2E270B8D9B60B352210",
+                        "tally": 0,
+                        "value": "01"
+                    },
+                    "sharp-althea-selection": {
+                        "object_id": "sharp-althea-selection",
+                        "sequence_order": 11,
+                        "description_hash": "616043429CCDE41684E321DB620BA174A772DFC7A512251937805998E76AC698",
+                        "tally": 0,
+                        "value": "01"
+                    },
+                    "greher-selection": {
+                        "object_id": "greher-selection",
+                        "sequence_order": 12,
+                        "description_hash": "EDEEA2941F5F009C6C3365E7B1D977924BE6D5E63F0939FDB2BABCAFB0A25981",
+                        "tally": 0,
+                        "value": "01"
+                    },
+                    "alexander-selection": {
+                        "object_id": "alexander-selection",
+                        "sequence_order": 13,
+                        "description_hash": "4E34F0F3B9811EA0101886A14A769C25B8C234F85F1C113ED57B2641E2249B3E",
+                        "tally": 0,
+                        "value": "01"
+                    },
+                    "mitchell-selection": {
+                        "object_id": "mitchell-selection",
+                        "sequence_order": 14,
+                        "description_hash": "A94C51A92F4EA44E55BBEC0161F187D1BEAA17676F88F6418D83540F4F82633B",
+                        "tally": 0,
+                        "value": "01"
+                    },
+                    "lee-selection": {
+                        "object_id": "lee-selection",
+                        "sequence_order": 15,
+                        "description_hash": "17CE4C489AD050B10E4BFF438A3CFB34097079D28A80A2DD523C4035CDEF6372",
+                        "tally": 0,
+                        "value": "01"
+                    },
+                    "ash-selection": {
+                        "object_id": "ash-selection",
+                        "sequence_order": 16,
+                        "description_hash": "423B4EE6E1B6902EE1F90F428105DFE3AE66CF3D5B7710EA892ED1FE22CE762F",
+                        "tally": 0,
+                        "value": "01"
+                    },
+                    "kennedy-selection": {
+                        "object_id": "kennedy-selection",
+                        "sequence_order": 17,
+                        "description_hash": "312FAC230DF535F8E1E218E8B53BE7EE8254335736748B931DD75664B81E5D27",
+                        "tally": 0,
+                        "value": "01"
+                    },
+                    "jackson-selection": {
+                        "object_id": "jackson-selection",
+                        "sequence_order": 18,
+                        "description_hash": "33A8D8A95B6C23BE73352E9092910EC9CFC18EFEA874E3036A98855D3993E3F3",
+                        "tally": 0,
+                        "value": "01"
+                    },
+                    "brown-selection": {
+                        "object_id": "brown-selection",
+                        "sequence_order": 19,
+                        "description_hash": "3CA4D2890B3D3403687BD648882A56BFA46551B4AD28E710CAADE8B2D2CF0362",
+                        "tally": 0,
+                        "value": "01"
+                    },
+                    "teller-selection": {
+                        "object_id": "teller-selection",
+                        "sequence_order": 20,
+                        "description_hash": "D8F6537AC9F18321FBE264B4CDF19508348D54346EB03E38024A33A53EBF0F2E",
+                        "tally": 0,
+                        "value": "01"
+                    },
+                    "ward-selection": {
+                        "object_id": "ward-selection",
+                        "sequence_order": 21,
+                        "description_hash": "888E1ED2B00B90E577CB177A8A6DFEF84215506158F6166071140C1215E0DF07",
+                        "tally": 0,
+                        "value": "01"
+                    },
+                    "murphy-selection": {
+                        "object_id": "murphy-selection",
+                        "sequence_order": 22,
+                        "description_hash": "BD3ECD423D91BDCDA6C4FFA15D6A54188A7F441DF8892A96908107FE7A4E801D",
+                        "tally": 0,
+                        "value": "01"
+                    },
+                    "newman-selection": {
+                        "object_id": "newman-selection",
+                        "sequence_order": 23,
+                        "description_hash": "5FE6B9727D882C0E88EAA53C32B870BACA6103D2525A4E6D3B7D9464F245E1CD",
+                        "tally": 0,
+                        "value": "01"
+                    },
+                    "callanann-selection": {
+                        "object_id": "callanann-selection",
+                        "sequence_order": 24,
+                        "description_hash": "FC60F9E363149DABA365572751F4A7221D129D635745E14536745D63957A36C5",
+                        "tally": 0,
+                        "value": "01"
+                    },
+                    "york-selection": {
+                        "object_id": "york-selection",
+                        "sequence_order": 25,
+                        "description_hash": "EEFD4A3CCE987E247CF4B03664A8FEBAA398DC2553437D52448AAEE552CB8A62",
+                        "tally": 0,
+                        "value": "01"
+                    },
+                    "chandler-selection": {
+                        "object_id": "chandler-selection",
+                        "sequence_order": 26,
+                        "description_hash": "6E5D1735D6FE56E10FB84B17C119AFC2ADF20956779B49F4B7CD2ECAAE489FEF",
+                        "tally": 0,
+                        "value": "01"
+                    },
+                    "write-in-selection-governor": {
+                        "object_id": "write-in-selection-governor",
+                        "sequence_order": 27,
+                        "description_hash": "1D1E8D0B23EFD2B3CD09A028D20D8AF3652120648734634D2E3234479807F7C5",
+                        "tally": 0,
+                        "value": "01"
+                    }
+                }
+            },
+            "congress-district-5-contest": {
+                "object_id": "congress-district-5-contest",
+                "sequence_order": 2,
+                "description_hash": "78E362042F57BDD4C4B36805C31666FA23A81EC1CAF7B461C575E495B2191FEF",
+                "selections": {
+                    "soliz-selection": {
+                        "object_id": "soliz-selection",
+                        "sequence_order": 0,
+                        "description_hash": "957A4204B5D0970FD36798674F0FD28011FA8EC5291B57A37914255C02A32DBB",
+                        "tally": 4,
+                        "value": "01"
+                    },
+                    "keller-selection": {
+                        "object_id": "keller-selection",
+                        "sequence_order": 1,
+                        "description_hash": "41A466923615FD820D5CC8B2B7F504CF85B6622826EA0242112C3EF9DDB81762",
+                        "tally": 5,
+                        "value": "01"
+                    },
+                    "rangel-selection": {
+                        "object_id": "rangel-selection",
+                        "sequence_order": 2,
+                        "description_hash": "7B21CFE977240FE386EBCEBBC83DF03826948B470C573C6C4AD3C9DEA8591816",
+                        "tally": 0,
+                        "value": "01"
+                    },
+                    "argent-selection": {
+                        "object_id": "argent-selection",
+                        "sequence_order": 3,
+                        "description_hash": "A93C75A165EC4009BFC15189B1ACA97400BC825A0020349EE2DB3C547738AEFA",
+                        "tally": 0,
+                        "value": "01"
+                    },
+                    "witherspoon-smithson-selection": {
+                        "object_id": "witherspoon-smithson-selection",
+                        "sequence_order": 4,
+                        "description_hash": "B2870E91A97C0C9ECFF7467897D40E68B5E6782AF879C8E157BB8DC75EEB8255",
+                        "tally": 2,
+                        "value": "01"
+                    },
+                    "write-in-selection-us-congress-district-5": {
+                        "object_id": "write-in-selection-us-congress-district-5",
+                        "sequence_order": 5,
+                        "description_hash": "D011C593FA6342F6C5FF6FD6A35663AB6BFBB71932272EA8E07D759CBD90EB8A",
+                        "tally": 0,
+                        "value": "01"
+                    }
+                }
+            },
+            "congress-district-7-contest": {
+                "object_id": "congress-district-7-contest",
+                "sequence_order": 3,
+                "description_hash": "C79CDB286207640A02C46127C1C4ACE0C27EEE6CCF2D561A2A83463FEB3EABDA",
+                "selections": {
+                    "bainbridge-selection": {
+                        "object_id": "bainbridge-selection",
+                        "sequence_order": 0,
+                        "description_hash": "D34334E748814B75ED7DD3591F4AB23734390B49E1497B17111337DC9F9BC942",
+                        "tally": 10,
+                        "value": "01"
+                    },
+                    "hennessey-selection": {
+                        "object_id": "hennessey-selection",
+                        "sequence_order": 1,
+                        "description_hash": "F6EA0FD05B9E104E73A55699BC1812C7E03966292796FADFA82B4196458E03F8",
+                        "tally": 4,
+                        "value": "01"
+                    },
+                    "savoy-selection": {
+                        "object_id": "savoy-selection",
+                        "sequence_order": 2,
+                        "description_hash": "2CCE402B2A86A6DCD6862B4A75BCB02A5238F5782FCAAF9125D27EDA5D0C5B8F",
+                        "tally": 2,
+                        "value": "01"
+                    },
+                    "tawa-selection": {
+                        "object_id": "tawa-selection",
+                        "sequence_order": 3,
+                        "description_hash": "F9D5B89E0A2D538959C2A3CDA7CB33FA87E758FEE3EC9ADD12ED5049EE4406FF",
+                        "tally": 0,
+                        "value": "01"
+                    },
+                    "tawa-mary-selection": {
+                        "object_id": "tawa-mary-selection",
+                        "sequence_order": 4,
+                        "description_hash": "0122EFA2C54D432B308729730ADE710D8D366042F0A743EB40F0CAA31E35BD48",
+                        "tally": 1,
+                        "value": "01"
+                    },
+                    "write-in-selection-us-congress-district-7": {
+                        "object_id": "write-in-selection-us-congress-district-7",
+                        "sequence_order": 5,
+                        "description_hash": "7FAA9A22537C2FAB7B97D3396185FAEE3B9BD86EF9AC3EAEA5386BFA376E821E",
+                        "tally": 1,
+                        "value": "01"
+                    }
+                }
+            },
+            "pismo-beach-school-board-contest": {
+                "object_id": "pismo-beach-school-board-contest",
+                "sequence_order": 4,
+                "description_hash": "5E1632EBC68394FC36EC76E192760917E2E15DDA7FF2D107A54DFFECCB316BA9",
+                "selections": {
+                    "moore-selection": {
+                        "object_id": "moore-selection",
+                        "sequence_order": 0,
+                        "description_hash": "5C8C18F1C05B4BA9A1A80A11E07B451DAD1E4B0CCE9A3987BAD642FA682C9CE6",
+                        "tally": 2,
+                        "value": "01"
+                    },
+                    "white-selection": {
+                        "object_id": "white-selection",
+                        "sequence_order": 1,
+                        "description_hash": "9BD6E74E7075A19BE5976DE7447E78C742420BC5D6B8FFD710C84C3FE2039390",
+                        "tally": 4,
+                        "value": "01"
+                    },
+                    "smallberries-selection": {
+                        "object_id": "smallberries-selection",
+                        "sequence_order": 2,
+                        "description_hash": "B6FFA76644921926DC3B83E4B6E237A99DE1797BA19F625178980C20FEC05E26",
+                        "tally": 3,
+                        "value": "01"
+                    },
+                    "warfin-selection": {
+                        "object_id": "warfin-selection",
+                        "sequence_order": 3,
+                        "description_hash": "5AAADBE5E5ACDDF2F3FCFA45E23ABFD54DD0B44981FC55FA77D8D8AA1459C271",
+                        "tally": 4,
+                        "value": "01"
+                    },
+                    "norberg-selection": {
+                        "object_id": "norberg-selection",
+                        "sequence_order": 4,
+                        "description_hash": "BE70CCA7B5D0E8F4CAD581503D882FEB4A8EAF2EDF68A6E1965917771B7F6A72",
+                        "tally": 1,
+                        "value": "01"
+                    },
+                    "parks-selection": {
+                        "object_id": "parks-selection",
+                        "sequence_order": 5,
+                        "description_hash": "5C92159F19E6AE6CD383127ABAC999CF811F6200B08B69082D4CDF37E12E0F88",
+                        "tally": 2,
+                        "value": "01"
+                    },
+                    "savannah-selection": {
+                        "object_id": "savannah-selection",
+                        "sequence_order": 6,
+                        "description_hash": "680330EAD9C0E40A14B9330EDCD6FBA2C7C4B704206A0DEA040B3EFBE459C63F",
+                        "tally": 1,
+                        "value": "01"
+                    },
+                    "write-in-selection-1-pismo-beach-school-board": {
+                        "object_id": "write-in-selection-1-pismo-beach-school-board",
+                        "sequence_order": 7,
+                        "description_hash": "289D972A6163C1692FBEBDFF75B24C958729DBC9BCC823966E66DB4CA1EBF3B4",
+                        "tally": 2,
+                        "value": "01"
+                    },
+                    "write-in-selection-2-pismo-beach-school-board": {
+                        "object_id": "write-in-selection-2-pismo-beach-school-board",
+                        "sequence_order": 8,
+                        "description_hash": "056332CB4503D9B86F743107ABBE338EDB96CA26115EA51B2817EBD32AA9024B",
+                        "tally": 0,
+                        "value": "01"
+                    },
+                    "write-in-selection-3-pismo-beach-school-board": {
+                        "object_id": "write-in-selection-3-pismo-beach-school-board",
+                        "sequence_order": 9,
+                        "description_hash": "E9C94DE11261DA1AE76E7CE03AE08D533AF24AA561CE2BB591DCB6C02ACBBD0E",
+                        "tally": 0,
+                        "value": "01"
+                    }
+                }
+            },
+            "somerset-school-board-contest": {
+                "object_id": "somerset-school-board-contest",
+                "sequence_order": 5,
+                "description_hash": "AC62D3221BE27CD57E8CEEE5B4C73E172E7692A0ABBB55EC68842231C6E06165",
+                "selections": {
+                    "summers-selection": {
+                        "object_id": "summers-selection",
+                        "sequence_order": 0,
+                        "description_hash": "F46B8CFDD07BE8D0D5B27EFFF16A0433808629EED3D102D1FD0B96A7C24C06B6",
+                        "tally": 1,
+                        "value": "01"
+                    },
+                    "chase-selection": {
+                        "object_id": "chase-selection",
+                        "sequence_order": 1,
+                        "description_hash": "AD308465DC754A52AB690F5D488B09A2064DA0C2B135C71F73799E2520C8C648",
+                        "tally": 0,
+                        "value": "01"
+                    },
+                    "osborne-selection": {
+                        "object_id": "osborne-selection",
+                        "sequence_order": 2,
+                        "description_hash": "A04F5E2E67375DDEA125DC3C1AD5A9FBD11DAA5445059F3494CA5C74248F0FD6",
+                        "tally": 2,
+                        "value": "01"
+                    },
+                    "rosenberg-selection": {
+                        "object_id": "rosenberg-selection",
+                        "sequence_order": 3,
+                        "description_hash": "ACA22085B12D0761B34C5375E64DAD97D7250249419A45161B39CF78F0BE9D30",
+                        "tally": 1,
+                        "value": "01"
+                    },
+                    "head-selection": {
+                        "object_id": "head-selection",
+                        "sequence_order": 4,
+                        "description_hash": "E7D7FC2A1767E2D94D077057275D8C13CA55E51E2AC8AC39881308FED4258F7A",
+                        "tally": 3,
+                        "value": "01"
+                    },
+                    "marsters-selection": {
+                        "object_id": "marsters-selection",
+                        "sequence_order": 5,
+                        "description_hash": "BF3F0E2C860C1054693C5B8ED4AB4584E41D4491183FDBAF8F38B1773E76334B",
+                        "tally": 1,
+                        "value": "01"
+                    },
+                    "write-in-selection-1-somerset-school-board": {
+                        "object_id": "write-in-selection-1-somerset-school-board",
+                        "sequence_order": 6,
+                        "description_hash": "FEAE6696548BC32DBF409B485DF9841042C4187A912528EA8F028ED25CB2245A",
+                        "tally": 0,
+                        "value": "01"
+                    },
+                    "write-in-selection-2-somerset-school-board": {
+                        "object_id": "write-in-selection-2-somerset-school-board",
+                        "sequence_order": 7,
+                        "description_hash": "ED367A3ADFA4604E1D4E3F7AEA7BE66F374C86846577B9DA8AAF3BDF2CB2F701",
+                        "tally": 0,
+                        "value": "01"
+                    }
+                }
+            },
+            "arlington-chief-justice-retain-demergue": {
+                "object_id": "arlington-chief-justice-retain-demergue",
+                "sequence_order": 6,
+                "description_hash": "BC351FF3E17BB60D7837BD0242ACFA9449F58C4A08389756C43FA3851D6E7AEF",
+                "selections": {
+                    "ozark-chief-justice-retain-demergue-affirmative-selection": {
+                        "object_id": "ozark-chief-justice-retain-demergue-affirmative-selection",
+                        "sequence_order": 0,
+                        "description_hash": "3004BCC29C9F0FD95A30DD0EB19C0487B7018789DDD68689E6FA65942D105D86",
+                        "tally": 6,
+                        "value": "01"
+                    },
+                    "ozark-chief-justice-retain-demergue-negative-selection": {
+                        "object_id": "ozark-chief-justice-retain-demergue-negative-selection",
+                        "sequence_order": 1,
+                        "description_hash": "6F66EC2D82D2FF892AC0239DF94A59A25FBD4FFDA9381FBD6CC54D7EA8A1BC2B",
+                        "tally": 2,
+                        "value": "01"
+                    }
+                }
+            },
+            "exeter-utility-district-referendum-contest": {
+                "object_id": "exeter-utility-district-referendum-contest",
+                "sequence_order": 7,
+                "description_hash": "9DEC4F2EB5EC45D42A5755040BEC11DBC2CC9E663AFA5DB2E4BEA24F75D10F55",
+                "selections": {
+                    "exeter-utility-district-referendum-affirmative-selection": {
+                        "object_id": "exeter-utility-district-referendum-affirmative-selection",
+                        "sequence_order": 0,
+                        "description_hash": "309D9080E8E6E21554FDC5DC612331AC8A3167FD7F764AD397F88CE90B60AAD9",
+                        "tally": 0,
+                        "value": "01"
+                    },
+                    "exeter-utility-district-referendum-selection": {
+                        "object_id": "exeter-utility-district-referendum-selection",
+                        "sequence_order": 1,
+                        "description_hash": "1EA812A3621BD1820C451CBE088592A7978D0144E87295CC79EB9178E7E8BE10",
+                        "tally": 2,
+                        "value": "01"
+                    }
+                }
+            }
+        }
+    },
+    "spoiled_ballots": [
+        {
+            "tally_id": "5280d2b1-3e31-44ea-aa9c-be18f3ac904f",
+            "name": "fake-ballot-30",
+            "contests": {
+                "president-vice-president-contest": {
+                    "object_id": "president-vice-president-contest",
+                    "sequence_order": 0,
+                    "description_hash": "1597AD20EDD1BBADEFA79D667B5A807F16D3B16A67D05EDC67CD5E4E678FA99C",
+                    "selections": {
+                        "barchi-hallaren-selection": {
+                            "object_id": "barchi-hallaren-selection",
+                            "sequence_order": 0,
+                            "description_hash": "5105D7CF4FA6BC327DA744A7462249530A5CD126F56E67FBAD30B0339E501177",
+                            "tally": 1,
+                            "value": "01"
+                        },
+                        "cramer-vuocolo-selection": {
+                            "object_id": "cramer-vuocolo-selection",
+                            "sequence_order": 1,
+                            "description_hash": "1BD0201B8292857B900088ED0B0417E4DA9758556B9250D73B14B562C6D254C4",
+                            "tally": 0,
+                            "value": "01"
+                        },
+                        "court-blumhardt-selection": {
+                            "object_id": "court-blumhardt-selection",
+                            "sequence_order": 2,
+                            "description_hash": "1C495683D1B32030D3914802487E1B6F224780C80A46F2E2687972F439683465",
+                            "tally": 0,
+                            "value": "01"
+                        },
+                        "boone-lian-selection": {
+                            "object_id": "boone-lian-selection",
+                            "sequence_order": 3,
+                            "description_hash": "C672C2AE80779AB5D1EA7891ADF5089E9ECB18E1B7A0B908F16F49422541758B",
+                            "tally": 0,
+                            "value": "01"
+                        },
+                        "hildebrand-garritty-selection": {
+                            "object_id": "hildebrand-garritty-selection",
+                            "sequence_order": 4,
+                            "description_hash": "7984C11FE00A44E237B54D692085B19C9DD5E2A25CB4A93E40FF15E6D31FD5CF",
+                            "tally": 0,
+                            "value": "01"
+                        },
+                        "patterson-lariviere-selection": {
+                            "object_id": "patterson-lariviere-selection",
+                            "sequence_order": 5,
+                            "description_hash": "CF818A24F4D2E9A99A8FA17ED0DF6E812C608E65DA229F4B813D54AF141B1930",
+                            "tally": 0,
+                            "value": "01"
+                        },
+                        "write-in-selection-president": {
+                            "object_id": "write-in-selection-president",
+                            "sequence_order": 6,
+                            "description_hash": "BB0ABD0A8B212BC213E9CD37921ECDD40C243773305E7F2F870D0F3152847E75",
+                            "tally": 0,
+                            "value": "01"
+                        }
+                    }
+                },
+                "ozark-governor": {
+                    "object_id": "ozark-governor",
+                    "sequence_order": 1,
+                    "description_hash": "FB3952A7FFE6CD78AE6FAEE2096435079B440E9B1766BD6E32E52D5066A6C75C",
+                    "selections": {
+                        "franz-selection": {
+                            "object_id": "franz-selection",
+                            "sequence_order": 0,
+                            "description_hash": "2274EC158CE8845E59106082D6F6F9C22C23BAEEB7F1AFC67BA8E98559C38632",
+                            "tally": 1,
+                            "value": "01"
+                        },
+                        "harris-selection": {
+                            "object_id": "harris-selection",
+                            "sequence_order": 1,
+                            "description_hash": "061AF13CA4C0353CDE2AEE1A73C040CC4232389EE328A833443B2F9D93CBE2FB",
+                            "tally": 0,
+                            "value": "01"
+                        },
+                        "bargmann-selection": {
+                            "object_id": "bargmann-selection",
+                            "sequence_order": 2,
+                            "description_hash": "B24E2DF621A9010BA4BE3A30908BCF9C0EB93922F18021440B320938DF3B801E",
+                            "tally": 0,
+                            "value": "01"
+                        },
+                        "abcock-selection": {
+                            "object_id": "abcock-selection",
+                            "sequence_order": 3,
+                            "description_hash": "C97B903AB4DBF9FEF6548FEF48181338284D13DAB65A65CD3BC721F5C01CD689",
+                            "tally": 0,
+                            "value": "01"
+                        },
+                        "steel-loy-selection": {
+                            "object_id": "steel-loy-selection",
+                            "sequence_order": 4,
+                            "description_hash": "22D76479A95414D5CF6AD18F1F736DFA418435A427E68ED3D41071CC5F5AA806",
+                            "tally": 0,
+                            "value": "01"
+                        },
+                        "sharp-selection": {
+                            "object_id": "sharp-selection",
+                            "sequence_order": 5,
+                            "description_hash": "DED085AD07B15C4A08C0409F86F12941A22F4EBDD9F68A80701A6C014AB9FE9D",
+                            "tally": 0,
+                            "value": "01"
+                        },
+                        "walace-selection": {
+                            "object_id": "walace-selection",
+                            "sequence_order": 6,
+                            "description_hash": "956461B7C7E12D15977EBF96A68E351E08D498F177CD155770D48804E2E9D68A",
+                            "tally": 0,
+                            "value": "01"
+                        },
+                        "williams-selection": {
+                            "object_id": "williams-selection",
+                            "sequence_order": 7,
+                            "description_hash": "84963958C97EAAE7DFA86DF2D8BF6E38559876175B55782AAD1C8A1EBD4CBF27",
+                            "tally": 0,
+                            "value": "01"
+                        },
+                        "alpern-selection": {
+                            "object_id": "alpern-selection",
+                            "sequence_order": 9,
+                            "description_hash": "6A1DB9A4C4E15AAB6CA162DFC5FF7C2D335D9FF73BB1EF8D1A40054AA3A539A4",
+                            "tally": 0,
+                            "value": "01"
+                        },
+                        "windbeck-selection": {
+                            "object_id": "windbeck-selection",
+                            "sequence_order": 10,
+                            "description_hash": "E67F4CEAEFEDB7F36CAC1666EA35F1EAD5569B2D1451E2E270B8D9B60B352210",
+                            "tally": 0,
+                            "value": "01"
+                        },
+                        "sharp-althea-selection": {
+                            "object_id": "sharp-althea-selection",
+                            "sequence_order": 11,
+                            "description_hash": "616043429CCDE41684E321DB620BA174A772DFC7A512251937805998E76AC698",
+                            "tally": 0,
+                            "value": "01"
+                        },
+                        "greher-selection": {
+                            "object_id": "greher-selection",
+                            "sequence_order": 12,
+                            "description_hash": "EDEEA2941F5F009C6C3365E7B1D977924BE6D5E63F0939FDB2BABCAFB0A25981",
+                            "tally": 0,
+                            "value": "01"
+                        },
+                        "alexander-selection": {
+                            "object_id": "alexander-selection",
+                            "sequence_order": 13,
+                            "description_hash": "4E34F0F3B9811EA0101886A14A769C25B8C234F85F1C113ED57B2641E2249B3E",
+                            "tally": 0,
+                            "value": "01"
+                        },
+                        "mitchell-selection": {
+                            "object_id": "mitchell-selection",
+                            "sequence_order": 14,
+                            "description_hash": "A94C51A92F4EA44E55BBEC0161F187D1BEAA17676F88F6418D83540F4F82633B",
+                            "tally": 0,
+                            "value": "01"
+                        },
+                        "lee-selection": {
+                            "object_id": "lee-selection",
+                            "sequence_order": 15,
+                            "description_hash": "17CE4C489AD050B10E4BFF438A3CFB34097079D28A80A2DD523C4035CDEF6372",
+                            "tally": 0,
+                            "value": "01"
+                        },
+                        "ash-selection": {
+                            "object_id": "ash-selection",
+                            "sequence_order": 16,
+                            "description_hash": "423B4EE6E1B6902EE1F90F428105DFE3AE66CF3D5B7710EA892ED1FE22CE762F",
+                            "tally": 0,
+                            "value": "01"
+                        },
+                        "kennedy-selection": {
+                            "object_id": "kennedy-selection",
+                            "sequence_order": 17,
+                            "description_hash": "312FAC230DF535F8E1E218E8B53BE7EE8254335736748B931DD75664B81E5D27",
+                            "tally": 0,
+                            "value": "01"
+                        },
+                        "jackson-selection": {
+                            "object_id": "jackson-selection",
+                            "sequence_order": 18,
+                            "description_hash": "33A8D8A95B6C23BE73352E9092910EC9CFC18EFEA874E3036A98855D3993E3F3",
+                            "tally": 0,
+                            "value": "01"
+                        },
+                        "brown-selection": {
+                            "object_id": "brown-selection",
+                            "sequence_order": 19,
+                            "description_hash": "3CA4D2890B3D3403687BD648882A56BFA46551B4AD28E710CAADE8B2D2CF0362",
+                            "tally": 0,
+                            "value": "01"
+                        },
+                        "teller-selection": {
+                            "object_id": "teller-selection",
+                            "sequence_order": 20,
+                            "description_hash": "D8F6537AC9F18321FBE264B4CDF19508348D54346EB03E38024A33A53EBF0F2E",
+                            "tally": 0,
+                            "value": "01"
+                        },
+                        "ward-selection": {
+                            "object_id": "ward-selection",
+                            "sequence_order": 21,
+                            "description_hash": "888E1ED2B00B90E577CB177A8A6DFEF84215506158F6166071140C1215E0DF07",
+                            "tally": 0,
+                            "value": "01"
+                        },
+                        "murphy-selection": {
+                            "object_id": "murphy-selection",
+                            "sequence_order": 22,
+                            "description_hash": "BD3ECD423D91BDCDA6C4FFA15D6A54188A7F441DF8892A96908107FE7A4E801D",
+                            "tally": 0,
+                            "value": "01"
+                        },
+                        "newman-selection": {
+                            "object_id": "newman-selection",
+                            "sequence_order": 23,
+                            "description_hash": "5FE6B9727D882C0E88EAA53C32B870BACA6103D2525A4E6D3B7D9464F245E1CD",
+                            "tally": 0,
+                            "value": "01"
+                        },
+                        "callanann-selection": {
+                            "object_id": "callanann-selection",
+                            "sequence_order": 24,
+                            "description_hash": "FC60F9E363149DABA365572751F4A7221D129D635745E14536745D63957A36C5",
+                            "tally": 0,
+                            "value": "01"
+                        },
+                        "york-selection": {
+                            "object_id": "york-selection",
+                            "sequence_order": 25,
+                            "description_hash": "EEFD4A3CCE987E247CF4B03664A8FEBAA398DC2553437D52448AAEE552CB8A62",
+                            "tally": 0,
+                            "value": "01"
+                        },
+                        "chandler-selection": {
+                            "object_id": "chandler-selection",
+                            "sequence_order": 26,
+                            "description_hash": "6E5D1735D6FE56E10FB84B17C119AFC2ADF20956779B49F4B7CD2ECAAE489FEF",
+                            "tally": 0,
+                            "value": "01"
+                        },
+                        "write-in-selection-governor": {
+                            "object_id": "write-in-selection-governor",
+                            "sequence_order": 27,
+                            "description_hash": "1D1E8D0B23EFD2B3CD09A028D20D8AF3652120648734634D2E3234479807F7C5",
+                            "tally": 0,
+                            "value": "01"
+                        }
+                    }
+                },
+                "congress-district-7-contest": {
+                    "object_id": "congress-district-7-contest",
+                    "sequence_order": 3,
+                    "description_hash": "C79CDB286207640A02C46127C1C4ACE0C27EEE6CCF2D561A2A83463FEB3EABDA",
+                    "selections": {
+                        "bainbridge-selection": {
+                            "object_id": "bainbridge-selection",
+                            "sequence_order": 0,
+                            "description_hash": "D34334E748814B75ED7DD3591F4AB23734390B49E1497B17111337DC9F9BC942",
+                            "tally": 0,
+                            "value": "01"
+                        },
+                        "hennessey-selection": {
+                            "object_id": "hennessey-selection",
+                            "sequence_order": 1,
+                            "description_hash": "F6EA0FD05B9E104E73A55699BC1812C7E03966292796FADFA82B4196458E03F8",
+                            "tally": 1,
+                            "value": "01"
+                        },
+                        "savoy-selection": {
+                            "object_id": "savoy-selection",
+                            "sequence_order": 2,
+                            "description_hash": "2CCE402B2A86A6DCD6862B4A75BCB02A5238F5782FCAAF9125D27EDA5D0C5B8F",
+                            "tally": 0,
+                            "value": "01"
+                        },
+                        "tawa-selection": {
+                            "object_id": "tawa-selection",
+                            "sequence_order": 3,
+                            "description_hash": "F9D5B89E0A2D538959C2A3CDA7CB33FA87E758FEE3EC9ADD12ED5049EE4406FF",
+                            "tally": 0,
+                            "value": "01"
+                        },
+                        "tawa-mary-selection": {
+                            "object_id": "tawa-mary-selection",
+                            "sequence_order": 4,
+                            "description_hash": "0122EFA2C54D432B308729730ADE710D8D366042F0A743EB40F0CAA31E35BD48",
+                            "tally": 0,
+                            "value": "01"
+                        },
+                        "write-in-selection-us-congress-district-7": {
+                            "object_id": "write-in-selection-us-congress-district-7",
+                            "sequence_order": 5,
+                            "description_hash": "7FAA9A22537C2FAB7B97D3396185FAEE3B9BD86EF9AC3EAEA5386BFA376E821E",
+                            "tally": 0,
+                            "value": "01"
+                        }
+                    }
+                },
+                "pismo-beach-school-board-contest": {
+                    "object_id": "pismo-beach-school-board-contest",
+                    "sequence_order": 4,
+                    "description_hash": "5E1632EBC68394FC36EC76E192760917E2E15DDA7FF2D107A54DFFECCB316BA9",
+                    "selections": {
+                        "moore-selection": {
+                            "object_id": "moore-selection",
+                            "sequence_order": 0,
+                            "description_hash": "5C8C18F1C05B4BA9A1A80A11E07B451DAD1E4B0CCE9A3987BAD642FA682C9CE6",
+                            "tally": 0,
+                            "value": "01"
+                        },
+                        "white-selection": {
+                            "object_id": "white-selection",
+                            "sequence_order": 1,
+                            "description_hash": "9BD6E74E7075A19BE5976DE7447E78C742420BC5D6B8FFD710C84C3FE2039390",
+                            "tally": 0,
+                            "value": "01"
+                        },
+                        "smallberries-selection": {
+                            "object_id": "smallberries-selection",
+                            "sequence_order": 2,
+                            "description_hash": "B6FFA76644921926DC3B83E4B6E237A99DE1797BA19F625178980C20FEC05E26",
+                            "tally": 0,
+                            "value": "01"
+                        },
+                        "warfin-selection": {
+                            "object_id": "warfin-selection",
+                            "sequence_order": 3,
+                            "description_hash": "5AAADBE5E5ACDDF2F3FCFA45E23ABFD54DD0B44981FC55FA77D8D8AA1459C271",
+                            "tally": 0,
+                            "value": "01"
+                        },
+                        "norberg-selection": {
+                            "object_id": "norberg-selection",
+                            "sequence_order": 4,
+                            "description_hash": "BE70CCA7B5D0E8F4CAD581503D882FEB4A8EAF2EDF68A6E1965917771B7F6A72",
+                            "tally": 1,
+                            "value": "01"
+                        },
+                        "parks-selection": {
+                            "object_id": "parks-selection",
+                            "sequence_order": 5,
+                            "description_hash": "5C92159F19E6AE6CD383127ABAC999CF811F6200B08B69082D4CDF37E12E0F88",
+                            "tally": 0,
+                            "value": "01"
+                        },
+                        "savannah-selection": {
+                            "object_id": "savannah-selection",
+                            "sequence_order": 6,
+                            "description_hash": "680330EAD9C0E40A14B9330EDCD6FBA2C7C4B704206A0DEA040B3EFBE459C63F",
+                            "tally": 1,
+                            "value": "01"
+                        },
+                        "write-in-selection-1-pismo-beach-school-board": {
+                            "object_id": "write-in-selection-1-pismo-beach-school-board",
+                            "sequence_order": 7,
+                            "description_hash": "289D972A6163C1692FBEBDFF75B24C958729DBC9BCC823966E66DB4CA1EBF3B4",
+                            "tally": 0,
+                            "value": "01"
+                        },
+                        "write-in-selection-2-pismo-beach-school-board": {
+                            "object_id": "write-in-selection-2-pismo-beach-school-board",
+                            "sequence_order": 8,
+                            "description_hash": "056332CB4503D9B86F743107ABBE338EDB96CA26115EA51B2817EBD32AA9024B",
+                            "tally": 0,
+                            "value": "01"
+                        },
+                        "write-in-selection-3-pismo-beach-school-board": {
+                            "object_id": "write-in-selection-3-pismo-beach-school-board",
+                            "sequence_order": 9,
+                            "description_hash": "E9C94DE11261DA1AE76E7CE03AE08D533AF24AA561CE2BB591DCB6C02ACBBD0E",
+                            "tally": 1,
+                            "value": "01"
+                        }
+                    }
+                },
+                "arlington-chief-justice-retain-demergue": {
+                    "object_id": "arlington-chief-justice-retain-demergue",
+                    "sequence_order": 6,
+                    "description_hash": "BC351FF3E17BB60D7837BD0242ACFA9449F58C4A08389756C43FA3851D6E7AEF",
+                    "selections": {
+                        "ozark-chief-justice-retain-demergue-affirmative-selection": {
+                            "object_id": "ozark-chief-justice-retain-demergue-affirmative-selection",
+                            "sequence_order": 0,
+                            "description_hash": "3004BCC29C9F0FD95A30DD0EB19C0487B7018789DDD68689E6FA65942D105D86",
+                            "tally": 0,
+                            "value": "01"
+                        },
+                        "ozark-chief-justice-retain-demergue-negative-selection": {
+                            "object_id": "ozark-chief-justice-retain-demergue-negative-selection",
+                            "sequence_order": 1,
+                            "description_hash": "6F66EC2D82D2FF892AC0239DF94A59A25FBD4FFDA9381FBD6CC54D7EA8A1BC2B",
+                            "tally": 1,
+                            "value": "01"
+                        }
+                    }
+                }
+            }
+        },
+        {
+            "tally_id": "5280d2b1-3e31-44ea-aa9c-be18f3ac904f",
+            "name": "fake-ballot-31",
+            "contests": {
+                "president-vice-president-contest": {
+                    "object_id": "president-vice-president-contest",
+                    "sequence_order": 0,
+                    "description_hash": "1597AD20EDD1BBADEFA79D667B5A807F16D3B16A67D05EDC67CD5E4E678FA99C",
+                    "selections": {
+                        "barchi-hallaren-selection": {
+                            "object_id": "barchi-hallaren-selection",
+                            "sequence_order": 0,
+                            "description_hash": "5105D7CF4FA6BC327DA744A7462249530A5CD126F56E67FBAD30B0339E501177",
+                            "tally": 1,
+                            "value": "01"
+                        },
+                        "cramer-vuocolo-selection": {
+                            "object_id": "cramer-vuocolo-selection",
+                            "sequence_order": 1,
+                            "description_hash": "1BD0201B8292857B900088ED0B0417E4DA9758556B9250D73B14B562C6D254C4",
+                            "tally": 0,
+                            "value": "01"
+                        },
+                        "court-blumhardt-selection": {
+                            "object_id": "court-blumhardt-selection",
+                            "sequence_order": 2,
+                            "description_hash": "1C495683D1B32030D3914802487E1B6F224780C80A46F2E2687972F439683465",
+                            "tally": 0,
+                            "value": "01"
+                        },
+                        "boone-lian-selection": {
+                            "object_id": "boone-lian-selection",
+                            "sequence_order": 3,
+                            "description_hash": "C672C2AE80779AB5D1EA7891ADF5089E9ECB18E1B7A0B908F16F49422541758B",
+                            "tally": 0,
+                            "value": "01"
+                        },
+                        "hildebrand-garritty-selection": {
+                            "object_id": "hildebrand-garritty-selection",
+                            "sequence_order": 4,
+                            "description_hash": "7984C11FE00A44E237B54D692085B19C9DD5E2A25CB4A93E40FF15E6D31FD5CF",
+                            "tally": 0,
+                            "value": "01"
+                        },
+                        "patterson-lariviere-selection": {
+                            "object_id": "patterson-lariviere-selection",
+                            "sequence_order": 5,
+                            "description_hash": "CF818A24F4D2E9A99A8FA17ED0DF6E812C608E65DA229F4B813D54AF141B1930",
+                            "tally": 0,
+                            "value": "01"
+                        },
+                        "write-in-selection-president": {
+                            "object_id": "write-in-selection-president",
+                            "sequence_order": 6,
+                            "description_hash": "BB0ABD0A8B212BC213E9CD37921ECDD40C243773305E7F2F870D0F3152847E75",
+                            "tally": 0,
+                            "value": "01"
+                        }
+                    }
+                },
+                "ozark-governor": {
+                    "object_id": "ozark-governor",
+                    "sequence_order": 1,
+                    "description_hash": "FB3952A7FFE6CD78AE6FAEE2096435079B440E9B1766BD6E32E52D5066A6C75C",
+                    "selections": {
+                        "franz-selection": {
+                            "object_id": "franz-selection",
+                            "sequence_order": 0,
+                            "description_hash": "2274EC158CE8845E59106082D6F6F9C22C23BAEEB7F1AFC67BA8E98559C38632",
+                            "tally": 0,
+                            "value": "01"
+                        },
+                        "harris-selection": {
+                            "object_id": "harris-selection",
+                            "sequence_order": 1,
+                            "description_hash": "061AF13CA4C0353CDE2AEE1A73C040CC4232389EE328A833443B2F9D93CBE2FB",
+                            "tally": 1,
+                            "value": "01"
+                        },
+                        "bargmann-selection": {
+                            "object_id": "bargmann-selection",
+                            "sequence_order": 2,
+                            "description_hash": "B24E2DF621A9010BA4BE3A30908BCF9C0EB93922F18021440B320938DF3B801E",
+                            "tally": 0,
+                            "value": "01"
+                        },
+                        "abcock-selection": {
+                            "object_id": "abcock-selection",
+                            "sequence_order": 3,
+                            "description_hash": "C97B903AB4DBF9FEF6548FEF48181338284D13DAB65A65CD3BC721F5C01CD689",
+                            "tally": 0,
+                            "value": "01"
+                        },
+                        "steel-loy-selection": {
+                            "object_id": "steel-loy-selection",
+                            "sequence_order": 4,
+                            "description_hash": "22D76479A95414D5CF6AD18F1F736DFA418435A427E68ED3D41071CC5F5AA806",
+                            "tally": 0,
+                            "value": "01"
+                        },
+                        "sharp-selection": {
+                            "object_id": "sharp-selection",
+                            "sequence_order": 5,
+                            "description_hash": "DED085AD07B15C4A08C0409F86F12941A22F4EBDD9F68A80701A6C014AB9FE9D",
+                            "tally": 0,
+                            "value": "01"
+                        },
+                        "walace-selection": {
+                            "object_id": "walace-selection",
+                            "sequence_order": 6,
+                            "description_hash": "956461B7C7E12D15977EBF96A68E351E08D498F177CD155770D48804E2E9D68A",
+                            "tally": 0,
+                            "value": "01"
+                        },
+                        "williams-selection": {
+                            "object_id": "williams-selection",
+                            "sequence_order": 7,
+                            "description_hash": "84963958C97EAAE7DFA86DF2D8BF6E38559876175B55782AAD1C8A1EBD4CBF27",
+                            "tally": 0,
+                            "value": "01"
+                        },
+                        "alpern-selection": {
+                            "object_id": "alpern-selection",
+                            "sequence_order": 9,
+                            "description_hash": "6A1DB9A4C4E15AAB6CA162DFC5FF7C2D335D9FF73BB1EF8D1A40054AA3A539A4",
+                            "tally": 0,
+                            "value": "01"
+                        },
+                        "windbeck-selection": {
+                            "object_id": "windbeck-selection",
+                            "sequence_order": 10,
+                            "description_hash": "E67F4CEAEFEDB7F36CAC1666EA35F1EAD5569B2D1451E2E270B8D9B60B352210",
+                            "tally": 0,
+                            "value": "01"
+                        },
+                        "sharp-althea-selection": {
+                            "object_id": "sharp-althea-selection",
+                            "sequence_order": 11,
+                            "description_hash": "616043429CCDE41684E321DB620BA174A772DFC7A512251937805998E76AC698",
+                            "tally": 0,
+                            "value": "01"
+                        },
+                        "greher-selection": {
+                            "object_id": "greher-selection",
+                            "sequence_order": 12,
+                            "description_hash": "EDEEA2941F5F009C6C3365E7B1D977924BE6D5E63F0939FDB2BABCAFB0A25981",
+                            "tally": 0,
+                            "value": "01"
+                        },
+                        "alexander-selection": {
+                            "object_id": "alexander-selection",
+                            "sequence_order": 13,
+                            "description_hash": "4E34F0F3B9811EA0101886A14A769C25B8C234F85F1C113ED57B2641E2249B3E",
+                            "tally": 0,
+                            "value": "01"
+                        },
+                        "mitchell-selection": {
+                            "object_id": "mitchell-selection",
+                            "sequence_order": 14,
+                            "description_hash": "A94C51A92F4EA44E55BBEC0161F187D1BEAA17676F88F6418D83540F4F82633B",
+                            "tally": 0,
+                            "value": "01"
+                        },
+                        "lee-selection": {
+                            "object_id": "lee-selection",
+                            "sequence_order": 15,
+                            "description_hash": "17CE4C489AD050B10E4BFF438A3CFB34097079D28A80A2DD523C4035CDEF6372",
+                            "tally": 0,
+                            "value": "01"
+                        },
+                        "ash-selection": {
+                            "object_id": "ash-selection",
+                            "sequence_order": 16,
+                            "description_hash": "423B4EE6E1B6902EE1F90F428105DFE3AE66CF3D5B7710EA892ED1FE22CE762F",
+                            "tally": 0,
+                            "value": "01"
+                        },
+                        "kennedy-selection": {
+                            "object_id": "kennedy-selection",
+                            "sequence_order": 17,
+                            "description_hash": "312FAC230DF535F8E1E218E8B53BE7EE8254335736748B931DD75664B81E5D27",
+                            "tally": 0,
+                            "value": "01"
+                        },
+                        "jackson-selection": {
+                            "object_id": "jackson-selection",
+                            "sequence_order": 18,
+                            "description_hash": "33A8D8A95B6C23BE73352E9092910EC9CFC18EFEA874E3036A98855D3993E3F3",
+                            "tally": 0,
+                            "value": "01"
+                        },
+                        "brown-selection": {
+                            "object_id": "brown-selection",
+                            "sequence_order": 19,
+                            "description_hash": "3CA4D2890B3D3403687BD648882A56BFA46551B4AD28E710CAADE8B2D2CF0362",
+                            "tally": 0,
+                            "value": "01"
+                        },
+                        "teller-selection": {
+                            "object_id": "teller-selection",
+                            "sequence_order": 20,
+                            "description_hash": "D8F6537AC9F18321FBE264B4CDF19508348D54346EB03E38024A33A53EBF0F2E",
+                            "tally": 0,
+                            "value": "01"
+                        },
+                        "ward-selection": {
+                            "object_id": "ward-selection",
+                            "sequence_order": 21,
+                            "description_hash": "888E1ED2B00B90E577CB177A8A6DFEF84215506158F6166071140C1215E0DF07",
+                            "tally": 0,
+                            "value": "01"
+                        },
+                        "murphy-selection": {
+                            "object_id": "murphy-selection",
+                            "sequence_order": 22,
+                            "description_hash": "BD3ECD423D91BDCDA6C4FFA15D6A54188A7F441DF8892A96908107FE7A4E801D",
+                            "tally": 0,
+                            "value": "01"
+                        },
+                        "newman-selection": {
+                            "object_id": "newman-selection",
+                            "sequence_order": 23,
+                            "description_hash": "5FE6B9727D882C0E88EAA53C32B870BACA6103D2525A4E6D3B7D9464F245E1CD",
+                            "tally": 0,
+                            "value": "01"
+                        },
+                        "callanann-selection": {
+                            "object_id": "callanann-selection",
+                            "sequence_order": 24,
+                            "description_hash": "FC60F9E363149DABA365572751F4A7221D129D635745E14536745D63957A36C5",
+                            "tally": 0,
+                            "value": "01"
+                        },
+                        "york-selection": {
+                            "object_id": "york-selection",
+                            "sequence_order": 25,
+                            "description_hash": "EEFD4A3CCE987E247CF4B03664A8FEBAA398DC2553437D52448AAEE552CB8A62",
+                            "tally": 0,
+                            "value": "01"
+                        },
+                        "chandler-selection": {
+                            "object_id": "chandler-selection",
+                            "sequence_order": 26,
+                            "description_hash": "6E5D1735D6FE56E10FB84B17C119AFC2ADF20956779B49F4B7CD2ECAAE489FEF",
+                            "tally": 0,
+                            "value": "01"
+                        },
+                        "write-in-selection-governor": {
+                            "object_id": "write-in-selection-governor",
+                            "sequence_order": 27,
+                            "description_hash": "1D1E8D0B23EFD2B3CD09A028D20D8AF3652120648734634D2E3234479807F7C5",
+                            "tally": 0,
+                            "value": "01"
+                        }
+                    }
+                },
+                "congress-district-7-contest": {
+                    "object_id": "congress-district-7-contest",
+                    "sequence_order": 3,
+                    "description_hash": "C79CDB286207640A02C46127C1C4ACE0C27EEE6CCF2D561A2A83463FEB3EABDA",
+                    "selections": {
+                        "bainbridge-selection": {
+                            "object_id": "bainbridge-selection",
+                            "sequence_order": 0,
+                            "description_hash": "D34334E748814B75ED7DD3591F4AB23734390B49E1497B17111337DC9F9BC942",
+                            "tally": 1,
+                            "value": "01"
+                        },
+                        "hennessey-selection": {
+                            "object_id": "hennessey-selection",
+                            "sequence_order": 1,
+                            "description_hash": "F6EA0FD05B9E104E73A55699BC1812C7E03966292796FADFA82B4196458E03F8",
+                            "tally": 0,
+                            "value": "01"
+                        },
+                        "savoy-selection": {
+                            "object_id": "savoy-selection",
+                            "sequence_order": 2,
+                            "description_hash": "2CCE402B2A86A6DCD6862B4A75BCB02A5238F5782FCAAF9125D27EDA5D0C5B8F",
+                            "tally": 0,
+                            "value": "01"
+                        },
+                        "tawa-selection": {
+                            "object_id": "tawa-selection",
+                            "sequence_order": 3,
+                            "description_hash": "F9D5B89E0A2D538959C2A3CDA7CB33FA87E758FEE3EC9ADD12ED5049EE4406FF",
+                            "tally": 0,
+                            "value": "01"
+                        },
+                        "tawa-mary-selection": {
+                            "object_id": "tawa-mary-selection",
+                            "sequence_order": 4,
+                            "description_hash": "0122EFA2C54D432B308729730ADE710D8D366042F0A743EB40F0CAA31E35BD48",
+                            "tally": 0,
+                            "value": "01"
+                        },
+                        "write-in-selection-us-congress-district-7": {
+                            "object_id": "write-in-selection-us-congress-district-7",
+                            "sequence_order": 5,
+                            "description_hash": "7FAA9A22537C2FAB7B97D3396185FAEE3B9BD86EF9AC3EAEA5386BFA376E821E",
+                            "tally": 0,
+                            "value": "01"
+                        }
+                    }
+                },
+                "arlington-chief-justice-retain-demergue": {
+                    "object_id": "arlington-chief-justice-retain-demergue",
+                    "sequence_order": 6,
+                    "description_hash": "BC351FF3E17BB60D7837BD0242ACFA9449F58C4A08389756C43FA3851D6E7AEF",
+                    "selections": {
+                        "ozark-chief-justice-retain-demergue-affirmative-selection": {
+                            "object_id": "ozark-chief-justice-retain-demergue-affirmative-selection",
+                            "sequence_order": 0,
+                            "description_hash": "3004BCC29C9F0FD95A30DD0EB19C0487B7018789DDD68689E6FA65942D105D86",
+                            "tally": 1,
+                            "value": "01"
+                        },
+                        "ozark-chief-justice-retain-demergue-negative-selection": {
+                            "object_id": "ozark-chief-justice-retain-demergue-negative-selection",
+                            "sequence_order": 1,
+                            "description_hash": "6F66EC2D82D2FF892AC0239DF94A59A25FBD4FFDA9381FBD6CC54D7EA8A1BC2B",
+                            "tally": 0,
+                            "value": "01"
+                        }
+                    }
+                }
+            }
+        }
+    ]
+}

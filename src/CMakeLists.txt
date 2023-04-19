@@ -34,7 +34,8 @@ include(${PROJECT_SOURCE_DIR}/src/electionguard/sources.cmake)
 set(PROJECT_SOURCE_FILES
     ${FACADES_electionguard}
     ${SOURCES_electionguard}
-    ${INCLUDES_electionguard}
+    ${INCLUDES_electionguard_hpp}
+    ${INCLUDES_electionguard_h}
 )
 
 add_library(${META_PROJECT_TARGET} ${PROJECT_SOURCE_FILES})
@@ -48,9 +49,12 @@ target_compile_features(${META_PROJECT_TARGET} PRIVATE cxx_std_17)
 target_compile_options(${META_PROJECT_TARGET} PUBLIC "$<$<BOOL:${MSVC}>:/permissive->")
 
 # define dll export markers
-if(BUILD_SHARED_LIBS)
+if(BUILD_SHARED_LIBS AND NOT EMSCRIPTEN)
     message("++ Building Shared Libs")
     add_compile_definitions(ELECTIONGUARD_BUILD_SHARED)
+else()
+    message("++ Building Static Libs")
+    add_compile_definitions(ELECTIONGUARD_BUILD_STATIC)
 endif()
 
 if(WIN32 AND CMAKE_SYSTEM_PROCESSOR MATCHES "x86" AND NOT USE_32BIT_MATH)
@@ -82,12 +86,12 @@ endif()
 # if the target is being exported or installed
 target_include_directories(${META_PROJECT_TARGET}
     SYSTEM PUBLIC
-        $<INSTALL_INTERFACE:include/${META_PROJECT_EXPORT}/${PROJECT_VERSION}>
+    $<INSTALL_INTERFACE:include/${META_PROJECT_EXPORT}/${PROJECT_VERSION}>
 
-        # Headers used from /build
-        $<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/include>
+    # Headers used from /build
+    $<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/include>
     PRIVATE
-        ${PROJECT_SOURCE_DIR}/src/${META_PROJECT_TARGET}
+    ${PROJECT_SOURCE_DIR}/src/${META_PROJECT_TARGET}
 )
 
 # ---- Dependencies ----
@@ -95,23 +99,23 @@ target_include_directories(${META_PROJECT_TARGET}
 # Include the karamel sources from hacl directly in the library
 # since some of the headers are still referenced directly
 # the rest of hacl is loaded as part of the libs/hacl cpp module
-target_include_directories(${META_PROJECT_TARGET} 
+target_include_directories(${META_PROJECT_TARGET}
     PRIVATE
-        ${hacl_SOURCE_DIR}/karamel/include
-        ${hacl_SOURCE_DIR}/karamel/krmllib/dist/minimal
+    ${hacl_SOURCE_DIR}/karamel/include
+    ${hacl_SOURCE_DIR}/karamel/krmllib/dist/minimal
 )
 
 add_library(nlohmann_json INTERFACE IMPORTED)
 target_include_directories(nlohmann_json INTERFACE ${nlohmann_json_SOURCE_DIR}/include)
 
 if(MINGW)
-    target_link_libraries(${META_PROJECT_TARGET} 
-        PRIVATE 
-            date::date 
-            hacl::hacl 
-            nlohmann_json 
-            spdlog::spdlog_header_only
-            Threads::Threads)
+    target_link_libraries(${META_PROJECT_TARGET}
+        PRIVATE
+        date::date
+        hacl::hacl
+        nlohmann_json
+        spdlog::spdlog_header_only
+        Threads::Threads)
 
     # Statically link in libstdc++
     set(CMAKE_EXE_LINKER_FLAGS " -static")
@@ -119,11 +123,11 @@ if(MINGW)
 else()
     target_link_libraries(${META_PROJECT_TARGET}
         PRIVATE
-            date::date
-            hacl::hacl
-            nlohmann_json
-            spdlog::spdlog_header_only
-            Threads::Threads)
+        date::date
+        hacl::hacl
+        nlohmann_json
+        spdlog::spdlog_header_only
+        Threads::Threads)
 endif()
 
 # ---- Install ----
@@ -160,6 +164,24 @@ install(
     DESTINATION lib/cmake/${META_PROJECT_EXPORT}/${PROJECT_VERSION}
 )
 
+# Compiler configuration
+if(MSVC)
+    message("++ Configuring compile options for MSVC")
+endif()
+
+if(CMAKE_CXX_COMPILER_ID MATCHES "Clang|GNU")
+    message("++ Configuring compile options for Clang|GNU")
+endif()
+
+if(CMAKE_CXX_COMPILER_ID MATCHES "Clang")
+    message("++ Configuring compile options for Clang")
+elseif(CMAKE_CXX_COMPILER_ID MATCHES "GNU")
+    message("++ Configuring compile options for GNU")
+
+    # TODO: qualify all calls to move as std::move
+    target_compile_options(${META_PROJECT_TARGET} PUBLIC -Wno-unqualified-std-cast-call)
+endif()
+
 # ---- Test ----
 if(OPTION_ENABLE_TESTS)
     message("++ Building for tests")
@@ -171,14 +193,17 @@ if(OPTION_ENABLE_TESTS)
     )
 
     # When running tests, set some specific compiler flags
+    # which are different from compiling in release mode
     if(MSVC)
+        message("++ Configuring TEST compile options for MSVC")
+
         # TODO: renenable warnings as errors when the correct ones are defined
         # target_compile_options(${META_PROJECT_TARGET} PUBLIC /W4 /WX)C5059
         target_compile_options(${META_PROJECT_TARGET} PUBLIC /Zi) # Generates complete debugging information.
     endif()
 
     if(CMAKE_CXX_COMPILER_ID MATCHES "Clang|GNU")
-        message("++ Configuring compile options for Clang|GNU")
+        message("++ Configuring TEST compile options for Clang|GNU")
         target_compile_options(${META_PROJECT_TARGET} PUBLIC -Wall)
 
         # TODO: target_compile_options(${META_PROJECT_TARGET} PUBLIC -Werror)
@@ -194,11 +219,11 @@ if(OPTION_ENABLE_TESTS)
     endif()
 
     if(CMAKE_CXX_COMPILER_ID MATCHES "Clang")
-        message("++ Configuring compile options for Clang")
+        message("++ Configuring TEST compile options for Clang")
         target_compile_options(${META_PROJECT_TARGET} PUBLIC -Wno-static-in-inline)
         target_compile_options(${META_PROJECT_TARGET} PUBLIC -Wno-vla-extension)
     elseif(CMAKE_CXX_COMPILER_ID MATCHES "GNU")
-        message("++ Configuring compile options for GNU")
+        message("++ Configuring TEST compile options for GNU")
         target_compile_options(${META_PROJECT_TARGET} PUBLIC -Wno-effc++)
         target_compile_options(${META_PROJECT_TARGET} PUBLIC -Wno-old-style-cast)
         target_compile_options(${META_PROJECT_TARGET} PUBLIC -Wno-unused-but-set-parameter)

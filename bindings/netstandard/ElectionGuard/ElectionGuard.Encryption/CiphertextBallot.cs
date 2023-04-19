@@ -30,6 +30,11 @@ namespace ElectionGuard
         public bool IsCast => State == BallotBoxState.Cast;
 
         /// <summary>
+        /// returns true if the ballot is marked as challenged
+        /// </summary>
+        public bool IsChallenged => State == BallotBoxState.Challenged;
+
+        /// <summary>
         /// returns true if the ballot is marked as spoiled
         /// </summary>
         public bool IsSpoiled => State == BallotBoxState.Spoiled;
@@ -65,9 +70,24 @@ namespace ElectionGuard
             }
         }
 
+        public CiphertextBallot(CiphertextBallot other) : this(other.ToJson())
+        {
+
+        }
+
         internal CiphertextBallot(External.CiphertextBallotHandle handle)
         {
             Handle = handle;
+        }
+
+        public static ElementModQ NonceSeed(
+            ElementModQ manifestHash,
+            string objectId, ElementModQ nonce)
+        {
+            var status = NativeInterface.CiphertextBallot.NonceSeed(
+                manifestHash.Handle, objectId, nonce.Handle, out var value);
+            status.ThrowIfError();
+            return value.IsInvalid ? null : new ElementModQ(value);
         }
 
         /// <summary>

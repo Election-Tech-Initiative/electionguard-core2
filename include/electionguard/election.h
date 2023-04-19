@@ -60,6 +60,22 @@ EG_API eg_electionguard_status_t eg_ciphertext_election_context_get_configuratio
   eg_ciphertext_election_context_t *handle, eg_context_configuration_t **out_config);
 
 /**
+ * @brief The number of guardians necessary to generate the public key
+ * 
+ * @param[out] out_number_of_guardians The number of guardians
+ */
+EG_API eg_electionguard_status_t eg_ciphertext_election_context_get_number_of_guardians(
+  eg_ciphertext_election_context_t *handle, uint64_t *out_number_of_guardians);
+
+/**
+ * The `quorum` of guardians necessary to decrypt an election.
+ * 
+ * @param[out] out_quorum The quorum
+ */
+EG_API eg_electionguard_status_t eg_ciphertext_election_context_get_quorum(
+  eg_ciphertext_election_context_t *handle, uint64_t *out_quorum);
+
+/**
  * The `commitment hash H(K 1,0 , K 2,0 ... , K n,0 )` of the public commitments
  * guardians make to each other in the [ElectionGuard Spec](https://github.com/microsoft/electionguard/wiki)
  * 
