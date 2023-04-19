@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Encryption Tests</title>
+    
+</head>
+<body>
+Check browser console.
+
+<script type="text/javascript">
+  var Module = {
+      onRuntimeInitialized: function() {
+        console.log("runtime initialized")
+
+        // Test ElementModQ Addition (Direct)
+        var elem1 = Module.ElementModQ.fromUint64(2n, false)
+        console.log("elem1: " + elem1.toHex())
+        var elem2 = Module.ElementModQ.fromUint64(3n, false)
+        console.log("elem2: " + elem2.toHex())
+        var result = Module.GroupFunctions.addModQ(elem1, elem2)
+
+        console.log("addModQ result: " + result.toHex())
+
+        // TODO: Test ElementModQ Addition (Packaged)
+        // var result = addModQ(2n, 3n)
+        // console.log("addModQ result: " + result)
+      }
+    };
+window.onload = function() {
+  console.log("window loaded")
+}
+</script>
+<!-- <script type="text/javascript" src="../../dist/src/index.js"></script> -->
+<script type="text/javascript" src="../../dist/src/wasm/electionguard.wasm.js"></script>
+</body>
+</html>

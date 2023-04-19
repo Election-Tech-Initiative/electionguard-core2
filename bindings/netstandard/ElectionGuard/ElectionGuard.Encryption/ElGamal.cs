@@ -81,6 +81,17 @@ namespace ElectionGuard
     /// </summary>
     public static class HashedElgamal
     {
+        public static unsafe HashedElGamalCiphertext Encrypt(
+            ElementModQ coordinate, ElementModQ nonce, ElementModP publicKey, ElementModQ seed)
+        {
+            if (coordinate == null || !coordinate.IsInBounds())
+            {
+                throw new ArgumentNullException(nameof(coordinate));
+            }
+            var data = coordinate.ToBytes();
+            return Encrypt(data, (ulong)data.Length, nonce, publicKey, seed);
+        }
+
         /// <summary>
         /// Encrypts a message with a given random nonce and an ElGamal public key.
         ///
@@ -94,6 +105,23 @@ namespace ElectionGuard
         public static unsafe HashedElGamalCiphertext Encrypt(
             byte[] data, ulong length, ElementModQ nonce, ElementModP publicKey, ElementModQ seed)
         {
+            if (data == null)
+            {
+                throw new ArgumentNullException(nameof(data));
+            }
+            if (nonce == null || !nonce.IsInBounds())
+            {
+                throw new ArgumentNullException(nameof(nonce));
+            }
+            if (publicKey == null || !publicKey.IsInBounds())
+            {
+                throw new ArgumentNullException(nameof(publicKey));
+            }
+            if (seed == null || !seed.IsInBounds())
+            {
+                throw new ArgumentNullException(nameof(seed));
+            }
+
             fixed (byte* pointer = data)
             {
                 var status = NativeInterface.HashedElGamal.Encrypt(

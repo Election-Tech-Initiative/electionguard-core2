@@ -1,4 +1,4 @@
-using ElectionGuard.Decryption.Concurrency;
+using ElectionGuard.ElectionSetup.Concurrency;
 using ElectionGuard.Encryption.Ballot;
 
 namespace ElectionGuard.Decryption.Tally
@@ -7,7 +7,8 @@ namespace ElectionGuard.Decryption.Tally
     /// A CiphertextTallySelection is a homomorphic accumulation of ElGamalCiphertexts that represent the
     /// encrypted votes for a particular selection in a contest.
     /// </summary>
-    public class CiphertextTallySelection : DisposableBase, ICiphertextSelection, IEquatable<CiphertextTallySelection>
+    public class CiphertextTallySelection : DisposableBase,
+        ICiphertextSelection, IEquatable<CiphertextTallySelection>
     {
         /// <summary>
         /// The object id of the selection
@@ -37,7 +38,7 @@ namespace ElectionGuard.Decryption.Tally
         {
             ObjectId = objectId;
             SequenceOrder = sequenceOrder;
-            DescriptionHash = descriptionHash;
+            DescriptionHash = new(descriptionHash);
             Ciphertext = new ElGamalCiphertext(Constants.ONE_MOD_P, Constants.ONE_MOD_P);
         }
 
@@ -45,7 +46,7 @@ namespace ElectionGuard.Decryption.Tally
         {
             ObjectId = selection.ObjectId;
             SequenceOrder = selection.SequenceOrder;
-            DescriptionHash = selection.CryptoHash();
+            DescriptionHash = new(selection.CryptoHash());
             Ciphertext = new ElGamalCiphertext(Constants.ONE_MOD_P, Constants.ONE_MOD_P);
         }
 
@@ -54,8 +55,16 @@ namespace ElectionGuard.Decryption.Tally
         {
             ObjectId = selection.ObjectId;
             SequenceOrder = selection.SequenceOrder;
-            DescriptionHash = selection.CryptoHash();
-            Ciphertext = ciphertext;
+            DescriptionHash = new(selection.CryptoHash());
+            Ciphertext = new(ciphertext);
+        }
+
+        public CiphertextTallySelection(CiphertextTallySelection other)
+        {
+            ObjectId = other.ObjectId;
+            SequenceOrder = other.SequenceOrder;
+            DescriptionHash = new(other.DescriptionHash);
+            Ciphertext = new(other.Ciphertext);
         }
 
         /// <summary>
@@ -156,8 +165,9 @@ namespace ElectionGuard.Decryption.Tally
         protected override void DisposeUnmanaged()
         {
             base.DisposeUnmanaged();
-            DescriptionHash.Dispose();
-            Ciphertext.Dispose();
+            DescriptionHash?.Dispose();
+            Ciphertext?.Dispose();
+            _mutex?.Dispose();
         }
 
         # region Equality

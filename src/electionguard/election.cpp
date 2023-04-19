@@ -23,7 +23,7 @@ using std::unordered_map;
 using std::vector;
 using std::chrono::system_clock;
 
-using ContextSerializer = electionguard::Serialize::CiphertextelectionContext;
+using ContextSerializer = electionguard::Serialize::CiphertextElectionContext;
 
 namespace electionguard
 {

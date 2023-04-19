@@ -173,6 +173,34 @@ eg_electionguard_status_t eg_element_mod_p_to_hex(eg_element_mod_p_t *handle, ch
     }
 }
 
+EG_API eg_electionguard_status_t eg_element_mod_p_from_hex_checked(char *in_hex,
+                                                                   eg_element_mod_p_t **out_handle)
+{
+    try {
+        auto element = ElementModP::fromHex(string(in_hex), false);
+        *out_handle = AS_TYPE(eg_element_mod_p_t, element.release());
+
+        return ELECTIONGUARD_STATUS_SUCCESS;
+    } catch (const exception &e) {
+        Log::error(__func__, e);
+        return ELECTIONGUARD_STATUS_ERROR_BAD_ALLOC;
+    }
+}
+
+EG_API eg_electionguard_status_t
+eg_element_mod_p_from_hex_unchecked(char *in_hex, eg_element_mod_p_t **out_handle)
+{
+    try {
+        auto element = ElementModP::fromHex(string(in_hex), true);
+        *out_handle = AS_TYPE(eg_element_mod_p_t, element.release());
+
+        return ELECTIONGUARD_STATUS_SUCCESS;
+    } catch (const exception &e) {
+        Log::error(__func__, e);
+        return ELECTIONGUARD_STATUS_ERROR_BAD_ALLOC;
+    }
+}
+
 #pragma endregion
 
 #pragma region ElementModQ
@@ -295,8 +323,8 @@ eg_electionguard_status_t eg_element_mod_q_to_hex(eg_element_mod_q_t *handle, ch
     }
 }
 
-EG_API eg_electionguard_status_t eg_element_mod_q_from_hex(char *in_hex,
-                                                           eg_element_mod_q_t **out_handle)
+EG_API eg_electionguard_status_t eg_element_mod_q_from_hex_checked(char *in_hex,
+                                                                   eg_element_mod_q_t **out_handle)
 {
     try {
         auto element = ElementModQ::fromHex(string(in_hex), false);

@@ -15,4 +15,13 @@ public class ElectionPartialKeyVerification : DatabaseRecord
     {
 
     }
+
+    public ElectionPartialKeyVerification(ElectionPartialKeyVerification other) : base(nameof(ElectionPartialKeyVerification))
+    {
+        KeyCeremonyId = other.KeyCeremonyId;
+        OwnerId = other.OwnerId;
+        DesignatedId = other.DesignatedId;
+        VerifierId = other.VerifierId;
+        Verified = other.Verified;
+    }
 }

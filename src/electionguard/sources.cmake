@@ -16,6 +16,8 @@ set(FACADES_electionguard
     ${PROJECT_SOURCE_DIR}/src/electionguard/facades/group.cpp
     ${PROJECT_SOURCE_DIR}/src/electionguard/facades/hash.cpp
     ${PROJECT_SOURCE_DIR}/src/electionguard/facades/manifest.cpp
+    ${PROJECT_SOURCE_DIR}/src/electionguard/facades/nonces.cpp
+    ${PROJECT_SOURCE_DIR}/src/electionguard/facades/polynomial.cpp
 )
 
 set(SOURCES_electionguard
@@ -36,7 +38,6 @@ set(SOURCES_electionguard
     ${PROJECT_SOURCE_DIR}/src/electionguard/lookup_table.hpp
     ${PROJECT_SOURCE_DIR}/src/electionguard/manifest.cpp
     ${PROJECT_SOURCE_DIR}/src/electionguard/nonces.cpp
-    ${PROJECT_SOURCE_DIR}/src/electionguard/nonces.hpp
     ${PROJECT_SOURCE_DIR}/src/electionguard/precompute_buffers.cpp
     ${PROJECT_SOURCE_DIR}/src/electionguard/convert.hpp
     ${PROJECT_SOURCE_DIR}/src/electionguard/random.cpp
@@ -45,38 +46,45 @@ set(SOURCES_electionguard
     ${PROJECT_SOURCE_DIR}/src/electionguard/variant_cast.hpp
 )
 
-set(INCLUDES_electionguard
-    ${PROJECT_SOURCE_DIR}/include/electionguard/async.hpp
+set(INCLUDES_electionguard_h
     ${PROJECT_SOURCE_DIR}/include/electionguard/ballot_code.h
-    ${PROJECT_SOURCE_DIR}/include/electionguard/ballot_code.hpp
     ${PROJECT_SOURCE_DIR}/include/electionguard/ballot_compact.h
-    ${PROJECT_SOURCE_DIR}/include/electionguard/ballot_compact.hpp
     ${PROJECT_SOURCE_DIR}/include/electionguard/plaintext_ballot.generated.h
     ${PROJECT_SOURCE_DIR}/include/electionguard/plaintext_ballot_contest.generated.h
     ${PROJECT_SOURCE_DIR}/include/electionguard/plaintext_ballot_selection.generated.h
     ${PROJECT_SOURCE_DIR}/include/electionguard/ballot.h
-    ${PROJECT_SOURCE_DIR}/include/electionguard/ballot.hpp
     ${PROJECT_SOURCE_DIR}/include/electionguard/chaum_pedersen.h
-    ${PROJECT_SOURCE_DIR}/include/electionguard/chaum_pedersen.hpp
     ${PROJECT_SOURCE_DIR}/include/electionguard/constants.h
     ${PROJECT_SOURCE_DIR}/include/electionguard/collections.h
-    ${PROJECT_SOURCE_DIR}/include/electionguard/crypto_hashable.hpp
     ${PROJECT_SOURCE_DIR}/include/electionguard/discrete_log.h
-    ${PROJECT_SOURCE_DIR}/include/electionguard/discrete_log.hpp
-    ${PROJECT_SOURCE_DIR}/include/electionguard/election_object_base.hpp
     ${PROJECT_SOURCE_DIR}/include/electionguard/election.h
-    ${PROJECT_SOURCE_DIR}/include/electionguard/election.hpp
     ${PROJECT_SOURCE_DIR}/include/electionguard/elgamal.h
-    ${PROJECT_SOURCE_DIR}/include/electionguard/elgamal.hpp
     ${PROJECT_SOURCE_DIR}/include/electionguard/encrypt.h
-    ${PROJECT_SOURCE_DIR}/include/electionguard/encrypt.hpp
     ${PROJECT_SOURCE_DIR}/include/electionguard/export.h
     ${PROJECT_SOURCE_DIR}/include/electionguard/group.h
-    ${PROJECT_SOURCE_DIR}/include/electionguard/group.hpp
     ${PROJECT_SOURCE_DIR}/include/electionguard/hash.h
-    ${PROJECT_SOURCE_DIR}/include/electionguard/hash.hpp
     ${PROJECT_SOURCE_DIR}/include/electionguard/manifest.h
-    ${PROJECT_SOURCE_DIR}/include/electionguard/manifest.hpp
-    ${PROJECT_SOURCE_DIR}/include/electionguard/precompute_buffers.hpp
+    ${PROJECT_SOURCE_DIR}/include/electionguard/nonces.h
+    ${PROJECT_SOURCE_DIR}/include/electionguard/polynomial.h
     ${PROJECT_SOURCE_DIR}/include/electionguard/status.h
+)
+
+set(INCLUDES_electionguard_hpp
+    ${PROJECT_SOURCE_DIR}/include/electionguard/async.hpp
+    ${PROJECT_SOURCE_DIR}/include/electionguard/ballot_code.hpp
+    ${PROJECT_SOURCE_DIR}/include/electionguard/ballot_compact.hpp
+    ${PROJECT_SOURCE_DIR}/include/electionguard/ballot.hpp
+    ${PROJECT_SOURCE_DIR}/include/electionguard/chaum_pedersen.hpp
+    ${PROJECT_SOURCE_DIR}/include/electionguard/crypto_hashable.hpp
+    ${PROJECT_SOURCE_DIR}/include/electionguard/discrete_log.hpp
+    ${PROJECT_SOURCE_DIR}/include/electionguard/election_object_base.hpp
+    ${PROJECT_SOURCE_DIR}/include/electionguard/election.hpp
+    ${PROJECT_SOURCE_DIR}/include/electionguard/elgamal.hpp
+    ${PROJECT_SOURCE_DIR}/include/electionguard/encrypt.hpp
+    ${PROJECT_SOURCE_DIR}/include/electionguard/group.hpp
+    ${PROJECT_SOURCE_DIR}/include/electionguard/hash.hpp
+    ${PROJECT_SOURCE_DIR}/include/electionguard/manifest.hpp
+    ${PROJECT_SOURCE_DIR}/include/electionguard/nonces.hpp
+    ${PROJECT_SOURCE_DIR}/include/electionguard/precompute_buffers.hpp
+    ${PROJECT_SOURCE_DIR}/include/electionguard/polynomial.hpp
 )

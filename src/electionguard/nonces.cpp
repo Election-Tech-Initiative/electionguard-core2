@@ -1,10 +1,11 @@
-#include "nonces.hpp"
+#include "electionguard/nonces.hpp"
 
 #include "electionguard/hash.hpp"
 #include "log.hpp"
 #include "variant_cast.hpp"
 
 using std::make_unique;
+using std::move;
 using std::string;
 using std::unique_ptr;
 

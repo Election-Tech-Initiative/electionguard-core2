@@ -1,4 +1,4 @@
-.PHONY: all build build-msys2 build-android build-ios build-netstandard build-ui clean clean-netstandard clean-ui environment format memcheck sanitize sanitize-asan sanitize-tsan bench bench-netstandard test test-msys2 test-netstandard test-netstandard-copy-output
+.PHONY: all build build-msys2 build-android build-ios build-netstandard build-ui build-wasm clean clean-netstandard clean-ui environment format memcheck sanitize sanitize-asan sanitize-tsan bench bench-netstandard test test-msys2 test-netstandard test-netstandard-copy-output
 
 .EXPORT_ALL_VARIABLES:
 ELECTIONGUARD_BINDING_DIR=$(realpath .)/bindings
@@ -78,6 +78,7 @@ TARGET?=Release
 ifeq ($(OPERATING_SYSTEM),Darwin)
 ANDROID_NDK_PATH?=/Users/$(USER)/Library/Android/sdk/ndk/25.1.8937393
 DOTNET_PATH?=/usr/local/share/dotnet
+EMSCRIPTEN_PATH?=/usr/local/share/emsdk
 endif
 ifeq ($(OPERATING_SYSTEM),Linux)
 ANDROID_NDK_PATH?=/usr/local/lib/android/sdk/ndk/25.1.8937393
@@ -223,6 +224,27 @@ build-ui: build-netstandard
 	cd ./src/electionguard-ui && dotnet restore
 	dotnet build --configuration $(TARGET) ./src/electionguard-ui/ElectionGuard.UI.sln /p:Platform=$(PROCESSOR)
 
+build-wasm:
+	@echo 🖥️ BUILD WASM $(OPERATING_SYSTEM) $(PROCESSOR) $(TARGET)
+ifeq ($(OPERATING_SYSTEM),Windows)
+	echo "wasm builds are only supported on MacOS and Linux"
+else
+	cmake -S . -B $(ELECTIONGUARD_BUILD_LIBS_DIR)/wasm/$(TARGET) \
+		-DCMAKE_BUILD_TYPE=$(TARGET) \
+		-DDISABLE_VALE=$(TEMP_DISABLE_VALE) \
+		-DCPM_SOURCE_CACHE=$(CPM_SOURCE_CACHE) \
+		-DCMAKE_TOOLCHAIN_FILE=$(EMSDK)/upstream/emscripten/cmake/Modules/Platform/Emscripten.cmake
+	cmake --build $(ELECTIONGUARD_BUILD_LIBS_DIR)/wasm/$(TARGET)
+	#npx tsembind $(ELECTIONGUARD_BUILD_LIBS_DIR)/wasm/$(TARGET)/src/electionguard/wasm/electionguard.wasm.js
+	cp $(ELECTIONGUARD_BUILD_LIBS_DIR)/wasm/$(TARGET)/src/electionguard/wasm/electionguard.wasm.js ./bindings/typescript/src/wasm/electionguard.wasm.js
+endif
+
+build-npm:
+	@echo 🖥️ BUILD NPM $(OPERATING_SYSTEM) $(PROCESSOR) $(TARGET)
+	npm run build
+	#cd ./bindings/typescript && npm install
+	#cd ./bindings/typescript && npm run build
+	
 
 # Clean
 
@@ -266,13 +288,13 @@ else
 	if [ ! -d "$(ELECTIONGUARD_BUILD_LIBS_DIR)/Darwin" ]; then mkdir $(ELECTIONGUARD_BUILD_LIBS_DIR)/Darwin; fi
 	if [ ! -d "$(ELECTIONGUARD_BUILD_LIBS_DIR)/Linux" ]; then mkdir $(ELECTIONGUARD_BUILD_LIBS_DIR)/Linux; fi
 	if [ ! -d "$(ELECTIONGUARD_BUILD_LIBS_DIR)/Windows" ]; then mkdir $(ELECTIONGUARD_BUILD_LIBS_DIR)/Windows; fi
-endif
-	dotnet clean ./bindings/netstandard/ElectionGuard/ElectionGuard.sln
-	dotnet clean ./src/electionguard-ui/ElectionGuard.UI.sln
+	if [ ! -d "$(ELECTIONGUARD_BUILD_LIBS_DIR)/Wasm" ]; then mkdir $(ELECTIONGUARD_BUILD_LIBS_DIR)/Wasm; fi
+endif	
 
 clean-netstandard:
 	@echo 🗑️ CLEAN NETSTANDARD
 	dotnet clean ./bindings/netstandard/ElectionGuard/ElectionGuard.sln
+	dotnet clean ./src/electionguard-ui/ElectionGuard.UI.sln
 
 clean-ui:
 	@echo 🗑️ CLEAN UI
@@ -486,6 +508,7 @@ test-netstandard: build-netstandard
 	dotnet test -a $(PROCESSOR) --configuration $(TARGET) ./bindings/netstandard/ElectionGuard/ElectionGuard.ElectionSetup.Tests/ElectionGuard.ElectionSetup.Tests.csproj
 	dotnet test -a $(PROCESSOR) --configuration $(TARGET) ./bindings/netstandard/ElectionGuard/ElectionGuard.Encryption.Tests/ElectionGuard.Encryption.Tests.csproj
 	dotnet test -a $(PROCESSOR) --configuration $(TARGET) ./bindings/netstandard/ElectionGuard/ElectionGuard.Decryption.Tests/ElectionGuard.Decryption.Tests.csproj
+	#dotnet test --filter TestCategory=SingleTest -a $(PROCESSOR) --configuration $(TARGET) ./bindings/netstandard/ElectionGuard/ElectionGuard.Decryption.Tests/ElectionGuard.Decryption.Tests.csproj
 
 test-netstandard-arm64:
 	PROCESSOR=arm64 && make test-netstandard
@@ -557,6 +580,10 @@ test-ui: build-ui
 	make test-netstandard-copy-output-ui
 
 	dotnet test -a $(PROCESSOR) --no-build --configuration $(TARGET) ./src/electionguard-ui/ElectionGuard.UI.Test/ElectionGuard.UI.Test.csproj
+
+test-wasm: build-wasm
+	@echo 🧪 TEST WASM $(PROCESSOR) $(TARGET)
+	npm run test
 
 # Coverage
 

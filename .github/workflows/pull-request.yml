@@ -96,14 +96,30 @@ jobs:
             runCsTests: true
 
     steps:
+      # Checkout
       - name: Checkout Code
         uses: actions/checkout@v3
+
       - name: Change Directory
         run: cd ${{ github.workspace }}
-      - name: Install .NET
-        uses: actions/setup-dotnet@v3
+
+      # Cache
+      - name: Restore C++ Dependency Cache
+        id: restore-dependency-cache
+        uses: actions/cache/restore@v3
         with:
-          dotnet-version: 7.0.x
+          path: |
+            .cache/
+            node_modules/
+          key: ${{ matrix.name }}-dependencies-${{ hashFiles('**/CMakeLists.txt', '**/*.cmake', '**/package-lock.json') }}
+
+      - name: Restore C++ Build Cache
+        id: restore-build-cache
+        uses: actions/cache/restore@v3
+        with:
+          path: |
+            build/
+          key: ${{ matrix.name }}-build-${{ hashFiles('**/*.h', '**/*.hpp', '**/*.cpp') }}
 
       # Runner Configuration
       - name: Update Environment (Linux)
@@ -146,19 +162,21 @@ jobs:
         with:
           arch: amd64_x86
 
+      # Tools
+      - name: Install .NET
+        uses: actions/setup-dotnet@v3
+        with:
+          dotnet-version: 7.0.x
+
+      # - name: Install Emscripten
+      #   if: (runner.os == 'Linux' && matrix.compiler == 'clang')
+      #   uses: mymindstorm/setup-emsdk@v11
+      #   with:
+      #     version: 3.1.33
+
       # Environment
       - name: Configure Environment
         run: make environment
-
-      # Build Cache
-      - name: Restore C++ Build Cache
-        id: restore-build-cache
-        uses: actions/cache/restore@v3
-        with:
-          path: |
-            .cache/
-            build/
-          key: ${{ matrix.name }}-build-${{ hashFiles('.cache', 'cmake', 'include', 'src/electionguard') }}
 
       # Lint
       - name: Lint
@@ -196,11 +214,25 @@ jobs:
         if: (matrix.runCsTests)
         run: make test-netstandard
 
+      # - name: Run Typescript Tests (Linux)
+      #   env:
+      #     EMSCRIPTEN_PATH: ${{ env.EMSDK }}
+      #     PROCESSOR: ${{ matrix.processor }}
+      #   if: (runner.os == 'Linux' && matrix.compiler == 'clang')
+      #   run: make test-wasm
+
       # Save build cache
       - name: Save C++ Build Cache
         uses: actions/cache/save@v3
         with:
           path: |
-            .cache/
             build/
           key: ${{ steps.restore-build-cache.outputs.cache-primary-key }}
+
+      - name: Save C++ Dependency Cache
+        uses: actions/cache/save@v3
+        with:
+          path: |
+            .cache/
+            node_modules/
+          key: ${{ steps.restore-dependency-cache.outputs.cache-primary-key }}

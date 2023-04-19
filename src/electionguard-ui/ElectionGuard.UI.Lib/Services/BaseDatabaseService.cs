@@ -24,7 +24,7 @@ public class BaseDatabaseService<T> : IDatabaseService<T> where T : DatabaseReco
     /// Constructor to set the collection name that will be used for this data type
     /// </summary>
     /// <param name="collection">Name of the collection to use for this data type</param>
-    public BaseDatabaseService(string collection, string? type=null)
+    public BaseDatabaseService(string collection, string? type = null)
     {
         _collection = collection;
         _type = type;
@@ -36,7 +36,7 @@ public class BaseDatabaseService<T> : IDatabaseService<T> where T : DatabaseReco
     /// <param name="data">data to be saved</param>
     /// <param name="table">Optional parameter to allow data type to use a different collection</param>
     /// <returns></returns>
-    virtual public async Task<T> SaveAsync(T data, string? table = null)
+    public virtual async Task<T> SaveAsync(T data, string? table = null)
     {
         var collection = DbService.GetCollection<T>(table ?? _collection);
         await collection.InsertOneAsync(data);
@@ -49,7 +49,7 @@ public class BaseDatabaseService<T> : IDatabaseService<T> where T : DatabaseReco
     /// <param name="data">data to be updated</param>
     /// <param name="table">Optional parameter to allow data type to use a different collection</param>
     /// <returns></returns>
-    virtual public async Task UpdateAsync(FilterDefinition<T> filter, UpdateDefinition<T> update, string? table = null)
+    public virtual async Task UpdateAsync(FilterDefinition<T> filter, UpdateDefinition<T> update, string? table = null)
     {
         try
         {
@@ -112,7 +112,7 @@ public class BaseDatabaseService<T> : IDatabaseService<T> where T : DatabaseReco
     /// <param name="id">Id to search for</param>
     /// <param name="table">Optional parameter to allow data type to use a different collection</param>
     /// <returns>Document that matches the given id</returns>
-    public async Task<T?> GetByIdAsync(string id, string? table= null)
+    public async Task<T?> GetByIdAsync(string id, string? table = null)
     {
         return await GetByFieldAsync(Constants.Id, id, table);
     }
@@ -123,7 +123,7 @@ public class BaseDatabaseService<T> : IDatabaseService<T> where T : DatabaseReco
     /// <param name="name">Name to search for</param>
     /// <param name="table">Optional parameter to allow data type to use a different collection</param>
     /// <returns>Document that matches the given name</returns>
-    virtual public async Task<T?> GetByNameAsync(string name, string? table = null)
+    public virtual async Task<T?> GetByNameAsync(string name, string? table = null)
     {
         return await GetByFieldAsync(Constants.Name, name, table);
     }

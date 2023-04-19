@@ -172,6 +172,8 @@ namespace ElectionGuard
             }
         }
 
+        public ElementModQ DescriptionHash => CryptoHash();
+
         /// <Summary>
         /// The collection of selections for this contest
         /// </Summary>

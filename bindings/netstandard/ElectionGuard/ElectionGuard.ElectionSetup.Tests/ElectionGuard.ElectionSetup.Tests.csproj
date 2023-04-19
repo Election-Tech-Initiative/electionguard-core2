@@ -32,6 +32,7 @@
   </ItemGroup>
 
   <PropertyGroup Label="Library Paths">
+    <ElectionGuardData>..\..\..\..\data</ElectionGuardData>
     <ElectionGuardLibs>..\..\..\..\build\libs</ElectionGuardLibs>
   </PropertyGroup>
   <PropertyGroup Label="Debug|arm64" Condition=" '$(Configuration)|$(Platform)' == 'Debug|arm64' ">
@@ -138,6 +139,11 @@
 
     <NoStdLib>false</NoStdLib>
   </PropertyGroup>
+   <ItemGroup>
+    <Content Include="$(ElectionGuardData)\**" LinkBase="data">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>  
+  </ItemGroup>
   <ItemGroup Label="C++ Built Libraries">
     <None Name="Windows (MSVC)" Visible="false" Include="$(ElectionGuardLibs)\Windows\$(PlatformTarget)\$(Configuration)\src\$(Configuration)\*.dll*">
       <CopyToOutputDirectory Condition="'$(OS)' == 'Windows_NT'">Always</CopyToOutputDirectory>

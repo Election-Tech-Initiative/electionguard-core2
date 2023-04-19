@@ -134,6 +134,8 @@ namespace electionguard
         /// </summary>
         bool getIsPlaceholder() const;
 
+        ExtendedData *getExtendedData() const;
+
         /// <summary>
         /// an optional field holding the value of a write-in candidate
         /// </summary>

@@ -1,9 +1,12 @@
+using ElectionGuard.ElectionSetup.Extensions;
+using ElectionGuard.Encryption.Ballot;
+
 namespace ElectionGuard.Decryption.Tally;
 
 /// <summary>
 /// A plaintext Tally Contest is a collection of plaintext selections
 /// </summary>
-public class PlaintextTallyContest : IEquatable<PlaintextTallyContest>
+public class PlaintextTallyContest : DisposableBase, IElectionContest, IEquatable<PlaintextTallyContest>
 {
     /// <summary>
     /// The object id of the contest
@@ -31,8 +34,17 @@ public class PlaintextTallyContest : IEquatable<PlaintextTallyContest>
     {
         ObjectId = objectId;
         SequenceOrder = sequenceOrder;
-        DescriptionHash = descriptionHash;
+        DescriptionHash = new(descriptionHash);
         Selections = selections;
+    }
+
+    public PlaintextTallyContest(
+        CiphertextBallotContest contest)
+    {
+        ObjectId = contest.ObjectId;
+        SequenceOrder = contest.SequenceOrder;
+        DescriptionHash = new(contest.DescriptionHash);
+        Selections = contest.ToPlaintextTallySelectionDictionary();
     }
 
     public PlaintextTallyContest(
@@ -40,7 +52,7 @@ public class PlaintextTallyContest : IEquatable<PlaintextTallyContest>
     {
         ObjectId = contest.ObjectId;
         SequenceOrder = contest.SequenceOrder;
-        DescriptionHash = contest.CryptoHash();
+        DescriptionHash = new(contest.CryptoHash());
         Selections = contest.ToPlaintextTallySelectionDictionary();
     }
 
@@ -49,8 +61,15 @@ public class PlaintextTallyContest : IEquatable<PlaintextTallyContest>
     {
         ObjectId = contest.ObjectId;
         SequenceOrder = contest.SequenceOrder;
-        DescriptionHash = contest.CryptoHash();
+        DescriptionHash = new(contest.CryptoHash());
         Selections = contest.ToPlaintextTallySelectionDictionary();
+    }
+
+    protected override void DisposeUnmanaged()
+    {
+        Selections?.Dispose();
+        Selections?.Clear();
+        base.DisposeUnmanaged();
     }
 
     #region IEquatable
@@ -122,6 +141,25 @@ public static partial class ContestDescriptionExtensions
     {
         var selections = new Dictionary<string, PlaintextTallySelection>();
         foreach (var selection in contest.Selections)
+        {
+            selections.Add(
+                selection.ObjectId,
+                new PlaintextTallySelection(selection));
+        }
+
+        // Do not add placeholders
+
+        return selections;
+    }
+
+    /// <summary>
+    /// Converts a <see cref="ContestDescriptionWithPlaceholders"/> to a dictionary of <see cref="PlaintextTallySelection"/>
+    /// </summary>
+    public static Dictionary<string, PlaintextTallySelection> ToPlaintextTallySelectionDictionary(
+        this CiphertextBallotContest contest)
+    {
+        var selections = new Dictionary<string, PlaintextTallySelection>();
+        foreach (var selection in contest.Selections.Where(x => x.IsPlaceholder == false))
         {
             selections.Add(
                 selection.ObjectId,

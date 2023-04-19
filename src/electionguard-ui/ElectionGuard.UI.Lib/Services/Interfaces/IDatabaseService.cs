@@ -60,7 +60,7 @@ internal static class Constants
 /// the specific Service created by this interface.
 /// </summary>
 /// <typeparam name="T">Data type to use for the service</typeparam>
-internal interface IDatabaseService<T>
+public interface IDatabaseService<T>
 {
     Task<long> CountByFilterAsync(FilterDefinition<T> filter, string? table = null);
     Task<List<T>> GetAllAsync(string? table = null);

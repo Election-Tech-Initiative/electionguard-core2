@@ -1,5 +1,6 @@
 using ElectionGuard.Proofs;
 using ElectionGuard.UI.Lib.Extensions;
+using Newtonsoft.Json;
 
 namespace ElectionGuard.UI.Lib.Models;
 
@@ -8,6 +9,7 @@ namespace ElectionGuard.UI.Lib.Models;
 /// </summary>
 public class ElectionPublicKey : DisposableBase
 {
+    [JsonConstructor]
     public ElectionPublicKey(
         string ownerId,
         ulong sequenceOrder,
@@ -17,9 +19,22 @@ public class ElectionPublicKey : DisposableBase
     {
         OwnerId = ownerId;
         SequenceOrder = sequenceOrder;
-        Key = key;
-        CoefficientCommitments = coefficientCommitments;
-        CoefficientProofs = coefficientProofs;
+        Key = new(key);
+        CoefficientCommitments = coefficientCommitments
+            .Select(x => new ElementModP(x)).ToList();
+        CoefficientProofs = coefficientProofs
+            .Select(x => new SchnorrProof(x)).ToList();
+    }
+
+    public ElectionPublicKey(ElectionPublicKey other)
+    {
+        OwnerId = other.OwnerId;
+        SequenceOrder = other.SequenceOrder;
+        Key = new(other.Key);
+        CoefficientCommitments = other.CoefficientCommitments
+            .Select(x => new ElementModP(x)).ToList();
+        CoefficientProofs = other.CoefficientProofs
+            .Select(x => new SchnorrProof(x)).ToList();
     }
 
     /// <summary>

@@ -1,21 +1,25 @@
 ﻿using MongoDB.Driver;
 using ElectionGuard.UI.Lib.Models;
-using System.Security.Cryptography.X509Certificates;
-using MongoDB.Bson;
-using System.Text.Json;
-using MongoDB.Bson.Serialization;
 
 namespace ElectionGuard.UI.Lib.Services;
+
+public interface IGuardianPublicKeyService : IDatabaseService<GuardianPublicKey>
+{
+    Task<long> CountAsync(string keyCeremonyId);
+    Task<List<GuardianPublicKey>> GetAllByKeyCeremonyIdAsync(string keyCeremonyId);
+    Task<GuardianPublicKey?> GetByIdsAsync(string keyCeremonyId, string guardianId);
+    Task UpdatePublicKeyAsync(string keyCeremonyId, string guardianId, ElectionPublicKey? key);
+}
 
 /// <summary>
 /// Data Service for Key Ceremonies
 /// </summary>
-public class GuardianPublicKeyService : BaseDatabaseService<GuardianPublicKey>
+public class GuardianPublicKeyService : BaseDatabaseService<GuardianPublicKey>, IGuardianPublicKeyService
 {
     /// <summary>
     /// The collection name to use to get/save data into
     /// </summary>
-    private readonly static string _collection = Constants.TableKeyCeremonies;
+    private static readonly string _collection = Constants.TableKeyCeremonies;
 
     /// <summary>
     /// Default constructor that sets the collection name
@@ -38,7 +42,8 @@ public class GuardianPublicKeyService : BaseDatabaseService<GuardianPublicKey>
     /// <param name="keyCeremony">key ceremony id to search for</param>
     /// <param name="guardianId">guardian id to search for</param>
     /// <param name="key">key to set for the guardian</param>
-    virtual public async Task UpdatePublicKeyAsync(string keyCeremonyId, string guardianId, ElectionPublicKey? key)
+    public virtual async Task UpdatePublicKeyAsync(
+        string keyCeremonyId, string guardianId, ElectionPublicKey? key)
     {
         var filterBuilder = Builders<GuardianPublicKey>.Filter;
         var filter = filterBuilder.And(filterBuilder.Eq(Constants.KeyCeremonyId, keyCeremonyId),
