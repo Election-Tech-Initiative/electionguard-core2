@@ -21,7 +21,7 @@ public partial class ViewKeyCeremonyViewModel : BaseViewModel
         base("ViewKeyCeremony", serviceProvider)
     {
         _keyCeremonyService = keyCeremonyService;
-        _guardianService = guardianService;
+        _publicKeyService = guardianService;
         _backupService = backupService;
         _verificationService = verificationService;
 
@@ -81,7 +81,14 @@ public partial class ViewKeyCeremonyViewModel : BaseViewModel
         {
             IsJoinVisible = (!AuthenticationService.IsAdmin && (value.State == KeyCeremonyState.PendingGuardiansJoin));
 
-            _mediator = new KeyCeremonyMediator("mediator", UserName!, value);
+            _mediator = new KeyCeremonyMediator(
+                mediatorId: "mediator",
+                userId: this.UserName!,
+                keyCeremony: value,
+                keyCeremonyService: _keyCeremonyService,
+                backupService: _backupService,
+                publicKeyService: _publicKeyService,
+                verificationService: _verificationService);
 
             if (!IsJoinVisible)
             {
@@ -122,7 +129,7 @@ public partial class ViewKeyCeremonyViewModel : BaseViewModel
         // if we have fewer than max number, see if anyone else joined
         if (GuardianList.Count != KeyCeremony.NumberOfGuardians)
         {
-            var localData = await _guardianService.GetAllByKeyCeremonyIdAsync(KeyCeremonyId);
+            var localData = await _publicKeyService.GetAllByKeyCeremonyIdAsync(KeyCeremonyId);
 
             foreach (var item in localData)
             {
@@ -146,7 +153,7 @@ public partial class ViewKeyCeremonyViewModel : BaseViewModel
     }
 
     private readonly KeyCeremonyService _keyCeremonyService;
-    private readonly GuardianPublicKeyService _guardianService;
+    private readonly GuardianPublicKeyService _publicKeyService;
     private readonly GuardianBackupService _backupService;
     private readonly VerificationService _verificationService;
 }
