@@ -547,7 +547,7 @@ public class KeyCeremonyMediator
                 catch (Exception ex)
                 {
                     var message = ex.Message;
-                    Console.WriteLine($"error running key ceremony step: {currentStep.State} {ex}");
+                    Debug.WriteLine($"error running key ceremony step: {currentStep.State} {ex}");
                 }
                 IsRunning = false;
             }

@@ -1,6 +1,3 @@
-using System;
-using System.IO;
-
 using ElectionGuard.Decryption.Decryption;
 using ElectionGuard.Decryption.Tally;
 using ElectionGuard.Decryption.Tests.Tally;
@@ -29,8 +26,14 @@ public class TestDecryptionData : DisposableBase
     // configure a test case by running a key ceremony and generating ballots
     public static TestDecryptionData ConfigureTestCase(
         TestKeyCeremonyData keyCeremony,
-        Manifest manifest, int castBallotCount, int spoiledBallotCount)
+        Manifest manifest,
+        int castBallotCount,
+        int challengedBallotCount,
+        int spoiledBallotCount, Random? random = null)
     {
+        random ??= new Random(1);
+        var ballotCount = castBallotCount + challengedBallotCount + spoiledBallotCount;
+
         var internalManifest = new InternalManifest(manifest);
         var context = new CiphertextElectionContext(
             (ulong)keyCeremony.NumberOfGuardians,
@@ -48,33 +51,61 @@ public class TestDecryptionData : DisposableBase
         };
 
         // generate the ballots
-        var random = new Random(1);
         var plaintextBallots = BallotGenerator.GetFakeBallots(
-            election.InternalManifest, random, castBallotCount + spoiledBallotCount);
+            election.InternalManifest, random, ballotCount);
         var ciphertextBallots = BallotGenerator.GetFakeCiphertextBallots(
             election.InternalManifest, election.Context, plaintextBallots, random);
+
+        // cast, challenge and spoil the ballots
+        IList<BallotBoxState> ballotBoxStates = new List<BallotBoxState>();
+        Enumerable.Range(0, castBallotCount).ToList().ForEach(i =>
+        {
+            ballotBoxStates.Add(BallotBoxState.Cast);
+        });
+        Enumerable.Range(0, challengedBallotCount).ToList().ForEach(i =>
+        {
+            ballotBoxStates.Add(BallotBoxState.Challenged);
+        });
+        Enumerable.Range(0, spoiledBallotCount).ToList().ForEach(i =>
+        {
+            ballotBoxStates.Add(BallotBoxState.Spoiled);
+        });
+        ballotBoxStates = ballotBoxStates.Shuffle(random);
 
         // hold onto the nonces so we can decrypt the ballots
         var nonces = new Dictionary<string, ElementModQ>();
 
-        // cast and spoil the ballots
-        // the spoiled ballots are the last ones in the list
-        Enumerable.Range(0, castBallotCount).ToList().ForEach(i =>
+        var plaintextCastBallots = new List<PlaintextBallot>();
+
+        // update the ballot box states
+        for (var index = 0; index < ballotCount; index++)
         {
-            var nonce = ciphertextBallots[i]!.Nonce;
-            nonces.Add(ciphertextBallots[i]!.ObjectId, new ElementModQ(nonce));
-            ciphertextBallots[i]!.Cast();
-        });
-        Enumerable.Range(castBallotCount, spoiledBallotCount).ToList().ForEach(i =>
-        {
-            var nonce = ciphertextBallots[i]!.Nonce;
-            nonces.Add(ciphertextBallots[i]!.ObjectId, new ElementModQ(nonce));
-            ciphertextBallots[i]!.Spoil();
-        });
+            var ballot = ciphertextBallots[index];
+            nonces.Add(ballot.ObjectId, new ElementModQ(ballot.Nonce));
+            var state = ballotBoxStates[index];
+            switch (state)
+            {
+                case BallotBoxState.Cast:
+                    ballot.Cast();
+                    plaintextCastBallots.Add(plaintextBallots[index]);
+                    break;
+                case BallotBoxState.Challenged:
+                    ballot.Challenge();
+                    break;
+                case BallotBoxState.Spoiled:
+                    ballot.Spoil();
+                    break;
+                default:
+                    throw new ArgumentOutOfRangeException($"invalid state for ballot {ballot.ObjectId}");
+            }
+        }
+
+        Console.WriteLine($"{nameof(ConfigureTestCase)} Ballots Generated.");
+        Console.WriteLine($" - Cast: {castBallotCount}");
+        Console.WriteLine($" - Challenged: {challengedBallotCount}");
+        Console.WriteLine($" - Spoiled: {spoiledBallotCount}");
 
         // create a tally
-        var plaintextCastBallots = Enumerable.Range(0, castBallotCount)
-            .Select(i => plaintextBallots[i]!).ToList();
         var plaintextTally = new PlaintextTally(
             "test-decrypt-with-shares", election.InternalManifest);
         plaintextTally.AccumulateBallots(plaintextCastBallots);
@@ -85,9 +116,12 @@ public class TestDecryptionData : DisposableBase
             plaintextTally.Name,
             election.Context,
             election.InternalManifest);
-        _ = ciphertextTally.Accumulate(ciphertextBallots);
+        var addResult = ciphertextTally.Accumulate(ciphertextBallots);
 
+        Console.WriteLine($"{ciphertextTally}");
+        Console.WriteLine($"{addResult}");
         Console.WriteLine($"{nameof(ConfigureTestCase)} Setup Complete.");
+
         return new TestDecryptionData
         {
             Election = election,
@@ -103,6 +137,7 @@ public class TestDecryptionData : DisposableBase
     protected override void DisposeUnmanaged()
     {
         base.DisposeUnmanaged();
+
         Election.Dispose();
         KeyCeremony.Dispose();
         PlaintextBallots.Dispose();
@@ -117,8 +152,6 @@ public class TestDecryptionData : DisposableBase
 
     public static void SaveToFile(TestDecryptionData data, DecryptionResult result)
     {
-
-
         var path = Path.Combine(AppContext.BaseDirectory, "data");
         var directoryPath = Path.GetDirectoryName(path);
         _ = Directory.CreateDirectory(directoryPath!);

@@ -36,10 +36,30 @@ public class DecryptionMediator : DisposableBase
         Id = mediatorId;
 
         Tallies.Add(tally.TallyId, new(tally));
+        TallyDecryptions.Add(
+                tally.TallyId,
+                new CiphertextDecryptionTally(Tallies[tally.TallyId]));
         foreach (var guardian in guardians)
         {
-            Guardians.Add(guardian.OwnerId, new(guardian));
+            AddGuardian(guardian);
         }
+    }
+
+    public DecryptionMediator(
+        string mediatorId,
+        CiphertextTally tally,
+        List<ElectionPublicKey> guardians,
+        List<CiphertextBallot> ballots) : this(mediatorId, tally, guardians)
+    {
+        foreach (var ballot in ballots)
+        {
+            AddBallot(tally.TallyId, ballot);
+        }
+    }
+
+    public void AddBallot(string tallyId, CiphertextBallot ballot)
+    {
+        TallyDecryptions[tallyId].AddBallot(new(ballot));
     }
 
     public void AddTally(CiphertextTally tally)
@@ -88,9 +108,8 @@ public class DecryptionMediator : DisposableBase
             return canDecrypt;
         }
 
-        var tally = Tallies[tallyId];
         var tallyDecryption = TallyDecryptions[tallyId];
-        return tallyDecryption.Decrypt(tally);
+        return tallyDecryption.Decrypt();
     }
 
     /// <summary>
@@ -108,13 +127,16 @@ public class DecryptionMediator : DisposableBase
         }
 
         var tallyDecryption = TallyDecryptions[tallyShare.TallyId];
-        tallyDecryption.AddTallyShare(Guardians[tallyShare.GuardianId], new(tallyShare));
+        tallyDecryption.AddTallyShare(
+            Guardians[tallyShare.GuardianId], new(tallyShare));
     }
 
     /// <summary>
     /// Submit a single ballot share
     /// </summary>
-    public void SubmitShare(CiphertextDecryptionBallotShare ballotShare, CiphertextBallot ballot)
+    public void SubmitShare(
+        CiphertextDecryptionBallotShare ballotShare,
+        CiphertextBallot ballot)
     {
         EnsureCiphertextDecryptionTally(ballotShare);
 
@@ -127,7 +149,8 @@ public class DecryptionMediator : DisposableBase
         }
 
         var tallyDecryption = TallyDecryptions[ballotShare.TallyId];
-        tallyDecryption.AddBallotShare(Guardians[ballotShare.GuardianId], new(ballotShare), new(ballot));
+        tallyDecryption.AddBallotShare(
+            Guardians[ballotShare.GuardianId], new(ballotShare), new(ballot));
     }
 
     /// <summary>
@@ -160,8 +183,19 @@ public class DecryptionMediator : DisposableBase
     /// Submit a list of ballot shares
     /// </summary>
     public void SubmitShares(
-        List<CiphertextDecryptionBallotShare> ballotShares, List<CiphertextBallot> ballots)
+        List<CiphertextDecryptionBallotShare> ballotShares,
+        List<CiphertextBallot> ballots)
     {
+        if (ballotShares.Count == 0)
+        {
+            throw new Exception("No ballot shares provided");
+        }
+
+        if (ballotShares.Count != ballots.Count)
+        {
+            throw new Exception("Number of ballot shares does not match number of ballots");
+        }
+
         EnsureCiphertextDecryptionTally(ballotShares.First());
 
         foreach (var ballotShare in ballotShares)
@@ -180,7 +214,8 @@ public class DecryptionMediator : DisposableBase
         foreach (var ballotShare in ballotShares)
         {
             tallyDecryption.AddBallotShare(
-                guardian, ballotShare, ballots.First(i => i.ObjectId == ballotShare.BallotId));
+                guardian, ballotShare,
+                ballots.First(i => i.ObjectId == ballotShare.BallotId));
         }
     }
 
@@ -216,7 +251,8 @@ public class DecryptionMediator : DisposableBase
         if (!TallyDecryptions.ContainsKey(share.TallyId))
         {
             TallyDecryptions.Add(
-                share.TallyId, new CiphertextDecryptionTally(Tallies[share.TallyId]));
+                share.TallyId,
+                new CiphertextDecryptionTally(Tallies[share.TallyId]));
         }
     }
 }

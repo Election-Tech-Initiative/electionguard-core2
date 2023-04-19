@@ -1170,7 +1170,7 @@ namespace electionguard
         }
 
         pimpl->nonce.reset();
-        pimpl->state = BallotBoxState::spoiled;
+        pimpl->state = BallotBoxState::challenged;
     }
 
     vector<uint8_t> CiphertextBallot::toBson(bool withNonces /* = false */) const

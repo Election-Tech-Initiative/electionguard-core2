@@ -30,6 +30,11 @@ namespace ElectionGuard
         public bool IsCast => State == BallotBoxState.Cast;
 
         /// <summary>
+        /// returns true if the ballot is marked as challenged
+        /// </summary>
+        public bool IsChallenged => State == BallotBoxState.Challenged;
+
+        /// <summary>
         /// returns true if the ballot is marked as spoiled
         /// </summary>
         public bool IsSpoiled => State == BallotBoxState.Spoiled;

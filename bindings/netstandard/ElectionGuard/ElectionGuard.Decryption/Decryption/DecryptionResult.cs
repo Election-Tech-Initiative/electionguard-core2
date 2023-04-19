@@ -30,7 +30,9 @@ public class DecryptionResult
     /// <summary>
     /// The result of decrypting the spoiled ballots
     /// </summary>
-    public List<PlaintextTallyBallot>? SpoiledBallots { get; set; }
+    public List<PlaintextTallyBallot>? ChallengedBallots { get; set; }
+
+    public List<CiphertextBallot>? SpoiledBallots { get; set; }
 
     public DecryptionResult(string tallyId, bool isValid = true)
     {
@@ -50,11 +52,13 @@ public class DecryptionResult
     public DecryptionResult(
         string tallyId,
         PlaintextTally result,
-        List<PlaintextTallyBallot> spoiledBallots)
+        List<PlaintextTallyBallot> challengedBallots,
+        List<CiphertextBallot> spoiledBallots)
     {
         TallyId = tallyId;
         IsValid = true;
         Tally = result;
+        ChallengedBallots = challengedBallots;
         SpoiledBallots = spoiledBallots;
     }
 
@@ -83,6 +87,11 @@ public class DecryptionResult
     }
 
     public static implicit operator List<PlaintextTallyBallot>?(DecryptionResult self)
+    {
+        return self.ChallengedBallots;
+    }
+
+    public static implicit operator List<CiphertextBallot>?(DecryptionResult self)
     {
         return self.SpoiledBallots;
     }
