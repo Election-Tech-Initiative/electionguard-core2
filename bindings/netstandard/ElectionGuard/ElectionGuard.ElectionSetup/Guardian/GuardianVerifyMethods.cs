@@ -15,12 +15,12 @@ public partial class Guardian
         get
         {
             var required = CeremonyDetails.NumberOfGuardians - 1;
-            if (_otherGuardianPartialKeyVerification?.Count != required)
+            if (_partialoVerifications?.Count != required)
             {
                 return false;
             }
 
-            foreach (var verification in _otherGuardianPartialKeyVerification.Values)
+            foreach (var verification in _partialoVerifications.Values)
             {
                 if (verification.Verified is false)
                 {
@@ -34,15 +34,15 @@ public partial class Guardian
     // save_election_partial_key_verification
     public void SaveElectionPartialKeyVerification(ElectionPartialKeyVerification verification)
     {
-        _otherGuardianPartialKeyVerification[verification.DesignatedId!] = verification;
+        _partialoVerifications[verification.DesignatedId!] = verification;
     }
 
     // verify_election_partial_key_backup
     public ElectionPartialKeyVerification? VerifyElectionPartialKeyBackup(
         string guardianId, string keyCeremonyId)
     {
-        var backup = _otherGuardianPartialKeyBackups[guardianId];
-        var publicKey = _otherGuardianPublicKeys[guardianId];
+        var backup = _partialKeyBackups[guardianId];
+        var publicKey = _publicKeys[guardianId];
 
         // TODO: throw exception instead of returning null
         if (backup is null)
@@ -54,7 +54,7 @@ public partial class Guardian
             return null;
         }
         return VerifyElectionPartialKeyBackup(
-            backup?.DesignatedId!, backup!, publicKey, _electionKeys, keyCeremonyId);
+            backup?.DesignatedId!, backup!, publicKey, _myElectionKeys, keyCeremonyId);
     }
 
     private static ElectionPartialKeyVerification VerifyElectionPartialKeyBackup(
