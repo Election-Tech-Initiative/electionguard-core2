@@ -90,10 +90,6 @@ public partial class Guardian : DisposableBase
         var keyPair = new ElGamalKeyPair(nextRandom);
         _myElectionKeys = new(guardianId, sequenceOrder, quorum, keyPair, random);
         CeremonyDetails = new(keyCeremonyId, numberOfGuardians, quorum);
-
-        Console.WriteLine($"TESTING!!! Created Guardian {guardianId} with secret key {keyPair.SecretKey}");
-
-        SaveGuardianKey(_myElectionKeys.Share());
     }
 
     /// <summary>
@@ -111,8 +107,6 @@ public partial class Guardian : DisposableBase
         var keyPair = new ElGamalKeyPair(secretKey);
         _myElectionKeys = new(guardianId, sequenceOrder, ceremonyDetails.Quorum, keyPair);
         CeremonyDetails = ceremonyDetails;
-
-        SaveGuardianKey(_myElectionKeys.Share());
     }
 
     /// <summary>
@@ -129,8 +123,6 @@ public partial class Guardian : DisposableBase
 
         _myElectionKeys = new(guardianId, sequenceOrder, ceremonyDetails.Quorum, elGamalKeyPair);
         CeremonyDetails = ceremonyDetails;
-
-        SaveGuardianKey(_myElectionKeys.Share());
     }
 
     /// <summary>
@@ -147,8 +139,6 @@ public partial class Guardian : DisposableBase
         GuardianId = keyPair.OwnerId;
         SequenceOrder = keyPair.SequenceOrder;
         CeremonyDetails = ceremonyDetails;
-
-        SaveGuardianKey(_myElectionKeys.Share());
     }
 
     /// <summary>
@@ -173,17 +163,6 @@ public partial class Guardian : DisposableBase
         GuardianId = keyPair.OwnerId;
         SequenceOrder = keyPair.SequenceOrder;
         CeremonyDetails = ceremonyDetails;
-
-        _publicKeys = otherKeys
-            ?? _publicKeys;
-        _partialKeyBackups = otherBackups
-            ?? _partialKeyBackups;
-        BackupsToShare = backupsToShare
-            ?? BackupsToShare;
-        _partialoVerifications = otherVerifications
-            ?? _partialoVerifications;
-
-        SaveGuardianKey(_myElectionKeys.Share());
     }
 
     #endregion
