@@ -74,9 +74,16 @@ public class PlaintextTallySelection
     {
         ObjectId = objectId;
         SequenceOrder = sequenceOrder;
-        DescriptionHash = descriptionHash;
+        DescriptionHash = new(descriptionHash);
         Tally = tally;
-        Value = value;
+        Value = new(value);
+    }
+
+    protected override void DisposeUnmanaged()
+    {
+        base.DisposeManaged();
+        DescriptionHash.Dispose();
+        Value.Dispose();
     }
 
     # region IEquatable

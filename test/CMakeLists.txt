@@ -44,9 +44,12 @@ target_compile_features(${UTILS_PROJECT_TARGET} PRIVATE cxx_std_17)
 target_compile_options(${UTILS_PROJECT_TARGET} PUBLIC "$<$<BOOL:${MSVC}>:/permissive->")
 
 # define dll export markers
-if(BUILD_SHARED_LIBS)
+if(BUILD_SHARED_LIBS AND NOT EMSCRIPTEN)
     message("++ Building Shared Libs")
     add_compile_definitions(ELECTIONGUARD_BUILD_SHARED)
+else()
+    message("++ Building Static Libs")
+    add_compile_definitions(ELECTIONGUARD_BUILD_STATIC)
 endif()
 
 if(MSVC)
@@ -93,25 +96,25 @@ add_executable(${CTEST_PROJECT_TARGET}
 target_compile_features(${CTEST_PROJECT_TARGET} PRIVATE c_std_99)
 
 # ---- Link Libraries ----
-target_link_libraries(${UTILS_PROJECT_TARGET} 
-    PUBLIC 
-        ${META_PROJECT_TARGET}
-        hacl::hacl
+target_link_libraries(${UTILS_PROJECT_TARGET}
+    PUBLIC
+    ${META_PROJECT_TARGET}
+    hacl::hacl
 )
 
-target_link_libraries(${CPP_BENCHMARK_TARGET} 
-    PRIVATE 
-        benchmark::benchmark 
-        ${UTILS_PROJECT_TARGET} 
-        ${META_PROJECT_TARGET}
-        hacl::hacl
+target_link_libraries(${CPP_BENCHMARK_TARGET}
+    PRIVATE
+    benchmark::benchmark
+    ${UTILS_PROJECT_TARGET}
+    ${META_PROJECT_TARGET}
+    hacl::hacl
 )
-target_link_libraries(${CPPTEST_PROJECT_TARGET} 
-    PRIVATE 
-        doctest 
-        ${UTILS_PROJECT_TARGET} 
-        ${META_PROJECT_TARGET} 
-        hacl::hacl
+target_link_libraries(${CPPTEST_PROJECT_TARGET}
+    PRIVATE
+    doctest
+    ${UTILS_PROJECT_TARGET}
+    ${META_PROJECT_TARGET}
+    hacl::hacl
 )
 
 if(MINGW)
@@ -120,11 +123,11 @@ if(MINGW)
     target_link_libraries(${CPPTEST_PROJECT_TARGET} PRIVATE -static-libstdc++)
 endif()
 
-target_link_libraries(${CTEST_PROJECT_TARGET} 
-    PRIVATE 
-        ${UTILS_PROJECT_TARGET} 
-        ${META_PROJECT_TARGET}
-        hacl::hacl
+target_link_libraries(${CTEST_PROJECT_TARGET}
+    PRIVATE
+    ${UTILS_PROJECT_TARGET}
+    ${META_PROJECT_TARGET}
+    hacl::hacl
 )
 
 if(MINGW)

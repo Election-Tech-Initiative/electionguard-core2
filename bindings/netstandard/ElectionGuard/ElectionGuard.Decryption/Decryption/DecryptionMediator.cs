@@ -35,21 +35,21 @@ public class DecryptionMediator : DisposableBase
     {
         Id = mediatorId;
 
-        Tallies.Add(tally.TallyId, tally);
+        Tallies.Add(tally.TallyId, new(tally));
         foreach (var guardian in guardians)
         {
-            Guardians.Add(guardian.OwnerId, guardian);
+            Guardians.Add(guardian.OwnerId, new(guardian));
         }
     }
 
     public void AddTally(CiphertextTally tally)
     {
-        Tallies.Add(tally.TallyId, tally);
+        Tallies.Add(tally.TallyId, new(tally));
     }
 
     public void AddGuardian(ElectionPublicKey guardian)
     {
-        Guardians.Add(guardian.OwnerId, guardian);
+        Guardians.Add(guardian.OwnerId, new(guardian));
     }
 
     /// <summary>
@@ -108,7 +108,7 @@ public class DecryptionMediator : DisposableBase
         }
 
         var tallyDecryption = TallyDecryptions[tallyShare.TallyId];
-        tallyDecryption.AddTallyShare(Guardians[tallyShare.GuardianId], tallyShare);
+        tallyDecryption.AddTallyShare(Guardians[tallyShare.GuardianId], new(tallyShare));
     }
 
     /// <summary>
@@ -127,7 +127,7 @@ public class DecryptionMediator : DisposableBase
         }
 
         var tallyDecryption = TallyDecryptions[ballotShare.TallyId];
-        tallyDecryption.AddBallotShare(Guardians[ballotShare.GuardianId], ballotShare, ballot);
+        tallyDecryption.AddBallotShare(Guardians[ballotShare.GuardianId], new(ballotShare), new(ballot));
     }
 
     /// <summary>
@@ -139,7 +139,9 @@ public class DecryptionMediator : DisposableBase
          )
     {
         SubmitShare(shares.Item1);
-        SubmitShares(shares.Item2.Values.ToList(), ballots);
+        SubmitShares(shares.Item2.Values
+            .Select(i => new CiphertextDecryptionBallotShare(i)).ToList(),
+            ballots.Select(i => new CiphertextBallot(i)).ToList());
     }
 
     /// <summary>
@@ -179,6 +181,23 @@ public class DecryptionMediator : DisposableBase
         {
             tallyDecryption.AddBallotShare(
                 guardian, ballotShare, ballots.First(i => i.ObjectId == ballotShare.BallotId));
+        }
+    }
+
+    protected override void DisposeUnmanaged()
+    {
+        base.DisposeUnmanaged();
+        foreach (var tallyDecryption in TallyDecryptions.Values)
+        {
+            tallyDecryption.Dispose();
+        }
+        foreach (var guardian in Guardians.Values)
+        {
+            guardian.Dispose();
+        }
+        foreach (var tally in Tallies.Values)
+        {
+            tally.Dispose();
         }
     }
 

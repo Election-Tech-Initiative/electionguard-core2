@@ -65,6 +65,16 @@ To build for iOS you need XCode installed
 
 The automated install of dependencies is currently only supported on debian-based systems. See the makefile for more information.
 
+### Web Assembly
+
+Building for WebAssembly (wasm) is supported with the `emscripten` toolchain.
+
+- Install [emscripten](https://emscripten.org/docs/getting_started/downloads.html)
+- Install [Node Version Manager](https://github.com/nvm-sh/nvm)
+- Ensure the latest versions of both emscripten and node are activated
+- Ensure Emscripten and node are both in your path
+- run `make test-wasm` to build for wasm and validate the library.
+
 ### 🖥️ Windows (using MSVC)
 
 Building on windows is supported using the `MSVC` toolchain.

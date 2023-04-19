@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Runtime.InteropServices;
 
@@ -24,6 +24,11 @@ namespace ElectionGuard
             get => GetNative();
             set => NewNative(value);
         }
+
+        /// <summary>
+        /// Determines if the element is valid and has not been cleaned up
+        /// </summary>
+        public bool IsAddressable => Handle != null && !Handle.IsInvalid && !IsDisposed;
 
         internal NaiveElementModP Handle;
 
@@ -76,11 +81,41 @@ namespace ElectionGuard
         /// <summary>
         /// Create a `ElementModP`
         /// </summary>
+        /// <param name="hex">string representing the hex bytes of the initialized data</param>
+        /// <param name="uncheckedInput">if data is checked or not</param>
+        public ElementModP(string hex, bool uncheckedInput = false)
+        {
+            var status = uncheckedInput ?
+                NativeInterface.ElementModP.FromHexUnchecked(hex, out Handle)
+                : NativeInterface.ElementModP.FromHexChecked(hex, out Handle);
+            status.ThrowIfError();
+        }
+
+        /// <summary>
+        /// Create a `ElementModP`
+        /// </summary>
         public ElementModP(ElementModQ elementModQ)
         {
             var status = NativeInterface.ElementModQ.ToElementModP(elementModQ.Handle, out Handle);
             status.ThrowIfError();
         }
+
+        /// <summary>
+        /// Create a copy of an existing `ElementModP`
+        /// </summary>
+        /// <param name="src">Existing `ElementModP` to copy</param>
+        public ElementModP(ElementModP src)
+        {
+            try
+            {
+                NewNative(src.Data);
+            }
+            catch (Exception ex)
+            {
+                throw new ElectionGuardException("construction error", ex);
+            }
+        }
+
 
         internal ElementModP(NaiveElementModP handle)
         {
@@ -97,7 +132,12 @@ namespace ElectionGuard
         {
             base.DisposeUnmanaged();
 
-            if (Handle == null || Handle.IsInvalid) return;
+            if (Handle == null || Handle.IsInvalid)
+            {
+                Handle = null;
+                return;
+            }
+
             Handle.Dispose();
             Handle = null;
         }
@@ -112,6 +152,14 @@ namespace ElectionGuard
         /// </Summary>
         public string ToHex()
         {
+            if (IsDisposed)
+            {
+                throw new ObjectDisposedException(nameof(ElementModP));
+            }
+            if (Handle == null || Handle.IsInvalid)
+            {
+                throw new ElectionGuardException("Handle is null or invalid");
+            }
             var status = NativeInterface.ElementModP.ToHex(Handle, out var pointer);
             if (status != Status.ELECTIONGUARD_STATUS_SUCCESS)
             {

@@ -44,8 +44,8 @@ public class CiphertextDecryptionSelection : DisposableBase, IElectionSelection
     {
         ObjectId = objectId;
         SequenceOrder = sequenceOrder;
-        DescriptionHash = descriptionHash;
-        Value = Constants.ONE_MOD_P;
+        DescriptionHash = new(descriptionHash);
+        Value = new(Constants.ONE_MOD_P);
     }
 
     public CiphertextDecryptionSelection(
@@ -53,8 +53,19 @@ public class CiphertextDecryptionSelection : DisposableBase, IElectionSelection
     {
         ObjectId = selection.ObjectId;
         SequenceOrder = selection.SequenceOrder;
-        DescriptionHash = selection.DescriptionHash;
-        Value = Constants.ONE_MOD_P;
+        DescriptionHash = new(selection.DescriptionHash);
+        Value = new(Constants.ONE_MOD_P);
+    }
+
+    public CiphertextDecryptionSelection(
+        CiphertextDecryptionSelection other)
+    {
+        ObjectId = other.ObjectId;
+        SequenceOrder = other.SequenceOrder;
+        DescriptionHash = new(other.DescriptionHash);
+        Value = new(Constants.ONE_MOD_P);
+        Proof = other.Proof;
+        Shares = other.Shares.Select(x => new CiphertextDecryptionSelectionShare(x)).ToList();
     }
 
     /// <summary>
@@ -115,6 +126,17 @@ public class CiphertextDecryptionSelection : DisposableBase, IElectionSelection
 
         Shares.Add(share);
         Accumulate(share.Share, lagrangeCoefficient);
+    }
+
+    protected override void DisposeUnmanaged()
+    {
+        base.DisposeUnmanaged();
+        Value.Dispose();
+        DescriptionHash.Dispose();
+        foreach (var share in Shares)
+        {
+            share.Dispose();
+        }
     }
 
     private void Accumulate(

@@ -1,3 +1,4 @@
+using ElectionGuard.ElectionSetup.Extensions;
 using ElectionGuard.Encryption.Ballot;
 
 namespace ElectionGuard.Decryption.Tally;
@@ -5,7 +6,7 @@ namespace ElectionGuard.Decryption.Tally;
 /// <summary>
 /// A plaintext Tally Contest is a collection of plaintext selections
 /// </summary>
-public class PlaintextTallyContest : IElectionContest, IEquatable<PlaintextTallyContest>
+public class PlaintextTallyContest : DisposableBase, IElectionContest, IEquatable<PlaintextTallyContest>
 {
     /// <summary>
     /// The object id of the contest
@@ -33,7 +34,7 @@ public class PlaintextTallyContest : IElectionContest, IEquatable<PlaintextTally
     {
         ObjectId = objectId;
         SequenceOrder = sequenceOrder;
-        DescriptionHash = descriptionHash;
+        DescriptionHash = new(descriptionHash);
         Selections = selections;
     }
 
@@ -42,7 +43,7 @@ public class PlaintextTallyContest : IElectionContest, IEquatable<PlaintextTally
     {
         ObjectId = contest.ObjectId;
         SequenceOrder = contest.SequenceOrder;
-        DescriptionHash = contest.DescriptionHash;
+        DescriptionHash = new(contest.DescriptionHash);
         Selections = contest.ToPlaintextTallySelectionDictionary();
     }
 
@@ -51,7 +52,7 @@ public class PlaintextTallyContest : IElectionContest, IEquatable<PlaintextTally
     {
         ObjectId = contest.ObjectId;
         SequenceOrder = contest.SequenceOrder;
-        DescriptionHash = contest.CryptoHash();
+        DescriptionHash = new(contest.CryptoHash());
         Selections = contest.ToPlaintextTallySelectionDictionary();
     }
 
@@ -60,8 +61,15 @@ public class PlaintextTallyContest : IElectionContest, IEquatable<PlaintextTally
     {
         ObjectId = contest.ObjectId;
         SequenceOrder = contest.SequenceOrder;
-        DescriptionHash = contest.CryptoHash();
+        DescriptionHash = new(contest.CryptoHash());
         Selections = contest.ToPlaintextTallySelectionDictionary();
+    }
+
+    protected override void DisposeUnmanaged()
+    {
+        Selections?.Dispose();
+        Selections?.Clear();
+        base.DisposeUnmanaged();
     }
 
     #region IEquatable

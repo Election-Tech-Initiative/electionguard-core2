@@ -274,7 +274,9 @@ namespace ElectionGuard
             status.ThrowIfError();
         }
 
-
+        public CiphertextElectionContext(CiphertextElectionContext other) : this(other.ToJson())
+        {
+        }
 
 #pragma warning disable CS1591 // Missing XML comment for publicly visible type or member
         protected override void DisposeUnmanaged()

@@ -1,6 +1,7 @@
+﻿using ElectionGuard.Encryption.Utils.Converters;
 using ElectionGuard.UI.Lib.Models;
 using ElectionGuard.UI.Lib.Services;
-using System.Text.Json;
+using Newtonsoft.Json;
 
 namespace ElectionGuard.ElectionSetup;
 
@@ -21,11 +22,7 @@ public static class GuardianStorageExtensions
     {
         return new(
             privateGuardianRecord.ElectionKeys,
-            new(keyCeremonyId, numberOfGuardians, quorum),
-            privateGuardianRecord.GuardianElectionPublicKeys,
-            privateGuardianRecord.GuardianElectionPartialKeyBackups,
-            privateGuardianRecord.BackupsToShare,
-            privateGuardianRecord.GuardianElectionPartialKeyVerifications);
+            new(keyCeremonyId, numberOfGuardians, quorum));
     }
 
     /// <summary>
@@ -47,7 +44,7 @@ public static class GuardianStorageExtensions
         var data = storage.FromFile(filePath);
         try
         {
-            var privateGuardian = JsonSerializer.Deserialize<GuardianPrivateRecord>(data);
+            var privateGuardian = JsonConvert.DeserializeObject<GuardianPrivateRecord>(data, SerializationSettings.NewtonsoftSettings());
             return privateGuardian != null ?
                 FromPrivateRecord(privateGuardian, keyCeremonyId, guardianCount, quorum) :
                 null;
@@ -76,7 +73,7 @@ public static class GuardianStorageExtensions
         var storage = StorageService.GetInstance();
 
         GuardianPrivateRecord data = self;
-        var dataJson = JsonSerializer.Serialize(data);
+        var dataJson = JsonConvert.SerializeObject(data, SerializationSettings.NewtonsoftSettings());
 
         var filename = GuardianPrefix + data.GuardianId + GuardianExt;
         var basePath = Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData);

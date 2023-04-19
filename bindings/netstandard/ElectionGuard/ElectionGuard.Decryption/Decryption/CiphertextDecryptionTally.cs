@@ -1,5 +1,6 @@
 using ElectionGuard.Decryption.Tally;
 using ElectionGuard.ElectionSetup;
+using ElectionGuard.ElectionSetup.Extensions;
 using ElectionGuard.UI.Lib.Models;
 
 namespace ElectionGuard.Decryption.Decryption;
@@ -38,7 +39,7 @@ public record class CiphertextDecryptionTally : DisposableRecordBase
         List<ElectionPublicKey> guardians,
         List<CiphertextBallot> ballots)
     {
-        _tally = tally;
+        _tally = new(tally);
 
         foreach (var guardian in guardians)
         {
@@ -147,6 +148,22 @@ public record class CiphertextDecryptionTally : DisposableRecordBase
             _ballotShares, lagrangeCoefficients, tally, skipValidation);
 
         return new DecryptionResult(tally.TallyId, plaintextTally, plaintextBallots);
+    }
+
+    protected override void DisposeUnmanaged()
+    {
+        base.DisposeUnmanaged();
+        _tally.Dispose();
+        _guardians.Dispose();
+        _ballots.Dispose();
+        foreach (var share in _tallyShares.Values)
+        {
+            share.Dispose();
+        }
+        foreach (var share in _ballotShares.Values)
+        {
+            share.Dispose();
+        }
     }
 
     private void AddBallot(CiphertextBallot ballot)

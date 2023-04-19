@@ -140,6 +140,18 @@ namespace ElectionGuard
             internal static extern Status ToHex(
                 ElementModPHandle handle, out IntPtr data);
 
+            [DllImport(DllName, EntryPoint = "eg_element_mod_p_from_hex_checked",
+                CallingConvention = CallingConvention.Cdecl, SetLastError = true)]
+            internal static extern Status FromHexChecked(
+                [MarshalAs(UnmanagedType.LPStr)] string hex,
+                out ElementModPHandle handle);
+
+            [DllImport(DllName, EntryPoint = "eg_element_mod_p_from_hex_unchecked",
+                CallingConvention = CallingConvention.Cdecl, SetLastError = true)]
+            internal static extern Status FromHexUnchecked(
+                [MarshalAs(UnmanagedType.LPStr)] string hex,
+                out ElementModPHandle handle);
+
             [DllImport(DllName, EntryPoint = "eg_element_mod_p_to_bytes",
                 CallingConvention = CallingConvention.Cdecl, SetLastError = true)]
             internal static extern Status ToBytes(
@@ -213,9 +225,9 @@ namespace ElectionGuard
             internal static extern Status ToElementModP(
                 ElementModQHandle handle, out ElementModP.ElementModPHandle out_handle);
 
-            [DllImport(DllName, EntryPoint = "eg_element_mod_q_from_hex",
+            [DllImport(DllName, EntryPoint = "eg_element_mod_q_from_hex_checked",
                 CallingConvention = CallingConvention.Cdecl, SetLastError = true)]
-            internal static extern Status FromHex(
+            internal static extern Status FromHexChecked(
                 [MarshalAs(UnmanagedType.LPStr)] string hex,
                 out ElementModQHandle handle);
 

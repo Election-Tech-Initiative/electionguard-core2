@@ -20,12 +20,12 @@ public partial class Guardian
         //     throw new InvalidOperationException("All election partial key backups must be verified before decrypting.");
         // }
 
-        if (_partialElectionSecretKey is null)
+        if (_myPartialSecretKey is null)
         {
             _ = CombinePrivateKeyShares();
         }
 
-        return ciphertext.PartialDecrypt(_partialElectionSecretKey);
+        return ciphertext.PartialDecrypt(_myPartialSecretKey);
     }
 
     public ElementModP PartialDecrypt(HashedElGamalCiphertext ciphertext)
@@ -41,24 +41,24 @@ public partial class Guardian
         //     throw new InvalidOperationException("All election partial key backups must be verified before decrypting.");
         // }
 
-        if (_partialElectionSecretKey is null)
+        if (_myPartialSecretKey is null)
         {
             _ = CombinePrivateKeyShares();
         }
 
-        return ciphertext.PartialDecrypt(_partialElectionSecretKey);
+        return ciphertext.PartialDecrypt(_myPartialSecretKey);
     }
 
     // P(i) = ∑ P_j(i) = (P1(i)+P2(i)+···+Pn(i)) mod q.
     private ElementModQ CombinePrivateKeyShares()
     {
         var partialSecretKey = Constants.ZERO_MOD_Q;
-        foreach (var item in _otherGuardianPartialKeyBackups!.Values)
+        foreach (var item in _partialKeyBackups!.Values)
         {
             var decryptedKey = DecryptBackup(item);
             partialSecretKey = BigMath.AddModQ(decryptedKey, partialSecretKey);
         }
-        return _partialElectionSecretKey = partialSecretKey;
+        return _myPartialSecretKey = partialSecretKey;
     }
 
     /// <summary>
@@ -68,7 +68,7 @@ public partial class Guardian
     /// <returns>coordinatedata of the decryption and its proof</returns>
     private ElementModQ? DecryptBackup(ElectionPartialKeyBackup backup)
     {
-        return DecryptBackup(backup, _electionKeys);
+        return DecryptBackup(backup, _myElectionKeys);
     }
 
     /// <summary>
@@ -77,14 +77,15 @@ public partial class Guardian
     /// <param name="guardianBackup">Missing guardian's backup</param>
     /// <param name="keyPair">The present guardian's key pair that will be used to decrypt the backup</param>
     /// <returns>coordinatedata of the decryption and its proof</returns>
-    private static ElementModQ? DecryptBackup(ElectionPartialKeyBackup guardianBackup, ElectionKeyPair keyPair)
+    private static ElementModQ? DecryptBackup(
+        ElectionPartialKeyBackup guardianBackup, ElectionKeyPair keyPair)
     {
         var encryptionSeed = GetBackupSeed(
             keyPair.OwnerId,
             keyPair.SequenceOrder
         );
 
-        var bytesOptional = guardianBackup.EncryptedCoordinate?.Decrypt(
+        var bytesOptional = guardianBackup.EncryptedCoordinate.Decrypt(
             keyPair.KeyPair.SecretKey, encryptionSeed, false);
 
         if (bytesOptional is null)

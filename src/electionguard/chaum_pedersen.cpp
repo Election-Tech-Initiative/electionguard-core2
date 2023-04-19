@@ -14,6 +14,7 @@ using electionguard::ONE_MOD_Q;
 using std::invalid_argument;
 using std::make_unique;
 using std::map;
+using std::move;
 using std::string;
 using std::unique_ptr;
 
