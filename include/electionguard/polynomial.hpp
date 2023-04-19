@@ -1,7 +1,6 @@
 #ifndef __ELECTIONGUARD_CPP_POLYNOMIAL_HPP_INCLUDED__
 #define __ELECTIONGUARD_CPP_POLYNOMIAL_HPP_INCLUDED__
 
-#include "../../src/electionguard/log.hpp" // testing
 #include "export.h"
 #include "group.hpp"
 

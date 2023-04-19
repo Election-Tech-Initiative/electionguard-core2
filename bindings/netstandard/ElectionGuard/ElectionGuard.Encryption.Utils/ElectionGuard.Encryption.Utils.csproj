@@ -11,7 +11,6 @@
     <ProjectReference Include="..\ElectionGuard.Encryption\ElectionGuard.Encryption.csproj" />
   </ItemGroup>
   <PropertyGroup Label="Library Paths">
-    <ElectionGuardData>..\..\..\..\data</ElectionGuardData>
     <ElectionGuardLibs>..\..\..\..\build\libs</ElectionGuardLibs>
   </PropertyGroup>
   <PropertyGroup Label="Debug|arm64" Condition=" '$(Configuration)|$(Platform)' == 'Debug|arm64' ">
@@ -119,9 +118,6 @@
     <NoStdLib>false</NoStdLib>
   </PropertyGroup>
   <ItemGroup>
-    <Content Include="$(ElectionGuardData)\**" LinkBase="data">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>  
   </ItemGroup>
   <ItemGroup Label="C++ Built Libraries">
     <None Name="Windows (MSVC)" Visible="false" Include="$(ElectionGuardLibs)\Windows\$(PlatformTarget)\$(Configuration)\src\$(Configuration)\*.dll*">
@@ -140,8 +136,5 @@
     <None Name="MacOS HACL" Visible="false" Include="$(ElectionGuardLibs)\Darwin\$(PlatformTarget)\$(Configuration)\libs\hacl\*.dylib" CopyToOutputDirectory="Always" />
     <None Name="Linux" Visible="false" Include="$(ElectionGuardLibs)\Linux\$(PlatformTarget)\$(Configuration)\src\*.so" CopyToOutputDirectory="Always" />
     <None Name="Linux HACL" Visible="false" Include="$(ElectionGuardLibs)\Linux\$(PlatformTarget)\$(Configuration)\libs\hacl\*.so" CopyToOutputDirectory="Always" />
-  </ItemGroup>
-  <ItemGroup>
-    <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
   </ItemGroup>
 </Project>

@@ -25,6 +25,11 @@ namespace ElectionGuard
             set => NewNative(value);
         }
 
+        /// <summary>
+        /// Determines if the element is valid and has not been cleaned up
+        /// </summary>
+        public bool IsAddressable => Handle != null && !Handle.IsInvalid && !IsDisposed;
+
         internal NaiveElementModP Handle;
 
         /// <summary>
@@ -95,6 +100,23 @@ namespace ElectionGuard
             status.ThrowIfError();
         }
 
+        /// <summary>
+        /// Create a copy of an existing `ElementModP`
+        /// </summary>
+        /// <param name="src">Existing `ElementModP` to copy</param>
+        public ElementModP(ElementModP src)
+        {
+            try
+            {
+                NewNative(src.Data);
+            }
+            catch (Exception ex)
+            {
+                throw new ElectionGuardException("construction error", ex);
+            }
+        }
+
+
         internal ElementModP(NaiveElementModP handle)
         {
             Handle = handle;
@@ -110,7 +132,12 @@ namespace ElectionGuard
         {
             base.DisposeUnmanaged();
 
-            if (Handle == null || Handle.IsInvalid) return;
+            if (Handle == null || Handle.IsInvalid)
+            {
+                Handle = null;
+                return;
+            }
+
             Handle.Dispose();
             Handle = null;
         }
@@ -125,6 +152,14 @@ namespace ElectionGuard
         /// </Summary>
         public string ToHex()
         {
+            if (IsDisposed)
+            {
+                throw new ObjectDisposedException(nameof(ElementModP));
+            }
+            if (Handle == null || Handle.IsInvalid)
+            {
+                throw new ElectionGuardException("Handle is null or invalid");
+            }
             var status = NativeInterface.ElementModP.ToHex(Handle, out var pointer);
             if (status != Status.ELECTIONGUARD_STATUS_SUCCESS)
             {

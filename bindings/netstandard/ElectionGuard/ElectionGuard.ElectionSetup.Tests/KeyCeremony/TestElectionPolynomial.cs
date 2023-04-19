@@ -1,4 +1,4 @@
-namespace ElectionGuard.ElectionSetup.Tests.KeyCeremony;
+﻿namespace ElectionGuard.ElectionSetup.Tests.KeyCeremony;
 
 public class TestElectionPolynomial
 {
@@ -37,11 +37,11 @@ public class TestElectionPolynomial
     {
         // Arrange
         var degrees = 3;
-        var secretKey = BigMath.RandQ();
-        var keyPair = new ElGamalKeyPair(secretKey);
+        using var secretKey = BigMath.RandQ();
+        using var keyPair = new ElGamalKeyPair(secretKey);
 
         // Act
-        var result = new ElectionPolynomial(degrees, keyPair);
+        using var result = new ElectionPolynomial(degrees, keyPair);
 
         // Assert
         Assert.That(result, Is.Not.Null);

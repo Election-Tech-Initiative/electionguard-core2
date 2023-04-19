@@ -1,6 +1,7 @@
 using System.Text;
 using ElectionGuard.Decryption.Decryption;
 using ElectionGuard.ElectionSetup;
+using ElectionGuard.ElectionSetup.Extensions;
 
 namespace ElectionGuard.Decryption.Tally;
 
@@ -108,6 +109,13 @@ public record PlaintextTally : DisposableRecordBase, IEquatable<PlaintextTally>
                 contestDescription.ObjectId,
                 new PlaintextTallyContest(contestDescription));
         }
+    }
+
+    protected override void DisposeUnmanaged()
+    {
+        base.DisposeUnmanaged();
+
+        Contests?.Dispose();
     }
 
     public static implicit operator string(PlaintextTally self)

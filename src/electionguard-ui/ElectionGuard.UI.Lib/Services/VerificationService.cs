@@ -3,10 +3,17 @@ using MongoDB.Driver;
 
 namespace ElectionGuard.UI.Lib.Services;
 
+public interface IVerificationService : IDatabaseService<ElectionPartialKeyVerification>
+{
+    Task<long> CountAsync(string keyCeremonyId, string guardianId);
+    Task<long> CountAsync(string keyCeremonyId);
+    Task<List<ElectionPartialKeyVerification>?> GetAllByKeyCeremonyIdAsync(string keyCeremonyId);
+}
+
 /// <summary>
 /// Data Service for backup verifications
 /// </summary>
-public class VerificationService : BaseDatabaseService<ElectionPartialKeyVerification>
+public class VerificationService : BaseDatabaseService<ElectionPartialKeyVerification>, IVerificationService
 {
     /// <summary>
     /// The collection name to use to get/save data into

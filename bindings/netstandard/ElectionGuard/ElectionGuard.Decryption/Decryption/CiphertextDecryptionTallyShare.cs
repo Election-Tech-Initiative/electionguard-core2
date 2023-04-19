@@ -22,7 +22,16 @@ public record CiphertextDecryptionTallyShare : DisposableRecordBase, IEquatable<
     {
         GuardianId = guardianId;
         TallyId = tallyId;
-        Contests = contests;
+        Contests = contests.Select(
+            x => new KeyValuePair<string, CiphertextDecryptionContestShare>(x.Key, new(x.Value))).ToDictionary(x => x.Key, x => x.Value);
+    }
+
+    public CiphertextDecryptionTallyShare(CiphertextDecryptionTallyShare other) : base(other)
+    {
+        GuardianId = other.GuardianId;
+        TallyId = other.TallyId;
+        Contests = other.Contests.Select(
+            x => new KeyValuePair<string, CiphertextDecryptionContestShare>(x.Key, new(x.Value))).ToDictionary(x => x.Key, x => x.Value);
     }
 
     public virtual bool IsValid(
@@ -71,5 +80,18 @@ public record CiphertextDecryptionTallyShare : DisposableRecordBase, IEquatable<
         return guardianId != GuardianId
             ? throw new ArgumentException($"GuardianId {guardianId} does not match {GuardianId}")
             : Contests[contestId].Selections[selectionId];
+    }
+
+    protected override void DisposeUnmanaged()
+    {
+        base.DisposeUnmanaged();
+        if (Contests is not null)
+        {
+            foreach (var contest in Contests)
+            {
+                contest.Value.Dispose();
+            }
+            Contests.Clear();
+        }
     }
 }

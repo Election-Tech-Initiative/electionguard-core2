@@ -21,7 +21,14 @@ public record CiphertextDecryptionBallotShare : CiphertextDecryptionTallyShare, 
     {
         BallotId = ballot.ObjectId;
         StyleId = ballot.StyleId;
-        ManifestHash = ballot.ManifestHash;
+        ManifestHash = new(ballot.ManifestHash);
+    }
+
+    public CiphertextDecryptionBallotShare(CiphertextDecryptionBallotShare other) : base(other)
+    {
+        BallotId = other.BallotId;
+        StyleId = other.StyleId;
+        ManifestHash = new(other.ManifestHash);
     }
 
     /// <summary>

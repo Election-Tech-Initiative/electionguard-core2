@@ -22,6 +22,11 @@ namespace ElectionGuard
             set => NewNative(value);
         }
 
+        /// <summary>
+        /// Determines if the element is valid and has not been cleaned up
+        /// </summary>
+        public bool IsAddressable => Handle != null && !Handle.IsInvalid && !IsDisposed;
+
         internal NativeInterface.ElementModQ.ElementModQHandle Handle;
 
         /// <summary>

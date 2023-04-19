@@ -1,3 +1,4 @@
+using ElectionGuard.ElectionSetup.Extensions;
 using ElectionGuard.Encryption.Ballot;
 
 namespace ElectionGuard.Decryption.Tally;
@@ -52,6 +53,14 @@ public class CiphertextTallyContest : DisposableBase, IElectionContest, IEquatab
         SequenceOrder = contestDescription.SequenceOrder;
         DescriptionHash = contestDescription.CryptoHash();
         Selections = contestDescription.ToCiphertextTallySelectionDictionary();
+    }
+
+    public CiphertextTallyContest(CiphertextTallyContest other)
+    {
+        ObjectId = other.ObjectId;
+        SequenceOrder = other.SequenceOrder;
+        DescriptionHash = new(other.DescriptionHash);
+        Selections = other.Selections.Select(x => new CiphertextTallySelection(x.Value)).ToDictionary(x => x.ObjectId);
     }
 
     /// <summary>
@@ -132,6 +141,14 @@ public class CiphertextTallyContest : DisposableBase, IElectionContest, IEquatab
         {
             await AccumulateAsync(contest, cancellationToken);
         }
+    }
+
+    protected override void DisposeUnmanaged()
+    {
+        base.DisposeUnmanaged();
+        Selections?.Dispose();
+        Selections?.Clear();
+        DescriptionHash?.Dispose();
     }
 
     #region IEquatable

@@ -11,21 +11,21 @@ public class TestDecryptWithSecret : DisposableBase
     public void Test_Decrypt_Spoiled_Ballot_With_Nonce()
     {
         // Arrange
-        var seed = Constants.ONE_MOD_Q;
-        var nonce = Constants.ONE_MOD_Q;
-        var manifest = ManifestGenerator.GetFakeManifest();
-        var data = ElectionGenerator.GenerateFakeElectionData(1, 1, manifest);
+        using var seed = Constants.ONE_MOD_Q;
+        using var nonce = Constants.ONE_MOD_Q;
+        using var manifest = ManifestGenerator.GetFakeManifest();
+        using var data = ElectionGenerator.GenerateFakeElectionData(1, 1, manifest);
 
-        var ballot = BallotGenerator.GetFakeBallot(data.InternalManifest);
+        using var ballot = BallotGenerator.GetFakeBallot(data.InternalManifest);
 
         // Act
-        var ciphertext = Encrypt.Ballot(
+        using var ciphertext = Encrypt.Ballot(
             ballot, data.InternalManifest, data.Context, seed, nonce);
-        var ballotNonce = new ElementModQ(ciphertext.Nonce);
+        using var ballotNonce = new ElementModQ(ciphertext.Nonce);
         ciphertext.Spoil();
 
         var result = ciphertext.IsValid(data.InternalManifest);
-        var decrypted = ciphertext.Decrypt(
+        using var decrypted = ciphertext.Decrypt(
             data.InternalManifest, data.Context, ballotNonce);
 
         // Assert

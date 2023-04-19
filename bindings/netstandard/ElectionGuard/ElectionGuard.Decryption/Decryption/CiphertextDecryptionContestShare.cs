@@ -45,8 +45,10 @@ public record CiphertextDecryptionContestShare
     {
         ObjectId = contest.ObjectId;
         SequenceOrder = contest.SequenceOrder;
-        DescriptionHash = contest.DescriptionHash;
-        Selections = selections;
+        DescriptionHash = new(contest.DescriptionHash);
+        Selections = selections.Select(
+            x => new CiphertextDecryptionSelectionShare(x.Value))
+            .ToDictionary(x => x.ObjectId);
     }
 
     public CiphertextDecryptionContestShare(
@@ -57,10 +59,24 @@ public record CiphertextDecryptionContestShare
     {
         ObjectId = contest.ObjectId;
         SequenceOrder = contest.SequenceOrder;
-        DescriptionHash = contest.DescriptionHash;
-        ExtendedData = extendedData;
-        Commitment = commitment;
-        Selections = selections;
+        DescriptionHash = new(contest.DescriptionHash);
+        ExtendedData = new(extendedData);
+        Commitment = commitment != null ? new(commitment) : null;
+        Selections = selections.Select(
+            x => new CiphertextDecryptionSelectionShare(x.Value))
+            .ToDictionary(x => x.ObjectId);
+    }
+
+    public CiphertextDecryptionContestShare(CiphertextDecryptionContestShare other) : base(other)
+    {
+        ObjectId = other.ObjectId;
+        SequenceOrder = other.SequenceOrder;
+        DescriptionHash = new(other.DescriptionHash);
+        ExtendedData = other.ExtendedData != null ? new(other.ExtendedData) : null;
+        Commitment = other.Commitment != null ? new(other.Commitment) : null;
+        Selections = other.Selections.Select(
+            x => new CiphertextDecryptionSelectionShare(x.Value))
+            .ToDictionary(x => x.ObjectId);
     }
 
     /// <summary>
@@ -123,5 +139,21 @@ public record CiphertextDecryptionContestShare
             }
         }
         return true;
+    }
+
+    protected override void DisposeUnmanaged()
+    {
+        base.DisposeUnmanaged();
+        ExtendedData?.Dispose();
+        Commitment?.Dispose();
+        DescriptionHash.Dispose();
+        if (Selections != null)
+        {
+            foreach (var selection in Selections.Values)
+            {
+                selection.Dispose();
+            }
+            Selections.Clear();
+        }
     }
 }

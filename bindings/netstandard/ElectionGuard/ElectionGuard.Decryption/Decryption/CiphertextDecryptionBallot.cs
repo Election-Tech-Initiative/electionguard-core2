@@ -1,4 +1,5 @@
 using ElectionGuard.ElectionSetup;
+using ElectionGuard.ElectionSetup.Extensions;
 using ElectionGuard.UI.Lib.Models;
 
 namespace ElectionGuard.Decryption.Decryption;
@@ -36,7 +37,7 @@ public record class CiphertextDecryptionBallot : DisposableRecordBase, IEquatabl
     {
         BallotId = ballotId;
         StyleId = styleId;
-        ManifestHash = manifestHash;
+        ManifestHash = new(manifestHash);
     }
 
     /// <summary>
@@ -48,7 +49,7 @@ public record class CiphertextDecryptionBallot : DisposableRecordBase, IEquatabl
     {
         BallotId = share.BallotId;
         StyleId = share.StyleId;
-        ManifestHash = share.ManifestHash;
+        ManifestHash = new(share.ManifestHash);
         AddShare(share, guardianPublicKey);
     }
 
@@ -61,9 +62,9 @@ public record class CiphertextDecryptionBallot : DisposableRecordBase, IEquatabl
     {
         BallotId = shares.First().Value.BallotId;
         StyleId = shares.First().Value.StyleId;
-        ManifestHash = shares.First().Value.ManifestHash;
-        Shares = shares;
-        GuardianPublicKeys = guardianPublicKeys;
+        ManifestHash = new(shares.First().Value.ManifestHash);
+        Shares = shares.Select(x => new KeyValuePair<string, CiphertextDecryptionBallotShare>(x.Key, new(x.Value))).ToDictionary(x => x.Key, x => x.Value);
+        GuardianPublicKeys = guardianPublicKeys.Select(x => new KeyValuePair<string, ElectionPublicKey>(x.Key, new(x.Value))).ToDictionary(x => x.Key, x => x.Value);
     }
 
     /// <summary>
@@ -162,6 +163,17 @@ public record class CiphertextDecryptionBallot : DisposableRecordBase, IEquatabl
         }
 
         return true;
+    }
+
+    protected override void DisposeUnmanaged()
+    {
+        base.DisposeUnmanaged();
+        ManifestHash.Dispose();
+        GuardianPublicKeys.Dispose();
+        foreach (var share in Shares)
+        {
+            share.Value.Dispose();
+        }
     }
 
     private void AddShare(CiphertextDecryptionBallotShare share)
