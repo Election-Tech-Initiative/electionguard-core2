@@ -798,11 +798,12 @@ public class KeyCeremonyMediator
             guardian!.SaveGuardianKey(publicKey.PublicKey!);
         }
         List<ElectionPartialKeyVerification> verifications = new();
+        // TODO: ISSUE #213 throw on invalid backup
         foreach (var backup in backups!)
         {
             guardian!.SaveElectionPartialKeyBackup(backup.Backup!);
             var verification = guardian.VerifyElectionPartialKeyBackup(backup.GuardianId!, keyCeremonyId);
-            if (verification == null || !verification.Verified)
+            if (verification == null)
             {
                 throw new KeyCeremonyException(
                     keyCeremony!.State,
