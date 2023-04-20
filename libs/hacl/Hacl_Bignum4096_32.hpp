@@ -18,6 +18,9 @@ namespace hacl
         explicit Bignum4096_32(uint32_t *elem);
         ~Bignum4096_32();
 
+        // size of a 4096-bit bignum, i.e. uint32_t[128].
+        static constexpr size_t size = 128;
+
         /**
         Write `a + b mod 2^256` in `res`.
 
