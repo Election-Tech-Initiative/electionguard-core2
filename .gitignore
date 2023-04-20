@@ -167,3 +167,7 @@ dist/
 bindings/typescript/src/wasm/electionguard.wasm.js
 
 .npmrc
+
+bindings/typescript/src/wasm/electionguard.wasm.wasm
+
+apps/angular-demo/.vscode/

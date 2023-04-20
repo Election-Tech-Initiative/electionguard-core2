@@ -231,6 +231,7 @@ build-wasm:
 ifeq ($(OPERATING_SYSTEM),Windows)
 	echo "wasm builds are only supported on MacOS and Linux"
 else
+	# HACK temparily disable 64-bit math for emscripten
 	cmake -S . -B $(ELECTIONGUARD_BUILD_LIBS_DIR)/wasm/$(TARGET) \
 		-DCMAKE_BUILD_TYPE=$(TARGET) \
 		-DUSE_32BIT_MATH=ON \

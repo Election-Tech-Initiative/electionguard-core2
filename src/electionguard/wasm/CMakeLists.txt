@@ -35,7 +35,6 @@ if(EMSCRIPTEN)
             "--no-entry"
             "-lembind"
         )
-
     else()
         # prod configuration
         message("++ Compiling WASM in RELEASE mode")
@@ -45,8 +44,6 @@ if(EMSCRIPTEN)
             "-s ALLOW_MEMORY_GROWTH=1"
             "-s MODULARIZE=1"
             "-s EXPORT_NAME=Electionguard"
-
-            # "-s SINGLE_FILE=1"
             "-s WASM_BIGINT=1"
             "-s ERROR_ON_UNDEFINED_SYMBOLS=0"
             "-s WARN_ON_UNDEFINED_SYMBOLS=1"
