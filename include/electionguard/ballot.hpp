@@ -20,13 +20,29 @@ namespace electionguard
     /// </summary>
     enum class BallotBoxState {
         /// <summary>
+        /// A ballot whose state is unknown to ElectionGuard
+        /// and will not be included in any election results
+        /// </summary>
+        notset = 0,
+        /// <summary>
         /// A ballot that has been explicitly cast
         /// </summary>
         cast = 1,
         /// <summary>
-        /// A ballot that has been explicitly spoiled
+        /// A ballot that never included in the tally BUT included in election record
+        /// - contents always decrypted and stored in plain text
+        /// - always included in the verification site
+        /// - used to be called spoiled
         /// </summary>
-        spoiled = 2,
+        challenged = 2,
+        /// <summary>
+        /// A ballot that never included in the tally
+        /// - included in election record for verification
+        /// - contents never decrypted
+        /// - never included in the verification site
+        /// - slightly new meaning of what spoiled is
+        /// </summary>
+        spoiled = 3,
         /// <summary>
         /// A ballot whose state is unknown to ElectionGuard
         /// and will not be included in any election results
@@ -784,6 +800,11 @@ namespace electionguard
         /// A helper function to mark the ballot as spoiled and remove sensitive values like the nonce.
         /// </summary>
         void spoil() const;
+
+        /// <summary>
+        /// A helper function to mark the ballot as challenged and remove sensitive values like the nonce.
+        /// </summary>
+        void challenge() const;
 
         /// <summary>
         /// Export the ballot representation as BSON

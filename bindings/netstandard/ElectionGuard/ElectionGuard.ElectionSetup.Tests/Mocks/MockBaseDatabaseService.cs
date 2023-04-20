@@ -1,3 +1,4 @@
+using System.Collections.Concurrent;
 using ElectionGuard.UI.Lib.Models;
 using ElectionGuard.UI.Lib.Services;
 using MongoDB.Driver;
@@ -6,7 +7,7 @@ namespace ElectionGuard.ElectionSetup.Tests.Mocks;
 
 public abstract class MockBaseDatabaseServiceBase<T> : DisposableBase, IDatabaseService<T> where T : DatabaseRecord
 {
-    protected readonly Dictionary<string, T> Collection = new();
+    protected readonly ConcurrentDictionary<string, T> Collection = new();
 
     public Task<long> CountByFilterAsync(FilterDefinition<T> filter, string? table = null)
     {

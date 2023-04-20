@@ -135,6 +135,21 @@ public record class CiphertextDecryptionBallot : DisposableRecordBase, IEquatabl
     /// <summary>
     /// check if this class is valid for the ballot. Used when computing decryption.
     /// </summary>
+    public bool IsValid(CiphertextBallot ballot, CiphertextElectionContext context)
+    {
+        var sharesCount = (ulong)Shares.Count;
+        if (sharesCount < context.Quorum || sharesCount > context.NumberOfGuardians)
+        {
+            return false;
+        }
+        return IsValid(ballot, context.CryptoExtendedBaseHash);
+    }
+
+    /// <summary>
+    /// check if this class is valid for the ballot.
+    /// Compares the ballot id, style id, and manifest hash.
+    /// Checks each of the shares in the collection against the guardian public keys.
+    /// </summary>
     public bool IsValid(
         CiphertextBallot ballot,
         ElementModQ extendedBaseHash)

@@ -8,7 +8,7 @@ namespace ElectionGuard.Decryption.Tests.Decryption;
 public class TestDecryptWithSecret : DisposableBase
 {
     [Test]
-    public void Test_Decrypt_Spoiled_Ballot_With_Nonce()
+    public void Test_Decrypt_Challenged_Ballot_With_Nonce()
     {
         // Arrange
         using var seed = Constants.ONE_MOD_Q;
@@ -22,7 +22,7 @@ public class TestDecryptWithSecret : DisposableBase
         using var ciphertext = Encrypt.Ballot(
             ballot, data.InternalManifest, data.Context, seed, nonce);
         using var ballotNonce = new ElementModQ(ciphertext.Nonce);
-        ciphertext.Spoil();
+        ciphertext.Challenge();
 
         var result = ciphertext.IsValid(data.InternalManifest);
         using var decrypted = ciphertext.Decrypt(

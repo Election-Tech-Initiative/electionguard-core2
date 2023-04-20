@@ -131,11 +131,30 @@ public static class DecryptWithSharesExtensions
         {
             var plaintextBallot = ballot.Decrypt(
                 ballotShares[ballotId], lagrangeCoefficients,
-                tally.TallyId, tally.Context.CryptoExtendedBaseHash, skipValidation);
+                tally,
+                skipValidation);
             plaintextBallots.Add(plaintextBallot);
         }
 
         return plaintextBallots;
+    }
+
+    /// <summary>
+    /// Decrypt a single ballot using the provided ballot shares
+    /// </summary>
+    public static PlaintextTallyBallot Decrypt(
+        this CiphertextBallot self,
+        CiphertextDecryptionBallot ballotShares,
+        Dictionary<string, ElementModQ> lagrangeCoefficients,
+        CiphertextTally tally,
+        bool skipValidation = false)
+    {
+        return self.Decrypt(
+            ballotShares.GetShares(),
+            lagrangeCoefficients,
+            tally.TallyId,
+            tally.Context.CryptoExtendedBaseHash,
+            skipValidation);
     }
 
     /// <summary>
@@ -150,7 +169,11 @@ public static class DecryptWithSharesExtensions
         bool skipValidation = false)
     {
         return self.Decrypt(
-            ballotShares.GetShares(), lagrangeCoefficients, tallyId, extendedBaseHash, skipValidation);
+            ballotShares.GetShares(),
+            lagrangeCoefficients,
+            tallyId,
+            extendedBaseHash,
+            skipValidation);
     }
 
     /// <summary>
@@ -281,7 +304,6 @@ public static class DecryptWithSharesExtensions
 
         // 𝑀𝑏𝑎𝑟 = 𝑀𝑏𝑎𝑟 * (𝑀𝑖 ^ 𝑤𝑖) mod p
         decryption.Accumulate(guardianShares, lagrangeCoefficients, skipValidation);
-        Console.WriteLine($"Decryption: {decryption.Value}");
 
         // Calculate 𝑀=𝐵⁄(∏𝑀𝑖) mod 𝑝.
         var tally = self.Ciphertext.Decrypt(decryption.Value);

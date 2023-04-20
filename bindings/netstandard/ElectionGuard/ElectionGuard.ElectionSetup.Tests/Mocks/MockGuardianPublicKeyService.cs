@@ -28,38 +28,38 @@ public class MockGuardianPublicKeyService : MockBaseDatabaseServiceBase<Guardian
         return Task.FromResult(record);
     }
 
-    public async Task UpdatePublicKeyAsync(string keyCeremonyId, string guardianId, ElectionPublicKey? key)
+    public async Task UpdatePublicKeyAsync(
+        string keyCeremonyId, string guardianId, ElectionPublicKey? key)
     {
         using (await _lock.LockAsync())
         {
             var record = Collection.Values.FirstOrDefault(
-                x => x.KeyCeremonyId == keyCeremonyId
-                && x.GuardianId == guardianId);
-            if (record != null)
+                    x => x.KeyCeremonyId!.Equals(keyCeremonyId)
+                    && x.GuardianId!.Equals(guardianId));
+            if (record == null)
             {
-                Console.WriteLine(
-                    $"UpdatePublicKeyAsync update existing {keyCeremonyId} {guardianId}");
-                record.PublicKey = key != null ? new(key) : null;
-                Collection[record.Id] = record;
-            }
-            else
-            {
-                Console.WriteLine(
-                    $"UpdatePublicKeyAsync create new {keyCeremonyId} {guardianId}");
-                var newRecord = new GuardianPublicKey
-                {
-                    KeyCeremonyId = keyCeremonyId,
-                    GuardianId = guardianId,
-                    PublicKey = key != null ? new(key) : null
-                };
-                Collection[newRecord.Id] = newRecord;
+                throw new Exception($"Record not found {keyCeremonyId} {guardianId}");
             }
 
+            Console.WriteLine(
+                $"UpdatePublicKeyAsync update existing {keyCeremonyId} {guardianId}");
+            record!.PublicKey = key != null ? new(key) : null;
+            Collection[record.Id] = record;
         }
     }
 
-    public override Task<GuardianPublicKey> SaveAsync(GuardianPublicKey data, string? table = null)
+    public override async Task<GuardianPublicKey> SaveAsync(
+        GuardianPublicKey data, string? table = null)
     {
-        throw new NotImplementedException();
+        using (await _lock.LockAsync())
+        {
+            Console.WriteLine(
+                        $"SaveAsync create new {data.KeyCeremonyId} {data.GuardianId}");
+            data.Id ??= Guid.NewGuid().ToString();
+            Collection[data.Id] = data;
+
+            return data;
+        }
     }
 }
+

@@ -1,5 +1,4 @@
-﻿using ElectionGuard.UI.Lib.Models;
-using Newtonsoft.Json;
+using ElectionGuard.UI.Lib.Models;
 
 namespace ElectionGuard.ElectionSetup;
 
@@ -40,8 +39,8 @@ public class ElectionKeyPair : DisposableBase
     {
         OwnerId = ownerId;
         SequenceOrder = sequenceOrder;
-        var randQ = BigMath.RandQ();
-        KeyPair = ElGamalKeyPair.FromSecret(randQ);
+        using var randQ = BigMath.RandQ();
+        KeyPair = new(randQ);
         Polynomial = new ElectionPolynomial(quorum, KeyPair);
     }
 
@@ -59,7 +58,7 @@ public class ElectionKeyPair : DisposableBase
         OwnerId = ownerId;
         SequenceOrder = sequenceOrder;
         KeyPair = new(keyPair);
-        Polynomial = new ElectionPolynomial(quorum, keyPair);
+        Polynomial = new(quorum, keyPair);
     }
 
     public ElectionKeyPair(
@@ -72,7 +71,7 @@ public class ElectionKeyPair : DisposableBase
         OwnerId = ownerId;
         SequenceOrder = sequenceOrder;
         KeyPair = new(keyPair);
-        Polynomial = new ElectionPolynomial(quorum, keyPair, random);
+        Polynomial = new(quorum, keyPair, random);
     }
 
     /// <summary>
@@ -92,14 +91,14 @@ public class ElectionKeyPair : DisposableBase
 
         // set the secret key to the zero-index coefficient
         var ai_0 = polynomial.Coefficients[0].Value;
-        KeyPair = ElGamalKeyPair.FromSecret(ai_0);
+        KeyPair = new(ai_0);
     }
 
     /// <summary>
     /// Construct an Election Key Pair using the provided key pair and polynomial.
     /// This override is used when the guardain generates the polynomial and keypair externally.
     /// </summary>
-    [JsonConstructor]
+    [Newtonsoft.Json.JsonConstructor]
     public ElectionKeyPair(
         string ownerId,
         ulong sequenceOrder,
@@ -129,7 +128,7 @@ public class ElectionKeyPair : DisposableBase
         return new(
             OwnerId,
             SequenceOrder,
-            new(KeyPair.PublicKey),
+            KeyPair.PublicKey,
             Polynomial.Commitments,
             Polynomial.Proofs
         );

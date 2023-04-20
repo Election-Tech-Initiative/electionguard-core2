@@ -19,9 +19,12 @@ public record class CiphertextDecryptionTally : DisposableRecordBase
     private readonly Dictionary<string, ElectionPublicKey> _guardians = new();
 
     // ballots which will be individually decrypted.
-    // spoiled ballots in most cases but sometimes individual ballots from the record can be decrypted
+    // challenged ballots in most cases but sometimes individual ballots from the record can be decrypted
     // key is ballotid
-    private readonly Dictionary<string, CiphertextBallot> _ballots = new();
+    private readonly Dictionary<string, CiphertextBallot> _challengedBallots = new();
+
+    // ballots that will not be decrypted
+    private readonly Dictionary<string, CiphertextBallot> _spoiledBallots = new();
 
     // key is guardianid
     private readonly Dictionary<string, CiphertextDecryptionTallyShare> _tallyShares = new();
@@ -52,6 +55,65 @@ public record class CiphertextDecryptionTally : DisposableRecordBase
         }
     }
 
+    public void AddBallot(CiphertextBallot ballot)
+    {
+        if (ballot.IsChallenged)
+        {
+            AddChallengedBallot(ballot);
+        }
+        else
+        {
+            AddSpoiledBallot(ballot);
+        }
+    }
+
+    /// <summary>
+    /// add a ballot share to the decryption tally
+    /// </summary>
+    public void AddBallotShare(
+        ElectionPublicKey guardian,
+        CiphertextDecryptionBallotShare ballotShare,
+        CiphertextBallot ballot)
+    {
+        if (!_tally.HasBallot(ballot.ObjectId))
+        {
+            throw new ArgumentException("Tally does not contain ballot");
+        }
+
+        if (ballot.IsSpoiled)
+        {
+            throw new ArgumentException("Cannot decrypt spoiled ballot");
+        }
+
+        if (!ballotShare.IsValid(
+            ballot, guardian, _tally.Context.CryptoExtendedBaseHash))
+        {
+            throw new ArgumentException("Invalid ballot share");
+        }
+
+        AddGuardian(guardian);
+        AddChallengedBallot(ballot);
+        AddShare(ballotShare);
+    }
+
+    public void AddSpoiledBallot(CiphertextBallot ballot)
+    {
+        if (!_tally.HasBallot(ballot.ObjectId))
+        {
+            throw new ArgumentException("Tally does not contain ballot");
+        }
+
+        if (!ballot.IsSpoiled)
+        {
+            throw new ArgumentException("Cannot add unspoiled ballot");
+        }
+
+        if (!_spoiledBallots.ContainsKey(ballot.ObjectId))
+        {
+            _spoiledBallots.Add(ballot.ObjectId, ballot);
+        }
+    }
+
     /// <summary>
     /// add a tally share to the decryption tally
     /// </summary>
@@ -69,29 +131,6 @@ public record class CiphertextDecryptionTally : DisposableRecordBase
     }
 
     /// <summary>
-    /// add a ballot share to the decryption tally
-    /// </summary>
-    public void AddBallotShare(
-        ElectionPublicKey guardian,
-        CiphertextDecryptionBallotShare ballotShare,
-        CiphertextBallot ballot)
-    {
-        if (!_tally.HasBallot(ballot.ObjectId))
-        {
-            throw new ArgumentException("Tally does not contain ballot");
-        }
-
-        if (!ballotShare.IsValid(ballot, guardian, _tally.Context.CryptoExtendedBaseHash))
-        {
-            throw new ArgumentException("Invalid ballot share");
-        }
-
-        AddGuardian(guardian);
-        AddBallot(ballot);
-        AddShare(ballotShare);
-    }
-
-    /// <summary>
     /// determine if the tally can be decrypted
     /// </summary>
     public bool CanDecrypt(CiphertextTally tally)
@@ -102,7 +141,7 @@ public record class CiphertextDecryptionTally : DisposableRecordBase
             return false;
         }
 
-        // some guardian shares have not been submitted, or there are too many
+        // some guardian shares have not been submitted or there are too many
         if (_guardians.Count != _tallyShares.Count)
         {
             return false;
@@ -120,7 +159,15 @@ public record class CiphertextDecryptionTally : DisposableRecordBase
         // check that the ballot shares are valid
         foreach (var (ballotId, share) in _ballotShares)
         {
-            if (!share.IsValid(_ballots[ballotId], _tally.Context.CryptoExtendedBaseHash))
+            if (!_tally.ChallengedBallotIds.Contains(ballotId))
+            {
+                // tally doesnt include the ballot
+                return false;
+            }
+
+            var challengedBallot = _challengedBallots[ballotId];
+            if (!share.IsValid(
+                challengedBallot, _tally.Context))
             {
                 return false;
             }
@@ -132,9 +179,9 @@ public record class CiphertextDecryptionTally : DisposableRecordBase
     /// <summary>
     /// decrypt the tally.
     /// </summary>
-    public DecryptionResult Decrypt(CiphertextTally tally, bool skipValidation = false)
+    public DecryptionResult Decrypt(bool skipValidation = false)
     {
-        if (!skipValidation && !CanDecrypt(tally))
+        if (!skipValidation && !CanDecrypt(_tally))
         {
             return new DecryptionResult("Tally is not valid");
         }
@@ -142,35 +189,47 @@ public record class CiphertextDecryptionTally : DisposableRecordBase
         var guardianShares = GetGuardianShares();
         var lagrangeCoefficients = guardianShares.ComputeLagrangeCoefficients();
 
-        var plaintextTally = tally.Decrypt(
+        var plaintextTally = _tally.Decrypt(
             guardianShares, lagrangeCoefficients, skipValidation);
-        var plaintextBallots = _ballots.Decrypt(
-            _ballotShares, lagrangeCoefficients, tally, skipValidation);
+        var plaintextBallots = _challengedBallots.Decrypt(
+            _ballotShares, lagrangeCoefficients, _tally, skipValidation);
+        var spoiledBallots = _spoiledBallots.Values.ToList();
 
-        return new DecryptionResult(tally.TallyId, plaintextTally, plaintextBallots);
+        return new DecryptionResult(
+            _tally.TallyId, plaintextTally, plaintextBallots, spoiledBallots);
+    }
+
+    public DecryptionResult DecryptBallot(string ballotId, bool skipValidation = false)
+    {
+        var ballot = _challengedBallots[ballotId];
+        var ballotShares = _ballotShares[ballotId];
+        var guardianShares = GetGuardianShares();
+        var lagrangeCoefficients = guardianShares.ComputeLagrangeCoefficients();
+        return ballot.Decrypt(ballotShares, lagrangeCoefficients, _tally, skipValidation);
     }
 
     protected override void DisposeUnmanaged()
     {
         base.DisposeUnmanaged();
-        _tally.Dispose();
-        _guardians.Dispose();
-        _ballots.Dispose();
+        _tally?.Dispose();
+        _guardians?.Dispose();
+        _challengedBallots?.Dispose();
+        _spoiledBallots?.Dispose();
         foreach (var share in _tallyShares.Values)
         {
-            share.Dispose();
+            share?.Dispose();
         }
         foreach (var share in _ballotShares.Values)
         {
-            share.Dispose();
+            share?.Dispose();
         }
     }
 
-    private void AddBallot(CiphertextBallot ballot)
+    private void AddChallengedBallot(CiphertextBallot ballot)
     {
-        if (!_ballots.ContainsKey(ballot.ObjectId))
+        if (!_challengedBallots.ContainsKey(ballot.ObjectId))
         {
-            _ballots.Add(ballot.ObjectId, ballot);
+            _challengedBallots.Add(ballot.ObjectId, ballot);
         }
     }
 
@@ -215,18 +274,4 @@ public record class CiphertextDecryptionTally : DisposableRecordBase
         }
         return guardianShares;
     }
-
-
-    // public PlaintextBallot DecryptBallot(CiphertextBallot ballot, bool skipValidation = false)
-    // {
-    //     if (!skipValidation && !IsValid(ballot.Tally))
-    //     {
-    //         throw new ArgumentException("Tally is not valid");
-    //     }
-
-    //     var guardianShares = GetGuardianBallotShares(ballot.BallotId);
-
-    //     return ballot.Decrypt(guardianShares, ballot.Tally.Context.CryptoExtendedBaseHash, skipValidation);
-    // }
-
 }

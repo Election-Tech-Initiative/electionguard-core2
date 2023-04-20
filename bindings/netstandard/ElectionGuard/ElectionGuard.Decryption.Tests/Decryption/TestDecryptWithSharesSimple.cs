@@ -2,7 +2,6 @@
 using ElectionGuard.Encryption.Utils.Generators;
 using ElectionGuard.ElectionSetup.Tests.Generators;
 using ElectionGuard.Decryption.Decryption;
-using ElectionGuard.Decryption.Tally;
 using ElectionGuard.Decryption.Tests.Tally;
 
 namespace ElectionGuard.Decryption.Tests.Decryption;
@@ -12,6 +11,7 @@ namespace ElectionGuard.Decryption.Tests.Decryption;
 public class TestDecryptWithSharesSimple : DisposableBase
 {
     private const int BALLOT_COUNT_CAST = 2;
+    private const int BALLOT_COUNT_CHALLENGED = 1;
     private const int BALLOT_COUNT_SPOILED = 1;
     private const int NUMBER_OF_GUARDIANS = 3;
     private const int QUORUM = 2;
@@ -26,6 +26,7 @@ public class TestDecryptWithSharesSimple : DisposableBase
             QUORUM, runKeyCeremony: true),
             ManifestGenerator.GetFakeManifest(),
             BALLOT_COUNT_CAST,
+            BALLOT_COUNT_CHALLENGED,
             BALLOT_COUNT_SPOILED);
 
         var guardians = data.KeyCeremony.Guardians.ToList();
@@ -57,6 +58,7 @@ public class TestDecryptWithSharesSimple : DisposableBase
             QUORUM, runKeyCeremony: true),
             ManifestGenerator.GetFakeManifest(),
             BALLOT_COUNT_CAST,
+            BALLOT_COUNT_CHALLENGED,
             BALLOT_COUNT_SPOILED);
 
         var guardians = data.KeyCeremony.Guardians
@@ -91,33 +93,37 @@ public class TestDecryptWithSharesSimple : DisposableBase
             QUORUM, runKeyCeremony: true),
             ManifestGenerator.GetFakeManifest(),
             BALLOT_COUNT_CAST,
+            BALLOT_COUNT_CHALLENGED,
             BALLOT_COUNT_SPOILED);
 
         var guardians = data.KeyCeremony.Guardians
-                .ToList();
-        var spoiledBallots = data.CiphertextBallots.Where(i => i.IsSpoiled).ToList();
+            .ToList();
+        var challengedBallots = data.CiphertextBallots
+            .Where(i => i.IsChallenged).ToList();
         using var mediator = new DecryptionMediator(
             "fake-mediator",
             data.CiphertextTally,
             guardians.Select(i => i.SharePublicKey()).ToList());
 
-        var plaintextSpoiledBallots = data.PlaintextBallots
-            .Where(i => data.CiphertextTally.SpoiledBallotIds.Contains(i.ObjectId))
+        var plaintextChallengedBallots = data.PlaintextBallots
+            .Where(i => data.CiphertextTally.ChallengedBallotIds.Contains(i.ObjectId))
             .Select(i => i.ToTallyBallot(data.CiphertextTally)).ToList();
+
+        Console.WriteLine($"Challenged Ballots: {challengedBallots.Count}");
 
         // Act
         foreach (var guardian in guardians)
         {
             var shares = guardian.ComputeDecryptionShares(
-                data.CiphertextTally, spoiledBallots);
-            mediator.SubmitShares(shares, spoiledBallots);
+                data.CiphertextTally, challengedBallots);
+            mediator.SubmitShares(shares, challengedBallots);
         }
 
         var result = mediator.Decrypt(data.CiphertextTally.TallyId);
 
         // Assert
         Assert.That(result.Tally, Is.EqualTo(data.PlaintextTally));
-        Assert.That(result.SpoiledBallots!.Count, Is.EqualTo(plaintextSpoiledBallots.Count));
-        Assert.That(result.SpoiledBallots, Is.EqualTo(plaintextSpoiledBallots));
+        Assert.That(result.ChallengedBallots!.Count, Is.EqualTo(plaintextChallengedBallots.Count));
+        Assert.That(result.ChallengedBallots, Is.EqualTo(plaintextChallengedBallots));
     }
 }

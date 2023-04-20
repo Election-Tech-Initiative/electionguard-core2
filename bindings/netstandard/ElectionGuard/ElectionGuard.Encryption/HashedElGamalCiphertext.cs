@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Runtime.InteropServices;
 
 namespace ElectionGuard
@@ -124,7 +124,6 @@ namespace ElectionGuard
                 throw new ArgumentNullException(nameof(descriptionHash));
             }
 
-            Console.WriteLine($"HashedElGamalCiphertext Decrypting");
             var status = NativeInterface.HashedElGamalCiphertext.Decrypt(
                 Handle, secretKey.Handle, descriptionHash.Handle,
                 lookForPadding, out var data, out var size);

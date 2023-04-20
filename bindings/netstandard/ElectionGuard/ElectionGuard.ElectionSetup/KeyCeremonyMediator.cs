@@ -1,3 +1,4 @@
+using System.Diagnostics;
 using ElectionGuard.ElectionSetup.Exceptions;
 using ElectionGuard.ElectionSetup.Extensions;
 using ElectionGuard.UI.Lib.Extensions;
@@ -63,7 +64,7 @@ public class KeyCeremonyMediator
         UserId = userId;
         CeremonyDetails = keyCeremony;
         _keyCeremony = keyCeremony;
-        _service = keyCeremonyService;
+        _keyCeremonyService = keyCeremonyService;
         _backupService = backupService;
         _publicKeyService = publicKeyService;
         _verificationService = verificationService;
@@ -71,7 +72,7 @@ public class KeyCeremonyMediator
         CreateGuardianSteps();
     }
 
-    protected readonly IKeyCeremonyService _service;
+    protected readonly IKeyCeremonyService _keyCeremonyService;
     protected readonly IGuardianBackupService _backupService;
     protected readonly IGuardianPublicKeyService _publicKeyService;
     protected readonly IVerificationService _verificationService;
@@ -80,6 +81,8 @@ public class KeyCeremonyMediator
     private readonly List<KeyCeremonyStep> _guardianSteps = new();
 
     // HACK: This only works as a mutex because we are using 5s long polling.
+    // TODO: figure out a more graceful way to support long polling 
+    // without multiple steps running at once.
     private static bool IsRunning = false;
 
     public string UserId { get; }
@@ -519,7 +522,7 @@ public class KeyCeremonyMediator
         {
             var keyCeremonyId = CeremonyDetails.KeyCeremonyId;
 
-            var keyCeremony = await _service.GetByKeyCeremonyIdAsync(keyCeremonyId);
+            var keyCeremony = await _keyCeremonyService.GetByKeyCeremonyIdAsync(keyCeremonyId);
             if (keyCeremony == null)
             {
                 throw new KeyCeremonyException(
@@ -544,7 +547,7 @@ public class KeyCeremonyMediator
                 catch (Exception ex)
                 {
                     var message = ex.Message;
-                    Console.WriteLine($"error running key ceremony step: {currentStep.State} {ex}");
+                    Debug.WriteLine($"error running key ceremony step: {currentStep.State} {ex}");
                 }
                 IsRunning = false;
             }
@@ -589,7 +592,7 @@ public class KeyCeremonyMediator
         }
 
         var unverifiedCount = verificationList.Count(v => v.Verified == false);
-        Console.WriteLine($"guardianCount: {guardianCount} backupCount: {backupCount} verificationCount: {verificationCount} unverifiedCount: {unverifiedCount}");
+        Debug.WriteLine($"guardianCount: {guardianCount} backupCount: {backupCount} verificationCount: {verificationCount} unverifiedCount: {unverifiedCount}");
 
         return guardianCount == CeremonyDetails.NumberOfGuardians &&
             backupCount == guardianCount * guardianCount &&
@@ -649,8 +652,13 @@ public class KeyCeremonyMediator
 
         // append guardian joined to key ceremony (db)
 
-        await _publicKeyService.UpdatePublicKeyAsync(
-            keyCeremonyId, currentGuardianUserName, null);
+        var newRecord = new GuardianPublicKey
+        {
+            KeyCeremonyId = keyCeremonyId,
+            GuardianId = currentGuardianUserName,
+            PublicKey = null
+        };
+        _ = await _publicKeyService.SaveAsync(newRecord);
 
         // get guardian number
         var sequenceOrder = await GetGuardianSequenceOrderAsync(
@@ -669,8 +677,7 @@ public class KeyCeremonyMediator
 
         // get public key
         var publicKey = guardian.SharePublicKey();
-        // read isInBounds to ensure the handle is valid
-        if (publicKey == null || publicKey.Key == null || !publicKey.Key.IsInBounds())
+        if (publicKey == null || !publicKey.Key.IsAddressable)
         {
             throw new Exception("Error getting public key");
         }
@@ -702,7 +709,7 @@ public class KeyCeremonyMediator
         // change state to step2
         var keyCeremonyId = CeremonyDetails.KeyCeremonyId;
         _keyCeremony.State = KeyCeremonyState.PendingAdminAnnounce;
-        await _service.UpdateStateAsync(keyCeremonyId, _keyCeremony.State);
+        await _keyCeremonyService.UpdateStateAsync(keyCeremonyId, _keyCeremony.State);
         // notify change to guardians (signalR)    
 
         // call announce
@@ -710,14 +717,14 @@ public class KeyCeremonyMediator
 
         // change state to step3
         _keyCeremony.State = KeyCeremonyState.PendingGuardianBackups;
-        await _service.UpdateStateAsync(keyCeremonyId, _keyCeremony.State);
+        await _keyCeremonyService.UpdateStateAsync(keyCeremonyId, _keyCeremony.State);
         // notify change to guardians (signalR)    
     }
 
     private async Task RunStep3()
     {
         var keyCeremonyId = CeremonyDetails.KeyCeremonyId;
-        var keyCeremony = await _service.GetByKeyCeremonyIdAsync(keyCeremonyId);
+        var keyCeremony = await _keyCeremonyService.GetByKeyCeremonyIdAsync(keyCeremonyId);
 
         // load guardian from key ceremony
         var guardian = GuardianStorageExtensions.Load(UserId, keyCeremony!);
@@ -737,13 +744,13 @@ public class KeyCeremonyMediator
         var backups = guardian.ShareElectionPartialKeyBackups();
 
         // save backups to database
-        foreach (var item in backups)
+        foreach (var backup in backups)
         {
             using GuardianBackups data = new(
                 keyCeremonyId,
                 UserId,
-                item.DesignatedId!,
-                item
+                backup.DesignatedId!,
+                backup
             );
 
             _ = await _backupService.SaveAsync(data);
@@ -758,7 +765,7 @@ public class KeyCeremonyMediator
 
         // change state
         _keyCeremony.State = KeyCeremonyState.PendingAdminToShareBackups;
-        await _service.UpdateStateAsync(keyCeremonyId, _keyCeremony.State);
+        await _keyCeremonyService.UpdateStateAsync(keyCeremonyId, _keyCeremony.State);
         // notify change to guardians (signalR)    
 
         // Announce guardians - puts data into keyceremony mediator structures
@@ -774,7 +781,7 @@ public class KeyCeremonyMediator
 
         // change state
         _keyCeremony.State = KeyCeremonyState.PendingGuardiansVerifyBackups;
-        await _service.UpdateStateAsync(keyCeremonyId, _keyCeremony.State);
+        await _keyCeremonyService.UpdateStateAsync(keyCeremonyId, _keyCeremony.State);
         // notify change to guardians (signalR)    
     }
 
@@ -783,14 +790,15 @@ public class KeyCeremonyMediator
         var keyCeremonyId = CeremonyDetails.KeyCeremonyId;
 
         var backups = await _backupService.GetByGuardianIdAsync(keyCeremonyId, UserId);
-        var keyCeremony = await _service.GetByKeyCeremonyIdAsync(keyCeremonyId);
+        var keyCeremony = await _keyCeremonyService.GetByKeyCeremonyIdAsync(keyCeremonyId);
         var guardian = GuardianStorageExtensions.Load(UserId, keyCeremony!);
         var publicKeys = await _publicKeyService.GetAllByKeyCeremonyIdAsync(keyCeremonyId);
-        foreach (var item in publicKeys)
+        foreach (var publicKey in publicKeys)
         {
-            guardian!.SaveGuardianKey(item.PublicKey!);
+            guardian!.SaveGuardianKey(publicKey.PublicKey!);
         }
         List<ElectionPartialKeyVerification> verifications = new();
+        // TODO: ISSUE #213 throw on invalid backup
         foreach (var backup in backups!)
         {
             guardian!.SaveElectionPartialKeyBackup(backup.Backup!);
@@ -821,7 +829,7 @@ public class KeyCeremonyMediator
 
         // change state
         _keyCeremony.State = KeyCeremonyState.PendingAdminToPublishJointKey;
-        await _service.UpdateStateAsync(keyCeremonyId, _keyCeremony.State);
+        await _keyCeremonyService.UpdateStateAsync(keyCeremonyId, _keyCeremony.State);
         // notify change to guardians (signalR)    
 
         // Announce guardians - puts data into keyceremony mediator structures
@@ -852,7 +860,7 @@ public class KeyCeremonyMediator
         // save joint key to key ceremony
         // update state to complete
         _keyCeremony.State = KeyCeremonyState.Complete;
-        await _service.UpdateCompleteAsync(keyCeremonyId, jointKey);
+        await _keyCeremonyService.UpdateCompleteAsync(keyCeremonyId, jointKey);
         // notify change to guardians (signalR)
     }
 
@@ -876,10 +884,8 @@ public class KeyCeremonyMediator
     {
         base.DisposeUnmanaged();
 
-        _electionPublicKeys.Dispose();
-        _electionPartialKeyBackups.Dispose();
-        _electionPartialKeyChallenges.Dispose();
+        _electionPublicKeys?.Dispose();
+        _electionPartialKeyBackups?.Dispose();
+        _electionPartialKeyChallenges?.Dispose();
     }
-
 }
-

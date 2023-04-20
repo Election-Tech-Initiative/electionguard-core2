@@ -22,11 +22,7 @@ public static class GuardianStorageExtensions
     {
         return new(
             privateGuardianRecord.ElectionKeys,
-            new(keyCeremonyId, numberOfGuardians, quorum),
-            privateGuardianRecord.GuardianElectionPublicKeys,
-            privateGuardianRecord.GuardianElectionPartialKeyBackups,
-            privateGuardianRecord.BackupsToShare,
-            privateGuardianRecord.GuardianElectionPartialKeyVerifications);
+            new(keyCeremonyId, numberOfGuardians, quorum));
     }
 
     /// <summary>

@@ -165,9 +165,9 @@ namespace ElectionGuard.Decryption.Tally
         protected override void DisposeUnmanaged()
         {
             base.DisposeUnmanaged();
-            DescriptionHash.Dispose();
-            Ciphertext.Dispose();
-            _mutex.Dispose();
+            DescriptionHash?.Dispose();
+            Ciphertext?.Dispose();
+            _mutex?.Dispose();
         }
 
         # region Equality

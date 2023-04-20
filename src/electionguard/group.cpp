@@ -651,7 +651,6 @@ namespace electionguard
             auto result = LookupTableContext::pow_mod_p(hex, base.ref(), exponent.ref());
             return make_unique<ElementModP>(result, true);
         }
-
         // if none exists, execute the modular exponentiation directly
         return pow_mod_p(base, *exponent.toElementModP());
     }

@@ -10,7 +10,7 @@ if(EMSCRIPTEN)
 
     # Debug configuration
     if(CMAKE_BUILD_TYPE MATCHES Debug)
-        message("++ Compiling WASM in RELEASE mode")
+        message("++ Compiling WASM in DEBUG mode")
         set(EMSCRIPTEN_FLAGS
             "-O0"
             "-g3"

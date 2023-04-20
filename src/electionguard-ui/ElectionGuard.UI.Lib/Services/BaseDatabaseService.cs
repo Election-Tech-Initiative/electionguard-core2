@@ -81,10 +81,11 @@ public class BaseDatabaseService<T> : IDatabaseService<T> where T : DatabaseReco
     /// <returns>List of the documents found in the given collection that matches the given field</returns>
     public async Task<List<T>> GetAllByFieldAsync(string fieldName, object fieldValue, string? table = null)
     {
-        var builder = Builders<T>.Filter;
-        var filter = builder.Eq(fieldName, fieldValue);
+        var filter = FilterBuilder.Eq(fieldName, fieldValue);
         return await GetAllByFilterAsync(filter, table);
     }
+
+    public FilterDefinitionBuilder<T> FilterBuilder => Builders<T>.Filter;
 
     /// <summary>
     /// Get all of a data type from a given collection using a filter

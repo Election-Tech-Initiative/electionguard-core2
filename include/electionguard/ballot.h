@@ -382,6 +382,11 @@ EG_API eg_electionguard_status_t eg_ciphertext_ballot_cast(eg_ciphertext_ballot_
 EG_API eg_electionguard_status_t eg_ciphertext_ballot_spoil(eg_ciphertext_ballot_t *handle);
 
 /**
+ * A helper function to mark the ballot as challenged and remove sensitive values like the nonce.
+ */
+EG_API eg_electionguard_status_t eg_ciphertext_ballot_challenge(eg_ciphertext_ballot_t *handle);
+
+/**
  * @brief Creates a CiphertextBallot object from a [RFC-8259](https://www.rfc-editor.org/rfc/rfc8259.html#section-8.1) UTF-8 encoded JSON string
  * 
  * @param[in] in_data The UTF-8 Encoded JSON data string

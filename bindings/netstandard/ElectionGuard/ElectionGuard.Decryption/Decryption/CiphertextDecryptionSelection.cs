@@ -143,8 +143,6 @@ public class CiphertextDecryptionSelection : DisposableBase, IElectionSelection
         ElementModP share,
         ElementModQ lagrangeCoefficient)
     {
-        Console.WriteLine($"Accumulate: {share} {lagrangeCoefficient} {Value}");
-
         // M-bar = M-bar * (M_i ^ w_i) mod p
         // 𝑀𝑏𝑎𝑟 = 𝑀𝑏𝑎𝑟 * (𝑀𝑖 ^ 𝑤𝑖) mod p
         var interpolatedshare = share.PowModP(lagrangeCoefficient);

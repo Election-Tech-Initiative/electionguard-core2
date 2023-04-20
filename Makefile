@@ -294,13 +294,12 @@ else
 	if [ ! -d "$(ELECTIONGUARD_BUILD_LIBS_DIR)/Linux" ]; then mkdir $(ELECTIONGUARD_BUILD_LIBS_DIR)/Linux; fi
 	if [ ! -d "$(ELECTIONGUARD_BUILD_LIBS_DIR)/Windows" ]; then mkdir $(ELECTIONGUARD_BUILD_LIBS_DIR)/Windows; fi
 	if [ ! -d "$(ELECTIONGUARD_BUILD_LIBS_DIR)/Wasm" ]; then mkdir $(ELECTIONGUARD_BUILD_LIBS_DIR)/Wasm; fi
-endif
-	dotnet clean ./bindings/netstandard/ElectionGuard/ElectionGuard.sln
-	dotnet clean ./src/electionguard-ui/ElectionGuard.UI.sln
+endif	
 
 clean-netstandard:
 	@echo 🗑️ CLEAN NETSTANDARD
 	dotnet clean ./bindings/netstandard/ElectionGuard/ElectionGuard.sln
+	dotnet clean ./src/electionguard-ui/ElectionGuard.UI.sln
 
 clean-ui:
 	@echo 🗑️ CLEAN UI
@@ -514,6 +513,7 @@ test-netstandard: build-netstandard
 	dotnet test -a $(PROCESSOR) --configuration $(TARGET) ./bindings/netstandard/ElectionGuard/ElectionGuard.ElectionSetup.Tests/ElectionGuard.ElectionSetup.Tests.csproj
 	dotnet test -a $(PROCESSOR) --configuration $(TARGET) ./bindings/netstandard/ElectionGuard/ElectionGuard.Encryption.Tests/ElectionGuard.Encryption.Tests.csproj
 	dotnet test -a $(PROCESSOR) --configuration $(TARGET) ./bindings/netstandard/ElectionGuard/ElectionGuard.Decryption.Tests/ElectionGuard.Decryption.Tests.csproj
+	#dotnet test --filter TestCategory=SingleTest -a $(PROCESSOR) --configuration $(TARGET) ./bindings/netstandard/ElectionGuard/ElectionGuard.Decryption.Tests/ElectionGuard.Decryption.Tests.csproj
 
 test-netstandard-arm64:
 	PROCESSOR=arm64 && make test-netstandard

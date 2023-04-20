@@ -15,7 +15,7 @@ public partial class Guardian
         // TODO: throw exception instead of returning null
         if (backup is null)
             return null;
-        return GenerateElectionPartialKeyChallenge(backup, _electionKeys.Polynomial);
+        return GenerateElectionPartialKeyChallenge(backup, _myElectionKeys.Polynomial);
     }
 
     // verify_election_partial_key_challenge
