@@ -16,7 +16,7 @@
     "scripts": {
         "build": "npm run build:wasm && tsc",
         "build:wasm": "cd ../.. && make build-wasm",
-        "clean": "rm -rf dist && rm src/wasm/*.js && rm src/wasm/*.wasm",
+        "clean": "rm -rf dist",
         "pack": "webpack",
         "prepare": "npm run clean && npm run build",
         "test": "mocha --require ts-node/register **/*.test.ts"
