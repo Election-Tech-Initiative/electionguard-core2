@@ -178,6 +178,8 @@ public partial class ElectionViewModel : BaseViewModel
                 { BallotUploadViewModel.ElectionIdParam, CurrentElection.ElectionId }
             };
 
+        // TODO create the zip for the election
+
         // await NavigationService.GoToPage(typeof(BallotUploadViewModel), pageParams);
         await _electionService.UpdateExportDateAsync(CurrentElection.ElectionId, DateTime.Now);
 
