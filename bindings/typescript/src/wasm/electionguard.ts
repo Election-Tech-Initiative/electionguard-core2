@@ -16,7 +16,10 @@ export type CiphertextBallotHandle = {
   getStyleId(): string;
 
   getManifestHash(): ElementModQHandle;
+  getBallotCodeSeed(): ElementModQHandle;
   getBallotCode(): ElementModQHandle;
+  getTimestamp(): number;
+  getNonce(): ElementModQHandle;
 
   isValidEncryption(
     manifestHash: ElementModQHandle,
@@ -25,6 +28,7 @@ export type CiphertextBallotHandle = {
   ): boolean;
 
   cast(): void;
+  challenge(): void;
   spoil(): void;
   toJson(withNonces: boolean): string;
 };
@@ -63,7 +67,7 @@ export type EncryptionDeviceStatic = {
 export type EncryptionMediatorHandle = {
   new (
     internalManifest: InternalManifestHandle,
-    contest: CiphertextElectionContextHandle,
+    context: CiphertextElectionContextHandle,
     device: EncryptionDeviceHandle
   ): EncryptionMediatorHandle;
 
@@ -73,8 +77,21 @@ export type EncryptionMediatorHandle = {
   ): CiphertextBallotHandle;
 };
 
+export type EncryptFunctionsStatic = {
+  encryptBallot(
+    ballot: PlaintextBallotHandle,
+    internalManifest: InternalManifestHandle,
+    context: CiphertextElectionContextHandle,
+    ballotCodeSeed: ElementModQHandle,
+    nonce: ElementModQHandle,
+    timestamp: number,
+    shouldVerifyProofs: boolean
+  ): CiphertextBallotHandle;
+};
+
 export type ElementModPHandle = {
-  clone(): ElementModPHandle;
+  copy(): ElementModPHandle;
+  isInBounds(): boolean;
   toHex(): string;
 };
 
@@ -84,8 +101,10 @@ export type ElementModPStatic = {
 };
 
 export type ElementModQHandle = {
-  clone(): ElementModQHandle;
+  copy(): ElementModQHandle;
+  isInBounds(): boolean;
   toHex(): string;
+  toElementModP(): ElementModPHandle;
 };
 
 export type ElementModQStatic = {
@@ -95,6 +114,8 @@ export type ElementModQStatic = {
 
 export type GroupFunctionStatic = {
   addModQ(a: ElementModQHandle, b: ElementModQHandle): ElementModQHandle;
+  randomElementModP(): ElementModPHandle;
+  randomElementModQ(): ElementModQHandle;
 };
 
 export type ManifestHandle = {
@@ -131,6 +152,7 @@ export interface ElectionguardModule extends EmscriptenModule {
   CiphertextElectionContext: CiphertextElectionContextStatic;
   EncryptionDevice: EncryptionDeviceStatic;
   EncryptionMediator: EncryptionMediatorHandle;
+  EncryptFunctions: EncryptFunctionsStatic;
   ElementModP: ElementModPStatic;
   ElementModQ: ElementModQStatic;
   GroupFunctions: GroupFunctionStatic;

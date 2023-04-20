@@ -1,5 +1,6 @@
 import { CiphertextBallot, PlaintextBallot } from "./ballot";
 import { ElectionContext } from "./election";
+import { ElementModQ } from "./group";
 import { InternalManifest } from "./manifest";
 import {
   CiphertextElectionContextHandle,
@@ -104,5 +105,42 @@ export class EncryptionMediator {
       device._handle
     );
     return new EncryptionMediator(result);
+  }
+}
+
+/**
+ * A collection of functions for encrypting ballots
+ */
+export class EncryptFunctions {
+  /**
+   * Encrypt a specific `Ballot` in the context of a specific `CiphertextElectionContext`.
+   *
+   * @param plaintext: the ballot in the valid input form
+   * @param manifest: the `InternalManifest` which defines this ballot's structure
+   * @param context: all the cryptographic context for the election
+   * @param ballotCodeSeed: Hash from previous ballot or starting hash from device
+   * @param nonceSeed: an optional value used to seed the `Nonce` generated for this ballot
+   *                if this value is not provided, the secret generating mechanism of the OS provides its own
+   * @param shouldVerifyProofs: specify if the proofs should be verified prior to returning (default True)
+   */
+  static async encryptBallot(
+    plaintext: PlaintextBallot,
+    internalManifest: InternalManifest,
+    context: ElectionContext,
+    ballotCodeSeed: ElementModQ,
+    nonceSeed: ElementModQ,
+    timestamp: number,
+    shouldVerifyProofs: boolean
+  ): Promise<CiphertextBallot> {
+    var result = (await getInstance()).EncryptFunctions.encryptBallot(
+      plaintext._handle,
+      internalManifest._handle,
+      context._handle,
+      ballotCodeSeed._handle,
+      nonceSeed._handle,
+      timestamp,
+      shouldVerifyProofs
+    );
+    return new CiphertextBallot(result);
   }
 }
