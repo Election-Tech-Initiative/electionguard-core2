@@ -60,7 +60,6 @@ public partial class CreateElectionViewModel : BaseViewModel
     private async Task CreateElection()
     {
         var multiple = _manifestFiles.Count > 1;
-        var lastElectionId = string.Empty;
         ErrorMessage = string.Empty;
 
         _ = Parallel.ForEachAsync(_manifestFiles, async (file, cancel) =>
@@ -80,7 +79,6 @@ public partial class CreateElectionViewModel : BaseViewModel
                     ElectionUrl = ElectionUrl,
                     CreatedBy = UserName!
                 };
-                lastElectionId = election.ElectionId;
 
                 // create the context
                 using var context = new CiphertextElectionContext(
@@ -107,30 +105,35 @@ public partial class CreateElectionViewModel : BaseViewModel
 
                 // save the manifest
                 _ = await _manifestService.SaveAsync(manifestRecord);
+
+                if (!multiple)
+                {
+                    var loadElection = await _electionService.GetByElectionIdAsync(election.ElectionId);
+                    var pageParams = new Dictionary<string, object>
+                    {
+                        { ElectionViewModel.CurrentElectionParam, loadElection }
+                    };
+                    await Shell.Current.CurrentPage.Dispatcher.DispatchAsync(async () =>
+                    {
+                        await NavigationService.GoToPage(typeof(ElectionViewModel), pageParams);
+                    });
+                }
             }
             catch (Exception)
             {
                 ErrorMessage += $"{AppResources.ErrorCreatingElection} - {file.FileName}\n";
             }
-        });
-
-        if (string.IsNullOrEmpty(ErrorMessage))
+        }).ContinueWith((t) =>
         {
-            // goto the email page or go to the home page
-            if (multiple)
+            if (string.IsNullOrEmpty(ErrorMessage))
             {
-                HomeCommand.Execute(null);
-            }
-            else
-            {
-                var election = await _electionService.GetByElectionIdAsync(lastElectionId);
-                var pageParams = new Dictionary<string, object>
+                // goto the email page or go to the home page
+                if (multiple)
                 {
-                    { ElectionViewModel.CurrentElectionParam, election }
-                };
-                await NavigationService.GoToPage(typeof(ElectionViewModel), pageParams);
+                    HomeCommand.Execute(null);
+                }
             }
-        }
+        });
     }
 
     private async Task<string> MakeNameUnique(string electionName)

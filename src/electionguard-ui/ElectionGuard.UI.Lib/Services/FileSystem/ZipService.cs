@@ -6,13 +6,13 @@ namespace ElectionGuard.UI.Lib.Services;
 /// <summary>
 /// Service to allow simple creation and managing of zip files
 /// </summary>
-public class ZipService
+public static class ZipService
 {
     /// <summary>
     /// Creates a zip file if it does not exist
     /// </summary>
     /// <param name="zipFileName">file name and path where to make the zip file</param>
-    private void CreateZip(string zipFileName)
+    private static void CreateZip(string zipFileName)
     {
         if (!File.Exists(zipFileName))
         {
@@ -26,7 +26,7 @@ public class ZipService
     /// </summary>
     /// <param name="zipFileName">filename and path of the zip file to use / make</param>
     /// <param name="fileList">list of file data to add to the zip file</param>
-    public void AddFilesToZip(string zipFileName, List<FileContents> fileList)
+    public static void AddFiles(string zipFileName, List<FileContents> fileList)
     {
         CreateZip(zipFileName);
 
