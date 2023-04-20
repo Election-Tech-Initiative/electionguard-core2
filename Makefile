@@ -74,7 +74,7 @@ endif
 # Debug or Release (capitalized)
 TARGET?=Release
 
-# Set the Android NDK for cross-compilation
+# Set default OS paths for cross-compilation
 ifeq ($(OPERATING_SYSTEM),Darwin)
 ANDROID_NDK_PATH?=/Users/$(USER)/Library/Android/sdk/ndk/25.1.8937393
 DOTNET_PATH?=/usr/local/share/dotnet
@@ -83,10 +83,12 @@ endif
 ifeq ($(OPERATING_SYSTEM),Linux)
 ANDROID_NDK_PATH?=/usr/local/lib/android/sdk/ndk/25.1.8937393
 DOTNET_PATH?=/usr/share/dotnet
+EMSCRIPTEN_PATH?=/usr/share/emsdk
 endif
 ifeq ($(OPERATING_SYSTEM),Windows)
 ANDROID_NDK_PATH?=C:\Android\android-sdk\ndk-bundle
 DOTNET_PATH?=C:\Program Files\dotnet
+EMSCRIPTEN_PATH?=C:\Program Files\emsdk
 endif
 
 all: environment build
@@ -246,6 +248,7 @@ endif
 
 build-npm:
 	@echo 🖥️ BUILD NPM $(OPERATING_SYSTEM) $(PROCESSOR) $(TARGET)
+	npm install
 	npm run build
 	#cd ./bindings/typescript && npm install
 	#cd ./bindings/typescript && npm run build

@@ -219,7 +219,7 @@ jobs:
           EMSCRIPTEN_PATH: ${{ env.EMSDK }}
           PROCESSOR: ${{ matrix.processor }}
         if: (runner.os == 'Linux' && matrix.compiler == 'clang')
-        run: make test-wasm
+        run: make build-npm && make test-wasm
 
       # Save build cache
       - name: Save C++ Build Cache
