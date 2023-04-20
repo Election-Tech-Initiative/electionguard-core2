@@ -1,6 +1,7 @@
-.PHONY: all build build-msys2 build-android build-ios build-netstandard build-ui build-wasm clean clean-netstandard clean-ui environment format memcheck sanitize sanitize-asan sanitize-tsan bench bench-netstandard test test-msys2 test-netstandard test-netstandard-copy-output
+.PHONY: all build build-msys2 build-android build-ios build-netstandard build-ui build-wasm clean clean-netstandard clean-ui environment environment-wasm format memcheck sanitize sanitize-asan sanitize-tsan bench bench-netstandard test test-msys2 test-netstandard test-netstandard-copy-output
 
 .EXPORT_ALL_VARIABLES:
+ELECTIONGUARD_CACHE=$(subst \,/,$(realpath .))/.cache
 ELECTIONGUARD_BINDING_DIR=$(realpath .)/bindings
 ELECTIONGUARD_BINDING_LIB_DIR=$(ELECTIONGUARD_BINDING_DIR)/netstandard/ElectionGuard/ElectionGuard.Encryption
 ELECTIONGUARD_BINDING_BENCH_DIR=$(ELECTIONGUARD_BINDING_DIR)/netstandard/ElectionGuard/ElectionGuard.Encryption.Bench
@@ -12,7 +13,9 @@ ELECTIONGUARD_BUILD_DIR_WIN=$(subst \c\,C:\,$(subst /,\,$(ELECTIONGUARD_BUILD_DI
 ELECTIONGUARD_BUILD_APPS_DIR=$(ELECTIONGUARD_BUILD_DIR)/apps
 ELECTIONGUARD_BUILD_BINDING_DIR=$(ELECTIONGUARD_BUILD_DIR)/bindings
 ELECTIONGUARD_BUILD_LIBS_DIR=$(ELECTIONGUARD_BUILD_DIR)/libs
-CPM_SOURCE_CACHE=$(subst \,/,$(realpath .))/.cache/CPM
+CPM_SOURCE_CACHE=$(ELECTIONGUARD_CACHE)/CPM
+EMSCRIPTEN_VERSION?=3.1.35
+EMSDK?=$(ELECTIONGUARD_CACHE)/emscripten
 
 # Detect operating system & platform
 # These vars can be set from the command line.
@@ -78,17 +81,14 @@ TARGET?=Release
 ifeq ($(OPERATING_SYSTEM),Darwin)
 ANDROID_NDK_PATH?=/Users/$(USER)/Library/Android/sdk/ndk/25.1.8937393
 DOTNET_PATH?=/usr/local/share/dotnet
-EMSCRIPTEN_PATH?=/usr/local/share/emsdk
 endif
 ifeq ($(OPERATING_SYSTEM),Linux)
 ANDROID_NDK_PATH?=/usr/local/lib/android/sdk/ndk/25.1.8937393
 DOTNET_PATH?=/usr/share/dotnet
-EMSCRIPTEN_PATH?=/usr/share/emsdk
 endif
 ifeq ($(OPERATING_SYSTEM),Windows)
 ANDROID_NDK_PATH?=C:\Android\android-sdk\ndk-bundle
 DOTNET_PATH?=C:\Program Files\dotnet
-EMSCRIPTEN_PATH?=C:\Program Files\emsdk
 endif
 
 all: environment build
@@ -140,6 +140,16 @@ ifeq ($(OPERATING_SYSTEM),Windows)
 else
 	sudo dotnet workload install maui
 	sudo dotnet workload restore ./src/electionguard-ui/ElectionGuard.UI/ElectionGuard.UI.csproj && dotnet restore ./src/electionguard-ui/ElectionGuard.UI.sln
+endif
+
+# TODO: node?
+environment-wasm:
+	@echo 🌐 WASM INSTALL
+ifeq ($(OPERATING_SYSTEM),Windows)
+
+else
+	./cmake/install-emscripten.sh $(EMSCRIPTEN_VERSION)
+	cd ./bindings/typescript && npm install
 endif
 
 # Builds
@@ -227,7 +237,7 @@ build-ui: build-netstandard
 	dotnet build --configuration $(TARGET) ./src/electionguard-ui/ElectionGuard.UI.sln /p:Platform=$(PROCESSOR)
 
 build-wasm:
-	@echo 🖥️ BUILD WASM $(OPERATING_SYSTEM) $(PROCESSOR) $(TARGET)
+	@echo 🌐 BUILD WASM $(OPERATING_SYSTEM) $(PROCESSOR) $(TARGET)
 ifeq ($(OPERATING_SYSTEM),Windows)
 	echo "wasm builds are only supported on MacOS and Linux"
 else
@@ -239,19 +249,15 @@ else
 		-DCPM_SOURCE_CACHE=$(CPM_SOURCE_CACHE) \
 		-DCMAKE_TOOLCHAIN_FILE=$(EMSDK)/upstream/emscripten/cmake/Modules/Platform/Emscripten.cmake
 	cmake --build $(ELECTIONGUARD_BUILD_LIBS_DIR)/wasm/$(TARGET)
-	#npx tsembind $(ELECTIONGUARD_BUILD_LIBS_DIR)/wasm/$(TARGET)/src/electionguard/wasm/electionguard.wasm.js
 	cp $(ELECTIONGUARD_BUILD_LIBS_DIR)/wasm/$(TARGET)/src/electionguard/wasm/electionguard.wasm.js ./bindings/typescript/src/wasm/electionguard.wasm.js
 	cp $(ELECTIONGUARD_BUILD_LIBS_DIR)/wasm/$(TARGET)/src/electionguard/wasm/electionguard.wasm.wasm ./bindings/typescript/src/wasm/electionguard.wasm.wasm
 endif
 
 build-npm:
-	@echo 🖥️ BUILD NPM $(OPERATING_SYSTEM) $(PROCESSOR) $(TARGET)
-	npm install
-	npm run build
-	#cd ./bindings/typescript && npm install
-	#cd ./bindings/typescript && npm run build
+	@echo 🌐 BUILD NPM $(OPERATING_SYSTEM) $(PROCESSOR) $(TARGET)
+	cd ./bindings/typescript && npm install
+	cd ./bindings/typescript && npm run prepare
 	
-
 # Clean
 
 clean:
@@ -589,7 +595,8 @@ test-ui: build-ui
 
 test-wasm: build-wasm
 	@echo 🧪 TEST WASM $(PROCESSOR) $(TARGET)
-	npm run test
+	cd ./bindings/typescript && npm run test
+	#npm run test
 
 # Coverage
 

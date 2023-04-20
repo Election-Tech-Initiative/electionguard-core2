@@ -15,11 +15,11 @@
     "types": "dist/index.d.ts",
     "scripts": {
         "build": "npm run build:wasm && tsc",
-        "build:wasm": "make build-wasm",
-        "clean": "rm -rf dist",
+        "build:wasm": "cd ../.. && make build-wasm",
+        "clean": "rm -rf dist && rm src/wasm/*.js && rm src/wasm/*.wasm",
         "pack": "webpack",
         "prepare": "npm run clean && npm run build",
-        "test": "mocha --require ts-node/register bindings/typescript/**/*.test.ts"
+        "test": "mocha --require ts-node/register **/*.test.ts"
     },
     "devDependencies": {
         "@types/chai": "^4.3.4",
