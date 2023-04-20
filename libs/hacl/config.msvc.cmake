@@ -32,7 +32,6 @@ set(SOURCES_std
 	${PROJECT_SOURCE_DIR}/src/msvc/Hacl_K256_ECDSA.c
 	${PROJECT_SOURCE_DIR}/src/msvc/Hacl_EC_K256.c
 	${PROJECT_SOURCE_DIR}/src/msvc/Hacl_FFDHE.c
-	${PROJECT_SOURCE_DIR}/src/msvc/Hacl_hash_SHA3.c
 	${PROJECT_SOURCE_DIR}/src/msvc/Hacl_Hash_MD5.c
 	${PROJECT_SOURCE_DIR}/src/msvc/Hacl_HKDF.c
 	${PROJECT_SOURCE_DIR}/src/msvc/Hacl_RSAPSS.c

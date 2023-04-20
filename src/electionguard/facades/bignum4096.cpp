@@ -4,6 +4,7 @@
 #include "../../../libs/hacl/Hacl_Bignum4096_32.hpp"
 #include "../log.hpp"
 
+#include <cstring>
 #include <electionguard/constants.h>
 #include <memory>
 #include <variant>
