@@ -158,8 +158,8 @@ jobs:
           elif [ "${{ matrix.compiler }}" = "emscripten" ]; then
             make environment-wasm
             source ./.cache/emscripten/emsdk_env.sh
-            echo "CC=emcc" >> $GITHUB_ENV
-            echo "CXX=em++" >> $GITHUB_ENV
+            # echo "CC=emcc" >> $GITHUB_ENV
+            # echo "CXX=em++" >> $GITHUB_ENV
           else
             sudo apt-get install -y clang-${{ matrix.version }} g++-multilib
             echo "CC=clang-${{ matrix.version }}" >> $GITHUB_ENV
