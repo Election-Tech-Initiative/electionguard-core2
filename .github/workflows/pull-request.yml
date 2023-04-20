@@ -155,6 +155,11 @@ jobs:
           if [ "${{ matrix.compiler }}" = "gcc" ]; then
             echo "CC=gcc-${{ matrix.version }}" >> $GITHUB_ENV
             echo "CXX=g++-${{ matrix.version }}" >> $GITHUB_ENV
+          elif [ "${{ matrix.compiler }}" = "emscripten" ]; then
+            ./cmake/install-emscripten.sh ${{ matrix.version }}
+            source ./.cache/emscripten/emsdk_env.sh
+            echo "CC=emcc" >> $GITHUB_ENV
+            echo "CXX=em++" >> $GITHUB_ENV
           else
             sudo apt-get install -y clang-${{ matrix.version }} g++-multilib
             echo "CC=clang-${{ matrix.version }}" >> $GITHUB_ENV
