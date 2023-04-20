@@ -142,14 +142,12 @@ else
 	sudo dotnet workload restore ./src/electionguard-ui/ElectionGuard.UI/ElectionGuard.UI.csproj && dotnet restore ./src/electionguard-ui/ElectionGuard.UI.sln
 endif
 
-# TODO: node?
 environment-wasm:
 	@echo 🌐 WASM INSTALL
 ifeq ($(OPERATING_SYSTEM),Windows)
-
+	@echo currently only supported on posix systems
 else
 	./cmake/install-emscripten.sh $(EMSCRIPTEN_VERSION)
-	cd ./bindings/typescript && npm install
 endif
 
 # Builds
@@ -253,7 +251,7 @@ else
 	cp $(ELECTIONGUARD_BUILD_LIBS_DIR)/wasm/$(TARGET)/src/electionguard/wasm/electionguard.wasm.wasm ./bindings/typescript/src/wasm/electionguard.wasm.wasm
 endif
 
-build-npm:
+build-npm: build-wasm
 	@echo 🌐 BUILD NPM $(OPERATING_SYSTEM) $(PROCESSOR) $(TARGET)
 	cd ./bindings/typescript && npm install
 	cd ./bindings/typescript && npm run prepare
@@ -596,7 +594,6 @@ test-ui: build-ui
 test-wasm: build-wasm
 	@echo 🧪 TEST WASM $(PROCESSOR) $(TARGET)
 	cd ./bindings/typescript && npm run test
-	#npm run test
 
 # Coverage
 

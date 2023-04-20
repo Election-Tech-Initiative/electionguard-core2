@@ -202,12 +202,6 @@ jobs:
       - name: Configure Environment
         run: make environment
 
-      - name: Configure Environment (WASM)
-        env:
-          EMSCRIPTEN_VERSION: ${{ matrix.version }}
-        if: (matrix.compiler == 'emscripten')
-        run: make environment-wasm
-
       # Lint
       - name: Lint
         if: (matrix.lint)
@@ -248,4 +242,4 @@ jobs:
         env:
           PROCESSOR: ${{ matrix.processor }}
         if: (matrix.runTsTests)
-        run: make test-wasm
+        run: make build-npm && make test-wasm
