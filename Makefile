@@ -627,7 +627,7 @@ fetch-sample-data:
 	@echo ⬇️ FETCH Sample Data
 	wget -O sample-data-1-0.zip https://github.com/microsoft/electionguard/releases/download/v1.0/sample-data.zip
 	unzip -o sample-data-1-0.zip
-	rm sample-data-1.0.zip
+	rm -f sample-data-1.0.zip || true
 
 generate-sample-data:
 	@echo Generate Sample Data
