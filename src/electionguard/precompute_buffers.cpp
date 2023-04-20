@@ -382,6 +382,9 @@ namespace electionguard
         std::lock_guard<std::mutex> lock(getInstance()._mutex);
         if (getInstance()._instance == nullptr) {
             getInstance()._instance = make_unique<PrecomputeBuffer>(elgamalPublicKey);
+        } else if (*getInstance()._instance->getPublicKey() != elgamalPublicKey) {
+            getInstance()._instance->clear();
+            getInstance()._instance = make_unique<PrecomputeBuffer>(elgamalPublicKey);
         }
         getInstance()._instance->start();
     }
@@ -395,7 +398,6 @@ namespace electionguard
             getInstance()._instance->clear();
             getInstance()._instance = make_unique<PrecomputeBuffer>(elgamalPublicKey);
         }
-
         getInstance()._instance->startAsync();
     }
 

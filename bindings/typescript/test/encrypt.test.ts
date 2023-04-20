@@ -45,8 +45,7 @@ describe("EncryptionMediator Tests", () => {
     const result = await subject.encrypt(data, false);
 
     assert.isTrue(result.objectId.includes(data.objectId));
-    // TODO: reasonable timoeut for this test when optimizatiosn enabled
-  }).timeout(100000); // 100 seconds :-(
+  });
 });
 
 describe("EncryptionMediator Precompute Tests", () => {
@@ -72,6 +71,5 @@ describe("EncryptionMediator Precompute Tests", () => {
     const result = await subject.encrypt(data, false);
 
     assert.isTrue(result.objectId.includes(data.objectId));
-    // TODO: reasonable timoeut for this test when optimizatiosn enabled
-  }).timeout(100000); // 100 seconds :-(
+  });
 });

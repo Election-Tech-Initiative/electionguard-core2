@@ -106,7 +106,6 @@ ifeq ($(OPERATING_SYSTEM),Darwin)
 	brew install llvm
 	brew install ninja
 	test -f /usr/local/bin/clang-tidy || sudo ln -s "$(shell brew --prefix llvm)/bin/clang-tidy" "/usr/local/bin/clang-tidy"
-	npm install
 endif
 ifeq ($(OPERATING_SYSTEM),Linux)
 	@echo 🐧 LINUX INSTALL
@@ -121,7 +120,6 @@ ifeq ($(OPERATING_SYSTEM),Linux)
 	sudo apt install -y clang-tidy
 	sudo apt install -y ninja-build
 	sudo apt install -y valgrind
-	npm install
 endif
 ifeq ($(OPERATING_SYSTEM),Windows)
 	@echo 🏁 WINDOWS INSTALL
