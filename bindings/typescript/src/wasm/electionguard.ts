@@ -37,6 +37,7 @@ export type CiphertextElectionContextHandle = {
   getNumberOfGuardians(): number;
   getQuorum(): number;
   getElGamalPublicKey(): ElementModPHandle;
+  getElGamalPublicKeyRef(): ElementModPHandle;
   getManifestHash(): ElementModQHandle;
   getCryptoExtendedBaseHash(): ElementModQHandle;
   toJson(): string;
@@ -113,6 +114,17 @@ export type InternalManifestStatic = {
   fromJson(json: string): InternalManifestHandle;
 };
 
+export type PrecomputeBuffersStatic = {
+  clear(): void;
+
+  initialize(publicKey: ElementModPHandle, maxQueueSize: number): void;
+  start(): void;
+  stop(): void;
+
+  getMaxQueueSize(): number;
+  getCurrentQueueSize(): number;
+};
+
 export interface ElectionguardModule extends EmscriptenModule {
   PlaintextBallot: PlaintextBallotStatic;
   CiphertextBallot: CiphertextBallotStatic;
@@ -124,6 +136,7 @@ export interface ElectionguardModule extends EmscriptenModule {
   GroupFunctions: GroupFunctionStatic;
   Manifest: ManifestStatic;
   InternalManifest: InternalManifestStatic;
+  PrecomputeBufferContext: PrecomputeBuffersStatic;
 }
 const createModule: EmscriptenModuleFactory<ElectionguardModule> =
   wasModuleFactory;

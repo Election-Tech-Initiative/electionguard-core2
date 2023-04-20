@@ -5,6 +5,7 @@ import { PlaintextBallot } from "../src/ballot";
 import { ElectionContext } from "../src/election";
 import { EncryptionDevice, EncryptionMediator } from "../src/encrypt";
 import { InternalManifest } from "../src/manifest";
+import { PrecomputeBufferContext } from "../src";
 
 const ciphertextElectionContext = (test_data as unknown as any).election
   .context;
@@ -29,6 +30,33 @@ describe("EncryptionDevice Tests", () => {
 });
 
 describe("EncryptionMediator Tests", () => {
+  it("should encrypt a ballot", async () => {
+    const context = await ElectionContext.fromJson(
+      JSON.stringify(ciphertextElectionContext)
+    );
+    const manifest = await InternalManifest.fromJson(
+      JSON.stringify(internalManifest)
+    );
+    const device = await EncryptionDevice.fromJson(JSON.stringify(testDevice));
+    const data = await PlaintextBallot.fromJson(
+      JSON.stringify(plaintextBallots[0])
+    );
+    const subject = await EncryptionMediator.make(manifest, context, device);
+    const result = await subject.encrypt(data, false);
+
+    assert.isTrue(result.objectId.includes(data.objectId));
+    // TODO: reasonable timoeut for this test when optimizatiosn enabled
+  }).timeout(100000); // 100 seconds :-(
+});
+
+describe("EncryptionMediator Precompute Tests", () => {
+  before(async () => {
+    const context = await ElectionContext.fromJson(
+      JSON.stringify(ciphertextElectionContext)
+    );
+    await PrecomputeBufferContext.initialize(context.publicKeyRef, 150);
+    await PrecomputeBufferContext.start();
+  });
   it("should encrypt a ballot", async () => {
     const context = await ElectionContext.fromJson(
       JSON.stringify(ciphertextElectionContext)

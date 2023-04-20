@@ -21,7 +21,6 @@ class EncryptFunctions
         auto result =
           electionguard::encryptBallot(ballot, internalManifest, context, ballotCodeSeed,
                                        std::move(nonce), timestamp, shouldVerifyProofs);
-        // std::cout << "encryptBallot " << result->toHex() << std::endl;
         return std::move(result);
     }
 };
@@ -37,7 +36,6 @@ EMSCRIPTEN_BINDINGS(electionguard)
       .function("getLocation", &EncryptionDevice::getLocation)
       .function("toJson", &EncryptionDevice::toJson)
       .class_function("fromJson", &EncryptionDevice::fromJson);
-    ;
 
     class_<EncryptionMediator>("EncryptionMediator")
       .constructor<const InternalManifest &, const CiphertextElectionContext &,
@@ -45,6 +43,6 @@ EMSCRIPTEN_BINDINGS(electionguard)
       .function("encrypt", &EncryptionMediator::encrypt)
       .function("compactEncrypt", &EncryptionMediator::compactEncrypt);
 
-    class_<EncryptFunctions>("GroEncryptFunctionsupFunctions")
+    class_<EncryptFunctions>("EncryptFunctions")
       .class_function("encryptBallot", &EncryptFunctions::encryptBallot);
 }

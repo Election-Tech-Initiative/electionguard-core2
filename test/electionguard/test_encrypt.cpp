@@ -49,12 +49,12 @@ TEST_CASE("Encrypt simple selection using precomputed values succeeds")
     auto plaintext = BallotGenerator::selectionFrom(*metadata);
 
     // cause a two triples and a quad to be populated
-    PrecomputeBufferContext::init(1);
-    PrecomputeBufferContext::populate(*keypair->getPublicKey());
-    PrecomputeBufferContext::stop_populate();
+    PrecomputeBufferContext::initialize(*keypair->getPublicKey(), 1);
+    PrecomputeBufferContext::start();
+    PrecomputeBufferContext::stop();
 
-    uint32_t max_precomputed_queue_size = PrecomputeBufferContext::get_max_queue_size();
-    uint32_t current_precomputed_queue_size = PrecomputeBufferContext::get_current_queue_size();
+    uint32_t max_precomputed_queue_size = PrecomputeBufferContext::getMaxQueueSize();
+    uint32_t current_precomputed_queue_size = PrecomputeBufferContext::getCurrentQueueSize();
 
     CHECK(1 == max_precomputed_queue_size);
     CHECK(1 == current_precomputed_queue_size);
@@ -70,7 +70,7 @@ TEST_CASE("Encrypt simple selection using precomputed values succeeds")
     CHECK(result->getProof()->isValid(*result->getCiphertext(), *keypair->getPublicKey(),
                                       ONE_MOD_Q()) == true);
     // need to empty the queues because future tests don't use the same keys
-    PrecomputeBufferContext::empty_queues();
+    PrecomputeBufferContext::clear();
 }
 
 TEST_CASE("Encrypt simple selection malformed data fails")
@@ -1340,11 +1340,12 @@ TEST_CASE("Encrypt simple ballot from file succeeds with precomputed values")
     auto ballot = BallotGenerator::getFakeBallot(*internal);
 
     // cause a two triples and a quad to be populated
-    PrecomputeBufferContext::init(100);
-    PrecomputeBufferContext::populate(*keypair->getPublicKey());
-    PrecomputeBufferContext::stop_populate();
-    uint32_t max_precomputed_queue_size = PrecomputeBufferContext::get_max_queue_size();
-    uint32_t current_precomputed_queue_size = PrecomputeBufferContext::get_current_queue_size();
+    PrecomputeBufferContext::initialize(*keypair->getPublicKey(), 100);
+    PrecomputeBufferContext::start();
+    PrecomputeBufferContext::stop();
+
+    uint32_t max_precomputed_queue_size = PrecomputeBufferContext::getMaxQueueSize();
+    uint32_t current_precomputed_queue_size = PrecomputeBufferContext::getCurrentQueueSize();
 
     CHECK(100 == max_precomputed_queue_size);
     CHECK(100 == current_precomputed_queue_size);
@@ -1358,7 +1359,7 @@ TEST_CASE("Encrypt simple ballot from file succeeds with precomputed values")
     // Assert
     CHECK(ciphertext->isValidEncryption(*context->getManifestHash(), *keypair->getPublicKey(),
                                         *context->getCryptoExtendedBaseHash()) == true);
-    PrecomputeBufferContext::empty_queues();
+    PrecomputeBufferContext::clear();
 }
 
 TEST_CASE("Create EncryptionMediator with same manifest hash")

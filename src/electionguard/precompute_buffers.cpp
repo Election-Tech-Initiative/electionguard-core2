@@ -1,4 +1,5 @@
 #include "electionguard/group.hpp"
+#include "log.hpp"
 #include "utils.hpp"
 
 #include <array>
@@ -19,6 +20,7 @@ using std::unique_ptr;
 
 namespace electionguard
 {
+#pragma region Triple
     Triple::Triple(unique_ptr<ElementModQ> exp, unique_ptr<ElementModP> g_to_exp,
                    unique_ptr<ElementModP> pubkey_to_exp)
     {
@@ -71,6 +73,10 @@ namespace electionguard
     {
         return make_unique<Triple>(exp->clone(), g_to_exp->clone(), pubkey_to_exp->clone());
     }
+
+#pragma endregion
+
+#pragma region Quadruple
 
     Quadruple::Quadruple(unique_ptr<ElementModQ> exp1, unique_ptr<ElementModQ> exp2,
                          unique_ptr<ElementModP> g_to_exp1,
@@ -135,6 +141,10 @@ namespace electionguard
                                       g_to_exp2_mult_by_pubkey_to_exp1->clone());
     }
 
+#pragma endregion
+
+#pragma region TwoTriplesAndAQuadruple
+
     TwoTriplesAndAQuadruple::TwoTriplesAndAQuadruple(unique_ptr<Triple> triple1,
                                                      unique_ptr<Triple> triple2,
                                                      unique_ptr<Quadruple> quad)
@@ -183,21 +193,45 @@ namespace electionguard
                                                     quad->clone());
     }
 
-    void PrecomputeBufferContext::init(uint32_t size_of_queue /* = 0 */)
-    {
-        std::lock_guard<std::mutex> lock(queue_lock);
-        getInstance().populate_OK = true;
+#pragma endregion
 
-        // default size of quadruple_queue will be 5000
-        if (size_of_queue != 0) {
-            getInstance().max = size_of_queue;
-        } else {
-            getInstance().max = DEFAULT_PRECOMPUTE_SIZE;
+#pragma region PrecomputeBuffer
+
+    // Lifecycle Methods
+
+    PrecomputeBuffer::PrecomputeBuffer(const ElementModP &publicKey, uint32_t maxQueueSize,
+                                       bool shouldAutoPopulate)
+        : maxQueueSize(maxQueueSize == 0 ? DEFAULT_PRECOMPUTE_SIZE : maxQueueSize),
+          shouldAutoPopulate(shouldAutoPopulate), publicKey(publicKey.clone())
+    {
+    }
+    PrecomputeBuffer::~PrecomputeBuffer() = default;
+
+    void PrecomputeBuffer::clear()
+    {
+        stop();
+
+        std::lock_guard<std::mutex> lock1(triple_queue_lock);
+        uint32_t triple_size = triple_queue.size();
+        for (int i = 0; i < (int)triple_size; i++) {
+            triple_queue.pop();
+        }
+
+        std::lock_guard<std::mutex> lock2(quad_queue_lock);
+        uint32_t twoTriplesAndAQuadruple_size = twoTriplesAndAQuadruple_queue.size();
+        for (int i = 0; i < (int)twoTriplesAndAQuadruple_size; i++) {
+            twoTriplesAndAQuadruple_queue.pop();
         }
     }
 
-    void PrecomputeBufferContext::populate(const ElementModP &elgamalPublicKey)
+    void PrecomputeBuffer::start()
     {
+        if (publicKey == nullptr) {
+            throw std::runtime_error("PrecomputeBufferContext::start() - elgamalPublicKey is null");
+        }
+
+        isRunning = true;
+
         // This loop goes through until the queues are full but can be stopped
         // between generations of two triples and a quad. By full it means
         // we check how many quads are in the queue, to start with we will
@@ -205,100 +239,219 @@ namespace electionguard
         // queue size in we could use that.
         // for now we just go through the loop once
         int iteration_count = 0;
+        int iterationCountToGenerateTwoTriples = 3;
         do {
-            // TODO - Can we tolerate not returning until we have finished
-            // generating two triples and a quadruple?
-            // If not we can get more elaborate with the populate_OK checking
-            std::lock_guard<std::mutex> lock(queue_lock);
-            if (getInstance().populate_OK) {
-                // generate two triples and a quadruple
-                //
-                // these constuctors will generate the precomputed values
-                unique_ptr<Triple> triple1 = make_unique<Triple>(elgamalPublicKey);
-                unique_ptr<Triple> triple2 = make_unique<Triple>(elgamalPublicKey);
-                unique_ptr<Quadruple> quad = make_unique<Quadruple>(elgamalPublicKey);
+            std::lock_guard<std::mutex> lock1(triple_queue_lock);
+            std::lock_guard<std::mutex> lock2(quad_queue_lock);
 
-                unique_ptr<TwoTriplesAndAQuadruple> twoTriplesAndAQuadruple =
-                  make_unique<TwoTriplesAndAQuadruple>(move(triple1), move(triple2), move(quad));
+            // generate two triples and a quadruple
+            auto quad = createTwoTriplesAndAQuadruple(*publicKey);
+            twoTriplesAndAQuadruple_queue.push(move(quad));
 
-                getInstance().twoTriplesAndAQuadruple_queue.push(move(twoTriplesAndAQuadruple));
-
-                // This is very rudimentary. We can add a more complex algorithm in
-                // the future, that would look at the queues and increase production if one
-                // is getting lower than expected.
-                // Every third iteration we generate two extra triples, one for use with
-                // the contest constant chaum pedersen proof and one for hashed elgamal encryption
-                // we need less of these because this exponentiation is done only every contest
-                // encryption whereas the two triples and a quadruple is used every selection
-                // encryption. The generating two triples every third iteration is a guess
-                // on how many precomputes we will need.
-                if ((iteration_count % 3) == 0) {
-                    unique_ptr<Triple> contest_triple1 = make_unique<Triple>(elgamalPublicKey);
-                    getInstance().triple_queue.push(move(contest_triple1));
-                    unique_ptr<Triple> contest_triple2 = make_unique<Triple>(elgamalPublicKey);
-                    getInstance().triple_queue.push(move(contest_triple2));
-                }
-                iteration_count++;
-            } else {
-                return;
+            // This is very rudimentary. We can add a more complex algorithm in
+            // the future, that would look at the queues and increase production if one
+            // is getting lower than expected.
+            // Every third iteration we generate two extra triples, one for use with
+            // the contest constant chaum pedersen proof and one for hashed elgamal encryption
+            // we need less of these because this exponentiation is done only every contest
+            // encryption whereas the two triples and a quadruple is used every selection
+            // encryption. The generating two triples every third iteration is a guess
+            // on how many precomputes we will need.
+            if ((iteration_count % iterationCountToGenerateTwoTriples) == 0) {
+                auto tuple = createTwoTriples(*publicKey);
+                triple_queue.push(move(std::get<0>(tuple)));
+                triple_queue.push(move(std::get<1>(tuple)));
             }
-        } while (getInstance().twoTriplesAndAQuadruple_queue.size() < getInstance().max);
+            iteration_count++;
+
+        } while (isRunning && twoTriplesAndAQuadruple_queue.size() < maxQueueSize);
     }
 
-    void PrecomputeBufferContext::stop_populate() { getInstance().populate_OK = false; }
-
-    uint32_t PrecomputeBufferContext::get_max_queue_size() { return getInstance().max; }
-
-    uint32_t PrecomputeBufferContext::get_current_queue_size()
+    void PrecomputeBuffer::startAsync()
     {
-        return getInstance().twoTriplesAndAQuadruple_queue.size();
+        // TODO: implement this
+        // TODO: threading
+        start();
     }
 
-    std::unique_ptr<TwoTriplesAndAQuadruple> PrecomputeBufferContext::getTwoTriplesAndAQuadruple()
-    {
-        unique_ptr<TwoTriplesAndAQuadruple> result = nullptr;
+    void PrecomputeBuffer::stop() { isRunning = false; }
 
-        // take a lock while we get the triples and a quadruple
-        std::lock_guard<std::mutex> lock(queue_lock);
+    uint32_t PrecomputeBuffer::getMaxQueueSize() { return maxQueueSize; }
+
+    uint32_t PrecomputeBuffer::getCurrentQueueSize()
+    {
+        return twoTriplesAndAQuadruple_queue.size();
+    }
+
+    ElementModP *PrecomputeBuffer::getPublicKey() { return publicKey.get(); }
+
+    std::unique_ptr<Triple> PrecomputeBuffer::getTriple()
+    {
+        if (!triple_queue.empty()) {
+            return popTriple().value();
+        }
+        return make_unique<Triple>(*publicKey);
+    }
+
+    std::optional<std::unique_ptr<Triple>> PrecomputeBuffer::popTriple()
+    {
+        unique_ptr<Triple> result = nullptr;
+        std::lock_guard<std::mutex> lock(triple_queue_lock);
 
         // make sure there are enough in the queues
-        if (!getInstance().twoTriplesAndAQuadruple_queue.empty()) {
-            result = std::move(getInstance().twoTriplesAndAQuadruple_queue.front());
-            getInstance().twoTriplesAndAQuadruple_queue.pop();
+        if (!triple_queue.empty()) {
+            result = std::move(triple_queue.front());
+            triple_queue.pop();
         }
 
         return result;
+    }
+
+    std::unique_ptr<TwoTriplesAndAQuadruple> PrecomputeBuffer::getTwoTriplesAndAQuadruple()
+    {
+        if (!twoTriplesAndAQuadruple_queue.empty()) {
+            return popTwoTriplesAndAQuadruple().value();
+        }
+
+        return createTwoTriplesAndAQuadruple(*publicKey);
+    }
+
+    std::optional<std::unique_ptr<TwoTriplesAndAQuadruple>>
+    PrecomputeBuffer::popTwoTriplesAndAQuadruple()
+    {
+        unique_ptr<TwoTriplesAndAQuadruple> result = nullptr;
+        std::lock_guard<std::mutex> lock(quad_queue_lock);
+
+        // make sure there are enough in the queues
+        if (!twoTriplesAndAQuadruple_queue.empty()) {
+            result = std::move(twoTriplesAndAQuadruple_queue.front());
+            twoTriplesAndAQuadruple_queue.pop();
+        }
+
+        return result;
+    }
+
+    std::tuple<std::unique_ptr<Triple>, std::unique_ptr<Triple>>
+    PrecomputeBuffer::createTwoTriples(const ElementModP &publicKey)
+    {
+        auto triple1 = make_unique<Triple>(publicKey);
+        auto triple2 = make_unique<Triple>(publicKey);
+        return std::make_tuple(move(triple1), move(triple2));
+    }
+    unique_ptr<TwoTriplesAndAQuadruple>
+    PrecomputeBuffer::createTwoTriplesAndAQuadruple(const ElementModP &publicKey)
+    {
+        auto triple1 = make_unique<Triple>(publicKey);
+        auto triple2 = make_unique<Triple>(publicKey);
+        auto quad = make_unique<Quadruple>(publicKey);
+        return make_unique<TwoTriplesAndAQuadruple>(move(triple1), move(triple2), move(quad));
+    }
+
+#pragma endregion
+
+#pragma region PrecomputeBufferContext
+
+    void PrecomputeBufferContext::clear()
+    {
+        if (getInstance()._instance != nullptr) {
+            getInstance()._instance->clear();
+            getInstance()._instance = nullptr;
+        }
+    }
+
+    void PrecomputeBufferContext::initialize(const ElementModP &publicKey,
+                                             uint32_t maxQueueSize /* = 0 */)
+    {
+        std::lock_guard<std::mutex> lock(getInstance()._mutex);
+        clear();
+        getInstance()._instance = make_unique<PrecomputeBuffer>(publicKey, maxQueueSize);
+    }
+
+    void PrecomputeBufferContext::start()
+    {
+        std::lock_guard<std::mutex> lock(getInstance()._mutex);
+        if (getInstance()._instance == nullptr) {
+            throw std::runtime_error("PrecomputeBufferContext::start() called before "
+                                     "PrecomputeBufferContext::initialize()");
+        }
+        getInstance()._instance->start();
+    }
+
+    void PrecomputeBufferContext::start(const ElementModP &elgamalPublicKey)
+    {
+        std::lock_guard<std::mutex> lock(getInstance()._mutex);
+        if (getInstance()._instance == nullptr) {
+            getInstance()._instance = make_unique<PrecomputeBuffer>(elgamalPublicKey);
+        }
+        getInstance()._instance->start();
+    }
+
+    void PrecomputeBufferContext::startAsync(const ElementModP &elgamalPublicKey)
+    {
+        std::lock_guard<std::mutex> lock(getInstance()._mutex);
+        if (getInstance()._instance == nullptr) {
+            getInstance()._instance = make_unique<PrecomputeBuffer>(elgamalPublicKey);
+        } else if (*getInstance()._instance->getPublicKey() != elgamalPublicKey) {
+            getInstance()._instance->clear();
+            getInstance()._instance = make_unique<PrecomputeBuffer>(elgamalPublicKey);
+        }
+
+        getInstance()._instance->startAsync();
+    }
+
+    void PrecomputeBufferContext::stop()
+    {
+        std::lock_guard<std::mutex> lock(getInstance()._mutex);
+        if (getInstance()._instance != nullptr) {
+            getInstance()._instance->stop();
+        }
+    }
+
+    uint32_t PrecomputeBufferContext::getMaxQueueSize()
+    {
+        return getInstance()._instance->getMaxQueueSize();
+    }
+
+    uint32_t PrecomputeBufferContext::getCurrentQueueSize()
+    {
+        return getInstance()._instance->getCurrentQueueSize();
     }
 
     std::unique_ptr<Triple> PrecomputeBufferContext::getTriple()
     {
-        unique_ptr<Triple> result = nullptr;
-
-        // take a lock while we get the triples and a quadruple
-        std::lock_guard<std::mutex> lock(queue_lock);
-
-        // make sure there are enough in the queues
-        if (!getInstance().triple_queue.empty()) {
-            result = std::move(getInstance().triple_queue.front());
-            getInstance().triple_queue.pop();
+        if (getInstance()._instance != nullptr) {
+            return getInstance()._instance->getTriple();
         }
-
-        return result;
+        return nullptr;
     }
 
-    void PrecomputeBufferContext::empty_queues()
+    std::optional<std::unique_ptr<Triple>> PrecomputeBufferContext::popTriple()
     {
-        std::lock_guard<std::mutex> lock(queue_lock);
-        uint32_t triple_size = getInstance().triple_queue.size();
-        for (int i = 0; i < (int)triple_size; i++) {
-            getInstance().triple_queue.pop();
+        if (getInstance()._instance != nullptr) {
+            return getInstance()._instance->popTriple();
         }
-        uint32_t twoTriplesAndAQuadruple_size = getInstance().twoTriplesAndAQuadruple_queue.size();
-        for (int i = 0; i < (int)twoTriplesAndAQuadruple_size; i++) {
-            getInstance().twoTriplesAndAQuadruple_queue.pop();
-        }
+        return std::nullopt;
     }
 
-    std::mutex PrecomputeBufferContext::queue_lock;
+    std::unique_ptr<TwoTriplesAndAQuadruple> PrecomputeBufferContext::getTwoTriplesAndAQuadruple()
+    {
+        if (getInstance()._instance != nullptr) {
+            return getInstance()._instance->getTwoTriplesAndAQuadruple();
+        }
+        return nullptr;
+    }
+
+    std::optional<std::unique_ptr<TwoTriplesAndAQuadruple>>
+    PrecomputeBufferContext::popTwoTriplesAndAQuadruple()
+    {
+        if (getInstance()._instance != nullptr) {
+            return getInstance()._instance->popTwoTriplesAndAQuadruple();
+        }
+        return std::nullopt;
+    }
+
+    //std::mutex PrecomputeBufferContext::_lock;
+
+#pragma endregion
 
 } // namespace electionguard

@@ -15,6 +15,7 @@ class GroupFunctions
   public:
     static std::unique_ptr<ElementModQ> addModQ(ElementModQ &a, ElementModQ &b)
     {
+        //std::cout << "addModQ " << a.toHex() << std::endl;
         auto result = add_mod_q(a, b);
         return std::move(result);
     }

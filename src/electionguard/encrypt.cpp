@@ -16,10 +16,12 @@
 #include <future>
 #include <iostream>
 #include <nlohmann/json.hpp>
+#include <optional>
 
 using std::invalid_argument;
 using std::make_unique;
 using std::move;
+using std::optional;
 using std::runtime_error;
 using std::to_string;
 using std::unique_ptr;
@@ -263,7 +265,7 @@ namespace electionguard
     {
         unique_ptr<CiphertextBallotSelection> encrypted = NULL;
         unique_ptr<ElGamalCiphertext> ciphertext;
-        unique_ptr<TwoTriplesAndAQuadruple> precomputedTwoTriplesAndAQuad = nullptr;
+        optional<unique_ptr<TwoTriplesAndAQuadruple>> precomputedTwoTriplesAndAQuad = nullptr;
 
         // Validate Input
         if (!selection.isValid(description.getObjectId())) {
@@ -282,11 +284,11 @@ namespace electionguard
 
         // this method runs off to look in the precomputed values buffer and if
         // it finds what it needs then the returned class will contain those values
-        precomputedTwoTriplesAndAQuad = PrecomputeBufferContext::getTwoTriplesAndAQuadruple();
+        precomputedTwoTriplesAndAQuad = PrecomputeBufferContext::popTwoTriplesAndAQuadruple();
 
         // check if we found the precomputed values needed
-        if (precomputedTwoTriplesAndAQuad != nullptr) {
-            auto triple1 = precomputedTwoTriplesAndAQuad->get_triple1();
+        if (precomputedTwoTriplesAndAQuad != nullptr && precomputedTwoTriplesAndAQuad.has_value()) {
+            auto triple1 = precomputedTwoTriplesAndAQuad.value()->get_triple1();
             auto g_to_exp = triple1->get_g_to_exp();
             auto pubkey_to_exp = triple1->get_pubkey_to_exp();
 
@@ -304,7 +306,7 @@ namespace electionguard
             encrypted = CiphertextBallotSelection::make_with_precomputed(
               selection.getObjectId(), description.getSequenceOrder(), *descriptionHash,
               move(ciphertext), cryptoExtendedBaseHash, selection.getVote(),
-              move(precomputedTwoTriplesAndAQuad), isPlaceholder, true);
+              move(precomputedTwoTriplesAndAQuad.value()), isPlaceholder, true);
         } else {
             // Generate the encryption
             ciphertext = elgamalEncrypt(selection.getVote(), *selectionNonce, elgamalPublicKey);
