@@ -156,7 +156,7 @@ jobs:
             echo "CC=gcc-${{ matrix.version }}" >> $GITHUB_ENV
             echo "CXX=g++-${{ matrix.version }}" >> $GITHUB_ENV
           elif [ "${{ matrix.compiler }}" = "emscripten" ]; then
-            ./cmake/install-emscripten.sh ${{ matrix.version }}
+            make environment-wasm
             source ./.cache/emscripten/emsdk_env.sh
             echo "CC=emcc" >> $GITHUB_ENV
             echo "CXX=em++" >> $GITHUB_ENV
