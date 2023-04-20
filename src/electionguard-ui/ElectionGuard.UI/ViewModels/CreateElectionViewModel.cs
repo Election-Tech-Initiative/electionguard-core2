@@ -106,6 +106,22 @@ public partial class CreateElectionViewModel : BaseViewModel
                 // save the manifest
                 _ = await _manifestService.SaveAsync(manifestRecord);
 
+                if (multiple)
+                {
+                    // create the export file for each election
+                    // need to add the path from the manifest
+                    var zipPath = file.FullPath.ToLower().Replace(".json", ".zip");
+                    var files = new List<FileContents>
+                    {
+                        new("constants.json", constantsRecord.ConstantsData),
+                        new("context.json", contextRecord.ContextData),
+                        new("manifest.json", manifestRecord.ManifestData)
+                    };
+
+                    ZipService.AddFiles(zipPath, files);
+                }
+
+
                 if (!multiple)
                 {
                     var loadElection = await _electionService.GetByElectionIdAsync(election.ElectionId);
