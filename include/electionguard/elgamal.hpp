@@ -382,7 +382,8 @@ namespace electionguard
     EG_API std::unique_ptr<HashedElGamalCiphertext>
     hashedElgamalEncrypt(std::vector<uint8_t> plaintext, const ElementModQ &nonce,
                          const ElementModP &publicKey, const ElementModQ &descriptionHash,
-                         padded_data_size_t max_len, bool allow_truncation);
+                         padded_data_size_t max_len, bool allow_truncation,
+                         bool shouldUsePrecomputedValues = false);
 
 } // namespace electionguard
 

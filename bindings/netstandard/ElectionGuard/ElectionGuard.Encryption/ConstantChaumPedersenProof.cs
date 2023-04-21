@@ -86,6 +86,7 @@
         ///          usually the election extended base hash (𝑄')</param>
         /// <param name="hashHeader">Used to generate other random values here</param>
         /// <param name="constant">The constant value to prove</param>
+        /// <param name="shouldUsePrecomputedValues">Whether to use precomputed values</param>
         /// <returns>An instance</returns>
         /// </Summary>
         public ConstantChaumPedersenProof(
@@ -94,10 +95,17 @@
             ElementModP k,
             ElementModQ seed,
             ElementModQ hashHeader,
-            ulong constant)
+            ulong constant,
+            bool shouldUsePrecomputedValues = false)
         {
             var status = NativeInterface.ConstantChaumPedersenProof.Make(
-                message.Handle, r.Handle, k.Handle, seed.Handle, hashHeader.Handle, constant, out Handle);
+                message.Handle,
+                r.Handle,
+                k.Handle,
+                seed.Handle,
+                hashHeader.Handle,
+                constant,
+                shouldUsePrecomputedValues, out Handle);
             status.ThrowIfError();
         }
 

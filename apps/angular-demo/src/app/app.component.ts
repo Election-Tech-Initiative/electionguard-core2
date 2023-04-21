@@ -28,12 +28,6 @@ export class AppComponent implements OnInit {
     this.logger.log(`encrypting ballot`);
     const encryptedBallot = await this.service.encryptBallot(ballot);
     this.logger.log(`encrypted ballot: ${encryptedBallot.toJson(true)}`);
-
-    // get the nonce and timestamp
-
-    // reencrypt the ballot
-
-    // verify the code matches
   }
   title = 'angular-demo';
 }

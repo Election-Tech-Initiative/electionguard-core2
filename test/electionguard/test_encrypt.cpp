@@ -362,6 +362,66 @@ TEST_CASE("Encrypt simple ballot from file succeeds")
                                         *context->getCryptoExtendedBaseHash()) == true);
 }
 
+TEST_CASE("Encrypt simple ballot from file re-encrypt creates same ballot")
+{
+    // Arrange
+    auto secret = ElementModQ::fromHex(a_fixed_secret);
+    auto keypair = ElGamalKeyPair::fromSecret(*secret);
+    auto manifest = ManifestGenerator::getManifestFromFile(TEST_SPEC_VERSION, TEST_USE_SAMPLE);
+    auto internal = make_unique<InternalManifest>(*manifest);
+    auto context = ElectionGenerator::getFakeContext(*internal, *keypair->getPublicKey());
+
+    auto ballot = BallotGenerator::getFakeBallot(*internal);
+    auto codeSeed = TWO_MOD_Q();
+
+    // Act
+    auto ciphertext = encryptBallot(*ballot, *internal, *context, codeSeed);
+    auto timestamp = ciphertext->getTimestamp();
+    auto nonce = ciphertext->getNonce();
+
+    auto reencrypted =
+      encryptBallot(*ballot, *internal, *context, codeSeed, nonce->clone(), timestamp);
+
+    //Log::debug(ciphertext->toJson());
+
+    // Assert
+    CHECK(*ciphertext->getBallotCode() == *reencrypted->getBallotCode());
+}
+
+TEST_CASE(
+  "Encrypt simple ballot from file using precompute tables re-encrypt creates a different ballot")
+{
+    // Arrange
+    auto secret = ElementModQ::fromHex(a_fixed_secret);
+    auto keypair = ElGamalKeyPair::fromSecret(*secret);
+    auto manifest = ManifestGenerator::getManifestFromFile(TEST_SPEC_VERSION, TEST_USE_SAMPLE);
+    auto internal = make_unique<InternalManifest>(*manifest);
+    auto context = ElectionGenerator::getFakeContext(*internal, *keypair->getPublicKey());
+
+    auto ballot = BallotGenerator::getFakeBallot(*internal);
+    auto codeSeed = TWO_MOD_Q();
+
+    auto verifyProofs = true;
+    auto usePrecomputed = true;
+
+    // fill the precompute table
+    PrecomputeBufferContext::initialize(*keypair->getPublicKey(), 100);
+    PrecomputeBufferContext::start();
+    PrecomputeBufferContext::stop();
+
+    // Act
+    auto ciphertext = encryptBallot(*ballot, *internal, *context, codeSeed, nullptr, 0,
+                                    verifyProofs, usePrecomputed);
+    auto timestamp = ciphertext->getTimestamp();
+    auto nonce = ciphertext->getNonce();
+
+    auto reencrypted = encryptBallot(*ballot, *internal, *context, codeSeed, nonce->clone(),
+                                     timestamp, verifyProofs, false);
+
+    // Assert
+    CHECK(ciphertext->getBallotCode()->toHex() != reencrypted->getBallotCode()->toHex());
+}
+
 TEST_CASE("Encrypt simple ballot from file cast is valid")
 {
     // Arrange

@@ -63,6 +63,7 @@ describe("EncryptionMediator Precompute Tests", () => {
     await PrecomputeBufferContext.start();
   });
   it("should encrypt a ballot", async () => {
+    const usePreencrypt = true;
     const context = await ElectionContext.fromJson(
       JSON.stringify(ciphertextElectionContext)
     );
@@ -74,22 +75,15 @@ describe("EncryptionMediator Precompute Tests", () => {
       JSON.stringify(plaintextBallots[0])
     );
     const subject = await EncryptionMediator.make(manifest, context, device);
-    const result = await subject.encrypt(data, false);
+    const result = await subject.encrypt(data, false, usePreencrypt);
 
     assert.isTrue(result.objectId.includes(data.objectId));
   });
 });
 
 describe("EncryptionFunctions Tests", () => {
-  before(async () => {
-    const context = await ElectionContext.fromJson(
-      JSON.stringify(ciphertextElectionContext)
-    );
-
-    await PrecomputeBufferContext.initialize(context.publicKeyRef, 150);
-    await PrecomputeBufferContext.start();
-  });
   it("should re-encrypt a ballot", async () => {
+    const usePreencrypt = false;
     const context = await ElectionContext.fromJson(
       JSON.stringify(ciphertextElectionContext)
     );
@@ -99,31 +93,37 @@ describe("EncryptionFunctions Tests", () => {
     const plaintext = await PlaintextBallot.fromJson(
       JSON.stringify(plaintextBallots[0])
     );
-    const ciphertext = await CiphertextBallot.fromJson(
-      JSON.stringify(ciphertextBallots[0])
+    const codeSeed = await ElementModQ.fromNumber(2);
+
+    const ciphertext = await EncryptFunctions.encryptBallot(
+      plaintext,
+      manifest,
+      context,
+      codeSeed,
+      undefined,
+      undefined,
+      false,
+      usePreencrypt
     );
-    assert.isTrue(plaintext.objectId.includes(ciphertext.objectId));
+    const timestamp = ciphertext.timestamp;
+    const nonce = await ciphertext.nonce.copy();
 
-    // grab the nonce from the test data
-    const nonce = await ElementModQ.fromHex(nonces[plaintext.objectId]);
-    const codeSeed = await ciphertext.ballotCodeSeed.copy();
-
-    // re-encrypt the ballot
-    const result = await EncryptFunctions.encryptBallot(
+    const reencrypted = await EncryptFunctions.encryptBallot(
       plaintext,
       manifest,
       context,
       codeSeed,
       nonce,
-      ciphertext.timestamp,
-      false
+      timestamp,
+      false,
+      usePreencrypt
     );
 
-    const actual = result.ballotCode.toHex();
+    const actual = reencrypted.ballotCode.toHex();
     const expected = ciphertext.ballotCode.toHex();
 
-    console.log(`actual: ${actual}`);
-    console.log(`expected: ${expected}`);
+    console.log(`actual ballotCode: ${actual}`);
+    console.log(`expected ballotCode: ${expected}`);
 
     // check that the re-encrypted ballot has the same ballot code as the original
     assert.isTrue(actual.includes(expected));

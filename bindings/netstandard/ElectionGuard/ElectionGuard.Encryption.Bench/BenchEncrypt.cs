@@ -46,7 +46,7 @@ namespace ElectionGuard.Encryption.Bench
             Run(() =>
             {
                 _ = Encrypt.Ballot(
-                    _ballot, _internalManifest, _context, _device.GetHash(), _nonce, false);
+                    _ballot, _internalManifest, _context, _device.GetHash(), _nonce, 0, false);
             });
         }
 
@@ -55,7 +55,7 @@ namespace ElectionGuard.Encryption.Bench
             Console.WriteLine("Bench_Encrypt_BallotFull_WithProofCheck");
             Run(() =>
             {
-                Encrypt.Ballot(_ballot, _internalManifest, _context, _device.GetHash(), _nonce);
+                _ = Encrypt.Ballot(_ballot, _internalManifest, _context, _device.GetHash(), _nonce, 0, true);
             });
         }
 
@@ -65,7 +65,7 @@ namespace ElectionGuard.Encryption.Bench
             Run(() =>
             {
                 _ = Encrypt.CompactBallot(
-                    _ballot, _internalManifest, _context, _device.GetHash(), _nonce, false);
+                    _ballot, _internalManifest, _context, _device.GetHash(), _nonce, 0, false);
             });
         }
 

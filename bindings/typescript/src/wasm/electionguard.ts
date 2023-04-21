@@ -73,12 +73,21 @@ export type EncryptionMediatorHandle = {
 
   encrypt(
     ballot: PlaintextBallotHandle,
-    shouldVerifyProofs: boolean
+    shouldVerifyProofs: boolean,
+    shouldUsePrecomputedValues: boolean
   ): CiphertextBallotHandle;
 };
 
 export type EncryptFunctionsStatic = {
   encryptBallot(
+    ballot: PlaintextBallotHandle,
+    internalManifest: InternalManifestHandle,
+    context: CiphertextElectionContextHandle,
+    ballotCodeSeed: ElementModQHandle,
+    shouldVerifyProofs: boolean,
+    shouldUsePrecomputedValues: boolean
+  ): CiphertextBallotHandle;
+  encryptBallotWithNonce(
     ballot: PlaintextBallotHandle,
     internalManifest: InternalManifestHandle,
     context: CiphertextElectionContextHandle,

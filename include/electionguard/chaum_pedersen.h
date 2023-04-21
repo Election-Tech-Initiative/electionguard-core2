@@ -237,7 +237,7 @@ EG_API eg_electionguard_status_t eg_constant_chaum_pedersen_proof_get_response(
 EG_API eg_electionguard_status_t eg_constant_chaum_pedersen_proof_make(
   eg_elgamal_ciphertext_t *in_message, eg_element_mod_q_t *in_r, eg_element_mod_p_t *in_k,
   eg_element_mod_q_t *in_seed, eg_element_mod_q_t *in_hash_header, uint64_t in_constant,
-  eg_constant_chaum_pedersen_proof_t **out_handle);
+  bool in_should_use_precomputed_values, eg_constant_chaum_pedersen_proof_t **out_handle);
 
 /**
  * Validates a "constant" Chaum-Pedersen (selection-limit) proof.

@@ -230,12 +230,12 @@ bool test_constant_chaum_pedersen_proof(void)
     // Act
     eg_constant_chaum_pedersen_proof_t *proof = NULL;
     if (eg_constant_chaum_pedersen_proof_make(message, nonce, public_key, seed, one_mod_q, 0UL,
-                                              &proof)) {
+                                              false, &proof)) {
         assert(false);
     }
     eg_constant_chaum_pedersen_proof_t *bad_proof = NULL;
     if (eg_constant_chaum_pedersen_proof_make(message, nonce, public_key, seed, one_mod_q, 1UL,
-                                              &bad_proof)) {
+                                              false, &bad_proof)) {
         assert(false);
     }
 

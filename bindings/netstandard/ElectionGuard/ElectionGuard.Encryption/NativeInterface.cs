@@ -759,6 +759,7 @@ namespace ElectionGuard
                 ElementModQ.ElementModQHandle seed,
                 ElementModQ.ElementModQHandle hash_header,
                 ulong constant,
+                bool shouldUsePrecomputedValues,
                 out ConstantChaumPedersenProofHandle handle);
 
             [DllImport(DllName, EntryPoint = "eg_constant_chaum_pedersen_proof_is_valid",
@@ -2851,6 +2852,7 @@ namespace ElectionGuard
             internal static extern Status Encrypt(
                 EncryptionMediatorHandle handle,
                 ElectionGuard.PlaintextBallot.External.PlaintextBallotHandle plaintext,
+                bool usePrecomputedValues,
                 out ElectionGuard.CiphertextBallot.External.CiphertextBallotHandle ciphertext);
 
             [DllImport(DllName,
@@ -2859,6 +2861,7 @@ namespace ElectionGuard
             internal static extern Status EncryptAndVerify(
                 EncryptionMediatorHandle handle,
                 ElectionGuard.PlaintextBallot.External.PlaintextBallotHandle plaintext,
+                bool usePrecomputedValues,
                 out ElectionGuard.CiphertextBallot.External.CiphertextBallotHandle ciphertext);
         }
 
@@ -2873,6 +2876,7 @@ namespace ElectionGuard
                 ElementModQ.ElementModQHandle crypto_extended_base_hash,
                 ElementModQ.ElementModQHandle nonceSeed,
                 bool shouldVerifyProofs,
+                bool usePrecomputedValues,
                 out CiphertextBallotSelection.External.CiphertextBallotSelectionHandle handle);
 
             [DllImport(DllName, EntryPoint = "eg_encrypt_contest",
@@ -2884,6 +2888,7 @@ namespace ElectionGuard
                 ElementModQ.ElementModQHandle crypto_extended_base_hash,
                 ElementModQ.ElementModQHandle nonceSeed,
                 bool shouldVerifyProofs,
+                bool usePrecomputedValues,
                 out ElectionGuard.CiphertextBallotContest.External.CiphertextBallotContestHandle handle);
 
             [DllImport(DllName, EntryPoint = "eg_encrypt_ballot",
@@ -2894,6 +2899,7 @@ namespace ElectionGuard
                 CiphertextElectionContext.CiphertextElectionContextHandle context,
                 ElementModQ.ElementModQHandle ballot_code_seed,
                 bool shouldVerifyProofs,
+                bool usePrecomputedValues,
                 out ElectionGuard.CiphertextBallot.External.CiphertextBallotHandle handle);
 
             [DllImport(DllName, EntryPoint = "eg_encrypt_ballot_with_nonce",
@@ -2904,6 +2910,7 @@ namespace ElectionGuard
                 CiphertextElectionContext.CiphertextElectionContextHandle context,
                 ElementModQ.ElementModQHandle ballot_code_seed,
                 ElementModQ.ElementModQHandle nonce,
+                ulong timestamp,
                 bool shouldVerifyProofs,
                 out ElectionGuard.CiphertextBallot.External.CiphertextBallotHandle handle);
 
@@ -2925,6 +2932,7 @@ namespace ElectionGuard
                 CiphertextElectionContext.CiphertextElectionContextHandle context,
                 ElementModQ.ElementModQHandle ballot_code_seed,
                 ElementModQ.ElementModQHandle nonce,
+                ulong timestamp,
                 bool shouldVerifyProofs,
                 out CompactCiphertextBallot.CompactCiphertextBallotHandle handle);
         }

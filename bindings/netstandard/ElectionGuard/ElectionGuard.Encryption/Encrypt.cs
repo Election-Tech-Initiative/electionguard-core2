@@ -19,7 +19,8 @@
         /// <param name="nonceSeed">an `ElementModQ` used as a header to seed the `Nonce` generated
         ///                          for this selection. this value can be (or derived from) the
         ///                          Contest nonce, but no relationship is required</param>
-        /// <param name="shouldVerifyProofs">specify if the proofs should be verified prior to returning (default True)</param>
+        /// <param name="shouldVerifyProofs">specify if precomputed values should be used</param>
+        /// <param name="usePrecomputedValues">specify if the proofs should be verified using precomputed values (default False)</param>
         /// <returns>A `CiphertextBallotSelection`</returns>
         public static CiphertextBallotSelection Selection(
             PlaintextBallotSelection plaintext,
@@ -27,12 +28,14 @@
             ElementModP elgamalPublicKey,
             ElementModQ cryptoExtendedBaseHash,
             ElementModQ nonceSeed,
-            bool shouldVerifyProofs = true
+            bool shouldVerifyProofs = true,
+            bool usePrecomputedValues = false
         )
         {
             var status = NativeInterface.Encrypt.Selection(
                     plaintext.Handle, description.Handle, elgamalPublicKey.Handle,
                     cryptoExtendedBaseHash.Handle, nonceSeed.Handle, shouldVerifyProofs,
+                    usePrecomputedValues,
                     out var ciphertext);
             status.ThrowIfError();
             return ciphertext.IsInvalid ? null : new CiphertextBallotSelection(ciphertext);
@@ -62,7 +65,8 @@
             ElementModP elgamalPublicKey,
             ElementModQ cryptoExtendedBaseHash,
             ElementModQ nonceSeed,
-            bool shouldVerifyProofs = true
+            bool shouldVerifyProofs = true,
+            bool usePrecomputedValues = false
         )
         {
             var status = NativeInterface.Encrypt.Contest(
@@ -72,6 +76,7 @@
                 cryptoExtendedBaseHash.Handle,
                 nonceSeed.Handle,
                 shouldVerifyProofs,
+                usePrecomputedValues,
                 out var ciphertext);
 
             status.ThrowIfError();
@@ -88,6 +93,13 @@
         ///
         /// This method also allows for ballots to exclude passing contests for which the voter made no selections.
         /// It will fill missing contests with `False` selections and generate `placeholder` selections that are marked `True`.
+        /// This function can also take advantage of PrecomputeBuffers to speed up the encryption process.
+        /// when using precomputed values, the application looks in the `PrecomputeBufferContext` for values
+        /// and uses them for the encryptions. You must preload the `PrecomputeBufferContext` prior to calling this function
+        /// with `shouldUsePrecomputedValues` set to `true`, otherwise the function will fall back to realtime generation.
+        ///
+        /// Because PrecomputeBuffers require a random nonce, calling this function with `shouldUsePrecomputedValues`
+        /// set to `true` while also providing a nonce will result in an error.
         /// </summary>
         /// <param name="ballot">the selection in the valid input form</param>
         /// <param name="internalManifest">the `InternalManifest` which defines this ballot's structure</param>
@@ -96,6 +108,7 @@
         /// <param name="nonce">an optional value used to seed the `Nonce` generated for this ballot
         ///                     if this value is not provided, the secret generating mechanism of the OS provides its own</param>
         /// <param name="shouldVerifyProofs">specify if the proofs should be verified prior to returning (default True)</param>
+        /// <param name="shouldUsePrecomputedValues">specify if precomputed values should be used (default True)</param>
         /// <returns>A `CiphertextBallot`</returns>
         public static CiphertextBallot Ballot(
             PlaintextBallot ballot,
@@ -103,13 +116,15 @@
             CiphertextElectionContext context,
             ElementModQ ballotCodeSeed,
             ElementModQ nonce = null,
-            bool shouldVerifyProofs = true)
+            ulong timestamp = 0,
+            bool shouldVerifyProofs = true, bool usePrecomputedValues = false)
         {
             if (nonce == null)
             {
                 var status = NativeInterface.Encrypt.Ballot(
                     ballot.Handle, internalManifest.Handle, context.Handle,
                     ballotCodeSeed.Handle, shouldVerifyProofs,
+                    usePrecomputedValues,
                     out var ciphertext);
                 status.ThrowIfError();
                 return ciphertext.IsInvalid ? null : new CiphertextBallot(ciphertext);
@@ -118,7 +133,7 @@
             {
                 var status = NativeInterface.Encrypt.Ballot(
                     ballot.Handle, internalManifest.Handle, context.Handle,
-                    ballotCodeSeed.Handle, nonce.Handle, shouldVerifyProofs,
+                    ballotCodeSeed.Handle, nonce.Handle, timestamp, shouldVerifyProofs,
                     out var ciphertext);
                 status.ThrowIfError();
                 return ciphertext.IsInvalid ? null : new CiphertextBallot(ciphertext);
@@ -153,6 +168,7 @@
             CiphertextElectionContext context,
             ElementModQ ballotCodeSeed,
             ElementModQ nonce = null,
+            ulong timestamp = 0,
             bool shouldVerifyProofs = true)
         {
             if (nonce == null)
@@ -168,7 +184,7 @@
             {
                 var status = NativeInterface.Encrypt.CompactBallot(
                     ballot.Handle, internalManifest.Handle, context.Handle,
-                    ballotCodeSeed.Handle, nonce.Handle, shouldVerifyProofs,
+                    ballotCodeSeed.Handle, nonce.Handle, timestamp, shouldVerifyProofs,
                     out var ciphertext);
                 status.ThrowIfError();
                 return ciphertext.IsInvalid ? null : new CompactCiphertextBallot(ciphertext);

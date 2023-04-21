@@ -86,11 +86,35 @@ export class EncryptionMediator {
     this._handle = handle;
   }
 
+  /**
+   * Encrypt a specific `Ballot` in the context of a specific `CiphertextElectionContext`.
+   *
+   * This method accepts a ballot representation that only includes `True` selections.
+   * It will fill missing selections for a contest with `False` values, and generate `placeholder`
+   * selections to represent the number of seats available for a given contest.
+   *
+   * This method also allows for ballots to exclude passing contests for which the voter made no selections.
+   * It will fill missing contests with `False` selections and generate `placeholder` selections that are marked `True`.
+   *
+   * This function can also take advantage of PrecomputeBuffers to speed up the encryption process.
+   * when using precomputed values, the application looks in the `PrecomputeBufferContext` for values
+   * and uses them for the encryptions. You must preload the `PrecomputeBufferContext` prior to calling this function
+   * with `shouldUsePrecomputedValues` set to `true`, otherwise the function will fall back to realtime generation.
+   *
+   * @param ballot The plaintext representation of the ballot
+   * @param shouldVerifyProofs True if the mediator should verify proofs
+   * @param shouldUsePrecomputedValues True if the mediator should use the precomputed values
+   **/
   encrypt(
     ballot: PlaintextBallot,
-    shouldVerifyProofs: boolean
+    shouldVerifyProofs: boolean = true,
+    shouldUsePrecomputedValues: boolean = false
   ): Promise<CiphertextBallot> {
-    const result = this._handle.encrypt(ballot._handle, shouldVerifyProofs);
+    const result = this._handle.encrypt(
+      ballot._handle,
+      shouldVerifyProofs,
+      shouldUsePrecomputedValues
+    );
     return Promise.resolve(new CiphertextBallot(result));
   }
 
@@ -115,12 +139,31 @@ export class EncryptFunctions {
   /**
    * Encrypt a specific `Ballot` in the context of a specific `CiphertextElectionContext`.
    *
+   * This method accepts a ballot representation that only includes `True` selections.
+   * It will fill missing selections for a contest with `False` values, and generate `placeholder`
+   * selections to represent the number of seats available for a given contest.
+   *
+   * This method also allows for ballots to exclude passing contests for which the voter made no selections.
+   * It will fill missing contests with `False` selections and generate `placeholder` selections that are marked `True`.
+   *
+   * Additionally, if the nonce is provided it will be used to determinisitcally construct
+   * the ballot in real-time (i.e. the same nonce will always produce the same ballot).
+   * If the nonce is not provided, the secret generating mechanism of the OS provides its own.
+   *
+   * This function can also take advantage of PrecomputeBuffers to speed up the encryption process.
+   * when using precomputed values, the application looks in the `PrecomputeBufferContext` for values
+   * and uses them for the encryptions. You must preload the `PrecomputeBufferContext` prior to calling this function
+   * with `shouldUsePrecomputedValues` set to `true`, otherwise the function will fall back to realtime generation.
+   *
+   * Because PrecomputeBuffers require a random nonce, calling this function with `shouldUsePrecomputedValues`
+   * set to `true` while also providing a nonce will result in an error.
    * @param plaintext: the ballot in the valid input form
    * @param manifest: the `InternalManifest` which defines this ballot's structure
    * @param context: all the cryptographic context for the election
    * @param ballotCodeSeed: Hash from previous ballot or starting hash from device
-   * @param nonceSeed: an optional value used to seed the `Nonce` generated for this ballot
+   * @param nonce: an optional value used to seed the `Nonce` generated for this ballot
    *                if this value is not provided, the secret generating mechanism of the OS provides its own
+   * @param timestamp: an optional value used to seed the `Timestamp` generated for this ballot
    * @param shouldVerifyProofs: specify if the proofs should be verified prior to returning (default True)
    */
   static async encryptBallot(
@@ -128,18 +171,33 @@ export class EncryptFunctions {
     internalManifest: InternalManifest,
     context: ElectionContext,
     ballotCodeSeed: ElementModQ,
-    nonceSeed: ElementModQ,
-    timestamp: number,
-    shouldVerifyProofs: boolean
+    nonce: ElementModQ | undefined = undefined,
+    timestamp: number = 0,
+    shouldVerifyProofs: boolean = true,
+    shouldUsePrecomputedValues: boolean = false
   ): Promise<CiphertextBallot> {
+    if (nonce) {
+      var result = (
+        await getInstance()
+      ).EncryptFunctions.encryptBallotWithNonce(
+        plaintext._handle,
+        internalManifest._handle,
+        context._handle,
+        ballotCodeSeed._handle,
+        nonce._handle,
+        timestamp,
+        shouldVerifyProofs
+      );
+      return new CiphertextBallot(result);
+    }
+
     var result = (await getInstance()).EncryptFunctions.encryptBallot(
       plaintext._handle,
       internalManifest._handle,
       context._handle,
       ballotCodeSeed._handle,
-      nonceSeed._handle,
-      timestamp,
-      shouldVerifyProofs
+      shouldVerifyProofs,
+      shouldUsePrecomputedValues
     );
     return new CiphertextBallot(result);
   }
