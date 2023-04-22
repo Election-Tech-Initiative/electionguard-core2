@@ -376,10 +376,9 @@ namespace electionguard
             throw runtime_error("encryptSelection:: Error generating ciphertext");
         }
 
-        // note that there the public key and the selection nonce are not needed
-        // because the precomputation values are being used so a selection nonce
-        // was generated when precomputing and the public key was used in the
-        // precomputation
+        // We dont use the public key and the nonce like we do in the normal encryption
+        // because the public key was used to seed the precompute table and the nonce
+        // was generated when the precompute table was generated
         auto encrypted = CiphertextBallotSelection::make_with_precomputed(
           objectId, sequenceOrder, descriptionHash, move(ciphertext), cryptoExtendedBaseHash, vote,
           move(precomputedTwoTriplesAndAQuad), isPlaceholder, true);
@@ -414,6 +413,7 @@ namespace electionguard
     {
         Log::trace("encryptSelection: for " + objectId + " hash: ", descriptionHash.toHex());
 
+        // standard encryption in real-time
         auto ciphertext = elgamalEncrypt(vote, *selectionNonce, elgamalPublicKey);
         if (ciphertext == nullptr) {
             throw runtime_error("encryptSelection:: Error generating ciphertext");
@@ -450,9 +450,7 @@ namespace electionguard
 
         // check if we should use precomputed values
         if (shouldUsePrecomputedValues) {
-            // this method runs off to look in the precomputed values buffer and if
-            // it finds what it needs then the returned class will contain those values
-            // TODO: ensure that the PrecomputeBufferContext is the correct context
+            // TODO: Issue #216 ensure that the PrecomputeBufferContext is the correct context
             // associated with the elgamalPublicKey of this election.
             auto precomputedTwoTriplesAndAQuad =
               PrecomputeBufferContext::popTwoTriplesAndAQuadruple();
@@ -653,6 +651,8 @@ namespace electionguard
         vector<unique_ptr<CiphertextBallotContest>> encryptedContests;
         auto normalizedBallot = emplaceMissingValues(ballot, internalManifest);
 
+        // TODO: Issue #217: implement this
+
         // only iterate on contests for this specific ballot style
         for (const auto &description : internalManifest.getContestsFor(style->getObjectId())) {
             bool hasContest = false;
@@ -682,7 +682,7 @@ namespace electionguard
                   const CiphertextElectionContext &context, const ElementModQ &encryptionSeed,
                   unique_ptr<ElementModQ> nonce /* = nullptr */, uint64_t timestamp /* = 0 */,
                   bool shouldVerifyProofs /* = true */,
-                  bool shouldUsePrecomputedValues /* = true */)
+                  bool shouldUsePrecomputedValues /* = false */)
     {
         Log::trace("encryptBallot:: encrypting");
         auto *style = manifest.getBallotStyle(ballot.getStyleId());
@@ -692,6 +692,9 @@ namespace electionguard
             throw invalid_argument("could not find a ballot style: " + ballot.getStyleId());
         }
 
+        // when supplying a nonce we cannot use precompute
+        // because the precomputed nonces are not deterministic
+        // and so we can't regenerate them from the main nonce
         if (nonce != nullptr && shouldUsePrecomputedValues) {
             throw invalid_argument("cannot use precomputed values with a provided nonce");
         }
@@ -753,9 +756,13 @@ namespace electionguard
                          unique_ptr<ElementModQ> nonceSeed /* = nullptr */,
                          uint64_t timestamp /* = 0 */, bool shouldVerifyProofs /* = true*/)
     {
+        // Compact ballots cannot use precompute because they rely
+        // on the naonce's being deterministic in order to rehydrate
+        auto noPrecomputeForCompactBallotsExplicitFalse = false;
         auto normalized = emplaceMissingValues(ballot, manifest);
-        auto ciphertext = encryptBallot(*normalized, manifest, context, ballotCodeSeed,
-                                        move(nonceSeed), timestamp, shouldVerifyProofs, false);
+        auto ciphertext =
+          encryptBallot(*normalized, manifest, context, ballotCodeSeed, move(nonceSeed), timestamp,
+                        shouldVerifyProofs, noPrecomputeForCompactBallotsExplicitFalse);
         return CompactCiphertextBallot::make(*normalized, *ciphertext);
     }
 

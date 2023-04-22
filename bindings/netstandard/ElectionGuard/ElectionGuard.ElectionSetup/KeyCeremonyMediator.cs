@@ -803,7 +803,7 @@ public class KeyCeremonyMediator
         {
             guardian!.SaveElectionPartialKeyBackup(backup.Backup!);
             var verification = guardian.VerifyElectionPartialKeyBackup(backup.GuardianId!, keyCeremonyId);
-            if (verification == null || !verification.Verified)
+            if (verification == null) // TODO: ISSUE #213 throw on invalid backup
             {
                 throw new KeyCeremonyException(
                     keyCeremony!.State,
@@ -824,7 +824,6 @@ public class KeyCeremonyMediator
 
     private async Task RunStep6()
     {
-        Console.WriteLine("RunStep6");
         var keyCeremonyId = CeremonyDetails.KeyCeremonyId;
 
         // change state

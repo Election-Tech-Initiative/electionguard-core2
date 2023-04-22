@@ -269,8 +269,7 @@ namespace electionguard
 
     void PrecomputeBuffer::startAsync()
     {
-        // TODO: implement this
-        // TODO: threading
+        // TODO: Issue #217: implement this
         start();
     }
 
