@@ -171,3 +171,5 @@ bindings/typescript/src/wasm/electionguard.wasm.js
 bindings/typescript/src/wasm/electionguard.wasm.wasm
 
 apps/angular-demo/.vscode/
+
+bindings/typescript/src/wasm/electionguard.wasm.worker.js

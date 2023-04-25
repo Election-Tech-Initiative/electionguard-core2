@@ -270,6 +270,7 @@ else
 	cmake --build $(ELECTIONGUARD_BUILD_LIBS_DIR)/wasm/$(TARGET)
 	cp $(ELECTIONGUARD_BUILD_LIBS_DIR)/wasm/$(TARGET)/src/electionguard/wasm/electionguard.wasm.js ./bindings/typescript/src/wasm/electionguard.wasm.js
 	cp $(ELECTIONGUARD_BUILD_LIBS_DIR)/wasm/$(TARGET)/src/electionguard/wasm/electionguard.wasm.wasm ./bindings/typescript/src/wasm/electionguard.wasm.wasm
+	cp $(ELECTIONGUARD_BUILD_LIBS_DIR)/wasm/$(TARGET)/src/electionguard/wasm/electionguard.wasm.js ./bindings/typescript/src/wasm/electionguard.wasm.worker.js
 endif
 
 build-npm: build-wasm
