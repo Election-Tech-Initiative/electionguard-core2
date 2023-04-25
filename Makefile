@@ -177,13 +177,25 @@ else
 endif
 
 build-arm64:
+ifeq ($(OPERATING_SYSTEM),Windows)
+	set "PROCESSOR=arm64" & make build
+else
 	PROCESSOR=arm64 && make build
+endif
 
 build-x86:
+ifeq ($(OPERATING_SYSTEM),Windows)
+	set "PROCESSOR=x86" & set "VSPLATFORM=Win32" & make build
+else
 	PROCESSOR=x86 VSPLATFORM=Win32 && make build
+endif
 
 build-x64:
+ifeq ($(OPERATING_SYSTEM),Windows)
+	set "PROCESSOR=x64" & make build
+else
 	PROCESSOR=x64 && make build
+endif
 	
 build-msys2:
 	@echo 🖥️ BUILD MSYS2 $(OPERATING_SYSTEM) $(PROCESSOR) $(TARGET)
@@ -200,7 +212,12 @@ else
 endif
 
 build-android:
+	@echo 📱 BUILD ANDROID
+ifeq ($(OPERATING_SYSTEM),Windows)
+	set "PROCESSOR=arm64" & set "OPERATING_SYSTEM=Android" & make build
+else
 	PROCESSOR=arm64 OPERATING_SYSTEM=Android && make build
+endif
 
 build-ios:
 	@echo 📱 BUILD IOS
@@ -227,7 +244,11 @@ build-netstandard:
 	dotnet build -a $(PROCESSOR) --configuration $(TARGET) ./bindings/netstandard/ElectionGuard/ElectionGuard.ElectionSetup.Tests/ElectionGuard.ElectionSetup.Tests.csproj
 
 build-netstandard-x64:
+ifeq ($(OPERATING_SYSTEM),Windows)
+	set "PROCESSOR=x64" & make build-netstandard
+else
 	PROCESSOR=x64 && make build-netstandard
+endif
 
 build-ui: build-netstandard
 	@echo 🖥️ BUILD UI $(OPERATING_SYSTEM) $(PROCESSOR) $(TARGET)
@@ -452,17 +473,19 @@ endif
 	# 	--project ./bindings/netstandard/ElectionGuard/ElectionGuard.Encryption.Bench/Electionguard.Encryption.Bench.csproj 
 
 bench-netstandard-arm64:
+ifeq ($(OPERATING_SYSTEM),Windows)
+	set "PROCESSOR=arm64" && make bench-netstandard
+else
 	PROCESSOR=arm64 && make bench-netstandard
+endif
 
 bench-netstandard-x64:
+ifeq ($(OPERATING_SYSTEM),Windows)
+	set "PROCESSOR=x64" && make bench-netstandard
+else
 	PROCESSOR=x64 && make bench-netstandard
+endif
 
-
-	# @echo 🧪 BENCHMARK
-	# @echo net 7.0 x64
-	# ./bindings/netstandard/ElectionGuard/ElectionGuard.Encryption.Bench/bin/x64/$(TARGET)/net7.0/ElectionGuard.Encryption.Bench
-	# @echo netstandard 2.0 x64
-	# ./bindings/netstandard/ElectionGuard/ElectionGuard.Encryption.Bench/bin/x64/$(TARGET)/netstandard2.0/ElectionGuard.Encryption.Bench
 
 # Test
 
@@ -492,13 +515,25 @@ else
 endif
 
 test-arm64:
+ifeq ($(OPERATING_SYSTEM),Windows)
+	set "PROCESSOR=arm64" & make test
+else
 	PROCESSOR=arm64 && make test
+endif
 
 test-x64:
+ifeq ($(OPERATING_SYSTEM),Windows)
+	set "PROCESSOR=x64" & make test
+else
 	PROCESSOR=x64 && make test
+endif
 
 test-x86:
+ifeq ($(OPERATING_SYSTEM),Windows)
+	set "PROCESSOR=x86" & set "USE_32BIT_MATH=ON" & set "VSPLATFORM=Win32" & make test
+else
 	PROCESSOR=x86 USE_32BIT_MATH=ON VSPLATFORM=Win32 && make test
+endif
 
 test-msys2:
 	@echo 🧪 TEST MSYS2 $(OPERATING_SYSTEM) $(PROCESSOR) $(TARGET)
@@ -521,7 +556,11 @@ test-netstandard: build-netstandard
 	#dotnet test --filter TestCategory=SingleTest -a $(PROCESSOR) --configuration $(TARGET) ./bindings/netstandard/ElectionGuard/ElectionGuard.Decryption.Tests/ElectionGuard.Decryption.Tests.csproj
 
 test-netstandard-arm64:
+ifeq ($(OPERATING_SYSTEM),Windows)
+	set "PROCESSOR=arm64" && make test-netstandard
+else
 	PROCESSOR=arm64 && make test-netstandard
+endif
 
 test-netstandard-x64:
 	PROCESSOR=x64 && make test-netstandard
