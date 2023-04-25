@@ -84,7 +84,7 @@ namespace ElectionGuard.Encryption.Bench
             Console.WriteLine("Setup_Precompute_Buffers");
             var waitHandle = new AutoResetEvent(false);
 
-            var someExponentiations = 1000;
+            const int someExponentiations = 1000;
             var precompute = new PrecomputeBufferContext(_keypair.PublicKey, someExponentiations);
             precompute.CompletedEvent += _ =>
             {

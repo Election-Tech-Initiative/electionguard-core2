@@ -117,13 +117,17 @@
             ElementModQ ballotCodeSeed,
             ElementModQ nonce = null,
             ulong timestamp = 0,
-            bool shouldVerifyProofs = true, bool usePrecomputedValues = false)
+            bool shouldVerifyProofs = true,
+            bool usePrecomputedValues = false)
         {
             if (nonce == null)
             {
                 var status = NativeInterface.Encrypt.Ballot(
-                    ballot.Handle, internalManifest.Handle, context.Handle,
-                    ballotCodeSeed.Handle, shouldVerifyProofs,
+                    ballot.Handle,
+                    internalManifest.Handle,
+                    context.Handle,
+                    ballotCodeSeed.Handle,
+                    shouldVerifyProofs,
                     usePrecomputedValues,
                     out var ciphertext);
                 status.ThrowIfError();
@@ -132,8 +136,13 @@
             else
             {
                 var status = NativeInterface.Encrypt.Ballot(
-                    ballot.Handle, internalManifest.Handle, context.Handle,
-                    ballotCodeSeed.Handle, nonce.Handle, timestamp, shouldVerifyProofs,
+                    ballot.Handle,
+                    internalManifest.Handle,
+                    context.Handle,
+                    ballotCodeSeed.Handle,
+                    nonce.Handle,
+                    timestamp,
+                    shouldVerifyProofs,
                     out var ciphertext);
                 status.ThrowIfError();
                 return ciphertext.IsInvalid ? null : new CiphertextBallot(ciphertext);

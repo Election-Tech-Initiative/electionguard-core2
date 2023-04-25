@@ -11,7 +11,7 @@ namespace ElectionGuard
     /// <summary>
     /// A singleton context for a collection of precomputed triples and quadruples.
     /// </summary>
-    public class PrecomputeBufferContext
+    public class PrecomputeBufferContext : DisposableBase
     {
         private ElementModP _elgamalPublicKey;
 
@@ -31,8 +31,9 @@ namespace ElectionGuard
         public PrecomputeBufferContext(
             ElementModP publicKey, int maxQueueSize = 5000)
         {
+            _elgamalPublicKey = new ElementModP(publicKey);
             var status = NativeInterface.PrecomputeBufferContext.Initialize(
-                publicKey.Handle, maxQueueSize);
+                _elgamalPublicKey.Handle, maxQueueSize);
             status.ThrowIfError();
         }
 
@@ -117,6 +118,12 @@ namespace ElectionGuard
             ReportStatus();
         }
 
+        protected override void DisposeUnmanaged()
+        {
+            base.DisposeUnmanaged();
+            _elgamalPublicKey.Dispose();
+        }
+
         private void ReportStatus()
         {
             var status = GetStatus();
@@ -133,7 +140,6 @@ namespace ElectionGuard
 
         private void WorkerMethodNoKey()
         {
-            // _ = NativeInterface.PrecomputeBuffers.Init(_maxQueueSize);
             _ = _waitHandle.Set();
             _ = NativeInterface.PrecomputeBufferContext.Start();
 
@@ -142,7 +148,6 @@ namespace ElectionGuard
 
         private void WorkerMethod()
         {
-            // _ = NativeInterface.PrecomputeBuffers.Init(_maxQueueSize);
             _ = _waitHandle.Set();
             _ = NativeInterface.PrecomputeBufferContext.Start(_elgamalPublicKey.Handle);
 
