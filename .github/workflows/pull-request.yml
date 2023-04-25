@@ -32,8 +32,8 @@ jobs:
             "ubuntu-22.04-clang-14.0.0",
             "ubuntu-22.04-emscripten-3.1",
             "ubuntu-22.04-gcc-12.1.0",
-            "macos-12-xcode-14.1",
-            "macos-12-xcode-14.1-arm64",
+            "macos-13-xcode-14.2",
+            "macos-13-xcode-14.2-arm64",
             "windows-2022-gcc-11",
             "windows-2022-msvc-latest",
             "ubuntu-22.04-linter",
@@ -66,20 +66,20 @@ jobs:
             lint: false
             runCsTests: false
             runTsTests: false
-          - name: macOS-12-xcode-14.1
-            os: macOS-12
+          - name: macOS-13-xcode-14.2
+            os: macOS-13
             processor: x64
             compiler: xcode
-            version: "14.1"
+            version: "14.2"
             makeReleaseBuild: false
             lint: false
             runCsTests: true
             runTsTests: false
-          - name: macOS-12-xcode-14.1-arm64
-            os: macOS-12
+          - name: macOS-13-xcode-14.2-arm64
+            os: macOS-13
             processor: arm64
             compiler: xcode
-            version: "14.1"
+            version: "14.2"
             makeReleaseBuild: false
             lint: false
             runCsTests: false
