@@ -1,8 +1,7 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
-
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <TargetFrameworks>netstandard2.0;net7.0</TargetFrameworks>
-
     <!-- Project -->
     <RootNamespace>ElectionGuard</RootNamespace>
     <AssemblyName>ElectionGuard.Encryption</AssemblyName>
@@ -13,7 +12,6 @@
     <EnforceCodeStyleInBuild>true</EnforceCodeStyleInBuild>
     <Platforms>arm64;x64</Platforms>
   </PropertyGroup>
-
   <PropertyGroup>
     <!-- Package -->
     <PackageId>ElectionGuard.Encryption</PackageId>
@@ -33,12 +31,10 @@
     <!-- <PackageReleaseNotes>Changelog</PackageReleaseNotes> -->
     <Platforms>arm64;x64;x86</Platforms>
   </PropertyGroup>
-
   <PropertyGroup Label="Configuration">
     <Import_RootNamespace>ElectionGuard</Import_RootNamespace>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
   </PropertyGroup>
-
   <PropertyGroup Label="Debug" Condition=" '$(Configuration)' == 'Debug' ">
     <DebugType>full</DebugType>
     <DebugSymbols>true</DebugSymbols>
@@ -46,7 +42,6 @@
     <WarningLevel>4</WarningLevel>
     <WarningsNotAsErrors>SYSLIB0004</WarningsNotAsErrors>
   </PropertyGroup>
-
   <PropertyGroup Label="Release" Condition=" '$(Configuration)' == 'Release' ">
     <DebugType>pdbonly</DebugType>
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
@@ -55,11 +50,9 @@
     <WarningLevel>4</WarningLevel>
     <WarningsNotAsErrors>SYSLIB0004</WarningsNotAsErrors>
   </PropertyGroup>
-
   <PropertyGroup Label="Library Paths">
     <ElectionGuardLibs>..\..\..\..\build\libs</ElectionGuardLibs>
   </PropertyGroup>
-
   <ItemGroup Label="Package Native Libraries">
     <Content Name="Windows arm64" Include="$(ElectionGuardLibs)\Windows\arm64\$(Configuration)\src\$(Configuration)\*.dll*">
       <Pack>true</Pack>
@@ -141,25 +134,21 @@
     </Content>
     <Content Name="Linux x64 HACL" Include="$(ElectionGuardLibs)\Linux\$(PlatformTarget)\$(Configuration)\libs\hacl\*.so">
       <Pack>true</Pack>
-      <PackageCopyToOutput>true</PackageCopyToOutput> 
+      <PackageCopyToOutput>true</PackageCopyToOutput>
       <PackagePath>runtimes\linux-x64\native</PackagePath>
     </Content>
-    
     <None Include="Electionguard.Encryption.targets">
       <PackagePath>build\</PackagePath>
       <Pack>true</Pack>
     </None>
   </ItemGroup>
-
   <ItemGroup Label="Additional Package Files">
     <None Name="ReadMe" Include="..\README.md" Pack="true" PackagePath="\" />
     <None Name="Icon" Include="..\icon.png" Pack="true" PackagePath="\" />
   </ItemGroup>
-
   <ItemGroup>
     <Folder Include="GeneratedInterop\" />
   </ItemGroup>
-
   <ItemGroup>
     <PackageReference Include="Microsoft.Bcl.HashCode" Version="1.1.1" />
     <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />

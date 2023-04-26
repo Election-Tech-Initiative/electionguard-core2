@@ -16,6 +16,7 @@ jobs:
     runs-on: ubuntu-22.04
     outputs:
       version: ${{ steps.get_version_code.outputs.version }}
+      build_number: ${{ steps.get_version_code.outputs.build_number }}
     steps:
       - name: Checkout Code
         uses: actions/checkout@v3
@@ -26,6 +27,7 @@ jobs:
           echo "TAG_NAME=$TAG_NAME" >> $GITHUB_ENV
           BUILD_NUMBER=$(echo $TAG_NAME | grep -oP '\d+$')
           echo "BUILD_NUMBER=$BUILD_NUMBER" >> $GITHUB_ENV
+          echo "build_number=$BUILD_NUMBER" >> $GITHUB_OUTPUT
           VERSION="${TAG_NAME/v}" #-$BUILD_NUMBER
           echo "VERSION=$VERSION" >> $GITHUB_ENV
           echo "version=$VERSION" >> $GITHUB_OUTPUT
@@ -227,14 +229,13 @@ jobs:
       - name: Update version number
         run: |
           echo ${{needs.get_version_code.outputs.version}}
-          dotnet tool install --global dotnet-version-cli
-          dotnet version ./bindings/netstandard/ElectionGuard/ElectionGuard.Encryption/ElectionGuard.Encryption.csproj ${{needs.get_version_code.outputs.version}}
+          dotnet cake ./scripts/build.cake -t AssignVersion --newVersion ${{needs.get_version_code.outputs.version}}
 
       - name: Build and Package
         working-directory: bindings/netstandard/ElectionGuard/ElectionGuard.Encryption
         run: |
           dotnet build -c Release
-          dotnet pack -c Release
+          dotnet pack -c Release --version-suffix ${{needs.get_version_code.outputs.build_number}}
 
       - name: Upload Nuget
         uses: actions/upload-artifact@v3
