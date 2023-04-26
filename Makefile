@@ -613,28 +613,9 @@ ifeq ($(OPERATING_SYSTEM),Darwin)
 		"./build/libs/$(OPERATING_SYSTEM)/$(PROCESSOR)/$(TARGET)/_deps/hacl-build/libhacl.dylib" 
 endif
 
-test-netstandard-copy-output-ui:
-	@echo 🧪 TEST NETSTANDARD COPY UI OUTPUT $(PROCESSOR) $(TARGET)
-ifeq ($(OPERATING_SYSTEM),Windows)
-	cp -r "build/libs/$(OPERATING_SYSTEM)/$(PROCESSOR)/$(TARGET)/src/$(TARGET)/electionguard.dll" "src/electionguard-ui/electionGuard.UI.Test/bin/$(TARGET)/net7.0/win-$(PROCESSOR)/electionguard.dll"
-	cp -r "build/libs/$(OPERATING_SYSTEM)/$(PROCESSOR)/$(TARGET)/libs/hacl/$(TARGET)/hacl_cpp.dll" "src/electionguard-ui/electionGuard.UI.Test/bin/$(TARGET)/net7.0/win-$(PROCESSOR)/hacl_cpp.dll"
-	cp -r "build/libs/$(OPERATING_SYSTEM)/$(PROCESSOR)/$(TARGET)/_deps/hacl-build/$(TARGET)/hacl.dll" "src/electionguard-ui/electionGuard.UI.Test/bin/$(TARGET)/net7.0/win-$(PROCESSOR)/hacl.dll"
-endif
-ifeq ($(OPERATING_SYSTEM),Darwin)
-	cp -r "build/libs/$(OPERATING_SYSTEM)/$(PROCESSOR)/$(TARGET)/src/libelectionguard.dylib" "src/electionguard-ui/electionGuard.UI.Test/bin/$(TARGET)/net7.0/osx-$(PROCESSOR)"
-	cp -r "build/libs/$(OPERATING_SYSTEM)/$(PROCESSOR)/$(TARGET)/libs/hacl/libhacl_cpp.dylib" "src/electionguard-ui/electionGuard.UI.Test/bin/$(TARGET)/net7.0/osx-$(PROCESSOR)"
-	cp -r "build/libs/$(OPERATING_SYSTEM)/$(PROCESSOR)/$(TARGET)/_deps/hacl-build/libhacl.dylib" "src/electionguard-ui/electionGuard.UI.Test/bin/$(TARGET)/net7.0/osx-$(PROCESSOR)"
-endif
-
 test-ui: build-ui
-	@echo 🧪 TEST UI $(PROCESSOR) $(TARGET)
-	# dotnet build -a $(PROCESSOR) --configuration $(TARGET) ./src/electionguard-ui/electionGuard.UI.Test/ElectionGuard.UI.Test.csproj
-	
-	make build-netstandard
-	make test-netstandard-copy-output
-	make test-netstandard-copy-output-ui
-
-	dotnet test -a $(PROCESSOR) --no-build --configuration $(TARGET) ./src/electionguard-ui/ElectionGuard.UI.Test/ElectionGuard.UI.Test.csproj
+	@echo 🧪 TEST UI $(OPERATING_SYSTEM) $(PROCESSOR) $(TARGET)
+	dotnet test -a $(PROCESSOR) -c $(TARGET) ./src/electionguard-ui/ElectionGuard.UI.Test/ElectionGuard.UI.Test.csproj
 
 test-wasm: build-wasm
 	@echo 🧪 TEST WASM $(PROCESSOR) $(TARGET)

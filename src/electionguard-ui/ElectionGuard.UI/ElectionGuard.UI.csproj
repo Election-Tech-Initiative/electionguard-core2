@@ -222,4 +222,17 @@
 	    <Generator>MSBuild:Compile</Generator>
 	  </MauiXaml>
 	</ItemGroup>
+
+	<PropertyGroup Label="Library Paths">
+    <ElectionGuardLibs>..\..\..\build\libs</ElectionGuardLibs>
+  </PropertyGroup>
+  <ItemGroup Label="C++ Built Libraries">
+    <None Name="Windows (MSVC)" Visible="false" Include="$(ElectionGuardLibs)\Windows\x64\$(Configuration)\src\$(Configuration)\*.dll*" CopyToOutputDirectory="PreserveNewest" />
+    <None Name="Windows HACL (MSVC)" Visible="false" Include="$(ElectionGuardLibs)\Windows\x64\$(Configuration)\libs\hacl\$(Configuration)\*.dll*" CopyToOutputDirectory="PreserveNewest" />
+    <None Name="Windows Symbols (MSVC)" Visible="false" Include="$(ElectionGuardLibs)\Windows\x64\$(Configuration)\src\$(Configuration)\*.pdb*" CopyToOutputDirectory="PreserveNewest" />
+
+		<None Name="MacOS" Visible="false" Include="$(ElectionGuardLibs)\MacCatalyst\arm64\$(Configuration)\src\*.dylib" CopyToOutputDirectory="PreserveNewest" />
+    <None Name="MacOS HACL" Visible="false" Include="$(ElectionGuardLibs)\MacCatalyst\arm64\$(Configuration)\libs\hacl\*.dylib" CopyToOutputDirectory="PreserveNewest" />
+  </ItemGroup>
+
 </Project>
