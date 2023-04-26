@@ -649,5 +649,6 @@ fetch-sample-data:
 	unzip -o sample-data-1-0.zip
 	rm -f sample-data-1.0.zip || true
 
-generate-sample-data:
+generate-sample-data: build-netstandard
 	@echo Generate Sample Data
+	dotnet test -a $(PROCESSOR) -c $(TARGET) --filter TestCategory=OutputTestData ./bindings/netstandard/ElectionGuard/ElectionGuard.Decryption.Tests/ElectionGuard.Decryption.Tests.csproj

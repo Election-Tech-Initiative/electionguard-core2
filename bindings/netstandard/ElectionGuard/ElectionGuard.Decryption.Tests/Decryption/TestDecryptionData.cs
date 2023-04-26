@@ -152,10 +152,32 @@ public class TestDecryptionData : DisposableBase
 
     public static void SaveToFile(TestDecryptionData data, DecryptionResult result)
     {
-        var path = Path.Combine(AppContext.BaseDirectory, "data");
+        var path = Path.Combine(AppContext.BaseDirectory, "data", "generated");
         var directoryPath = Path.GetDirectoryName(path);
         _ = Directory.CreateDirectory(directoryPath!);
 
+        // write data out to individual files (used by the cli and some tests)
+        var context = JsonConvert.SerializeObject(data.Election.Context,
+            SerializationSettings.NewtonsoftSettings());
+        File.WriteAllText(Path.Combine(path, "context.json"), context);
+
+        var manifest = JsonConvert.SerializeObject(data.Election.Manifest,
+            SerializationSettings.NewtonsoftSettings());
+        File.WriteAllText(Path.Combine(path, "manifest.json"), manifest);
+
+        var device = JsonConvert.SerializeObject(data.Election.Device,
+            SerializationSettings.NewtonsoftSettings());
+        File.WriteAllText(Path.Combine(path, "device.json"), device);
+
+        _ = Directory.CreateDirectory(Path.Combine(path, "plaintext"));
+        foreach (var ballot in data.PlaintextBallots)
+        {
+            var plaintext = JsonConvert.SerializeObject(ballot,
+                SerializationSettings.NewtonsoftSettings());
+            File.WriteAllText(Path.Combine(path, "plaintext", $"{ballot.ObjectId}.json"), plaintext);
+        }
+
+        // write all of it in two files (used by typescript tests)
         var testData = JsonConvert.SerializeObject(data,
             SerializationSettings.NewtonsoftSettings());
         File.WriteAllText(Path.Combine(path, "test-data.json"), testData);
