@@ -183,6 +183,9 @@
 	    <AutoGen>True</AutoGen>
 	    <DependentUpon>AppResources.resx</DependentUpon>
 	  </Compile>
+	  <Compile Update="Views\EncryptionExportPage.xaml.cs">
+	    <DependentUpon>EncryptionExportPage.xaml</DependentUpon>
+	  </Compile>
 	  <Compile Update="Views\CreateElectionAdminPage.xaml.cs">
 	    <DependentUpon>CreateElectionAdminPage.xaml</DependentUpon>
 	  </Compile>
