@@ -82,7 +82,7 @@ public static class MauiProgram
         builder.Services.AddTransient<GuardianHomeViewModel>();
         builder.Services.AddTransient<AdminHomeViewModel>();
         builder.Services.AddSingleton<ElectionViewModel>();
-        builder.Services.AddTransient<EncryptionExportPage>();
+        builder.Services.AddTransient<EncryptionPackageExportViewModel>();
         builder.Services.AddTransient<SettingsViewModel>();
         builder.Services.AddTransient<CreateKeyCeremonyAdminViewModel>();
         builder.Services.AddTransient<ViewKeyCeremonyViewModel>();
