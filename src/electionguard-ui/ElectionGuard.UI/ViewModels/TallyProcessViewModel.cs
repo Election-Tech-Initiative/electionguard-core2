@@ -90,6 +90,7 @@ public partial class TallyProcessViewModel : BaseViewModel
     [RelayCommand(CanExecute =nameof(CanJoinTally))]
     private void RejectTally() 
     {
+        // TODO: what happens when we don't want to join a tally, nothing? Can we change our mind later?
     }
 
 }
