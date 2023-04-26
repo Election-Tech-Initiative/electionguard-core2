@@ -6,7 +6,7 @@
     <ImplicitUsings>enable</ImplicitUsings>
     <EnableNETAnalyzers>true</EnableNETAnalyzers>
     <EnforceCodeStyleInBuild>true</EnforceCodeStyleInBuild>
-    <Platforms>arm64;x64;x86</Platforms>    <!-- Yes, we actually do need the x86. -->
+    <Platforms>arm64;x64;x86</Platforms>
     <Configurations>Debug;Release</Configurations>
   </PropertyGroup>
 

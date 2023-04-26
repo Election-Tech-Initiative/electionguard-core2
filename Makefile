@@ -337,16 +337,10 @@ endif
 clean-netstandard:
 	@echo 🗑️ CLEAN NETSTANDARD
 	dotnet clean ./bindings/netstandard/ElectionGuard/ElectionGuard.sln
-	dotnet clean ./src/electionguard-ui/ElectionGuard.UI.sln
 
 clean-ui:
 	@echo 🗑️ CLEAN UI
-	cd ./src/electionguard-ui/ElectionGuard.UI && dotnet restore ElectionGuard.UI.csproj
-	dotnet clean ./src/electionguard-ui/ElectionGuard.UI/ElectionGuard.UI.csproj
-	dotnet clean ./src/electionguard-ui/ElectionGuard.UI.Test/ElectionGuard.UI.Test.csproj
-	dotnet clean ./bindings/netstandard/ElectionGuard/ElectionGuard.ElectionSetup/ElectionGuard.ElectionSetup.csproj
-	dotnet clean ./bindings/netstandard/ElectionGuard/ElectionGuard.ElectionSetup.Tests/ElectionGuard.ElectionSetup.Tests.csproj
-	dotnet clean ./src/electionguard-ui/ElectionGuard.UI.Lib/ElectionGuard.UI.Lib.csproj
+	dotnet clean ./src/electionguard-ui/ElectionGuard.UI.sln
 
 clean: clean-build clean-netstandard clean-ui
 	@echo 🗑️ CLEAN ALL
