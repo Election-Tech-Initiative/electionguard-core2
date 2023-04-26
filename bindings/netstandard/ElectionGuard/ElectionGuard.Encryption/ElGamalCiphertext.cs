@@ -19,11 +19,7 @@ namespace ElectionGuard
                 var status = NativeInterface.ElGamalCiphertext.GetPad(
                     Handle, out var value);
                 status.ThrowIfError();
-                if (value.IsInvalid)
-                {
-                    return null;
-                }
-                return new ElementModP(value);
+                return value.IsInvalid ? null : new ElementModP(value);
             }
         }
 
@@ -37,11 +33,7 @@ namespace ElectionGuard
                 var status = NativeInterface.ElGamalCiphertext.GetData(
                     Handle, out var value);
                 status.ThrowIfError();
-                if (value.IsInvalid)
-                {
-                    return null;
-                }
-                return new ElementModP(value);
+                return value.IsInvalid ? null : new ElementModP(value);
             }
         }
 

@@ -93,10 +93,33 @@ export class CiphertextBallot {
   }
 
   /**
-   * @brief The unique ballot code for this ballot that is derived from the ballot seed, the timestamp, and the hash of the encrypted values
+   * @brief The seed hash for the ballot.  It may be the encryption device hash,
+   * the hash of a previous ballot or the hash of some other value that is meaningful to the consuming application.
+   */
+  get ballotCodeSeed(): ElementModQ {
+    var result = this._handle.getBallotCodeSeed();
+    return new ElementModQ(result);
+  }
+
+  /**
+   * @brief The unique ballot code for this ballot that is derived from the ballot seed,
+   *  the timestamp, and the hash of the encrypted values
    */
   get ballotCode(): ElementModQ {
     var result = this._handle.getBallotCode();
+    return new ElementModQ(result);
+  }
+
+  get timestamp(): number {
+    return this._handle.getTimestamp();
+  }
+
+  /**
+   * The nonce value used to encrypt all values in the ballot.
+   * Sensitive & should be treated as a secret
+   */
+  get nonce(): ElementModQ {
+    var result = this._handle.getNonce();
     return new ElementModQ(result);
   }
 
@@ -106,6 +129,13 @@ export class CiphertextBallot {
    * A helper function to mark the ballot as cast and remove sensitive values like the nonce.
    */
   cast(): void {
+    this._handle.cast();
+  }
+
+  /**
+   * A helper function to mark the ballot as challenged and remove sensitive values like the nonce.
+   */
+  challenge(): void {
     this._handle.cast();
   }
 

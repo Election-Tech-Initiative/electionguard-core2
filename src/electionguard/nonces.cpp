@@ -28,19 +28,19 @@ namespace electionguard
             nextItem = 0;
         }
 
-        unique_ptr<ElementModQ> get(uint64_t item)
-        {
-            nextItem = item + 1;
-            return hash_elems({seed.get(), item});
-        }
+        unique_ptr<ElementModQ> get(uint64_t item) { return hash_elems({seed.get(), item}); }
 
         unique_ptr<ElementModQ> get(uint64_t item, string headers)
         {
-            nextItem = item + 1;
             return hash_elems({seed.get(), item, headers});
         }
 
-        unique_ptr<ElementModQ> next() { return this->get(nextItem); }
+        unique_ptr<ElementModQ> next()
+        {
+            auto item = this->get(nextItem);
+            nextItem += 1;
+            return item;
+        }
     };
 
     Nonces::Nonces(const ElementModQ &seed, const NoncesHeaderType &headers)
@@ -58,14 +58,14 @@ namespace electionguard
 
     Nonces::~Nonces() = default;
 
-    unique_ptr<ElementModQ> Nonces::get(uint64_t item) { return pimpl->get(item); }
+    unique_ptr<ElementModQ> Nonces::get(uint64_t item) const { return pimpl->get(item); }
 
-    unique_ptr<ElementModQ> Nonces::get(uint64_t item, string headers)
+    unique_ptr<ElementModQ> Nonces::get(uint64_t item, string headers) const
     {
         return pimpl->get(item, move(headers));
     }
 
-    vector<unique_ptr<ElementModQ>> Nonces::get(uint64_t startItem, uint64_t count)
+    vector<unique_ptr<ElementModQ>> Nonces::get(uint64_t startItem, uint64_t count) const
     {
         // TODO: ISSUE #137: preallocate and address possible overflow
         vector<unique_ptr<ElementModQ>> result;
@@ -76,5 +76,5 @@ namespace electionguard
         return result;
     }
 
-    unique_ptr<ElementModQ> Nonces::next() { return pimpl->next(); }
+    unique_ptr<ElementModQ> Nonces::next() const { return pimpl->next(); }
 } // namespace electionguard

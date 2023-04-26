@@ -803,7 +803,7 @@ public class KeyCeremonyMediator
         {
             guardian!.SaveElectionPartialKeyBackup(backup.Backup!);
             var verification = guardian.VerifyElectionPartialKeyBackup(backup.GuardianId!, keyCeremonyId);
-            if (verification == null)
+            if (verification == null) // TODO: ISSUE #213 throw on invalid backup
             {
                 throw new KeyCeremonyException(
                     keyCeremony!.State,

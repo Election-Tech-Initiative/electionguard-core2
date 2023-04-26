@@ -16,7 +16,10 @@ export type CiphertextBallotHandle = {
   getStyleId(): string;
 
   getManifestHash(): ElementModQHandle;
+  getBallotCodeSeed(): ElementModQHandle;
   getBallotCode(): ElementModQHandle;
+  getTimestamp(): number;
+  getNonce(): ElementModQHandle;
 
   isValidEncryption(
     manifestHash: ElementModQHandle,
@@ -25,6 +28,7 @@ export type CiphertextBallotHandle = {
   ): boolean;
 
   cast(): void;
+  challenge(): void;
   spoil(): void;
   toJson(withNonces: boolean): string;
 };
@@ -37,6 +41,7 @@ export type CiphertextElectionContextHandle = {
   getNumberOfGuardians(): number;
   getQuorum(): number;
   getElGamalPublicKey(): ElementModPHandle;
+  getElGamalPublicKeyRef(): ElementModPHandle;
   getManifestHash(): ElementModQHandle;
   getCryptoExtendedBaseHash(): ElementModQHandle;
   toJson(): string;
@@ -62,18 +67,40 @@ export type EncryptionDeviceStatic = {
 export type EncryptionMediatorHandle = {
   new (
     internalManifest: InternalManifestHandle,
-    contest: CiphertextElectionContextHandle,
+    context: CiphertextElectionContextHandle,
     device: EncryptionDeviceHandle
   ): EncryptionMediatorHandle;
 
   encrypt(
     ballot: PlaintextBallotHandle,
+    shouldVerifyProofs: boolean,
+    shouldUsePrecomputedValues: boolean
+  ): CiphertextBallotHandle;
+};
+
+export type EncryptFunctionsStatic = {
+  encryptBallot(
+    ballot: PlaintextBallotHandle,
+    internalManifest: InternalManifestHandle,
+    context: CiphertextElectionContextHandle,
+    ballotCodeSeed: ElementModQHandle,
+    shouldVerifyProofs: boolean,
+    shouldUsePrecomputedValues: boolean
+  ): CiphertextBallotHandle;
+  encryptBallotWithNonce(
+    ballot: PlaintextBallotHandle,
+    internalManifest: InternalManifestHandle,
+    context: CiphertextElectionContextHandle,
+    ballotCodeSeed: ElementModQHandle,
+    nonce: ElementModQHandle,
+    timestamp: number,
     shouldVerifyProofs: boolean
   ): CiphertextBallotHandle;
 };
 
 export type ElementModPHandle = {
-  clone(): ElementModPHandle;
+  copy(): ElementModPHandle;
+  isInBounds(): boolean;
   toHex(): string;
 };
 
@@ -83,8 +110,10 @@ export type ElementModPStatic = {
 };
 
 export type ElementModQHandle = {
-  clone(): ElementModQHandle;
+  copy(): ElementModQHandle;
+  isInBounds(): boolean;
   toHex(): string;
+  toElementModP(): ElementModPHandle;
 };
 
 export type ElementModQStatic = {
@@ -94,6 +123,8 @@ export type ElementModQStatic = {
 
 export type GroupFunctionStatic = {
   addModQ(a: ElementModQHandle, b: ElementModQHandle): ElementModQHandle;
+  randomElementModP(): ElementModPHandle;
+  randomElementModQ(): ElementModQHandle;
 };
 
 export type ManifestHandle = {
@@ -113,17 +144,30 @@ export type InternalManifestStatic = {
   fromJson(json: string): InternalManifestHandle;
 };
 
+export type PrecomputeBuffersStatic = {
+  clear(): void;
+
+  initialize(publicKey: ElementModPHandle, maxQueueSize: number): void;
+  start(): void;
+  stop(): void;
+
+  getMaxQueueSize(): number;
+  getCurrentQueueSize(): number;
+};
+
 export interface ElectionguardModule extends EmscriptenModule {
   PlaintextBallot: PlaintextBallotStatic;
   CiphertextBallot: CiphertextBallotStatic;
   CiphertextElectionContext: CiphertextElectionContextStatic;
   EncryptionDevice: EncryptionDeviceStatic;
   EncryptionMediator: EncryptionMediatorHandle;
+  EncryptFunctions: EncryptFunctionsStatic;
   ElementModP: ElementModPStatic;
   ElementModQ: ElementModQStatic;
   GroupFunctions: GroupFunctionStatic;
   Manifest: ManifestStatic;
   InternalManifest: InternalManifestStatic;
+  PrecomputeBufferContext: PrecomputeBuffersStatic;
 }
 const createModule: EmscriptenModuleFactory<ElectionguardModule> =
   wasModuleFactory;

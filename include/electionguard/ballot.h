@@ -22,10 +22,16 @@ typedef enum eg_ballot_box_state_e {
      * A ballot that has been explicitly cast
      */
     ELECTIONGUARD_BALLOT_BOX_STATE_CAST = 1,
+
+    /**
+     * A ballot that has been explicitly challenged
+     */
+    ELECTIONGUARD_BALLOT_BOX_STATE_CHALLENGED = 2,
+
     /**
      * A ballot that has been explicitly spoiled
      */
-    ELECTIONGUARD_BALLOT_BOX_STATE_SPOILED = 2,
+    ELECTIONGUARD_BALLOT_BOX_STATE_SPOILED = 3,
 
     /**
      * A ballot whose state is unknown to ElectionGuard and will not be included in any election results

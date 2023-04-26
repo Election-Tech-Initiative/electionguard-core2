@@ -1,0 +1,49 @@
+{
+    "name": "@infernored/electionguard-experimental",
+    "version": "0.0.6",
+    "description": "Library for encrypting ballots for the ElectionGuard voting system",
+    "author": "Microsoft <electionguard@microsoft.com>",
+    "license": "MIT",
+    "repository": {
+        "type": "git",
+        "url": "https://github.com/microsoft/electionguard-core2.git"
+    },
+    "bugs": {
+        "url": "https://github.com/microsoft/electionguard-core2/issues"
+    },
+    "main": "dist/index.js",
+    "types": "dist/index.d.ts",
+    "scripts": {
+        "build": "tsc",
+        "build:wasm": "cd ../.. && make build-wasm",
+        "clean": "rm -rf dist",
+        "pack": "webpack",
+        "prepare": "npm run clean && npm run build",
+        "test": "mocha --require ts-node/register **/*.test.ts"
+    },
+    "devDependencies": {
+        "@types/chai": "^4.3.4",
+        "@types/emscripten": "^1.39.6",
+        "@types/mocha": "^10.0.1",
+        "@types/node": "^18.15.12",
+        "chai": "^4.3.7",
+        "file-loader": "^6.2.0",
+        "mocha": "^10.2.0",
+        "prettier": "^2.8.7",
+        "ts-loader": "^9.4.2",
+        "ts-node": "^10.9.1",
+        "tsembind": "^1.1.0",
+        "typescript": "^5.0.4",
+        "webpack": "^5.79.0",
+        "webpack-cli": "^5.0.1"
+    },
+    "peerDependencies": {
+        "typescript": "^4.0.0"
+    },
+    "files": [
+        "dist"
+    ],
+    "publishConfig": {
+        "access": "public"
+    }
+}

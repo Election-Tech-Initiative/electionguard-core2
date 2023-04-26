@@ -15,13 +15,23 @@ class EncryptFunctions
     static std::unique_ptr<CiphertextBallot>
     encryptBallot(const PlaintextBallot &ballot, const InternalManifest &internalManifest,
                   const CiphertextElectionContext &context, const ElementModQ &ballotCodeSeed,
-                  std::unique_ptr<ElementModQ> nonce = nullptr, uint64_t timestamp = 0,
-                  bool shouldVerifyProofs = true)
+                  bool shouldVerifyProofs = true, bool usePrecomputedValues = false)
     {
         auto result =
-          electionguard::encryptBallot(ballot, internalManifest, context, ballotCodeSeed,
-                                       std::move(nonce), timestamp, shouldVerifyProofs);
-        // std::cout << "encryptBallot " << result->toHex() << std::endl;
+          electionguard::encryptBallot(ballot, internalManifest, context, ballotCodeSeed, nullptr,
+                                       0ULL, shouldVerifyProofs, usePrecomputedValues);
+        return std::move(result);
+    }
+    static std::unique_ptr<CiphertextBallot>
+    encryptBallotWithNonce(const PlaintextBallot &ballot, const InternalManifest &internalManifest,
+                           const CiphertextElectionContext &context,
+                           const ElementModQ &ballotCodeSeed, std::unique_ptr<ElementModQ> nonce,
+                           uint64_t timestamp, bool shouldVerifyProofs = true)
+    {
+        auto noPrecomputeWithNonceExplicitFalse = false;
+        auto result = electionguard::encryptBallot(
+          ballot, internalManifest, context, ballotCodeSeed, std::move(nonce), timestamp,
+          shouldVerifyProofs, noPrecomputeWithNonceExplicitFalse);
         return std::move(result);
     }
 };
@@ -37,7 +47,6 @@ EMSCRIPTEN_BINDINGS(electionguard)
       .function("getLocation", &EncryptionDevice::getLocation)
       .function("toJson", &EncryptionDevice::toJson)
       .class_function("fromJson", &EncryptionDevice::fromJson);
-    ;
 
     class_<EncryptionMediator>("EncryptionMediator")
       .constructor<const InternalManifest &, const CiphertextElectionContext &,
@@ -45,6 +54,7 @@ EMSCRIPTEN_BINDINGS(electionguard)
       .function("encrypt", &EncryptionMediator::encrypt)
       .function("compactEncrypt", &EncryptionMediator::compactEncrypt);
 
-    class_<EncryptFunctions>("GroEncryptFunctionsupFunctions")
-      .class_function("encryptBallot", &EncryptFunctions::encryptBallot);
+    class_<EncryptFunctions>("EncryptFunctions")
+      .class_function("encryptBallot", &EncryptFunctions::encryptBallot)
+      .class_function("encryptBallotWithNonce", &EncryptFunctions::encryptBallotWithNonce);
 }

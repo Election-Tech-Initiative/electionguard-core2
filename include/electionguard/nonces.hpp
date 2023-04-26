@@ -24,10 +24,10 @@ namespace electionguard
         Nonces &operator=(Nonces rhs);
         Nonces &operator=(Nonces &&rhs);
 
-        std::unique_ptr<ElementModQ> get(uint64_t item);
-        std::unique_ptr<ElementModQ> get(uint64_t item, std::string headers);
-        std::vector<std::unique_ptr<ElementModQ>> get(uint64_t startItem, uint64_t count);
-        std::unique_ptr<ElementModQ> next();
+        std::unique_ptr<ElementModQ> get(uint64_t item) const;
+        std::unique_ptr<ElementModQ> get(uint64_t item, std::string headers) const;
+        std::vector<std::unique_ptr<ElementModQ>> get(uint64_t startItem, uint64_t count) const;
+        std::unique_ptr<ElementModQ> next() const;
 
       private:
         struct Impl;

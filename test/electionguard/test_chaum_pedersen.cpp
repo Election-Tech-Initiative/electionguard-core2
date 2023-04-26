@@ -134,9 +134,9 @@ TEST_CASE("Disjunctive CP Proof simple valid inputs generate valid proofs")
     auto keypair = ElGamalKeyPair::fromSecret(TWO_MOD_Q(), false);
 
     // cause a two triples and a quad to be populated
-    PrecomputeBufferContext::init(4);
-    PrecomputeBufferContext::populate(*keypair->getPublicKey());
-    PrecomputeBufferContext::stop_populate();
+    PrecomputeBufferContext::initialize(*keypair->getPublicKey(), 4);
+    PrecomputeBufferContext::start();
+    PrecomputeBufferContext::stop();
 
     // this function runs off to look in the precomputed values buffer and if
     // it finds what it needs the the returned class will contain those values
@@ -190,7 +190,7 @@ TEST_CASE("Disjunctive CP Proof simple valid inputs generate valid proofs")
           false);
     CHECK(fourthMessageOneProof->isValid(*fourthMessage, *keypair->getPublicKey(), ONE_MOD_Q()) ==
           true);
-    PrecomputeBufferContext::empty_queues();
+    PrecomputeBufferContext::clear();
 }
 
 TEST_CASE("Disjunctive CP Proof encryption of zero with precomputed values")
@@ -200,9 +200,9 @@ TEST_CASE("Disjunctive CP Proof encryption of zero with precomputed values")
     auto keypair = ElGamalKeyPair::fromSecret(TWO_MOD_Q(), false);
 
     // cause a two triples and a quad to be populated
-    PrecomputeBufferContext::init(2);
-    PrecomputeBufferContext::populate(*keypair->getPublicKey());
-    PrecomputeBufferContext::stop_populate();
+    PrecomputeBufferContext::initialize(*keypair->getPublicKey(), 2);
+    PrecomputeBufferContext::start();
+    PrecomputeBufferContext::stop();
 
     // this function runs off to look in the precomputed values buffer and if
     // it finds what it needs the the returned class will contain those values
@@ -228,7 +228,7 @@ TEST_CASE("Disjunctive CP Proof encryption of zero with precomputed values")
 
     CHECK(proof->isValid(*message1, *keypair->getPublicKey(), ONE_MOD_Q()) == true);
     CHECK(badProof->isValid(*message2, *keypair->getPublicKey(), ONE_MOD_Q()) == false);
-    PrecomputeBufferContext::empty_queues();
+    PrecomputeBufferContext::clear();
 }
 
 TEST_CASE("Disjunctive CP Proof encryption of one with precomputed values")
@@ -238,9 +238,9 @@ TEST_CASE("Disjunctive CP Proof encryption of one with precomputed values")
     const auto &seed = TWO_MOD_Q();
 
     // cause a two triples and a quad to be populated
-    PrecomputeBufferContext::init(2);
-    PrecomputeBufferContext::populate(*keypair->getPublicKey());
-    PrecomputeBufferContext::stop_populate();
+    PrecomputeBufferContext::initialize(*keypair->getPublicKey(), 2);
+    PrecomputeBufferContext::start();
+    PrecomputeBufferContext::stop();
 
     // this function runs off to look in the precomputed values buffer and if
     // it finds what it needs the the returned class will contain those values
@@ -266,5 +266,5 @@ TEST_CASE("Disjunctive CP Proof encryption of one with precomputed values")
 
     CHECK(proof->isValid(*message1, *keypair->getPublicKey(), ONE_MOD_Q()) == true);
     CHECK(badProof->isValid(*message2, *keypair->getPublicKey(), ONE_MOD_Q()) == false);
-    PrecomputeBufferContext::empty_queues();
+    PrecomputeBufferContext::clear();
 }

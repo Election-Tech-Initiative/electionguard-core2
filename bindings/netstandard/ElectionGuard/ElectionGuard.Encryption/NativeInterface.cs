@@ -759,6 +759,7 @@ namespace ElectionGuard
                 ElementModQ.ElementModQHandle seed,
                 ElementModQ.ElementModQHandle hash_header,
                 ulong constant,
+                bool shouldUsePrecomputedValues,
                 out ConstantChaumPedersenProofHandle handle);
 
             [DllImport(DllName, EntryPoint = "eg_constant_chaum_pedersen_proof_is_valid",
@@ -2851,6 +2852,7 @@ namespace ElectionGuard
             internal static extern Status Encrypt(
                 EncryptionMediatorHandle handle,
                 ElectionGuard.PlaintextBallot.External.PlaintextBallotHandle plaintext,
+                bool usePrecomputedValues,
                 out ElectionGuard.CiphertextBallot.External.CiphertextBallotHandle ciphertext);
 
             [DllImport(DllName,
@@ -2859,6 +2861,7 @@ namespace ElectionGuard
             internal static extern Status EncryptAndVerify(
                 EncryptionMediatorHandle handle,
                 ElectionGuard.PlaintextBallot.External.PlaintextBallotHandle plaintext,
+                bool usePrecomputedValues,
                 out ElectionGuard.CiphertextBallot.External.CiphertextBallotHandle ciphertext);
         }
 
@@ -2873,6 +2876,7 @@ namespace ElectionGuard
                 ElementModQ.ElementModQHandle crypto_extended_base_hash,
                 ElementModQ.ElementModQHandle nonceSeed,
                 bool shouldVerifyProofs,
+                bool usePrecomputedValues,
                 out CiphertextBallotSelection.External.CiphertextBallotSelectionHandle handle);
 
             [DllImport(DllName, EntryPoint = "eg_encrypt_contest",
@@ -2884,6 +2888,7 @@ namespace ElectionGuard
                 ElementModQ.ElementModQHandle crypto_extended_base_hash,
                 ElementModQ.ElementModQHandle nonceSeed,
                 bool shouldVerifyProofs,
+                bool usePrecomputedValues,
                 out ElectionGuard.CiphertextBallotContest.External.CiphertextBallotContestHandle handle);
 
             [DllImport(DllName, EntryPoint = "eg_encrypt_ballot",
@@ -2894,6 +2899,7 @@ namespace ElectionGuard
                 CiphertextElectionContext.CiphertextElectionContextHandle context,
                 ElementModQ.ElementModQHandle ballot_code_seed,
                 bool shouldVerifyProofs,
+                bool usePrecomputedValues,
                 out ElectionGuard.CiphertextBallot.External.CiphertextBallotHandle handle);
 
             [DllImport(DllName, EntryPoint = "eg_encrypt_ballot_with_nonce",
@@ -2904,6 +2910,7 @@ namespace ElectionGuard
                 CiphertextElectionContext.CiphertextElectionContextHandle context,
                 ElementModQ.ElementModQHandle ballot_code_seed,
                 ElementModQ.ElementModQHandle nonce,
+                ulong timestamp,
                 bool shouldVerifyProofs,
                 out ElectionGuard.CiphertextBallot.External.CiphertextBallotHandle handle);
 
@@ -2925,6 +2932,7 @@ namespace ElectionGuard
                 CiphertextElectionContext.CiphertextElectionContextHandle context,
                 ElementModQ.ElementModQHandle ballot_code_seed,
                 ElementModQ.ElementModQHandle nonce,
+                ulong timestamp,
                 bool shouldVerifyProofs,
                 out CompactCiphertextBallot.CompactCiphertextBallotHandle handle);
         }
@@ -2932,21 +2940,75 @@ namespace ElectionGuard
         #endregion
 
         #region Precompute
-        internal static class PrecomputeBuffers
+
+        internal static class PrecomputeBuffer
         {
-            [DllImport(DllName, EntryPoint = "eg_precompute_init",
-                CallingConvention = CallingConvention.Cdecl, SetLastError = true)]
-            internal static extern Status Init(int max_buffers);
+            internal struct PrecomputeBufferType { };
 
-            [DllImport(DllName, EntryPoint = "eg_precompute_populate",
-                CallingConvention = CallingConvention.Cdecl, SetLastError = true)]
-            internal static extern Status Populate(ElementModP.ElementModPHandle publicKey);
+            internal class PrecomputeBufferHandle
+                : ElectionGuardSafeHandle<PrecomputeBufferType>
+            {
+#if NETSTANDARD
+                [ReliabilityContract(Consistency.WillNotCorruptState, Cer.MayFail)]
+#endif
+                protected override bool Free()
+                {
+                    if (IsClosed) return true;
 
-            [DllImport(DllName, EntryPoint = "eg_precompute_stop",
+                    var status = PrecomputeBuffer.Free(TypedPtr);
+                    if (status != ElectionGuard.Status.ELECTIONGUARD_STATUS_SUCCESS)
+                    {
+                        throw new ElectionGuardException($"EncryptionDevice Error Free: {status}", status);
+                    }
+                    return true;
+                }
+            }
+
+            [DllImport(DllName, EntryPoint = "eg_precompute_buffer_new",
+                CallingConvention = CallingConvention.Cdecl, SetLastError = true)]
+            internal static extern Status New(
+                ElementModP.ElementModPHandle publicKey, int maxBufferSize,
+                bool shouldAutoPopulate, out PrecomputeBufferHandle handle);
+
+            [DllImport(DllName, EntryPoint = "eg_precompute_buffer_free",
+                CallingConvention = CallingConvention.Cdecl, SetLastError = true)]
+            internal static extern Status Free(PrecomputeBufferType* handle);
+
+            [DllImport(DllName, EntryPoint = "eg_precompute_buffer_start",
+                CallingConvention = CallingConvention.Cdecl, SetLastError = true)]
+            internal static extern Status Start(PrecomputeBufferHandle handle);
+
+            [DllImport(DllName, EntryPoint = "eg_precompute_buffer_stop",
+                CallingConvention = CallingConvention.Cdecl, SetLastError = true)]
+            internal static extern Status Stop(PrecomputeBufferHandle handle);
+
+            [DllImport(DllName, EntryPoint = "eg_precompute_buffer_status",
+                CallingConvention = CallingConvention.Cdecl, SetLastError = true)]
+            internal static extern Status Status(
+                PrecomputeBufferHandle handle, out int count, out int queue_size);
+
+        }
+
+        internal static class PrecomputeBufferContext
+        {
+            [DllImport(DllName, EntryPoint = "eg_precompute_buffer_context_initialize",
+                CallingConvention = CallingConvention.Cdecl, SetLastError = true)]
+            internal static extern Status Initialize(
+                ElementModP.ElementModPHandle publicKey, int maxBufferSize);
+
+            [DllImport(DllName, EntryPoint = "eg_precompute_buffer_context_start",
+                CallingConvention = CallingConvention.Cdecl, SetLastError = true)]
+            internal static extern Status Start();
+
+            [DllImport(DllName, EntryPoint = "eg_precompute_buffer_context_start_new",
+                CallingConvention = CallingConvention.Cdecl, SetLastError = true)]
+            internal static extern Status Start(ElementModP.ElementModPHandle publicKey);
+
+            [DllImport(DllName, EntryPoint = "eg_precompute_buffer_context_stop",
                 CallingConvention = CallingConvention.Cdecl, SetLastError = true)]
             internal static extern Status Stop();
 
-            [DllImport(DllName, EntryPoint = "eg_precompute_status",
+            [DllImport(DllName, EntryPoint = "eg_precompute_buffer_context_status",
                 CallingConvention = CallingConvention.Cdecl, SetLastError = true)]
             internal static extern Status Status(out int count, out int queue_size);
         }

@@ -18,6 +18,7 @@ set(FACADES_electionguard
     ${PROJECT_SOURCE_DIR}/src/electionguard/facades/manifest.cpp
     ${PROJECT_SOURCE_DIR}/src/electionguard/facades/nonces.cpp
     ${PROJECT_SOURCE_DIR}/src/electionguard/facades/polynomial.cpp
+    ${PROJECT_SOURCE_DIR}/src/electionguard/facades/precompute_buffers.cpp
 )
 
 set(SOURCES_electionguard
@@ -66,6 +67,7 @@ set(INCLUDES_electionguard_h
     ${PROJECT_SOURCE_DIR}/include/electionguard/manifest.h
     ${PROJECT_SOURCE_DIR}/include/electionguard/nonces.h
     ${PROJECT_SOURCE_DIR}/include/electionguard/polynomial.h
+    ${PROJECT_SOURCE_DIR}/include/electionguard/precompute_buffers.h
     ${PROJECT_SOURCE_DIR}/include/electionguard/status.h
 )
 

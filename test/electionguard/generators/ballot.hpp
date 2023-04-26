@@ -71,7 +71,7 @@ namespace electionguard::tools::generators
                     Log::debug(" " + description.get().getObjectId() + " Adding Selection: TRUE");
                     selections.push_back(selectionFrom(description.get(), true));
                 } else {
-                    Log::debug(" " + description.get().getObjectId() + " Adding Selection: FALSE");
+                    Log::trace(" " + description.get().getObjectId() + " Adding Selection: FALSE");
                     selections.push_back(selectionFrom(description.get(), false));
                 }
             }

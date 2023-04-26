@@ -49,7 +49,8 @@ BENCHMARK_DEFINE_F(HashedElgamalEncryptFixture, HashedElGamalEncrypt)(benchmark:
     }
 }
 
-BENCHMARK_REGISTER_F(HashedElgamalEncryptFixture, HashedElGamalEncrypt)->Unit(benchmark::kMillisecond);
+BENCHMARK_REGISTER_F(HashedElgamalEncryptFixture, HashedElGamalEncrypt)
+  ->Unit(benchmark::kMillisecond);
 
 class HashedElgamalEncryptPrecomputeFixture : public benchmark::Fixture
 {
@@ -76,14 +77,11 @@ class HashedElgamalEncryptPrecomputeFixture : public benchmark::Fixture
         // cause precomputed entries that will be used by the selection
         // encryptions, that should be more than enough and on teardown
         // the rest will be removed.
-        PrecomputeBufferContext::init(300);
-        PrecomputeBufferContext::populate(*keypair->getPublicKey());
+        PrecomputeBufferContext::initialize(*keypair->getPublicKey(), 300);
+        PrecomputeBufferContext::start();
     }
 
-    void TearDown(const ::benchmark::State &state)
-    {
-        PrecomputeBufferContext::empty_queues(); 
-    }
+    void TearDown(const ::benchmark::State &state) { PrecomputeBufferContext::clear(); }
 
     unique_ptr<ElementModQ> nonce;
     unique_ptr<ElementModQ> secret;
@@ -103,4 +101,3 @@ BENCHMARK_DEFINE_F(HashedElgamalEncryptPrecomputeFixture, HashedElGamalEncryptPr
 
 BENCHMARK_REGISTER_F(HashedElgamalEncryptPrecomputeFixture, HashedElGamalEncryptPrecompute)
   ->Unit(benchmark::kMillisecond);
-

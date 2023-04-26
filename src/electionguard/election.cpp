@@ -160,6 +160,10 @@ namespace electionguard
     {
         return pimpl->elGamalPublicKey.get();
     }
+    const ElementModP &CiphertextElectionContext::getElGamalPublicKeyRef() const
+    {
+        return *pimpl->elGamalPublicKey.get();
+    }
     const ElementModQ *CiphertextElectionContext::getCommitmentHash() const
     {
         return pimpl->commitmentHash.get();

@@ -223,11 +223,10 @@ EG_API eg_electionguard_status_t eg_constant_chaum_pedersen_proof_get_response(
     return ELECTIONGUARD_STATUS_SUCCESS;
 }
 
-eg_electionguard_status_t
-eg_constant_chaum_pedersen_proof_make(eg_elgamal_ciphertext_t *in_message, eg_element_mod_q_t *in_r,
-                                      eg_element_mod_p_t *in_k, eg_element_mod_q_t *in_seed,
-                                      eg_element_mod_q_t *in_hash_header, uint64_t in_constant,
-                                      eg_constant_chaum_pedersen_proof_t **out_handle)
+eg_electionguard_status_t eg_constant_chaum_pedersen_proof_make(
+  eg_elgamal_ciphertext_t *in_message, eg_element_mod_q_t *in_r, eg_element_mod_p_t *in_k,
+  eg_element_mod_q_t *in_seed, eg_element_mod_q_t *in_hash_header, uint64_t in_constant,
+  bool in_should_use_precomputed_values, eg_constant_chaum_pedersen_proof_t **out_handle)
 {
     if (in_message == nullptr || in_r == nullptr || in_k == nullptr || in_seed == nullptr ||
         in_hash_header == nullptr) {
@@ -241,8 +240,8 @@ eg_constant_chaum_pedersen_proof_make(eg_elgamal_ciphertext_t *in_message, eg_el
     auto *hashHeader = AS_TYPE(ElementModQ, in_hash_header);
 
     try {
-        auto proof =
-          ConstantChaumPedersenProof::make(*ciphertext, *r, *k, *seed, *hashHeader, in_constant);
+        auto proof = ConstantChaumPedersenProof::make(
+          *ciphertext, *r, *k, *seed, *hashHeader, in_constant, in_should_use_precomputed_values);
         *out_handle = AS_TYPE(eg_constant_chaum_pedersen_proof_t, proof.release());
         return ELECTIONGUARD_STATUS_SUCCESS;
     } catch (const exception &e) {

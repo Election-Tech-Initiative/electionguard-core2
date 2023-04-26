@@ -631,7 +631,6 @@ namespace electionguard
         if (const_cast<ElementModP &>(exponent) == ZERO_MOD_P()) {
             return ElementModP::fromUint64(1UL);
         }
-
         uint64_t result[MAX_P_LEN] = {};
         CONTEXT_P().modExp(base.get(), MAX_P_SIZE, exponent.get(), static_cast<uint64_t *>(result));
         return make_unique<ElementModP>(result, true);
@@ -644,19 +643,14 @@ namespace electionguard
             return ElementModP::fromUint64(1UL);
         }
 
-// TODO: reenable fixed base math lookup table
-#ifndef __EMSCRIPTEN__
-
         // check if we have a lookup table initialized for this element
         if (base.isFixedBase()) {
             // TODO: use a smaller key
             auto hex = base.toHex();
             auto exp_ptr = exponent.get();
             auto result = LookupTableContext::pow_mod_p(hex, base.ref(), exponent.ref());
-
             return make_unique<ElementModP>(result, true);
         }
-#endif
         // if none exists, execute the modular exponentiation directly
         return pow_mod_p(base, *exponent.toElementModP());
     }

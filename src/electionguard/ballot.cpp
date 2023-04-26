@@ -464,7 +464,7 @@ namespace electionguard
 
     // Public Functions
 
-    eg_valid_contest_return_type_t
+    eg_contest_is_valid_result_t
     PlaintextBallotContest::isValid(const string &expectedObjectId,
                                     uint64_t expectedNumberSelections,
                                     uint64_t expectedNumberElected, uint64_t votesAllowd, /* = 0 */
@@ -654,7 +654,8 @@ namespace electionguard
       uint64_t numberElected, unique_ptr<ElementModQ> nonce /* = nullptr */,
       unique_ptr<ElementModQ> cryptoHash /* = nullptr */,
       unique_ptr<ConstantChaumPedersenProof> proof /* = nullptr */,
-      unique_ptr<HashedElGamalCiphertext> hashedElGamal /*nullptr */)
+      unique_ptr<HashedElGamalCiphertext> hashedElGamal /*nullptr */,
+      bool shouldUsePrecomputedValues /* = false */)
     {
         vector<reference_wrapper<CiphertextBallotSelection>> selectionReferences;
         selectionReferences.reserve(selections.size());
@@ -673,12 +674,13 @@ namespace electionguard
             cryptoHash = move(crypto_hash);
         }
 
+        // accumulate the ciphertexts and generate a proof
         auto accumulation = elgamalAccumulate(selectionReferences);
         if (proof == nullptr) {
             auto aggregate = aggregateNonce(selectionReferences);
-            auto owned_proof =
-              ConstantChaumPedersenProof::make(*accumulation, *aggregate, elgamalPublicKey,
-                                               proofSeed, cryptoExtendedBaseHash, numberElected);
+            auto owned_proof = ConstantChaumPedersenProof::make(
+              *accumulation, *aggregate, elgamalPublicKey, proofSeed, cryptoExtendedBaseHash,
+              numberElected, shouldUsePrecomputedValues);
             proof = move(owned_proof);
         }
 

@@ -20,15 +20,16 @@ namespace electionguard
 {
     enum DomainLoggableTypeEnum {
         NULL_PTR = 0,
-        UINT64_T = 1,
-        STRING = 2,
-        PTR_ELEMENTMODP = 3,
-        PTR_ELEMENTMODQ = 4,
-        REF_WRAP_ELEMENTMODP = 5,
-        REF_WRAP_ELEMENTMODQ = 6,
-        REF_WRAP_CONST_ELEMENTMODP = 7,
-        REF_WRAP_CONST_ELEMENTMODQ = 8,
-        MAP_STRING_BOOL = 9
+        UINT32_T = 1,
+        UINT64_T = 2,
+        STRING = 3,
+        PTR_ELEMENTMODP = 4,
+        PTR_ELEMENTMODQ = 5,
+        REF_WRAP_ELEMENTMODP = 6,
+        REF_WRAP_ELEMENTMODQ = 7,
+        REF_WRAP_CONST_ELEMENTMODP = 8,
+        REF_WRAP_CONST_ELEMENTMODQ = 9,
+        MAP_STRING_BOOL = 10
 
     };
 
@@ -37,6 +38,9 @@ namespace electionguard
         switch (element.index()) {
             case NULL_PTR: {
                 return "nullptr";
+            }
+            case UINT32_T: {
+                return to_string(get<uint32_t>(element));
             }
             case UINT64_T: {
                 return to_string(get<uint64_t>(element));

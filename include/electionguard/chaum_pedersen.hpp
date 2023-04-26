@@ -242,7 +242,8 @@ namespace electionguard
         /// </Summary>
         static std::unique_ptr<ConstantChaumPedersenProof>
         make(const ElGamalCiphertext &message, const ElementModQ &r, const ElementModP &k,
-             const ElementModQ &seed, const ElementModQ &hash_header, uint64_t constant);
+             const ElementModQ &seed, const ElementModQ &hash_header, uint64_t constant,
+             bool shouldUsePrecomputedValues = false);
 
         /// <Summary>
         /// Validates a `ConstantChaumPedersenProof`
