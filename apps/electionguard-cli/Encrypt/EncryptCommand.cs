@@ -1,4 +1,4 @@
-﻿namespace ElectionGuard.Encryption.Cli.Encrypt
+﻿namespace ElectionGuard.CLI.Encrypt
 {
     internal class EncryptCommand
     {
@@ -19,11 +19,15 @@
         private async Task EncryptInternal(EncryptOptions encryptOptions)
         {
             encryptOptions.Validate();
-            if (string.IsNullOrEmpty(encryptOptions.Context)) throw new ArgumentNullException(nameof(encryptOptions.Context));
-            if (string.IsNullOrEmpty(encryptOptions.Manifest)) throw new ArgumentNullException(nameof(encryptOptions.Manifest));
-            if (string.IsNullOrEmpty(encryptOptions.BallotsDir)) throw new ArgumentNullException(nameof(encryptOptions.BallotsDir));
+            if (string.IsNullOrEmpty(encryptOptions.Context))
+                throw new ArgumentNullException(nameof(encryptOptions.Context));
+            if (string.IsNullOrEmpty(encryptOptions.Manifest))
+                throw new ArgumentNullException(nameof(encryptOptions.Manifest));
+            if (string.IsNullOrEmpty(encryptOptions.BallotsDir))
+                throw new ArgumentNullException(nameof(encryptOptions.BallotsDir));
 
-            var encryptionMediator = await GetEncryptionMediator(encryptOptions.Context, encryptOptions.Manifest);
+            var encryptionMediator = await GetEncryptionMediator(
+                encryptOptions.Context, encryptOptions.Manifest);
             var ballotFiles = GetBallotFiles(encryptOptions.BallotsDir);
 
             foreach (var ballotFile in ballotFiles)
@@ -31,7 +35,8 @@
                 Console.WriteLine($"Parsing: {ballotFile}");
                 var plaintextBallot = await GetPlaintextBallot(ballotFile);
                 var spoiledDeviceIds = encryptOptions.SpoiledDeviceIds.ToList();
-                var submittedBallot = EncryptAndSubmit(encryptionMediator, plaintextBallot, spoiledDeviceIds, ballotFile);
+                var submittedBallot = EncryptAndSubmit(
+                    encryptionMediator, plaintextBallot, spoiledDeviceIds, ballotFile);
                 await WriteSubmittedBallot(encryptOptions, ballotFile, submittedBallot);
             }
             Console.WriteLine("Parsing Complete");
@@ -41,14 +46,17 @@
             PlaintextBallot plaintextBallot, IList<string> spoiledDeviceIds, string ballotFile)
         {
             var ciphertextBallot = encryptionMediator.Encrypt(plaintextBallot);
-            var shouldSpoil = spoiledDeviceIds.Contains(ciphertextBallot.ObjectId, StringComparer.OrdinalIgnoreCase) ||
-                              spoiledDeviceIds.Contains(Path.GetFileNameWithoutExtension(ballotFile), StringComparer.OrdinalIgnoreCase);
+            var shouldSpoil = spoiledDeviceIds.Contains(
+                ciphertextBallot.ObjectId, StringComparer.OrdinalIgnoreCase) ||
+                              spoiledDeviceIds.Contains(
+                                Path.GetFileNameWithoutExtension(ballotFile), StringComparer.OrdinalIgnoreCase);
             var state = shouldSpoil ? BallotBoxState.Spoiled : BallotBoxState.Cast;
             var submittedBallot = new SubmittedBallot(ciphertextBallot, state);
             return submittedBallot;
         }
 
-        private static async Task<EncryptionMediator> GetEncryptionMediator(string contextFile, string manifestFile)
+        private static async Task<EncryptionMediator> GetEncryptionMediator(
+            string contextFile, string manifestFile)
         {
             var context = await GetContext(contextFile);
             var internalManifest = await GetInternalManifest(manifestFile);

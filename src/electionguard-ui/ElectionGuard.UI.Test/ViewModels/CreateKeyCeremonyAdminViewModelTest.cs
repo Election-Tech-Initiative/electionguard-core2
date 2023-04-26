@@ -19,8 +19,8 @@ namespace ElectionGuard.UI.Test.ViewModels
         {
             // ARRANGE
             var createKeyCeremonyAdminViewModel = CreateKeyCeremonyAdminViewModel();
-            var ret = new KeyCeremony("test", 1, 1, "admin");
-            _keyCeremonyService.SaveAsync(Arg.Any<KeyCeremony>()).Returns(ret);
+            var ret = new KeyCeremonyRecord("test", 1, 1, "admin");
+            _keyCeremonyService.SaveAsync(Arg.Any<KeyCeremonyRecord>()).Returns(ret);
 
             // ACT
             await createKeyCeremonyAdminViewModel.CreateKeyCeremonyCommand.ExecuteAsync(null);
@@ -42,7 +42,7 @@ namespace ElectionGuard.UI.Test.ViewModels
 
             // ACT
             var canExecute = createKeyCeremonyAdminViewModel.CreateKeyCeremonyCommand.CanExecute(null);
-            
+
             // ASSERT
             canExecute.ShouldBeFalse();
         }
@@ -58,7 +58,7 @@ namespace ElectionGuard.UI.Test.ViewModels
 
             // ACT
             var canExecute = createKeyCeremonyAdminViewModel.CreateKeyCeremonyCommand.CanExecute(null);
-            
+
             // ASSERT
             canExecute.ShouldBeTrue();
         }
@@ -72,7 +72,7 @@ namespace ElectionGuard.UI.Test.ViewModels
 
             // ACT
             var canExecute = createKeyCeremonyAdminViewModel.CreateKeyCeremonyCommand.CanExecute(null);
-            
+
             // ASSERT
             canExecute.ShouldBeFalse();
         }
@@ -86,7 +86,7 @@ namespace ElectionGuard.UI.Test.ViewModels
 
             // ACT
             var canExecute = createKeyCeremonyAdminViewModel.CreateKeyCeremonyCommand.CanExecute(null);
-            
+
             // ASSERT
             canExecute.ShouldBeTrue();
         }
@@ -97,7 +97,7 @@ namespace ElectionGuard.UI.Test.ViewModels
             // ARRANGE
             var createKeyCeremonyAdminViewModel = CreateKeyCeremonyAdminViewModel();
             createKeyCeremonyAdminViewModel.KeyCeremonyName = "kc1";
-            _keyCeremonyService.GetByNameAsync("kc1").Returns(new KeyCeremony("kc1", 1, 1, "admin"));
+            _keyCeremonyService.GetByNameAsync("kc1").Returns(new KeyCeremonyRecord("kc1", 1, 1, "admin"));
 
             // ACT
             await createKeyCeremonyAdminViewModel.CreateKeyCeremonyCommand.ExecuteAsync(null);

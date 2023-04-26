@@ -65,8 +65,8 @@ namespace electionguard
         SUCCESS = 0,
         OVERVOTE = 1,
         OVERVOTE_ERROR = 2,
-        INVALID_OBJECT_ID_ERROR = 2,
-        TOO_MANY_SELECTIONS_ERROR = 3,
+        INVALID_OBJECT_ID_ERROR = 3,
+        TOO_MANY_SELECTIONS_ERROR = 4,
     } eg_contest_is_valid_result_t;
 
     /// <summary>
