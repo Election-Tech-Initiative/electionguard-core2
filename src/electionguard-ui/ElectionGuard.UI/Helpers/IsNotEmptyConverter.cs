@@ -9,8 +9,8 @@ namespace ElectionGuard.UI.Helpers
 
         public override string DefaultConvertBackReturnValue { get; set; } = string.Empty;
 
-        public override string ConvertBackTo(bool value, CultureInfo culture) => throw new NotImplementedException();
+        public override string ConvertBackTo(bool value, CultureInfo? culture) => throw new NotImplementedException();
 
-        public override bool ConvertFrom(string value, CultureInfo culture) => !value.Equals(string.Empty);
+        public override bool ConvertFrom(string value, CultureInfo? culture) => culture != null && !value.Equals(string.Empty);
     }
 }
