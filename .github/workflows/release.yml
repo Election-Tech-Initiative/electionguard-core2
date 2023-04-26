@@ -26,7 +26,7 @@ jobs:
           echo "BUILD_NUMBER=$BUILD_NUMBER" >> $GITHUB_ENV
           VERSION="${TAG_NAME/v}-$BUILD_NUMBER"
           echo "VERSION=$VERSION" >> $GITHUB_ENV
-          echo "::set-output name=version::$VERSION"
+          echo "version=$VERSION" >> $GITHUB_OUTPUT
 
   linux_build_x64:
     name: Linux Build (x64)
@@ -193,9 +193,9 @@ jobs:
         run: make environment
       - name: Update version number
         run: |
+          echo $VERSION
           dotnet tool install --global dotnet-version-cli
           dotnet version ./bindings/netstandard/ElectionGuard/ElectionGuard.Encryption/ElectionGuard.Encryption.csproj $VERSION
-          npm version $VERSION --no-git-tag-version
 
       - name: Get Linux x64 Artifacts
         uses: actions/download-artifact@v3
@@ -262,11 +262,11 @@ jobs:
         uses: actions/download-artifact@v3
         with:
           name: wasm
-          path: build/libs/wasm/Release/src/electionguard/wasm
-      - name: Copy WASM Artifacts
-        run: |
-          cp build/libs/wasm/Release/src/wasm/*.js bindings/typescript/src/wasm
-          cp build/libs/wasm/Release/src/wasm/*.wasm bindings/typescript/src/wasm
+          path: bindings/typescript/src/wasm
+      # - name: Copy WASM Artifacts
+      #   run: |
+      #     cp build/libs/wasm/Release/src/wasm/*.js bindings/typescript/src/wasm
+      #     cp build/libs/wasm/Release/src/wasm/*.wasm bindings/typescript/src/wasm
       - name: Install Dependencies
         working-directory: bindings/typescript
         run: npm install
