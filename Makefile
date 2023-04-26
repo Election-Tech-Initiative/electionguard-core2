@@ -2,10 +2,11 @@
 
 .EXPORT_ALL_VARIABLES:
 ELECTIONGUARD_CACHE=$(subst \,/,$(realpath .))/.cache
+ELECTIONGUARD_APPS_DIR=$(realpath .)/apps
 ELECTIONGUARD_BINDING_DIR=$(realpath .)/bindings
 ELECTIONGUARD_BINDING_LIB_DIR=$(ELECTIONGUARD_BINDING_DIR)/netstandard/ElectionGuard/ElectionGuard.Encryption
 ELECTIONGUARD_BINDING_BENCH_DIR=$(ELECTIONGUARD_BINDING_DIR)/netstandard/ElectionGuard/ElectionGuard.Encryption.Bench
-ELECTIONGUARD_BINDING_CLI_DIR=$(ELECTIONGUARD_BINDING_DIR)/netstandard/ElectionGuard/ElectionGuard.Encryption.Cli
+ELECTIONGUARD_APP_CLI_DIR=$(ELECTIONGUARD_APPS_DIR)/electionguard-cli/ElectionGuard.CLI
 ELECTIONGUARD_BINDING_TEST_DIR=$(ELECTIONGUARD_BINDING_DIR)/netstandard/ElectionGuard/ElectionGuard.Encryption.Tests
 ELECTIONGUARD_BINDING_UTILS_DIR=$(ELECTIONGUARD_BINDING_DIR)/netstandard/ElectionGuard/ElectionGuard.Encryption.Utils
 ELECTIONGUARD_BUILD_DIR=$(subst \,/,$(realpath .))/build
@@ -299,6 +300,11 @@ else
 	if [ -d "$(ELECTIONGUARD_BUILD_DIR)" ]; then rm -rf $(ELECTIONGUARD_BUILD_DIR)/*; fi
 	if [ ! -d "$(ELECTIONGUARD_BUILD_DIR)" ]; then mkdir $(ELECTIONGUARD_BUILD_DIR); fi
 
+	if [ -d "$(ELECTIONGUARD_APP_CLI_DIR)/bin" ]; then rm -rf $(ELECTIONGUARD_APP_CLI_DIR)/bin/*; fi
+	if [ ! -d "$(ELECTIONGUARD_APP_CLI_DIR)/bin" ]; then mkdir $(ELECTIONGUARD_APP_CLI_DIR)/bin; fi
+	if [ -d "$(ELECTIONGUARD_APP_CLI_DIR)/obj" ]; then rm -rf $(ELECTIONGUARD_APP_CLI_DIR)/obj/*; fi
+	if [ ! -d "$(ELECTIONGUARD_APP_CLI_DIR)/obj" ]; then mkdir $(ELECTIONGUARD_APP_CLI_DIR)/obj; fi
+
 	if [ -d "$(ELECTIONGUARD_BINDING_LIB_DIR)/bin" ]; then rm -rf $(ELECTIONGUARD_BINDING_LIB_DIR)/bin/*; fi
 	if [ ! -d "$(ELECTIONGUARD_BINDING_LIB_DIR)/bin" ]; then mkdir $(ELECTIONGUARD_BINDING_LIB_DIR)/bin; fi
 	if [ -d "$(ELECTIONGUARD_BINDING_LIB_DIR)/obj" ]; then rm -rf $(ELECTIONGUARD_BINDING_LIB_DIR)/obj/*; fi
@@ -308,11 +314,6 @@ else
 	if [ ! -d "$(ELECTIONGUARD_BINDING_BENCH_DIR)/bin" ]; then mkdir $(ELECTIONGUARD_BINDING_BENCH_DIR)/bin; fi
 	if [ -d "$(ELECTIONGUARD_BINDING_BENCH_DIR)/obj" ]; then rm -rf $(ELECTIONGUARD_BINDING_BENCH_DIR)/obj/*; fi
 	if [ ! -d "$(ELECTIONGUARD_BINDING_BENCH_DIR)/obj" ]; then mkdir $(ELECTIONGUARD_BINDING_BENCH_DIR)/obj; fi
-
-	if [ -d "$(ELECTIONGUARD_BINDING_CLI_DIR)/bin" ]; then rm -rf $(ELECTIONGUARD_BINDING_CLI_DIR)/bin/*; fi
-	if [ ! -d "$(ELECTIONGUARD_BINDING_CLI_DIR)/bin" ]; then mkdir $(ELECTIONGUARD_BINDING_CLI_DIR)/bin; fi
-	if [ -d "$(ELECTIONGUARD_BINDING_CLI_DIR)/obj" ]; then rm -rf $(ELECTIONGUARD_BINDING_CLI_DIR)/obj/*; fi
-	if [ ! -d "$(ELECTIONGUARD_BINDING_CLI_DIR)/obj" ]; then mkdir $(ELECTIONGUARD_BINDING_CLI_DIR)/obj; fi
 
 	if [ -d "$(ELECTIONGUARD_BINDING_TEST_DIR)/bin" ]; then rm -rf $(ELECTIONGUARD_BINDING_TEST_DIR)/bin/*; fi
 	if [ ! -d "$(ELECTIONGUARD_BINDING_TEST_DIR)/bin" ]; then mkdir $(ELECTIONGUARD_BINDING_TEST_DIR)/bin; fi
