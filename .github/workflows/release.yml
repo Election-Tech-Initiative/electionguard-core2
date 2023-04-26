@@ -11,6 +11,23 @@ env:
   TARGET: Release
 
 jobs:
+  get_version_code:
+    name: Get Version Code
+    runs-on: ubuntu-22.04
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v3
+      - name: Get Version Code
+        id: get_version_code
+        run: |
+          TAG_NAME=${GITHUB_REF/refs\/tags\//} # v1.0.0
+          echo "TAG_NAME=$TAG_NAME" >> $GITHUB_ENV
+          BUILD_NUMBER=$(echo $TAG_NAME | grep -oP '\d+$')
+          echo "BUILD_NUMBER=$BUILD_NUMBER" >> $GITHUB_ENV
+          VERSION="${TAG_NAME/v}-$BUILD_NUMBER"
+          echo "VERSION=$VERSION" >> $GITHUB_ENV
+          echo "::set-output name=version::$VERSION"
+
   linux_build_x64:
     name: Linux Build (x64)
     runs-on: ubuntu-22.04
@@ -130,8 +147,8 @@ jobs:
         with:
           name: wasm
           path: |
-            build/libs/Wasm/Release/src/electionguard/wasm/*.js
-            build/libs/Wasm/Release/src/electionguard/wasm/*.wasm
+            build/libs/wasm/Release/src/electionguard/wasm/*.js
+            build/libs/wasm/Release/src/electionguard/wasm/*.wasm
 
   # TODO: win x86
 
@@ -161,6 +178,7 @@ jobs:
     name: Publish Nuget
     needs:
       [
+        get_version_code,
         linux_build_x64,
         maccatalyst_build_arm64,
         macos_build_arm64,
@@ -171,6 +189,13 @@ jobs:
     steps:
       - name: Checkout Code
         uses: actions/checkout@v3
+      - name: Setup Environment
+        run: make environment
+      - name: Update version number
+        run: |
+          dotnet tool install --global dotnet-version-cli
+          dotnet version ./bindings/netstandard/ElectionGuard/ElectionGuard.Encryption/ElectionGuard.Encryption.csproj $VERSION
+          npm version $VERSION --no-git-tag-version
 
       - name: Get Linux x64 Artifacts
         uses: actions/download-artifact@v3
@@ -224,7 +249,7 @@ jobs:
 
   publish_npm:
     name: Publish NPM
-    needs: [wasm_build]
+    needs: [get_version_code, wasm_build]
     runs-on: ubuntu-22.04
     steps:
       - name: Checkout Code
@@ -237,19 +262,22 @@ jobs:
         uses: actions/download-artifact@v3
         with:
           name: wasm
-          path: build/libs/Wasm/Release/src/electionguard/wasm
+          path: build/libs/wasm/Release/src/electionguard/wasm
       - name: Copy WASM Artifacts
         run: |
-          cp build/libs/Wasm/Release/src/wasm/*.js bindings/typescript/src/wasm
-          cp build/libs/Wasm/Release/src/wasm/*.wasm bindings/typescript/src/wasm
+          cp build/libs/wasm/Release/src/wasm/*.js bindings/typescript/src/wasm
+          cp build/libs/wasm/Release/src/wasm/*.wasm bindings/typescript/src/wasm
       - name: Install Dependencies
         working-directory: bindings/typescript
         run: npm install
+      - name: Update version number
+        working-directory: bindings/typescript
+        run: npm version $VERSION --no-git-tag-version
       - name: Publish to NPM
         working-directory: bindings/typescript
         run: |
           echo "//registry.npmjs.org/:_authToken=${{ secrets.NPM_REGISTRY_TOKEN }}" > .npmrc
-          echo $GITHUB_REF
+          echo $VERSION
           npm run package
           npm publish
 
