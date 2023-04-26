@@ -5,6 +5,7 @@ on:
   pull_request:
     paths:
       - ".github/pull-request.yml"
+      - "apps/**"
       - "bindings/**"
       - "cmake/**"
       - "include/**"
@@ -206,6 +207,13 @@ jobs:
       - name: Lint
         if: (matrix.lint)
         run: make lint
+      
+      # Build
+      - name: Build CLI (Windows)
+        env:
+          PROCESSOR: ${{ matrix.processor }}
+        if: (runner.os == 'Windows' && matrix.compiler == 'msvc')
+        run: make build-cli
 
       # Tests
       - name: Run Tests (Linux)
