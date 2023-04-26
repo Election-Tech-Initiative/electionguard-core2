@@ -2,7 +2,7 @@
 
 public partial class EncryptionExportPage
 {
-	public EncryptionExportPage(BallotUploadViewModel vm) : base(vm)
+	public EncryptionExportPage(EncryptionPackageExportViewModel vm) : base(vm)
     {
 		InitializeComponent();
 	}
