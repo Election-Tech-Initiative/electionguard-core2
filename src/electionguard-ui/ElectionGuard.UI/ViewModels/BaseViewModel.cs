@@ -20,18 +20,21 @@ public partial class BaseViewModel : ObservableObject, IDisposable
     [ObservableProperty]
     private string _pageTitle = "";
 
-    protected IDispatcherTimer _timer;
+    protected IDispatcherTimer? _timer;
 
     private void InitTimer()
     {
-        _timer = Dispatcher.GetForCurrentThread()!.CreateTimer();
-        _timer.Interval = TimeSpan.FromSeconds(UISettings.LONG_POLLING_INTERVAL);
-        _timer.IsRepeating = true;
+        _timer = Dispatcher.GetForCurrentThread()?.CreateTimer();
+        if (_timer is not null)
+        {
+            _timer.Interval = TimeSpan.FromSeconds(UISettings.LONG_POLLING_INTERVAL);
+            _timer.IsRepeating = true;
+        }
     }
 
     public virtual async Task OnAppearing()
     {
-        _timer.Start();
+        _timer?.Start();
         await Task.Yield();
     }
 
