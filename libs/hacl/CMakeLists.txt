@@ -21,7 +21,7 @@ CPMAddPackage(
     NAME hacl
     GITHUB_REPOSITORY addressxception/hacl-packages
     VERSION 0.6.0
-    GIT_TAG 4a465b5fdc2b18ffbca493a0abad40eec015da45
+    GIT_TAG 0669c5553a0a619b1c70414aea2ebcc5f875ac13
     OPTIONS "HACL_CUSTOM_CONFIG_FILE_PATH ${HACL_CUSTOM_CONFIG_FILE_PATH}"
 )
 

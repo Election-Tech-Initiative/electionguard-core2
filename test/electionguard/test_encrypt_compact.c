@@ -4,11 +4,11 @@
 #include "utils/utils.h"
 
 #include <assert.h>
-#include <electionguard/encrypt.h>
+#include <electionguard/ballot_compact.h>
 #include <electionguard/ciphertext_ballot.generated.h>
 #include <electionguard/ciphertext_ballot_selection.generated.h>
+#include <electionguard/encrypt.h>
 #include <electionguard/plaintext_ballot.generated.h>
-#include <electionguard/ballot_compact.h>
 #include <stdlib.h>
 
 bool strings_are_equal(char *expected, char *actual);
@@ -72,7 +72,7 @@ bool test_encrypt_ballot_compact_simple_succeeds(void)
     // Act
 
     eg_ciphertext_ballot_t *ciphertext = NULL;
-    if (eg_encrypt_ballot(ballot, manifest, context, device_hash, true, &ciphertext)) {
+    if (eg_encrypt_ballot(ballot, manifest, context, device_hash, true, false, &ciphertext)) {
         assert(false);
     }
 

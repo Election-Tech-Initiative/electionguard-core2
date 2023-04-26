@@ -30,9 +30,10 @@ jobs:
         name:
           [
             "ubuntu-22.04-clang-14.0.0",
+            "ubuntu-22.04-emscripten-3.1",
             "ubuntu-22.04-gcc-12.1.0",
-            "macos-12-xcode-14.1",
-            "macos-12-xcode-14.1-arm64",
+            "macos-13-xcode-14.2",
+            "macos-13-xcode-14.2-arm64",
             "windows-2022-gcc-11",
             "windows-2022-msvc-latest",
             "ubuntu-22.04-linter",
@@ -46,6 +47,16 @@ jobs:
             makeReleaseBuild: false
             lint: false
             runCsTests: false
+            runTsTests: false
+          - name: ubuntu-22.04-emscripten-3.1
+            os: ubuntu-22.04
+            processor: x64
+            compiler: emscripten
+            version: "3.1.35"
+            makeReleaseBuild: true
+            lint: false
+            runCsTests: false
+            runTsTests: true
           - name: ubuntu-22.04-gcc-12.1.0
             os: ubuntu-22.04
             processor: x64
@@ -54,22 +65,25 @@ jobs:
             makeReleaseBuild: false
             lint: false
             runCsTests: false
-          - name: macOS-12-xcode-14.1
-            os: macOS-12
+            runTsTests: false
+          - name: macOS-13-xcode-14.2
+            os: macOS-13
             processor: x64
             compiler: xcode
-            version: "14.1"
+            version: "14.2"
             makeReleaseBuild: false
             lint: false
             runCsTests: true
-          - name: macOS-12-xcode-14.1-arm64
-            os: macOS-12
+            runTsTests: false
+          - name: macOS-13-xcode-14.2-arm64
+            os: macOS-13
             processor: arm64
             compiler: xcode
-            version: "14.1"
+            version: "14.2"
             makeReleaseBuild: false
             lint: false
             runCsTests: false
+            runTsTests: false
           - name: windows-2022-gcc-11
             os: windows-2022
             processor: x64
@@ -78,6 +92,7 @@ jobs:
             makeReleaseBuild: false
             lint: false
             runCsTests: false
+            runTsTests: false
           - name: windows-2022-msvc-latest
             os: windows-2022
             processor: x64
@@ -86,6 +101,7 @@ jobs:
             makeReleaseBuild: false
             lint: false
             runCsTests: true
+            runTsTests: false
           - name: ubuntu-22.04-linter
             os: ubuntu-22.04
             processor: x64
@@ -94,6 +110,7 @@ jobs:
             makeReleaseBuild: false
             lint: true
             runCsTests: true
+            runTsTests: false
 
     steps:
       # Checkout
@@ -104,22 +121,30 @@ jobs:
         run: cd ${{ github.workspace }}
 
       # Cache
-      - name: Restore C++ Dependency Cache
-        id: restore-dependency-cache
-        uses: actions/cache/restore@v3
+      - name: Setup Dependency Cache
+        id: dependency-cache
+        uses: actions/cache@v3
         with:
           path: |
             .cache/
-            node_modules/
-          key: ${{ matrix.name }}-dependencies-${{ hashFiles('**/CMakeLists.txt', '**/*.cmake', '**/package-lock.json') }}
+          key: ${{ matrix.name }}-dependencies-${{ hashFiles('**/CMakeLists.txt', '**/*.cmake') }}
 
-      - name: Restore C++ Build Cache
-        id: restore-build-cache
-        uses: actions/cache/restore@v3
+      - name: Setup C++ Build Cache
+        id: build-cache
+        uses: actions/cache@v3
         with:
           path: |
             build/
           key: ${{ matrix.name }}-build-${{ hashFiles('**/*.h', '**/*.hpp', '**/*.cpp') }}
+
+      - name: Setup Node Cache
+        id: node-cache
+        if: (matrix.compiler == 'emscripten')
+        uses: actions/cache@v3
+        with:
+          path: |
+            bindings/typescript/node_modules/
+          key: ${{ matrix.name }}-node-${{ hashFiles('**/package-lock.json') }}
 
       # Runner Configuration
       - name: Update Environment (Linux)
@@ -130,6 +155,11 @@ jobs:
           if [ "${{ matrix.compiler }}" = "gcc" ]; then
             echo "CC=gcc-${{ matrix.version }}" >> $GITHUB_ENV
             echo "CXX=g++-${{ matrix.version }}" >> $GITHUB_ENV
+          elif [ "${{ matrix.compiler }}" = "emscripten" ]; then
+            make environment-wasm
+            source ./.cache/emscripten/emsdk_env.sh
+            # echo "CC=emcc" >> $GITHUB_ENV
+            # echo "CXX=em++" >> $GITHUB_ENV
           else
             sudo apt-get install -y clang-${{ matrix.version }} g++-multilib
             echo "CC=clang-${{ matrix.version }}" >> $GITHUB_ENV
@@ -167,12 +197,6 @@ jobs:
         uses: actions/setup-dotnet@v3
         with:
           dotnet-version: 7.0.x
-
-      # - name: Install Emscripten
-      #   if: (runner.os == 'Linux' && matrix.compiler == 'clang')
-      #   uses: mymindstorm/setup-emsdk@v11
-      #   with:
-      #     version: 3.1.33
 
       # Environment
       - name: Configure Environment
@@ -214,25 +238,8 @@ jobs:
         if: (matrix.runCsTests)
         run: make test-netstandard
 
-      # - name: Run Typescript Tests (Linux)
-      #   env:
-      #     EMSCRIPTEN_PATH: ${{ env.EMSDK }}
-      #     PROCESSOR: ${{ matrix.processor }}
-      #   if: (runner.os == 'Linux' && matrix.compiler == 'clang')
-      #   run: make test-wasm
-
-      # Save build cache
-      - name: Save C++ Build Cache
-        uses: actions/cache/save@v3
-        with:
-          path: |
-            build/
-          key: ${{ steps.restore-build-cache.outputs.cache-primary-key }}
-
-      - name: Save C++ Dependency Cache
-        uses: actions/cache/save@v3
-        with:
-          path: |
-            .cache/
-            node_modules/
-          key: ${{ steps.restore-dependency-cache.outputs.cache-primary-key }}
+      - name: Run Typescript Tests (Linux)
+        env:
+          PROCESSOR: ${{ matrix.processor }}
+        if: (matrix.runTsTests)
+        run: make build-npm && make test-wasm

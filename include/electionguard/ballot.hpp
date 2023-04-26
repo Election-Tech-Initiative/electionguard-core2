@@ -61,6 +61,14 @@ namespace electionguard
     /// </summary>
     EG_API BallotBoxState getBallotBoxState(const std::string &value);
 
+    typedef enum eg_contest_is_valid_result_e {
+        SUCCESS = 0,
+        OVERVOTE = 1,
+        OVERVOTE_ERROR = 2,
+        INVALID_OBJECT_ID_ERROR = 2,
+        TOO_MANY_SELECTIONS_ERROR = 3,
+    } eg_contest_is_valid_result_t;
+
     /// <summary>
     /// ExtendedData represents any arbitrary data expressible as a string with a length.
     ///
@@ -352,14 +360,6 @@ namespace electionguard
         //TODO: void setNonce(ElementModQ *nonce);
     };
 
-    typedef enum eg_valid_contest_return_e {
-        SUCCESS = 0,
-        OVERVOTE = 1,
-        OVERVOTE_ERROR = 2,
-        INVALID_OBJECT_ID_ERROR = 2,
-        TOO_MANY_SELECTIONS_ERROR = 3,
-    } eg_valid_contest_return_type_t;
-
     /// <summary>
     /// A PlaintextBallotContest represents the selections made by a voter for a specific ContestDescription
     ///
@@ -400,11 +400,11 @@ namespace electionguard
         ///
         /// Note: because this class supports partial representations, undervotes are considered a valid state.
         /// </summary>
-        eg_valid_contest_return_type_t isValid(const std::string &expectedObjectId,
-                                               uint64_t expectedNumberSelections,
-                                               uint64_t expectedNumberElected,
-                                               uint64_t votesAllowd = 0,
-                                               bool supportOvervotes = true) const;
+        eg_contest_is_valid_result_t isValid(const std::string &expectedObjectId,
+                                             uint64_t expectedNumberSelections,
+                                             uint64_t expectedNumberElected,
+                                             uint64_t votesAllowd = 0,
+                                             bool supportOvervotes = true) const;
 
       private:
         class Impl;
@@ -520,7 +520,8 @@ namespace electionguard
              std::unique_ptr<ElementModQ> nonce = nullptr,
              std::unique_ptr<ElementModQ> cryptoHash = nullptr,
              std::unique_ptr<ConstantChaumPedersenProof> proof = nullptr,
-             std::unique_ptr<HashedElGamalCiphertext> hashedElGamal = nullptr);
+             std::unique_ptr<HashedElGamalCiphertext> hashedElGamal = nullptr,
+             bool shouldUsePrecomputedValues = false);
 
         /// <summary>
         /// An aggregate nonce for the contest composed of the nonces of the selections.

@@ -2,7 +2,9 @@
 
 #include "../../../libs/hacl/Hacl_Bignum4096.hpp"
 #include "../../../libs/hacl/Hacl_Bignum4096_32.hpp"
+#include "../log.hpp"
 
+#include <cstring>
 #include <electionguard/constants.h>
 #include <memory>
 #include <variant>
@@ -27,38 +29,47 @@ namespace electionguard::facades
         HaclBignumType element;
         bool prefer32BitMath = false;
 
-        Impl(uint32_t *elem) : element(make_unique<hacl::Bignum4096_32>(move(elem)))
+        Impl(const uint32_t *elem)
         {
             // When passing in 32-bit objects we always prefer
+            Log::debug("Bignum4096: uint32_t *elem using 32-bit math (compiled)");
+
+            // copy the value
+            uint32_t *data = new uint32_t[hacl::Bignum4096_32::size];
+            memcpy(data, elem, hacl::Bignum4096_32::size * sizeof(uint32_t));
+
             this->prefer32BitMath = true;
+            element = make_unique<hacl::Bignum4096_32>(move(data));
         }
 
-        Impl(uint64_t *elem) : prefer32BitMath(Bignum4096::use32BitMath)
-        {
-            // when compiling with USE_32BIT_MATH we prefer
-            if (prefer32BitMath) {
-                element =
-                  make_unique<hacl::Bignum4096_32>(move(reinterpret_cast<uint32_t *>(elem)));
-            } else {
-                element = make_unique<hacl::Bignum4096>(move(elem));
-            }
-        }
+        Impl(const uint64_t *elem) : Impl(elem, Bignum4096::use32BitMath) {}
 
-        Impl(uint64_t *elem, bool prefer32BitMath) : prefer32BitMath(prefer32BitMath)
+        Impl(const uint64_t *elem, bool prefer32BitMath) : prefer32BitMath(prefer32BitMath)
         {
-            // when calling this overload we allow the value to be set at runtime
+            // when compiling with USE_32BIT_MATH we prefer to use it even for 64 bit numbers
             if (prefer32BitMath) {
-                element =
-                  make_unique<hacl::Bignum4096_32>(move(reinterpret_cast<uint32_t *>(elem)));
+                Log::debug("Bignum4096: uint64_t *elem using 32-bit math");
+
+                // copy the value
+                uint32_t *data = new uint32_t[hacl::Bignum4096_32::size];
+                memcpy(data, elem, hacl::Bignum4096_32::size * sizeof(uint32_t));
+
+                element = make_unique<hacl::Bignum4096_32>(move(data));
             } else {
-                element = make_unique<hacl::Bignum4096>(move(elem));
+                Log::debug("Bignum4096: uint64_t *elem using 64-bit math");
+
+                // copy the value
+                uint64_t *data = new uint64_t[hacl::Bignum4096::size];
+                memcpy(data, elem, hacl::Bignum4096::size * sizeof(uint64_t));
+
+                element = make_unique<hacl::Bignum4096>(move(data));
             }
         }
     };
 
-    Bignum4096::Bignum4096(uint32_t *elem) : pimpl(new Impl(elem)) {}
-    Bignum4096::Bignum4096(uint64_t *elem) : pimpl(new Impl(elem)) {}
-    Bignum4096::Bignum4096(uint64_t *elem, bool prefer32BitMath)
+    Bignum4096::Bignum4096(const uint32_t *elem) : pimpl(new Impl(elem)) {}
+    Bignum4096::Bignum4096(const uint64_t *elem) : pimpl(new Impl(elem)) {}
+    Bignum4096::Bignum4096(const uint64_t *elem, bool prefer32BitMath)
         : pimpl(new Impl(elem, prefer32BitMath))
     {
     }
@@ -241,6 +252,7 @@ namespace electionguard::facades
     {
         if (pimpl->prefer32BitMath) {
             to_montgomery_form(reinterpret_cast<uint32_t *>(a), reinterpret_cast<uint32_t *>(aM));
+            return;
         }
         std::get<unique_ptr<hacl::Bignum4096>>(pimpl->element)->to_montgomery_form(a, aM);
     }
@@ -253,6 +265,7 @@ namespace electionguard::facades
     {
         if (pimpl->prefer32BitMath) {
             from_montgomery_form(reinterpret_cast<uint32_t *>(aM), reinterpret_cast<uint32_t *>(a));
+            return;
         }
         std::get<unique_ptr<hacl::Bignum4096>>(pimpl->element)->from_montgomery_form(aM, a);
     }
@@ -270,6 +283,7 @@ namespace electionguard::facades
             montgomery_mod_mul_stay_in_mont_form(reinterpret_cast<uint32_t *>(aM),
                                                  reinterpret_cast<uint32_t *>(bM),
                                                  reinterpret_cast<uint32_t *>(cM));
+            return;
         }
         std::get<unique_ptr<hacl::Bignum4096>>(pimpl->element)
           ->montgomery_mod_mul_stay_in_mont_form(aM, bM, cM);
@@ -280,9 +294,9 @@ namespace electionguard::facades
     const Bignum4096 &CONTEXT_P()
     {
 #ifdef USE_32BIT_MATH
-        static Bignum4096 instance{(uint32_t *)(P_ARRAY_REVERSE)};
+        static Bignum4096 instance{reinterpret_cast<const uint32_t *>(P_ARRAY_REVERSE)};
 #else
-        static Bignum4096 instance{const_cast<uint64_t *>(P_ARRAY_REVERSE)};
+        static Bignum4096 instance{reinterpret_cast<const uint64_t *>(P_ARRAY_REVERSE)};
 #endif // _WIN32
         return instance;
     }

@@ -4,7 +4,6 @@ using ElectionGuard.Encryption.Utils.Generators;
 
 namespace ElectionGuard.Encryption.Bench
 {
-
     public class BenchEncrypt : Fixture
     {
         private const int MaxCompleteDelay = 7000;
@@ -46,7 +45,8 @@ namespace ElectionGuard.Encryption.Bench
             Console.WriteLine("Bench_Encrypt_BallotFull_NoProofCheck");
             Run(() =>
             {
-                Encrypt.Ballot(_ballot, _internalManifest, _context, _device.GetHash(), _nonce, false);
+                _ = Encrypt.Ballot(
+                    _ballot, _internalManifest, _context, _device.GetHash(), _nonce, 0, false);
             });
         }
 
@@ -55,7 +55,7 @@ namespace ElectionGuard.Encryption.Bench
             Console.WriteLine("Bench_Encrypt_BallotFull_WithProofCheck");
             Run(() =>
             {
-                Encrypt.Ballot(_ballot, _internalManifest, _context, _device.GetHash(), _nonce);
+                _ = Encrypt.Ballot(_ballot, _internalManifest, _context, _device.GetHash(), _nonce, 0, true);
             });
         }
 
@@ -64,7 +64,8 @@ namespace ElectionGuard.Encryption.Bench
             Console.WriteLine("Bench_Encrypt_Ballot_Compact_NoProofCheck");
             Run(() =>
             {
-                Encrypt.CompactBallot(_ballot, _internalManifest, _context, _device.GetHash(), _nonce, false);
+                _ = Encrypt.CompactBallot(
+                    _ballot, _internalManifest, _context, _device.GetHash(), _nonce, 0, false);
             });
         }
 
@@ -73,7 +74,8 @@ namespace ElectionGuard.Encryption.Bench
             Console.WriteLine("Bench_Encrypt_Ballot_Compact_WithProofCheck");
             Run(() =>
             {
-                Encrypt.CompactBallot(_ballot, _internalManifest, _context, _device.GetHash(), _nonce);
+                _ = Encrypt.CompactBallot(
+                    _ballot, _internalManifest, _context, _device.GetHash(), _nonce);
             });
         }
 
@@ -82,13 +84,14 @@ namespace ElectionGuard.Encryption.Bench
             Console.WriteLine("Setup_Precompute_Buffers");
             var waitHandle = new AutoResetEvent(false);
 
-            var precompute = new Precompute();
+            const int someExponentiations = 1000;
+            var precompute = new PrecomputeBufferContext(_keypair.PublicKey, someExponentiations);
             precompute.CompletedEvent += _ =>
             {
                 waitHandle.Set();
             };
-            precompute.StartPrecomputeAsync(_keypair.PublicKey, 1000);
-            waitHandle.WaitOne(MaxCompleteDelay);
+            precompute.StartPrecomputeAsync();
+            _ = waitHandle.WaitOne(MaxCompleteDelay);
             Run(() =>
             {
                 precompute.StopPrecompute();

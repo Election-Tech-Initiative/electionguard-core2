@@ -576,26 +576,34 @@ namespace electionguard
     unique_ptr<ConstantChaumPedersenProof>
     ConstantChaumPedersenProof::make(const ElGamalCiphertext &message, const ElementModQ &r,
                                      const ElementModP &k, const ElementModQ &seed,
-                                     const ElementModQ &hash_header, uint64_t constant)
+                                     const ElementModQ &hash_header, uint64_t constant,
+                                     bool shouldUsePrecomputedValues /* = false */)
     {
         Log::trace("ConstantChaumPedersenProof:: making proof");
         auto *alpha = message.getPad();
         auto *beta = message.getData();
 
-        // Derive nonce from seed and the constant string below
-        auto nonces = make_unique<Nonces>(seed, "constant-chaum-pedersen-proof");
         unique_ptr<ElementModQ> u;
 
         // Compute the NIZKP
         unique_ptr<ElementModP> a; //𝑔^𝑢 mod 𝑝
         unique_ptr<ElementModP> b; // 𝐾^𝑢 mod 𝑝
-        // check if the are precompute values rather than doing the exponentiations here
-        unique_ptr<Triple> triple = PrecomputeBufferContext::getTriple();
-        if (triple != nullptr) {
-            u = triple->get_exp();
-            a = triple->get_g_to_exp();
-            b = triple->get_pubkey_to_exp();
-        } else {
+
+        if (shouldUsePrecomputedValues) {
+            Log::debug("ConstantChaumPedersenProof:: using precomputed values. Your seed value is "
+                       "ignored and is no longer deterministic.");
+            // check if the are precompute values rather than doing the exponentiations here
+            auto triple = PrecomputeBufferContext::popTriple();
+            if (triple != nullptr && triple.has_value()) {
+                u = triple.value()->get_exp();
+                a = triple.value()->get_g_to_exp();
+                b = triple.value()->get_pubkey_to_exp();
+            }
+        }
+        // if there are no precomputed values, do the exponentiations here
+        if (u == nullptr || a == nullptr || b == nullptr) {
+            // Derive nonce from seed and the constant string below
+            auto nonces = make_unique<Nonces>(seed, "constant-chaum-pedersen-proof");
             u = nonces->get(0);
             a = g_pow_p(*u);      //𝑔^𝑢 mod 𝑝
             b = pow_mod_p(k, *u); // 𝐾^𝑢 mod 𝑝

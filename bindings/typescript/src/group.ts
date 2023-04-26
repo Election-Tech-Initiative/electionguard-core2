@@ -7,6 +7,11 @@ export class ElementModP {
     this._handle = handle;
   }
 
+  copy(): Promise<ElementModP> {
+    var hex = this._handle.toHex();
+    return ElementModP.fromHex(hex);
+  }
+
   toHex(): string {
     return this._handle.toHex();
   }
@@ -30,6 +35,11 @@ export class ElementModQ {
 
   constructor(handle: ElementModQHandle) {
     this._handle = handle;
+  }
+
+  copy(): Promise<ElementModQ> {
+    var hex = this._handle.toHex();
+    return ElementModQ.fromHex(hex);
   }
 
   toHex(): string {
@@ -59,5 +69,15 @@ export class GroupFunctions {
       elem2._handle
     );
     return BigInt("0x" + result.toHex());
+  }
+
+  static async randomElementModP(): Promise<ElementModP> {
+    var result = (await getInstance()).GroupFunctions.randomElementModP();
+    return new ElementModP(result);
+  }
+
+  static async randomElementModQ(): Promise<ElementModQ> {
+    var result = (await getInstance()).GroupFunctions.randomElementModQ();
+    return new ElementModQ(result);
   }
 }

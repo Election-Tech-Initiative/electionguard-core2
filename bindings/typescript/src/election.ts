@@ -30,6 +30,11 @@ export class ElectionContext {
     return new ElementModP(result);
   }
 
+  get publicKeyRef(): ElementModP {
+    var result = this._handle.getElGamalPublicKeyRef();
+    return new ElementModP(result);
+  }
+
   /**
    * The hash of the election metadata
    */

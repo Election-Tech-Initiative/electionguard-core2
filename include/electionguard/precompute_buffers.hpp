@@ -11,14 +11,8 @@
 #include <iostream>
 #include <memory>
 #include <mutex>
+#include <optional>
 #include <queue>
-
-using std::begin;
-using std::copy;
-using std::end;
-using std::make_unique;
-using std::mutex;
-using std::unique_ptr;
 
 namespace electionguard
 {
@@ -30,15 +24,15 @@ namespace electionguard
     /// </summary>
     class EG_API Triple
     {
-        unique_ptr<ElementModQ> exp;
-        unique_ptr<ElementModP> g_to_exp;
-        unique_ptr<ElementModP> pubkey_to_exp;
+        std::unique_ptr<ElementModQ> exp;
+        std::unique_ptr<ElementModP> g_to_exp;
+        std::unique_ptr<ElementModP> pubkey_to_exp;
 
       public:
         explicit Triple(const ElementModP &publicKey) { generateTriple(publicKey); }
         Triple() {}
-        Triple(unique_ptr<ElementModQ> exp, unique_ptr<ElementModP> g_to_exp,
-               unique_ptr<ElementModP> pubkey_to_exp);
+        Triple(std::unique_ptr<ElementModQ> exp, std::unique_ptr<ElementModP> g_to_exp,
+               std::unique_ptr<ElementModP> pubkey_to_exp);
 
         Triple(const Triple &triple);
         Triple(Triple &&);
@@ -47,13 +41,13 @@ namespace electionguard
         Triple &operator=(const Triple &triple);
         Triple &operator=(Triple &&);
 
-        unique_ptr<ElementModQ> get_exp() { return exp->clone(); }
+        std::unique_ptr<ElementModQ> get_exp() { return exp->clone(); }
 
-        unique_ptr<ElementModP> get_g_to_exp() { return g_to_exp->clone(); }
+        std::unique_ptr<ElementModP> get_g_to_exp() { return g_to_exp->clone(); }
 
-        unique_ptr<ElementModP> get_pubkey_to_exp() { return pubkey_to_exp->clone(); }
+        std::unique_ptr<ElementModP> get_pubkey_to_exp() { return pubkey_to_exp->clone(); }
 
-        unique_ptr<Triple> clone();
+        std::unique_ptr<Triple> clone();
 
       protected:
         void generateTriple(const ElementModP &publicKey);
@@ -68,17 +62,17 @@ namespace electionguard
     /// </summary>
     class EG_API Quadruple
     {
-        unique_ptr<ElementModQ> exp1;
-        unique_ptr<ElementModQ> exp2;
-        unique_ptr<ElementModP> g_to_exp1;
-        unique_ptr<ElementModP> g_to_exp2_mult_by_pubkey_to_exp1;
+        std::unique_ptr<ElementModQ> exp1;
+        std::unique_ptr<ElementModQ> exp2;
+        std::unique_ptr<ElementModP> g_to_exp1;
+        std::unique_ptr<ElementModP> g_to_exp2_mult_by_pubkey_to_exp1;
 
       public:
         explicit Quadruple(const ElementModP &publicKey) { generateQuadruple(publicKey); }
         Quadruple(){};
-        Quadruple(unique_ptr<ElementModQ> exp1, unique_ptr<ElementModQ> exp2,
-                  unique_ptr<ElementModP> g_to_exp1,
-                  unique_ptr<ElementModP> g_to_exp2_mult_by_pubkey_to_exp1);
+        Quadruple(std::unique_ptr<ElementModQ> exp1, std::unique_ptr<ElementModQ> exp2,
+                  std::unique_ptr<ElementModP> g_to_exp1,
+                  std::unique_ptr<ElementModP> g_to_exp2_mult_by_pubkey_to_exp1);
         Quadruple(const Quadruple &quadruple);
         Quadruple(Quadruple &&);
         ~Quadruple();
@@ -86,18 +80,18 @@ namespace electionguard
         Quadruple &operator=(const Quadruple &quadruple);
         Quadruple &operator=(Quadruple &&);
 
-        unique_ptr<ElementModQ> get_exp1() { return exp1->clone(); }
+        std::unique_ptr<ElementModQ> get_exp1() { return exp1->clone(); }
 
-        unique_ptr<ElementModQ> get_exp2() { return exp2->clone(); }
+        std::unique_ptr<ElementModQ> get_exp2() { return exp2->clone(); }
 
-        unique_ptr<ElementModP> get_g_to_exp1() { return g_to_exp1->clone(); }
+        std::unique_ptr<ElementModP> get_g_to_exp1() { return g_to_exp1->clone(); }
 
-        unique_ptr<ElementModP> get_g_to_exp2_mult_by_pubkey_to_exp1()
+        std::unique_ptr<ElementModP> get_g_to_exp2_mult_by_pubkey_to_exp1()
         {
             return g_to_exp2_mult_by_pubkey_to_exp1->clone();
         }
 
-        unique_ptr<Quadruple> clone();
+        std::unique_ptr<Quadruple> clone();
 
       protected:
         void generateQuadruple(const ElementModP &publicKey);
@@ -112,14 +106,15 @@ namespace electionguard
     /// </summary>
     class EG_API TwoTriplesAndAQuadruple
     {
-        unique_ptr<Triple> triple1;
-        unique_ptr<Triple> triple2;
-        unique_ptr<Quadruple> quad;
+        std::unique_ptr<Triple> triple1;
+        std::unique_ptr<Triple> triple2;
+        std::unique_ptr<Quadruple> quad;
 
       public:
         explicit TwoTriplesAndAQuadruple() {}
-        TwoTriplesAndAQuadruple(unique_ptr<Triple> in_triple1, unique_ptr<Triple> in_triple2,
-                                unique_ptr<Quadruple> in_quad);
+        TwoTriplesAndAQuadruple(std::unique_ptr<Triple> in_triple1,
+                                std::unique_ptr<Triple> in_triple2,
+                                std::unique_ptr<Quadruple> in_quad);
         TwoTriplesAndAQuadruple(const TwoTriplesAndAQuadruple &other);
         TwoTriplesAndAQuadruple(TwoTriplesAndAQuadruple &&);
         ~TwoTriplesAndAQuadruple();
@@ -127,17 +122,162 @@ namespace electionguard
         TwoTriplesAndAQuadruple &operator=(const TwoTriplesAndAQuadruple &other);
         TwoTriplesAndAQuadruple &operator=(TwoTriplesAndAQuadruple &&);
 
-        unique_ptr<Triple> get_triple1() { return triple1->clone(); }
+        std::unique_ptr<Triple> get_triple1() { return triple1->clone(); }
 
-        unique_ptr<Triple> get_triple2() { return triple2->clone(); }
+        std::unique_ptr<Triple> get_triple2() { return triple2->clone(); }
 
-        unique_ptr<Quadruple> get_quad() { return quad->clone(); }
+        std::unique_ptr<Quadruple> get_quad() { return quad->clone(); }
 
-        unique_ptr<TwoTriplesAndAQuadruple> clone();
+        std::unique_ptr<TwoTriplesAndAQuadruple> clone();
+    };
+
+    /// <summary>
+    /// A buffer of precomputed values that are used to speed up encryption
+    /// of a selection. Since the values are precomputed it removes many the
+    /// exponentiations from the ElGamal encryption of the selection as well
+    /// as the computation of the Chaum Pedersen proof.
+    ///
+    /// The precompute buffer is a queue of TwoTriplesAndAQuadruple objects.
+    /// The queue is filled by a background thread. The background thread
+    /// will fill the queue until it reaches the max queue size. The max
+    /// queue size is set by the caller and defaults to 5000. The queue
+    /// size is set by the caller in the init method.
+    ///
+    /// This class is initialized against a specific public key and is thread safe.
+    /// </summary>
+    class EG_API PrecomputeBuffer
+    {
+      public:
+        /// <summary>
+        /// The init method initializes the precompute and allows the queue
+        /// size to be set.
+        ///
+        /// <param name="publicKey">the elgamal public key for the election</param>
+        /// <param name="maxQueueSize">by default the quad queue size is 5000, so
+        ///                             10000 triples, if the caller wants the
+        ///                             queue size to be different then this
+        ///                             parameter is used</param>
+        /// <param name="shouldAutoPopulate">controls whether the
+        ///                                           precompute buffer should
+        ///                                           automatically populate
+        ///                                           itself</param>
+        /// </summary>
+        PrecomputeBuffer(const ElementModP &publicKey, uint32_t maxQueueSize = 0,
+                         bool shouldAutoPopulate = false);
+
+        PrecomputeBuffer(const PrecomputeBuffer &other) = delete;
+        PrecomputeBuffer(PrecomputeBuffer &&other) = delete;
+        PrecomputeBuffer &operator=(const PrecomputeBuffer &) = delete;
+        PrecomputeBuffer &operator=(PrecomputeBuffer &&) = delete;
+        ~PrecomputeBuffer();
+
+      public:
+        /// <summary>
+        /// clear the precomputations queues
+        /// </summary>
+        void clear();
+
+        /// <summary>
+        /// The start method populates the precomputations queues with
+        /// values used by encryptSelection. The function is stopped by calling
+        /// stop. Pre-computed values are currently computed by generating
+        /// two triples and a quad. We do this because two triples and a quad
+        /// are need for an encryptSelection.
+        /// <returns>once the queue is populated</returns>
+        /// </summary>
+        void start();
+
+        /// <summary>
+        /// The start method populates the precomputations queues with
+        /// values used by encryptSelection. The function is stopped by calling
+        /// stop. Pre-computed values are currently computed by generating
+        /// two triples and a quad. We do this because two triples and a quad
+        /// are need for an encryptSelection.
+        /// <returns>immediately and schedules work in the background</returns>
+        /// </summary>
+        void startAsync();
+
+        /// <summary>
+        /// The stopPopulating method stops the population of the
+        /// precomputations queues started by the populate method.
+        /// </summary>
+        void stop();
+
+        /// <summary>
+        /// Get the currently set maximum queue size for the number
+        /// of quadruples to generate. The number of triples in
+        /// the triple_queue will be twice this.
+        /// </summary>
+        uint32_t getMaxQueueSize();
+
+        /// <summary>
+        /// Get the current number of quadruples in the quadruple_queue,
+        /// the number of triples in the triple_queue will be twice this.
+        /// </summary>
+        uint32_t getCurrentQueueSize();
+
+        ElementModP *getPublicKey();
+
+        /// <summary>
+        /// Get the next triple from the triple queue.
+        /// If no triple exists, one is created.
+        ///
+        /// This method is called by hashedElgamalEncrypt in order to get
+        /// the precomputed value to perform the hashed elgamal encryption.
+        /// </summary>
+        std::unique_ptr<Triple> getTriple();
+
+        /// <summary>
+        /// Pop the next triple from the triple queue.
+        /// If no triple exists, then nullopt is returned.
+        /// </summary>
+        std::optional<std::unique_ptr<Triple>> popTriple();
+
+        /// <summary>
+        /// Get the next two triples and a quadruple from the queues.
+        /// If no quadruple exists, one is created.
+        ///
+        /// This method is called by encryptSelection in order to get
+        /// the precomputed values to encrypt the selection and make a
+        /// proof for it.
+        /// </summary>
+        std::unique_ptr<TwoTriplesAndAQuadruple> getTwoTriplesAndAQuadruple();
+
+        /// <summary>
+        /// Pop the next quadruple set from the triple queue.
+        /// If no quadruple exists, then nullopt is returned.
+        /// </summary>
+        std::optional<std::unique_ptr<TwoTriplesAndAQuadruple>> popTwoTriplesAndAQuadruple();
+
+      protected:
+        static std::tuple<std::unique_ptr<Triple>, std::unique_ptr<Triple>>
+        createTwoTriples(const ElementModP &publicKey);
+        static std::unique_ptr<TwoTriplesAndAQuadruple>
+        createTwoTriplesAndAQuadruple(const ElementModP &publicKey);
+
+      private:
+        uint32_t maxQueueSize = DEFAULT_PRECOMPUTE_SIZE;
+        bool isRunning = false;
+        bool shouldAutoPopulate = false;
+        std::mutex triple_queue_lock;
+        std::mutex quad_queue_lock;
+        std::unique_ptr<ElementModP> publicKey;
+        std::queue<std::unique_ptr<Triple>> triple_queue;
+        std::queue<std::unique_ptr<TwoTriplesAndAQuadruple>> twoTriplesAndAQuadruple_queue;
     };
 
     /// <summary>
     /// A singleton context for a collection of precomputed triples and quadruples.
+    ///
+    /// When initializing the context, the caller can specify the maximum number of
+    /// quadruples to precompute. The number of triples in the triple queue will be
+    /// twice this.
+    ///
+    /// The context is initialized against a specific public key. There can only be one context
+    /// initialized at a time. If the caller attempts to initialize the context with a different
+    /// public key, then the context will be cleared and re-initialized.
+    ///
+    /// The context is thread safe.
     /// </summary>
     class EG_API PrecomputeBufferContext
     {
@@ -151,52 +291,72 @@ namespace electionguard
         PrecomputeBufferContext() {}
         ~PrecomputeBufferContext() {}
 
-      public:
+      private:
         static PrecomputeBufferContext &getInstance()
         {
             static PrecomputeBufferContext instance;
             return instance;
         }
 
+      public:
+        /// <summary>
+        /// clear the precomputations queues
+        /// </summary>
+        static void clear();
+
         /// <summary>
         /// The init method initializes the precompute and allows the queue
         /// size to be set.
         ///
-        /// <param name="size_of_queue">by default the quad queue size is 5000, so
+        /// <param name="publicKey">the elgamal public key for the election</param>
+        /// <param name="maxQueueSize">by default the quad queue size is 5000, so
         ///                             10000 triples, if the caller wants the
         ///                             queue size to be different then this
         ///                             parameter is used</param>
         /// </summary>
-        ///
-        static void init(uint32_t size_of_queue = 0);
+        static void initialize(const ElementModP &publicKey, uint32_t maxQueueSize = 0);
 
         /// <summary>
-        /// The populate method populates the precomputations queues with
+        /// The start method populates the precomputations queues with
         /// values used by encryptSelection. The function is stopped by calling
-        /// stop_populate. Pre-computed values are currently computed by generating
+        /// stop. Pre-computed values are currently computed by generating
         /// two triples and a quad. We do this because two triples and a quad
-        /// are need for an encryptSelection.The triple queue is twice the size of
-        /// the quad queue. We use two different queues in case we need to
-        /// make the stop more granular at some point, in other words currently
-        /// if we call stop it will finish the two triples and a quad before
-        /// stopping. If we want it to stop more granularly (for example after
-        /// each queue item then we can do that but it makes the code a bit
-        /// more complicated). In anticipation of possibly needing this we
-        /// use two queues.
-        ///
-        /// <param name="elgamalPublicKey">the elgamal public key for the election</param>
-        /// <returns>void</returns>
+        /// are need for an encryptSelection.
+        /// <returns>once the queue is populated</returns>
         /// </summary>
-        ///
-        static void populate(const ElementModP &elgamalPublicKey);
+        static void start();
 
         /// <summary>
-        /// The stop_populate method stops the population of the
+        /// The start method populates the precomputations queues with
+        /// values used by encryptSelection. The function is stopped by calling
+        /// stop. Pre-computed values are currently computed by generating
+        /// two triples and a quad. We do this because two triples and a quad
+        /// are need for an encryptSelection.
+        ///
+        /// calling this override will re-initialize the context with the
+        /// provided public key.
+        ///
+        /// <param name="publicKey">the elgamal public key for the election</param>
+        /// <returns>once the queue is populated</returns>
+        /// </summary>
+        static void start(const ElementModP &publicKey);
+
+        /// <summary>
+        /// The start method populates the precomputations queues with
+        /// values used by encryptSelection. The function is stopped by calling
+        /// stop. Pre-computed values are currently computed by generating
+        /// two triples and a quad. We do this because two triples and a quad
+        /// are need for an encryptSelection.
+        /// <returns>immediately and schedules work in the background</returns>
+        /// </summary>
+        static void startAsync(const ElementModP &publicKey);
+
+        /// <summary>
+        /// The stopPopulating method stops the population of the
         /// precomputations queues started by the populate method.
         /// <returns>void</returns>
         /// </summary>
-        ///
-        static void stop_populate();
+        static void stop();
 
         /// <summary>
         /// Get the currently set maximum queue size for the number
@@ -204,14 +364,26 @@ namespace electionguard
         /// the triple_queue will be twice this.
         /// <returns>uint32_t</returns>
         /// </summary>
-        static uint32_t get_max_queue_size();
+        static uint32_t getMaxQueueSize();
 
         /// <summary>
         /// Get the current number of quadruples in the quadruple_queue,
         /// the number of triples in the triple_queue will be twice this.
-        /// <returns>uint32_t</returns>
         /// </summary>
-        static uint32_t get_current_queue_size();
+        static uint32_t getCurrentQueueSize();
+
+        /// <summary>
+        /// Get the next triple from the triple queue.
+        /// This method is called by hashedElgamalEncrypt in order to get
+        /// the precomputed value to perform the hashed elgamal encryption.
+        /// </summary>
+        static std::unique_ptr<Triple> getTriple();
+
+        /// <summary>
+        /// Pop the next triple from the triple queue.
+        /// If no triple exists, then nullopt is returned.
+        /// </summary>
+        static std::optional<std::unique_ptr<Triple>> popTriple();
 
         /// <summary>
         /// Get the next two triples and a quadruple from the queues.
@@ -223,26 +395,16 @@ namespace electionguard
         static std::unique_ptr<TwoTriplesAndAQuadruple> getTwoTriplesAndAQuadruple();
 
         /// <summary>
-        /// Get the next triple from the triple queue.
-        /// This method is called by hashedElgamalEncrypt in order to get
-        /// the precomputed value to perform the hashed elgamal encryption.
-        /// <returns>std::unique_ptr<Triple></returns>
+        /// Pop the next quadruple set from the triple queue.
+        /// If no quadruple exists, then nullopt is returned.
         /// </summary>
-        static std::unique_ptr<Triple> getTriple();
-
-        /// <summary>
-        /// Empty the precomputed values queues.
-        /// <returns>void</returns>
-        /// </summary>
-        static void empty_queues();
+        static std::optional<std::unique_ptr<TwoTriplesAndAQuadruple>> popTwoTriplesAndAQuadruple();
 
       private:
-        uint32_t max = DEFAULT_PRECOMPUTE_SIZE;
-        static std::mutex queue_lock;
-        bool populate_OK = false;
-        std::queue<std::unique_ptr<Triple>> triple_queue;
-        std::queue<std::unique_ptr<TwoTriplesAndAQuadruple>> twoTriplesAndAQuadruple_queue;
+        std::mutex _mutex;
+        std::unique_ptr<PrecomputeBuffer> _instance = nullptr;
     };
+
 } // namespace electionguard
 
 #endif /* __ELECTIONGUARD_CPP_PRECOMPUTE_BUFFERS_HPP_INCLUDED__ */
