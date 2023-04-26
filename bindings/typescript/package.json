@@ -4,13 +4,22 @@
     "description": "Library for encrypting ballots for the ElectionGuard voting system",
     "author": "Microsoft <electionguard@microsoft.com>",
     "license": "MIT",
+    "homepage": "https://electionguard.vote",
     "repository": {
         "type": "git",
         "url": "https://github.com/microsoft/electionguard-core2.git"
     },
     "bugs": {
-        "url": "https://github.com/microsoft/electionguard-core2/issues"
+        "url": "https://github.com/microsoft/electionguard-core2/issues",
+        "email": "electionguard@microsoft.com"
     },
+    "keywords": [
+        "election",
+        "voting",
+        "vote",
+        "electionguard",
+        "electionguardjs"
+    ],
     "main": "dist/index.js",
     "types": "dist/index.d.ts",
     "scripts": {
