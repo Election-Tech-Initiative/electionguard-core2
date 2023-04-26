@@ -231,9 +231,7 @@ jobs:
           path: build/libs/Windows/x64/Release
 
       - name: Update version number
-        run: |
-          echo ${{needs.get_version_code.outputs.version}}
-          dotnet cake ./scripts/build.cake -t AssignVersion --newVersion ${{needs.get_version_code.outputs.version}}
+        run: dotnet cake ./scripts/build.cake -t AssignVersion --newVersion ${{needs.get_version_code.outputs.version}}
 
       - name: Build and Package
         working-directory: bindings/netstandard/ElectionGuard/ElectionGuard.Encryption
@@ -267,10 +265,6 @@ jobs:
         with:
           name: wasm
           path: bindings/typescript/src/wasm
-      # - name: Copy WASM Artifacts
-      #   run: |
-      #     cp build/libs/wasm/Release/src/wasm/*.js bindings/typescript/src/wasm
-      #     cp build/libs/wasm/Release/src/wasm/*.wasm bindings/typescript/src/wasm
       - name: Install Dependencies
         working-directory: bindings/typescript
         run: npm install
@@ -281,7 +275,6 @@ jobs:
         working-directory: bindings/typescript
         run: |
           echo "//registry.npmjs.org/:_authToken=${{ secrets.NPM_REGISTRY_TOKEN }}" > .npmrc
-          echo $VERSION
           npm run prepare
           npm publish
 
