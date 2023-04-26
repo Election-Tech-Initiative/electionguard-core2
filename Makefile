@@ -4,6 +4,7 @@
 ELECTIONGUARD_CACHE=$(subst \,/,$(realpath .))/.cache
 ELECTIONGUARD_APPS_DIR=$(realpath .)/apps
 ELECTIONGUARD_BINDING_DIR=$(realpath .)/bindings
+ELECTIONGUARD_DATA_DIR=$(realpath .)/data
 ELECTIONGUARD_BINDING_LIB_DIR=$(ELECTIONGUARD_BINDING_DIR)/netstandard/ElectionGuard/ElectionGuard.Encryption
 ELECTIONGUARD_BINDING_BENCH_DIR=$(ELECTIONGUARD_BINDING_DIR)/netstandard/ElectionGuard/ElectionGuard.Encryption.Bench
 ELECTIONGUARD_APP_CLI_DIR=$(ELECTIONGUARD_APPS_DIR)/electionguard-cli/ElectionGuard.CLI

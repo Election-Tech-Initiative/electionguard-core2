@@ -12,6 +12,13 @@
     <Platforms>arm64;x64;x86</Platforms>
   </PropertyGroup>
 
+  <PropertyGroup>
+    <PackAsTool>true</PackAsTool>
+    <ToolCommandName>electionguard</ToolCommandName>
+    <PackageOutputPath>./nupkg</PackageOutputPath>
+    <IncludeBuildOutput>false</IncludeBuildOutput>
+  </PropertyGroup>
+
   <ItemGroup>
     <PackageReference Include="CommandLineParser" Version="2.9.1" />
   </ItemGroup>
