@@ -248,8 +248,8 @@ build-netstandard:
 	@echo 🖥️ BUILD NETSTANDARD $(OPERATING_SYSTEM) $(PROCESSOR) $(TARGET)
 	make build
 	cd ./bindings/netstandard/ElectionGuard && dotnet restore
-	dotnet build --configuration $(TARGET) ./bindings/netstandard/ElectionGuard/ElectionGuard.sln /p:Platform=$(PROCESSOR)
-	dotnet build -a $(PROCESSOR) --configuration $(TARGET) ./bindings/netstandard/ElectionGuard/ElectionGuard.ElectionSetup.Tests/ElectionGuard.ElectionSetup.Tests.csproj
+	dotnet build -c $(TARGET) ./bindings/netstandard/ElectionGuard/ElectionGuard.sln /p:Platform=$(PROCESSOR)
+	dotnet build -a $(PROCESSOR) -c $(TARGET) ./bindings/netstandard/ElectionGuard/ElectionGuard.ElectionSetup.Tests/ElectionGuard.ElectionSetup.Tests.csproj
 
 build-netstandard-x64:
 ifeq ($(OPERATING_SYSTEM),Windows)
@@ -258,10 +258,10 @@ else
 	PROCESSOR=x64 && make build-netstandard
 endif
 
-build-ui: build-netstandard
+build-ui: build-maccatalyst build-netstandard
 	@echo 🖥️ BUILD UI $(OPERATING_SYSTEM) $(PROCESSOR) $(TARGET)
 	cd ./src/electionguard-ui && dotnet restore
-	dotnet build --configuration $(TARGET) ./src/electionguard-ui/ElectionGuard.UI.sln /p:Platform=$(PROCESSOR)
+	dotnet build -c $(TARGET) ./src/electionguard-ui/ElectionGuard.UI.sln /p:Platform=$(PROCESSOR)
 
 build-wasm:
 	@echo 🌐 BUILD WASM $(OPERATING_SYSTEM) $(PROCESSOR) $(TARGET)
@@ -498,7 +498,6 @@ else
 	PROCESSOR=x64 && make bench-netstandard
 endif
 
-
 # Test
 
 test:
@@ -562,10 +561,10 @@ endif
 test-netstandard: build-netstandard
 	@echo 🧪 TEST NETSTANDARD $(PROCESSOR) $(TARGET)
 	# make test-netstandard-copy-output
-	dotnet test -a $(PROCESSOR) --configuration $(TARGET) ./bindings/netstandard/ElectionGuard/ElectionGuard.ElectionSetup.Tests/ElectionGuard.ElectionSetup.Tests.csproj
-	dotnet test -a $(PROCESSOR) --configuration $(TARGET) ./bindings/netstandard/ElectionGuard/ElectionGuard.Encryption.Tests/ElectionGuard.Encryption.Tests.csproj
-	dotnet test -a $(PROCESSOR) --configuration $(TARGET) ./bindings/netstandard/ElectionGuard/ElectionGuard.Decryption.Tests/ElectionGuard.Decryption.Tests.csproj
-	#dotnet test --filter TestCategory=SingleTest -a $(PROCESSOR) --configuration $(TARGET) ./bindings/netstandard/ElectionGuard/ElectionGuard.Decryption.Tests/ElectionGuard.Decryption.Tests.csproj
+	dotnet test -a $(PROCESSOR) -c $(TARGET) ./bindings/netstandard/ElectionGuard/ElectionGuard.ElectionSetup.Tests/ElectionGuard.ElectionSetup.Tests.csproj
+	dotnet test -a $(PROCESSOR) -c $(TARGET) ./bindings/netstandard/ElectionGuard/ElectionGuard.Encryption.Tests/ElectionGuard.Encryption.Tests.csproj
+	dotnet test -a $(PROCESSOR) -c $(TARGET) ./bindings/netstandard/ElectionGuard/ElectionGuard.Decryption.Tests/ElectionGuard.Decryption.Tests.csproj
+	#dotnet test --filter TestCategory=SingleTest -a $(PROCESSOR) -c $(TARGET) ./bindings/netstandard/ElectionGuard/ElectionGuard.Decryption.Tests/ElectionGuard.Decryption.Tests.csproj
 
 test-netstandard-arm64:
 ifeq ($(OPERATING_SYSTEM),Windows)
