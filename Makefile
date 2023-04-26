@@ -258,7 +258,7 @@ else
 	PROCESSOR=x64 && make build-netstandard
 endif
 
-build-cli: build
+build-cli:
 	@echo 🖥️ BUILD CLI $(OPERATING_SYSTEM) $(PROCESSOR) $(TARGET)
 	cd ./apps/electionguard-cli && dotnet restore
 	dotnet build -c $(TARGET) ./apps/electionguard-cli/ElectionGuard.CLI.sln /p:Platform=$(PROCESSOR)
@@ -609,6 +609,10 @@ ifeq ($(OPERATING_SYSTEM),Darwin)
 		"./build/libs/$(OPERATING_SYSTEM)/$(PROCESSOR)/$(TARGET)/libs/hacl/libhacl_cpp.dylib" \
 		"./build/libs/$(OPERATING_SYSTEM)/$(PROCESSOR)/$(TARGET)/_deps/hacl-build/libhacl.dylib" 
 endif
+
+test-cli: build-cli
+	@echo 🧪 TEST CLI $(OPERATING_SYSTEM) $(PROCESSOR) $(TARGET)
+	cd ./apps/electionguard-cli && dotnet run -- -c $(ELECTIONGUARD_DATA_DIR)/test/context.json -m $(ELECTIONGUARD_DATA_DIR)/test/manifest.json -b $(ELECTIONGUARD_DATA_DIR)/test/plaintext -d $(ELECTIONGUARD_DATA_DIR)/test/device.json -o $(ELECTIONGUARD_DATA_DIR)/test/output
 
 test-ui: build-ui
 	@echo 🧪 TEST UI $(OPERATING_SYSTEM) $(PROCESSOR) $(TARGET)

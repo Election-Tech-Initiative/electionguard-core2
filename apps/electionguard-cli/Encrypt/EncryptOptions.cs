@@ -31,12 +31,16 @@ internal class EncryptOptions
 
     private void ValidateDirectories()
     {
-        if (string.IsNullOrEmpty(BallotsDir)) throw new ArgumentNullException(nameof(BallotsDir));
-        if (string.IsNullOrEmpty(OutDir)) throw new ArgumentNullException(nameof(OutDir));
+        if (string.IsNullOrEmpty(BallotsDir))
+            throw new ArgumentNullException(nameof(BallotsDir));
+        if (string.IsNullOrEmpty(OutDir))
+            throw new ArgumentNullException(nameof(OutDir));
 
-        if (!Directory.Exists(BallotsDir)) throw new ArgumentException("ballots directory does not exist");
+        if (!Directory.Exists(BallotsDir))
+            throw new ArgumentException("ballots directory does not exist");
         if (!Directory.Exists(OutDir))
         {
+            Console.WriteLine($"Creating directory: {OutDir}");
             Directory.CreateDirectory(OutDir);
         }
     }
