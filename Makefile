@@ -236,6 +236,14 @@ else
 	echo "iOS builds are only supported on MacOS"
 endif
 
+build-maccatalyst:
+# TODO: support maccatalyst-x64 builds
+ifeq ($(OPERATING_SYSTEM),Darwin)
+	PROCESSOR=arm64 OPERATING_SYSTEM=MacCatalyst && make build
+else
+	echo "MacCatalyst builds are only supported on MacOS"
+endif
+
 build-netstandard:
 	@echo 🖥️ BUILD NETSTANDARD $(OPERATING_SYSTEM) $(PROCESSOR) $(TARGET)
 	make build
