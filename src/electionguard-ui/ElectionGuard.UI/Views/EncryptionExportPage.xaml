@@ -42,12 +42,6 @@
                         Command="{Binding PickDeviceFileCommand}"
                         Text="{helper:Translate ChooseFile}"
                         TextColor="{StaticResource Gray950}" />
-                    <Entry
-                        Grid.Column="1"
-                        IsReadOnly="True"
-                        Placeholder="{helper:Translate NoFileText}"
-                        Text="{Binding DeviceFile}"
-                        VerticalOptions="CenterAndExpand" />
                 </Grid>
                 <Label
                     IsVisible="{Binding FileErrorMessage, Converter={StaticResource IsNotEmptyConverter}}"
@@ -63,14 +57,14 @@
                     <Button
                         Grid.Column="0"
                         BackgroundColor="{StaticResource Gray200}"
-                        Command="{Binding PickBallotFolderCommand}"
+                        Command="{Binding PickFolderCommand}"
                         Text="{helper:Translate ChooseFolder}"
                         TextColor="{StaticResource Gray950}" />
                     <Entry
                         Grid.Column="1"
                         IsReadOnly="True"
                         Placeholder="{helper:Translate NoFolderText}"
-                        Text="{Binding BallotFolder}"
+                        Text="{Binding FileFolder}"
                         VerticalOptions="CenterAndExpand" />
                 </Grid>
                 <Label
@@ -82,7 +76,7 @@
             <Grid ColumnDefinitions="auto, auto, *">
                 <Button
                     Grid.Column="0"
-                    Command="{Binding UploadCommand}"
+                    Command="{Binding ExportCommand}"
                     Text="{helper:Translate UploadText}" />
                 <Button
                     Grid.Column="1"
@@ -99,10 +93,6 @@
             <Label Style="{StaticResource H1}" Text="{helper:Translate BallotUploadText}" />
             <Label Style="{StaticResource H3}" Text="{Binding ResultsText}" />
             <Grid ColumnDefinitions="auto, auto, *">
-                <Button
-                    Grid.Column="0"
-                    Command="{Binding UploadMoreCommand}"
-                    Text="{helper:Translate UploadMoreText}" />
                 <Button
                     Grid.Column="1"
                     Command="{Binding CancelCommand}"
