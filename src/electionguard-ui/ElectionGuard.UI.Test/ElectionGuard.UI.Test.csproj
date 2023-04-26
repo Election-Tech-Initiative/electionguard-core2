@@ -46,11 +46,11 @@
     <ElectionGuardData>..\..\..\data</ElectionGuardData>
     <ElectionGuardLibs>..\..\..\build\libs</ElectionGuardLibs>
   </PropertyGroup>
-  <ItemGroup>
+  <!--<ItemGroup>
     <Content Include="$(ElectionGuardData)\**" LinkBase="data">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>  
-  </ItemGroup>
+  </ItemGroup>-->
   <ItemGroup Label="C++ Built Libraries">
     <None Name="Windows (MSVC)" Visible="false" Include="$(ElectionGuardLibs)\Windows\x64\$(Configuration)\src\$(Configuration)\*.dll*" CopyToOutputDirectory="PreserveNewest" />
     <None Name="Windows HACL (MSVC)" Visible="false" Include="$(ElectionGuardLibs)\Windows\x64\$(Configuration)\libs\hacl\$(Configuration)\*.dll*" CopyToOutputDirectory="PreserveNewest" />
