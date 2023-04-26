@@ -1,7 +1,7 @@
 ﻿using CommandLine;
-using ElectionGuard.Encryption.Cli.Encrypt;
+using ElectionGuard.CLI.Encrypt;
 
-namespace ElectionGuard.Encryption.Cli;
+namespace ElectionGuard.CLI;
 
 class Program
 {

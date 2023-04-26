@@ -1,26 +1,24 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
 <Project Sdk="Microsoft.NET.Sdk">
-
   <PropertyGroup>
     <TargetFrameworks>netstandard2.0;net7.0</TargetFrameworks>
-
     <!-- Project -->
     <RootNamespace>ElectionGuard</RootNamespace>
     <AssemblyName>ElectionGuard.Encryption</AssemblyName>
-    <Version>2.0.0</Version>
-    <AssemblyVersion>2.0.0.0</AssemblyVersion>
-    <AssemblyFileVersion>2.0.0.0</AssemblyFileVersion>
+    <Version>1.75.0</Version>
+    <AssemblyVersion>1.75.0.0</AssemblyVersion>
+    <AssemblyFileVersion>1.75.0.0</AssemblyFileVersion>
     <EnableNETAnalyzers>true</EnableNETAnalyzers>
     <EnforceCodeStyleInBuild>true</EnforceCodeStyleInBuild>
     <Platforms>arm64;x64</Platforms>
   </PropertyGroup>
-
   <PropertyGroup>
     <!-- Package -->
     <PackageId>ElectionGuard.Encryption</PackageId>
     <Title>ElectionGuard Encryption</Title>
     <Description>Open source implementation of ElectionGuard's ballot encryption.</Description>
     <Authors>Microsoft</Authors>
-    <PackageVersion>2.0.0</PackageVersion>
+    <PackageVersion>1.75.0</PackageVersion>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
     <PackageProjectUrl>https://github.com/microsoft/electionguard-core2</PackageProjectUrl>
     <RepositoryUrl>https://github.com/microsoft/electionguard-core2</RepositoryUrl>
@@ -33,255 +31,124 @@
     <!-- <PackageReleaseNotes>Changelog</PackageReleaseNotes> -->
     <Platforms>arm64;x64;x86</Platforms>
   </PropertyGroup>
-
   <PropertyGroup Label="Configuration">
     <Import_RootNamespace>ElectionGuard</Import_RootNamespace>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
   </PropertyGroup>
-
-  <!-- <PropertyGroup Label="Debug" Condition=" '$(Configuration)' == 'Debug' ">
+  <PropertyGroup Label="Debug" Condition=" '$(Configuration)' == 'Debug' ">
     <DebugType>full</DebugType>
     <DebugSymbols>true</DebugSymbols>
-    <GenerateDocumentationFile>false</GenerateDocumentationFile>
-    <TreatWarningsAsErrors>True</TreatWarningsAsErrors>
     <NoWarn>1701;1702</NoWarn>
     <WarningLevel>4</WarningLevel>
     <WarningsNotAsErrors>SYSLIB0004</WarningsNotAsErrors>
   </PropertyGroup>
-
   <PropertyGroup Label="Release" Condition=" '$(Configuration)' == 'Release' ">
     <DebugType>pdbonly</DebugType>
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
-    <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
-    <TreatWarningsAsErrors>True</TreatWarningsAsErrors>
+    <!-- <GeneratePackageOnBuild>true</GeneratePackageOnBuild> -->
     <NoWarn>1701;1702</NoWarn>
     <WarningLevel>4</WarningLevel>
     <WarningsNotAsErrors>SYSLIB0004</WarningsNotAsErrors>
-  </PropertyGroup> -->
-
-  <!-- <PropertyGroup Label="Debug|AnyCPU" Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
-    <DebugType>full</DebugType>
-    <DebugSymbols>true</DebugSymbols>
-    <GenerateDocumentationFile>false</GenerateDocumentationFile>
-    <TreatWarningsAsErrors>True</TreatWarningsAsErrors>
-    <NoWarn>1701;1702</NoWarn>
-    <WarningLevel>4</WarningLevel>
-    <WarningsNotAsErrors>SYSLIB0004</WarningsNotAsErrors>
-    <NoStdLib>false</NoStdLib>
   </PropertyGroup>
-
-  <PropertyGroup Label="Release|AnyCPU" Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
-    <DebugType>pdbonly</DebugType>
-    <TreatWarningsAsErrors>True</TreatWarningsAsErrors>
-    <NoWarn>1701;1702</NoWarn>
-    <WarningLevel>4</WarningLevel>
-    <WarningsNotAsErrors>SYSLIB0004</WarningsNotAsErrors>
-    <NoStdLib>false</NoStdLib>
-  </PropertyGroup> -->
-
-  <PropertyGroup Label="Debug|arm64" Condition=" '$(Configuration)|$(Platform)' == 'Debug|arm64' ">
-    <DebugType>full</DebugType>
-    <DebugSymbols>true</DebugSymbols>
-    <Optimize>false</Optimize>
-    <OutputPath>bin\arm64\Debug</OutputPath>
-    <DefineConstants></DefineConstants>
-    <PlatformTarget>arm64</PlatformTarget>
-    <IntermediateOutputPath>obj\arm64\Debug</IntermediateOutputPath>
-    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
-    
-    <TreatWarningsAsErrors>True</TreatWarningsAsErrors>
-    <NoWarn>1701;1702</NoWarn>
-    <WarningLevel>4</WarningLevel>
-    <WarningsNotAsErrors>SYSLIB0004</WarningsNotAsErrors>
-
-    <NoStdLib>false</NoStdLib>
-  </PropertyGroup>
-
-  <PropertyGroup Label="Release|arm64" Condition=" '$(Configuration)|$(Platform)' == 'Release|arm64' ">
-    <DebugType>pdbonly</DebugType>
-    <Optimize>false</Optimize>
-    <OutputPath>bin\arm64\Release</OutputPath>
-    <DefineConstants></DefineConstants>
-    <PlatformTarget>arm64</PlatformTarget>
-    <IntermediateOutputPath>obj\arm64\Release</IntermediateOutputPath>
-    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
-
-    <TreatWarningsAsErrors>True</TreatWarningsAsErrors>
-    <NoWarn>1701;1702</NoWarn>
-    <WarningLevel>4</WarningLevel>
-    <WarningsNotAsErrors>SYSLIB0004</WarningsNotAsErrors>
-
-    <NoStdLib>false</NoStdLib>
-  </PropertyGroup>
-
-  <PropertyGroup Label="Debug|x64" Condition=" '$(Configuration)|$(Platform)' == 'Debug|x64' ">
-    <DebugType>full</DebugType>
-    <DebugSymbols>true</DebugSymbols>
-    <Optimize>false</Optimize>
-    <OutputPath>bin\x64\Debug</OutputPath>
-    <DefineConstants></DefineConstants>
-    <PlatformTarget>x64</PlatformTarget>
-    <IntermediateOutputPath>obj\x64\Debug</IntermediateOutputPath>
-    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
-    
-    <TreatWarningsAsErrors>True</TreatWarningsAsErrors>
-    <NoWarn>1701;1702</NoWarn>
-    <WarningLevel>4</WarningLevel>
-    <WarningsNotAsErrors>SYSLIB0004</WarningsNotAsErrors>
-
-    <NoStdLib>false</NoStdLib>
-  </PropertyGroup>
-
-  <PropertyGroup Label="Release|x64" Condition=" '$(Configuration)|$(Platform)' == 'Release|x64' ">
-    <DebugType>pdbonly</DebugType>
-    <Optimize>false</Optimize>
-    <OutputPath>bin\x64\Release</OutputPath>
-    <DefineConstants></DefineConstants>
-    <PlatformTarget>x64</PlatformTarget>
-    <IntermediateOutputPath>obj\x64\Release</IntermediateOutputPath>
-    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
-
-    <TreatWarningsAsErrors>True</TreatWarningsAsErrors>
-    <NoWarn>1701;1702</NoWarn>
-    <WarningLevel>4</WarningLevel>
-    <WarningsNotAsErrors>SYSLIB0004</WarningsNotAsErrors>
-
-    <NoStdLib>false</NoStdLib>
-  </PropertyGroup>
-  
-  <PropertyGroup Label="Debug|x86" Condition=" '$(Configuration)|$(Platform)' == 'Debug|x86' ">
-    <DebugType>full</DebugType>
-    <DebugSymbols>true</DebugSymbols>
-    <Optimize>false</Optimize>
-    <OutputPath>bin\x86\Debug</OutputPath>
-    <DefineConstants></DefineConstants>
-    <PlatformTarget>x86</PlatformTarget>
-    <IntermediateOutputPath>obj\x86\Debug</IntermediateOutputPath>
-    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
-    
-    <TreatWarningsAsErrors>True</TreatWarningsAsErrors>
-    <NoWarn>1701;1702</NoWarn>
-    <WarningLevel>4</WarningLevel>
-    <WarningsNotAsErrors>SYSLIB0004</WarningsNotAsErrors>
-
-    <NoStdLib>false</NoStdLib>
-  </PropertyGroup>
-
-  <PropertyGroup Label="Release|x86" Condition=" '$(Configuration)|$(Platform)' == 'Release|x86' ">
-    <DebugType>pdbonly</DebugType>
-    <Optimize>false</Optimize>
-    <OutputPath>bin\x86\Release</OutputPath>
-    <DefineConstants></DefineConstants>
-    <PlatformTarget>x86</PlatformTarget>
-    <IntermediateOutputPath>obj\x86\Release</IntermediateOutputPath>
-    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
-
-    <TreatWarningsAsErrors>True</TreatWarningsAsErrors>
-    <NoWarn>1701;1702</NoWarn>
-    <WarningLevel>4</WarningLevel>
-    <WarningsNotAsErrors>SYSLIB0004</WarningsNotAsErrors>
-
-    <NoStdLib>false</NoStdLib>
-  </PropertyGroup>
-
-   <!-- <PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Debug|netstandard2.0|x64'">
-    <TreatWarningsAsErrors>True</TreatWarningsAsErrors>
-    <NoWarn>1701;1702</NoWarn>
-    <WarningLevel>4</WarningLevel>
-    <WarningsNotAsErrors>SYSLIB0004</WarningsNotAsErrors>
-    <NoStdLib>false</NoStdLib>
-  </PropertyGroup>
-
-  <PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Release|netstandard2.0|x64'">
-    <TreatWarningsAsErrors>True</TreatWarningsAsErrors>
-    <NoWarn>1701;1702</NoWarn>
-    <WarningLevel>4</WarningLevel>
-    <WarningsNotAsErrors>SYSLIB0004</WarningsNotAsErrors>
-    <NoStdLib>false</NoStdLib>
-  </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Debug|net7.0|x64'">
-    <NoWarn>1701;1702</NoWarn>
-    <WarningLevel>4</WarningLevel>
-    <TreatWarningsAsErrors>True</TreatWarningsAsErrors>
-    <WarningsNotAsErrors>SYSLIB0004</WarningsNotAsErrors>
-
-    <NoStdLib>false</NoStdLib>
-  </PropertyGroup>
-
-  <PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Release|net7.0|x64'">
-    <NoWarn>1701;1702</NoWarn>
-    <WarningLevel>4</WarningLevel>
-    <TreatWarningsAsErrors>True</TreatWarningsAsErrors>
-    <WarningsNotAsErrors>SYSLIB0004</WarningsNotAsErrors>
-
-    <NoStdLib>false</NoStdLib>
-  </PropertyGroup> -->
-
   <PropertyGroup Label="Library Paths">
     <ElectionGuardLibs>..\..\..\..\build\libs</ElectionGuardLibs>
   </PropertyGroup>
-  <ItemGroup Label="C++ Built Libraries">
-    <Content Name="Windows (MSVC)" Include="$(ElectionGuardLibs)\Windows\$(PlatformTarget)\$(Configuration)\src\$(Configuration)\*.dll*" Pack="true">
-      <CopyToOutputDirectory Condition="'$(OS)' == 'Windows_NT'">Always</CopyToOutputDirectory>
-      <PackageCopyToOutput Condition="'$(OS)' == 'Windows_NT'">true</PackageCopyToOutput>
-      <PackagePath Condition="'$(Platform)' == 'arm64' AND '$(OS)' == 'Windows_NT'">runtimes\win-arm64\native</PackagePath>
-      <PackagePath Condition="'$(Platform)' == 'x86' AND '$(OS)' == 'Windows_NT'">runtimes\win-x86\native</PackagePath>
-      <PackagePath Condition="'$(Platform)' == 'x64' AND '$(OS)' == 'Windows_NT'">runtimes\win-x64\native</PackagePath>
-    </Content>
-    <Content Name="Windows HACL (MSVC)" Include="$(ElectionGuardLibs)\Windows\$(PlatformTarget)\$(Configuration)\libs\hacl\$(Configuration)\*.dll*" Pack="true">
-      <CopyToOutputDirectory Condition="'$(OS)' == 'Windows_NT'">Always</CopyToOutputDirectory>
-      <PackageCopyToOutput Condition="'$(OS)' == 'Windows_NT'">true</PackageCopyToOutput>
-      <PackagePath Condition="'$(Platform)' == 'arm64' AND '$(OS)' == 'Windows_NT'">runtimes\win-arm64\native</PackagePath>
-      <PackagePath Condition="'$(Platform)' == 'x86' AND '$(OS)' == 'Windows_NT'">runtimes\win-x86\native</PackagePath>
-      <PackagePath Condition="'$(Platform)' == 'x64' AND '$(OS)' == 'Windows_NT'">runtimes\win-x64\native</PackagePath>
-    </Content>
-    <Content Name="Windows Symbols (MSVC)" Include="$(ElectionGuardLibs)\Windows\$(PlatformTarget)\$(Configuration)\src\$(Configuration)\*.pdb*" Pack="true">
-      <CopyToOutputDirectory Condition="'$(OS)' == 'Windows_NT' AND '$(Configuration)' == 'Debug'">Always</CopyToOutputDirectory>
-      <PackageCopyToOutput Condition="'$(OS)' == 'Windows_NT' AND '$(Configuration)' == 'Debug'">true</PackageCopyToOutput>
-      <PackagePath Condition="'$(Platform)' == 'arm64' AND '$(OS)' == 'Windows_NT'">runtimes\win-arm64\native</PackagePath>
-      <PackagePath Condition="'$(Platform)' == 'x86' AND '$(OS)' == 'Windows_NT'">runtimes\win-x86\native</PackagePath>
-      <PackagePath Condition="'$(Platform)' == 'x64' AND '$(OS)' == 'Windows_NT'">runtimes\win-x64\native</PackagePath>
-    </Content>
-    <Content Name="Windows (msys2)" Include="$(ElectionGuardLibs)\Windows\$(PlatformTarget)\$(Configuration)\src\*.dll" Pack="true" PackagePath="runtimes\win-$(Platform)\native">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+  <ItemGroup Label="Package Native Libraries">
+    <Content Name="Windows arm64" Include="$(ElectionGuardLibs)\Windows\arm64\$(Configuration)\src\$(Configuration)\*.dll*">
+      <Pack>true</Pack>
       <PackageCopyToOutput>true</PackageCopyToOutput>
+      <PackagePath>runtimes\win-arm64\native</PackagePath>
     </Content>
-    <Content Name="Windows HACL (msys2)" Include="$(ElectionGuardLibs)\Windows\$(PlatformTarget)\$(Configuration)\libs\hacl\*.dll" Pack="true" PackagePath="runtimes\win-$(Platform)\native">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    <Content Name="Windows arm64 HACL" Include="$(ElectionGuardLibs)\Windows\arm64\$(Configuration)\libs\hacl\$(Configuration)\*.dll*">
+      <Pack>true</Pack>
       <PackageCopyToOutput>true</PackageCopyToOutput>
+      <PackagePath>runtimes\win-arm64\native</PackagePath>
     </Content>
-    <Content Name="MacOS" Include="$(ElectionGuardLibs)\Darwin\$(PlatformTarget)\$(Configuration)\src\*.dylib" Pack="true" PackagePath="runtimes\osx-$(Platform)\native">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    <Content Name="Windows x86" Include="$(ElectionGuardLibs)\Windows\x86\$(Configuration)\src\$(Configuration)\*.dll*">
+      <Pack>true</Pack>
       <PackageCopyToOutput>true</PackageCopyToOutput>
+      <PackagePath>runtimes\win-x86\native</PackagePath>
+      <PackagePath>runtimes\win-x64\native</PackagePath>
     </Content>
-    <Content Name="MacOS HACL" Include="$(ElectionGuardLibs)\Darwin\$(PlatformTarget)\$(Configuration)\libs\hacl\*.dylib" Pack="true" PackagePath="runtimes\osx-$(Platform)\native">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    <Content Name="Windows x86 HACL" Include="$(ElectionGuardLibs)\Windows\x86\$(Configuration)\libs\hacl\$(Configuration)\*.dll*">
+      <Pack>true</Pack>
       <PackageCopyToOutput>true</PackageCopyToOutput>
+      <PackagePath>runtimes\win-x86\native</PackagePath>
+      <PackagePath>runtimes\win-x64\native</PackagePath>
     </Content>
-    <Content Name="Linux" Include="$(ElectionGuardLibs)\Linux\$(PlatformTarget)\$(Configuration)\src\*.so" Pack="true" PackagePath="runtimes\linux-$(Platform)\native">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    <Content Name="Windows x64" Include="$(ElectionGuardLibs)\Windows\x64\$(Configuration)\src\$(Configuration)\*.dll*">
+      <Pack>true</Pack>
       <PackageCopyToOutput>true</PackageCopyToOutput>
+      <PackagePath>runtimes\win-x64\native</PackagePath>
     </Content>
-    <Content Name="Linux" Include="$(ElectionGuardLibs)\Linux\$(PlatformTarget)\$(Configuration)\libs\hacl\*.so" Pack="true" PackagePath="runtimes\linux-$(Platform)\native">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    <Content Name="Windows x64 HACL" Include="$(ElectionGuardLibs)\Windows\x64\$(Configuration)\libs\hacl\$(Configuration)\*.dll*">
+      <Pack>true</Pack>
       <PackageCopyToOutput>true</PackageCopyToOutput>
+      <PackagePath>runtimes\win-x64\native</PackagePath>
     </Content>
-    
+    <Content Name="MacOS arm64" Include="$(ElectionGuardLibs)\Darwin\arm64\$(Configuration)\src\*.dylib">
+      <Pack>true</Pack>
+      <PackageCopyToOutput>true</PackageCopyToOutput>
+      <!-- <Link>osx-arm64\%(Filename)%(Extension)</Link> -->
+      <PackagePath>runtimes\osx-arm64\native</PackagePath>
+    </Content>
+    <Content Name="MacOS arm64 HACL" Include="$(ElectionGuardLibs)\Darwin\arm64\$(Configuration)\libs\hacl\*.dylib">
+      <Pack>true</Pack>
+      <PackageCopyToOutput>true</PackageCopyToOutput>
+      <PackagePath>runtimes\osx-arm64\native</PackagePath>
+    </Content>
+    <Content Name="MacOS x64" Include="$(ElectionGuardLibs)\Darwin\x64\$(Configuration)\src\*.dylib">
+      <Pack>true</Pack>
+      <PackageCopyToOutput>true</PackageCopyToOutput>
+      <PackagePath>runtimes\osx-x64\native</PackagePath>
+    </Content>
+    <Content Name="MacOS x64 HACL" Include="$(ElectionGuardLibs)\Darwin\x64\$(Configuration)\libs\hacl\*.dylib">
+      <Pack>true</Pack>
+      <PackageCopyToOutput>true</PackageCopyToOutput>
+      <PackagePath>runtimes\osx-x64\native</PackagePath>
+    </Content>
+    <Content Name="MacCatalyst arm64" Include="$(ElectionGuardLibs)\MacCatalyst\arm64\$(Configuration)\src\*.dylib">
+      <Pack>true</Pack>
+      <PackageCopyToOutput>true</PackageCopyToOutput>
+      <PackagePath>runtimes\maccatalyst-arm64\native</PackagePath>
+    </Content>
+    <Content Name="MacCatalyst arm64 HACL" Include="$(ElectionGuardLibs)\MacCatalyst\arm64\$(Configuration)\libs\hacl\*.dylib">
+      <Pack>true</Pack>
+      <PackageCopyToOutput>true</PackageCopyToOutput>
+      <PackagePath>runtimes\osx-arm64\native</PackagePath>
+    </Content>
+    <Content Name="MacCatalyst x64" Include="$(ElectionGuardLibs)\MacCatalyst\x64\$(Configuration)\src\*.dylib">
+      <Pack>true</Pack>
+      <PackageCopyToOutput>true</PackageCopyToOutput>
+      <PackagePath>runtimes\maccatalyst-x64\native</PackagePath>
+    </Content>
+    <Content Name="MacCatalyst x64 HACL" Include="$(ElectionGuardLibs)\MacCatalyst\x64\$(Configuration)\libs\hacl\*.dylib">
+      <Pack>true</Pack>
+      <PackageCopyToOutput>true</PackageCopyToOutput>
+      <PackagePath>runtimes\osx-x64\native</PackagePath>
+    </Content>
+    <Content Name="Linux x64" Include="$(ElectionGuardLibs)\Linux\x64\$(Configuration)\src\*.so">
+      <Pack>true</Pack>
+      <PackageCopyToOutput>true</PackageCopyToOutput>
+      <PackagePath>runtimes\linux-x64\native</PackagePath>
+    </Content>
+    <Content Name="Linux x64 HACL" Include="$(ElectionGuardLibs)\Linux\$(PlatformTarget)\$(Configuration)\libs\hacl\*.so">
+      <Pack>true</Pack>
+      <PackageCopyToOutput>true</PackageCopyToOutput>
+      <PackagePath>runtimes\linux-x64\native</PackagePath>
+    </Content>
     <None Include="Electionguard.Encryption.targets">
       <PackagePath>build\</PackagePath>
       <Pack>true</Pack>
     </None>
   </ItemGroup>
-
   <ItemGroup Label="Additional Package Files">
     <None Name="ReadMe" Include="..\README.md" Pack="true" PackagePath="\" />
     <None Name="Icon" Include="..\icon.png" Pack="true" PackagePath="\" />
   </ItemGroup>
-
   <ItemGroup>
     <Folder Include="GeneratedInterop\" />
   </ItemGroup>
-
   <ItemGroup>
     <PackageReference Include="Microsoft.Bcl.HashCode" Version="1.1.1" />
     <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
