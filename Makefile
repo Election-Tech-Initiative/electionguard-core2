@@ -280,7 +280,7 @@ build-npm: build-wasm
 	
 # Clean
 
-clean:
+clean-build:
 	@echo 🗑️ Cleaning Output Directory
 ifeq ($(OPERATING_SYSTEM),Windows)
 	pwsh -Command "rm -R -Fo $(ELECTIONGUARD_BUILD_DIR_WIN); $$null"
@@ -336,6 +336,9 @@ clean-ui:
 	dotnet clean ./bindings/netstandard/ElectionGuard/ElectionGuard.ElectionSetup/ElectionGuard.ElectionSetup.csproj
 	dotnet clean ./bindings/netstandard/ElectionGuard/ElectionGuard.ElectionSetup.Tests/ElectionGuard.ElectionSetup.Tests.csproj
 	dotnet clean ./src/electionguard-ui/ElectionGuard.UI.Lib/ElectionGuard.UI.Lib.csproj
+
+clean: clean-build clean-netstandard clean-ui
+	@echo 🗑️ CLEAN ALL
 
 # Generate
 
@@ -573,7 +576,9 @@ else
 	PROCESSOR=x86 && make test-netstandard
 endif
 
-# copy the build output from the processor builds to the default build for the current platform (which enables debugging in vscode using code lens)
+# copy the build output from the processor builds to 
+# the default build for the current platform 
+# (which enables debugging in vscode using code lens)
 test-netstandard-copy-output:
 	@echo 🧪 TEST NETSTANDARD COPY OUTPUT $(PROCESSOR) $(TARGET)
 ifeq ($(OPERATING_SYSTEM),Windows)
