@@ -175,8 +175,12 @@ jobs:
         with:
           name: win-x64
           path: |
-            build/libs/Windows/x64/Release/src/Release/*.dll*
-            build/libs/Windows/x64/Release/libs/hacl/Release/*.dll*
+            build/libs/Windows/x64/Release/src/Release/*.dll
+            build/libs/Windows/x64/Release/src/Release/*.exp
+            build/libs/Windows/x64/Release/src/Release/*.lib
+            build/libs/Windows/x64/Release/libs/hacl/Release/*.dll
+            build/libs/Windows/x64/Release/libs/hacl/Release/*.exp
+            build/libs/Windows/x64/Release/libs/hacl/Release/*.lib
 
   publish_nuget:
     name: Publish Nuget
@@ -224,7 +228,7 @@ jobs:
         uses: actions/download-artifact@v3
         with:
           name: win-x64
-          path: build/libs/Windows/x64/src/Release
+          path: build/libs/Windows/x64/Release
 
       - name: Update version number
         run: |
