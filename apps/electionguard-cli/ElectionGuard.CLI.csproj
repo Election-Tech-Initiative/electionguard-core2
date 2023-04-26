@@ -5,8 +5,8 @@
     <TargetFramework>net7.0</TargetFramework>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
-    <StartupObject>ElectionGuard.Encryption.Cli.Program</StartupObject>
-    <AssemblyName>ElectionGuard.Encryption.Cli</AssemblyName>
+    <StartupObject>ElectionGuard.CLI.Program</StartupObject>
+    <AssemblyName>ElectionGuard.CLI</AssemblyName>
     <EnableNETAnalyzers>true</EnableNETAnalyzers>
     <EnforceCodeStyleInBuild>true</EnforceCodeStyleInBuild>
     <Platforms>arm64;x64;x86</Platforms>
@@ -17,7 +17,8 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\ElectionGuard.Encryption\ElectionGuard.Encryption.csproj" />
+    <ProjectReference Include="..\..\bindings\netstandard\ElectionGuard\ElectionGuard.Encryption.Utils\ElectionGuard.Encryption.Utils.csproj" />
+    <ProjectReference Include="..\..\bindings\netstandard\ElectionGuard\ElectionGuard.Encryption\ElectionGuard.Encryption.csproj" />
   </ItemGroup>
 
   <PropertyGroup Label="Debug" Condition=" '$(Configuration)' == 'Debug' ">

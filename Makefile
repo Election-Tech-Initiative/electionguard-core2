@@ -256,6 +256,11 @@ else
 	PROCESSOR=x64 && make build-netstandard
 endif
 
+build-cli: build
+	@echo 🖥️ BUILD CLI $(OPERATING_SYSTEM) $(PROCESSOR) $(TARGET)
+	cd ./apps/electionguard-cli && dotnet restore
+	dotnet build -c $(TARGET) ./apps/electionguard-cli/ElectionGuard.CLI.sln /p:Platform=$(PROCESSOR)
+
 build-ui: build-maccatalyst build-netstandard
 	@echo 🖥️ BUILD UI $(OPERATING_SYSTEM) $(PROCESSOR) $(TARGET)
 	cd ./src/electionguard-ui && dotnet restore

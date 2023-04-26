@@ -1,6 +1,6 @@
 ﻿using CommandLine;
 
-namespace ElectionGuard.Encryption.Cli.Encrypt;
+namespace ElectionGuard.CLI.Encrypt;
 
 [Verb("encrypt", HelpText = "Encrypt ballots using a context.")]
 internal class EncryptOptions

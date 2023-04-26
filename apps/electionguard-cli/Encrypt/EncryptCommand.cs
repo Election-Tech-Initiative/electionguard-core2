@@ -1,4 +1,4 @@
-﻿namespace ElectionGuard.Encryption.Cli.Encrypt
+﻿namespace ElectionGuard.CLI.Encrypt
 {
     internal class EncryptCommand
     {
