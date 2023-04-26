@@ -100,7 +100,7 @@ if(MSVC)
     add_custom_command(
         TARGET ${HACL_CPP_TARGET_NAME} POST_BUILD
         COMMAND ${CMAKE_COMMAND} -E copy_directory
-        ${hacl_BINARY_DIR}/Release
+        ${hacl_BINARY_DIR}/${CMAKE_BUILD_TYPE}
         $<TARGET_FILE_DIR:${HACL_CPP_TARGET_NAME}>
     )
 else()
