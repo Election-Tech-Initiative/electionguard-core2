@@ -1,0 +1,42 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>net7.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <StartupObject>ElectionGuard.CLI.Program</StartupObject>
+    <AssemblyName>ElectionGuard.CLI</AssemblyName>
+    <EnableNETAnalyzers>true</EnableNETAnalyzers>
+    <EnforceCodeStyleInBuild>true</EnforceCodeStyleInBuild>
+    <Platforms>arm64;x64;x86</Platforms>
+  </PropertyGroup>
+
+  <PropertyGroup>
+    <PackAsTool>true</PackAsTool>
+    <ToolCommandName>electionguard</ToolCommandName>
+    <PackageOutputPath>./nupkg</PackageOutputPath>
+    <IncludeBuildOutput>false</IncludeBuildOutput>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="CommandLineParser" Version="2.9.1" />
+    <PackageReference Include="ElectionGuard.Encryption" Version="1.0.7" />
+  </ItemGroup>
+
+  <PropertyGroup Label="Debug" Condition=" '$(Configuration)' == 'Debug' ">
+    <DebugType>full</DebugType>
+    <DebugSymbols>true</DebugSymbols>
+    <NoWarn>1701;1702</NoWarn>
+    <WarningLevel>4</WarningLevel>
+    <WarningsNotAsErrors>SYSLIB0004</WarningsNotAsErrors>
+  </PropertyGroup>
+
+  <PropertyGroup Label="Release" Condition=" '$(Configuration)' == 'Release' ">
+    <DebugType>pdbonly</DebugType>
+    <NoWarn>1701;1702</NoWarn>
+    <WarningLevel>4</WarningLevel>
+    <WarningsNotAsErrors>SYSLIB0004</WarningsNotAsErrors>
+  </PropertyGroup>
+
+</Project>

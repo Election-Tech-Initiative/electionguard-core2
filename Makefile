@@ -2,10 +2,12 @@
 
 .EXPORT_ALL_VARIABLES:
 ELECTIONGUARD_CACHE=$(subst \,/,$(realpath .))/.cache
+ELECTIONGUARD_APPS_DIR=$(realpath .)/apps
 ELECTIONGUARD_BINDING_DIR=$(realpath .)/bindings
+ELECTIONGUARD_DATA_DIR=$(realpath .)/data
 ELECTIONGUARD_BINDING_LIB_DIR=$(ELECTIONGUARD_BINDING_DIR)/netstandard/ElectionGuard/ElectionGuard.Encryption
 ELECTIONGUARD_BINDING_BENCH_DIR=$(ELECTIONGUARD_BINDING_DIR)/netstandard/ElectionGuard/ElectionGuard.Encryption.Bench
-ELECTIONGUARD_BINDING_CLI_DIR=$(ELECTIONGUARD_BINDING_DIR)/netstandard/ElectionGuard/ElectionGuard.Encryption.Cli
+ELECTIONGUARD_APP_CLI_DIR=$(ELECTIONGUARD_APPS_DIR)/electionguard-cli/ElectionGuard.CLI
 ELECTIONGUARD_BINDING_TEST_DIR=$(ELECTIONGUARD_BINDING_DIR)/netstandard/ElectionGuard/ElectionGuard.Encryption.Tests
 ELECTIONGUARD_BINDING_UTILS_DIR=$(ELECTIONGUARD_BINDING_DIR)/netstandard/ElectionGuard/ElectionGuard.Encryption.Utils
 ELECTIONGUARD_BUILD_DIR=$(subst \,/,$(realpath .))/build
@@ -236,12 +238,18 @@ else
 	echo "iOS builds are only supported on MacOS"
 endif
 
-build-netstandard:
+build-maccatalyst:
+# TODO: support maccatalyst-x64 builds
+ifeq ($(OPERATING_SYSTEM),Darwin)
+	PROCESSOR=arm64 OPERATING_SYSTEM=MacCatalyst && make build
+else
+	echo "MacCatalyst builds are only supported on MacOS"
+endif
+
+build-netstandard: build
 	@echo 🖥️ BUILD NETSTANDARD $(OPERATING_SYSTEM) $(PROCESSOR) $(TARGET)
-	make build
 	cd ./bindings/netstandard/ElectionGuard && dotnet restore
-	dotnet build --configuration $(TARGET) ./bindings/netstandard/ElectionGuard/ElectionGuard.sln /p:Platform=$(PROCESSOR)
-	dotnet build -a $(PROCESSOR) --configuration $(TARGET) ./bindings/netstandard/ElectionGuard/ElectionGuard.ElectionSetup.Tests/ElectionGuard.ElectionSetup.Tests.csproj
+	dotnet build -c $(TARGET) ./bindings/netstandard/ElectionGuard/ElectionGuard.sln /p:Platform=$(PROCESSOR)
 
 build-netstandard-x64:
 ifeq ($(OPERATING_SYSTEM),Windows)
@@ -250,10 +258,15 @@ else
 	PROCESSOR=x64 && make build-netstandard
 endif
 
-build-ui: build-netstandard
+build-cli:
+	@echo 🖥️ BUILD CLI $(OPERATING_SYSTEM) $(PROCESSOR) $(TARGET)
+	cd ./apps/electionguard-cli && dotnet restore
+	dotnet build -c $(TARGET) ./apps/electionguard-cli/ElectionGuard.CLI.sln /p:Platform=$(PROCESSOR)
+
+build-ui: build-maccatalyst build-netstandard
 	@echo 🖥️ BUILD UI $(OPERATING_SYSTEM) $(PROCESSOR) $(TARGET)
 	cd ./src/electionguard-ui && dotnet restore
-	dotnet build --configuration $(TARGET) ./src/electionguard-ui/ElectionGuard.UI.sln /p:Platform=$(PROCESSOR)
+	dotnet build -c $(TARGET) ./src/electionguard-ui/ElectionGuard.UI.sln /p:Platform=$(PROCESSOR)
 
 build-wasm:
 	@echo 🌐 BUILD WASM $(OPERATING_SYSTEM) $(PROCESSOR) $(TARGET)
@@ -280,13 +293,18 @@ build-npm: build-wasm
 	
 # Clean
 
-clean:
+clean-build:
 	@echo 🗑️ Cleaning Output Directory
 ifeq ($(OPERATING_SYSTEM),Windows)
 	pwsh -Command "rm -R -Fo $(ELECTIONGUARD_BUILD_DIR_WIN); $$null"
 else
 	if [ -d "$(ELECTIONGUARD_BUILD_DIR)" ]; then rm -rf $(ELECTIONGUARD_BUILD_DIR)/*; fi
 	if [ ! -d "$(ELECTIONGUARD_BUILD_DIR)" ]; then mkdir $(ELECTIONGUARD_BUILD_DIR); fi
+
+	if [ -d "$(ELECTIONGUARD_APP_CLI_DIR)/bin" ]; then rm -rf $(ELECTIONGUARD_APP_CLI_DIR)/bin/*; fi
+	if [ ! -d "$(ELECTIONGUARD_APP_CLI_DIR)/bin" ]; then mkdir $(ELECTIONGUARD_APP_CLI_DIR)/bin; fi
+	if [ -d "$(ELECTIONGUARD_APP_CLI_DIR)/obj" ]; then rm -rf $(ELECTIONGUARD_APP_CLI_DIR)/obj/*; fi
+	if [ ! -d "$(ELECTIONGUARD_APP_CLI_DIR)/obj" ]; then mkdir $(ELECTIONGUARD_APP_CLI_DIR)/obj; fi
 
 	if [ -d "$(ELECTIONGUARD_BINDING_LIB_DIR)/bin" ]; then rm -rf $(ELECTIONGUARD_BINDING_LIB_DIR)/bin/*; fi
 	if [ ! -d "$(ELECTIONGUARD_BINDING_LIB_DIR)/bin" ]; then mkdir $(ELECTIONGUARD_BINDING_LIB_DIR)/bin; fi
@@ -297,11 +315,6 @@ else
 	if [ ! -d "$(ELECTIONGUARD_BINDING_BENCH_DIR)/bin" ]; then mkdir $(ELECTIONGUARD_BINDING_BENCH_DIR)/bin; fi
 	if [ -d "$(ELECTIONGUARD_BINDING_BENCH_DIR)/obj" ]; then rm -rf $(ELECTIONGUARD_BINDING_BENCH_DIR)/obj/*; fi
 	if [ ! -d "$(ELECTIONGUARD_BINDING_BENCH_DIR)/obj" ]; then mkdir $(ELECTIONGUARD_BINDING_BENCH_DIR)/obj; fi
-
-	if [ -d "$(ELECTIONGUARD_BINDING_CLI_DIR)/bin" ]; then rm -rf $(ELECTIONGUARD_BINDING_CLI_DIR)/bin/*; fi
-	if [ ! -d "$(ELECTIONGUARD_BINDING_CLI_DIR)/bin" ]; then mkdir $(ELECTIONGUARD_BINDING_CLI_DIR)/bin; fi
-	if [ -d "$(ELECTIONGUARD_BINDING_CLI_DIR)/obj" ]; then rm -rf $(ELECTIONGUARD_BINDING_CLI_DIR)/obj/*; fi
-	if [ ! -d "$(ELECTIONGUARD_BINDING_CLI_DIR)/obj" ]; then mkdir $(ELECTIONGUARD_BINDING_CLI_DIR)/obj; fi
 
 	if [ -d "$(ELECTIONGUARD_BINDING_TEST_DIR)/bin" ]; then rm -rf $(ELECTIONGUARD_BINDING_TEST_DIR)/bin/*; fi
 	if [ ! -d "$(ELECTIONGUARD_BINDING_TEST_DIR)/bin" ]; then mkdir $(ELECTIONGUARD_BINDING_TEST_DIR)/bin; fi
@@ -326,16 +339,13 @@ endif
 clean-netstandard:
 	@echo 🗑️ CLEAN NETSTANDARD
 	dotnet clean ./bindings/netstandard/ElectionGuard/ElectionGuard.sln
-	dotnet clean ./src/electionguard-ui/ElectionGuard.UI.sln
 
 clean-ui:
 	@echo 🗑️ CLEAN UI
-	cd ./src/electionguard-ui/ElectionGuard.UI && dotnet restore ElectionGuard.UI.csproj
-	dotnet clean ./src/electionguard-ui/ElectionGuard.UI/ElectionGuard.UI.csproj
-	dotnet clean ./src/electionguard-ui/ElectionGuard.UI.Test/ElectionGuard.UI.Test.csproj
-	dotnet clean ./bindings/netstandard/ElectionGuard/ElectionGuard.ElectionSetup/ElectionGuard.ElectionSetup.csproj
-	dotnet clean ./bindings/netstandard/ElectionGuard/ElectionGuard.ElectionSetup.Tests/ElectionGuard.ElectionSetup.Tests.csproj
-	dotnet clean ./src/electionguard-ui/ElectionGuard.UI.Lib/ElectionGuard.UI.Lib.csproj
+	dotnet clean ./src/electionguard-ui/ElectionGuard.UI.sln
+
+clean: clean-build clean-netstandard clean-ui
+	@echo 🗑️ CLEAN ALL
 
 # Generate
 
@@ -371,7 +381,7 @@ endif
 # Publish
 
 publish-ui:
-	@echo 🧱 BUILD UI
+	@echo 🧱 PUBLISH UI
 ifeq ($(OPERATING_SYSTEM),Windows)
 	dotnet publish -f net7.0-windows10.0.19041.0 -c $(TARGET) /p:ApplicationVersion=$(BUILD) /p:RuntimeIdentifierOverride=win10-x64 src/electionguard-ui/ElectionGuard.UI/ElectionGuard.UI.csproj
 endif
@@ -451,27 +461,20 @@ endif
 	$(ELECTIONGUARD_BUILD_LIBS_DIR)/$(PROCESSOR)/$(TARGET)/test/ElectionGuardBenchmark
 
 bench-netstandard: build-netstandard
-	@echo 🧪 BENCHMARK $(OPERATING_SYSTEM) $(PROCESSOR) $(TARGET) net7.0
-
 # handle executing benchamrks on different processors
 ifeq ($(HOST_PROCESSOR),$(PROCESSOR))
-	$(ELECTIONGUARD_BINDING_BENCH_DIR)/bin/$(PROCESSOR)/$(TARGET)/net7.0/ElectionGuard.Encryption.Bench.exe
-else
-	$(ELECTIONGUARD_BINDING_BENCH_DIR)/bin/$(PROCESSOR)/$(TARGET)/net7.0/ElectionGuard.Encryption.Bench.exe
-endif
+	@echo 🧪 BENCHMARK $(OPERATING_SYSTEM) $(PROCESSOR) $(TARGET) net7.0
+	dotnet run --framework net7.0 -a $(PROCESSOR) -c $(TARGET) --project $(ELECTIONGUARD_BINDING_BENCH_DIR)/Electionguard.Encryption.Bench.csproj 	
 
-ifeq ($(OPERATING_SYSTEM),Windows)
-	@echo 🧪 BENCHMARK $(OPERATING_SYSTEM) $(PROCESSOR) $(TARGET) netstandard2.0
-	dotnet run --framework netstandard2.0 -a $(PROCESSOR) --configuration $(TARGET) \	
-		--project ./bindings/netstandard/ElectionGuard/ElectionGuard.Encryption.Bench/Electionguard.Encryption.Bench.csproj 	
+	# @echo 🧪 BENCHMARK $(OPERATING_SYSTEM) $(PROCESSOR) $(TARGET) netstandard2.0
+	# dotnet run --framework netstandard2.0 -a $(PROCESSOR) -c $(TARGET) --project $(ELECTIONGUARD_BINDING_BENCH_DIR)/Electionguard.Encryption.Bench.csproj 	
+else
+	@echo 🧪 BENCHMARK $(OPERATING_SYSTEM) $(PROCESSOR) on $(HOST_PROCESSOR) $(TARGET) net7.0
+	$(DOTNET_PATH)/$(PROCESSOR)/dotnet exec --runtimeconfig $(ELECTIONGUARD_BINDING_BENCH_DIR)/bin/$(PROCESSOR)/$(TARGET)/net7.0/ElectionGuard.Encryption.Bench.runtimeconfig.json $(ELECTIONGUARD_BINDING_BENCH_DIR)/bin/$(PROCESSOR)/$(TARGET)/net7.0/ElectionGuard.Encryption.Bench.dll
+	
+	# @echo 🧪 BENCHMARK $(OPERATING_SYSTEM) $(PROCESSOR) on $(HOST_PROCESSOR) $(TARGET) netstandard2.0
 	# $(DOTNET_PATH)/$(PROCESSOR)/dotnet $(ELECTIONGUARD_BINDING_BENCH_DIR)/bin/$(PROCESSOR)/$(TARGET)/netstandard2.0/ElectionGuard.Encryption.Bench.dll
 endif
-	# $(DOTNET_PATH)/dotnet exec --runtimeconfig $(ELECTIONGUARD_BINDING_BENCH_DIR)/bin/$(PROCESSOR)/$(TARGET)/net7.0/ElectionGuard.Encryption.Bench.runtimeconfig.json $(ELECTIONGUARD_BINDING_BENCH_DIR)/bin/$(PROCESSOR)/$(TARGET)/net7.0/ElectionGuard.Encryption.Bench.dll
-	# dotnet run --framework net7.0 -a $(PROCESSOR) --configuration $(TARGET) \
-	# 	--project ./bindings/netstandard/ElectionGuard/ElectionGuard.Encryption.Bench/Electionguard.Encryption.Bench.csproj 
-	# @echo net 4.8 $(PROCESSOR)
-	# dotnet run --framework netstandard2.0 -a $(PROCESSOR) --configuration $(TARGET) \
-	# 	--project ./bindings/netstandard/ElectionGuard/ElectionGuard.Encryption.Bench/Electionguard.Encryption.Bench.csproj 
 
 bench-netstandard-arm64:
 ifeq ($(OPERATING_SYSTEM),Windows)
@@ -486,7 +489,6 @@ ifeq ($(OPERATING_SYSTEM),Windows)
 else
 	PROCESSOR=x64 && make bench-netstandard
 endif
-
 
 # Test
 
@@ -550,11 +552,9 @@ endif
 
 test-netstandard: build-netstandard
 	@echo 🧪 TEST NETSTANDARD $(PROCESSOR) $(TARGET)
-	# make test-netstandard-copy-output
-	dotnet test -a $(PROCESSOR) --configuration $(TARGET) ./bindings/netstandard/ElectionGuard/ElectionGuard.ElectionSetup.Tests/ElectionGuard.ElectionSetup.Tests.csproj
-	dotnet test -a $(PROCESSOR) --configuration $(TARGET) ./bindings/netstandard/ElectionGuard/ElectionGuard.Encryption.Tests/ElectionGuard.Encryption.Tests.csproj
-	dotnet test -a $(PROCESSOR) --configuration $(TARGET) ./bindings/netstandard/ElectionGuard/ElectionGuard.Decryption.Tests/ElectionGuard.Decryption.Tests.csproj
-	#dotnet test --filter TestCategory=SingleTest -a $(PROCESSOR) --configuration $(TARGET) ./bindings/netstandard/ElectionGuard/ElectionGuard.Decryption.Tests/ElectionGuard.Decryption.Tests.csproj
+	dotnet test -a $(PROCESSOR) -c $(TARGET) ./bindings/netstandard/ElectionGuard/ElectionGuard.ElectionSetup.Tests/ElectionGuard.ElectionSetup.Tests.csproj
+	dotnet test -a $(PROCESSOR) -c $(TARGET) ./bindings/netstandard/ElectionGuard/ElectionGuard.Encryption.Tests/ElectionGuard.Encryption.Tests.csproj
+	dotnet test -a $(PROCESSOR) -c $(TARGET) ./bindings/netstandard/ElectionGuard/ElectionGuard.Decryption.Tests/ElectionGuard.Decryption.Tests.csproj
 
 test-netstandard-arm64:
 ifeq ($(OPERATING_SYSTEM),Windows)
@@ -573,7 +573,9 @@ else
 	PROCESSOR=x86 && make test-netstandard
 endif
 
-# copy the build output from the processor builds to the default build for the current platform (which enables debugging in vscode using code lens)
+# copy the build output from the processor builds to 
+# the default build for the current platform 
+# (which enables debugging in vscode using code lens)
 test-netstandard-copy-output:
 	@echo 🧪 TEST NETSTANDARD COPY OUTPUT $(PROCESSOR) $(TARGET)
 ifeq ($(OPERATING_SYSTEM),Windows)
@@ -608,28 +610,13 @@ ifeq ($(OPERATING_SYSTEM),Darwin)
 		"./build/libs/$(OPERATING_SYSTEM)/$(PROCESSOR)/$(TARGET)/_deps/hacl-build/libhacl.dylib" 
 endif
 
-test-netstandard-copy-output-ui:
-	@echo 🧪 TEST NETSTANDARD COPY UI OUTPUT $(PROCESSOR) $(TARGET)
-ifeq ($(OPERATING_SYSTEM),Windows)
-	cp -r "build/libs/$(OPERATING_SYSTEM)/$(PROCESSOR)/$(TARGET)/src/$(TARGET)/electionguard.dll" "src/electionguard-ui/electionGuard.UI.Test/bin/$(TARGET)/net7.0/win-$(PROCESSOR)/electionguard.dll"
-	cp -r "build/libs/$(OPERATING_SYSTEM)/$(PROCESSOR)/$(TARGET)/libs/hacl/$(TARGET)/hacl_cpp.dll" "src/electionguard-ui/electionGuard.UI.Test/bin/$(TARGET)/net7.0/win-$(PROCESSOR)/hacl_cpp.dll"
-	cp -r "build/libs/$(OPERATING_SYSTEM)/$(PROCESSOR)/$(TARGET)/_deps/hacl-build/$(TARGET)/hacl.dll" "src/electionguard-ui/electionGuard.UI.Test/bin/$(TARGET)/net7.0/win-$(PROCESSOR)/hacl.dll"
-endif
-ifeq ($(OPERATING_SYSTEM),Darwin)
-	cp -r "build/libs/$(OPERATING_SYSTEM)/$(PROCESSOR)/$(TARGET)/src/libelectionguard.dylib" "src/electionguard-ui/electionGuard.UI.Test/bin/$(TARGET)/net7.0/osx-$(PROCESSOR)"
-	cp -r "build/libs/$(OPERATING_SYSTEM)/$(PROCESSOR)/$(TARGET)/libs/hacl/libhacl_cpp.dylib" "src/electionguard-ui/electionGuard.UI.Test/bin/$(TARGET)/net7.0/osx-$(PROCESSOR)"
-	cp -r "build/libs/$(OPERATING_SYSTEM)/$(PROCESSOR)/$(TARGET)/_deps/hacl-build/libhacl.dylib" "src/electionguard-ui/electionGuard.UI.Test/bin/$(TARGET)/net7.0/osx-$(PROCESSOR)"
-endif
+test-cli: build-cli
+	@echo 🧪 TEST CLI $(OPERATING_SYSTEM) $(PROCESSOR) $(TARGET)
+	cd ./apps/electionguard-cli && dotnet run -- -c $(ELECTIONGUARD_DATA_DIR)/test/context.json -m $(ELECTIONGUARD_DATA_DIR)/test/manifest.json -b $(ELECTIONGUARD_DATA_DIR)/test/plaintext -d $(ELECTIONGUARD_DATA_DIR)/test/device.json -o $(ELECTIONGUARD_DATA_DIR)/test/output
 
 test-ui: build-ui
-	@echo 🧪 TEST UI $(PROCESSOR) $(TARGET)
-	# dotnet build -a $(PROCESSOR) --configuration $(TARGET) ./src/electionguard-ui/electionGuard.UI.Test/ElectionGuard.UI.Test.csproj
-	
-	make build-netstandard
-	make test-netstandard-copy-output
-	make test-netstandard-copy-output-ui
-
-	dotnet test -a $(PROCESSOR) --no-build --configuration $(TARGET) ./src/electionguard-ui/ElectionGuard.UI.Test/ElectionGuard.UI.Test.csproj
+	@echo 🧪 TEST UI $(OPERATING_SYSTEM) $(PROCESSOR) $(TARGET)
+	dotnet test -a $(PROCESSOR) -c $(TARGET) ./src/electionguard-ui/ElectionGuard.UI.Test/ElectionGuard.UI.Test.csproj
 
 test-wasm: build-wasm
 	@echo 🧪 TEST WASM $(PROCESSOR) $(TARGET)
@@ -666,5 +653,6 @@ fetch-sample-data:
 	unzip -o sample-data-1-0.zip
 	rm -f sample-data-1.0.zip || true
 
-generate-sample-data:
+generate-sample-data: build-netstandard
 	@echo Generate Sample Data
+	dotnet test -a $(PROCESSOR) -c $(TARGET) --filter TestCategory=OutputTestData ./bindings/netstandard/ElectionGuard/ElectionGuard.Decryption.Tests/ElectionGuard.Decryption.Tests.csproj

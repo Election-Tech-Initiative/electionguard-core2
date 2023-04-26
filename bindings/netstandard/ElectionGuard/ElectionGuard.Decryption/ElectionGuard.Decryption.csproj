@@ -6,6 +6,7 @@
     <Nullable>enable</Nullable>
     <EnableNETAnalyzers>true</EnableNETAnalyzers>
     <EnforceCodeStyleInBuild>true</EnforceCodeStyleInBuild>
+    <Platforms>arm64;x64;x86</Platforms>
   </PropertyGroup>
 
   <ItemGroup>
@@ -13,131 +14,19 @@
     <ProjectReference Include="..\ElectionGuard.ElectionSetup\ElectionGuard.ElectionSetup.csproj" />
   </ItemGroup>
 
-  <PropertyGroup Label="Library Paths">
-    <ElectionGuardLibs>..\..\..\..\build\libs</ElectionGuardLibs>
-  </PropertyGroup>
-
-  <PropertyGroup Label="Debug|arm64" Condition=" '$(Configuration)|$(Platform)' == 'Debug|arm64' ">
+  <PropertyGroup Label="Debug" Condition=" '$(Configuration)' == 'Debug' ">
     <DebugType>full</DebugType>
     <DebugSymbols>true</DebugSymbols>
-    <Optimize>false</Optimize>
-    <OutputPath>bin\arm64\Debug</OutputPath>
-    <DefineConstants></DefineConstants>
-    <PlatformTarget>arm64</PlatformTarget>
-    <IntermediateOutputPath>obj\arm64\Debug</IntermediateOutputPath>
-    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
-    
-    <TreatWarningsAsErrors>True</TreatWarningsAsErrors>
     <NoWarn>1701;1702</NoWarn>
     <WarningLevel>4</WarningLevel>
-    <WarningsNotAsErrors>SYSLIB0004;CS0618</WarningsNotAsErrors>
-
-    <NoStdLib>false</NoStdLib>
+    <WarningsNotAsErrors>SYSLIB0004</WarningsNotAsErrors>
   </PropertyGroup>
 
-  <PropertyGroup Label="Release|arm64" Condition=" '$(Configuration)|$(Platform)' == 'Release|arm64' ">
+  <PropertyGroup Label="Release" Condition=" '$(Configuration)' == 'Release' ">
     <DebugType>pdbonly</DebugType>
-    <Optimize>false</Optimize>
-    <OutputPath>bin\arm64\Release</OutputPath>
-    <DefineConstants></DefineConstants>
-    <PlatformTarget>arm64</PlatformTarget>
-    <IntermediateOutputPath>obj\arm64\Release</IntermediateOutputPath>
-    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
-
-    <TreatWarningsAsErrors>True</TreatWarningsAsErrors>
     <NoWarn>1701;1702</NoWarn>
     <WarningLevel>4</WarningLevel>
-    <WarningsNotAsErrors>SYSLIB0004;CS0618</WarningsNotAsErrors>
-
-    <NoStdLib>false</NoStdLib>
+    <WarningsNotAsErrors>SYSLIB0004</WarningsNotAsErrors>
   </PropertyGroup>
 
-  <PropertyGroup Label="Debug|x64" Condition=" '$(Configuration)|$(Platform)' == 'Debug|x64' ">
-    <DebugType>full</DebugType>
-    <DebugSymbols>true</DebugSymbols>
-    <Optimize>false</Optimize>
-    <OutputPath>bin\x64\Debug</OutputPath>
-    <DefineConstants></DefineConstants>
-    <PlatformTarget>x64</PlatformTarget>
-    <IntermediateOutputPath>obj\x64\Debug</IntermediateOutputPath>
-    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
-    
-    <TreatWarningsAsErrors>True</TreatWarningsAsErrors>
-    <NoWarn>1701;1702</NoWarn>
-    <WarningLevel>4</WarningLevel>
-    <WarningsNotAsErrors>SYSLIB0004;CS0618</WarningsNotAsErrors>
-
-    <NoStdLib>false</NoStdLib>
-  </PropertyGroup>
-
-  <PropertyGroup Label="Release|x64" Condition=" '$(Configuration)|$(Platform)' == 'Release|x64' ">
-    <DebugType>pdbonly</DebugType>
-    <Optimize>false</Optimize>
-    <OutputPath>bin\x64\Release</OutputPath>
-    <DefineConstants></DefineConstants>
-    <PlatformTarget>x64</PlatformTarget>
-    <IntermediateOutputPath>obj\x64\Release</IntermediateOutputPath>
-    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
-
-    <TreatWarningsAsErrors>True</TreatWarningsAsErrors>
-    <NoWarn>1701;1702</NoWarn>
-    <WarningLevel>4</WarningLevel>
-    <WarningsNotAsErrors>SYSLIB0004;CS0618</WarningsNotAsErrors>
-
-    <NoStdLib>false</NoStdLib>
-  </PropertyGroup>
-  
-  <PropertyGroup Label="Debug|x86" Condition=" '$(Configuration)|$(Platform)' == 'Debug|x86' ">
-    <DebugType>full</DebugType>
-    <DebugSymbols>true</DebugSymbols>
-    <Optimize>false</Optimize>
-    <OutputPath>bin\x86\Debug</OutputPath>
-    <DefineConstants></DefineConstants>
-    <PlatformTarget>x86</PlatformTarget>
-    <IntermediateOutputPath>obj\x86\Debug</IntermediateOutputPath>
-    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
-    
-    <TreatWarningsAsErrors>True</TreatWarningsAsErrors>
-    <NoWarn>1701;1702</NoWarn>
-    <WarningLevel>4</WarningLevel>
-    <WarningsNotAsErrors>SYSLIB0004;CS0618</WarningsNotAsErrors>
-
-    <NoStdLib>false</NoStdLib>
-  </PropertyGroup>
-
-  <PropertyGroup Label="Release|x86" Condition=" '$(Configuration)|$(Platform)' == 'Release|x86' ">
-    <DebugType>pdbonly</DebugType>
-    <Optimize>false</Optimize>
-    <OutputPath>bin\x86\Release</OutputPath>
-    <DefineConstants></DefineConstants>
-    <PlatformTarget>x86</PlatformTarget>
-    <IntermediateOutputPath>obj\x86\Release</IntermediateOutputPath>
-    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
-
-    <TreatWarningsAsErrors>True</TreatWarningsAsErrors>
-    <NoWarn>1701;1702</NoWarn>
-    <WarningLevel>4</WarningLevel>
-    <WarningsNotAsErrors>SYSLIB0004;CS0618</WarningsNotAsErrors>
-
-    <NoStdLib>false</NoStdLib>
-  </PropertyGroup>
-
-  <ItemGroup Label="C++ Built Libraries">
-    <None Name="Windows (MSVC)" Visible="false" Include="$(ElectionGuardLibs)\Windows\$(PlatformTarget)\$(Configuration)\src\$(Configuration)\*.dll*">
-      <CopyToOutputDirectory Condition="'$(OS)' == 'Windows_NT'">Always</CopyToOutputDirectory>
-    </None>
-    <None Name="Windows HACL (MSVC)" Visible="false" Include="$(ElectionGuardLibs)\Windows\$(PlatformTarget)\$(Configuration)\libs\hacl\$(Configuration)\*.dll*">
-      <CopyToOutputDirectory Condition="'$(OS)' == 'Windows_NT'">Always</CopyToOutputDirectory>
-    </None>
-    <None Name="Windows Symbols (MSVC)" Visible="false" Include="$(ElectionGuardLibs)\Windows\$(PlatformTarget)\$(Configuration)\src\$(Configuration)\*.pdb*">
-      <CopyToOutputDirectory Condition="'$(OS)' == 'Windows_NT'">Always</CopyToOutputDirectory>
-    </None>
-
-    <None Name="Windows (msys2)" Visible="false" Include="$(ElectionGuardLibs)\Windows\$(PlatformTarget)\$(Configuration)\src\*.dll*" CopyToOutputDirectory="Always" />
-    <None Name="Windows HACL (msys2)" Visible="false" Include="$(ElectionGuardLibs)\Windows\$(PlatformTarget)\$(Configuration)\libs\hacl\*.dll*" CopyToOutputDirectory="Always" />
-    <None Name="MacOS" Visible="false" Include="$(ElectionGuardLibs)\Darwin\$(PlatformTarget)\$(Configuration)\src\*.dylib" CopyToOutputDirectory="Always" />
-    <None Name="MacOS HACL" Visible="false" Include="$(ElectionGuardLibs)\Darwin\$(PlatformTarget)\$(Configuration)\libs\hacl\*.dylib" CopyToOutputDirectory="Always" />
-    <None Name="Linux" Visible="false" Include="$(ElectionGuardLibs)\Linux\$(PlatformTarget)\$(Configuration)\src\*.so" CopyToOutputDirectory="Always" />
-    <None Name="Linux HACL" Visible="false" Include="$(ElectionGuardLibs)\Linux\$(PlatformTarget)\$(Configuration)\libs\hacl\*.so" CopyToOutputDirectory="Always" />
-  </ItemGroup>
 </Project>
