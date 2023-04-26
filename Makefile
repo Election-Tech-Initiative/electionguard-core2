@@ -557,7 +557,6 @@ test-netstandard: build-netstandard
 	dotnet test -a $(PROCESSOR) -c $(TARGET) ./bindings/netstandard/ElectionGuard/ElectionGuard.ElectionSetup.Tests/ElectionGuard.ElectionSetup.Tests.csproj
 	dotnet test -a $(PROCESSOR) -c $(TARGET) ./bindings/netstandard/ElectionGuard/ElectionGuard.Encryption.Tests/ElectionGuard.Encryption.Tests.csproj
 	dotnet test -a $(PROCESSOR) -c $(TARGET) ./bindings/netstandard/ElectionGuard/ElectionGuard.Decryption.Tests/ElectionGuard.Decryption.Tests.csproj
-	#dotnet test --filter TestCategory=SingleTest -a $(PROCESSOR) -c $(TARGET) ./bindings/netstandard/ElectionGuard/ElectionGuard.Decryption.Tests/ElectionGuard.Decryption.Tests.csproj
 
 test-netstandard-arm64:
 ifeq ($(OPERATING_SYSTEM),Windows)

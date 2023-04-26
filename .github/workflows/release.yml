@@ -124,8 +124,8 @@ jobs:
       - name: Configure Environment
         run: make environment
       - name: Build
-        run: make build
-      - name: Upload Library (x64)
+        run: make build-wasm
+      - name: Upload Library (wasm)
         uses: actions/upload-artifact@v3
         with:
           name: wasm
@@ -176,25 +176,25 @@ jobs:
         uses: actions/download-artifact@v3
         with:
           name: linux-x64
-          path: build/libs/Linux/x64/Release/src
+          path: build/libs/Linux/x64/Release
 
       - name: Get MacCatalyst arm64 Artifacts
         uses: actions/download-artifact@v3
         with:
           name: maccatalyst-arm64
-          path: build/libs/MacCatalyst/arm64/Release/src
+          path: build/libs/MacCatalyst/arm64/Release
 
       - name: Get MacOS arm64 Artifacts
         uses: actions/download-artifact@v3
         with:
           name: osx-arm64
-          path: build/libs/Darwin/arm64/Release/src
+          path: build/libs/Darwin/arm64/Release
 
       - name: Get MacOS x64 Artifacts
         uses: actions/download-artifact@v3
         with:
           name: osx-x64
-          path: build/libs/Darwin/x64/Release/src
+          path: build/libs/Darwin/x64/Release
 
       - name: Get Windows x64 Artifacts
         uses: actions/download-artifact@v3
@@ -212,9 +212,15 @@ jobs:
           dotnet build -c Release
           dotnet pack -c Release --version-suffix "v${{ steps.sha.outputs.sha_short }}"
 
-      - name: Publish to Nuget.org
-        working-directory: bindings/netstandard/ElectionGuard/ElectionGuard.Encryption
-        run: dotnet nuget push "**/*.nupkg" --api-key ${{ secrets.NUGET_API_KEY}} --source https://api.nuget.org/v3/index.json --skip-duplicate
+      - name: Upload Nuget
+        uses: actions/upload-artifact@v3
+        with:
+          name: nuget
+          path: bindings/netstandard/ElectionGuard/ElectionGuard.Encryption/bin/Release/*.nupkg
+
+      # - name: Publish to Nuget.org
+      #   working-directory: bindings/netstandard/ElectionGuard/ElectionGuard.Encryption
+      #   run: dotnet nuget push "**/*.nupkg" --api-key ${{ secrets.NUGET_API_KEY}} --source https://api.nuget.org/v3/index.json --skip-duplicate
 
   publish_npm:
     name: Publish NPM
@@ -247,24 +253,24 @@ jobs:
           npm run package
           npm publish
 
-  publish_release:
-    name: Publish Release
-    needs: [publish_nuget, publish_npm]
-    runs-on: ubuntu-22.04
-    steps:
-      - name: Get Release Version
-        id: get_version
-        uses: greenygh0st/net-proj-release-version@v2
-        with:
-          PROJ_FILE: ./bindings/netstandard/ElectionGuard/ElectionGuard.Encryption/ElectionGuard.Encryption.csproj
+  # publish_release:
+  #   name: Publish Release
+  #   needs: [publish_nuget, publish_npm]
+  #   runs-on: ubuntu-22.04
+  #   steps:
+  #     - name: Get Release Version
+  #       id: get_version
+  #       uses: greenygh0st/net-proj-release-version@v2
+  #       with:
+  #         PROJ_FILE: ./bindings/netstandard/ElectionGuard/ElectionGuard.Encryption/ElectionGuard.Encryption.csproj
 
-      - name: Create Github Release
-        uses: softprops/action-gh-release@v1
-        with:
-          name: Release ${{ steps.get_version.outputs.RELEASE_VERSION }}
-          tag_name: v${{ steps.get_version.outputs.RELEASE_VERSION }}
-          draft: true
-          prerelease: false
+  #     - name: Create Github Release
+  #       uses: softprops/action-gh-release@v1
+  #       with:
+  #         name: Release ${{ steps.get_version.outputs.RELEASE_VERSION }}
+  #         tag_name: v${{ steps.get_version.outputs.RELEASE_VERSION }}
+  #         draft: true
+  #         prerelease: false
           # files: |
           #   ./bindings/netstandard/ElectionGuard/ElectionGuard.Encryption/bin/Release/*.nupkg
           #   ./build/libs/Darwin/arm64/Release/src/*.dylib
