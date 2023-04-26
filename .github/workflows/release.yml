@@ -26,7 +26,7 @@ jobs:
           echo "TAG_NAME=$TAG_NAME" >> $GITHUB_ENV
           BUILD_NUMBER=$(echo $TAG_NAME | grep -oP '\d+$')
           echo "BUILD_NUMBER=$BUILD_NUMBER" >> $GITHUB_ENV
-          VERSION="${TAG_NAME/v}.$BUILD_NUMBER"
+          VERSION="${TAG_NAME/v}" #-$BUILD_NUMBER
           echo "VERSION=$VERSION" >> $GITHUB_ENV
           echo "version=$VERSION" >> $GITHUB_OUTPUT
 
