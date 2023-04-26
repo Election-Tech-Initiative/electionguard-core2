@@ -26,7 +26,7 @@ jobs:
           echo "TAG_NAME=$TAG_NAME" >> $GITHUB_ENV
           BUILD_NUMBER=$(echo $TAG_NAME | grep -oP '\d+$')
           echo "BUILD_NUMBER=$BUILD_NUMBER" >> $GITHUB_ENV
-          VERSION="${TAG_NAME/v}-$BUILD_NUMBER"
+          VERSION="${TAG_NAME/v}.$BUILD_NUMBER"
           echo "VERSION=$VERSION" >> $GITHUB_ENV
           echo "version=$VERSION" >> $GITHUB_OUTPUT
 
@@ -226,7 +226,7 @@ jobs:
 
       - name: Update version number
         run: |
-          echo $VERSION
+          echo ${{needs.get_version_code.outputs.version}}
           dotnet tool install --global dotnet-version-cli
           dotnet version ./bindings/netstandard/ElectionGuard/ElectionGuard.Encryption/ElectionGuard.Encryption.csproj ${{needs.get_version_code.outputs.version}}
 
@@ -277,7 +277,7 @@ jobs:
         run: |
           echo "//registry.npmjs.org/:_authToken=${{ secrets.NPM_REGISTRY_TOKEN }}" > .npmrc
           echo $VERSION
-          npm run package
+          npm run prepare
           npm publish
 
   # publish_release:
