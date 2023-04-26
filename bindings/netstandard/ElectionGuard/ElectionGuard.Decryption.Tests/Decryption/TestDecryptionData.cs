@@ -152,7 +152,7 @@ public class TestDecryptionData : DisposableBase
 
     public static void SaveToFile(TestDecryptionData data, DecryptionResult result)
     {
-        var path = Path.Combine(AppContext.BaseDirectory, "data", "generated");
+        var path = Path.Combine(AppContext.BaseDirectory, "data");
         var directoryPath = Path.GetDirectoryName(path);
         _ = Directory.CreateDirectory(directoryPath!);
 
