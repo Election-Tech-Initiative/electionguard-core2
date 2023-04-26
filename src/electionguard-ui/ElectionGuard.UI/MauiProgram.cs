@@ -71,6 +71,7 @@ public static class MauiProgram
         builder.Services.AddTransient<UserService>();
         builder.Services.AddTransient<ElectionService>();
         builder.Services.AddTransient<TallyService>();
+        builder.Services.AddTransient<TallyJoinedService>();
         builder.Services.AddTransient<ManifestService>();
         builder.Services.AddTransient<ContextService>();
         builder.Services.AddTransient<ConstantsService>();
