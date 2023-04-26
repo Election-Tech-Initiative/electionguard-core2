@@ -239,12 +239,6 @@ jobs:
           dotnet build -c Release
           dotnet pack -c Release --version-suffix ${{needs.get_version_code.outputs.build_number}}
 
-      # - name: Upload Nuget
-      #   uses: actions/upload-artifact@v3
-      #   with:
-      #     name: nuget
-      #     path: bindings/netstandard/ElectionGuard/ElectionGuard.Encryption/bin/Release/*.nupkg
-
       - name: Publish to Nuget.org
         working-directory: bindings/netstandard/ElectionGuard/ElectionGuard.Encryption
         run: dotnet nuget push "**/*.nupkg" --api-key ${{ secrets.NUGET_API_KEY}} --source https://api.nuget.org/v3/index.json --skip-duplicate
