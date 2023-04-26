@@ -14,6 +14,8 @@ jobs:
   get_version_code:
     name: Get Version Code
     runs-on: ubuntu-22.04
+    outputs:
+      version: ${{ steps.get_version_code.outputs.version }}
     steps:
       - name: Checkout Code
         uses: actions/checkout@v3
@@ -191,12 +193,7 @@ jobs:
         uses: actions/checkout@v3
       - name: Setup Environment
         run: make environment
-      - name: Update version number
-        run: |
-          echo $VERSION
-          dotnet tool install --global dotnet-version-cli
-          dotnet version ./bindings/netstandard/ElectionGuard/ElectionGuard.Encryption/ElectionGuard.Encryption.csproj $VERSION
-
+      
       - name: Get Linux x64 Artifacts
         uses: actions/download-artifact@v3
         with:
@@ -227,15 +224,17 @@ jobs:
           name: win-x64
           path: build/libs/Windows/x64/src/Release
 
-      - name: Get Shortened Sha
-        id: sha
-        run: echo "::set-output name=sha_short::$(git rev-parse --short HEAD)"
+      - name: Update version number
+        run: |
+          echo $VERSION
+          dotnet tool install --global dotnet-version-cli
+          dotnet version ./bindings/netstandard/ElectionGuard/ElectionGuard.Encryption/ElectionGuard.Encryption.csproj ${{needs.get_version_code.outputs.version}}
 
       - name: Build and Package
         working-directory: bindings/netstandard/ElectionGuard/ElectionGuard.Encryption
         run: |
           dotnet build -c Release
-          dotnet pack -c Release --version-suffix "v${{ steps.sha.outputs.sha_short }}"
+          dotnet pack -c Release
 
       - name: Upload Nuget
         uses: actions/upload-artifact@v3
@@ -272,7 +271,7 @@ jobs:
         run: npm install
       - name: Update version number
         working-directory: bindings/typescript
-        run: npm version $VERSION --no-git-tag-version
+        run: npm version ${{needs.get_version_code.outputs.version}} --no-git-tag-version
       - name: Publish to NPM
         working-directory: bindings/typescript
         run: |
