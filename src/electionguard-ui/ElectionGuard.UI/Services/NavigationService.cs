@@ -26,6 +26,7 @@ public class NavigationService : INavigationService
         new PageType(typeof(BallotUploadViewModel), typeof(BallotUploadPage), false),
         new PageType(typeof(CreateTallyViewModel), typeof(CreateTallyPage), false),
         new PageType(typeof(TallyProcessViewModel), typeof(TallyProcessPage), false),
+        new PageType(typeof(EncryptionPackageExportViewModel), typeof(EncryptionExportPage), false),
     };
 
     private Type _currentPage = typeof(LoginPage);

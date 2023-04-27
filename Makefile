@@ -647,11 +647,13 @@ endif
 
 # Sample Data
 
+TEMPFILE=sample-data-1-0.zip
 fetch-sample-data:
+
 	@echo ⬇️ FETCH Sample Data
-	wget -O sample-data-1-0.zip https://github.com/microsoft/electionguard/releases/download/v1.0/sample-data.zip
-	unzip -o sample-data-1-0.zip
-	rm -f sample-data-1.0.zip || true
+	wget -O $(TEMPFILE) https://github.com/microsoft/electionguard/releases/download/v1.0/sample-data.zip
+	unzip -o $(TEMPFILE)
+	rm -f $(TEMPFILE)
 
 generate-sample-data: build-netstandard
 	@echo Generate Sample Data

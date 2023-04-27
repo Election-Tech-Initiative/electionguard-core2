@@ -83,6 +83,7 @@ public static class MauiProgram
         builder.Services.AddTransient<GuardianHomeViewModel>();
         builder.Services.AddTransient<AdminHomeViewModel>();
         builder.Services.AddSingleton<ElectionViewModel>();
+        builder.Services.AddTransient<EncryptionPackageExportViewModel>();
         builder.Services.AddTransient<SettingsViewModel>();
         builder.Services.AddTransient<CreateKeyCeremonyAdminViewModel>();
         builder.Services.AddTransient<ViewKeyCeremonyViewModel>();
@@ -104,6 +105,7 @@ public static class MauiProgram
         builder.Services.AddTransient<BallotUploadPage>();
         builder.Services.AddTransient<CreateTallyPage>();
         builder.Services.AddTransient<TallyProcessPage>();
+        builder.Services.AddTransient<EncryptionExportPage>();
 
         // popup pages
         builder.Services.AddTransient<SettingsPage>();
