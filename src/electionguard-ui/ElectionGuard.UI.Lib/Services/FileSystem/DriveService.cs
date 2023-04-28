@@ -1,4 +1,5 @@
 ﻿using System.IO.Compression;
+using ElectionGuard.UI.Lib.Models;
 
 namespace ElectionGuard.UI.Lib.Services;
 
@@ -19,6 +20,14 @@ public class DriveService : IStorageService
     {
         var filePath = Path.Combine(_rootDirectoryPath, fileName);
         File.WriteAllText(filePath, content);
+    }
+
+    public void ToFiles(List<FileContents> fileContents)
+    {
+        Parallel.ForEach(fileContents, fileContent =>
+        {
+            ToFile(fileContent.FileName, fileContent.Contents);
+        });
     }
 
     public string FromFile(string fileName)

@@ -1,10 +1,13 @@
 ﻿using System.IO.Compression;
 using Amazon.Util.Internal;
+using ElectionGuard.UI.Lib.Models;
 
 namespace ElectionGuard.UI.Lib.Services;
 public class ZipStorageService : IStorageService
 {
     private string _zipFile;
+
+    private ZipArchiveMode ZipMode => File.Exists(_zipFile) ? ZipArchiveMode.Update : ZipArchiveMode.Create;
 
     public ZipStorageService(string zipFile)
     {
@@ -17,11 +20,25 @@ public class ZipStorageService : IStorageService
     {
         if (string.IsNullOrEmpty(fileName)) throw new ArgumentNullException(nameof(fileName));
 
-        using var zipArchive = ZipFile.Open(_zipFile, ZipArchiveMode.Update);
+        using var zipArchive = ZipFile.Open(_zipFile, ZipMode);
+
         var entry = zipArchive.CreateEntry(fileName);
         using var stream = entry.Open();
         using var writer = new StreamWriter(stream);
+        
         writer.Write(content);
+    }
+
+    public void ToFiles(List<FileContents> fileContents)
+    {
+        using var zipArchive = ZipFile.Open(_zipFile, ZipMode);
+        Parallel.ForEach(fileContents, fileContent =>
+        {
+            var entry = zipArchive.CreateEntry(fileContent.FileName);
+            using var stream = entry.Open();
+            using var writer = new StreamWriter(stream);
+            writer.Write(fileContent.Contents);
+        });
     }
 
     public string FromFile(string fileName)
@@ -38,10 +55,6 @@ public class ZipStorageService : IStorageService
 
     public void UpdatePath(string zipFile)
     {
-        if (!File.Exists(zipFile))
-        {
-            ZipFile.Open(zipFile, ZipArchiveMode.Create).Dispose();
-        }
         _zipFile = zipFile;
     }
 }
