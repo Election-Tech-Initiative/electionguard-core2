@@ -10,15 +10,23 @@ public partial class CreateElectionViewModel : BaseViewModel
     private readonly ManifestService _manifestService;
     private readonly ContextService _contextService;
     private readonly ConstantsService _constantsService;
+    private readonly IStorageService _storageService;
     private const string PageName = "CreateElection";
 
-    public CreateElectionViewModel(IServiceProvider serviceProvider, KeyCeremonyService keyCeremonyService, ElectionService electionService, ManifestService manifestService, ContextService contextService, ConstantsService constantsService) : base(PageName, serviceProvider)
+    public CreateElectionViewModel(IServiceProvider serviceProvider,
+                                   KeyCeremonyService keyCeremonyService,
+                                   ElectionService electionService,
+                                   ManifestService manifestService,
+                                   ContextService contextService,
+                                   ConstantsService constantsService,
+                                   ZipStorageService storageService) : base(PageName, serviceProvider)
     {
         _keyCeremonyService = keyCeremonyService;
         _electionService = electionService;
         _manifestService = manifestService;
         _contextService = contextService;
         _constantsService = constantsService;
+        _storageService = storageService;
     }
 
     public override async Task OnAppearing()
@@ -113,12 +121,13 @@ public partial class CreateElectionViewModel : BaseViewModel
                     var zipPath = file.FullPath.ToLower().Replace(".json", ".zip");
                     var files = new List<FileContents>
                     {
-                        new("constants.json", constantsRecord.ConstantsData),
-                        new("context.json", contextRecord.ContextData),
-                        new("manifest.json", manifestRecord.ManifestData)
+                        new(UISettings.EncryptionPackageFilenames.CONSTANTS, constantsRecord.ConstantsData),
+                        new(UISettings.EncryptionPackageFilenames.CONTEXT, contextRecord.ContextData),
+                        new(UISettings.EncryptionPackageFilenames.MANIFEST, manifestRecord.ManifestData)
                     };
 
-                    ZipService.AddFiles(zipPath, files);
+                    _storageService.UpdatePath(zipPath);
+                    _storageService.ToFiles(files);
                 }
 
 
