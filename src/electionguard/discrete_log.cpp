@@ -25,6 +25,8 @@ namespace electionguard
 {
     uint64_t DiscreteLog::getAsync(const ElementModP &element)
     {
+        // TODO: Issue #217: implement multithreading
+
         // search for the existing element and return it if found
         auto iter = getInstance().cache.find(element);
         if (iter != getInstance().cache.end()) {

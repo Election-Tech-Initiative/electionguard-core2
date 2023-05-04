@@ -111,6 +111,7 @@ namespace electionguard
 
         /// <Summary>
         /// Decrypts an ElGamal ciphertext with a "known product" (the blinding factor used in the encryption).
+        /// Calculates 𝑀=𝐵⁄(∏𝑀𝑖) mod 𝑝.
         ///
         /// <param name="product">The known product (blinding factor).</param>
         /// <returns>An exponentially encoded plaintext message.</returns
@@ -167,7 +168,6 @@ namespace electionguard
 
         /// <Summary>
         /// Partially Decrypts an ElGamal ciphertext with a known ElGamal secret key.
-
         /// 𝑀_i = 𝐴^𝑠𝑖 mod 𝑝 in the spec
         ///
         /// <param name="secretKey">The corresponding ElGamal secret key.</param>
@@ -175,6 +175,8 @@ namespace electionguard
         /// </Summary>
         std::unique_ptr<ElementModP> partialDecrypt(const ElementModQ &secretKey);
 
+        /// <Summary>
+        /// Partially Decrypts an ElGamal ciphertext with a known ElGamal secret key.
         /// 𝑀_i = 𝐴^𝑠𝑖 mod 𝑝 in the spec
         ///
         /// <param name="secretKey">The corresponding ElGamal secret key.</param>
@@ -309,13 +311,31 @@ namespace electionguard
         /// plaintext will be the same size as the ciphertext.
         ///
         /// <param name="nonce"> Randomly chosen nonce in [1,Q). </param>
-        /// <param name="publicKey"> ElGamal public key. </param>
-        /// <param name="descriptionHash"> Hash of the ballot description. </param>
+        /// <param name="secret_key"> ElGamal public key. </param>
+        /// <param name="encryptionSeed">usually the Hash of the ballot description. </param>
         /// <param name="look_for_padding"> Indicates if padding removed. </param>
         /// <returns>A plaintext vector.</returns>
         /// </summary>
         std::vector<uint8_t> decrypt(const ElementModQ &secret_key,
-                                     const ElementModQ &descriptionHash, bool look_for_padding);
+                                     const ElementModQ &encryptionSeed, bool look_for_padding);
+
+        /// <Summary>
+        /// Partially Decrypts an ElGamal ciphertext with a known ElGamal secret key.
+        /// 𝑀_i = C0^P𝑖 mod 𝑝 in the spec
+        ///
+        /// <param name="secretKey">The corresponding ElGamal secret key.</param>
+        /// <returns>A partial decryption of the plaintext value</returns
+        /// </Summary>
+        std::unique_ptr<ElementModP> partialDecrypt(const ElementModQ &secretKey);
+
+        /// <Summary>
+        /// Partially Decrypts an ElGamal ciphertext with a known ElGamal secret key.
+        /// 𝑀_i = C0^P𝑖 mod 𝑝 in the spec
+        ///
+        /// <param name="secretKey">The corresponding ElGamal secret key.</param>
+        /// <returns>A partial decryption of the plaintext value</returns
+        /// </Summary>
+        std::unique_ptr<ElementModP> partialDecrypt(const ElementModQ &secretKey) const;
 
         /// <Summary>
         /// Clone the value by making a deep copy.
@@ -362,7 +382,8 @@ namespace electionguard
     EG_API std::unique_ptr<HashedElGamalCiphertext>
     hashedElgamalEncrypt(std::vector<uint8_t> plaintext, const ElementModQ &nonce,
                          const ElementModP &publicKey, const ElementModQ &descriptionHash,
-                         padded_data_size_t max_len, bool allow_truncation);
+                         padded_data_size_t max_len, bool allow_truncation,
+                         bool shouldUsePrecomputedValues = false);
 
 } // namespace electionguard
 

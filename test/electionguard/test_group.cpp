@@ -649,6 +649,41 @@ TEST_CASE("Test g_pow_p with random")
     CHECK((*expected == *actual));
 }
 
+TEST_CASE("Test bignum 32-bit g_pow_p with random using context")
+{
+    // Arrange
+    auto g = G();
+    auto e = rand_q()->toElementModP();
+
+    // Act
+    uint64_t result[MAX_P_LEN] = {};
+    CONTEXT_P().modExp(G().get(), MAX_P_SIZE, e->get(), static_cast<uint64_t *>(result));
+    auto actual = make_unique<ElementModP>(result, true);
+    auto expected = g_pow_p(*e);
+
+    // Assert
+    CHECK((*expected == *actual));
+}
+
+TEST_CASE("Test bignum 32-bit g_pow_p with random")
+{
+    // Arrange
+    auto g = G();
+    auto e = rand_q()->toElementModP();
+
+    // create a bignum instance that uses 32-bit math
+    Bignum4096 instance{reinterpret_cast<const uint32_t *>(P_ARRAY_REVERSE)};
+
+    // Act
+    uint64_t result[MAX_P_LEN] = {};
+    instance.modExp(g.get(), MAX_P_SIZE, e->get(), static_cast<uint64_t *>(result));
+    auto expected = g_pow_p(*e);
+    auto actual = make_unique<ElementModP>(result, true);
+
+    // Assert
+    CHECK((*expected == *actual));
+}
+
 #pragma endregion
 
 #pragma region Q Misc

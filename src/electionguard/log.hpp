@@ -19,7 +19,7 @@ using std::vector;
 namespace electionguard
 {
     using DomainLoggableType =
-      std::variant<std::nullptr_t, uint64_t, std::string, ElementModP *, ElementModQ *,
+      std::variant<std::nullptr_t, uint32_t, uint64_t, std::string, ElementModP *, ElementModQ *,
                    std::reference_wrapper<ElementModP>, std::reference_wrapper<ElementModQ>,
                    std::reference_wrapper<const ElementModP>,
                    std::reference_wrapper<const ElementModQ>, std::map<std::string, bool>>;

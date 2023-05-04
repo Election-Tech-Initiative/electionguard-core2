@@ -22,10 +22,16 @@ typedef enum eg_ballot_box_state_e {
      * A ballot that has been explicitly cast
      */
     ELECTIONGUARD_BALLOT_BOX_STATE_CAST = 1,
+
+    /**
+     * A ballot that has been explicitly challenged
+     */
+    ELECTIONGUARD_BALLOT_BOX_STATE_CHALLENGED = 2,
+
     /**
      * A ballot that has been explicitly spoiled
      */
-    ELECTIONGUARD_BALLOT_BOX_STATE_SPOILED = 2,
+    ELECTIONGUARD_BALLOT_BOX_STATE_SPOILED = 3,
 
     /**
      * A ballot whose state is unknown to ElectionGuard and will not be included in any election results
@@ -198,6 +204,17 @@ EG_API eg_electionguard_status_t eg_ciphertext_ballot_contest_get_ciphertext_acc
   eg_elgamal_ciphertext_t **out_ciphertext_accumulation_ref);
 
 /**
+ * @brief The hashed elgamal ciphertext is the encrypted extended data (overvote information
+ *        and writeins).
+ * 
+ * @param[in] handle 
+ * @param[out] out_extended_data An opaque pointer to the nonce.  
+ *                               The caller is responsible for lifecycle.
+ */
+EG_API eg_electionguard_status_t eg_ciphertext_ballot_contest_get_extended_data(
+  eg_ciphertext_ballot_contest_t *handle, eg_hashed_elgamal_ciphertext_t **out_extended_data);
+
+/**
  * Given an encrypted Ballotcontest, generates a hash, suitable for rolling up
  * into a hash / tracking code for an entire ballot. Of note, this particular hash examines
  * the `encryptionSeed` and `ballot_selections`, but not the proof.
@@ -349,6 +366,18 @@ EG_API eg_electionguard_status_t eg_ciphertext_ballot_crypto_hash_with(
 // TODO: eg_ciphertext_ballot_make
 
 /**
+ * @brief A static helper method to derive the nonceSeed used to encrypt the ballot
+ * @param[in] in_manifest_hash A pointer to the `eg_element_mod_q_t` opaque instance
+ * @param[out] out_nonce_seed A pointer to the output Nonce.  The value is a reference and is not owned by the caller.
+ * @return eg_electionguard_status_t indicating success or failure
+ * @retval ELECTIONGUARD_STATUS_SUCCESS The function was successfully executed
+ * @retval ELECTIONGUARD_STATUS_ERROR_BAD_ALLOC The function was unable to allocate memory
+ */
+EG_API eg_electionguard_status_t
+eg_ciphertext_ballot_nonce_seed(eg_element_mod_q_t *in_manifest_hash, const char *in_object_id,
+                                eg_element_mod_q_t *nonce, eg_element_mod_q_t **out_nonce_seed);
+
+/**
  * A helper function to mark the ballot as cast and remove sensitive values like the nonce.
  */
 EG_API eg_electionguard_status_t eg_ciphertext_ballot_cast(eg_ciphertext_ballot_t *handle);
@@ -357,6 +386,11 @@ EG_API eg_electionguard_status_t eg_ciphertext_ballot_cast(eg_ciphertext_ballot_
  * A helper function to mark the ballot as spoiled and remove sensitive values like the nonce.
  */
 EG_API eg_electionguard_status_t eg_ciphertext_ballot_spoil(eg_ciphertext_ballot_t *handle);
+
+/**
+ * A helper function to mark the ballot as challenged and remove sensitive values like the nonce.
+ */
+EG_API eg_electionguard_status_t eg_ciphertext_ballot_challenge(eg_ciphertext_ballot_t *handle);
 
 /**
  * @brief Creates a CiphertextBallot object from a [RFC-8259](https://www.rfc-editor.org/rfc/rfc8259.html#section-8.1) UTF-8 encoded JSON string

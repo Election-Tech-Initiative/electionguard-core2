@@ -1,5 +1,6 @@
 #include "../../libs/hacl/Hacl_Bignum256.hpp"
 #include "../../libs/hacl/Hacl_Bignum4096.hpp"
+#include "../../libs/hacl/Hacl_Bignum4096_32.hpp"
 #include "../../src/electionguard/log.hpp"
 #include "utils/constants.hpp"
 
@@ -209,8 +210,25 @@ TEST_CASE("Hacl_Bignum4096_mod_exp Test mod exp for BigNum 4096 valid preconditi
 
     // 4 ^ 2 % 9 = 7
     uint64_t result[MAX_P_LEN] = {};
-    bool success = Bignum4096::modExp(mod, a, MAX_Q_SIZE, b, result);
+    bool success = Bignum4096::modExp(mod, a, MAX_P_SIZE, b, result);
     CHECK(success == true);
+    CHECK((*result == *expected));
+}
+
+TEST_CASE("Hacl_Bignum4096_mod_exp Test mod exp 32-bit instance methods succeeds")
+{
+    uint64_t mod[MAX_P_LEN] = {0x09};
+    uint64_t a[MAX_P_LEN] = {0x04};
+    uint64_t b[MAX_P_LEN] = {0x02};
+    uint64_t expected[MAX_P_LEN] = {0x07};
+
+    auto subject = make_unique<Bignum4096_32>(move(reinterpret_cast<uint32_t *>(mod)));
+
+    // 4 ^ 2 % 9 = 7
+    uint64_t result[MAX_P_LEN] = {};
+    subject->modExp(reinterpret_cast<uint32_t *>(a), MAX_P_SIZE, reinterpret_cast<uint32_t *>(b),
+                    reinterpret_cast<uint32_t *>(result));
+    Log::debug("result: %s", result[0]);
     CHECK((*result == *expected));
 }
 
@@ -245,16 +263,17 @@ TEST_CASE("Hacl_Bignum256_mod_exp Test mod exp for BigNum 256 invalid preconditi
     CHECK(a_is_in_range == false);
 }
 
-TEST_CASE("Hacl_Bignum256_mod_exp Test mod exp for BigNum 256 valid preconditions succeeds")
+TEST_CASE("Hacl_Bignum256_mod_exp Test mod exp for BigNum 256 (32-bit runtime math) valid "
+          "precondition succeeds")
 {
-    uint64_t mod[MAX_Q_LEN] = {0x09};
-    uint64_t a[MAX_Q_LEN] = {0x04};
-    uint64_t b[MAX_Q_LEN] = {0x02};
-    uint64_t expected[MAX_Q_LEN] = {0x07};
+    uint64_t mod[MAX_P_LEN] = {0x09};
+    uint64_t a[MAX_P_LEN] = {0x04};
+    uint64_t b[MAX_P_LEN] = {0x02};
+    uint64_t expected[MAX_P_LEN] = {0x07};
 
     // 4 ^ 2 % 9 = 7
-    uint64_t result[MAX_Q_LEN] = {};
-    bool success = Bignum256::modExp(mod, a, MAX_Q_SIZE, b, result);
+    uint64_t result[MAX_P_LEN] = {};
+    bool success = Bignum4096::modExp(mod, a, MAX_Q_SIZE, b, result);
     CHECK(success == true);
     CHECK((*result == *expected));
 }

@@ -4,11 +4,21 @@
   "tools": {
     "jetbrains.resharper.globaltools": {
       "version": "2022.3.2",
-      "commands": ["jb"]
+      "commands": [
+        "jb"
+      ]
     },
     "nvika": {
       "version": "3.0.0",
-      "commands": ["nvika"]
+      "commands": [
+        "nvika"
+      ]
+    },
+    "cake.tool": {
+      "version": "3.0.0",
+      "commands": [
+        "dotnet-cake"
+      ]
     }
   }
 }

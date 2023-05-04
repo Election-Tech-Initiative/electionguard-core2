@@ -8,12 +8,17 @@
         /// <summary>
         /// Percentage of the calculations that are complete
         /// </summary>
-        public double Percentage;
+        public double Progress;
 
         /// <summary>
         /// The number of exponentiations that are completed
         /// </summary>
-        public long CompletedExponentiationsCount;
+        public long CurrentQueueSize;
+
+        /// <summary>
+        /// The total number of exponentiations to be calculated
+        /// </summary>
+        public long MaxQueueSize;
 
         /// <summary>
         /// Current status of the precompute process

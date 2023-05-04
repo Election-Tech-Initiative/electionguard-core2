@@ -116,6 +116,22 @@ eg_ciphertext_election_context_get_configuration(eg_ciphertext_election_context_
 }
 
 eg_electionguard_status_t
+eg_ciphertext_election_context_get_number_of_guardians(eg_ciphertext_election_context_t *handle,
+                                                       uint64_t *out_number_of_guardians)
+{
+    *out_number_of_guardians = AS_TYPE(CiphertextElectionContext, handle)->getNumberOfGuardians();
+    return ELECTIONGUARD_STATUS_SUCCESS;
+}
+
+eg_electionguard_status_t
+eg_ciphertext_election_context_get_quorum(eg_ciphertext_election_context_t *handle,
+                                          uint64_t *out_quorum)
+{
+    *out_quorum = AS_TYPE(CiphertextElectionContext, handle)->getQuorum();
+    return ELECTIONGUARD_STATUS_SUCCESS;
+}
+
+eg_electionguard_status_t
 eg_ciphertext_election_context_get_commitment_hash(eg_ciphertext_election_context_t *handle,
                                                    eg_element_mod_q_t **out_commitment_hash_ref)
 {

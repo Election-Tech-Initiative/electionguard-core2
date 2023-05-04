@@ -3,7 +3,7 @@ namespace ElectionGuard.Encryption.Ballot
     /// <summary>
     /// A selection on a ballot or in a tally
     /// </summary>
-    public interface ICiphertextSelection
+    public interface IElectionSelection
     {
         /// <summary>
         /// The object id
@@ -19,7 +19,13 @@ namespace ElectionGuard.Encryption.Ballot
         /// The description hash
         /// </summary>
         ElementModQ DescriptionHash { get; }
+    }
 
+    /// <summary>
+    /// A selection on a ballot or in a tally
+    /// </summary>
+    public interface ICiphertextSelection : IElectionSelection
+    {
         /// <summary>
         /// The ciphertext
         /// </summary>

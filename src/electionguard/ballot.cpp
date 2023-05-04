@@ -16,6 +16,7 @@
 using std::invalid_argument;
 using std::make_unique;
 using std::map;
+using std::move;
 using std::ref;
 using std::reference_wrapper;
 using std::string;
@@ -65,6 +66,7 @@ namespace electionguard
     struct PlaintextBallotSelection::Impl : public ElectionObjectBase {
         uint64_t vote;
         bool isPlaceholderSelection;
+        unique_ptr<ExtendedData> extendedData;
         string writeIn;
 
         Impl(string objectId, uint64_t vote, bool isPlaceholderSelection /* = false */,
@@ -72,6 +74,7 @@ namespace electionguard
             : vote(vote), isPlaceholderSelection(isPlaceholderSelection), writeIn(move(writeIn))
         {
             this->object_id = move(objectId);
+            this->extendedData = make_unique<ExtendedData>(writeIn, writeIn.length());
         }
 
         [[nodiscard]] unique_ptr<PlaintextBallotSelection::Impl> clone() const
@@ -115,6 +118,10 @@ namespace electionguard
     bool PlaintextBallotSelection::getIsPlaceholder() const
     {
         return pimpl->isPlaceholderSelection;
+    }
+    ExtendedData *PlaintextBallotSelection::getExtendedData() const
+    {
+        return pimpl->extendedData.get();
     }
     string PlaintextBallotSelection::getWriteIn() const { return pimpl->writeIn; }
 
@@ -457,7 +464,7 @@ namespace electionguard
 
     // Public Functions
 
-    eg_valid_contest_return_type_t
+    eg_contest_is_valid_result_t
     PlaintextBallotContest::isValid(const string &expectedObjectId,
                                     uint64_t expectedNumberSelections,
                                     uint64_t expectedNumberElected, uint64_t votesAllowd, /* = 0 */
@@ -647,7 +654,8 @@ namespace electionguard
       uint64_t numberElected, unique_ptr<ElementModQ> nonce /* = nullptr */,
       unique_ptr<ElementModQ> cryptoHash /* = nullptr */,
       unique_ptr<ConstantChaumPedersenProof> proof /* = nullptr */,
-      unique_ptr<HashedElGamalCiphertext> hashedElGamal /*nullptr */)
+      unique_ptr<HashedElGamalCiphertext> hashedElGamal /*nullptr */,
+      bool shouldUsePrecomputedValues /* = false */)
     {
         vector<reference_wrapper<CiphertextBallotSelection>> selectionReferences;
         selectionReferences.reserve(selections.size());
@@ -666,12 +674,13 @@ namespace electionguard
             cryptoHash = move(crypto_hash);
         }
 
+        // accumulate the ciphertexts and generate a proof
         auto accumulation = elgamalAccumulate(selectionReferences);
         if (proof == nullptr) {
             auto aggregate = aggregateNonce(selectionReferences);
-            auto owned_proof =
-              ConstantChaumPedersenProof::make(*accumulation, *aggregate, elgamalPublicKey,
-                                               proofSeed, cryptoExtendedBaseHash, numberElected);
+            auto owned_proof = ConstantChaumPedersenProof::make(
+              *accumulation, *aggregate, elgamalPublicKey, proofSeed, cryptoExtendedBaseHash,
+              numberElected, shouldUsePrecomputedValues);
             proof = move(owned_proof);
         }
 
@@ -1105,6 +1114,10 @@ namespace electionguard
             Log::error(":ballot has already been spoiled");
             throw invalid_argument("ballot has already been spoiled");
         }
+        if (pimpl->state == BallotBoxState::challenged) {
+            Log::error(":ballot has already been challenged");
+            throw invalid_argument("ballot has already been challenged");
+        }
 
         // iterate over the collection of contests and selections and reset the nonce
         for (const auto &contest : this->getContests()) {
@@ -1123,6 +1136,10 @@ namespace electionguard
             Log::error(":ballot has already been cast");
             throw invalid_argument("ballot has already been cast");
         }
+        if (pimpl->state == BallotBoxState::challenged) {
+            Log::error(":ballot has already been challenged");
+            throw invalid_argument("ballot has already been challenged");
+        }
 
         // iterate over the collection of contests and selections and reset the nonce
         for (const auto &contest : this->getContests()) {
@@ -1133,6 +1150,29 @@ namespace electionguard
 
         pimpl->nonce.reset();
         pimpl->state = BallotBoxState::spoiled;
+    }
+
+    void CiphertextBallot::challenge() const
+    {
+        if (pimpl->state == BallotBoxState::cast) {
+            Log::error(":ballot has already been cast");
+            throw invalid_argument("ballot has already been cast");
+        }
+
+        if (pimpl->state == BallotBoxState::spoiled) {
+            Log::error(":ballot has already been spoiled");
+            throw invalid_argument("ballot has already been spoiled");
+        }
+
+        // iterate over the collection of contests and selections and reset the nonce
+        for (const auto &contest : this->getContests()) {
+            for (const auto &selection : contest.get().getSelections()) {
+                selection.get().resetNonce();
+            }
+        }
+
+        pimpl->nonce.reset();
+        pimpl->state = BallotBoxState::challenged;
     }
 
     vector<uint8_t> CiphertextBallot::toBson(bool withNonces /* = false */) const

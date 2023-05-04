@@ -21,8 +21,8 @@ jobs:
         name: ["macOS", "windows-os"]
         include:
           - name: macOS
-            os: macOS-12
-            version: "14.1"
+            os: macOS-13
+            version: "14.2"
             osFolder: "maccatalyst"
           - name: windows-os
             os: windows-2022
@@ -48,11 +48,12 @@ jobs:
         run: make environment-ui
       - name: Clean UI
         run: make clean-ui
+      - name: Build UI
+        run: make build-ui
       - name: Publish UI
         run: make publish-ui BUILD=${{ github.run_number }}
       - name: save build artifacts
         uses: actions/upload-artifact@v3
-
         with:
           name: electionguard-ui-${{ matrix.name }}
           retention-days: 7

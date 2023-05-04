@@ -113,6 +113,8 @@ namespace electionguard
         /// </summary>
         const ElementModP *getElGamalPublicKey() const;
 
+        const ElementModP &getElGamalPublicKeyRef() const;
+
         /// <summary>
         /// the `commitment hash H(K 1,0 , K 2,0 ... , K n,0 )` of the public commitments
         /// guardians make to each other in the [ElectionGuard Spec](https://github.com/microsoft/electionguard/wiki)

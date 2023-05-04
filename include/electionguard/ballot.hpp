@@ -20,13 +20,29 @@ namespace electionguard
     /// </summary>
     enum class BallotBoxState {
         /// <summary>
+        /// A ballot whose state is unknown to ElectionGuard
+        /// and will not be included in any election results
+        /// </summary>
+        notset = 0,
+        /// <summary>
         /// A ballot that has been explicitly cast
         /// </summary>
         cast = 1,
         /// <summary>
-        /// A ballot that has been explicitly spoiled
+        /// A ballot that never included in the tally BUT included in election record
+        /// - contents always decrypted and stored in plain text
+        /// - always included in the verification site
+        /// - used to be called spoiled
         /// </summary>
-        spoiled = 2,
+        challenged = 2,
+        /// <summary>
+        /// A ballot that never included in the tally
+        /// - included in election record for verification
+        /// - contents never decrypted
+        /// - never included in the verification site
+        /// - slightly new meaning of what spoiled is
+        /// </summary>
+        spoiled = 3,
         /// <summary>
         /// A ballot whose state is unknown to ElectionGuard
         /// and will not be included in any election results
@@ -44,6 +60,14 @@ namespace electionguard
     /// <returns>BallotBoxState.unknown if the value cannot be resolved</returns>
     /// </summary>
     EG_API BallotBoxState getBallotBoxState(const std::string &value);
+
+    typedef enum eg_contest_is_valid_result_e {
+        SUCCESS = 0,
+        OVERVOTE = 1,
+        OVERVOTE_ERROR = 2,
+        INVALID_OBJECT_ID_ERROR = 3,
+        TOO_MANY_SELECTIONS_ERROR = 4,
+    } eg_contest_is_valid_result_t;
 
     /// <summary>
     /// ExtendedData represents any arbitrary data expressible as a string with a length.
@@ -117,6 +141,8 @@ namespace electionguard
         /// Determines if this is a placeholder selection
         /// </summary>
         bool getIsPlaceholder() const;
+
+        ExtendedData *getExtendedData() const;
 
         /// <summary>
         /// an optional field holding the value of a write-in candidate
@@ -334,14 +360,6 @@ namespace electionguard
         //TODO: void setNonce(ElementModQ *nonce);
     };
 
-    typedef enum eg_valid_contest_return_e {
-        SUCCESS = 0,
-        OVERVOTE = 1,
-        OVERVOTE_ERROR = 2,
-        INVALID_OBJECT_ID_ERROR = 2,
-        TOO_MANY_SELECTIONS_ERROR = 3,
-    } eg_valid_contest_return_type_t;
-
     /// <summary>
     /// A PlaintextBallotContest represents the selections made by a voter for a specific ContestDescription
     ///
@@ -382,11 +400,11 @@ namespace electionguard
         ///
         /// Note: because this class supports partial representations, undervotes are considered a valid state.
         /// </summary>
-        eg_valid_contest_return_type_t isValid(const std::string &expectedObjectId,
-                                               uint64_t expectedNumberSelections,
-                                               uint64_t expectedNumberElected,
-                                               uint64_t votesAllowd = 0,
-                                               bool supportOvervotes = true) const;
+        eg_contest_is_valid_result_t isValid(const std::string &expectedObjectId,
+                                             uint64_t expectedNumberSelections,
+                                             uint64_t expectedNumberElected,
+                                             uint64_t votesAllowd = 0,
+                                             bool supportOvervotes = true) const;
 
       private:
         class Impl;
@@ -502,7 +520,8 @@ namespace electionguard
              std::unique_ptr<ElementModQ> nonce = nullptr,
              std::unique_ptr<ElementModQ> cryptoHash = nullptr,
              std::unique_ptr<ConstantChaumPedersenProof> proof = nullptr,
-             std::unique_ptr<HashedElGamalCiphertext> hashedElGamal = nullptr);
+             std::unique_ptr<HashedElGamalCiphertext> hashedElGamal = nullptr,
+             bool shouldUsePrecomputedValues = false);
 
         /// <summary>
         /// An aggregate nonce for the contest composed of the nonces of the selections.
@@ -782,6 +801,11 @@ namespace electionguard
         /// A helper function to mark the ballot as spoiled and remove sensitive values like the nonce.
         /// </summary>
         void spoil() const;
+
+        /// <summary>
+        /// A helper function to mark the ballot as challenged and remove sensitive values like the nonce.
+        /// </summary>
+        void challenge() const;
 
         /// <summary>
         /// Export the ballot representation as BSON

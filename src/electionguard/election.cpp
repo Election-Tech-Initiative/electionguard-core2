@@ -23,7 +23,7 @@ using std::unordered_map;
 using std::vector;
 using std::chrono::system_clock;
 
-using ContextSerializer = electionguard::Serialize::CiphertextelectionContext;
+using ContextSerializer = electionguard::Serialize::CiphertextElectionContext;
 
 namespace electionguard
 {
@@ -159,6 +159,10 @@ namespace electionguard
     const ElementModP *CiphertextElectionContext::getElGamalPublicKey() const
     {
         return pimpl->elGamalPublicKey.get();
+    }
+    const ElementModP &CiphertextElectionContext::getElGamalPublicKeyRef() const
+    {
+        return *pimpl->elGamalPublicKey.get();
     }
     const ElementModQ *CiphertextElectionContext::getCommitmentHash() const
     {

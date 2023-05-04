@@ -1,0 +1,103 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!--  TODO: Look at making a popup instead of base page  -->
+<views:ContentPageBase
+    x:Class="ElectionGuard.UI.Views.EncryptionExportPage"
+    xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+    xmlns:helper="clr-namespace:ElectionGuard.UI.Helpers"
+    xmlns:toolkit="http://schemas.microsoft.com/dotnet/2022/maui/toolkit"
+    xmlns:viewModels="clr-namespace:ElectionGuard.UI.ViewModels"
+    xmlns:views="using:ElectionGuard.UI.Views"
+    Title="EncryptionExportPage"
+    x:DataType="viewModels:EncryptionPackageExportViewModel"
+    x:TypeArguments="viewModels:EncryptionPackageExportViewModel"
+    ControlTemplate="{StaticResource PageTemplate}">
+    <ContentPage.Resources>
+        <helper:BallotUloadPanelConverter x:Key="BallotUloadPanelConverter" />
+        <helper:IsNotEmptyConverter x:Key="IsNotEmptyConverter" />
+    </ContentPage.Resources>
+    <Grid Style="{StaticResource NarrowCenteredGrid}">
+        <VerticalStackLayout IsVisible="{Binding ShowPanel, Converter={StaticResource BallotUloadPanelConverter}, ConverterParameter=AutoUpload}">
+            <Label Style="{StaticResource H1}" Text="{helper:Translate UploadWizardText}" />
+            <Label Style="{StaticResource H3}" Text="{helper:Translate InsertUsbText}" />
+            <ActivityIndicator
+                Margin="10"
+                HeightRequest="100"
+                IsRunning="True"
+                WidthRequest="100" />
+            <Label HorizontalTextAlignment="Center" Text="{Binding UploadText}" />
+            <Button Command="{Binding ManualCommand}" Text="{helper:Translate ManuelUploadText}" />
+        </VerticalStackLayout>
+        <VerticalStackLayout IsVisible="{Binding ShowPanel, Converter={StaticResource BallotUloadPanelConverter}, ConverterParameter=ManualUpload}">
+            <Label Style="{StaticResource H1}" Text="{helper:Translate UploadWizardText}" />
+            <StackLayout Style="{StaticResource FormControl}">
+                <Label Style="{StaticResource FormLabel}" Text="{helper:Translate DeviceFileText}" />
+                <Grid
+                    Padding="0"
+                    BackgroundColor="WhiteSmoke"
+                    ColumnDefinitions="auto, *">
+                    <Button
+                        Grid.Column="0"
+                        BackgroundColor="{StaticResource Gray200}"
+                        Command="{Binding PickDeviceFileCommand}"
+                        Text="{helper:Translate ChooseFile}"
+                        TextColor="{StaticResource Gray950}" />
+                </Grid>
+                <Label
+                    IsVisible="{Binding FileErrorMessage, Converter={StaticResource IsNotEmptyConverter}}"
+                    Style="{StaticResource Error}"
+                    Text="{Binding FileErrorMessage}" />
+            </StackLayout>
+            <StackLayout Style="{StaticResource FormControl}">
+                <Label Style="{StaticResource FormLabel}" Text="{helper:Translate BallotFolderText}" />
+                <Grid
+                    Padding="0"
+                    BackgroundColor="WhiteSmoke"
+                    ColumnDefinitions="auto, *">
+                    <Button
+                        Grid.Column="0"
+                        BackgroundColor="{StaticResource Gray200}"
+                        Command="{Binding PickFolderCommand}"
+                        Text="{helper:Translate ChooseFolder}"
+                        TextColor="{StaticResource Gray950}" />
+                    <Entry
+                        Grid.Column="1"
+                        IsReadOnly="True"
+                        Placeholder="{helper:Translate NoFolderText}"
+                        Text="{Binding FileFolder}"
+                        VerticalOptions="CenterAndExpand" />
+                </Grid>
+                <Label
+                    IsVisible="{Binding FolderErrorMessage, Converter={StaticResource IsNotEmptyConverter}}"
+                    Style="{StaticResource Error}"
+                    Text="{Binding FolderErrorMessage}" />
+            </StackLayout>
+            <Label HorizontalTextAlignment="Center" Text="{Binding UploadText}" />
+            <Grid ColumnDefinitions="auto, auto, *">
+                <Button
+                    Grid.Column="0"
+                    Command="{Binding ExportCommand}"
+                    Text="{helper:Translate UploadText}" />
+                <Button
+                    Grid.Column="1"
+                    Command="{Binding CancelCommand}"
+                    Text="{helper:Translate CancelText}" />
+                <Button
+                    Grid.Column="2"
+                    Command="{Binding AutoCommand}"
+                    HorizontalOptions="End"
+                    Text="{helper:Translate UploadWizardText}" />
+            </Grid>
+        </VerticalStackLayout>
+        <VerticalStackLayout IsVisible="{Binding ShowPanel, Converter={StaticResource BallotUloadPanelConverter}, ConverterParameter=Results}">
+            <Label Style="{StaticResource H1}" Text="{helper:Translate BallotUploadText}" />
+            <Label Style="{StaticResource H3}" Text="{Binding ResultsText}" />
+            <Grid ColumnDefinitions="auto, auto, *">
+                <Button
+                    Grid.Column="1"
+                    Command="{Binding CancelCommand}"
+                    Text="{helper:Translate CancelText}" />
+            </Grid>
+        </VerticalStackLayout>
+    </Grid>
+</views:ContentPageBase>

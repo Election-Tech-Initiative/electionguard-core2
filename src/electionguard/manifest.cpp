@@ -1794,8 +1794,6 @@ namespace electionguard
 
     vector<uint8_t> Manifest::toMsgPack() const { return ManifestSerializer::toMsgPack(*this); }
 
-    string Manifest::toJson() { return ManifestSerializer::toJson(*this); }
-
     string Manifest::toJson() const { return ManifestSerializer::toJson(*this); }
 
     unique_ptr<Manifest> Manifest::fromJson(string data)
@@ -1967,8 +1965,6 @@ namespace electionguard
     {
         return InternalManifestSerializer::toMsgPack(*this);
     }
-
-    string InternalManifest::toJson() { return InternalManifestSerializer::toJson(*this); }
 
     string InternalManifest::toJson() const { return InternalManifestSerializer::toJson(*this); }
 
