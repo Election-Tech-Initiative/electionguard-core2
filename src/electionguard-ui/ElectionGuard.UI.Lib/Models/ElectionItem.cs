@@ -6,7 +6,7 @@ public partial class ElectionItem : ObservableObject
     private Election? _election;
 
     [ObservableProperty]
-    private List<BallotUpload> _ballotUploads = new();
+    private ObservableCollection<BallotUpload> _ballotUploads = new();
 
     [ObservableProperty]
     private long _ballotAddedTotal;

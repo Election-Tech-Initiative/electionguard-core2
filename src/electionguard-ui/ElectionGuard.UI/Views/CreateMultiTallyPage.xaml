@@ -51,10 +51,11 @@
         <CollectionView ItemsSource="{Binding Elections}" SelectionMode="Multiple">
             <CollectionView.ItemTemplate>
                 <DataTemplate x:DataType="model:ElectionItem">
-                    <VerticalStackLayout>
-                        <Label Text="{Binding Election.Name}" />
+                    <VerticalStackLayout HeightRequest="200">
+                        <Label Margin="10,0,0,0" Text="{Binding Election.Name}" />
                         <CollectionView
                             Margin="50,0"
+                            HeightRequest="100"
                             ItemsSource="{Binding BallotUploads}"
                             SelectionMode="None">
                             <CollectionView.Header>

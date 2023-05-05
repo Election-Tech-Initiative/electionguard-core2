@@ -26,13 +26,13 @@ public partial class CreateMultiTallyViewModel : BaseViewModel
     private string? _errorMessage;
 
     [ObservableProperty]
-    private List<KeyCeremonyRecord> _keyCeremonies = new();
+    private ObservableCollection<KeyCeremonyRecord> _keyCeremonies = new();
 
     [ObservableProperty]
     private KeyCeremonyRecord _selectedKeyCeremony;
 
     [ObservableProperty]
-    private List<ElectionItem> _elections = new();
+    private ObservableCollection<ElectionItem> _elections = new();
 
     partial void OnSelectedKeyCeremonyChanged(KeyCeremonyRecord value)
     {
@@ -57,14 +57,16 @@ public partial class CreateMultiTallyViewModel : BaseViewModel
                     ballotDuplicateTotal += upload.BallotDuplicated;
                     ballotRejectedTotal += upload.BallotRejected;
                 });
-                var election = new ElectionItem { 
+                var election = new ElectionItem
+                {
                     Election = item,
-                    BallotUploads = allUploads,
+                    BallotUploads = new(allUploads),
                     BallotAddedTotal = ballotAddedTotal,
                     BallotDuplicateTotal = ballotDuplicateTotal,
                     BallotRejectedTotal = ballotDuplicateTotal,
                     BallotSpoiledTotal = ballotSpoiledTotal,
-                    BallotCountTotal = ballotCountTotal };
+                    BallotCountTotal = ballotCountTotal
+                };
                 Elections.Add(election);
             }
         });
@@ -77,7 +79,7 @@ public partial class CreateMultiTallyViewModel : BaseViewModel
         foreach (var item in allKeys)
         {
             var count = await _electionService.CountByKeyCeremonyIdAsync(item.KeyCeremonyId);
-            if(count >= 0)
+            if(count > 1)
             {
                 KeyCeremonies.Add(item);
             }

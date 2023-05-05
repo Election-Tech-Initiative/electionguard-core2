@@ -124,65 +124,72 @@ public partial class BallotUploadViewModel : BaseViewModel
         ulong startDate = ulong.MaxValue;
         ulong endDate = ulong.MinValue;
 
-        _ = Parallel.ForEach(ballots, (currentBallot) =>
+        try
         {
-            try
+            await Parallel.ForEachAsync(ballots, async (currentBallot, cancellationToken) =>
             {
-                var filename = Path.GetFileName(currentBallot);
-                var ballotData = File.ReadAllText(currentBallot);
-                SubmittedBallot ballot = new(ballotData);
-
-                if (ballot.ManifestHash != _manifestHash)
+                try
                 {
-                    _ = Interlocked.Increment(ref totalRejected);
-                    return;
-                }
+                    var filename = Path.GetFileName(currentBallot);
+                    var ballotData = File.ReadAllText(currentBallot);
+                    SubmittedBallot ballot = new(ballotData);
 
-                var exists = _ballotService.BallotExists(ballot.BallotCode.ToHex()).Result;
-                if (!exists)
-                {
-                    var timestamp = ballot.Timestamp;
-                    if (timestamp < startDate)
+                    if (ballot.ManifestHash != _manifestHash)
                     {
-                        _ = Interlocked.Exchange(ref startDate, timestamp);
+                        _ = Interlocked.Increment(ref totalRejected);
+                        return;
                     }
-                    if (timestamp > endDate)
-                    {
-                        _ = Interlocked.Exchange(ref endDate, timestamp);
-                    }
-                    BallotRecord ballotRecord = new()
-                    {
-                        ElectionId = ElectionId,
-                        TimeStamp = DateTime.UnixEpoch.AddSeconds(timestamp),
-                        UploadId = upload.UploadId,
-                        FileName = filename,
-                        BallotCode = ballot.BallotCode.ToHex(),
-                        BallotState = ballot.State,
-                        BallotData = ballotData
-                    };
-                    _ = _ballotService.SaveAsync(ballotRecord).Result;
 
-                    if (ballot.State == BallotBoxState.Spoiled)
+                    var exists = await _ballotService.BallotExists(ballot.BallotCode.ToHex());
+                    if (!exists)
                     {
-                        _ = Interlocked.Increment(ref totalSpoiled);
+                        var timestamp = ballot.Timestamp;
+                        if (timestamp < startDate)
+                        {
+                            _ = Interlocked.Exchange(ref startDate, timestamp);
+                        }
+                        if (timestamp > endDate)
+                        {
+                            _ = Interlocked.Exchange(ref endDate, timestamp);
+                        }
+                        BallotRecord ballotRecord = new()
+                        {
+                            ElectionId = ElectionId,
+                            TimeStamp = DateTime.UnixEpoch.AddSeconds(timestamp),
+                            UploadId = upload.UploadId,
+                            FileName = filename,
+                            BallotCode = ballot.BallotCode.ToHex(),
+                            BallotState = ballot.State,
+                            BallotData = ballotData
+                        };
+                        _ = await _ballotService.SaveAsync(ballotRecord);
+
+                        if (ballot.State == BallotBoxState.Spoiled)
+                        {
+                            _ = Interlocked.Increment(ref totalSpoiled);
+                        }
+                        else
+                        {
+                            _ = Interlocked.Increment(ref totalInserted);
+                        }
+
                     }
                     else
                     {
-                        _ = Interlocked.Increment(ref totalInserted);
+                        _ = Interlocked.Increment(ref totalDuplicated);
                     }
-
+                    _ = Interlocked.Increment(ref totalCount);
+                    UploadText = $"{AppResources.SuccessText} {totalCount} / {ballots.Length} {AppResources.Success2Text}";
                 }
-                else
+                catch (Exception ex)
                 {
-                    _ = Interlocked.Increment(ref totalDuplicated);
                 }
-                _ = Interlocked.Increment(ref totalCount);
-                UploadText = $"{AppResources.SuccessText} {totalCount} / {ballots.Length} {AppResources.Success2Text}";
-            }
-            catch (Exception)
-            {
-            }
-        });
+            });
+        }
+        catch (Exception ex)
+        {
+        }
+
 
         // update totals before saving
         upload.BallotCount = totalCount;
