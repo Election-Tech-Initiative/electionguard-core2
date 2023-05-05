@@ -130,7 +130,7 @@ public partial class BallotUploadViewModel : BaseViewModel
             {
                 var filename = Path.GetFileName(currentBallot);
                 var ballotData = File.ReadAllText(currentBallot);
-                SubmittedBallot ballot = new(ballotData);
+                CiphertextBallot ballot = new(ballotData);
 
                 if (ballot.ManifestHash != _manifestHash)
                 {
