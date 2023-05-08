@@ -1,25 +1,41 @@
 ﻿using System.Linq;
 using CommunityToolkit.Mvvm.DependencyInjection;
 using CommunityToolkit.Mvvm.Input;
+using ElectionGuard.UI.Models;
 
 namespace ElectionGuard.UI.ViewModels;
 
 [QueryProperty(CurrentElectionParam, nameof(CurrentElection))]
 public partial class ElectionViewModel : BaseViewModel
 {
-    private KeyCeremonyService _keyCeremonyService;
-    private ManifestService _manifestService;
-    private BallotUploadService _uploadService;
-    private ElectionService _electionService;
-    private TallyService _tallyService;
+    private readonly IStorageService _storageService;
+    private readonly KeyCeremonyService _keyCeremonyService;
+    private readonly ManifestService _manifestService;
+    private readonly BallotUploadService _uploadService;
+    private readonly ElectionService _electionService;
+    private readonly TallyService _tallyService;
+    private readonly ConstantsService _constantsService;
+    private readonly ContextService _contextService;
 
-    public ElectionViewModel(IServiceProvider serviceProvider, KeyCeremonyService keyCeremonyService, ManifestService manifestService, BallotUploadService uploadService, ElectionService electionService, TallyService tallyService) : base(null, serviceProvider)
+    public ElectionViewModel(
+        IServiceProvider serviceProvider,
+        KeyCeremonyService keyCeremonyService,
+        ManifestService manifestService,
+        ContextService contextService,
+        ConstantsService constantsService,
+        BallotUploadService uploadService,
+        ElectionService electionService,
+        TallyService tallyService,
+        ZipStorageService storageService): base(null, serviceProvider)
     {
         _keyCeremonyService = keyCeremonyService;
         _manifestService = manifestService;
         _uploadService = uploadService;
         _electionService = electionService;
         _tallyService = tallyService;
+        _constantsService = constantsService;
+        _contextService = contextService;
+        _storageService = storageService;
     }
 
     [ObservableProperty]
@@ -175,19 +191,12 @@ public partial class ElectionViewModel : BaseViewModel
     {
         var pageParams = new Dictionary<string, object>
             {
-                { BallotUploadViewModel.ElectionIdParam, CurrentElection.ElectionId }
+                { EncryptionPackageExportViewModel.ElectionIdParam, CurrentElection.ElectionId }
             };
 
-        // TODO create the zip for the election
-
-        // await NavigationService.GoToPage(typeof(BallotUploadViewModel), pageParams);
-        await _electionService.UpdateExportDateAsync(CurrentElection.ElectionId, DateTime.Now);
-
-        // this is for testing only and will be removed
-        CurrentElection.ExportEncryptionDateTime = DateTime.Now;
-        AddBallotsCommand.NotifyCanExecuteChanged();
-        Step1Complete = true;
+        await NavigationService.GoToPage(typeof(EncryptionPackageExportViewModel), pageParams);
     }
+
 
     [RelayCommand]
     private async Task View()
