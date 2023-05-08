@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Runtime.InteropServices;
+using ElectionGuard.Base;
 
 namespace ElectionGuard
 {
@@ -9,7 +10,7 @@ namespace ElectionGuard
     /// <summary>
     /// An element of the larger `mod p` space, i.e., in [0, P), where P is a 4096-bit prime.
     /// </summary>
-    public class ElementModP : DisposableBase, IEquatable<ElementModP>
+    public class ElementModP : CryptoHashableBase, IEquatable<ElementModP>
     {
         /// <summary>
         /// Number of 64-bit ints that make up the 4096-bit prime

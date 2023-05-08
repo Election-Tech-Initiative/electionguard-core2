@@ -452,7 +452,7 @@ public class KeyCeremonyMediator
         return new ElectionJointKey()
         {
             JointPublicKey = ElgamalCombinePublicKeys(publicKeys!),
-            CommitmentHash = BigMath.HashElems(commitments)
+            CommitmentHash = Hash.HashElems(commitments)
         };  // H(K 1,0 , K 2,0 ... , K n,0 )
     }
 

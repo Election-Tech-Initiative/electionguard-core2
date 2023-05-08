@@ -1,12 +1,15 @@
-﻿using System;
+using System;
 using System.Runtime.InteropServices;
+using ElectionGuard.Base;
 
 namespace ElectionGuard
 {
+    using NaiveElementModQ = NativeInterface.ElementModQ.ElementModQHandle;
+
     /// <summary>
     /// An element of the smaller `mod q` space, i.e., in [0, Q), where Q is a 256-bit prime.
     /// </summary>
-    public class ElementModQ : DisposableBase, IEquatable<ElementModQ>
+    public class ElementModQ : CryptoHashableBase, IEquatable<ElementModQ>
     {
         /// <summary>
         /// Number of 64-bit ints that make up the 256-bit prime
@@ -104,7 +107,7 @@ namespace ElectionGuard
             status.ThrowIfError();
         }
 
-        internal ElementModQ(NativeInterface.ElementModQ.ElementModQHandle handle)
+        internal ElementModQ(NaiveElementModQ handle)
         {
             Handle = handle;
         }

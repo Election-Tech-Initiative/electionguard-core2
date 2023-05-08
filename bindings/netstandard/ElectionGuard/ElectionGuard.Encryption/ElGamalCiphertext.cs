@@ -82,6 +82,10 @@ namespace ElectionGuard
             Handle = handle;
         }
 
+        /// <summary>
+        /// Homomorphically accumulates other ElGamal ciphertext by pairwise multiplication
+        /// and returns the result without modifying the original.
+        /// </summary>
         public ElGamalCiphertext Add(ElGamalCiphertext other)
         {
             var status = NativeInterface.ElGamalCiphertext.Add(
