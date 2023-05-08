@@ -141,12 +141,12 @@ public partial class ElectionViewModel : BaseViewModel
                     Tallies.Add(item);
                 }
 
-                Step1Complete = CurrentElection.ExportEncryptionDateTime != null;
+                Step1Complete = CurrentElection?.ExportEncryptionDateTime != null;
                 Step2Complete = BallotAddedTotal + BallotSpoiledTotal > 0;
                 Step4Complete = Tallies.Count > 0;
                 Step5Complete = Tallies.Count(t => t.LastExport != null) > 0;
             }
-            catch (Exception ex)
+            catch (Exception)
             {
             }
         });

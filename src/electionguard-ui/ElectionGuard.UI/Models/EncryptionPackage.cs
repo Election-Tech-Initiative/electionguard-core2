@@ -23,9 +23,9 @@ public record EncryptionPackage
 
     public EncryptionPackage(ContextRecord contextRecord, ConstantsRecord constantsRecord, ManifestRecord manifestRecord)
     {
-        Context = contextRecord.ContextData ?? throw new ArgumentNullException(nameof(contextRecord));
-        Constants = constantsRecord.ConstantsData ?? throw new ArgumentNullException(nameof(constantsRecord));
-        Manifest = manifestRecord.ManifestData ?? throw new ArgumentNullException(nameof(manifestRecord));
+        Context = contextRecord.ToString();
+        Constants = constantsRecord.ToString();
+        Manifest = manifestRecord.ToString();
     }
 
 
