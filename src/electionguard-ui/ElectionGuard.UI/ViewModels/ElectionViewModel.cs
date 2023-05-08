@@ -244,15 +244,17 @@ public partial class ElectionViewModel : BaseViewModel
 
         if (egDrives.Count() >= 0)
         {
-            CurrentElection.ExportEncryptionDateTime = DateTime.UtcNow
-            await _electionService.UpdateEncryptionExportDateAsync(CurrentElection.ElectionId, CurrentElection.ExportEncryptionDateTime);
-            AddBallotsCommand.NotifyCanExecuteChanged();
-            Step1Complete = true;
+            await MarkCurrentElectionAsExported();
         }
-
-
     }
 
+    private async Task MarkCurrentElectionAsExported()
+    {
+        CurrentElection.ExportEncryptionDateTime = DateTime.UtcNow;
+        await _electionService.UpdateEncryptionExportDateAsync(CurrentElection.ElectionId, CurrentElection.ExportEncryptionDateTime.Value);
+        AddBallotsCommand.NotifyCanExecuteChanged();
+        Step1Complete = true;
+    }
 
     [RelayCommand]
     private async Task View()
