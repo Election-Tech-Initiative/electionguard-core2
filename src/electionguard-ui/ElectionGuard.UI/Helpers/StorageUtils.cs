@@ -131,12 +131,13 @@ namespace ElectionGuard.UI.Helpers
 #endif
         public static bool GetVolumeInformation(string rootPathName, out uint volumeSerialNumber)
         {
-            const int DWORD = 32;
+            const int NAME_SIZE = 32;
             volumeSerialNumber = StorageUtils.UnknownSerial;
+            StringBuilder f = new(NAME_SIZE);
+            StringBuilder f2 = new(NAME_SIZE);
+
 #if WINDOWS
-            StringBuilder f = new(DWORD);
-            StringBuilder f2 = new(DWORD);
-            return StorageUtils.GetVolumeInformation(rootPathName, f, DWORD, out volumeSerialNumber, out _, out _, f2, DWORD);
+            return StorageUtils.GetVolumeInformation(rootPathName, f, NAME_SIZE, out volumeSerialNumber, out _, out _, f2, NAME_SIZE);
 #endif
 
             // TODO: implement for non-windows.
