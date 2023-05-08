@@ -58,6 +58,4 @@ public class TallyService : BaseDatabaseService<TallyRecord>
 
         await UpdateAsync(filter, update);
     }
-
-
 }

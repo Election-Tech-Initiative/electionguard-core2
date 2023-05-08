@@ -35,5 +35,4 @@ public class BallotUploadService : BaseDatabaseService<BallotUpload>
         var uploadCount = await CountByFilterAsync(filter);
         return uploadCount > 0;
     }
-
 }
