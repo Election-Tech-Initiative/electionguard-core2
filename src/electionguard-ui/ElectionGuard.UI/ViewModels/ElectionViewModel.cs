@@ -244,7 +244,8 @@ public partial class ElectionViewModel : BaseViewModel
 
         if (egDrives.Count() >= 0)
         {
-            await _electionService.UpdateEncryptionExportDateAsync(CurrentElection.ElectionId);
+            CurrentElection.ExportEncryptionDateTime = DateTime.UtcNow
+            await _electionService.UpdateEncryptionExportDateAsync(CurrentElection.ElectionId, CurrentElection.ExportEncryptionDateTime);
             AddBallotsCommand.NotifyCanExecuteChanged();
             Step1Complete = true;
         }

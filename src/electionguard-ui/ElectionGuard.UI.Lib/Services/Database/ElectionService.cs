@@ -52,10 +52,4 @@ public class ElectionService : BaseDatabaseService<Election>
 
         await UpdateAsync(filter, update);
     }
-
-    virtual public async Task UpdateEncryptionExportDateAsync(string electionId)
-    {
-        await UpdateEncryptionExportDateAsync(electionId, DateTime.UtcNow);
-    }
-
 }
