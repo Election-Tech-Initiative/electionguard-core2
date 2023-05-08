@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Runtime.InteropServices;
+using ElectionGuard.Base;
 
 namespace ElectionGuard
 {
@@ -150,6 +151,9 @@ namespace ElectionGuard
             return value.IsInvalid ? null : new ElementModQ(value);
         }
 
+        /// <summary>
+        /// Hash together the ICryptoHashableType values
+        /// </summary>
         public static ElementModQ HashElems(string prefix, params ICryptoHashableType[] data)
         {
             // TODO: we should define a clear method for 
@@ -185,6 +189,7 @@ namespace ElectionGuard
             return hashed;
         }
 
+        // TODO: enforce polymorphism
         // public static ElementModQ HashElems(string prefix, params ICryptoHashableType[] data)
         // {
         //     var dataPointers = new IntPtr[data.Length];

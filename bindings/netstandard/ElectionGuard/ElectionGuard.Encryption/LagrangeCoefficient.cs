@@ -1,53 +1,65 @@
-using System;
 using System.Collections.Generic;
-using System.Runtime.InteropServices;
+using System.Linq;
 
 namespace ElectionGuard
 {
-    public class Polynomial
+    /// <summary>
+    /// A data structure for keeping track of the lagrange coefficients
+    /// </summary>
+    public class LagrangeCoefficient : DisposableBase
     {
-        /// <summary>
-        /// Compute the lagrange polynomial interpolation coefficient for a specific coordinate against N degrees.
-        /// <param name="coordinate"> the coordinate to plot, uisually a Guardian's Sequence Order</param>
-        /// <param name="degrees"> the degrees across which to plot, usually the collection of available Guardians' Sequence Orders</param>
-        /// </summary>
-        public static ElementModQ Interpolate(ulong coordinate, List<ulong> degrees)
+        public string GuardianId { get; set; }
+        public ulong SequenceOrder { get; set; }
+        public ElementModQ Coefficient { get; set; }
+
+        public LagrangeCoefficient(
+            string guardianId,
+            ulong sequenceOrder,
+            ElementModQ coefficient)
         {
-            return Interpolate(
-                new ElementModQ(coordinate),
-                degrees.ConvertAll(x => new ElementModQ(x)));
+            GuardianId = guardianId;
+            SequenceOrder = sequenceOrder;
+            Coefficient = coefficient;
+        }
+
+        public LagrangeCoefficient(
+            IElectionGuardian guardian,
+            ElementModQ coefficient)
+        {
+            GuardianId = guardian.GuardianId;
+            SequenceOrder = guardian.SequenceOrder;
+            Coefficient = coefficient;
+        }
+
+        public LagrangeCoefficient(
+            ElectionPublicKey guardian,
+            ElementModQ coefficient)
+        {
+            GuardianId = guardian.GuardianId;
+            SequenceOrder = guardian.SequenceOrder;
+            Coefficient = coefficient;
         }
 
         /// <summary>
-        /// Compute the lagrange polynomial interpolation coefficient for a specific coordinate against N degrees.
-        /// <param name="coordinate"> the coordinate to plot, uisually a Guardian's Sequence Order</param>
-        /// <param name="degrees"> the degrees across which to plot, usually the collection of available Guardians' Sequence Orders</param>
+        /// Computes the lagrange coefficients for the guardians
         /// </summary>
-        public static ElementModQ Interpolate(ElementModQ coordinate, List<ElementModQ> degrees)
+        public static List<LagrangeCoefficient> Compute(
+         List<ElectionPublicKey> guardians)
         {
-            var dataPointers = new IntPtr[degrees.Count];
-            for (var i = 0; i < degrees.Count; i++)
+            var lagrangeCoefficients = new List<LagrangeCoefficient>();
+            foreach (var guardian in guardians.OrderBy(x => x.SequenceOrder))
             {
-                dataPointers[i] = degrees[i].Handle.Ptr;
+                var otherSequenceOrders = guardians
+                    .Where(i => i.GuardianId != guardian.GuardianId)
+                    .Select(x => x.SequenceOrder).ToList();
+                var lagrangeCoefficient = Polynomial.Interpolate(
+                    guardian.SequenceOrder, otherSequenceOrders
+                    );
+                lagrangeCoefficients.Add(
+                    new LagrangeCoefficient(
+                        guardian, lagrangeCoefficient));
             }
-            var status = External.Interpolate(coordinate.Handle, dataPointers, (ulong)degrees.Count, out var value);
-            status.ThrowIfError();
-            return new ElementModQ(value);
+            return lagrangeCoefficients;
         }
-
-        #region Extern
-
-        internal static unsafe class External
-        {
-            [DllImport(NativeInterface.DllName, EntryPoint = "eg_polynomial_interpolate",
-            CallingConvention = CallingConvention.Cdecl, SetLastError = true)]
-            public static extern Status Interpolate(
-                NativeInterface.ElementModQ.ElementModQHandle coordinate,
-                IntPtr[] degrees,
-                ulong degreesLength,
-                out NativeInterface.ElementModQ.ElementModQHandle outHandle);
-        }
-
-        #endregion
     }
 }
