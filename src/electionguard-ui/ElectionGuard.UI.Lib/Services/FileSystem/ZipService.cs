@@ -1,5 +1,4 @@
 ﻿using System.IO.Compression;
-using Amazon.Util.Internal;
 using ElectionGuard.UI.Lib.Models;
 
 namespace ElectionGuard.UI.Lib.Services;
