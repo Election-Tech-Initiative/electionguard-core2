@@ -3,7 +3,7 @@ using ElectionGuard.Encryption.Utils.Generators;
 using ElectionGuard.ElectionSetup.Tests.Generators;
 using ElectionGuard.Decryption.Decryption;
 using ElectionGuard.Decryption.Tests.Tally;
-using ElectionGuard.UI.Lib.Extensions;
+using ElectionGuard.Decryption.Shares;
 
 namespace ElectionGuard.Decryption.Tests.Decryption;
 
@@ -152,6 +152,8 @@ public class TestDecryptWithShares : DisposableBase
             mediator.AddBallot(Data.CiphertextTally.TallyId, ballot);
         }
         var result = mediator.Decrypt(Data.CiphertextTally.TallyId);
+
+
 
         // Assert
         Assert.That(result.Tally, Is.EqualTo(Data.PlaintextTally));
