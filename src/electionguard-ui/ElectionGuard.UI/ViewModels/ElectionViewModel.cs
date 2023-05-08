@@ -211,7 +211,7 @@ public partial class ElectionViewModel : BaseViewModel
             return;
         }
 
-        // check for nya usb drives named egDrive
+        // check for any usb drives named egDrive
         var egDrives = from drive in DriveInfo.GetDrives()
                        where drive != null
                        where drive.DriveType == DriveType.Removable

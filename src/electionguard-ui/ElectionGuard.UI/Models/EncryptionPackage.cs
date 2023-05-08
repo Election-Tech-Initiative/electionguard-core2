@@ -2,10 +2,10 @@
 
 
 /// <summary>
-/// Representative of all data needed to export an election record
+/// Representative of all data needed to export an encryption Package
 /// </summary>
 public record EncryptionPackage
-{ 
+{
     public string Context { get; init; }
     public string Constants { get; init; }
     public string Manifest { get; init; }
@@ -33,11 +33,13 @@ public record EncryptionPackage
     /// Make a list of files for export into <see cref="IStorageService"/>
     /// </summary>
     /// <param name="package">The election package</param>
-    public static implicit operator List<FileContents>(EncryptionPackage package) =>
-        new()
+    public static implicit operator List<FileContents>(EncryptionPackage package)
+    {
+        return new()
         {
             new(MANIFEST_FILE, package.Manifest),
             new(CONTEXT_FILE, package.Context),
             new(CONSTANTS_FILE, package.Constants),
         };
+    }
 }
