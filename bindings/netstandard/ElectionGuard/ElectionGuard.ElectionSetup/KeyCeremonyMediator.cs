@@ -1,7 +1,7 @@
 using System.Diagnostics;
 using ElectionGuard.ElectionSetup.Exceptions;
 using ElectionGuard.ElectionSetup.Extensions;
-using ElectionGuard.UI.Lib.Extensions;
+using ElectionGuard.Extensions;
 using ElectionGuard.UI.Lib.Models;
 using ElectionGuard.UI.Lib.Services;
 

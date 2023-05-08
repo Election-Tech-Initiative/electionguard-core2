@@ -1,6 +1,6 @@
 ﻿using ElectionGuard.ElectionSetup.Extensions;
 using ElectionGuard.Proofs;
-using ElectionGuard.UI.Lib.Extensions;
+using ElectionGuard.Extensions;
 
 namespace ElectionGuard.ElectionSetup;
 public class ElectionPartialKeyChallenge : DisposableBase

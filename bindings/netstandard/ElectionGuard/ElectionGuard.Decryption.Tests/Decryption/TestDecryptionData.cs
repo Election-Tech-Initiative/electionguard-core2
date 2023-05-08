@@ -5,7 +5,7 @@ using ElectionGuard.ElectionSetup.Tests.Generators;
 using ElectionGuard.Encryption.Utils.Generators;
 using ElectionGuard.Encryption.Utils.Converters;
 using Newtonsoft.Json;
-using ElectionGuard.UI.Lib.Extensions;
+using ElectionGuard.Extensions;
 
 namespace ElectionGuard.Decryption.Tests.Decryption;
 
