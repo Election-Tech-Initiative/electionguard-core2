@@ -3,6 +3,7 @@ using ElectionGuard.ElectionSetup.Extensions;
 using ElectionGuard.Proofs;
 using ElectionGuard.Extensions;
 using ElectionGuard.UI.Lib.Models;
+using ElectionGuard.Guardians;
 
 namespace ElectionGuard.ElectionSetup;
 
@@ -22,13 +23,16 @@ namespace ElectionGuard.ElectionSetup;
 /// The Guardian class is responsible for managing the state of the key exchange ceremony and
 /// the decryption process.
 /// </remarks>
-public partial class Guardian : DisposableBase
+public partial class Guardian : DisposableBase, IElectionGuardian
 {
     private readonly ElectionKeyPair _myElectionKeys;
+    private readonly ElementModQ _commitmentSeed;
     private ElementModQ? _myPartialSecretKey;
     private readonly Dictionary<string, ElectionPublicKey> _publicKeys = new();
     private readonly Dictionary<string, ElectionPartialKeyBackup> _partialKeyBackups = new();
     private readonly Dictionary<string, ElectionPartialKeyVerification> _partialVerifications = new();
+
+    public string ObjectId => GuardianId;
 
     /// <summary>
     /// The unique identifier for the guardian.
@@ -66,6 +70,7 @@ public partial class Guardian : DisposableBase
         SequenceOrder = sequenceOrder;
 
         _myElectionKeys = new(guardianId, sequenceOrder, quorum);
+        _commitmentSeed = BigMath.RandQ();
         CeremonyDetails = new(keyCeremonyId, numberOfGuardians, quorum);
 
         SaveGuardianKey(_myElectionKeys.Share());
@@ -89,6 +94,7 @@ public partial class Guardian : DisposableBase
         using var nextRandom = random.NextElementModQ();
         var keyPair = new ElGamalKeyPair(nextRandom);
         _myElectionKeys = new(guardianId, sequenceOrder, quorum, keyPair, random);
+        _commitmentSeed = BigMath.RandQ();
         CeremonyDetails = new(keyCeremonyId, numberOfGuardians, quorum);
 
         SaveGuardianKey(_myElectionKeys.Share());
@@ -108,6 +114,7 @@ public partial class Guardian : DisposableBase
 
         var keyPair = new ElGamalKeyPair(secretKey);
         _myElectionKeys = new(guardianId, sequenceOrder, ceremonyDetails.Quorum, keyPair);
+        _commitmentSeed = BigMath.RandQ();
         CeremonyDetails = ceremonyDetails;
 
         SaveGuardianKey(_myElectionKeys.Share());
@@ -120,12 +127,14 @@ public partial class Guardian : DisposableBase
         string guardianId,
         ulong sequenceOrder,
         CeremonyDetails ceremonyDetails,
-        ElGamalKeyPair elGamalKeyPair)
+        ElGamalKeyPair elGamalKeyPair,
+        ElementModQ commitmentSeed)
     {
         GuardianId = guardianId;
         SequenceOrder = sequenceOrder;
 
         _myElectionKeys = new(guardianId, sequenceOrder, ceremonyDetails.Quorum, elGamalKeyPair);
+        _commitmentSeed = new(commitmentSeed);
         CeremonyDetails = ceremonyDetails;
 
         SaveGuardianKey(_myElectionKeys.Share());
@@ -138,11 +147,13 @@ public partial class Guardian : DisposableBase
     /// <param name="ceremonyDetails">The details of the key ceremony</param>
     public Guardian(
         ElectionKeyPair keyPair,
-        CeremonyDetails ceremonyDetails
+        CeremonyDetails ceremonyDetails,
+        ElementModQ commitmentSeed
         )
     {
         _myElectionKeys = new(keyPair);
-        GuardianId = keyPair.OwnerId;
+        _commitmentSeed = new(commitmentSeed);
+        GuardianId = keyPair.GuardianId;
         SequenceOrder = keyPair.SequenceOrder;
         CeremonyDetails = ceremonyDetails;
 
@@ -160,6 +171,7 @@ public partial class Guardian : DisposableBase
     /// <param name="otherVerifications"></param>
     public Guardian(
         ElectionKeyPair keyPair,
+        ElementModQ commitmentSeed,
         CeremonyDetails ceremonyDetails,
         Dictionary<string, ElectionPublicKey>? otherKeys = null,
         Dictionary<string, ElectionPartialKeyBackup>? otherBackups = null,
@@ -168,7 +180,8 @@ public partial class Guardian : DisposableBase
         )
     {
         _myElectionKeys = new(keyPair);
-        GuardianId = keyPair.OwnerId;
+        _commitmentSeed = new(commitmentSeed);
+        GuardianId = keyPair.GuardianId;
         SequenceOrder = keyPair.SequenceOrder;
         CeremonyDetails = ceremonyDetails;
 
@@ -201,7 +214,7 @@ public partial class Guardian : DisposableBase
     // export_private_data
     public static implicit operator GuardianPrivateRecord(Guardian data)
     {
-        return new(data.GuardianId, data._myElectionKeys);
+        return new(data.GuardianId, data._myElectionKeys, data._commitmentSeed);
     }
 
     // all_guardian_keys_received
@@ -221,7 +234,7 @@ public partial class Guardian : DisposableBase
         {
             throw new ArgumentOutOfRangeException(nameof(key));
         }
-        _publicKeys[key.OwnerId] = new(key);
+        _publicKeys[key.GuardianId] = new(key);
     }
 
     // generate_election_partial_key_backups
@@ -237,7 +250,7 @@ public partial class Guardian : DisposableBase
                 GuardianId,
                 _myElectionKeys.Polynomial,
                 guardianKey);
-            BackupsToShare[guardianKey.OwnerId] = new(backup);
+            BackupsToShare[guardianKey.GuardianId] = new(backup);
         }
         return true;
     }
@@ -260,7 +273,7 @@ public partial class Guardian : DisposableBase
         ElectionPolynomial myPolynomial,
         ElectionPublicKey recipientPublicKey)
     {
-        Debug.WriteLine($"GenerateElectionPartialKeyBackup: {myGuardianId} -> {recipientPublicKey.OwnerId} {recipientPublicKey.SequenceOrder}");
+        Debug.WriteLine($"GenerateElectionPartialKeyBackup: {myGuardianId} -> {recipientPublicKey.GuardianId} {recipientPublicKey.SequenceOrder}");
 
         if (!recipientPublicKey.Key.IsAddressable)
         {
@@ -270,7 +283,7 @@ public partial class Guardian : DisposableBase
         var coordinate = myPolynomial.ComputeCoordinate(
             recipientPublicKey.SequenceOrder);
         var seed = GetBackupSeed(
-                recipientPublicKey.OwnerId,
+                recipientPublicKey.GuardianId,
                 recipientPublicKey.SequenceOrder);
 
         using var nonce = BigMath.RandQ();
@@ -279,7 +292,7 @@ public partial class Guardian : DisposableBase
 
         return new(
             myGuardianId,
-            recipientPublicKey.OwnerId,
+            recipientPublicKey.GuardianId,
             recipientPublicKey.SequenceOrder,
             encryptedCoordinate
         );
@@ -287,6 +300,6 @@ public partial class Guardian : DisposableBase
 
     private static ElementModQ GetBackupSeed(string ownerId, ulong sequenceOrder)
     {
-        return BigMath.HashElems(ownerId, sequenceOrder);
+        return Hash.HashElems(ownerId, sequenceOrder);
     }
 }

@@ -2,6 +2,7 @@ using System.Diagnostics;
 using ElectionGuard.ElectionSetup.Exceptions;
 using ElectionGuard.ElectionSetup.Extensions;
 using ElectionGuard.Extensions;
+using ElectionGuard.Guardians;
 using ElectionGuard.UI.Lib.Models;
 using ElectionGuard.UI.Lib.Services;
 
@@ -487,7 +488,7 @@ public class KeyCeremonyMediator
     /// <param name="publicKey">Election public key</param>
     private void ReceiveElectionPublicKey(ElectionPublicKey publicKey)
     {
-        _electionPublicKeys[publicKey.OwnerId] = publicKey;
+        _electionPublicKeys[publicKey.GuardianId] = publicKey;
     }
 
     private static async Task<ulong> GetGuardianSequenceOrderAsync(

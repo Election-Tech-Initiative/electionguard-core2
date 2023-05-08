@@ -1,4 +1,4 @@
-using System.ComponentModel.DataAnnotations;
+﻿using System.ComponentModel.DataAnnotations;
 using ElectionGuard.ElectionSetup.Extensions;
 using ElectionGuard.Proofs;
 using ElectionGuard.Extensions;

@@ -1,7 +1,7 @@
 using ElectionGuard.Decryption.Tally;
 using ElectionGuard.ElectionSetup;
 using ElectionGuard.ElectionSetup.Extensions;
-using ElectionGuard.UI.Lib.Models;
+using ElectionGuard.Guardians;
 
 namespace ElectionGuard.Decryption.Decryption;
 
