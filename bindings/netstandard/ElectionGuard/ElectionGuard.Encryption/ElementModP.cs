@@ -33,6 +33,10 @@ namespace ElectionGuard
 
         internal NaiveElementModP Handle;
 
+        internal override IntPtr Ptr => Handle == null || Handle.IsInvalid
+                    ? throw new ElectionGuardException("handle is null or invalid")
+                    : Handle.DangerousGetHandle();
+
         /// <summary>
         /// Creates a `ElementModP` object
         /// </summary>
@@ -273,6 +277,28 @@ namespace ElectionGuard
             }
 
             return data;
+        }
+
+        /// <summary>
+        /// Reassign this object's handle by taking ownership of the handle from the other object
+        /// but does not explicitly dispose the other object in order to maintain compatibility
+        /// with the `using` directive. This method is similar to `std::move` in C++ since we cannot
+        /// override the assignment operator in csharp.
+        ///
+        /// This is useful for avoiding unnecessary copies of large objects when passing them
+        /// and assigning them to new variables. It is also useful for avoiding unnecessary
+        /// allocations when reassigning objects in a loop.
+        /// </summary>
+        /// <remarks>
+        internal void Reassign(ElementModP other)
+        {
+            if (other == null)
+            {
+                throw new ArgumentNullException(nameof(other));
+            }
+
+            Reassign(other.Handle);
+            other.Handle = null;
         }
 
         // TODO: ISSUE #189 - this is a temporary function to handle object reassignment and disposal
