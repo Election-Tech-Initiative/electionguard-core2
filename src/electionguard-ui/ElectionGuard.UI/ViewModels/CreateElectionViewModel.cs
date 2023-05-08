@@ -120,7 +120,7 @@ public partial class CreateElectionViewModel : BaseViewModel
                     // create the export file for each election
                     // need to add the path from the manifest
                     var zipPath = file.FullPath.ToLower().Replace(".json", ".zip");
-                    var encryptionPackage = new EncryptionPackage(contextRecord.ContextData, constantsRecord.ConstantsData, manifestRecord.ManifestData);
+                    var encryptionPackage = new EncryptionPackage(contextRecord, constantsRecord, manifestRecord);
                     _storageService.UpdatePath(zipPath);
                     _storageService.ToFiles(encryptionPackage);
                 }
