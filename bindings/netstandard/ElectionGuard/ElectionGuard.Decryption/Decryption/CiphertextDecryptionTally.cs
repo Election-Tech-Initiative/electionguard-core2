@@ -1,5 +1,6 @@
 using ElectionGuard.Decryption.Accumulation;
 using ElectionGuard.Decryption.Challenge;
+using ElectionGuard.Decryption.ChallengeResponse;
 using ElectionGuard.Decryption.Extensions;
 using ElectionGuard.Decryption.Shares;
 using ElectionGuard.Decryption.Tally;
@@ -46,6 +47,9 @@ public record class CiphertextDecryptionTally : DisposableRecordBase
 
     // key is guardianid
     private Dictionary<string, GuardianChallenge> _challenges { get; init; } = new();
+
+    // key is guardianid
+    private Dictionary<string, GuardianChallengeResponse> _challengeResponses { get; init; } = new();
 
     #endregion
 
@@ -338,19 +342,90 @@ public record class CiphertextDecryptionTally : DisposableRecordBase
 
     #endregion
 
+    #region Challenge Response
+
+    public bool CanValidateResponses()
+    {
+        if (_challengeResponses.Count == _challenges.Count)
         {
-            throw new ArgumentException("Invalid tally share");
+            return true;
         }
 
-        AddGuardian(guardian);
-        AddShare(tallyShare);
+        return false;
     }
+
+    public void SubmitChallengeResponse(GuardianChallengeResponse response)
+    {
+        if (DecryptionState != DecryptionState.PendingGuardianChallengeResponses)
+        {
+            throw new ArgumentException("Cannot submit challenge response while state is " + DecryptionState);
+        }
+
+        if (!_challenges.ContainsKey(response.GuardianId))
+        {
+            throw new ArgumentException("Guardian challenge does not exist");
+        }
+
+        _challengeResponses.Add(response.GuardianId, response);
+
+        // TODO: check if all responses received against the tally?
+        // if (_challengeResponses.Count == _challenges.Count)
+        // {
+        //     DecryptionState = DecryptionState.PendingAdminValidateResponses;
+        // }
+    }
+
+    // TODO: return a result
+    // TODO: async
+    public bool ValidateChallengeResponses()
+    {
+        if (!CanValidateResponses())
+        {
+            throw new ArgumentException("Cannot validate challenge responses");
+        }
+
+        var challengeBallots = _challengedBallots.Values.ToList();
+
+        foreach (var (guardianId, response) in _challengeResponses)
+        {
+            var share = GetShare(guardianId);
+
+            // TODO: return the accumulated responses so that we can make the cp proofs
+
+            if (!response.IsValid(
+                _tally,
+                _accumulatedTally!,
+                challengeBallots,
+                _accumulatedBallots!,
+                share,
+                _challenges[guardianId]))
+            {
+                Console.WriteLine("Invalid challenge response for guardian " + guardianId);
+                return false;
+            }
+        }
+
+        DecryptionState = DecryptionState.PendingAdminDecryptShares;
+
+        return true;
+    }
+
+    #endregion
+
+    # region Decrypt
 
     /// <summary>
     /// determine if the tally can be decrypted
     /// </summary>
     public bool CanDecrypt(CiphertextTally tally)
     {
+        // TODO: break up these checks into their appropriate locations
+
+        if (DecryptionState != DecryptionState.PendingAdminDecryptShares)
+        {
+            throw new ArgumentException("Cannot decrypt while state is " + DecryptionState);
+        }
+
         // There are not enough guardians to decrypt the tally
         if (_guardians.Count < (int)tally.Context.Quorum)
         {

@@ -18,7 +18,7 @@ public class TestDecryptWithSharesSimple : DisposableBase
     private const int NUMBER_OF_GUARDIANS = 3;
     private const int QUORUM = 2;
 
-    [Test]
+    [Test] //Category("SingleTest")
     public void Test_Decrypt_Tally_With_All_Guardians_Present_Simple()
     {
         // Arrange
@@ -48,6 +48,19 @@ public class TestDecryptWithSharesSimple : DisposableBase
 
         // create challenges
         var challenges = mediator.CreateChallenge(data.CiphertextTally.TallyId);
+        foreach (var guardian in guardians)
+        {
+            var challenge = challenges[guardian.GuardianId];
+            var share = mediator.GetShare(data.CiphertextTally.TallyId, guardian.GuardianId)!;
+
+            // respond to challenge
+            var response = guardian.ComputeChallengeResponse(share, challenge);
+            mediator.SubmitResponse(data.CiphertextTally.TallyId, response!);
+        }
+
+        var validated = mediator.ValidateResponses(data.CiphertextTally.TallyId);
+        Assert.That(validated, Is.True);
+
         var plaintextTally = mediator.Decrypt(data.CiphertextTally.TallyId);
 
         // Assert
