@@ -1,6 +1,6 @@
 using ElectionGuard.Decryption.Tally;
 
-namespace ElectionGuard.Decryption;
+namespace ElectionGuard.Decryption.Decryption;
 
 /// <summary>
 /// Decryption methods for decrypting with known secret values.
