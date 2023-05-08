@@ -484,6 +484,24 @@ namespace ElectionGuard.UI.Resx {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Please ensure the EGDrive removable storage is connected to the device. Please note, this will replace any encryption package currently on all EGDrive devices.
+        /// </summary>
+        internal static string ExportDriveWarning {
+            get {
+                return ResourceManager.GetString("ExportDriveWarning", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Export Encryption Package.
+        /// </summary>
+        internal static string ExportDriveWarningTitle {
+            get {
+                return ResourceManager.GetString("ExportDriveWarningTitle", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Export Encryption.
         /// </summary>
         internal static string ExportEncryptionText {

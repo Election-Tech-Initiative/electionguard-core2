@@ -1,4 +1,4 @@
-using ElectionGuard.Encryption.Utils.Converters;
+﻿using ElectionGuard.Encryption.Utils.Converters;
 using ElectionGuard.UI.Lib.Models;
 using ElectionGuard.UI.Lib.Services;
 using Newtonsoft.Json;
@@ -79,6 +79,7 @@ public static class GuardianStorageExtensions
         var basePath = Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData);
         var filePath = Path.Combine(basePath, PrivateKeyFolder, keyCeremonyId);
 
-        storage.ToFile(filePath, filename, dataJson);
+        storage.UpdatePath(filePath);
+        storage.ToFile(filename, dataJson);
     }
 }

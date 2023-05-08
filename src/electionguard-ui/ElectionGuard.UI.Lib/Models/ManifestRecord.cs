@@ -16,4 +16,7 @@ public partial class ManifestRecord : DatabaseRecord
     public ManifestRecord() : base(nameof(ManifestRecord))
     {
     }
+
+    public override string ToString() => ManifestData ?? string.Empty;
+    public static implicit operator string(ManifestRecord record) => record.ToString();
 }
