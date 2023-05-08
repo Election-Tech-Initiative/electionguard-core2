@@ -159,6 +159,7 @@ bindings/netstandard/ElectionGuard/*.user
 lint-results.xml
 
 database/
+!src/electionguard-ui/ElectionGuard.UI.Lib/Services/Database
 
 node_modules/
 

@@ -25,5 +25,4 @@ public class ConstantsService : BaseDatabaseService<ConstantsRecord>
     {
         return await GetByFieldAsync(Constants.ElectionId, electionId);
     }
-
 }

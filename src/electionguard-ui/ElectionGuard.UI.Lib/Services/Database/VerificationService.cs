@@ -49,6 +49,4 @@ public class VerificationService : BaseDatabaseService<ElectionPartialKeyVerific
 
         return await CountByFilterAsync(filter);
     }
-
-
 }
