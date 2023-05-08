@@ -71,6 +71,4 @@ public class GuardianPublicKeyService : BaseDatabaseService<GuardianPublicKey>, 
         var list = await GetAllByFilterAsync(filter);
         return list.FirstOrDefault();
     }
-
-
 }

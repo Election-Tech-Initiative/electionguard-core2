@@ -25,5 +25,4 @@ public class ContextService : BaseDatabaseService<ContextRecord>
     {
         return await GetByFieldAsync(Constants.ElectionId, electionId);
     }
-
 }

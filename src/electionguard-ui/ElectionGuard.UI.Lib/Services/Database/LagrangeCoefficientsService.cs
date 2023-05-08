@@ -1,5 +1,4 @@
 ﻿using ElectionGuard.UI.Lib.Models;
-using MongoDB.Driver;
 
 namespace ElectionGuard.UI.Lib.Services;
 
