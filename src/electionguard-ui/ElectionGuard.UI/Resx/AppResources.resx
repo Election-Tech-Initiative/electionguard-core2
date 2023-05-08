@@ -489,4 +489,10 @@
   <data name="ReviewSpoiledText" xml:space="preserve">
     <value>Review Challenge</value>
   </data>
+  <data name="ExportDriveWarning" xml:space="preserve">
+    <value>Please ensure the EGDrive removable storage is connected to the device. Please note, this will replace any encryption package currently on all EGDrive devices</value>
+  </data>
+  <data name="ExportDriveWarningTitle" xml:space="preserve">
+    <value>Export Encryption Package</value>
+  </data>
 </root>

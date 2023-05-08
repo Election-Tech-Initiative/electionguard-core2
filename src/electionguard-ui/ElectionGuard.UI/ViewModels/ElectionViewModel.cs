@@ -1,5 +1,4 @@
-﻿using System.Linq;
-using CommunityToolkit.Mvvm.DependencyInjection;
+﻿using CommunityToolkit.Mvvm.DependencyInjection;
 using CommunityToolkit.Mvvm.Input;
 using ElectionGuard.UI.Models;
 
@@ -9,6 +8,7 @@ namespace ElectionGuard.UI.ViewModels;
 public partial class ElectionViewModel : BaseViewModel
 {
     private readonly IStorageService _storageService;
+    private readonly IStorageService _driveService;
     private readonly KeyCeremonyService _keyCeremonyService;
     private readonly ManifestService _manifestService;
     private readonly BallotUploadService _uploadService;
@@ -26,7 +26,8 @@ public partial class ElectionViewModel : BaseViewModel
         BallotUploadService uploadService,
         ElectionService electionService,
         TallyService tallyService,
-        ZipStorageService storageService): base(null, serviceProvider)
+        ZipStorageService zipStorageService,
+        IStorageService driveService) : base(null, serviceProvider)
     {
         _keyCeremonyService = keyCeremonyService;
         _manifestService = manifestService;
@@ -35,7 +36,8 @@ public partial class ElectionViewModel : BaseViewModel
         _tallyService = tallyService;
         _constantsService = constantsService;
         _contextService = contextService;
-        _storageService = storageService;
+        _storageService = zipStorageService;
+        _driveService = driveService;
     }
 
     [ObservableProperty]
@@ -161,7 +163,10 @@ public partial class ElectionViewModel : BaseViewModel
         await NavigationService.GoToPage(typeof(CreateTallyViewModel), pageParams);
     }
 
-    private bool CanCreateTally() => BallotCountTotal > 0 || BallotSpoiledTotal > 0;
+    private bool CanCreateTally()
+    {
+        return BallotCountTotal > 0 || BallotSpoiledTotal > 0;
+    }
 
     [RelayCommand(CanExecute = nameof(CanUpload))]
     private async Task AddBallots()
@@ -174,8 +179,10 @@ public partial class ElectionViewModel : BaseViewModel
         await NavigationService.GoToPage(typeof(BallotUploadViewModel), pageParams);
     }
 
-    private bool CanUpload() => CurrentElection?.ExportEncryptionDateTime != null;
-
+    private bool CanUpload()
+    {
+        return CurrentElection?.ExportEncryptionDateTime != null;
+    }
 
     [RelayCommand(CanExecute = nameof(CanReview))]
     private async Task ReviewChallenged()
@@ -183,18 +190,64 @@ public partial class ElectionViewModel : BaseViewModel
         // add code to go to the Challenged ballot page
     }
 
-    private bool CanReview() => BallotSpoiledTotal > 0;
-
+    private bool CanReview()
+    {
+        return BallotSpoiledTotal > 0;
+    }
 
     [RelayCommand]
     private async Task ExportEncryption()
     {
-        var pageParams = new Dictionary<string, object>
-            {
-                { EncryptionPackageExportViewModel.ElectionIdParam, CurrentElection.ElectionId }
-            };
+        const string egDriveLabel = "egdrive";
 
-        await NavigationService.GoToPage(typeof(EncryptionPackageExportViewModel), pageParams);
+        var answer = await Shell.Current.CurrentPage.DisplayAlert(
+            AppResources.ExportDriveWarningTitle,
+            AppResources.ExportDriveWarning,
+            AppResources.YesText,
+            AppResources.NoText);
+
+        if (!answer)
+        {
+            return;
+        }
+
+        // check for nya usb drives named egDrive
+        var egDrives = from drive in DriveInfo.GetDrives()
+                       where drive != null
+                       where drive.DriveType == DriveType.Removable
+                       where drive.VolumeLabel.ToLower() == egDriveLabel
+                       select drive;
+
+        var context = await _contextService.GetByElectionIdAsync(CurrentElection.ElectionId);
+        var constants = await _constantsService.GetByElectionIdAsync(CurrentElection.ElectionId);
+        var manifest = await _manifestService.GetByElectionIdAsync(CurrentElection.ElectionId);
+
+        if (context == null || constants == null || manifest == null)
+        {
+            // there's a data problem. This should never happen.
+            return;
+        }
+
+        var encryptionPackage = new EncryptionPackage(context, constants, manifest);
+
+        foreach (var drive in egDrives)
+        {
+            const string artifactFolder = "artifacts";
+
+            var destinationFolder = Path.Combine(drive.Name, artifactFolder);
+            _ = Directory.CreateDirectory(destinationFolder);
+
+            _driveService.UpdatePath(destinationFolder);
+            _driveService.ToFiles(encryptionPackage);
+
+        }
+
+        if (egDrives.Count() >= 0)
+        {
+            await _electionService.UpdateEncryptionExportDateAsync(CurrentElection.ElectionId);
+        }
+
+
     }
 
 

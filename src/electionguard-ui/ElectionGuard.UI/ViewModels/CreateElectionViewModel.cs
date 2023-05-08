@@ -1,5 +1,6 @@
 ﻿using CommunityToolkit.Mvvm.DependencyInjection;
 using CommunityToolkit.Mvvm.Input;
+using ElectionGuard.UI.Models;
 
 namespace ElectionGuard.UI.ViewModels;
 
@@ -119,15 +120,9 @@ public partial class CreateElectionViewModel : BaseViewModel
                     // create the export file for each election
                     // need to add the path from the manifest
                     var zipPath = file.FullPath.ToLower().Replace(".json", ".zip");
-                    var files = new List<FileContents>
-                    {
-                        new(UISettings.EncryptionPackageFilenames.CONSTANTS, constantsRecord.ConstantsData),
-                        new(UISettings.EncryptionPackageFilenames.CONTEXT, contextRecord.ContextData),
-                        new(UISettings.EncryptionPackageFilenames.MANIFEST, manifestRecord.ManifestData)
-                    };
-
+                    var encryptionPackage = new EncryptionPackage(contextRecord.ContextData, constantsRecord.ConstantsData, manifestRecord.ManifestData);
                     _storageService.UpdatePath(zipPath);
-                    _storageService.ToFiles(files);
+                    _storageService.ToFiles(encryptionPackage);
                 }
 
 

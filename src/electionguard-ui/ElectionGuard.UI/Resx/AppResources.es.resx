@@ -492,4 +492,10 @@
   <data name="ReviewSpoiledText" xml:space="preserve">
     <value>¡Revisa el desafío!</value>
   </data>
+  <data name="ExportDriveWarning" xml:space="preserve">
+    <value>Asegúrese de que el almacenamiento extraíble de EGDrive esté conectado al dispositivo. ¡Tenga en cuenta que esto reemplazará cualquier paquete de cifrado actualmente en todos los dispositivos EGDrive!</value>
+  </data>
+  <data name="ExportDriveWarningTitle" xml:space="preserve">
+    <value>¡Exportar paquete de cifrado!</value>
+  </data>
 </root>
