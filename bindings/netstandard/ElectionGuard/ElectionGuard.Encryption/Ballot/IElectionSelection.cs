@@ -1,14 +1,15 @@
+using ElectionGuard.Base;
+
 namespace ElectionGuard.Ballot
 {
-
     /// <summary>
     /// A selection on a ballot or in a tally
     /// </summary>
-    public interface ICiphertextSelection : IElectionSelection
+    public interface IElectionSelection : IElectionObject
     {
         /// <summary>
-        /// The ciphertext
+        /// The description hash
         /// </summary>
-        ElGamalCiphertext Ciphertext { get; }
+        ElementModQ DescriptionHash { get; }
     }
 }

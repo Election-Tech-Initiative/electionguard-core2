@@ -1,5 +1,5 @@
+using ElectionGuard.Ballot;
 using ElectionGuard.ElectionSetup.Concurrency;
-using ElectionGuard.Encryption.Ballot;
 
 namespace ElectionGuard.Decryption.Tally
 {

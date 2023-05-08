@@ -1,23 +1,13 @@
-namespace ElectionGuard.Encryption.Ballot
+using System.Collections.Generic;
+
+namespace ElectionGuard.Ballot
 {
-    /// <summary>
-    /// A contest on a ballot or in a tally
-    /// </summary>
-    public interface IElectionContest
+
+    public interface ICiphertextContest : IElectionContest
     {
         /// <summary>
-        /// The object id
+        /// The ciphertext
         /// </summary>
-        string ObjectId { get; }
-
-        /// <summary>
-        /// The sequence order
-        /// </summary>
-        ulong SequenceOrder { get; }
-
-        /// <summary>
-        /// The description hash
-        /// </summary>
-        ElementModQ DescriptionHash { get; }
+        IReadOnlyList<ICiphertextSelection> Selections { get; }
     }
 }

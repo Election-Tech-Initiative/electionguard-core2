@@ -1,4 +1,5 @@
-using ElectionGuard.Encryption.Ballot;
+using ElectionGuard.Ballot;
+
 namespace ElectionGuard.Decryption.Tally;
 
 /// <summary>
