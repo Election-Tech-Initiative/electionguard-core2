@@ -17,21 +17,24 @@ public class ZipStorageService : IStorageService
 
     public void ToFile(string fileName, string content)
     {
-        if (string.IsNullOrEmpty(fileName)) throw new ArgumentNullException(nameof(fileName));
+        if (string.IsNullOrEmpty(fileName))
+        {
+            throw new ArgumentNullException(nameof(fileName));
+        }
 
         using var zipArchive = ZipFile.Open(_zipFile, ZipMode);
 
         var entry = zipArchive.CreateEntry(fileName);
         using var stream = entry.Open();
         using var writer = new StreamWriter(stream);
-        
+
         writer.Write(content);
     }
 
     public void ToFiles(List<FileContents> fileContents)
     {
         using var zipArchive = ZipFile.Open(_zipFile, ZipMode);
-        Parallel.ForEach(fileContents, fileContent =>
+        _ = Parallel.ForEach(fileContents, fileContent =>
         {
             var entry = zipArchive.CreateEntry(fileContent.FileName);
             using var stream = entry.Open();
@@ -43,10 +46,7 @@ public class ZipStorageService : IStorageService
     public string FromFile(string fileName)
     {
         using var zipArchive = ZipFile.OpenRead(_zipFile);
-        var entry = zipArchive.GetEntry(fileName);
-
-        if (entry == null) throw new FileNotFoundException(nameof(fileName));
-
+        var entry = zipArchive.GetEntry(fileName) ?? throw new FileNotFoundException(nameof(fileName));
         using var stream = entry.Open();
         using var reader = new StreamReader(stream);
         return reader.ReadToEnd();
