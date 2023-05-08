@@ -41,9 +41,13 @@ public class TestDecryptWithSharesSimple : DisposableBase
         // Act
         foreach (var guardian in guardians)
         {
+            // compute the share
             var share = guardian.ComputeDecryptionShare(data.CiphertextTally);
             mediator.SubmitShare(share!);
         }
+
+        // create challenges
+        var challenges = mediator.CreateChallenge(data.CiphertextTally.TallyId);
         var plaintextTally = mediator.Decrypt(data.CiphertextTally.TallyId);
 
         // Assert

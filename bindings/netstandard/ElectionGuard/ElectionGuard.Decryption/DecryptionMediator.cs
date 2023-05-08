@@ -1,11 +1,11 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using ElectionGuard;
-using ElectionGuard.UI.Lib.Models;
+using ElectionGuard.Decryption.Challenge;
+using ElectionGuard.Decryption.ChallengeResponse;
+using ElectionGuard.Decryption.Decryption;
+using ElectionGuard.Decryption.Shares;
 using ElectionGuard.Decryption.Tally;
+using ElectionGuard.Guardians;
 
-namespace ElectionGuard.Decryption.Decryption;
+namespace ElectionGuard.Decryption;
 
 /// <summary>
 /// A mediator for coordinating decryption
@@ -57,6 +57,8 @@ public class DecryptionMediator : DisposableBase
         }
     }
 
+    #region Misc Admin
+
     public void AddBallot(string tallyId, CiphertextBallot ballot)
     {
         TallyDecryptions[tallyId].AddBallot(new(ballot));
@@ -69,8 +71,45 @@ public class DecryptionMediator : DisposableBase
 
     public void AddGuardian(ElectionPublicKey guardian)
     {
-        Guardians.Add(guardian.OwnerId, new(guardian));
+        Guardians.Add(guardian.GuardianId, new(guardian));
     }
+
+    #endregion
+
+    #region Accumulate Tally
+
+    public void Accumulate(string tallyId, bool skipValidation = false)
+    {
+        TallyDecryptions[tallyId].AccumulateShares(skipValidation);
+    }
+
+    #endregion
+
+    #region Challenge
+
+    public Dictionary<string, GuardianChallenge> CreateChallenge(string tallyId, bool skipValidation = false)
+    {
+        return TallyDecryptions[tallyId].CreateChallenge(skipValidation);
+    }
+
+    #endregion
+
+    #region Challenge Response
+
+    public void SubmitResponse(
+        string tallyId, GuardianChallengeResponse response)
+    {
+        TallyDecryptions[tallyId].SubmitChallengeResponse(response);
+    }
+
+    public bool ValidateResponses(string tallyId)
+    {
+        return TallyDecryptions[tallyId].ValidateChallengeResponses();
+    }
+
+    #endregion
+
+    #region Decrypt
 
     /// <summary>
     /// Determine if the tally can be decrypted.
@@ -100,7 +139,7 @@ public class DecryptionMediator : DisposableBase
     /// <summary>
     /// Decrypt the tally
     /// </summary>
-    public DecryptionResult Decrypt(string tallyId)
+    public DecryptionResult Decrypt(string tallyId, bool skipValidation = false)
     {
         var canDecrypt = CanDecrypt(tallyId);
         if (!canDecrypt)
@@ -109,14 +148,29 @@ public class DecryptionMediator : DisposableBase
         }
 
         var tallyDecryption = TallyDecryptions[tallyId];
-        return tallyDecryption.Decrypt();
+        return tallyDecryption.Decrypt(skipValidation);
+    }
+
+    #endregion
+
+    #region Submit Shares
+
+    public GuardianShare? GetShare(string tallyId, string guardianId)
+    {
+        if (!TallyDecryptions.ContainsKey(tallyId))
+        {
+            return null;
+        }
+
+        var tallyDecryption = TallyDecryptions[tallyId];
+        return tallyDecryption.GetShare(guardianId);
     }
 
     /// <summary>
     /// Submit a single tally share
     /// </summary>
     public void SubmitShare(
-        CiphertextDecryptionTallyShare tallyShare)
+        TallyShare tallyShare)
     {
         EnsureCiphertextDecryptionTally(tallyShare);
 
@@ -134,8 +188,8 @@ public class DecryptionMediator : DisposableBase
     /// <summary>
     /// Submit a single ballot share
     /// </summary>
-    public void SubmitShare(
-        CiphertextDecryptionBallotShare ballotShare,
+    protected void SubmitShare(
+        BallotShare ballotShare,
         CiphertextBallot ballot)
     {
         EnsureCiphertextDecryptionTally(ballotShare);
@@ -157,13 +211,13 @@ public class DecryptionMediator : DisposableBase
     /// Submit a tally share and a list of ballot shares
     /// </summary>
     public void SubmitShares(
-        Tuple<CiphertextDecryptionTallyShare, Dictionary<string, CiphertextDecryptionBallotShare>> shares,
+        Tuple<TallyShare, Dictionary<string, BallotShare>> shares,
         List<CiphertextBallot> ballots
          )
     {
         SubmitShare(shares.Item1);
         SubmitShares(shares.Item2.Values
-            .Select(i => new CiphertextDecryptionBallotShare(i)).ToList(),
+            .Select(i => new BallotShare(i)).ToList(),
             ballots.Select(i => new CiphertextBallot(i)).ToList());
     }
 
@@ -171,8 +225,8 @@ public class DecryptionMediator : DisposableBase
     /// Submit a list of tally shares and a list of ballot shares
     /// </summary>
     public void SubmitShares(
-        CiphertextDecryptionTallyShare tallyShare,
-        List<CiphertextDecryptionBallotShare> ballotShares,
+        TallyShare tallyShare,
+        List<BallotShare> ballotShares,
         List<CiphertextBallot> ballots)
     {
         SubmitShare(tallyShare);
@@ -183,7 +237,7 @@ public class DecryptionMediator : DisposableBase
     /// Submit a list of ballot shares
     /// </summary>
     public void SubmitShares(
-        List<CiphertextDecryptionBallotShare> ballotShares,
+        List<BallotShare> ballotShares,
         List<CiphertextBallot> ballots)
     {
         if (ballotShares.Count == 0)
@@ -219,6 +273,8 @@ public class DecryptionMediator : DisposableBase
         }
     }
 
+    #endregion
+
     protected override void DisposeUnmanaged()
     {
         base.DisposeUnmanaged();
@@ -236,7 +292,7 @@ public class DecryptionMediator : DisposableBase
         }
     }
 
-    private void EnsureCiphertextDecryptionTally(CiphertextDecryptionTallyShare share)
+    private void EnsureCiphertextDecryptionTally(TallyShare share)
     {
         if (!Tallies.ContainsKey(share.TallyId))
         {
