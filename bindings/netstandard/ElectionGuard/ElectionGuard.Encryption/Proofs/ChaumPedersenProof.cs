@@ -19,8 +19,16 @@ namespace ElectionGuard
     /// </note>
     public class ChaumPedersenProof
     {
+        public ChaumPedersenProof(
+            ElGamalCiphertext commitment, ElementModQ challenge, ElementModQ response)
+        {
+            // Data = data;
+            // Challenge = challenge;
+            // Response = response;
+        }
+
         // TODO: implement. Just a stub for now
-        public bool IsValid(ElGamalCiphertext message, ElementModP k, ElementModP m, ElementModQ q)
+        public bool IsValid(ElGamalCiphertext message, ElementModP k, ElementModQ q)
         {
             // TODO: implement
             return true;

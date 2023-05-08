@@ -1,4 +1,6 @@
-namespace ElectionGuard.Decryption.Tally;
+using ElectionGuard.Decryption.Tally;
+
+namespace ElectionGuard.Decryption;
 
 public class TallyMediator : DisposableBase
 {

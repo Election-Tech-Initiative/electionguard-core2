@@ -31,6 +31,11 @@ public class PlaintextTallySelection
     /// </summary>
     public ElementModP Value { get; set; }
 
+    /// <summary>
+    /// The proof that the decrypted representation of the sum of all ballots for the selection is correct
+    /// </summary>
+    public ChaumPedersenProof Proof { get; set; }
+
     public PlaintextTallySelection(
         IElectionSelection selection) : this(
             selection.ObjectId,
