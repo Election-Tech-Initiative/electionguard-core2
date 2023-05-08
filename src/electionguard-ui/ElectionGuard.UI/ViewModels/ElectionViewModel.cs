@@ -245,6 +245,7 @@ public partial class ElectionViewModel : BaseViewModel
         if (egDrives.Count() >= 0)
         {
             await _electionService.UpdateEncryptionExportDateAsync(CurrentElection.ElectionId);
+            Step1Complete = true;
         }
 
 
