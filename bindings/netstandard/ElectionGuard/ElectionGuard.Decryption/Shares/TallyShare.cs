@@ -1,43 +1,47 @@
 using ElectionGuard.Decryption.Tally;
 using ElectionGuard.ElectionSetup;
-using ElectionGuard.UI.Lib.Models;
+using ElectionGuard.Guardians;
 
-namespace ElectionGuard.Decryption.Decryption;
+namespace ElectionGuard.Decryption.Shares;
 
 /// <summary>
 /// a share of a guardian's decryption of a collection of contests that have been accumulated into a tally
 /// </summary>
-public record CiphertextDecryptionTallyShare : DisposableRecordBase, IEquatable<CiphertextDecryptionTallyShare>
+public record TallyShare : DisposableRecordBase, IEquatable<TallyShare>
 {
     public string GuardianId { get; init; }
 
     public string TallyId { get; init; }
 
-    public Dictionary<string, CiphertextDecryptionContestShare> Contests { get; init; } = default!;
+    public Dictionary<string, ContestShare> Contests { get; init; } = default!;
 
-    public CiphertextDecryptionTallyShare(
+    public TallyShare(
         string guardianId,
         string tallyId,
-        Dictionary<string, CiphertextDecryptionContestShare> contests)
+        Dictionary<string, ContestShare> contests)
     {
         GuardianId = guardianId;
         TallyId = tallyId;
         Contests = contests.Select(
-            x => new KeyValuePair<string, CiphertextDecryptionContestShare>(x.Key, new(x.Value))).ToDictionary(x => x.Key, x => x.Value);
+            x => new KeyValuePair<string, ContestShare>(x.Key, new(x.Value)))
+        .ToDictionary(x => x.Key, x => x.Value);
     }
 
-    public CiphertextDecryptionTallyShare(CiphertextDecryptionTallyShare other) : base(other)
+    public TallyShare(
+        TallyShare other)
+        : base(other)
     {
         GuardianId = other.GuardianId;
         TallyId = other.TallyId;
         Contests = other.Contests.Select(
-            x => new KeyValuePair<string, CiphertextDecryptionContestShare>(x.Key, new(x.Value))).ToDictionary(x => x.Key, x => x.Value);
+            x => new KeyValuePair<string, ContestShare>(x.Key, new(x.Value)))
+        .ToDictionary(x => x.Key, x => x.Value);
     }
 
     public virtual bool IsValid(
         CiphertextTally tally, ElectionPublicKey guardian)
     {
-        if (guardian.OwnerId != GuardianId)
+        if (guardian.GuardianId != GuardianId)
         {
             return false;
         }
@@ -66,15 +70,31 @@ public record CiphertextDecryptionTallyShare : DisposableRecordBase, IEquatable<
         return true;
     }
 
-    public Tuple<ElectionPublicKey, CiphertextDecryptionSelectionShare> GetSelectionShare(
+    public Tuple<ElectionPublicKey, ContestShare> GetContestShare(
+        ElectionPublicKey guardian,
+        string contestId)
+    {
+        var contest = GetContestShare(guardian.GuardianId, contestId);
+        return new Tuple<ElectionPublicKey, ContestShare>(guardian, contest);
+    }
+
+    public ContestShare GetContestShare(
+        string guardianId, string contestId)
+    {
+        return guardianId != GuardianId
+            ? throw new ArgumentException($"GuardianId {guardianId} does not match {GuardianId}")
+            : Contests[contestId];
+    }
+
+    public Tuple<ElectionPublicKey, SelectionShare> GetSelectionShare(
         ElectionPublicKey guardian,
         string contestId, string selectionId)
     {
-        var selection = GetSelectionShare(guardian.OwnerId, contestId, selectionId);
-        return new Tuple<ElectionPublicKey, CiphertextDecryptionSelectionShare>(guardian, selection);
+        var selection = GetSelectionShare(guardian.GuardianId, contestId, selectionId);
+        return new Tuple<ElectionPublicKey, SelectionShare>(guardian, selection);
     }
 
-    public CiphertextDecryptionSelectionShare GetSelectionShare(
+    public SelectionShare GetSelectionShare(
         string guardianId, string contestId, string selectionId)
     {
         return guardianId != GuardianId
