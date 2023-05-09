@@ -94,7 +94,7 @@ public partial class TallyProcessViewModel : BaseViewModel
         var joiner = new TallyJoinedRecord()
         {
             TallyId = TallyId,
-            GuardianId = UserName!, // can assume not null, since you need to be signed in to get here 
+            GuardianId = UserName!, // can assume not null, since you need to be signed in to get here
         };
 
         await _tallyJoinedService.JoinTallyAsync(joiner);
