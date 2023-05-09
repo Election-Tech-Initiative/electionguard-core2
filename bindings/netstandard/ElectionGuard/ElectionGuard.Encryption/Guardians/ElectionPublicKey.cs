@@ -57,6 +57,8 @@ namespace ElectionGuard.Guardians
 
         /// <summary>
         /// The commitments for the coefficients in the secret polynomial
+        ///
+        /// 𝐾𝑖,j = g^𝑎𝑖,j mod p in the spec (7) 
         /// </summary>
         public List<ElementModP> CoefficientCommitments { get; set; }
 

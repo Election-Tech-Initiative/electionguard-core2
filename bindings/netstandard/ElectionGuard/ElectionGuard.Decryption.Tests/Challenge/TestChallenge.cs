@@ -112,16 +112,16 @@ public class TestChallenge : DisposableBase
             var share = shares[guardianId];
             var guardianChallenge = challenges[guardianId];
 
-            // var validated = response.IsValid(
-            //     selection, accumulation, share, guardianChallenge, context);
-
             var validated = response.IsValid(
-                selection, accumulation, share, guardianChallenge, context);
+                selection, guardian.SharePublicKey(), share, guardianChallenge);
 
             Assert.That(validated, Is.True);
         }
 
-        // TODO: create the proof
+        // create the proof
+        var proof = accumulation.ComputeProof(
+            challenge, responses.Values.ToList());
+        accumulation.AddProof(proof);
 
         // decrypt
         var decrypted = selection.Decrypt(accumulation);

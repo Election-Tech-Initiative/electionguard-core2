@@ -2,7 +2,6 @@
 using ElectionGuard.ElectionSetup.Extensions;
 using ElectionGuard.Proofs;
 using ElectionGuard.Extensions;
-using Newtonsoft.Json;
 
 namespace ElectionGuard.ElectionSetup;
 
@@ -21,7 +20,8 @@ public class ElectionPolynomial : DisposableBase
     public List<Coefficient> Coefficients { get; init; }
 
     /// <summary>
-    /// Access the list of public keys generated from secret coefficient
+    /// Access the list of public keys generated from secret coefficient.
+    /// 𝐾𝑖,j = g^𝑎𝑖,j mod p in the spec (7)
     /// </summary>
     [JsonIgnore]
     public List<ElementModP> Commitments => Coefficients

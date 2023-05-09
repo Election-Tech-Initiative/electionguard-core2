@@ -8,12 +8,13 @@ namespace ElectionGuard.ElectionSetup;
 /// </summary>
 public partial class Guardian
 {
-    // (a𝑖, b𝑖) = (𝑔^𝑢𝑖 mod 𝑝, 𝐴^𝑢𝑖 mod 𝑝).
+    // (𝑎𝑖, 𝑏𝑖) = (𝑔^𝑢𝑖 mod 𝑝, 𝐴^𝑢𝑖 mod 𝑝).
     public ElGamalCiphertext CreateCommitment(ICiphertextSelection selection)
     {
         if (AllGuardianKeysReceived is false)
         {
-            throw new InvalidOperationException("All guardian keys must be received before decrypting.");
+            throw new InvalidOperationException(
+                "All guardian keys must be received before decrypting.");
         }
 
         // create a nonce for the selection
@@ -36,7 +37,8 @@ public partial class Guardian
     {
         if (AllGuardianKeysReceived is false)
         {
-            throw new InvalidOperationException("All guardian keys must be received before decrypting.");
+            throw new InvalidOperationException(
+                "All guardian keys must be received before decrypting.");
         }
 
         // recreate the nonce for the selection
@@ -55,8 +57,8 @@ public partial class Guardian
         // TODO: double check the mul mod q here is not a problem
         // since its not a mod op in the spec
 
-        // vi = (ui − ciP(i)) mod q.
-        using var product = BigMath.MultModQ(challenge, _myPartialSecretKey);
+        // 𝑣𝑖 = (𝑢𝑖 − 𝑐𝑖P(𝑖)) mod q.
+        var product = BigMath.MultModQ(challenge, _myPartialSecretKey);
         var v = BigMath.SubModQ(u, product);
         return v;
     }

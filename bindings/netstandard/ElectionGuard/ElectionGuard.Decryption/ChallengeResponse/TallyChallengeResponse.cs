@@ -4,6 +4,7 @@ using ElectionGuard.Decryption.Challenge;
 using ElectionGuard.Decryption.Shares;
 using ElectionGuard.Decryption.Tally;
 using ElectionGuard.ElectionSetup;
+using ElectionGuard.Guardians;
 
 namespace ElectionGuard.Decryption.ChallengeResponse;
 
@@ -44,7 +45,7 @@ public record TallyChallengeResponse
 
     public bool IsValid(
         CiphertextTally tally,
-        AccumulatedTally accumulated,
+        ElectionPublicKey guardian,
         TallyShare share,
         TallyChallenge challenge)
     {
@@ -52,10 +53,9 @@ public record TallyChallengeResponse
         {
             if (!contest.IsValid(
                 tally.Contests[contestId],
-                accumulated.Contests[contestId],
+                guardian,
                 share.Contests[contestId],
-                challenge.Contests[contestId],
-                tally.Context
+                challenge.Contests[contestId]
             ))
             {
                 return false;

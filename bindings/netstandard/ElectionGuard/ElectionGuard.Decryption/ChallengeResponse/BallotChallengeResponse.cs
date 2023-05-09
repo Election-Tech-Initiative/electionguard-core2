@@ -3,6 +3,7 @@ using ElectionGuard.Decryption.Accumulation;
 using ElectionGuard.Decryption.Challenge;
 using ElectionGuard.Decryption.Shares;
 using ElectionGuard.ElectionSetup;
+using ElectionGuard.Guardians;
 
 namespace ElectionGuard.Decryption.ChallengeResponse;
 
@@ -49,19 +50,17 @@ public record BallotChallengeResponse
 
     public bool IsValid(
         CiphertextBallot ballot,
-        AccumulatedBallot accumulated,
+        ElectionPublicKey guardian,
         BallotShare share,
-        BallotChallenge challenge,
-        CiphertextElectionContext context)
+        BallotChallenge challenge)
     {
         foreach (var (contestId, contest) in Contests)
         {
             if (!contest.IsValid(
                 ballot.Contests.First(x => x.ObjectId == contestId),
-                accumulated.Contests[contestId],
+                guardian,
                 share.Contests[contestId],
-                challenge.Contests[contestId],
-                context
+                challenge.Contests[contestId]
             ))
             {
                 return false;

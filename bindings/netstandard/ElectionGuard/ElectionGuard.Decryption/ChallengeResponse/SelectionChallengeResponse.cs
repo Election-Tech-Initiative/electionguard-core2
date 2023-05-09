@@ -20,6 +20,7 @@ public class SelectionChallengeResponse
     // the sequence order of the guardian
     public ulong SequenceOrder { get; init; }
 
+    // 𝑣𝑖 in the spec
     public ElementModQ Response { get; init; }
 
     public SelectionChallengeResponse(
@@ -35,45 +36,42 @@ public class SelectionChallengeResponse
 
     public bool IsValid(
         ICiphertextSelection selection,
-        AccumulatedSelection accumulated,
+        ElectionPublicKey guardian,
         SelectionShare share,
-        SelectionChallenge challenge,
-        CiphertextElectionContext context
-        )
+        SelectionChallenge challenge)
     {
         if (!ObjectId.Equals(selection.ObjectId)
             || !ObjectId.Equals(share.ObjectId)
-            || !ObjectId.Equals(challenge.ObjectId)
-            || !ObjectId.Equals(accumulated.ObjectId))
+            || !ObjectId.Equals(challenge.ObjectId))
         {
-            Console.WriteLine($"SelectionChallengeResponse: Invalid object id: \n {ObjectId} \n {selection.ObjectId} \n {share.ObjectId} \n {challenge.ObjectId} \n {accumulated.ObjectId}");
+            Console.WriteLine($"SelectionChallengeResponse: Invalid object id: \n {ObjectId} \n {selection.ObjectId} \n {share.ObjectId} \n {challenge.ObjectId}");
             return false;
         }
-        var mbar_i = BigMath.PowModP(share.Share, challenge.Coefficient);
 
-        Console.WriteLine($"SelectionChallengeResponse: IsValid: \n {accumulated.Commitment} \n");
+        Console.WriteLine($"SelectionChallengeResponse: Commitment: \n {share.Commitment} \n");
         return IsValid(
             selection.Ciphertext,
             share.Commitment,
             challenge.Challenge,
-            context.ElGamalPublicKey,
-            mbar_i); // share.Share
+            guardian.CoefficientCommitments,
+            share.Share);
     }
 
     public bool IsValid(
         ElGamalCiphertext ciphertext,
         ElGamalCiphertext commitment,
         ElementModQ challenge,
-        ElementModP publicKey,
-        ElementModP mBar)
+        List<ElementModP> coefficientCommitments,
+        ElementModP m_i)
     {
         using var recomputedCommitment = this.ComputeCommitment(
-            ciphertext,
+            ciphertext.Pad,
             challenge,
-            publicKey,
-            mBar);
+            coefficientCommitments,
+            SequenceOrder,
+            m_i);
 
-        Console.WriteLine($"SelectionChallengeResponse: IsValid: \n {recomputedCommitment} \n {commitment}");
+        Console.WriteLine($"SelectionChallengeResponse: recomputedCommitment: \n {recomputedCommitment}");
 
         return recomputedCommitment.Equals(commitment);
     }

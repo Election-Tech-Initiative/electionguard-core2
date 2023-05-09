@@ -402,9 +402,8 @@ public record class CiphertextDecryptionTally : DisposableRecordBase
 
             if (!response.IsValid(
                 _tally,
-                _accumulatedTally!,
+                _guardians[guardianId],
                 challengeBallots,
-                _accumulatedBallots!,
                 share,
                 _challenges[guardianId]))
             {

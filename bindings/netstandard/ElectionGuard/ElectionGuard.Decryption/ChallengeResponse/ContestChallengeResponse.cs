@@ -5,6 +5,7 @@ using ElectionGuard.Decryption.Shares;
 using ElectionGuard.Decryption.Accumulation;
 using ElectionGuard.Ballot;
 using ElectionGuard.Base;
+using ElectionGuard.Guardians;
 
 namespace ElectionGuard.Decryption.ChallengeResponse;
 public record ContestChallengeResponse
@@ -41,20 +42,18 @@ public record ContestChallengeResponse
 
     public bool IsValid(
         ICiphertextContest contest,
-        AccumulatedContest accumulated,
+        ElectionPublicKey guardian,
         ContestShare share,
-        ContestChallenge challenge,
-        CiphertextElectionContext context
+        ContestChallenge challenge
     )
     {
         foreach (var (selectionId, selection) in Selections)
         {
             if (!selection.IsValid(
                 contest.Selections.First(x => x.ObjectId == selectionId),
-                accumulated.Selections[selectionId],
+                guardian,
                 share.Selections[selectionId],
-                challenge.Selections[selectionId],
-                context
+                challenge.Selections[selectionId]
             ))
             {
                 Console.WriteLine($"ContestChallengeResponse: Invalid selection {selectionId}");

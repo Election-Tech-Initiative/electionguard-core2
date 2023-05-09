@@ -35,15 +35,14 @@ public record GuardianChallengeResponse : DisposableRecordBase
 
     public bool IsValid(
        CiphertextTally tally,
-       AccumulatedTally accumulatedTally,
+       ElectionPublicKey guardian,
        List<CiphertextBallot> ballots,
-       List<AccumulatedBallot> accumulatedBallots,
        GuardianShare share,
        GuardianChallenge challenge)
     {
         if (!Tally.IsValid(
             tally,
-            accumulatedTally,
+            guardian,
             share.Tally,
             challenge.Tally))
         {
@@ -53,16 +52,14 @@ public record GuardianChallengeResponse : DisposableRecordBase
         for (var i = 0; i < Ballots.Count; i++)
         {
             var ballot = ballots[i];
-            var accumulatedBallot = accumulatedBallots[i];
             var ballotShare = share.Ballots[i];
             var ballotChallenge = challenge.Ballots[i];
 
             if (!Ballots[i].IsValid(
                 ballot,
-                accumulatedBallot,
+                guardian,
                 ballotShare,
-                ballotChallenge,
-                tally.Context))
+                ballotChallenge))
             {
                 Console.WriteLine($"Ballot {ballot.ObjectId} is invalid");
                 return false;
