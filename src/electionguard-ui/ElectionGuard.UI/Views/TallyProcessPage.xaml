@@ -29,11 +29,11 @@
             <Button
                 Command="{Binding JoinTallyCommand}"
                 IsVisible="{Binding IsAdmin, Converter={StaticResource InvertedBoolConverter}}"
-                Text="Yes, Join Tally" />
+                Text="{helper:Translate ProcessTallyJoinYes}" />
             <Button
                 Command="{Binding RejectTallyCommand}"
                 IsVisible="{Binding IsAdmin, Converter={StaticResource InvertedBoolConverter}}"
-                Text="No, Do not Join Tally" />
+                Text="{helper:Translate ProcessTallyJoinNo}" />
         </VerticalStackLayout>
         <!--  List of guardians joined for all  -->
         <!--  status of tally  -->

@@ -71,4 +71,11 @@ public class GuardianPublicKeyService : BaseDatabaseService<GuardianPublicKey>, 
         var list = await GetAllByFilterAsync(filter);
         return list.FirstOrDefault();
     }
+
+    public async Task<List<string>> GetKeyCeremonyIdsAsync(string guardianId)
+    {
+        var list = await GetAllByFieldAsync(Constants.GuardianId, guardianId);
+        return list.Select(g => g.KeyCeremonyId!).ToList();
+    }
+
 }

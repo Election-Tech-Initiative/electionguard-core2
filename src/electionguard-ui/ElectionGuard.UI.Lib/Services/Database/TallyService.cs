@@ -1,4 +1,5 @@
 ﻿using ElectionGuard.UI.Lib.Models;
+using MongoDB.Bson;
 using MongoDB.Driver;
 
 namespace ElectionGuard.UI.Lib.Services;
@@ -36,10 +37,16 @@ public class TallyService : BaseDatabaseService<TallyRecord>
         return await GetByFieldAsync(Constants.TallyId, tallyId);
     }
 
-    public async Task<bool> TallyNameExists(string name)
+    public async Task<bool> TallyNameExistsAsync(string name)
     {
         var tally = await GetByNameAsync(name);
         return tally != null;
+    }
+
+    public async Task<List<TallyRecord>> GetAllByKeyCeremoniesAsync(List<string> ids)
+    {
+        BsonArray array = new BsonArray(ids);
+        return await GetAllByFieldInListAsync(Constants.KeyCeremonyId, array);
     }
 
     /// <summary>

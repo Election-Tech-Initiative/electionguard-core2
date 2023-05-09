@@ -1,4 +1,5 @@
 ﻿using ElectionGuard.UI.Lib.Models;
+using MongoDB.Bson;
 using MongoDB.Driver;
 
 namespace ElectionGuard.UI.Lib.Services;
@@ -84,6 +85,21 @@ public class BaseDatabaseService<T> : IDatabaseService<T> where T : DatabaseReco
         var filter = FilterBuilder.Eq(fieldName, fieldValue);
         return await GetAllByFilterAsync(filter, table);
     }
+
+    /// <summary>
+    /// Get the document from the database with the provided value for a field
+    /// </summary>
+    /// <param name="fieldName">Field name to search for</param>
+    /// <param name="fieldValues">List of values to match for search</param>
+    /// <param name="table">Optional parameter to allow data type to use a different collection</param>
+    /// <returns>List of the documents found in the given collection that matches the given field</returns>
+    public async Task<List<T>> GetAllByFieldInListAsync(string fieldName, BsonArray fieldValues, string? table = null)
+    {
+        var filter = FilterBuilder.In(fieldName, fieldValues);
+        return await GetAllByFilterAsync(filter, table);
+    }
+
+
 
     public FilterDefinitionBuilder<T> FilterBuilder => Builders<T>.Filter;
 
