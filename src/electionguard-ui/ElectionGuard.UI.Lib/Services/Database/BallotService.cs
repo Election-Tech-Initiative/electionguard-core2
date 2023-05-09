@@ -50,16 +50,12 @@ public class BallotService : BaseDatabaseService<BallotRecord>
     }
 
     /// <summary>
-    /// Check to see if the ballot has already been included
+    /// Get a ballot based on its ballot code
     /// </summary>
     /// <param name="ballotCode">ballotcode to find</param>
-    public async Task<bool> GetByBallotCodeAsync(string ballotCode)
+    public async Task<BallotRecord?> GetByBallotCodeAsync(string ballotCode)
     {
-        var filterBuilder = Builders<BallotRecord>.Filter;
-        var filter = filterBuilder.And(filterBuilder.Eq(Constants.BallotCode, ballotCode));
-
-        var ballotCount = await CountByFilterAsync(filter);
-        return ballotCount > 0;
+        return await GetByFieldAsync(Constants.BallotCode, ballotCode);
     }
 
     /// <summary>
@@ -73,5 +69,4 @@ public class BallotService : BaseDatabaseService<BallotRecord>
 
         await MarkAsDeletedAsync(filter);
     }
-
 }

@@ -147,10 +147,9 @@ public static class DbService
         }
 
         var server = client.Cluster.Description.Servers.FirstOrDefault();
-        return (
+        return
             server is not null &&
             server.HeartbeatException is null &&
-            server.State == ServerState.Connected
-            );
+            server.State == ServerState.Connected;
     }
 }

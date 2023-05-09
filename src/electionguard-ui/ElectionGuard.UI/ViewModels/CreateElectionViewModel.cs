@@ -1,5 +1,6 @@
 ﻿using CommunityToolkit.Mvvm.DependencyInjection;
 using CommunityToolkit.Mvvm.Input;
+using ElectionGuard.UI.Models;
 
 namespace ElectionGuard.UI.ViewModels;
 
@@ -10,15 +11,23 @@ public partial class CreateElectionViewModel : BaseViewModel
     private readonly ManifestService _manifestService;
     private readonly ContextService _contextService;
     private readonly ConstantsService _constantsService;
+    private readonly IStorageService _storageService;
     private const string PageName = "CreateElection";
 
-    public CreateElectionViewModel(IServiceProvider serviceProvider, KeyCeremonyService keyCeremonyService, ElectionService electionService, ManifestService manifestService, ContextService contextService, ConstantsService constantsService) : base(PageName, serviceProvider)
+    public CreateElectionViewModel(IServiceProvider serviceProvider,
+                                   KeyCeremonyService keyCeremonyService,
+                                   ElectionService electionService,
+                                   ManifestService manifestService,
+                                   ContextService contextService,
+                                   ConstantsService constantsService,
+                                   ZipStorageService storageService) : base(PageName, serviceProvider)
     {
         _keyCeremonyService = keyCeremonyService;
         _electionService = electionService;
         _manifestService = manifestService;
         _contextService = contextService;
         _constantsService = constantsService;
+        _storageService = storageService;
     }
 
     public override async Task OnAppearing()
@@ -111,14 +120,9 @@ public partial class CreateElectionViewModel : BaseViewModel
                     // create the export file for each election
                     // need to add the path from the manifest
                     var zipPath = file.FullPath.ToLower().Replace(".json", ".zip");
-                    var files = new List<FileContents>
-                    {
-                        new("constants.json", constantsRecord.ConstantsData),
-                        new("context.json", contextRecord.ContextData),
-                        new("manifest.json", manifestRecord.ManifestData)
-                    };
-
-                    ZipService.AddFiles(zipPath, files);
+                    var encryptionPackage = new EncryptionPackage(contextRecord, constantsRecord, manifestRecord);
+                    _storageService.UpdatePath(zipPath);
+                    _storageService.ToFiles(encryptionPackage);
                 }
 
 
