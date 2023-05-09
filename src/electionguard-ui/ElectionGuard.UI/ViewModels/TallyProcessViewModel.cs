@@ -48,11 +48,11 @@ public partial class TallyProcessViewModel : BaseViewModel
         _ = Shell.Current.CurrentPage.Dispatcher.DispatchAsync(async () =>
         {
             var firstValue = value;
-            var Tally = await _tallyService.GetByTallyIdAsync(firstValue);
+            Tally = await _tallyService.GetByTallyIdAsync(firstValue);
 
             if (Tally != null)
             {
-                JoinedGuardians = await _tallyJoinedService.GetByTallyIdAsync(firstValue);
+                JoinedGuardians = await _tallyJoinedService.GetAllByTallyIdAsync(firstValue);
                 var electionId = Tally.ElectionId ?? string.Empty;
                 var election = await _electionService.GetByElectionIdAsync(electionId);
                 if (election is null)
@@ -65,21 +65,22 @@ public partial class TallyProcessViewModel : BaseViewModel
 
                 BallotUploads = await _ballotUploadService.GetByElectionIdAsync(electionId);
 
-                JoinedGuardians = await _tallyJoinedService.GetByTallyIdAsync(Tally.TallyId);
+                JoinedGuardians = await _tallyJoinedService.GetAllByTallyIdAsync(Tally.TallyId);
             }
         });
     }
 
     [RelayCommand(CanExecute = nameof(CanJoinTally))]
-    private void JoinTally()
+    private async Task JoinTally()
     {
         var joiner = new TallyJoinedRecord()
         {
             TallyId = TallyId,
             GuardianId = UserName!, // can assume not null, since you need to be signed into 
+            Joined = true,
         };
 
-        Task.Run(async () => await _tallyJoinedService.JoinTally(joiner));
+        await _tallyJoinedService.JoinTally(joiner);
         JoinedGuardians.Add(joiner);
     }
 
@@ -88,9 +89,18 @@ public partial class TallyProcessViewModel : BaseViewModel
     private bool CurrentUserJoinedAlready() => JoinedGuardians.SingleOrDefault(g => g.GuardianId == UserName) is object;
 
     [RelayCommand(CanExecute =nameof(CanJoinTally))]
-    private void RejectTally() 
+    private async Task RejectTally() 
     {
-        // TODO: what happens when we don't want to join a tally, nothing? Can we change our mind later?
+        var joiner = new TallyJoinedRecord()
+        {
+            TallyId = TallyId,
+            GuardianId = UserName!, // can assume not null, since you need to be signed in to get here 
+        };
+
+        await _tallyJoinedService.JoinTally(joiner);
+        JoinedGuardians.Add(joiner);
+
+        await NavigationService.GoHome();
     }
 
 }
