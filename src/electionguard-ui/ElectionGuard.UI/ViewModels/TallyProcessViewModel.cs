@@ -80,7 +80,7 @@ public partial class TallyProcessViewModel : BaseViewModel
             Joined = true,
         };
 
-        await _tallyJoinedService.JoinTally(joiner);
+        await _tallyJoinedService.JoinTallyAsync(joiner);
         JoinedGuardians.Add(joiner);
     }
 
@@ -97,7 +97,7 @@ public partial class TallyProcessViewModel : BaseViewModel
             GuardianId = UserName!, // can assume not null, since you need to be signed in to get here 
         };
 
-        await _tallyJoinedService.JoinTally(joiner);
+        await _tallyJoinedService.JoinTallyAsync(joiner);
         JoinedGuardians.Add(joiner);
 
         await NavigationService.GoHome();
