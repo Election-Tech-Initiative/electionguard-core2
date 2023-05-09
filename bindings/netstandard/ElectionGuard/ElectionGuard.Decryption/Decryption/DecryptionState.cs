@@ -6,8 +6,9 @@ public enum DecryptionState
     PendingGuardianShares = 1,
     PendingAdminChallenge = 2,
     PendingGuardianChallengeResponses = 3,
-    PendingAdminValidateResponses = 4, // maybe should be pending proof generqation?
-    PendingAdminDecryptShares = 5,
-    PendingAdminPublishResults = 6,
-    Complete = 7
+    PendingAdminValidateResponses = 4,
+    PendingAdminComputeProofs = 5,
+    PendingAdminDecryptShares = 6,
+    PendingAdminPublishResults = 7,
+    Complete = 8
 }

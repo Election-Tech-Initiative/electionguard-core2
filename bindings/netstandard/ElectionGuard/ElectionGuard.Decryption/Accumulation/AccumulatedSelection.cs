@@ -2,12 +2,15 @@ using ElectionGuard.Decryption.Shares;
 using ElectionGuard.Decryption.Extensions;
 using ElectionGuard.Ballot;
 using ElectionGuard.Guardians;
+using ElectionGuard.ElectionSetup.Extensions;
 
 namespace ElectionGuard.Decryption.Accumulation;
 
 /// <summary>
 /// accumulated collection of all guardian shares for a given selection.
 /// This object is used to compute the final selection value.
+///
+/// This is a mutable class that is filled in through the decrypion process.
 /// </summary>
 public class AccumulatedSelection : DisposableBase, IElectionSelection
 {
@@ -31,28 +34,21 @@ public class AccumulatedSelection : DisposableBase, IElectionSelection
     /// </summary>
     public ElementModP Value { get; private set; }
 
+    /// <summary>
+    /// The accumulated commitment of all guardian commitments.
+    /// </summary>
     public ElGamalCiphertext Commitment { get; private set; }
 
     /// <summary>
     /// The proof that the accumulated value is correct.
     /// </summary>
-    //public ChaumPedersenProof? Proof { get; private set; }
+    public ChaumPedersenProof? Proof { get; private set; }
 
-    // TODO: hashset
-    public List<SelectionShare> Shares { get; private set; } = new();
+    public Dictionary<string, SelectionShare> Shares { get; private set; } = new();
 
-    public AccumulatedSelection(
-        string objectId,
-        ulong sequenceOrder,
-        ElementModQ descriptionHash)
-    {
-        ObjectId = objectId;
-        SequenceOrder = sequenceOrder;
-        DescriptionHash = new(descriptionHash);
-        Value = new(Constants.ONE_MOD_P);
-        Commitment = new(Constants.ONE_MOD_P, Constants.ONE_MOD_P);
-    }
-
+    /// <summary>
+    /// Create an empty AccumulatedSelection object initialized with default values
+    /// </summary>
     public AccumulatedSelection(
         IElectionSelection selection)
     {
@@ -70,9 +66,11 @@ public class AccumulatedSelection : DisposableBase, IElectionSelection
         SequenceOrder = other.SequenceOrder;
         DescriptionHash = new(other.DescriptionHash);
         Value = new(other.Value);
-        //Proof = other.Proof;
+        Proof = new(other.Proof);
         Commitment = new(other.Commitment);
-        Shares = other.Shares.Select(x => new SelectionShare(x)).ToList();
+        Shares = other.Shares.ToDictionary(
+            x => x.Key,
+            x => new SelectionShare(x.Value));
     }
 
     /// <summary>
@@ -127,8 +125,32 @@ public class AccumulatedSelection : DisposableBase, IElectionSelection
             // TODO: validation
         }
 
-        Shares.Add(share);
-        Accumulate(share.Share, share.Commitment, lagrangeCoefficient.Coefficient);
+        Shares.Add(share.GuardianId, share);
+        Accumulate(
+            share.Share,
+            share.Commitment,
+            lagrangeCoefficient.Coefficient);
+    }
+
+    public void AddProof(ChaumPedersenProof proof)
+    {
+        Proof = new(proof);
+    }
+
+    public bool IsValid()
+    {
+        // TODO: actual validation
+        if (Shares.Count == 0)
+        {
+            return false;
+        }
+
+        if (Proof is null)
+        {
+            return false;
+        }
+
+        return true;
     }
 
     protected override void DisposeUnmanaged()
@@ -136,10 +158,8 @@ public class AccumulatedSelection : DisposableBase, IElectionSelection
         base.DisposeUnmanaged();
         Value.Dispose();
         DescriptionHash.Dispose();
-        foreach (var share in Shares)
-        {
-            share.Dispose();
-        }
+        Proof?.Dispose();
+        Shares.Dispose();
     }
 
     private void Accumulate(
@@ -150,6 +170,7 @@ public class AccumulatedSelection : DisposableBase, IElectionSelection
         // 𝑀𝑏𝑎𝑟 = 𝑀𝑏𝑎𝑟 * (𝑀𝑖 ^ 𝑤𝑖) mod p
         var interpolatedshare = share.PowModP(lagrangeCoefficient);
         Value = Value.MultModP(interpolatedshare);
+
 
         // TODO: double check this
         // a= Yai modp, b= Ybi modp.

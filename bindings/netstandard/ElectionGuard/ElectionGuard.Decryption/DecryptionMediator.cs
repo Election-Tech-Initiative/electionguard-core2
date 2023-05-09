@@ -57,6 +57,7 @@ public class DecryptionMediator : DisposableBase
         }
     }
 
+
     #region Misc Admin
 
     public void AddBallot(string tallyId, CiphertextBallot ballot)
@@ -72,83 +73,6 @@ public class DecryptionMediator : DisposableBase
     public void AddGuardian(ElectionPublicKey guardian)
     {
         Guardians.Add(guardian.GuardianId, new(guardian));
-    }
-
-    #endregion
-
-    #region Accumulate Tally
-
-    public void Accumulate(string tallyId, bool skipValidation = false)
-    {
-        TallyDecryptions[tallyId].AccumulateShares(skipValidation);
-    }
-
-    #endregion
-
-    #region Challenge
-
-    public Dictionary<string, GuardianChallenge> CreateChallenge(string tallyId, bool skipValidation = false)
-    {
-        return TallyDecryptions[tallyId].CreateChallenge(skipValidation);
-    }
-
-    #endregion
-
-    #region Challenge Response
-
-    public void SubmitResponse(
-        string tallyId, GuardianChallengeResponse response)
-    {
-        TallyDecryptions[tallyId].SubmitChallengeResponse(response);
-    }
-
-    public bool ValidateResponses(string tallyId)
-    {
-        return TallyDecryptions[tallyId].ValidateChallengeResponses();
-    }
-
-    #endregion
-
-    #region Decrypt
-
-    /// <summary>
-    /// Determine if the tally can be decrypted.
-    /// </summary>
-    public DecryptionResult CanDecrypt(string tallyId)
-    {
-        if (!Tallies.ContainsKey(tallyId))
-        {
-            return new DecryptionResult(tallyId, "Tally does not exist");
-        }
-
-        if (!TallyDecryptions.ContainsKey(tallyId))
-        {
-            return new DecryptionResult(tallyId, "Tally decryption does not exist");
-        }
-
-        var tallyDecryption = TallyDecryptions[tallyId];
-
-        if (!tallyDecryption.CanDecrypt(Tallies[tallyId]))
-        {
-            return new DecryptionResult(tallyId, "Tally decryption is not valid");
-        }
-
-        return new DecryptionResult(tallyId);
-    }
-
-    /// <summary>
-    /// Decrypt the tally
-    /// </summary>
-    public DecryptionResult Decrypt(string tallyId, bool skipValidation = false)
-    {
-        var canDecrypt = CanDecrypt(tallyId);
-        if (!canDecrypt)
-        {
-            return canDecrypt;
-        }
-
-        var tallyDecryption = TallyDecryptions[tallyId];
-        return tallyDecryption.Decrypt(skipValidation);
     }
 
     #endregion
@@ -271,6 +195,92 @@ public class DecryptionMediator : DisposableBase
                 guardian, ballotShare,
                 ballots.First(i => i.ObjectId == ballotShare.BallotId));
         }
+    }
+
+    #endregion
+
+    #region Accumulate Tally
+
+    // accumulate can be called before CreateChallenge
+    // but it doesnt have to be because CreateChallenge will also handle it
+    public void AccumulateShares(string tallyId, bool skipValidation = false)
+    {
+        _ = TallyDecryptions[tallyId].AccumulateShares(skipValidation);
+    }
+
+    #endregion
+
+    #region Challenge
+
+    public Dictionary<string, GuardianChallenge> CreateChallenge(string tallyId, bool skipValidation = false)
+    {
+        return TallyDecryptions[tallyId].CreateChallenge(skipValidation);
+    }
+
+    #endregion
+
+    #region Challenge Response
+
+    public void SubmitResponse(
+        string tallyId, GuardianChallengeResponse response)
+    {
+        TallyDecryptions[tallyId].SubmitChallengeResponse(response);
+    }
+
+    public bool ValidateResponses(string tallyId)
+    {
+        return TallyDecryptions[tallyId].ValidateChallengeResponses();
+    }
+
+    // compute proofs can be called before decrypt
+    // but it doesnt have to be because decrypt will also handle it
+    public void ComputeProofs(string tallyId, bool skipValidation = false)
+    {
+        TallyDecryptions[tallyId].ComputeDecryptionProofs(skipValidation);
+    }
+
+    #endregion
+
+    #region Decrypt
+
+    /// <summary>
+    /// Determine if the tally can be decrypted.
+    /// </summary>
+    public DecryptionResult CanDecrypt(string tallyId)
+    {
+        if (!Tallies.ContainsKey(tallyId))
+        {
+            return new DecryptionResult(tallyId, "Tally does not exist");
+        }
+
+        if (!TallyDecryptions.ContainsKey(tallyId))
+        {
+            return new DecryptionResult(tallyId, "Tally decryption does not exist");
+        }
+
+        var tallyDecryption = TallyDecryptions[tallyId];
+
+        if (!tallyDecryption.CanDecrypt(Tallies[tallyId]))
+        {
+            return new DecryptionResult(tallyId, "Tally decryption is not valid");
+        }
+
+        return new DecryptionResult(tallyId);
+    }
+
+    /// <summary>
+    /// Decrypt the tally
+    /// </summary>
+    public DecryptionResult Decrypt(string tallyId, bool skipValidation = false)
+    {
+        var canDecrypt = CanDecrypt(tallyId);
+        if (!canDecrypt)
+        {
+            return canDecrypt;
+        }
+
+        var tallyDecryption = TallyDecryptions[tallyId];
+        return tallyDecryption.Decrypt(skipValidation);
     }
 
     #endregion

@@ -40,7 +40,7 @@ public class SelectionChallenge : DisposableBase
         SequenceOrder = guardian.SequenceOrder;
         GuardianId = guardian.GuardianId;
         Coefficient = new(coefficient);
-        using var challenge = CompueteChallenge(
+        using var challenge = ComputeChallenge(
             extendedBaseHash,
             publicKey,
             ciphertext.Ciphertext,
@@ -65,7 +65,7 @@ public class SelectionChallenge : DisposableBase
         SequenceOrder = guardian.SequenceOrder;
         GuardianId = guardian.GuardianId;
         Coefficient = new(coefficient);
-        using var challenge = CompueteChallenge(
+        using var challenge = ComputeChallenge(
             extendedBaseHash,
             publicKey,
             ciphertext,
@@ -147,7 +147,7 @@ public class SelectionChallenge : DisposableBase
             ICiphertextSelection selection,
             AccumulatedSelection accumulated)
     {
-        return CompueteChallenge(
+        return ComputeChallenge(
                     context.CryptoExtendedBaseHash,
                     context.ElGamalPublicKey,
                     selection.Ciphertext,
@@ -162,7 +162,7 @@ public class SelectionChallenge : DisposableBase
         ICiphertextSelection selection,
         AccumulatedSelection accumulated)
     {
-        return CompueteChallenge(
+        return ComputeChallenge(
                     extendedHash,
                     elGamalPublicKey,
                     selection.Ciphertext,
@@ -171,7 +171,7 @@ public class SelectionChallenge : DisposableBase
     }
 
     // c = H(06,Q;K,A,B,a,b,M)
-    public static ElementModQ CompueteChallenge(
+    public static ElementModQ ComputeChallenge(
         ElementModQ extendedHash,
         ElementModP elGamalPublicKey,
         ElGamalCiphertext ciphertext,

@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Runtime.InteropServices;
 using ElectionGuard.Base;
 
@@ -357,6 +358,38 @@ namespace ElectionGuard
                 throw new ElectionGuardException($"IsInBounds Error Status: {status}");
             }
             return inBounds;
+        }
+
+        /// <summary>
+        /// Multiply by an ElementModP value
+        /// </summary>
+        /// <param name="rhs">right hand side for the multiply</param>
+        public ElementModQ MultModQ(ElementModQ rhs)
+        {
+            var status = BigMath.External.MultModQ(Handle, rhs.Handle,
+                out var value);
+            status.ThrowIfError();
+
+            // BigMath static operators reutrn null if invalid
+            // but instance functions throw an exception
+            value.ThrowIfInvalid();
+            Reassign(value);
+
+            return this;
+        }
+
+        /// <summary>
+        /// Multiply list of ElementModP values
+        /// </summary>
+        /// <param name="keys">list of keys the multiply</param>
+        public ElementModQ MultModQ(IEnumerable<ElementModQ> keys)
+        {
+            foreach (var key in keys)
+            {
+                _ = MultModQ(key);
+            }
+
+            return this;
         }
     }
 }

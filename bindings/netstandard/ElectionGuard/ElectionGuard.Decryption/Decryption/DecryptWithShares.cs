@@ -252,7 +252,8 @@ public static class DecryptWithSharesExtensions
             throw new Exception("Failed to decrypt selection");
         }
 
-        var plaintext = new PlaintextTallySelection(self, tally ?? 0UL, decryption.Value!);
+        var plaintext = new PlaintextTallySelection(
+            self, tally ?? 0UL, decryption.Value!, decryption.Proof!);
         return plaintext;
     }
 }

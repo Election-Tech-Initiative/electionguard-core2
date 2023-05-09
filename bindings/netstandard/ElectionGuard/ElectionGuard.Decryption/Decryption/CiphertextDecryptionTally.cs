@@ -38,7 +38,8 @@ public record class CiphertextDecryptionTally : DisposableRecordBase
 
     #endregion
 
-    #region computed and cahced values
+    #region computed and cached values
+
     // key is guardianid
     private Dictionary<string, TallyShare> _tallyShares { get; init; } = new();
 
@@ -88,6 +89,8 @@ public record class CiphertextDecryptionTally : DisposableRecordBase
         DecryptionState = DecryptionState.PendingGuardianShares;
     }
 
+    #region Misc Admin
+
     public void AddBallot(CiphertextBallot ballot)
     {
         if (ballot.IsChallenged)
@@ -122,6 +125,8 @@ public record class CiphertextDecryptionTally : DisposableRecordBase
 
         // TODO: check that all spoiled ballots are received
     }
+
+    #endregion
 
     #region Submit Shares
 
@@ -213,6 +218,7 @@ public record class CiphertextDecryptionTally : DisposableRecordBase
         return false;
     }
 
+    // TODO: async version
     public Tuple<AccumulatedTally, List<AccumulatedBallot>> AccumulateShares(
         bool skipValidation = false)
     {
@@ -227,6 +233,7 @@ public record class CiphertextDecryptionTally : DisposableRecordBase
         var accumulationResult = new Tuple<AccumulatedTally, List<AccumulatedBallot>>(
             _accumulatedTally, _accumulatedBallots);
 
+        // state transition
         DecryptionState = DecryptionState.PendingAdminChallenge;
 
         return accumulationResult;
@@ -291,6 +298,7 @@ public record class CiphertextDecryptionTally : DisposableRecordBase
                 ballotChallengesForGuardian));
         }
 
+        // state transition
         DecryptionState = DecryptionState.PendingGuardianChallengeResponses;
 
         return _challenges;
@@ -368,11 +376,11 @@ public record class CiphertextDecryptionTally : DisposableRecordBase
 
         _challengeResponses.Add(response.GuardianId, response);
 
-        // TODO: check if all responses received against the tally?
-        // if (_challengeResponses.Count == _challenges.Count)
-        // {
-        //     DecryptionState = DecryptionState.PendingAdminValidateResponses;
-        // }
+        // state transition
+        if (CanValidateResponses())
+        {
+            DecryptionState = DecryptionState.PendingAdminValidateResponses;
+        }
     }
 
     // TODO: return a result
@@ -405,9 +413,38 @@ public record class CiphertextDecryptionTally : DisposableRecordBase
             }
         }
 
-        DecryptionState = DecryptionState.PendingAdminDecryptShares;
+        // state transition
+        DecryptionState = DecryptionState.PendingAdminComputeProofs;
 
         return true;
+    }
+
+    // TODO: async
+    public void ComputeDecryptionProofs(bool skipValidation = false)
+    {
+        if (DecryptionState != DecryptionState.PendingAdminComputeProofs)
+        {
+            throw new ArgumentException("Cannot create proofs while state is " + DecryptionState);
+        }
+
+        // compute the CP proofs and add them to the accumulated values
+        // so that they can be used as part of decryption
+
+        _accumulatedTally!.AddProofs(
+            _tally,
+            _challengeResponses.Values.ToList(),
+            skipValidation
+        );
+
+        _accumulatedBallots!.AddProofs(
+            _challengedBallots.Values.ToList(),
+            _tally.Context,
+            _challengeResponses.Values.ToList(),
+            skipValidation
+        );
+
+        // state transition
+        DecryptionState = DecryptionState.PendingAdminDecryptShares;
     }
 
     #endregion
@@ -470,19 +507,25 @@ public record class CiphertextDecryptionTally : DisposableRecordBase
 
         // check that all of the challenge responses are valid
 
-
-
         return true;
     }
 
     /// <summary>
     /// decrypt the tally.
     /// </summary>
+    // TODO: async
     public DecryptionResult Decrypt(bool regenerate = false, bool skipValidation = false)
     {
+        // if we already have a result, return it
         if (regenerate && _decryptionResult != null)
         {
             return _decryptionResult;
+        }
+
+        // try to compute the proofs if they ahve not been computed already
+        if (DecryptionState == DecryptionState.PendingAdminComputeProofs)
+        {
+            ComputeDecryptionProofs(skipValidation);
         }
 
         if (!skipValidation && !CanDecrypt(_tally))
@@ -493,18 +536,20 @@ public record class CiphertextDecryptionTally : DisposableRecordBase
         var guardianShares = GetGuardianShares();
         var lagrangeCoefficients = guardianShares.ComputeLagrangeCoefficients();
 
+        // decrypt
         var plaintextTally = _tally.Decrypt(
             guardianShares, lagrangeCoefficients, skipValidation);
         var plaintextBallots = _challengedBallots.Decrypt(
             _ballotShares, lagrangeCoefficients, _tally, skipValidation);
         var spoiledBallots = _spoiledBallots.Values.ToList();
 
-        // Create the decryption proofs
-
+        // construct the decryption result
         var result = new DecryptionResult(
             _tally.TallyId, plaintextTally, plaintextBallots, spoiledBallots);
 
         DecryptionState = DecryptionState.PendingAdminPublishResults;
+
+        _decryptionResult = result;
 
         return result;
     }
@@ -522,9 +567,14 @@ public record class CiphertextDecryptionTally : DisposableRecordBase
 
     #region Verify
 
+    // TODO: implement verification methods 
+    // (these are the methods that a 3rd aprty verifier would implement)
+
     #endregion
 
     #region Publish
+
+    // TODO: implement publish methods
 
     #endregion
 
@@ -544,6 +594,8 @@ public record class CiphertextDecryptionTally : DisposableRecordBase
             share?.Dispose();
         }
     }
+
+    #region Private Methods
 
     private void AddChallengedBallot(CiphertextBallot ballot)
     {
@@ -594,4 +646,6 @@ public record class CiphertextDecryptionTally : DisposableRecordBase
         }
         return guardianShares;
     }
+
+    #endregion
 }

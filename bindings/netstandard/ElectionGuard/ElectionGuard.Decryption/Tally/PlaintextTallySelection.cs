@@ -34,7 +34,7 @@ public class PlaintextTallySelection
     /// <summary>
     /// The proof that the decrypted representation of the sum of all ballots for the selection is correct
     /// </summary>
-    public ChaumPedersenProof Proof { get; set; }
+    public ChaumPedersenProof? Proof { get; set; }
 
     public PlaintextTallySelection(
         IElectionSelection selection) : this(
@@ -62,11 +62,11 @@ public class PlaintextTallySelection
     public PlaintextTallySelection(
         IElectionSelection selection,
         ulong tally,
-        ElementModP value) : this(
+        ElementModP value, ChaumPedersenProof proof) : this(
             selection.ObjectId,
             selection.SequenceOrder,
             selection.DescriptionHash,
-            tally, value)
+            tally, value, proof)
     {
 
     }
@@ -76,13 +76,18 @@ public class PlaintextTallySelection
         ulong sequenceOrder,
         ElementModQ descriptionHash,
         ulong tally,
-        ElementModP value)
+        ElementModP value,
+        ChaumPedersenProof? proof = null)
     {
         ObjectId = objectId;
         SequenceOrder = sequenceOrder;
         DescriptionHash = new(descriptionHash);
         Tally = tally;
         Value = new(value);
+        if (proof is not null)
+        {
+            Proof = new(proof);
+        }
     }
 
     protected override void DisposeUnmanaged()
@@ -90,6 +95,7 @@ public class PlaintextTallySelection
         base.DisposeManaged();
         DescriptionHash.Dispose();
         Value.Dispose();
+        Proof?.Dispose();
     }
 
     # region IEquatable
