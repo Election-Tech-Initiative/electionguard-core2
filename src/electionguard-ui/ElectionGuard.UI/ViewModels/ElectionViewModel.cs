@@ -107,6 +107,15 @@ public partial class ElectionViewModel : BaseViewModel
         Step2Complete = true;
     }
 
+    partial void OnCurrentTallyChanged(TallyRecord? value)
+    {
+        MainThread.BeginInvokeOnMainThread(async () =>
+            await NavigationService.GoToPage(typeof(TallyProcessViewModel), new Dictionary<string, object>
+            {
+                { "TallyId", value.TallyId! }
+            }));
+    }
+
 
     partial void OnCurrentElectionChanged(Election? value)
     {

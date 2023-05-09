@@ -84,23 +84,23 @@ public partial class TallyProcessViewModel : BaseViewModel
         JoinedGuardians.Add(joiner);
     }
 
-    private bool CanJoinTally() => CurrentUserJoinedAlready() && Tally.State == TallyState.PendingGuardiansJoin;
+    private bool CanJoinTally() => Tally.State == TallyState.PendingGuardiansJoin && !CurrentUserJoinedAlready();
 
     private bool CurrentUserJoinedAlready() => JoinedGuardians.SingleOrDefault(g => g.GuardianId == UserName) is object;
 
-    [RelayCommand(CanExecute =nameof(CanJoinTally))]
-    private async Task RejectTally() 
+    [RelayCommand(CanExecute = nameof(CanJoinTally))]
+    private async Task RejectTally()
     {
         var joiner = new TallyJoinedRecord()
         {
             TallyId = TallyId,
-            GuardianId = UserName!, // can assume not null, since you need to be signed in to get here 
+            GuardianId = UserName!, // can assume not null, since you need to be signed in to get here
         };
 
         await _tallyJoinedService.JoinTallyAsync(joiner);
         JoinedGuardians.Add(joiner);
 
-        await NavigationService.GoHome();
+        HomeCommand.Execute(null);
     }
 
 }
