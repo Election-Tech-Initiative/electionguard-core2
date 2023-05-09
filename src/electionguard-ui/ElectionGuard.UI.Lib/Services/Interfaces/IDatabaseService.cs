@@ -23,6 +23,8 @@ internal static class Constants
 
     public readonly static string GuardianId = "GuardianId";
 
+    public readonly static string Joined = "Joined";
+
     public readonly static string Id = "Id";
 
     public readonly static string KeyCeremonyId = "KeyCeremonyId";

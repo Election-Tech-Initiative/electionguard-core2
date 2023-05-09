@@ -30,7 +30,7 @@ public class TallyJoinedService : BaseDatabaseService<TallyJoinedRecord>
     public async Task<List<string>> GetGuardianRejectedIdsAsync(string guardianId)
     {
         var filter = FilterBuilder.And(
-                // FilterBuilder.Eq(Constants.Joined, false),
+                FilterBuilder.Eq(Constants.Joined, false),
                 FilterBuilder.Eq(Constants.GuardianId, guardianId));
 
         var list = await GetAllByFilterAsync(filter);
