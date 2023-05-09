@@ -411,16 +411,24 @@ namespace ElectionGuard.Encryption.Utils.Generators
            InternalManifest manifest,
             CiphertextElectionContext context,
             List<PlaintextBallot> plaintext,
-            ElementModQ seed, ElementModQ nonce)
+            ElementModQ seed,
+            ElementModQ nonce)
         {
-            Console.WriteLine($"GetFakeCiphertextBallots {plaintext.Count}");
+            Console.WriteLine($"GetFakeCiphertextBallots: withNonces {plaintext.Count}");
+            ulong timestamp = 1;
             var ballots = new List<CiphertextBallot>();
             for (var i = 0; i < plaintext.Count; i++)
             {
                 var ballot = plaintext[i];
                 var ciphertext = Encrypt.Ballot(
-                    ballot, manifest, context,
-                    seed, nonce, shouldVerifyProofs: false);
+                    ballot,
+                    manifest,
+                    context,
+                    seed,
+                    nonce,
+                    timestamp,
+                    shouldVerifyProofs: false,
+                    usePrecomputedValues: false);
                 ballots.Add(ciphertext);
             }
 
@@ -434,14 +442,19 @@ namespace ElectionGuard.Encryption.Utils.Generators
             List<PlaintextBallot> plaintext,
             Random random)
         {
-            Console.WriteLine($"GetFakeCiphertextBallots {plaintext.Count}");
+            Console.WriteLine($"GetFakeCiphertextBallots: withRandom {plaintext.Count}");
             var ballots = new List<CiphertextBallot>();
             for (var i = 0; i < plaintext.Count; i++)
             {
                 var ballot = plaintext[i];
                 var ciphertext = Encrypt.Ballot(
-                    ballot, manifest, context,
-                    random.NextElementModQ(), random.NextElementModQ(), shouldVerifyProofs: false);
+                    ballot,
+                    manifest,
+                    context,
+                    random.NextElementModQ(),
+                    random.NextElementModQ(),
+                    shouldVerifyProofs: false,
+                    usePrecomputedValues: false);
                 ballots.Add(ciphertext);
             }
 

@@ -20,6 +20,7 @@ public record TallyChallenge
     // sequence order of the guardian
     public ulong SequenceOrder { get; init; }
 
+    // lagrange coefficient of the guardian
     public ElementModQ Coefficient { get; init; }
 
     public Dictionary<string, ContestChallenge> Contests { get; init; } = new Dictionary<string, ContestChallenge>();

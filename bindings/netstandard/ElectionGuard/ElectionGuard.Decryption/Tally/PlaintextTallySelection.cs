@@ -1,3 +1,4 @@
+using System.Text;
 using ElectionGuard.Ballot;
 
 namespace ElectionGuard.Decryption.Tally;
@@ -96,6 +97,15 @@ public class PlaintextTallySelection
         DescriptionHash.Dispose();
         Value.Dispose();
         Proof?.Dispose();
+    }
+
+    public override string ToString()
+    {
+        var builder = new StringBuilder();
+        _ = builder.AppendLine($"Selection: {ObjectId} ({SequenceOrder}) {DescriptionHash}");
+        _ = builder.AppendLine($"     Vote: {Tally}");
+        _ = builder.AppendLine($"    Value: {Value}");
+        return builder.ToString();
     }
 
     # region IEquatable

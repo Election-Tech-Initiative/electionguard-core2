@@ -24,15 +24,19 @@ public class TestChallenge : DisposableBase
     [Test, Category("SingleTest")]
     public void Test_Challenge_Selection()
     {
+        var seed = new ElementModQ(Constants.TWO_MOD_Q);
+        var nonce = new ElementModQ(Constants.TWO_MOD_Q);
+
         // Arrange
         using var data = TestDecryptionData.ConfigureTestCase(
             KeyCeremonyGenerator.GenerateKeyCeremonyData(
             NUMBER_OF_GUARDIANS,
             QUORUM, runKeyCeremony: true),
-            ManifestGenerator.GetFakeManifest(),
+            ManifestGenerator.GetFakeManifest(startDateTime: DateTime.UtcNow.Date),
             BALLOT_COUNT_CAST,
             BALLOT_COUNT_CHALLENGED,
-            BALLOT_COUNT_SPOILED);
+            BALLOT_COUNT_SPOILED,
+            seed, nonce);
 
         var context = data.CiphertextTally.Context;
 

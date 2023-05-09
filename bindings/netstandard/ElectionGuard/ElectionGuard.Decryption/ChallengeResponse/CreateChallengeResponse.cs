@@ -147,25 +147,4 @@ public static class GuardianChallengeResponseExtensions
             guardian, challenge, response
         );
     }
-
-    // dont think these are used since the admin can now producxe the proof
-    // public static ChaumPedersenProof ComputeDecryptionShareProof(
-    //     this Guardian guardian,
-    //     SelectionShare share, SelectionChallenge challenge)
-    // {
-    //     return guardian.ComputeDecryptionShareProof(share, challenge.Challenge);
-    // }
-
-    // public static ChaumPedersenProof ComputeDecryptionShareProof(
-    //     this Guardian guardian,
-    //     SelectionShare share, ElementModQ challenge)
-    // {
-    //     var response = guardian.CreateResponse(share, challenge);
-    //     var proof = new ChaumPedersenProof(
-    //         share.Commitment,
-    //         challenge,
-    //         response
-    //     );
-    //     return proof;
-    // }
 }

@@ -1,3 +1,4 @@
+using System.Text;
 using ElectionGuard.Ballot;
 using ElectionGuard.ElectionSetup.Concurrency;
 
@@ -169,6 +170,15 @@ namespace ElectionGuard.Decryption.Tally
             Ciphertext?.Dispose();
             _mutex?.Dispose();
         }
+
+        public override string ToString()
+        {
+            var builder = new StringBuilder();
+            _ = builder.AppendLine($"Selection : {ObjectId} ({SequenceOrder}) {DescriptionHash}");
+            _ = builder.AppendLine($"Ciphertext: {Ciphertext}");
+            return builder.ToString();
+        }
+
 
         # region Equality
 
