@@ -9,7 +9,10 @@
         private string _guardianId = string.Empty;
 
         [ObservableProperty]
-        private DateTime _joined = DateTime.UtcNow;
+        private bool _joined = false;
+
+        [ObservableProperty]
+        private DateTime _joinedDate = DateTime.UtcNow;
 
         public TallyJoinedRecord() : base(nameof(TallyJoinedRecord)) { }
     }

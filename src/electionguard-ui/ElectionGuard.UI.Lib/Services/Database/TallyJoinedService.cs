@@ -10,10 +10,10 @@ public class TallyJoinedService : BaseDatabaseService<TallyJoinedRecord>
     {
     }
 
-    public async Task<List<TallyJoinedRecord>> GetByTallyIdAsync(string tallyId) => 
+    public async Task<List<TallyJoinedRecord>> GetAllByTallyIdAsync(string tallyId) => 
         await GetAllByFieldAsync(Constants.TallyId, tallyId);
 
-    public async Task JoinTally(TallyJoinedRecord joiner)
+    public async Task JoinTallyAsync(TallyJoinedRecord joiner)
     {
         var filter = FilterBuilder.And(
                 FilterBuilder.Eq(Constants.TallyId, joiner.TallyId),

@@ -495,4 +495,10 @@
   <data name="ExportDriveWarningTitle" xml:space="preserve">
     <value>Export Encryption Package</value>
   </data>
+  <data name="ProcessTallyJoinNo" xml:space="preserve">
+    <value>No, Do not Join Tally</value>
+  </data>
+  <data name="ProcessTallyJoinYes" xml:space="preserve">
+    <value>Yes, Join Tally</value>
+  </data>
 </root>
