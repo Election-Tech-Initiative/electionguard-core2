@@ -45,7 +45,7 @@ public class TallyService : BaseDatabaseService<TallyRecord>
 
     public async Task<List<TallyRecord>> GetAllByKeyCeremoniesAsync(List<string> ids)
     {
-        BsonArray array = new BsonArray(ids);
+        BsonArray array = new(ids);
         return await GetAllByFieldInListAsync(Constants.KeyCeremonyId, array);
     }
 

@@ -1,5 +1,4 @@
-﻿using System.Reflection;
-using ElectionGuard.UI.Lib.Models;
+﻿using ElectionGuard.UI.Lib.Models;
 
 namespace ElectionGuard.UI.Lib.Services;
 
