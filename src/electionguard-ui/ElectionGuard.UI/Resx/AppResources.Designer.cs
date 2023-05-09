@@ -871,6 +871,24 @@ namespace ElectionGuard.UI.Resx {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to No, Do not Join Tally.
+        /// </summary>
+        internal static string ProcessTallyJoinNo {
+            get {
+                return ResourceManager.GetString("ProcessTallyJoinNo", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Yes, Join Tally.
+        /// </summary>
+        internal static string ProcessTallyJoinYes {
+            get {
+                return ResourceManager.GetString("ProcessTallyJoinYes", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Quorum.
         /// </summary>
         internal static string Quorum {
