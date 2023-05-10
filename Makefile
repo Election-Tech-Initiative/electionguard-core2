@@ -5,15 +5,14 @@ ELECTIONGUARD_CACHE=$(subst \,/,$(realpath .))/.cache
 ELECTIONGUARD_APPS_DIR=$(realpath .)/apps
 ELECTIONGUARD_BINDING_DIR=$(realpath .)/bindings
 ELECTIONGUARD_DATA_DIR=$(realpath .)/data
-ELECTIONGUARD_BINDING_LIB_DIR=$(ELECTIONGUARD_BINDING_DIR)/netstandard/ElectionGuard/ElectionGuard.Encryption
-ELECTIONGUARD_BINDING_BENCH_DIR=$(ELECTIONGUARD_BINDING_DIR)/netstandard/ElectionGuard/ElectionGuard.Encryption.Bench
+ELECTIONGUARD_BINDING_NETSTANDARD_DIR=$(ELECTIONGUARD_BINDING_DIR)/netstandard/ElectionGuard
+ELECTIONGUARD_BINDING_LIB_DIR=$(ELECTIONGUARD_BINDING_NETSTANDARD_DIR)/ElectionGuard.Encryption
+ELECTIONGUARD_BINDING_BENCH_DIR=$(ELECTIONGUARD_BINDING_NETSTANDARD_DIR)/ElectionGuard.Encryption.Bench
 ELECTIONGUARD_APP_CLI_DIR=$(ELECTIONGUARD_APPS_DIR)/electionguard-cli/ElectionGuard.CLI
-ELECTIONGUARD_BINDING_TEST_DIR=$(ELECTIONGUARD_BINDING_DIR)/netstandard/ElectionGuard/ElectionGuard.Encryption.Tests
-ELECTIONGUARD_BINDING_UTILS_DIR=$(ELECTIONGUARD_BINDING_DIR)/netstandard/ElectionGuard/ElectionGuard.Encryption.Utils
+ELECTIONGUARD_BINDING_TEST_DIR=$(ELECTIONGUARD_BINDING_NETSTANDARD_DIR)/ElectionGuard.Encryption.Tests
+ELECTIONGUARD_BINDING_UTILS_DIR=$(ELECTIONGUARD_BINDING_NETSTANDARD_DIR)/ElectionGuard.Encryption.Utils
 ELECTIONGUARD_BUILD_DIR=$(subst \,/,$(realpath .))/build
 ELECTIONGUARD_BUILD_DIR_WIN=$(subst \c\,C:\,$(subst /,\,$(ELECTIONGUARD_BUILD_DIR)))
-ELECTIONGUARD_BUILD_APPS_DIR=$(ELECTIONGUARD_BUILD_DIR)/apps
-ELECTIONGUARD_BUILD_BINDING_DIR=$(ELECTIONGUARD_BUILD_DIR)/bindings
 ELECTIONGUARD_BUILD_LIBS_DIR=$(ELECTIONGUARD_BUILD_DIR)/libs
 CPM_SOURCE_CACHE=$(ELECTIONGUARD_CACHE)/CPM
 EMSCRIPTEN_VERSION?=3.1.35
@@ -600,14 +599,9 @@ ifeq ($(OPERATING_SYSTEM),Windows)
 	xcopy "build/libs/$(OPERATING_SYSTEM)/$(PROCESSOR)/$(TARGET)/_deps/hacl-build/$(TARGET)/hacl.dll" "bindings/netstandard/ElectionGuard/ElectionGuard.Encryption.Tests/bin/$(TARGET)/net7.0/win-$(PROCESSOR)/hacl.dll" /s 
 endif
 ifeq ($(OPERATING_SYSTEM),Darwin)
-	TARGET_FOLDERS="./bindings/netstandard/ElectionGuard/ElectionGuard.Decryption.Tests/bin/$(TARGET)/net7.0/osx-$(PROCESSOR) ./bindings/netstandard/ElectionGuard/ElectionGuard.ElectionSetup.Tests/bin/$(TARGET)/net7.0/osx-$(PROCESSOR) ./bindings/netstandard/ElectionGuard/ElectionGuard.Encryption.Tests/bin/$(TARGET)/net7.0/osx-$(PROCESSOR)"
-	NATIVE_FOLDERS="./bindings/netstandard/ElectionGuard/ElectionGuard.Decryption.Tests/bin/$(TARGET)/net7.0/runtimes/osx/native ./bindings/netstandard/ElectionGuard/ElectionGuard.ElectionSetup.Tests/bin/$(TARGET)/net7.0/runtimes/osx/native ./bindings/netstandard/ElectionGuard/ElectionGuard.Encryption.Tests/bin/$(TARGET)/net7.0/runtimes/osx/native"
-	ALL_FOLDERS=$(TARGET_FOLDERS) $(NATIVE_FOLDERS)
-	echo $(ALL_FOLDERS) | xargs -n 1 mkdir -p
-
-	echo $(ALL_FOLDERS) | xargs cp -n 1 -r "./build/libs/$(OPERATING_SYSTEM)/$(PROCESSOR)/$(TARGET)/src/libelectionguard.dylib" \
-		"./build/libs/$(OPERATING_SYSTEM)/$(PROCESSOR)/$(TARGET)/libs/hacl/libhacl_cpp.dylib" \
-		"./build/libs/$(OPERATING_SYSTEM)/$(PROCESSOR)/$(TARGET)/_deps/hacl-build/libhacl.dylib" 
+	input_files="$(ELECTIONGUARD_BUILD_LIBS_DIR)/$(OPERATING_SYSTEM)/$(PROCESSOR)/$(TARGET)/src/*.{dylib,a} $(ELECTIONGUARD_BUILD_LIBS_DIR)/$(OPERATING_SYSTEM)/$(PROCESSOR)/$(TARGET)/libs/hacl/*.{dylib,a} $(ELECTIONGUARD_BUILD_LIBS_DIR)/$(OPERATING_SYSTEM)/$(PROCESSOR)/$(TARGET)/_deps/hacl-build/*.{dylib,a}"
+	output_dirs="$(ELECTIONGUARD_BINDING_NETSTANDARD_DIR)/ElectionGuard.Decryption.Tests/bin/$(TARGET)/net7.0/runtimes/osx/native $(ELECTIONGUARD_BINDING_NETSTANDARD_DIR)/ElectionGuard.ElectionSetup.Tests/bin/$(TARGET)/net7.0/runtimes/osx/native $(ELECTIONGUARD_BINDING_NETSTANDARD_DIR)/ElectionGuard.Encryption.Tests/bin/$(TARGET)/net7.0/runtimes/osx/native"
+	echo "$$input_files" | xargs cp -n -R --preserve=mode,timestamps $$output_dirs
 endif
 
 test-cli: build-cli
