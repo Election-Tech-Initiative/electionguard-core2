@@ -22,12 +22,17 @@ public static class GuardianChallengeResponseExtensions
         this Guardian guardian,
         GuardianShare share, GuardianChallenge challenge)
     {
+        if (guardian.CommitmentOffset is null)
+        {
+            throw new AggregateException(
+                $"Guardian {guardian.GuardianId} does not have a commitment offset");
+        }
         var tallyResponse = guardian.ComputeChallengeResponse(share.Tally, challenge.Tally);
-
         var ballotResponses = guardian.ComputeChallengeResponse(share.Ballots, challenge.Ballots);
 
         return new GuardianChallengeResponse(
             guardian,
+            guardian.CommitmentOffset,
             tallyResponse,
             ballotResponses!.Values.ToList());
     }

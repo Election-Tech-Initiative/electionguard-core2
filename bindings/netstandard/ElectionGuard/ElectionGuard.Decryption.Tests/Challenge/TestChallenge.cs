@@ -127,7 +127,7 @@ public class TestChallenge : DisposableBase
             // 𝑏𝑖 = 𝐴^𝑣𝑖 • 𝑀𝑖^𝑐𝑖 mod 𝑝 Equation (64)
             var validated = response.IsValid(
                 selection,
-                guardianKeys,
+                guardian.CommitmentOffset!,
                 share, guardianChallenge);
 
             Assert.That(validated, Is.True);

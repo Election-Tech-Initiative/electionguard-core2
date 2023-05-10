@@ -281,9 +281,6 @@ public record class CiphertextDecryptionTally : DisposableRecordBase
         var tallyChallenges = CreateTallyChallenge();
         var ballotChallenges = CreateBallotChallenges();
 
-        Console.WriteLine($"Tally challenges: {tallyChallenges.Count}");
-        Console.WriteLine($"Ballot challenges: {ballotChallenges?.Count}");
-
         // create guardian challenges for each guardian
         foreach (var (guardianId, guardian) in _guardians)
         {
@@ -402,7 +399,6 @@ public record class CiphertextDecryptionTally : DisposableRecordBase
 
             if (!response.IsValid(
                 _tally,
-                _guardians[guardianId],
                 challengeBallots,
                 share,
                 _challenges[guardianId]))

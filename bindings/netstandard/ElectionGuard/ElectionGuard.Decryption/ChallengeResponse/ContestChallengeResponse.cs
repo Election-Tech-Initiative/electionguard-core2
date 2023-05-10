@@ -59,7 +59,7 @@ public record ContestChallengeResponse
 
     public bool IsValid(
         ICiphertextContest contest,
-        ElectionPublicKey guardian,
+        ElementModP commitmentOffset,
         ContestShare share,
         ContestChallenge challenge
     )
@@ -68,7 +68,7 @@ public record ContestChallengeResponse
         {
             if (!selection.IsValid(
                 contest.Selections.First(x => x.ObjectId == selectionId),
-                guardian,
+                commitmentOffset,
                 share.Selections[selectionId],
                 challenge.Selections[selectionId]
             ))

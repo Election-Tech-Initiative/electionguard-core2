@@ -3,7 +3,6 @@ using ElectionGuard.Decryption.Challenge;
 using ElectionGuard.Decryption.Shares;
 using ElectionGuard.ElectionSetup;
 using ElectionGuard.ElectionSetup.Extensions;
-using ElectionGuard.Guardians;
 
 namespace ElectionGuard.Decryption.ChallengeResponse;
 
@@ -68,7 +67,7 @@ public record BallotChallengeResponse
 
     public bool IsValid(
         CiphertextBallot ballot,
-        ElectionPublicKey guardian,
+        ElementModP commitmentOffset,
         BallotShare share,
         BallotChallenge challenge)
     {
@@ -76,7 +75,7 @@ public record BallotChallengeResponse
         {
             if (!contest.IsValid(
                 ballot.Contests.First(x => x.ObjectId == contestId),
-                guardian,
+                commitmentOffset,
                 share.Contests[contestId],
                 challenge.Contests[contestId]
             ))

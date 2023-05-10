@@ -25,17 +25,24 @@ public record GuardianChallengeResponse : DisposableRecordBase
     /// </summary>
     public ulong SequenceOrder { get; init; }
 
+    /// <summary>
+    /// The offset used to generate the commitment.
+    /// </summary>
+    public ElementModP CommitmentOffset { get; init; }
+
     public TallyChallengeResponse Tally { get; init; }
 
     public List<BallotChallengeResponse> Ballots { get; init; }
 
     public GuardianChallengeResponse(
         IElectionGuardian guardian,
+        ElementModP commitmentOffset,
         TallyChallengeResponse tally,
         List<BallotChallengeResponse>? ballots)
     {
         GuardianId = guardian.GuardianId;
         SequenceOrder = guardian.SequenceOrder;
+        CommitmentOffset = new(commitmentOffset);
         Tally = tally;
         Ballots = ballots ?? new List<BallotChallengeResponse>();
     }
@@ -44,20 +51,20 @@ public record GuardianChallengeResponse : DisposableRecordBase
     {
         GuardianId = other.GuardianId;
         SequenceOrder = other.SequenceOrder;
+        CommitmentOffset = new(other.CommitmentOffset);
         Tally = new(other.Tally);
         Ballots = other.Ballots.Select(x => new BallotChallengeResponse(x)).ToList();
     }
 
     public bool IsValid(
        CiphertextTally tally,
-       ElectionPublicKey guardian,
        List<CiphertextBallot> ballots,
        GuardianShare share,
        GuardianChallenge challenge)
     {
         if (!Tally.IsValid(
             tally,
-            guardian,
+            CommitmentOffset,
             share.Tally,
             challenge.Tally))
         {
@@ -72,7 +79,7 @@ public record GuardianChallengeResponse : DisposableRecordBase
 
             if (!Ballots[i].IsValid(
                 ballot,
-                guardian,
+                CommitmentOffset,
                 ballotShare,
                 ballotChallenge))
             {

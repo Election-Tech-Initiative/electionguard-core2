@@ -91,6 +91,18 @@ public class PlaintextTallySelection
         }
     }
 
+    public PlaintextTallySelection(
+        PlaintextTallySelection other) : this(
+            other.ObjectId,
+            other.SequenceOrder,
+            other.DescriptionHash,
+            other.Tally,
+            other.Value,
+            other.Proof)
+    {
+
+    }
+
     protected override void DisposeUnmanaged()
     {
         base.DisposeManaged();

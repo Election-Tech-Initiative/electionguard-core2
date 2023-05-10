@@ -54,7 +54,7 @@ public record SelectionChallengeResponse : DisposableRecordBase
 
     public bool IsValid(
         ICiphertextSelection selection,
-        ElectionPublicKey guardian,
+        ElementModP commitmentOffset,
         SelectionShare share,
         SelectionChallenge challenge)
     {
@@ -66,12 +66,11 @@ public record SelectionChallengeResponse : DisposableRecordBase
             return false;
         }
 
-        Console.WriteLine($"SelectionChallengeResponse: Commitment: \n {share.Commitment} \n");
         return IsValid(
             selection.Ciphertext,
             share.Commitment,
             challenge.Challenge,
-            guardian.CoefficientCommitments,
+            commitmentOffset,
             share.Share);
     }
 
@@ -79,17 +78,14 @@ public record SelectionChallengeResponse : DisposableRecordBase
         ElGamalCiphertext ciphertext,
         ElGamalCiphertext commitment,
         ElementModQ challenge,
-        List<ElementModP> coefficientCommitments,
+        ElementModP commitmentOffset,
         ElementModP m_i)
     {
         using var recomputedCommitment = this.ComputeCommitment(
             ciphertext.Pad,
             challenge,
-            coefficientCommitments,
-            SequenceOrder,
+            commitmentOffset,
             m_i);
-
-        Console.WriteLine($"SelectionChallengeResponse: recomputedCommitment: \n {recomputedCommitment}");
 
         return recomputedCommitment.Equals(commitment);
     }

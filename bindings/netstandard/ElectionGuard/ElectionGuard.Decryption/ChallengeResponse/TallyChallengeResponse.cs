@@ -58,7 +58,7 @@ public record TallyChallengeResponse
 
     public bool IsValid(
         CiphertextTally tally,
-        ElectionPublicKey guardian,
+        ElementModP commitmentOffset,
         TallyShare share,
         TallyChallenge challenge)
     {
@@ -66,7 +66,7 @@ public record TallyChallengeResponse
         {
             if (!contest.IsValid(
                 tally.Contests[contestId],
-                guardian,
+                commitmentOffset,
                 share.Contests[contestId],
                 challenge.Contests[contestId]
             ))
