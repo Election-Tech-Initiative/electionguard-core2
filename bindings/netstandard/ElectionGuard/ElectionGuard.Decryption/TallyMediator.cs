@@ -1,4 +1,5 @@
 using ElectionGuard.Decryption.Tally;
+using ElectionGuard.ElectionSetup.Extensions;
 
 namespace ElectionGuard.Decryption;
 
@@ -31,5 +32,11 @@ public class TallyMediator : DisposableBase
     public CiphertextTally GetTally(string tallyId)
     {
         return Tallies[tallyId];
+    }
+
+    protected override void DisposeManaged()
+    {
+        base.DisposeManaged();
+        Tallies.Dispose();
     }
 }

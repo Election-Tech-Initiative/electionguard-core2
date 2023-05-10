@@ -3,6 +3,7 @@ using ElectionGuard.Decryption.ChallengeResponse;
 using ElectionGuard.Decryption.Decryption;
 using ElectionGuard.Decryption.Shares;
 using ElectionGuard.Decryption.Tally;
+using ElectionGuard.ElectionSetup.Extensions;
 using ElectionGuard.Guardians;
 
 namespace ElectionGuard.Decryption;
@@ -258,13 +259,6 @@ public class DecryptionMediator : DisposableBase
             return new DecryptionResult(tallyId, "Tally decryption does not exist");
         }
 
-        var tallyDecryption = TallyDecryptions[tallyId];
-
-        if (!tallyDecryption.CanDecrypt(Tallies[tallyId]))
-        {
-            return new DecryptionResult(tallyId, "Tally decryption is not valid");
-        }
-
         return new DecryptionResult(tallyId);
     }
 
@@ -285,21 +279,12 @@ public class DecryptionMediator : DisposableBase
 
     #endregion
 
-    protected override void DisposeUnmanaged()
+    protected override void DisposeManaged()
     {
-        base.DisposeUnmanaged();
-        foreach (var tallyDecryption in TallyDecryptions.Values)
-        {
-            tallyDecryption.Dispose();
-        }
-        foreach (var guardian in Guardians.Values)
-        {
-            guardian.Dispose();
-        }
-        foreach (var tally in Tallies.Values)
-        {
-            tally.Dispose();
-        }
+        base.DisposeManaged();
+        Guardians.Dispose();
+        Tallies.Dispose();
+        TallyDecryptions.Dispose();
     }
 
     private void EnsureCiphertextDecryptionTally(TallyShare share)

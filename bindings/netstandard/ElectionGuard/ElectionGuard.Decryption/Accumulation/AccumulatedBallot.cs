@@ -1,4 +1,6 @@
 using ElectionGuard.ElectionSetup;
+using ElectionGuard.Extensions;
+using ElectionGuard.ElectionSetup.Extensions;
 
 namespace ElectionGuard.Decryption.Accumulation;
 
@@ -13,17 +15,19 @@ public record AccumulatedBallot
     /// </summary>
     public string ObjectId { get; init; }
 
-
+    /// <summary>
+    /// The accumulated partial decryptions of the contests of the ballot
+    /// </summary>
     public Dictionary<string, AccumulatedContest> Contests { get; init; } = default!;
-
-    // TODO: derive from AccumulatedTally
 
     public AccumulatedBallot(
         string objectId,
         Dictionary<string, AccumulatedContest> contests)
     {
         ObjectId = objectId;
-        Contests = contests;
+        Contests = contests
+            .Select(x => new AccumulatedContest(x.Value))
+            .ToDictionary(x => x.ObjectId);
     }
 
     public AccumulatedBallot(
@@ -31,12 +35,22 @@ public record AccumulatedBallot
         List<AccumulatedContest> contests)
     {
         ObjectId = objectId;
-        Contests = contests.ToDictionary(x => x.ObjectId, x => x);
+        Contests = contests
+            .Select(x => new AccumulatedContest(x))
+            .ToDictionary(x => x.ObjectId);
     }
 
-
-    protected override void DisposeUnmanaged()
+    public AccumulatedBallot(AccumulatedBallot other) : base(other)
     {
-        base.DisposeUnmanaged();
+        ObjectId = other.ObjectId;
+        Contests = other.Contests
+            .Select(x => new AccumulatedContest(x.Value))
+            .ToDictionary(x => x.ObjectId);
+    }
+
+    protected override void DisposeManaged()
+    {
+        base.DisposeManaged();
+        Contests.Dispose();
     }
 }

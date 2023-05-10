@@ -8,12 +8,24 @@ namespace ElectionGuard.Decryption.Challenge;
 /// </summary>
 public record GuardianChallenge : DisposableRecordBase
 {
+    /// <summary>
+    /// The object id of the guardian.
+    /// </summary>
     public string GuardianId { get; init; }
 
+    /// <summary>
+    /// The sequence order of the guardian.
+    /// </summary>
     public ulong SequenceOrder { get; init; }
 
+    /// <summary>
+    /// The tally challenge for this guardian.
+    /// </summary>
     public TallyChallenge Tally { get; init; }
 
+    /// <summary>
+    /// The ballot challenges for this guardian.
+    /// </summary>
     public List<BallotChallenge> Ballots { get; init; }
 
     public GuardianChallenge(
@@ -28,10 +40,13 @@ public record GuardianChallenge : DisposableRecordBase
     }
 
 
-    protected override void DisposeUnmanaged()
+    protected override void DisposeManaged()
     {
-        base.DisposeUnmanaged();
+        base.DisposeManaged();
         Tally.Dispose();
-        // TODO Ballots.Dispose();
+        foreach (var ballot in Ballots)
+        {
+            ballot.Dispose();
+        }
     }
 }

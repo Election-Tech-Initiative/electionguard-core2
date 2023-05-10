@@ -1,11 +1,12 @@
 using ElectionGuard.Ballot;
 using ElectionGuard.ElectionSetup;
+using ElectionGuard.ElectionSetup.Extensions;
 using ElectionGuard.Guardians;
 
 namespace ElectionGuard.Decryption.Challenge;
 
 /// <summary>
-/// The Decryption of a contest used when publishing the results of an election.
+/// A challenge for a specific tally that is scoped to a specific guardian.
 /// </summary>
 public record TallyChallenge
     : DisposableRecordBase, IEquatable<TallyChallenge>
@@ -17,10 +18,14 @@ public record TallyChallenge
     /// </summary>
     public string GuardianId { get; init; }
 
-    // sequence order of the guardian
+    /// <summary>
+    /// sequence order of the guardian
+    /// </summary>
     public ulong SequenceOrder { get; init; }
 
-    // lagrange coefficient of the guardian
+    /// <summary>
+    /// lagrange coefficient of the guardian
+    /// </summary>
     public ElementModQ Coefficient { get; init; }
 
     public Dictionary<string, ContestChallenge> Contests { get; init; } = new Dictionary<string, ContestChallenge>();
@@ -75,10 +80,16 @@ public record TallyChallenge
         }
         GuardianId = guardian.GuardianId;
         SequenceOrder = guardian.SequenceOrder;
-        Coefficient = coefficient.Coefficient;
-        Contests = contests;
+        Coefficient = new(coefficient.Coefficient);
+        Contests = contests
+            .ToDictionary(
+                kvp => kvp.Key,
+                kvp => new ContestChallenge(kvp.Value));
     }
 
+    /// <summary>
+    /// Add an existing Selection challenge for a contest to the tally challenge
+    /// </summary>
     public void Add(
         IElectionContest contest,
         SelectionChallenge selection)
@@ -86,22 +97,35 @@ public record TallyChallenge
         Contests[contest.ObjectId].Add(selection);
     }
 
+    /// <summary>
+    /// Add a new Selection challenge for a contest to the tally challenge
+    /// </summary>
     public void Add(
         IElectionContest contest,
         IElectionSelection selection,
         ElementModQ challenge)
     {
-        Contests[contest.ObjectId].Add(new SelectionChallenge(
-            selection.ObjectId,
-            GuardianId,
-            SequenceOrder,
-            Coefficient,
-            challenge));
+        Contests[contest.ObjectId].Add(
+            new SelectionChallenge(
+                selection.ObjectId,
+                GuardianId,
+                SequenceOrder,
+                Coefficient,
+                challenge
+            )
+        );
+    }
+
+    protected override void DisposeManaged()
+    {
+        base.DisposeManaged();
+        Contests.Dispose();
     }
 
     protected override void DisposeUnmanaged()
     {
         base.DisposeUnmanaged();
+        Coefficient.Dispose();
     }
 }
 

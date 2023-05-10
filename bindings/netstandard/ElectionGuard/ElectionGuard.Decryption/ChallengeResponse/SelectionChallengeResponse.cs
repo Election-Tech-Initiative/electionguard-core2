@@ -1,26 +1,36 @@
-
-using System.Diagnostics;
 using ElectionGuard.Ballot;
-using ElectionGuard.Decryption.Accumulation;
 using ElectionGuard.Decryption.Challenge;
 using ElectionGuard.Decryption.Shares;
+using ElectionGuard.ElectionSetup;
 using ElectionGuard.Guardians;
 
 namespace ElectionGuard.Decryption.ChallengeResponse;
 
-public class SelectionChallengeResponse
+/// <summary>
+/// A response to a challenge for a specific selection.
+/// </summary>
+public record SelectionChallengeResponse : DisposableRecordBase
 {
     /// <summary>
     /// The object id of the selection.
     /// </summary>
     public string ObjectId { get; init; }
 
+    /// <summary>
+    /// The id of the guardian.
+    /// </summary>
     public string GuardianId { get; init; }
 
-    // the sequence order of the guardian
+    /// <summary>
+    /// The sequence order of the guardian
+    /// </summary>
     public ulong SequenceOrder { get; init; }
 
+    /// <summary>
+    // The response to the challenge.
+    ///
     // 𝑣𝑖 in the spec
+    /// </summary>
     public ElementModQ Response { get; init; }
 
     public SelectionChallengeResponse(
@@ -32,6 +42,14 @@ public class SelectionChallengeResponse
         SequenceOrder = guardian.SequenceOrder;
         GuardianId = guardian.GuardianId;
         Response = response;
+    }
+
+    public SelectionChallengeResponse(SelectionChallengeResponse other) : base(other)
+    {
+        ObjectId = other.ObjectId;
+        SequenceOrder = other.SequenceOrder;
+        GuardianId = other.GuardianId;
+        Response = new(other.Response);
     }
 
     public bool IsValid(
@@ -74,5 +92,11 @@ public class SelectionChallengeResponse
         Console.WriteLine($"SelectionChallengeResponse: recomputedCommitment: \n {recomputedCommitment}");
 
         return recomputedCommitment.Equals(commitment);
+    }
+
+    protected override void DisposeUnmanaged()
+    {
+        base.DisposeUnmanaged();
+        Response.Dispose();
     }
 }

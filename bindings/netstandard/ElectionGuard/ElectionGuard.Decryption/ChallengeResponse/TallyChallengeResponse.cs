@@ -1,25 +1,29 @@
 using ElectionGuard.Ballot;
-using ElectionGuard.Decryption.Accumulation;
 using ElectionGuard.Decryption.Challenge;
 using ElectionGuard.Decryption.Shares;
 using ElectionGuard.Decryption.Tally;
 using ElectionGuard.ElectionSetup;
+using ElectionGuard.ElectionSetup.Extensions;
 using ElectionGuard.Guardians;
 
 namespace ElectionGuard.Decryption.ChallengeResponse;
 
 /// <summary>
-/// The Decryption of a contest used when publishing the results of an election.
+/// The Challenge response for a specific tally
 /// </summary>
 public record TallyChallengeResponse
     : DisposableRecordBase, IEquatable<TallyChallengeResponse>
 {
+    // TODO: tallyId
+
     /// <summary>
     /// The object id of the contest
     /// </summary>
     public string GuardianId { get; init; }
 
-    // sequence order of the guardian
+    /// <summary>
+    /// Sequence order of the guardian
+    /// </summary>
     public ulong SequenceOrder { get; init; }
 
     public ElementModQ Coefficient { get; init; }
@@ -34,6 +38,15 @@ public record TallyChallengeResponse
         Coefficient = challenge.Coefficient;
         Contests = challenge
             .ToContestChallengeResponseDictionary();
+    }
+
+    public TallyChallengeResponse(TallyChallengeResponse other) : base(other)
+    {
+        GuardianId = other.GuardianId;
+        SequenceOrder = other.SequenceOrder;
+        Coefficient = other.Coefficient;
+        Contests = other.Contests
+            .ToDictionary(x => x.Key, x => new ContestChallengeResponse(x.Value));
     }
 
     public void Add(
@@ -65,9 +78,16 @@ public record TallyChallengeResponse
         return true;
     }
 
+    protected override void DisposeManaged()
+    {
+        base.DisposeManaged();
+        Contests.Dispose();
+    }
+
     protected override void DisposeUnmanaged()
     {
         base.DisposeUnmanaged();
+        Coefficient.Dispose();
     }
 }
 

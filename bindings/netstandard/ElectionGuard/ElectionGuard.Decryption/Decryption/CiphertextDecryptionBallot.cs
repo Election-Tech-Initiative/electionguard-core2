@@ -186,15 +186,17 @@ public record class CiphertextDecryptionBallot : DisposableRecordBase, IEquatabl
         return true;
     }
 
+    protected override void DisposeManaged()
+    {
+        base.DisposeManaged();
+        GuardianPublicKeys.Dispose();
+        Shares.Dispose();
+    }
+
     protected override void DisposeUnmanaged()
     {
         base.DisposeUnmanaged();
         ManifestHash.Dispose();
-        GuardianPublicKeys.Dispose();
-        foreach (var share in Shares)
-        {
-            share.Value.Dispose();
-        }
     }
 
     private void AddShare(BallotShare share)

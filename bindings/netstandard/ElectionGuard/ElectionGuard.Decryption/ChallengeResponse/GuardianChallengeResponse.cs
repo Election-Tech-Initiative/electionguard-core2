@@ -13,9 +13,16 @@ namespace ElectionGuard.Decryption.ChallengeResponse;
 /// </summary>
 public record GuardianChallengeResponse : DisposableRecordBase
 {
-    // TODO: tallyId
+    // TODO: tallyId?
+
+    /// <summary>
+    /// The object id of the guardian.
+    /// </summary>
     public string GuardianId { get; init; }
 
+    /// <summary>
+    /// The sequence order of the guardian.
+    /// </summary>
     public ulong SequenceOrder { get; init; }
 
     public TallyChallengeResponse Tally { get; init; }
@@ -31,6 +38,14 @@ public record GuardianChallengeResponse : DisposableRecordBase
         SequenceOrder = guardian.SequenceOrder;
         Tally = tally;
         Ballots = ballots ?? new List<BallotChallengeResponse>();
+    }
+
+    public GuardianChallengeResponse(GuardianChallengeResponse other) : base(other)
+    {
+        GuardianId = other.GuardianId;
+        SequenceOrder = other.SequenceOrder;
+        Tally = new(other.Tally);
+        Ballots = other.Ballots.Select(x => new BallotChallengeResponse(x)).ToList();
     }
 
     public bool IsValid(
@@ -69,10 +84,13 @@ public record GuardianChallengeResponse : DisposableRecordBase
         return true;
     }
 
-    protected override void DisposeUnmanaged()
+    protected override void DisposeManaged()
     {
-        base.DisposeUnmanaged();
+        base.DisposeManaged();
         Tally.Dispose();
-        // TODO Ballots.Dispose();
+        foreach (var ballot in Ballots)
+        {
+            ballot.Dispose();
+        }
     }
 }

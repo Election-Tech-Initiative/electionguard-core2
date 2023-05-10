@@ -53,7 +53,7 @@ namespace ElectionGuard.Extensions
             return source.Select((item, index) => (item, (ulong)index));
         }
 
-        public static void Dispose(this IEnumerable<DisposableBase> source)
+        public static void Dispose(this IEnumerable<IDisposable> source)
         {
             if (source.IsNullOrEmpty())
             {

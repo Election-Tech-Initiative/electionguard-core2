@@ -1,5 +1,6 @@
 using ElectionGuard.Decryption.Tally;
 using ElectionGuard.ElectionSetup;
+using ElectionGuard.ElectionSetup.Extensions;
 using ElectionGuard.Guardians;
 
 namespace ElectionGuard.Decryption.Shares;
@@ -102,16 +103,9 @@ public record TallyShare : DisposableRecordBase, IEquatable<TallyShare>
             : Contests[contestId].Selections[selectionId];
     }
 
-    protected override void DisposeUnmanaged()
+    protected override void DisposeManaged()
     {
-        base.DisposeUnmanaged();
-        if (Contests is not null)
-        {
-            foreach (var contest in Contests)
-            {
-                contest.Value.Dispose();
-            }
-            Contests.Clear();
-        }
+        base.DisposeManaged();
+        Contests.Dispose();
     }
 }

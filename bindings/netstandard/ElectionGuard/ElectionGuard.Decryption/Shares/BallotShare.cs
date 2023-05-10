@@ -167,4 +167,10 @@ public record BallotShare : TallyShare, IEquatable<BallotShare>
 
         return true;
     }
+
+    protected override void DisposeUnmanaged()
+    {
+        base.DisposeUnmanaged();
+        ManifestHash.Dispose();
+    }
 }

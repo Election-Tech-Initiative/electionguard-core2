@@ -577,21 +577,29 @@ public record class CiphertextDecryptionTally : DisposableRecordBase
 
     #endregion
 
-    protected override void DisposeUnmanaged()
+    protected override void DisposeManaged()
     {
-        base.DisposeUnmanaged();
+        base.DisposeManaged();
         _tally?.Dispose();
         _guardians?.Dispose();
         _challengedBallots?.Dispose();
         _spoiledBallots?.Dispose();
-        foreach (var share in _tallyShares.Values)
-        {
-            share?.Dispose();
-        }
-        foreach (var share in _ballotShares.Values)
-        {
-            share?.Dispose();
-        }
+
+        _tallyShares.Dispose();
+        _ballotShares.Dispose();
+
+        _challenges.Dispose();
+        _challengeResponses.Dispose();
+
+        _accumulatedTally?.Dispose();
+        _accumulatedBallots?.ForEach(x => x.Dispose());
+        _decryptionResult?.Dispose();
+    }
+
+    protected override void DisposeUnmanaged()
+    {
+        base.DisposeUnmanaged();
+
     }
 
     #region Private Methods

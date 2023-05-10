@@ -5,7 +5,7 @@ namespace ElectionGuard.Decryption.Decryption;
 /// <summary>   
 /// The result of a decryption operation
 /// </summary>
-public class DecryptionResult
+public class DecryptionResult : DisposableBase
 {
     /// <summary>
     /// The id of the tally
@@ -46,7 +46,7 @@ public class DecryptionResult
     {
         TallyId = tallyId;
         IsValid = true;
-        Tally = result;
+        Tally = new(result);
     }
 
     public DecryptionResult(
@@ -58,8 +58,8 @@ public class DecryptionResult
         TallyId = tallyId;
         IsValid = true;
         Tally = result;
-        ChallengedBallots = challengedBallots;
-        SpoiledBallots = spoiledBallots;
+        ChallengedBallots = challengedBallots.Select(x => new PlaintextTallyBallot(x)).ToList();
+        SpoiledBallots = spoiledBallots.Select(x => new CiphertextBallot(x)).ToList();
     }
 
     public DecryptionResult(
@@ -94,5 +94,18 @@ public class DecryptionResult
     public static implicit operator List<CiphertextBallot>?(DecryptionResult self)
     {
         return self.SpoiledBallots;
+    }
+
+    protected override void DisposeManaged()
+    {
+        base.DisposeManaged();
+        Tally?.Dispose();
+        ChallengedBallots?.ForEach(x => x.Dispose());
+    }
+
+    protected override void DisposeUnmanaged()
+    {
+        base.DisposeUnmanaged();
+        SpoiledBallots?.ForEach(x => x.Dispose());
     }
 }

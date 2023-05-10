@@ -6,6 +6,9 @@ using ElectionGuard.Decryption.Tally;
 
 namespace ElectionGuard.Decryption.Extensions;
 
+/// <summary>
+/// Extensions for computing Chaum-Pedersen proofs
+/// </summary>
 public static class ComputeChaumPedersenProofs
 {
 

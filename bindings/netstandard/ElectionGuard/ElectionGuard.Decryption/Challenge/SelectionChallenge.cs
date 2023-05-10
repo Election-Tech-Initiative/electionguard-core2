@@ -1,32 +1,40 @@
 using ElectionGuard.Ballot;
 using ElectionGuard.Decryption.Accumulation;
+using ElectionGuard.ElectionSetup;
 using ElectionGuard.Guardians;
 
 namespace ElectionGuard.Decryption.Challenge;
 
 /// <summary>
-/// 
+/// A challenge for a specific guardian to prove that a selection share was generated correctly.
 /// </summary>
-public class SelectionChallenge : DisposableBase
+public record SelectionChallenge : DisposableRecordBase
 {
     /// <summary>
     /// The object id of the selection.
     /// </summary>
     public string ObjectId { get; init; }
 
+    /// <summary>
+    /// the guardian id for which this challenge belongs
+    /// </summary>
     public string GuardianId { get; init; }
 
     // the sequence order of the guardian
     public ulong SequenceOrder { get; init; }
 
+    /// <summary>
+    /// The lagrange coefficient for the guardian
+    /// </summary>
     public ElementModQ Coefficient { get; init; }
 
-    // the challenge adjusted by the guardian lagrange coefficient
-    // // ci =(c·wi)modq in the spec.
+    /// <summary>
+    /// The selection challenge adjusted by the guardian lagrange coefficient
+    /// ci =(c·wi)modq in the spec.
+    /// </summary>
     public ElementModQ Challenge { get; init; }
 
     public const string HASH_PREFIX = "06";
-
 
     public SelectionChallenge(
         IElectionGuardian guardian,
@@ -47,7 +55,7 @@ public class SelectionChallenge : DisposableBase
             accumulation.Commitment,
             accumulation.Value);
 
-        // ci =(c·wi)modq
+        // ci =(c·wi) mod q
         Challenge = BigMath.MultModQ(challenge, coefficient);
     }
 
@@ -103,7 +111,11 @@ public class SelectionChallenge : DisposableBase
         Challenge = BigMath.MultModQ(challenge, coefficient);
     }
 
-    // // ci =(c·wi)modq
+    /// <summary>
+    /// constructor that accepts a pregenerated challenge
+    ///
+    /// This constructor is only for testing and should not be used in production
+    /// </summary>
     [Obsolete("just for testing")]
     public SelectionChallenge(
         IElectionSelection selection,
@@ -132,7 +144,7 @@ public class SelectionChallenge : DisposableBase
     }
 
     public SelectionChallenge(
-        SelectionChallenge other)
+        SelectionChallenge other) : base(other)
     {
         ObjectId = other.ObjectId;
         GuardianId = other.GuardianId;
@@ -141,7 +153,16 @@ public class SelectionChallenge : DisposableBase
         Challenge = new(other.Challenge);
     }
 
-    // c = H(06,Q;K,A,B,a,b,M)
+    /// <summary>
+    /// Given a selection and the proposed accumulated selection consisting 
+    /// of all selection decryption shares submitted by all participating guardians, 
+    /// compute a challenge value by hashing the inputs together. The challenge
+    /// is computed as follows:
+    /// c = H(06,Q;K,A,B,a,b,M)
+    ///
+    /// Once the challenge is computed, it is offset for each guardian by the lagrange coefficient
+    /// and the result is stored in the SelectionChallenge object.
+    /// </summary>
     public static ElementModQ ComputeChallenge(
             CiphertextElectionContext context,
             ICiphertextSelection selection,
@@ -155,7 +176,16 @@ public class SelectionChallenge : DisposableBase
                     accumulated.Value);
     }
 
-    // c = H(06,Q;K,A,B,a,b,M)
+    /// <summary>
+    /// Given a selection and the proposed accumulated selection consisting 
+    /// of all selection decryption shares submitted by all participating guardians, 
+    /// compute a challenge value by hashing the inputs together. The challenge
+    /// is computed as follows:
+    /// c = H(06,Q;K,A,B,a,b,M)
+    ///
+    /// Once the challenge is computed, it is offset for each guardian by the lagrange coefficient
+    /// and the result is stored in the SelectionChallenge object.
+    /// </summary>
     public static ElementModQ ComputeChallenge(
         ElementModQ extendedHash,
         ElementModP elGamalPublicKey,
@@ -170,7 +200,16 @@ public class SelectionChallenge : DisposableBase
                     accumulated.Value);
     }
 
-    // c = H(06,Q;K,A,B,a,b,M)
+    /// <summary>
+    /// Given a selection and the proposed accumulated selection consisting 
+    /// of all selection decryption shares submitted by all participating guardians, 
+    /// compute a challenge value by hashing the inputs together. The challenge
+    /// is computed as follows:
+    /// c = H(06,Q;K,A,B,a,b,M)
+    ///
+    /// Once the challenge is computed, it is offset for each guardian by the lagrange coefficient
+    /// and the result is stored in the SelectionChallenge object.
+    /// </summary>
     public static ElementModQ ComputeChallenge(
         ElementModQ extendedHash,
         ElementModP elGamalPublicKey,
@@ -192,6 +231,7 @@ public class SelectionChallenge : DisposableBase
     protected override void DisposeUnmanaged()
     {
         base.DisposeUnmanaged();
+        Coefficient.Dispose();
         Challenge.Dispose();
     }
 }

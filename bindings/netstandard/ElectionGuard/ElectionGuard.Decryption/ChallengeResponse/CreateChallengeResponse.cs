@@ -4,6 +4,7 @@ using ElectionGuard.ElectionSetup;
 
 namespace ElectionGuard.Decryption.ChallengeResponse;
 
+
 // TODO: all of the iterator functions for al;l of these types should be consoldaited somewhere
 // in fact we can probably define a single base class collection lookup
 // that takes a generic and iterates over the collectiosn and does zips and comaprisons
@@ -14,6 +15,9 @@ namespace ElectionGuard.Decryption.ChallengeResponse;
 public static class GuardianChallengeResponseExtensions
 {
 
+    /// <summary>
+    /// Compute a challenge response for a specific guardian challenge that was issued by an election administrator.
+    /// </summary>
     public static GuardianChallengeResponse ComputeChallengeResponse(
         this Guardian guardian,
         GuardianShare share, GuardianChallenge challenge)
@@ -28,7 +32,9 @@ public static class GuardianChallengeResponseExtensions
             ballotResponses!.Values.ToList());
     }
 
-    // compute a challenge response for a specific ballot
+    /// <summary>
+    /// Compute a challenge response for a specific tally challenge that was issued by an election administrator.
+    /// </summary>
     public static TallyChallengeResponse ComputeChallengeResponse(
         this Guardian guardian,
         TallyShare share, TallyChallenge challenge)
@@ -63,6 +69,9 @@ public static class GuardianChallengeResponseExtensions
         return response;
     }
 
+    /// <summary>
+    /// Compute a challenge response for a specific collection of ballots that was issued by an election administrator.
+    /// </summary>
     public static Dictionary<string, BallotChallengeResponse> ComputeChallengeResponse(
         this Guardian guardian,
         List<BallotShare> shares, List<BallotChallenge> challenges)
@@ -83,7 +92,9 @@ public static class GuardianChallengeResponseExtensions
     }
 
 
-    // compute a challenge response for a specific ballot
+    /// <summary>
+    /// Compute a challenge response for a specific ballot.
+    /// </summary>
     public static BallotChallengeResponse ComputeChallengeResponse(
         this Guardian guardian,
         BallotShare share, BallotChallenge challenge)
@@ -118,7 +129,9 @@ public static class GuardianChallengeResponseExtensions
         return response;
     }
 
-    // compute a challenge response for a specific selection
+    /// <summary>
+    /// Compute a challenge response for a specific selection.
+    /// </summary>
     public static SelectionChallengeResponse ComputeChallengeResponse(
         this Guardian guardian,
         SelectionShare share,

@@ -27,6 +27,9 @@ public record AccumulatedContest
     /// </summary>
     public ElementModQ DescriptionHash { get; init; }
 
+    /// <summary>
+    /// The accumulated selections for this contest
+    /// </summary>
     public Dictionary<string, AccumulatedSelection> Selections { get; init; } = default!;
 
     public AccumulatedContest(
@@ -67,6 +70,20 @@ public record AccumulatedContest
         .ToDictionary(x => x.ObjectId);
     }
 
+    public AccumulatedContest(
+        AccumulatedContest other) : base(other)
+    {
+        ObjectId = other.ObjectId;
+        SequenceOrder = other.SequenceOrder;
+        DescriptionHash = new(other.DescriptionHash);
+        Selections = other.Selections.Select(
+            x => new AccumulatedSelection(x.Value))
+        .ToDictionary(x => x.ObjectId);
+    }
+
+    /// <summary>
+    /// Accumulate the shares for this contest
+    /// </summary>
     public void Accumulate(
         List<Tuple<ElectionPublicKey, ContestShare>> guardianShares,
         Dictionary<string, LagrangeCoefficient> lagrangeCoefficients,
@@ -84,6 +101,9 @@ public record AccumulatedContest
             Accumulate(share, lagrangeCoefficient, skipValidation);
         }
     }
+
+    /// <summary>
+    /// Accumulate the shares for this contest
 
     public void Accumulate(
         ContestShare share,
@@ -106,10 +126,15 @@ public record AccumulatedContest
         }
     }
 
+    protected override void DisposeManaged()
+    {
+        base.DisposeManaged();
+        Selections.Dispose();
+    }
+
     protected override void DisposeUnmanaged()
     {
-        Selections.Dispose();
-        DescriptionHash.Dispose();
         base.DisposeUnmanaged();
+        DescriptionHash.Dispose();
     }
 }

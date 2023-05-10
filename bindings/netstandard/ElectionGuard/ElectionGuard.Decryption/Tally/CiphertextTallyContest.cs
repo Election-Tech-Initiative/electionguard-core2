@@ -145,11 +145,15 @@ public class CiphertextTallyContest : DisposableBase, ICiphertextContest, IEquat
         }
     }
 
+    protected override void DisposeManaged()
+    {
+        base.DisposeManaged();
+        Selections?.Dispose();
+    }
+
     protected override void DisposeUnmanaged()
     {
         base.DisposeUnmanaged();
-        Selections?.Dispose();
-        Selections?.Clear();
         DescriptionHash?.Dispose();
     }
 

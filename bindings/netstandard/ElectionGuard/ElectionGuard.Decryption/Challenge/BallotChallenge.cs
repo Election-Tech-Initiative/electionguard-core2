@@ -7,7 +7,7 @@ using ElectionGuard.Guardians;
 namespace ElectionGuard.Decryption.Challenge;
 
 /// <summary>
-/// The Decryption of a contest used when publishing the results of an election.
+/// A challenge for a ballot that is scoped to a specific guardian
 /// </summary>
 public record BallotChallenge
     : DisposableRecordBase, IEquatable<BallotChallenge>
@@ -22,9 +22,14 @@ public record BallotChallenge
     /// </summary>
     public string GuardianId { get; init; }
 
-    // sequence order of the guardian
+    /// <summary>
+    /// The sequence order of the guardian
+    /// </summary>
     public ulong SequenceOrder { get; init; }
 
+    /// <summary>
+    /// The lagrange coefficient of the guardian
+    /// </summary>
     public ElementModQ Coefficient { get; init; }
 
     public Dictionary<string, ContestChallenge> Contests { get; init; } = default!;
@@ -107,6 +112,20 @@ public record BallotChallenge
             .ToContestChallengeDictionary();
     }
 
+    public BallotChallenge(BallotChallenge other) : base(other)
+    {
+        ObjectId = other.ObjectId;
+        GuardianId = other.GuardianId;
+        SequenceOrder = other.SequenceOrder;
+        Coefficient = other.Coefficient;
+        Contests = other.Contests
+            .Select(x => new ContestChallenge(x.Value))
+            .ToDictionary(x => x.ObjectId);
+    }
+
+    /// <summary>
+    /// Add an existing selection challenge to the contest collection
+    /// </summary>
     public void Add(
         IElectionContest contest,
         SelectionChallenge selection)
@@ -114,6 +133,9 @@ public record BallotChallenge
         Contests[contest.ObjectId].Add(selection);
     }
 
+    /// <summary>
+    /// Add a new selection challenge to the contest collection
+    /// </summary>
     public void Add(
         IElectionContest contest,
         IElectionSelection selection,
@@ -127,10 +149,16 @@ public record BallotChallenge
             challenge));
     }
 
+    protected override void DisposeManaged()
+    {
+        base.DisposeManaged();
+        Coefficient.Dispose();
+    }
 
     protected override void DisposeUnmanaged()
     {
         base.DisposeUnmanaged();
+        Contests.Dispose();
     }
 }
 

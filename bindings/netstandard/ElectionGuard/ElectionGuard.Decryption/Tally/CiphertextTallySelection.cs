@@ -163,12 +163,17 @@ namespace ElectionGuard.Decryption.Tally
             }
         }
 
+        protected override void DisposeManaged()
+        {
+            base.DisposeManaged();
+            _mutex?.Dispose();
+        }
+
         protected override void DisposeUnmanaged()
         {
             base.DisposeUnmanaged();
             DescriptionHash?.Dispose();
             Ciphertext?.Dispose();
-            _mutex?.Dispose();
         }
 
         public override string ToString()

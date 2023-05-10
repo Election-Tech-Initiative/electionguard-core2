@@ -1,4 +1,5 @@
 using ElectionGuard.Ballot;
+using ElectionGuard.ElectionSetup;
 using ElectionGuard.Guardians;
 
 namespace ElectionGuard.Decryption.Shares;
@@ -160,7 +161,8 @@ public class SelectionShare
         return ObjectId == other.ObjectId &&
                SequenceOrder == other.SequenceOrder &&
                DescriptionHash.Equals(other.DescriptionHash) &&
-               Share.Equals(other.Share); // TODO: proof comparison
+               Share.Equals(other.Share) &&
+               Commitment.Equals(other.Commitment);
     }
 
     public override bool Equals(object? obj)

@@ -3,11 +3,15 @@ using ElectionGuard.Guardians;
 
 namespace ElectionGuard.Decryption.ChallengeResponse;
 
+/// <summary>
+/// functions to validate the challenge responses.
+/// </summary>
 public static class ValidateChallengeResponseExtensions
 {
     /// <summary>
     /// Compute the commitment for the selection using 
-    /// the publically available data
+    /// the publically available data.
+    ///
     /// equations (63) and (64) in the spec
     /// </summary>
     public static ElGamalCiphertext ComputeCommitment(
@@ -27,7 +31,8 @@ public static class ValidateChallengeResponseExtensions
 
     /// <summary>
     /// Compute the commitment for the selection using 
-    /// the publically available data
+    /// the publically available data.
+    ///
     /// equations (63) and (64) in the spec
     /// </summary>
     public static ElGamalCiphertext ComputeCommitment(
@@ -39,7 +44,7 @@ public static class ValidateChallengeResponseExtensions
         ElementModP m_i)
     {
         // 𝑎𝑖 = 𝑔^𝑣𝑖 • 𝐾^𝑐𝑖 mod 𝑝
-        var gvi = BigMath.GPowP(self.Response); // 𝑔^𝑣𝑖
+        using var gvi = BigMath.GPowP(self.Response); // 𝑔^𝑣𝑖
 
         // Π 𝐾^𝑖^m mod 𝑝
         using var calculated = new ElementModP(Constants.ONE_MOD_P);
@@ -50,13 +55,13 @@ public static class ValidateChallengeResponseExtensions
             _ = calculated.MultModP(k_pow_im);
         }
 
-        var Kc = BigMath.PowModP(calculated, challenge); // 𝐾^𝑐𝑖
-        var aprime = BigMath.MultModP(gvi, Kc); // 𝑎𝑖 = 𝑔^𝑣𝑖 • 𝐾^𝑐𝑖
+        using var Kc = BigMath.PowModP(calculated, challenge); // 𝐾^𝑐𝑖
+        using var aprime = BigMath.MultModP(gvi, Kc); // 𝑎𝑖 = 𝑔^𝑣𝑖 • 𝐾^𝑐𝑖
 
         // 𝑏𝑖 = 𝐴^𝑣𝑖 • 𝑀𝑖^𝑐𝑖 mod 𝑝
-        var avi = BigMath.PowModP(ciphertextPad, self.Response); // 𝐴^𝑣𝑖
-        var Mc = BigMath.PowModP(m_i, challenge); // 𝑀𝑖^𝑐𝑖
-        var bprime = BigMath.MultModP(avi, Mc); // 𝑏𝑖 = 𝐴^𝑣𝑖 • 𝑀𝑖^𝑐𝑖
+        using var avi = BigMath.PowModP(ciphertextPad, self.Response); // 𝐴^𝑣𝑖
+        using var Mc = BigMath.PowModP(m_i, challenge); // 𝑀𝑖^𝑐𝑖
+        using var bprime = BigMath.MultModP(avi, Mc); // 𝑏𝑖 = 𝐴^𝑣𝑖 • 𝑀𝑖^𝑐𝑖
 
         return new ElGamalCiphertext(aprime, bprime);
     }

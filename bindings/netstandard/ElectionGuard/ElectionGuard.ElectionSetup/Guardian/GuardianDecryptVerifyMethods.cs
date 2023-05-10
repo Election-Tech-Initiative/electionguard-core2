@@ -54,9 +54,6 @@ public partial class Guardian
             _ = CombinePrivateKeyShares();
         }
 
-        // TODO: double check the mul mod q here is not a problem
-        // since its not a mod op in the spec
-
         // 𝑣𝑖 = (𝑢𝑖 − 𝑐𝑖P(𝑖)) mod q.
         var product = BigMath.MultModQ(challenge, _myPartialSecretKey);
         var v = BigMath.SubModQ(u, product);

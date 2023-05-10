@@ -10,6 +10,15 @@ namespace ElectionGuard.Decryption.Challenge;
 // TODO: async versions
 public static class CreateChallengeExtensions
 {
+    /// <summary>
+    /// Create a challenge for the tally. Accepts a ciphertext tally which contains 
+    /// the accumulation of all selections on all of all ballots cast and the Accumulated tally
+    /// with is the accumulation of all decryption shares submitted by guardains for each selection
+    /// in the ciphertext tally.
+    ///
+    /// A challenge is created for each selection and then offset by the lagrange coefficient
+    /// to craete a guardian-scoped challenge for each selection.
+    /// </summary>
     public static Dictionary<string, TallyChallenge> CreateChallenge(
         this CiphertextTally self, AccumulatedTally accumulatedTally,
         Dictionary<string, ElectionPublicKey> _guardians)
@@ -18,6 +27,17 @@ public static class CreateChallengeExtensions
         return self.CreateChallenge(accumulatedTally, coefficients);
     }
 
+    /// <summary>
+    /// Create a challenge for the tally. Accepts a ciphertext tally which contains 
+    /// the accumulation of all selections on all of all ballots cast and the Accumulated tally
+    /// with is the accumulation of all decryption shares submitted by guardains for each selection
+    /// in the ciphertext tally.
+    ///
+    /// A challenge is created for each selection and then offset by the lagrange coefficient
+    /// to craete a guardian-scoped challenge for each selection.
+    ///
+    /// Thiss override accepts existing lagrange coefficients to be used in the challenge
+    /// </summary>
     public static Dictionary<string, TallyChallenge> CreateChallenge(
         this CiphertextTally self, AccumulatedTally accumulatedTally,
         Dictionary<string, LagrangeCoefficient> lagrangeCoefficients)
@@ -34,6 +54,17 @@ public static class CreateChallengeExtensions
         return self.CreateChallenge(accumulatedTally, challenges);
     }
 
+    /// <summary>
+    /// Create a challenge for the tally. Accepts a ciphertext tally which contains 
+    /// the accumulation of all selections on all of all ballots cast and the Accumulated tally
+    /// with is the accumulation of all decryption shares submitted by guardains for each selection
+    /// in the ciphertext tally.
+    ///
+    /// A challenge is created for each selection and then offset by the lagrange coefficient
+    /// to craete a guardian-scoped challenge for each selection.
+    ///
+    /// This override accepts a collection of existing challenge objects that will be filled in and returned to the caller.
+    /// </summary>
     public static Dictionary<string, TallyChallenge> CreateChallenge(
         this CiphertextTally self, AccumulatedTally accumulatedTally,
         Dictionary<string, TallyChallenge> challenges)
@@ -73,6 +104,16 @@ public static class CreateChallengeExtensions
         return challenges;
     }
 
+    /// <summary>
+    /// Create a challenge for a collection of ballots. 
+    /// Accepts a collection of ciphertext ballots and
+    /// a collection of accumulated ballots which contains  
+    /// the accumulation of all decryption shares submitted by guardains for each selection
+    /// in each ballot.
+    ///
+    /// A challenge is created for each selection and then offset by the lagrange coefficient
+    /// to craete a guardian-scoped challenge for each selection.
+    /// </summary>
     public static Dictionary<string, List<BallotChallenge>> CreateChallenges(
         this List<CiphertextBallot> self, List<AccumulatedBallot> accumulatedBallot,
         Dictionary<string, LagrangeCoefficient> lagrangeCoefficients,

@@ -28,10 +28,13 @@ public record GuardianShare : DisposableRecordBase
     }
 
 
-    protected override void DisposeUnmanaged()
+    protected override void DisposeManaged()
     {
-        base.DisposeUnmanaged();
+        base.DisposeManaged();
         Tally.Dispose();
-        // TODO Ballots.Dispose();
+        foreach (var ballot in Ballots)
+        {
+            ballot.Dispose();
+        }
     }
 }

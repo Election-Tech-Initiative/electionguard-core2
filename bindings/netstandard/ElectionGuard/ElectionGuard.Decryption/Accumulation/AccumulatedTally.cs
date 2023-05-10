@@ -1,9 +1,10 @@
 using ElectionGuard.ElectionSetup;
+using ElectionGuard.ElectionSetup.Extensions;
 
 namespace ElectionGuard.Decryption.Accumulation;
 
 /// <summary>
-/// The Accumulated Decryption of a ballot used when publishing the results of an election.
+/// The Accumulated Decryption of a tally used when publishing the results of an election.
 /// </summary>
 public record AccumulatedTally
     : DisposableRecordBase, IEquatable<AccumulatedTally>
@@ -13,7 +14,9 @@ public record AccumulatedTally
     /// </summary>
     public string ObjectId { get; init; }
 
-
+    /// <summary>
+    /// The accumulated partial decryptions of the contests of the tally
+    /// </summary>
     public Dictionary<string, AccumulatedContest> Contests { get; init; } = default!;
 
     public AccumulatedTally(
@@ -29,12 +32,14 @@ public record AccumulatedTally
         List<AccumulatedContest> contests)
     {
         ObjectId = objectId;
-        Contests = contests.ToDictionary(x => x.ObjectId, x => x);
+        Contests = contests
+            .Select(x => new AccumulatedContest(x))
+            .ToDictionary(x => x.ObjectId);
     }
 
-
-    protected override void DisposeUnmanaged()
+    protected override void DisposeManaged()
     {
-        base.DisposeUnmanaged();
+        base.DisposeManaged();
+        Contests.Dispose();
     }
 }

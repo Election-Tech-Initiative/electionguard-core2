@@ -16,8 +16,14 @@ public record ContestChallenge
     /// </summary>
     public string ObjectId { get; init; }
 
+    /// <summary>
+    /// The sequence order of the contest
+    /// </summary>
     public ulong SequenceOrder { get; init; }
 
+    /// <summary>
+    /// The selection challenges for this contest
+    /// </summary>
     public Dictionary<string, SelectionChallenge> Selections { get; init; } = new Dictionary<string, SelectionChallenge>();
 
     public ContestChallenge(
@@ -52,15 +58,26 @@ public record ContestChallenge
         Selections = selections;
     }
 
+    public ContestChallenge(ContestChallenge other) : base(other)
+    {
+        ObjectId = other.ObjectId;
+        SequenceOrder = other.SequenceOrder;
+        Selections = other.Selections
+            .Select(x => new SelectionChallenge(x.Value))
+            .ToDictionary(x => x.ObjectId);
+    }
+
+    /// <summary>
+    /// Add a selection challenge to this contest challenge
+    /// </summary>
     public void Add(SelectionChallenge selection)
     {
         Selections.Add(selection.ObjectId, selection);
     }
 
-
-    protected override void DisposeUnmanaged()
+    protected override void DisposeManaged()
     {
+        base.DisposeManaged();
         Selections.Dispose();
-        base.DisposeUnmanaged();
     }
 }
