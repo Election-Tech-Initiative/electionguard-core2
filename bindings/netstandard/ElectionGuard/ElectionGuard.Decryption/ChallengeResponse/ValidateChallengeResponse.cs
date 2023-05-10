@@ -1,4 +1,3 @@
-using ElectionGuard.Extensions;
 using ElectionGuard.Guardians;
 
 namespace ElectionGuard.Decryption.ChallengeResponse;
@@ -18,14 +17,33 @@ public static class ValidateChallengeResponseExtensions
         this SelectionChallengeResponse self,
         ElGamalCiphertext ciphertext,
         ElementModQ challenge,
-        ElectionPublicKey guardian,
+        Dictionary<string, ElectionPublicKey> guardians,
         ElementModP m_i)
     {
         return self.ComputeCommitment(
             ciphertext.Pad,
             challenge,
-            guardian.CoefficientCommitments,
-            guardian.SequenceOrder,
+            guardians,
+            m_i);
+    }
+
+    /// <summary>
+    /// Compute the commitment for the selection using 
+    /// the publically available data.
+    ///
+    /// equations (63) and (64) in the spec
+    /// </summary>
+    public static ElGamalCiphertext ComputeCommitment(
+        this SelectionChallengeResponse self,
+        ElGamalCiphertext ciphertext,
+        ElementModQ challenge,
+        ElementModP commitmnetOffset,
+        ElementModP m_i)
+    {
+        return self.ComputeCommitment(
+            ciphertext.Pad,
+            challenge,
+            commitmnetOffset,
             m_i);
     }
 
@@ -39,24 +57,36 @@ public static class ValidateChallengeResponseExtensions
         this SelectionChallengeResponse self,
         ElementModP ciphertextPad,
         ElementModQ challenge,
-        List<ElementModP> coefficientCommitments,
-        ulong sequenceOrder,
+        Dictionary<string, ElectionPublicKey> guardians,
         ElementModP m_i)
     {
-        // 𝑎𝑖 = 𝑔^𝑣𝑖 • 𝐾^𝑐𝑖 mod 𝑝
+        // Π 𝐾^𝑖^m mod 𝑝
+        var commitmentOffset = guardians.ComputeCommitmentOffset(self.SequenceOrder);
+        return self.ComputeCommitment(
+            ciphertextPad,
+            challenge,
+            commitmentOffset,
+            m_i);
+    }
+
+    /// <summary>
+    /// Compute the commitment for the selection using 
+    /// the publically available data.
+    ///
+    /// equations (63) and (64) in the spec
+    /// </summary>
+    public static ElGamalCiphertext ComputeCommitment(
+        this SelectionChallengeResponse self,
+        ElementModP ciphertextPad,
+        ElementModQ challenge,
+        ElementModP commitmentOffset,
+        ElementModP m_i)
+    {
+        // 𝑎𝑖 = 𝑔^𝑣𝑖 • 𝐾'^𝑐𝑖 mod 𝑝
         using var gvi = BigMath.GPowP(self.Response); // 𝑔^𝑣𝑖
 
-        // Π 𝐾^𝑖^m mod 𝑝
-        using var calculated = new ElementModP(Constants.ONE_MOD_P);
-        foreach (var (commitment, index) in coefficientCommitments.WithIndex())
-        {
-            using var exponent = BigMath.PowModP(sequenceOrder, index);
-            using var k_pow_im = BigMath.PowModP(commitment, exponent);
-            _ = calculated.MultModP(k_pow_im);
-        }
-
-        using var Kc = BigMath.PowModP(calculated, challenge); // 𝐾^𝑐𝑖
-        using var aprime = BigMath.MultModP(gvi, Kc); // 𝑎𝑖 = 𝑔^𝑣𝑖 • 𝐾^𝑐𝑖
+        using var Kc = BigMath.PowModP(commitmentOffset, challenge); // 𝐾'^𝑐𝑖
+        using var aprime = BigMath.MultModP(gvi, Kc); // 𝑎𝑖 = 𝑔^𝑣𝑖 • 𝐾'^𝑐𝑖
 
         // 𝑏𝑖 = 𝐴^𝑣𝑖 • 𝑀𝑖^𝑐𝑖 mod 𝑝
         using var avi = BigMath.PowModP(ciphertextPad, self.Response); // 𝐴^𝑣𝑖

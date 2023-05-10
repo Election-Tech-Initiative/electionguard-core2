@@ -1,6 +1,5 @@
 using System.Diagnostics;
 using ElectionGuard.ElectionSetup.Extensions;
-using ElectionGuard.Proofs;
 using ElectionGuard.Extensions;
 using ElectionGuard.UI.Lib.Models;
 using ElectionGuard.Guardians;
@@ -54,6 +53,34 @@ public partial class Guardian : DisposableBase, IElectionGuardian
     /// </summary>
     public Dictionary<string, ElectionPartialKeyBackup> BackupsToShare { get; set; } = new();
 
+    private ElementModP? _commitmentOffset;
+
+    /// <summary>
+    /// The commitment offset for the polynomial.
+    /// This value is computed as the inner most product of the following equation
+    ///
+    /// Π Π 𝐾j^𝑖^m mod 𝑝 in the spec Equation (63)
+    /// 
+    /// This value can be computed from public data for all guardians
+    /// and is used to regenerate commitments during decryption.
+    /// It is calculated during the key ceremony process
+    /// to simplify the decryption process.
+    /// </summary>
+    public ElementModP? CommitmentOffset
+    {
+        get
+        {
+            // once we receive all of the keys
+            // we can calculate the commitment offset
+            if (_commitmentOffset == null && AllGuardianKeysReceived)
+            {
+                _commitmentOffset = _publicKeys.ComputeCommitmentOffset(_myElectionKeys.SequenceOrder);
+            }
+            return _commitmentOffset;
+        }
+    }
+
+
     #region Constructors
 
     /// <summary>
@@ -73,7 +100,7 @@ public partial class Guardian : DisposableBase, IElectionGuardian
         _commitmentSeed = BigMath.RandQ();
         CeremonyDetails = new(keyCeremonyId, numberOfGuardians, quorum);
 
-        SaveGuardianKey(_myElectionKeys.Share());
+        AddGuardianKey(_myElectionKeys.Share());
     }
 
     /// <summary>
@@ -94,10 +121,10 @@ public partial class Guardian : DisposableBase, IElectionGuardian
         using var nextRandom = random.NextElementModQ();
         var keyPair = new ElGamalKeyPair(nextRandom);
         _myElectionKeys = new(guardianId, sequenceOrder, quorum, keyPair, random);
-        _commitmentSeed = BigMath.RandQ();
+        _commitmentSeed = keyPair.SecretKey;
         CeremonyDetails = new(keyCeremonyId, numberOfGuardians, quorum);
 
-        SaveGuardianKey(_myElectionKeys.Share());
+        AddGuardianKey(_myElectionKeys.Share());
     }
 
     /// <summary>
@@ -117,7 +144,7 @@ public partial class Guardian : DisposableBase, IElectionGuardian
         _commitmentSeed = BigMath.RandQ();
         CeremonyDetails = ceremonyDetails;
 
-        SaveGuardianKey(_myElectionKeys.Share());
+        AddGuardianKey(_myElectionKeys.Share());
     }
 
     /// <summary>
@@ -137,7 +164,7 @@ public partial class Guardian : DisposableBase, IElectionGuardian
         _commitmentSeed = new(commitmentSeed);
         CeremonyDetails = ceremonyDetails;
 
-        SaveGuardianKey(_myElectionKeys.Share());
+        AddGuardianKey(_myElectionKeys.Share());
     }
 
     /// <summary>
@@ -157,7 +184,7 @@ public partial class Guardian : DisposableBase, IElectionGuardian
         SequenceOrder = keyPair.SequenceOrder;
         CeremonyDetails = ceremonyDetails;
 
-        SaveGuardianKey(_myElectionKeys.Share());
+        AddGuardianKey(_myElectionKeys.Share());
     }
 
     /// <summary>
@@ -194,7 +221,7 @@ public partial class Guardian : DisposableBase, IElectionGuardian
         _partialVerifications = otherVerifications
             ?? _partialVerifications;
 
-        SaveGuardianKey(_myElectionKeys.Share());
+        AddGuardianKey(_myElectionKeys.Share());
     }
 
     #endregion
@@ -228,13 +255,29 @@ public partial class Guardian : DisposableBase, IElectionGuardian
         return _myElectionKeys.Share();
     }
 
-    public void SaveGuardianKey(ElectionPublicKey key)
+    public void AddGuardianKeys(List<ElectionPublicKey> keys)
+    {
+        foreach (var key in keys)
+        {
+            AddGuardianKey(key);
+        }
+    }
+
+    public void AddGuardianKey(ElectionPublicKey key)
     {
         if (!key.Key.IsAddressable)
         {
             throw new ArgumentOutOfRangeException(nameof(key));
         }
         _publicKeys[key.GuardianId] = new(key);
+
+        // if we have received all keys
+        // compute the commitment offset
+        if (AllGuardianKeysReceived)
+        {
+            // access the commitment offset variable to force the computation
+            var _ = CommitmentOffset;
+        }
     }
 
     // generate_election_partial_key_backups

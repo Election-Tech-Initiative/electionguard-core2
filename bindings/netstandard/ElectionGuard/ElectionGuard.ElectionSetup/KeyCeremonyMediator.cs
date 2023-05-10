@@ -735,7 +735,7 @@ public class KeyCeremonyMediator
             keyCeremonyId);
         foreach (var publicKey in publicKeys)
         {
-            guardian!.SaveGuardianKey(publicKey.PublicKey!);
+            guardian!.AddGuardianKey(publicKey.PublicKey!);
         }
 
         // generate election partial key backups
@@ -796,7 +796,7 @@ public class KeyCeremonyMediator
         var publicKeys = await _publicKeyService.GetAllByKeyCeremonyIdAsync(keyCeremonyId);
         foreach (var publicKey in publicKeys)
         {
-            guardian!.SaveGuardianKey(publicKey.PublicKey!);
+            guardian!.AddGuardianKey(publicKey.PublicKey!);
         }
         List<ElectionPartialKeyVerification> verifications = new();
         // TODO: ISSUE #213 throw on invalid backup
