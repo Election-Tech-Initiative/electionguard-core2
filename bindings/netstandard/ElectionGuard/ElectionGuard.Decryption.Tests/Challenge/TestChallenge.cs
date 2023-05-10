@@ -21,7 +21,7 @@ public class TestChallenge : DisposableBase
     private const int NUMBER_OF_GUARDIANS = 3;
     private const int QUORUM = 2;
 
-    [Test, Category("SingleTest")] // Category("SingleTest")
+    [Test] // Category("SingleTest")
     public void Test_Challenge_Selection()
     {
         var seed = new ElementModQ(Constants.TWO_MOD_Q);
@@ -81,7 +81,6 @@ public class TestChallenge : DisposableBase
                     context,
                     selection,
                     accumulation);
-        Console.WriteLine($"Challenge: {challenge}");
 
         // interpolate challenge coefficients
         var challenges = new Dictionary<string, SelectionChallenge>();
@@ -92,8 +91,6 @@ public class TestChallenge : DisposableBase
             // ci =(c·wi)modq. Equation (61)
             var guardianChallenge = new SelectionChallenge(
                 selection, guardian, coefficient, challenge);
-
-            Console.WriteLine($"Guardian Challenge: {guardianChallenge.Challenge}");
 
             challenges.Add(
                 guardianId,
@@ -145,6 +142,5 @@ public class TestChallenge : DisposableBase
         // TODO: verify the proof
 
         Assert.That(decrypted.Tally, Is.EqualTo(plaintext.Tally));
-
     }
 }
