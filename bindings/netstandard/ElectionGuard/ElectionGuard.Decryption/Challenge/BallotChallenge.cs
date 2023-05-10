@@ -152,13 +152,13 @@ public record BallotChallenge
     protected override void DisposeManaged()
     {
         base.DisposeManaged();
-        Coefficient.Dispose();
+        Contests.Dispose();
     }
 
     protected override void DisposeUnmanaged()
     {
         base.DisposeUnmanaged();
-        Contests.Dispose();
+        Coefficient?.Dispose();
     }
 }
 

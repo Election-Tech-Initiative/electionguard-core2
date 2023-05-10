@@ -94,8 +94,8 @@ public class PlaintextTallySelection
     protected override void DisposeUnmanaged()
     {
         base.DisposeManaged();
-        DescriptionHash.Dispose();
-        Value.Dispose();
+        DescriptionHash?.Dispose();
+        Value?.Dispose();
         Proof?.Dispose();
     }
 

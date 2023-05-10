@@ -1,5 +1,4 @@
 using ElectionGuard.Ballot;
-using ElectionGuard.ElectionSetup;
 using ElectionGuard.Guardians;
 
 namespace ElectionGuard.Decryption.Shares;
@@ -69,14 +68,14 @@ public class SelectionShare
     }
 
     public SelectionShare(
-        SelectionShare share)
+        SelectionShare other)
     {
-        ObjectId = share.ObjectId;
-        SequenceOrder = share.SequenceOrder;
-        DescriptionHash = new(share.DescriptionHash);
-        GuardianId = share.GuardianId;
-        Share = new(share.Share);
-        Commitment = new(share.Commitment);
+        ObjectId = other.ObjectId;
+        SequenceOrder = other.SequenceOrder;
+        DescriptionHash = new(other.DescriptionHash);
+        GuardianId = other.GuardianId;
+        Share = new(other.Share);
+        Commitment = new(other.Commitment);
     }
 
     /// <summary>
@@ -140,8 +139,9 @@ public class SelectionShare
     protected override void DisposeUnmanaged()
     {
         base.DisposeUnmanaged();
-        DescriptionHash.Dispose();
-        Share.Dispose();
+        DescriptionHash?.Dispose();
+        Share?.Dispose();
+        Commitment?.Dispose();
     }
 
     #region Equality

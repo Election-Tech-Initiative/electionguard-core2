@@ -44,10 +44,14 @@ public static class AccumulateSharesExtensions
         foreach (var (contestId, contest) in self.Contests)
         {
             var accumulator = new AccumulatedContest(
-                contest, contest.Selections.Select(i => (IElectionSelection)i.Value).ToList());
-            var contestShares = guardianShares.Select(
-                x => x.Item2.GetContestShare(x.Item1, contest.ObjectId))
-            .ToList();
+                contest,
+                contest.Selections
+                    .Select(i => (IElectionSelection)i.Value)
+                    .ToList());
+            var contestShares = guardianShares
+                .Select(
+                    x => x.Item2.GetContestShare(x.Item1, contest.ObjectId))
+                .ToList();
 
             accumulator.Accumulate(
                 contestShares,

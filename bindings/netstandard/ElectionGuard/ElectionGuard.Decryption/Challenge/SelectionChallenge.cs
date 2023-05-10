@@ -231,7 +231,7 @@ public record SelectionChallenge : DisposableRecordBase
     protected override void DisposeUnmanaged()
     {
         base.DisposeUnmanaged();
-        Coefficient.Dispose();
-        Challenge.Dispose();
+        Coefficient?.Dispose();
+        Challenge?.Dispose();
     }
 }

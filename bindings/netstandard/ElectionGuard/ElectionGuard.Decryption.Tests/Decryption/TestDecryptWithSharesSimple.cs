@@ -18,7 +18,7 @@ public class TestDecryptWithSharesSimple : DisposableBase
     private const int NUMBER_OF_GUARDIANS = 3;
     private const int QUORUM = 2;
 
-    [Test] //Category("SingleTest")
+    [Test] // Category("SingleTest")
     public void Test_Decrypt_Tally_With_All_Guardians_Present_Simple()
     {
         // Arrange

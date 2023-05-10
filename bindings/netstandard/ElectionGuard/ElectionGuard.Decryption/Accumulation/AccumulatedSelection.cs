@@ -169,10 +169,9 @@ public record AccumulatedSelection : DisposableRecordBase, IElectionSelection
     protected override void DisposeUnmanaged()
     {
         base.DisposeUnmanaged();
-
-        Value.Dispose();
-        DescriptionHash.Dispose();
-        Commitment.Dispose();
+        Value?.Dispose();
+        DescriptionHash?.Dispose();
+        Commitment?.Dispose();
         Proof?.Dispose();
     }
 

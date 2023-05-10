@@ -148,7 +148,7 @@ public class CiphertextTallyContest : DisposableBase, ICiphertextContest, IEquat
     protected override void DisposeManaged()
     {
         base.DisposeManaged();
-        Selections?.Dispose();
+        Selections.Dispose();
     }
 
     protected override void DisposeUnmanaged()

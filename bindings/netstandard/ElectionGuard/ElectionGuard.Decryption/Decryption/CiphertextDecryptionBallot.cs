@@ -196,7 +196,7 @@ public record class CiphertextDecryptionBallot : DisposableRecordBase, IEquatabl
     protected override void DisposeUnmanaged()
     {
         base.DisposeUnmanaged();
-        ManifestHash.Dispose();
+        ManifestHash?.Dispose();
     }
 
     private void AddShare(BallotShare share)

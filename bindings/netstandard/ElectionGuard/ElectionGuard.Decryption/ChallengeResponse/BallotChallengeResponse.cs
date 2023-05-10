@@ -97,7 +97,7 @@ public record BallotChallengeResponse
     protected override void DisposeUnmanaged()
     {
         base.DisposeUnmanaged();
-        Coefficient.Dispose();
+        Coefficient?.Dispose();
     }
 }
 

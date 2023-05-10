@@ -394,7 +394,7 @@ namespace ElectionGuard
         }
 
         /// <summary>
-        /// Multiply by an ElementModP value
+        /// Multiply by an ElementModP value. This function reassigns the product to this object
         /// </summary>
         /// <param name="rhs">right hand side for the multiply</param>
         public ElementModP MultModP(ElementModP rhs)
@@ -412,7 +412,7 @@ namespace ElectionGuard
         }
 
         /// <summary>
-        /// Multiply list of ElementModP values
+        /// Multiply list of ElementModP values. This function reassigns the product to this object
         /// </summary>
         /// <param name="keys">list of keys the multiply</param>
         public ElementModP MultModP(IEnumerable<ElementModP> keys)
@@ -426,7 +426,7 @@ namespace ElectionGuard
         }
 
         /// <summary>
-        /// Raise a ElementModP value to an ElementModP exponent
+        /// Raise a ElementModP value to an ElementModP exponent. This function reassigns the exponentiation to this object
         /// </summary>
         /// <param name="e">exponent to raise the base by</param>
         public ElementModP PowModP(ElementModQ e)

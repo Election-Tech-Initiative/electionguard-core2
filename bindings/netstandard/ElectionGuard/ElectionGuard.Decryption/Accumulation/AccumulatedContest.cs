@@ -135,6 +135,6 @@ public record AccumulatedContest
     protected override void DisposeUnmanaged()
     {
         base.DisposeUnmanaged();
-        DescriptionHash.Dispose();
+        DescriptionHash?.Dispose();
     }
 }

@@ -84,7 +84,7 @@ public class PlaintextTallyContest : DisposableBase, IElectionContest, IEquatabl
     protected override void DisposeUnmanaged()
     {
         base.DisposeUnmanaged();
-        DescriptionHash.Dispose();
+        DescriptionHash?.Dispose();
     }
 
     #region IEquatable

@@ -585,21 +585,15 @@ public record class CiphertextDecryptionTally : DisposableRecordBase
         _challengedBallots?.Dispose();
         _spoiledBallots?.Dispose();
 
-        _tallyShares.Dispose();
-        _ballotShares.Dispose();
+        _tallyShares?.Dispose();
+        _ballotShares?.Dispose();
 
-        _challenges.Dispose();
-        _challengeResponses.Dispose();
+        _challenges?.Dispose();
+        _challengeResponses?.Dispose();
 
         _accumulatedTally?.Dispose();
         _accumulatedBallots?.ForEach(x => x.Dispose());
         _decryptionResult?.Dispose();
-    }
-
-    protected override void DisposeUnmanaged()
-    {
-        base.DisposeUnmanaged();
-
     }
 
     #region Private Methods

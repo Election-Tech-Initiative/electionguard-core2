@@ -97,6 +97,6 @@ public record SelectionChallengeResponse : DisposableRecordBase
     protected override void DisposeUnmanaged()
     {
         base.DisposeUnmanaged();
-        Response.Dispose();
+        Response?.Dispose();
     }
 }
