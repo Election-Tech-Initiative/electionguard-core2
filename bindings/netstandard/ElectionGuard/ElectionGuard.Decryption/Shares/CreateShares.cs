@@ -128,6 +128,7 @@ public static class CreateSharesExtensions
         this Guardian guardian,
         ICiphertextSelection selection)
     {
+        // 𝑀𝑖 = 𝐴^𝑠𝑖 mod 𝑝 
         var partial = guardian.PartialDecrypt(selection.Ciphertext);
         var commitment = guardian.CreateCommitment(selection);
 

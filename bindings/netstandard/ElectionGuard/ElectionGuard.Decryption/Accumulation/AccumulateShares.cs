@@ -178,7 +178,7 @@ public static class AccumulateSharesExtensions
 
     /// <summary>
     /// Accumulate the guardian shares for a selection.
-    /// Computes 𝑀𝑏𝑎𝑟 = 𝑀𝑏𝑎𝑟 * (𝑀𝑖 ^ 𝑤𝑖) mod p
+    /// Computes 𝑀𝑏𝑎𝑟 = Π (𝑀𝑖 ^ 𝑤𝑖) mod p
     /// </summary>
     public static AccumulatedSelection AccumulateShares(
         this ICiphertextSelection self,
@@ -189,7 +189,7 @@ public static class AccumulateSharesExtensions
         // accumulate all of the shares calculated for the selection
         var decryption = new AccumulatedSelection(self);
 
-        // 𝑀𝑏𝑎𝑟 = 𝑀𝑏𝑎𝑟 * (𝑀𝑖 ^ 𝑤𝑖) mod p
+        // 𝑀𝑏𝑎𝑟 = Π (𝑀𝑖 ^ 𝑤𝑖) mod p
         decryption.Accumulate(guardianShares, lagrangeCoefficients, skipValidation);
         return decryption;
     }

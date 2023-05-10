@@ -21,8 +21,6 @@ public partial class Guardian
         using var nonces = NonceForSelection(selection);
         using var u = nonces.Next();
 
-        Debug.WriteLine($"CreateCommitment: {u}");
-
         using var a = BigMath.GPowP(u);  // 𝑔^𝑢𝑖 mod 𝑝
         using var b = BigMath.PowModP(selection.Ciphertext.Pad, u);  // 𝐴^𝑢𝑖 mod 𝑝
 
@@ -45,8 +43,6 @@ public partial class Guardian
         using var nonces = NonceForSelection(selection);
         using var u = nonces.Next();
 
-        Debug.WriteLine($"CreateResponse: {u}");
-
         // rehydrate the partial secret if it has not been done already
         if (_myPartialSecretKey is null)
         {
@@ -55,7 +51,7 @@ public partial class Guardian
         }
 
         // 𝑣𝑖 = (𝑢𝑖 − 𝑐𝑖P(𝑖)) mod q.
-        var product = BigMath.MultModQ(challenge, _myPartialSecretKey);
+        using var product = BigMath.MultModQ(challenge, _myPartialSecretKey);
         var v = BigMath.SubModQ(u, product);
         return v;
     }
@@ -65,8 +61,7 @@ public partial class Guardian
     {
         using var selectionHash = Hash.HashElems(
             selection.ObjectId, selection.SequenceOrder, selection.DescriptionHash);
-        using var hashSeed = Hash.HashElems(
-            _commitmentSeed, selectionHash);
+        using var hashSeed = Hash.HashElems(_commitmentSeed, selectionHash);
 
         // TODO: move this magic string to a constant
         return new Nonces(hashSeed, "chaum-pedersen-proof");
