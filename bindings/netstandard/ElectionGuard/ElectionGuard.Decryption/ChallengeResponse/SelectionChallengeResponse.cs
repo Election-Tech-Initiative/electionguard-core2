@@ -1,5 +1,6 @@
 using ElectionGuard.Ballot;
 using ElectionGuard.Decryption.Challenge;
+using ElectionGuard.Decryption.Extensions;
 using ElectionGuard.Decryption.Shares;
 using ElectionGuard.ElectionSetup;
 using ElectionGuard.Guardians;
@@ -74,6 +75,9 @@ public record SelectionChallengeResponse : DisposableRecordBase
             share.Share);
     }
 
+    /// <summary>
+    /// Verify the response to the challenge.
+    /// </summary>
     public bool IsValid(
         ElGamalCiphertext ciphertext,
         ElGamalCiphertext commitment,

@@ -4,11 +4,6 @@ using ElectionGuard.ElectionSetup;
 
 namespace ElectionGuard.Decryption.ChallengeResponse;
 
-
-// TODO: all of the iterator functions for al;l of these types should be consoldaited somewhere
-// in fact we can probably define a single base class collection lookup
-// that takes a generic and iterates over the collectiosn and does zips and comaprisons
-
 /// <summary>
 /// Decryption extension methods for the <see cref="Guardian" /> class
 /// </summary>

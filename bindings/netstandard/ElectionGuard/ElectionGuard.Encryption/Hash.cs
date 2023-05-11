@@ -156,7 +156,7 @@ namespace ElectionGuard
         /// </summary>
         public static ElementModQ HashElems(string prefix, params ICryptoHashableType[] data)
         {
-            // TODO: we should define a clear method for 
+            // TODO: ISSUE #239 we should define a clear method for 
             // passing hashable elements back and forth
             // between C# and C++ so we don't have to do this
             var hashed = HashElems(prefix);
@@ -188,29 +188,6 @@ namespace ElectionGuard
             }
             return hashed;
         }
-
-        // TODO: enforce polymorphism
-        // public static ElementModQ HashElems(string prefix, params ICryptoHashableType[] data)
-        // {
-        //     var dataPointers = new IntPtr[data.Length];
-        //     for (var i = 0; i < data.Length; i++)
-        //     {
-        //         if (data[i] is CryptoHashableBase)
-        //         {
-        //             dataPointers[i] = (data[i] as CryptoHashableBase).Ptr;
-        //         }
-        //         else
-        //         {
-        //             throw new ArgumentException("data must be of type CryptoHashableBase");
-        //         }
-
-        //     }
-
-        //     var status = External.HashElems(dataPointers, (ulong)data.Length,
-        //         out var value);
-        //     status.ThrowIfError();
-        //     return value.IsInvalid ? null : new ElementModQ(value);
-        // }
 
         internal static class External
         {

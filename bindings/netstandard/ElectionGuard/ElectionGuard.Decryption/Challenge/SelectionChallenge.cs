@@ -30,7 +30,8 @@ public record SelectionChallenge : DisposableRecordBase
 
     /// <summary>
     /// The selection challenge adjusted by the guardian lagrange coefficient
-    /// ci =(c·wi)modq in the spec.
+    /// 
+    /// 𝑐𝑖 = (𝑐 • ω𝑖) mod q in the spec. Equation (61)
     /// </summary>
     public ElementModQ Challenge { get; init; }
 
@@ -55,7 +56,7 @@ public record SelectionChallenge : DisposableRecordBase
             accumulation.Commitment,
             accumulation.Value);
 
-        // ci =(c·wi) mod q
+        // 𝑐𝑖 = (𝑐 • ω𝑖) mod q.
         Challenge = BigMath.MultModQ(challenge, coefficient);
     }
 
@@ -79,7 +80,7 @@ public record SelectionChallenge : DisposableRecordBase
             ciphertext,
             commitment,
             mBar);
-        // ci =(c·wi)modq
+        // 𝑐𝑖 = (𝑐 • ω𝑖) mod q
         Challenge = BigMath.MultModQ(challenge, coefficient);
     }
 
@@ -93,7 +94,7 @@ public record SelectionChallenge : DisposableRecordBase
         GuardianId = guardian.GuardianId;
         SequenceOrder = guardian.SequenceOrder;
         Coefficient = new(coefficient.Coefficient);
-        // ci =(c·wi)modq
+        // 𝑐𝑖 = (𝑐 • ω𝑖) mod q
         Challenge = BigMath.MultModQ(challenge, coefficient.Coefficient);
     }
 
@@ -107,25 +108,8 @@ public record SelectionChallenge : DisposableRecordBase
         GuardianId = guardian.GuardianId;
         SequenceOrder = guardian.SequenceOrder;
         Coefficient = new(coefficient);
-        // ci =(c·wi)modq
+        // 𝑐𝑖 = (𝑐 • ω𝑖) mod q
         Challenge = BigMath.MultModQ(challenge, coefficient);
-    }
-
-    /// <summary>
-    /// constructor that accepts a pregenerated challenge
-    ///
-    /// This constructor is only for testing and should not be used in production
-    /// </summary>
-    [Obsolete("just for testing")]
-    public SelectionChallenge(
-        IElectionSelection selection,
-        IElectionGuardian guardian,
-        ElementModQ challenge)
-    {
-        ObjectId = selection.ObjectId;
-        GuardianId = guardian.GuardianId;
-        SequenceOrder = guardian.SequenceOrder;
-        Challenge = new(challenge);
     }
 
     public SelectionChallenge(
@@ -139,7 +123,7 @@ public record SelectionChallenge : DisposableRecordBase
         GuardianId = guardianId;
         SequenceOrder = sequenceOrder;
         Coefficient = new(coefficient);
-        // ci =(c·wi)modq
+        // 𝑐𝑖 = (𝑐 • ω𝑖) mod q
         Challenge = BigMath.MultModQ(challenge, coefficient);
     }
 
@@ -156,9 +140,9 @@ public record SelectionChallenge : DisposableRecordBase
     /// <summary>
     /// Given a selection and the proposed accumulated selection consisting 
     /// of all selection decryption shares submitted by all participating guardians, 
-    /// compute a challenge value by hashing the inputs together. The challenge
-    /// is computed as follows:
-    /// c = H(06,Q;K,A,B,a,b,M)
+    /// compute a challenge value by hashing the inputs together. 
+    /// The challenge is computed as follows:
+    /// c = H(06,Q;K,A,B,a,b,M). Equation (60)
     ///
     /// Once the challenge is computed, it is offset for each guardian by the lagrange coefficient
     /// and the result is stored in the SelectionChallenge object.
@@ -180,8 +164,8 @@ public record SelectionChallenge : DisposableRecordBase
     /// Given a selection and the proposed accumulated selection consisting 
     /// of all selection decryption shares submitted by all participating guardians, 
     /// compute a challenge value by hashing the inputs together. The challenge
-    /// is computed as follows:
-    /// c = H(06,Q;K,A,B,a,b,M)
+    /// The challenge is computed as follows:
+    /// c = H(06,Q;K,A,B,a,b,M). Equation (60)
     ///
     /// Once the challenge is computed, it is offset for each guardian by the lagrange coefficient
     /// and the result is stored in the SelectionChallenge object.
@@ -204,8 +188,8 @@ public record SelectionChallenge : DisposableRecordBase
     /// Given a selection and the proposed accumulated selection consisting 
     /// of all selection decryption shares submitted by all participating guardians, 
     /// compute a challenge value by hashing the inputs together. The challenge
-    /// is computed as follows:
-    /// c = H(06,Q;K,A,B,a,b,M)
+    /// The challenge is computed as follows:
+    /// c = H(06,Q;K,A,B,a,b,M). Equation (60)
     ///
     /// Once the challenge is computed, it is offset for each guardian by the lagrange coefficient
     /// and the result is stored in the SelectionChallenge object.

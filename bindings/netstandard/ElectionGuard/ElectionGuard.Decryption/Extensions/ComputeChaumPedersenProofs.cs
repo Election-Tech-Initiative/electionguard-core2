@@ -12,6 +12,9 @@ namespace ElectionGuard.Decryption.Extensions;
 public static class ComputeChaumPedersenProofs
 {
 
+    /// <summary>
+    /// Add proofs to the tally
+    /// </summary>
     public static void AddProofs(
         this AccumulatedTally self,
         CiphertextTally tally,
@@ -26,6 +29,9 @@ public static class ComputeChaumPedersenProofs
          );
     }
 
+    /// <summary>
+    /// Add proofs to the tally
+    /// </summary>
     public static void AddProofs(
         this AccumulatedTally self,
         CiphertextTally tally,
@@ -46,6 +52,9 @@ public static class ComputeChaumPedersenProofs
         }
     }
 
+    /// <summary>
+    /// Add proofs to the collection of ballots
+    /// </summary>
     public static void AddProofs(
        this List<AccumulatedBallot> self,
        List<CiphertextBallot> ballots,
@@ -71,6 +80,9 @@ public static class ComputeChaumPedersenProofs
         self.AddProofs(ballots, context, ballotResponses, skipValidation);
     }
 
+    /// <summary>
+    /// Add proofs to the collection of ballots
+    /// </summary>
     public static void AddProofs(
         this List<AccumulatedBallot> self,
         List<CiphertextBallot> ballots,
@@ -88,6 +100,9 @@ public static class ComputeChaumPedersenProofs
         }
     }
 
+    /// <summary>
+    /// Add proofs to the ballot
+    /// </summary>
     public static void AddProofs(
         this AccumulatedBallot self,
         CiphertextBallot ballot,
@@ -109,6 +124,9 @@ public static class ComputeChaumPedersenProofs
         }
     }
 
+    /// <summary>
+    /// Add proofs to the contest
+    /// </summary>
     public static void AddProofs(
         this AccumulatedContest self,
         ICiphertextContest contest,
@@ -131,6 +149,9 @@ public static class ComputeChaumPedersenProofs
         }
     }
 
+    /// <summary>
+    /// Compute a CP proof for the accumulated selection
+    /// </summary>
     public static ChaumPedersenProof ComputeProof(
         this AccumulatedSelection self,
         ICiphertextSelection selection,
@@ -148,6 +169,9 @@ public static class ComputeChaumPedersenProofs
 
     }
 
+    /// <summary>
+    /// Compute a CP proof for the accumulated selection
+    /// </summary>
     public static ChaumPedersenProof ComputeProof(
         this AccumulatedSelection self,
         ICiphertextSelection selection,
@@ -165,6 +189,9 @@ public static class ComputeChaumPedersenProofs
         );
     }
 
+    /// <summary>
+    /// Compute a CP proof for the accumulated selection
+    /// </summary>
     public static ChaumPedersenProof ComputeProof(
         this AccumulatedSelection self,
         ElGamalCiphertext ciphertext,
@@ -179,16 +206,6 @@ public static class ComputeChaumPedersenProofs
                     ciphertext,
                     self.Commitment,
                     self.Value);
-
-
-        // foreach (var response in responses)
-        // {
-        //     if (!skipValidation && !response.IsValid(
-        //         selection, self, self.Shares[response.GuardianId], challenge, context))
-        //     {
-        //         throw new ArgumentException("Invalid challenge response");
-        //     }
-        // }
 
         return self.ComputeProof(challenge, responses);
     }

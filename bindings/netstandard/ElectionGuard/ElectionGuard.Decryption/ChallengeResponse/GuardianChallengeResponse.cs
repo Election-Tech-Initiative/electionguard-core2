@@ -1,9 +1,8 @@
-using System.Diagnostics;
-using ElectionGuard.Decryption.Accumulation;
 using ElectionGuard.Decryption.Challenge;
 using ElectionGuard.Decryption.Shares;
 using ElectionGuard.Decryption.Tally;
 using ElectionGuard.ElectionSetup;
+using ElectionGuard.Extensions;
 using ElectionGuard.Guardians;
 
 namespace ElectionGuard.Decryption.ChallengeResponse;
@@ -95,9 +94,6 @@ public record GuardianChallengeResponse : DisposableRecordBase
     {
         base.DisposeManaged();
         Tally.Dispose();
-        foreach (var ballot in Ballots)
-        {
-            ballot.Dispose();
-        }
+        Ballots.Dispose();
     }
 }

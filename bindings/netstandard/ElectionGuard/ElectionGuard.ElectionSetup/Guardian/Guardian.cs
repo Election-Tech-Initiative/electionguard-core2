@@ -107,6 +107,7 @@ public partial class Guardian : DisposableBase, IElectionGuardian
     /// Initialize a guardian with the specified arguments.
     // Do not use this constructor in production. It is only for testing.
     /// </summary>
+    [Obsolete("Do not use this constructor in production. It is only for testing.")]
     public Guardian(
         string guardianId,
         ulong sequenceOrder,
@@ -172,6 +173,7 @@ public partial class Guardian : DisposableBase, IElectionGuardian
     /// </summary>
     /// <param name="keyPair">The key pair the guardian generated during a key ceremony</param>
     /// <param name="ceremonyDetails">The details of the key ceremony</param>
+    /// <param name="commitmentSeed">A secret value used by the guardian to create commitments for generating proofs during decryption</param>
     public Guardian(
         ElectionKeyPair keyPair,
         CeremonyDetails ceremonyDetails,
@@ -191,6 +193,7 @@ public partial class Guardian : DisposableBase, IElectionGuardian
     /// Initialize a guardian with the specified arguments.
     /// </summary>
     /// <param name="keyPair">The key pair the guardian generated during a key ceremony</param>
+    /// <param name="commitmentSeed">A secret value used by the guardian to create commitments for generating proofs during decryption</param>
     /// <param name="ceremonyDetails">The details of the key ceremony</param>
     /// <param name="otherKeys">The public keys the guardian generated during a key ceremony</param>
     /// <param name="otherBackups">The partial key backups the guardian generated during a key ceremony</param>
@@ -244,7 +247,9 @@ public partial class Guardian : DisposableBase, IElectionGuardian
         return new(data.GuardianId, data._myElectionKeys, data._commitmentSeed);
     }
 
-    // all_guardian_keys_received
+    /// <summary>
+    /// Returns true if the number of public keys is equal to the number of guardians.
+    /// </summary>
     public bool AllGuardianKeysReceived => _publicKeys?.Count == CeremonyDetails.NumberOfGuardians;
 
     /// <summary>
@@ -255,6 +260,9 @@ public partial class Guardian : DisposableBase, IElectionGuardian
         return _myElectionKeys.Share();
     }
 
+    /// <summary>
+    /// Adds the public keys of guardians to the list of public keys.
+    /// </summary>
     public void AddGuardianKeys(List<ElectionPublicKey> keys)
     {
         foreach (var key in keys)
@@ -263,6 +271,9 @@ public partial class Guardian : DisposableBase, IElectionGuardian
         }
     }
 
+    /// <summary>
+    /// Adds the public key of a guardian to the list of public keys.
+    /// </summary>
     public void AddGuardianKey(ElectionPublicKey key)
     {
         if (!key.Key.IsAddressable)

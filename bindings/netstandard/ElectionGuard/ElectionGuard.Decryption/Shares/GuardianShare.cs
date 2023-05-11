@@ -1,4 +1,5 @@
 using ElectionGuard.ElectionSetup;
+using ElectionGuard.Extensions;
 using ElectionGuard.Guardians;
 
 namespace ElectionGuard.Decryption.Shares;
@@ -32,9 +33,6 @@ public record GuardianShare : DisposableRecordBase
     {
         base.DisposeManaged();
         Tally.Dispose();
-        foreach (var ballot in Ballots)
-        {
-            ballot.Dispose();
-        }
+        Ballots.Dispose();
     }
 }

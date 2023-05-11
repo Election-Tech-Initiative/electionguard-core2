@@ -1,4 +1,5 @@
 using ElectionGuard.Ballot;
+using ElectionGuard.Decryption.Extensions;
 using ElectionGuard.Guardians;
 
 namespace ElectionGuard.Decryption.Shares;
@@ -30,7 +31,8 @@ public class SelectionShare
     public string GuardianId { get; init; }
 
     /// <summary>
-    /// The Guardian's share of the partial decryption. `M_i` in the spec
+    /// The Guardian's share of the partial decryption. 
+    /// `M_i` in the spec
     /// </summary>
     public ElementModP Share { get; init; }
 
@@ -86,8 +88,7 @@ public class SelectionShare
     /// </summary>
     public bool IsValid(
         ICiphertextSelection message,
-        ElectionPublicKey guardian,
-        ElementModQ extendedBaseHash)
+        ElectionPublicKey guardian)
     {
         if (guardian.GuardianId != GuardianId)
         {
@@ -106,34 +107,25 @@ public class SelectionShare
         }
 
         return true;
-
-        // TODO:
-        // return IsValidEncryption(
-        //     message.Ciphertext,
-        //     guardian.Key!,
-        //     extendedBaseHash);
     }
 
     /// <summary>
-    /// Verify that this CiphertextDecryptionSelection is valid for a 
-    /// specific ciphertext, guardian public key, and extended base hash.
+    /// Verify that this share is a valid decryption share for a 
+    /// specific ciphertext, challenge, commitment offset, and response.
     /// </summary>
-    [Obsolete("Use IsValid(ICiphertextSelection, ElectionPublicKey, ElementModQ, ChaumPedersenProof?)")]
-    public bool IsValidEncryption(
+    public bool IsValidShare(
         ElGamalCiphertext message,
-        ElementModP guardianPublicKey,
-        ElementModQ extendedBaseHash)
+        ElementModQ challenge,
+        ElementModP commitmentOffset,
+        ElementModQ response)
     {
-        // TODO: determine if we can do proof verification here if we keep the proof as part of the decryption share
-        // or if we need to do it somewhere else
-        // var proofIsValid = Proof.IsValid(
-        //     message,
-        //     guardianPublicKey,
-        //     Share,
-        //     extendedBaseHash);
+        using var recomputedCommitment = this.ComputeCommitment(
+            message.Pad,
+            challenge,
+            commitmentOffset,
+            response);
 
-        // return proofIsValid;
-        return true;
+        return recomputedCommitment.Equals(Commitment);
     }
 
     protected override void DisposeUnmanaged()
@@ -186,5 +178,4 @@ public class SelectionShare
     }
 
     #endregion
-
 }

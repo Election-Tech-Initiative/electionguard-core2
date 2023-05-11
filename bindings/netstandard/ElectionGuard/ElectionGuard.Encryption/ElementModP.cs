@@ -289,7 +289,6 @@ namespace ElectionGuard
         /// and assigning them to new variables. It is also useful for avoiding unnecessary
         /// allocations when reassigning objects in a loop.
         /// </summary>
-        /// <remarks>
         internal void Reassign(ElementModP other)
         {
             if (other == null)

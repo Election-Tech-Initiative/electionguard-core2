@@ -1,4 +1,5 @@
 using ElectionGuard.Decryption.Tally;
+using ElectionGuard.Extensions;
 
 namespace ElectionGuard.Decryption.Decryption;
 
@@ -102,12 +103,12 @@ public class DecryptionResult : DisposableBase
     {
         base.DisposeManaged();
         Tally?.Dispose();
-        ChallengedBallots?.ForEach(x => x.Dispose());
+        ChallengedBallots?.Dispose();
     }
 
     protected override void DisposeUnmanaged()
     {
         base.DisposeUnmanaged();
-        SpoiledBallots?.ForEach(x => x.Dispose());
+        SpoiledBallots?.Dispose();
     }
 }

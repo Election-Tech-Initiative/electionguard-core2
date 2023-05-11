@@ -751,41 +751,6 @@ namespace electionguard
     ElementModQ *ChaumPedersenProof::getChallenge() const { return pimpl->challenge.get(); }
     ElementModQ *ChaumPedersenProof::getResponse() const { return pimpl->response.get(); }
 
-    // Public Static Methods
-
-    // unique_ptr<ChaumPedersenProof> ChaumPedersenProof::make(const ElGamalCiphertext &message,
-    //                                                         const ElGamalCiphertext &commitment,
-    //                                                         const ElementModP &m,
-    //                                                         const ElementModP &elGamalPublicKey,
-    //                                                         const ElementModQ &hash_header)
-    // {
-    //     Log::trace("ConstantChaumPedersenProof:: making proof");
-    //     auto *alpha = message.getPad();
-    //     auto *beta = message.getData();
-
-    //     unique_ptr<ElementModQ> u;
-
-    //     // Compute the NIZKP
-    //     unique_ptr<ElementModP> a; //𝑔^𝑢 mod 𝑝
-    //     unique_ptr<ElementModP> b; // 𝐾^𝑢 mod 𝑝
-
-    //     // if there are no precomputed values, do the exponentiations here
-    //     if (u == nullptr || a == nullptr || b == nullptr) {
-    //         // Derive nonce from seed and the constant string below
-    //         auto nonces = make_unique<Nonces>(seed, "constant-chaum-pedersen-proof");
-    //         u = nonces->get(0);
-    //         a = g_pow_p(*u);      //𝑔^𝑢 mod 𝑝
-    //         b = pow_mod_p(k, *u); // 𝐾^𝑢 mod 𝑝
-    //     }
-
-    //     // sha256(𝑄', A, B, a, b)
-    //     auto c =
-    //       hash_elems({&const_cast<ElementModQ &>(hash_header), alpha, beta, a.get(), b.get()});
-    //     auto v = a_plus_bc_mod_q(*u, *c, r);
-
-    //     return make_unique<ChaumPedersenProof>(move(a), move(b), move(c), move(v), );
-    // }
-
     // Public Methods
 
     bool ChaumPedersenProof::isValid(const ElGamalCiphertext &message, const ElementModP &k,
