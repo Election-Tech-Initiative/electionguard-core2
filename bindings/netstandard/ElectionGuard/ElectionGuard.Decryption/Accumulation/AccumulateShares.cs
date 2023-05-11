@@ -165,7 +165,7 @@ public static class AccumulateSharesExtensions
         {
             foreach (var (guardian, share) in guardianShares)
             {
-                if (!share.IsValid(self, guardian, extendedBaseHash))
+                if (!share.IsValid(self, guardian))
                 {
                     throw new Exception(
                         $"Failed to verify selection share for guardian {guardian.GuardianId}");

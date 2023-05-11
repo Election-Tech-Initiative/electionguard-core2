@@ -99,7 +99,7 @@ public record ContestShare
             }
 
             if (!Selections[selection.ObjectId].IsValid(
-                selection, guardian, extendedBaseHash))
+                selection, guardian))
             {
                 return false;
             }
@@ -129,7 +129,7 @@ public record ContestShare
             }
 
             if (!Selections[selection.Key].IsValid(
-                selection.Value, guardian, extendedBaseHash))
+                selection.Value, guardian))
             {
                 return false;
             }
