@@ -66,6 +66,9 @@ public partial class TallyProcessViewModel : BaseViewModel
                 BallotUploads = await _ballotUploadService.GetByElectionIdAsync(electionId);
 
                 JoinedGuardians = await _tallyJoinedService.GetAllByTallyIdAsync(Tally.TallyId);
+
+                await ElectionRecordGenerator.GenerateEelectionRecord(Tally, $"f:\\");
+
             }
         });
     }

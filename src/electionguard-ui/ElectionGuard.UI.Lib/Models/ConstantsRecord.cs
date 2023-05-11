@@ -19,5 +19,5 @@ public partial class ConstantsRecord : DatabaseRecord
     }
 
     public override string ToString() => ConstantsData ?? string.Empty;
-    public static implicit operator string(ConstantsRecord record) => record.ToString();
+    public static implicit operator string(ConstantsRecord? record) => record?.ToString();
 }

@@ -1,4 +1,4 @@
-using System.Diagnostics;
+﻿using System.Diagnostics;
 using ElectionGuard.ElectionSetup.Exceptions;
 using ElectionGuard.ElectionSetup.Extensions;
 using ElectionGuard.UI.Lib.Extensions;
@@ -652,7 +652,7 @@ public class KeyCeremonyMediator
 
         // append guardian joined to key ceremony (db)
 
-        var newRecord = new GuardianPublicKey
+        using var newRecord = new GuardianPublicKey
         {
             KeyCeremonyId = keyCeremonyId,
             GuardianId = currentGuardianUserName,

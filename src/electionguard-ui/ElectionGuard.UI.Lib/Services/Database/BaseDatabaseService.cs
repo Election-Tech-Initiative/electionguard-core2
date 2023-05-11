@@ -123,6 +123,25 @@ public class BaseDatabaseService<T> : IDatabaseService<T> where T : DatabaseReco
     }
 
     /// <summary>
+    /// Get all of a data type from a given collection using a filter
+    /// </summary>
+    /// <param name="table">Optional parameter to allow data type to use a different collection</param>
+    /// <returns>List of the documents found in the given collection</returns>
+    public async Task<IAsyncCursor<T>> GetCursorByFilterAsync(FilterDefinition<T> filter, string? table = null)
+    {
+        try
+        {
+            var data = DbService.GetCollection<T>(table ?? _collection);
+            return data.Find<T>(UpdateFilter(filter)).ToCursor();
+        }
+        catch (Exception ex)
+        {
+            throw new ElectionGuardException("Error getting all by filter", ex);
+        }
+    }
+
+
+    /// <summary>
     /// Get the document from the database with the provided id
     /// </summary>
     /// <param name="id">Id to search for</param>
