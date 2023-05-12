@@ -58,7 +58,7 @@ public class DecryptionResult : DisposableBase
     {
         TallyId = tallyId;
         IsValid = true;
-        Tally = result;
+        Tally = new(result);
         ChallengedBallots = challengedBallots
             .Select(x => new PlaintextTallyBallot(x)).ToList();
         SpoiledBallots = spoiledBallots
