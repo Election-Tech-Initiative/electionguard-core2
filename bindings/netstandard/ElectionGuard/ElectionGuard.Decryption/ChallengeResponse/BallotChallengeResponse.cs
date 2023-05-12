@@ -34,7 +34,7 @@ public record BallotChallengeResponse
 
     /// <summary>
     /// the lagrange coefficient for the guardian
-    /// 
+    /// </summary>
     public ElementModQ Coefficient { get; init; }
 
     public Dictionary<string, ContestChallengeResponse> Contests { get; init; } = default!;
