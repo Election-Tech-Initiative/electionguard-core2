@@ -4,7 +4,6 @@ using ElectionGuard.Decryption.Shares;
 using ElectionGuard.Decryption.Tally;
 using ElectionGuard.ElectionSetup;
 using ElectionGuard.ElectionSetup.Extensions;
-using ElectionGuard.Guardians;
 
 namespace ElectionGuard.Decryption.ChallengeResponse;
 
@@ -14,10 +13,13 @@ namespace ElectionGuard.Decryption.ChallengeResponse;
 public record TallyChallengeResponse
     : DisposableRecordBase, IEquatable<TallyChallengeResponse>
 {
-    // TODO: tallyId
+    /// <summary>
+    /// The object id of the tally
+    /// </summary>
+    public string TallyId { get; init; }
 
     /// <summary>
-    /// The object id of the contest
+    /// The object id of the guardian
     /// </summary>
     public string GuardianId { get; init; }
 
@@ -33,18 +35,20 @@ public record TallyChallengeResponse
     public TallyChallengeResponse(
         TallyChallenge challenge)
     {
+        TallyId = challenge.TallyId;
         GuardianId = challenge.GuardianId;
         SequenceOrder = challenge.SequenceOrder;
-        Coefficient = challenge.Coefficient;
+        Coefficient = new(challenge.Coefficient);
         Contests = challenge
             .ToContestChallengeResponseDictionary();
     }
 
     public TallyChallengeResponse(TallyChallengeResponse other) : base(other)
     {
+        TallyId = other.TallyId;
         GuardianId = other.GuardianId;
         SequenceOrder = other.SequenceOrder;
-        Coefficient = other.Coefficient;
+        Coefficient = new(other.Coefficient);
         Contests = other.Contests
             .ToDictionary(x => x.Key, x => new ContestChallengeResponse(x.Value));
     }

@@ -11,6 +11,11 @@ public record AccumulatedBallot
     : DisposableRecordBase, IEquatable<AccumulatedBallot>
 {
     /// <summary>
+    /// The object id of the tally
+    /// </summary>
+    public string TallyId { get; init; }
+
+    /// <summary>
     /// The object id of the ballot
     /// </summary>
     public string ObjectId { get; init; }
@@ -21,9 +26,11 @@ public record AccumulatedBallot
     public Dictionary<string, AccumulatedContest> Contests { get; init; } = default!;
 
     public AccumulatedBallot(
+        string tallyId,
         string objectId,
         Dictionary<string, AccumulatedContest> contests)
     {
+        TallyId = tallyId;
         ObjectId = objectId;
         Contests = contests
             .Select(x => new AccumulatedContest(x.Value))
@@ -31,9 +38,11 @@ public record AccumulatedBallot
     }
 
     public AccumulatedBallot(
+        string tallyId,
         string objectId,
         List<AccumulatedContest> contests)
     {
+        TallyId = tallyId;
         ObjectId = objectId;
         Contests = contests
             .Select(x => new AccumulatedContest(x))
@@ -42,6 +51,7 @@ public record AccumulatedBallot
 
     public AccumulatedBallot(AccumulatedBallot other) : base(other)
     {
+        TallyId = other.TallyId;
         ObjectId = other.ObjectId;
         Contests = other.Contests
             .Select(x => new AccumulatedContest(x.Value))

@@ -6,6 +6,7 @@ using ElectionGuard.Decryption.Shares;
 using ElectionGuard.Decryption.Tally;
 using ElectionGuard.ElectionSetup;
 using ElectionGuard.ElectionSetup.Extensions;
+using ElectionGuard.Extensions;
 using ElectionGuard.Guardians;
 
 namespace ElectionGuard.Decryption.Decryption;
@@ -259,6 +260,7 @@ public record class CiphertextDecryptionTally : DisposableRecordBase
         var lagrangeCoefficients = guardianShares.ComputeLagrangeCoefficients();
 
         return _challengedBallots.AccumulateShares(
+                _tally.TallyId,
                 _ballotShares,
                 lagrangeCoefficients,
                 _tally.Context.CryptoExtendedBaseHash,
@@ -269,8 +271,17 @@ public record class CiphertextDecryptionTally : DisposableRecordBase
 
     #region Challenge
 
-    // create a challenge for each guardian that includes the tally and ballot challenges
-    // which are offset by the lagrange coefficients for the guardian
+    /// <summary>
+    /// Create a challenge for each available guardian that includes the tally and ballot challenges
+    /// which are offset by the lagrange coefficients for the guardian.
+    ///
+    /// At this point in the protocol the administrator commits to the quorum of guardains by accumulating
+    /// the tally and ballot shares for all guardians that have submitted their shares.
+    /// from this point on, all guardians who have submitted shares must complete the protocol.
+    /// It is possible to restart from this step in certain circumstances such as when a guardian
+    /// is removed from the quorum, or a new guardian is added. 
+    /// (to do this you must reset the state manually and re-run AccumulateShares)
+    /// </summary>
     public Dictionary<string, GuardianChallenge> CreateChallenge(bool skipValidation = false)
     {
         if (DecryptionState != DecryptionState.PendingAdminChallenge)
@@ -339,7 +350,7 @@ public record class CiphertextDecryptionTally : DisposableRecordBase
         var lagrangeCoefficients = guardianShares.ComputeLagrangeCoefficients();
 
         var challenges = _challengedBallots.Values.ToList().CreateChallenges(
-            _accumulatedBallots, lagrangeCoefficients, _tally.Context);
+            _accumulatedBallots, _tally.TallyId, lagrangeCoefficients, _tally.Context);
 
         return challenges;
 
@@ -588,7 +599,7 @@ public record class CiphertextDecryptionTally : DisposableRecordBase
         _challengeResponses?.Dispose();
 
         _accumulatedTally?.Dispose();
-        _accumulatedBallots?.ForEach(x => x.Dispose());
+        _accumulatedBallots?.Dispose();
         _decryptionResult?.Dispose();
     }
 

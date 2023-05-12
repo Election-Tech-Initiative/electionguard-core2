@@ -66,6 +66,7 @@ public static class AccumulateSharesExtensions
 
     public static List<AccumulatedBallot> AccumulateShares(
         this Dictionary<string, CiphertextBallot> self,
+        string tallyId,
         Dictionary<string, CiphertextDecryptionBallot> ballotShares,
         Dictionary<string, LagrangeCoefficient> lagrangeCoefficients,
         ElementModQ extendedBaseHash,
@@ -75,6 +76,7 @@ public static class AccumulateSharesExtensions
         foreach (var (ballotId, ballot) in self)
         {
             var accumulation = ballot.AccumulateShares(
+                tallyId,
                 ballotShares[ballotId],
                 lagrangeCoefficients,
                 extendedBaseHash,
@@ -86,12 +88,14 @@ public static class AccumulateSharesExtensions
 
     public static AccumulatedBallot AccumulateShares(
         this CiphertextBallot self,
+        string tallyId,
         CiphertextDecryptionBallot ballotShares,
         Dictionary<string, LagrangeCoefficient> lagrangeCoefficients,
         ElementModQ extendedBaseHash,
         bool skipValidation = false)
     {
         return self.AccumulateShares(
+            tallyId,
             ballotShares.GetShares(),
             lagrangeCoefficients,
             extendedBaseHash,
@@ -103,6 +107,7 @@ public static class AccumulateSharesExtensions
     /// </summary>
     public static AccumulatedBallot AccumulateShares(
         this CiphertextBallot self,
+        string tallyId,
         List<Tuple<ElectionPublicKey, BallotShare>> guardianShares,
         Dictionary<string, LagrangeCoefficient> lagrangeCoefficients,
         ElementModQ extendedBaseHash,
@@ -147,7 +152,7 @@ public static class AccumulateSharesExtensions
             contests.Add(accumulator);
         }
 
-        return new AccumulatedBallot(self.ObjectId, contests);
+        return new AccumulatedBallot(tallyId, self.ObjectId, contests);
     }
 
     /// <summary>

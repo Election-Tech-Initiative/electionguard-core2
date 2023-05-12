@@ -163,6 +163,7 @@ public static class DecryptWithSharesExtensions
     {
         // Accumulate the shares
         var accumulation = self.AccumulateShares(
+            tallyId,
             guardianShares,
             lagrangeCoefficients,
              extendedBaseHash,

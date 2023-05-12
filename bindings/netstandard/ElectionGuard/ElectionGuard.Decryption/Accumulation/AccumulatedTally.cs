@@ -12,7 +12,8 @@ public record AccumulatedTally
     /// <summary>
     /// The object id of the tally
     /// </summary>
-    public string ObjectId { get; init; }
+    public string TallyId { get; init; }
+
 
     /// <summary>
     /// The accumulated partial decryptions of the contests of the tally
@@ -20,18 +21,18 @@ public record AccumulatedTally
     public Dictionary<string, AccumulatedContest> Contests { get; init; } = default!;
 
     public AccumulatedTally(
-        string objectId,
+        string tallyId,
         Dictionary<string, AccumulatedContest> contests)
     {
-        ObjectId = objectId;
+        TallyId = tallyId;
         Contests = contests;
     }
 
     public AccumulatedTally(
-        string objectId,
+        string tallyId,
         List<AccumulatedContest> contests)
     {
-        ObjectId = objectId;
+        TallyId = tallyId;
         Contests = contests
             .Select(x => new AccumulatedContest(x))
             .ToDictionary(x => x.ObjectId);

@@ -36,8 +36,9 @@ public record GuardianChallenge : DisposableRecordBase
     {
         GuardianId = guardian.GuardianId;
         SequenceOrder = guardian.SequenceOrder;
-        Tally = tally;
-        Ballots = ballots ?? new List<BallotChallenge>();
+        Tally = new(tally);
+        Ballots = ballots != null
+            ? ballots.Select(x => new BallotChallenge(x)).ToList() : new();
     }
 
 

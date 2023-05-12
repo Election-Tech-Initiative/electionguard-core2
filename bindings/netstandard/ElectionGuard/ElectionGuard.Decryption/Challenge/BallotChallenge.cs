@@ -13,12 +13,17 @@ public record BallotChallenge
     : DisposableRecordBase, IEquatable<BallotChallenge>
 {
     /// <summary>
-    /// The object id of the contest
+    /// The object id of the tally
+    /// </summary>
+    public string TallyId { get; init; }
+
+    /// <summary>
+    /// The object id of the ballot
     /// </summary>
     public string ObjectId { get; init; }
 
     /// <summary>
-    /// The object id of the contest
+    /// The object id of the guardian
     /// </summary>
     public string GuardianId { get; init; }
 
@@ -35,6 +40,7 @@ public record BallotChallenge
     public Dictionary<string, ContestChallenge> Contests { get; init; } = default!;
 
     public BallotChallenge(
+        string tallyId,
         IElectionGuardian guardian,
         LagrangeCoefficient coefficient,
         CiphertextBallot ballot,
@@ -45,16 +51,18 @@ public record BallotChallenge
             throw new ArgumentException(
                 $"Guardian sequence order {guardian.SequenceOrder} does not match coefficient sequence order {coefficient.SequenceOrder}");
         }
+        TallyId = tallyId;
         ObjectId = ballot.ObjectId;
         GuardianId = guardian.GuardianId;
         SequenceOrder = guardian.SequenceOrder;
-        Coefficient = coefficient.Coefficient;
+        Coefficient = new(coefficient.Coefficient);
         Contests = manifest
             .GetContests(ballot.StyleId)
             .ToContestChallengeDictionary();
     }
 
     public BallotChallenge(
+        string tallyId,
         IElectionGuardian guardian,
         LagrangeCoefficient coefficient,
         CiphertextBallot ballot)
@@ -64,50 +72,56 @@ public record BallotChallenge
             throw new ArgumentException(
                 $"Guardian sequence order {guardian.SequenceOrder} does not match coefficient sequence order {coefficient.SequenceOrder}");
         }
-
+        TallyId = tallyId;
         ObjectId = ballot.ObjectId;
         GuardianId = guardian.GuardianId;
         SequenceOrder = guardian.SequenceOrder;
-        Coefficient = coefficient.Coefficient;
+        Coefficient = new(coefficient.Coefficient);
         Contests = ballot
             .ToContestChallengeDictionary();
     }
 
     public BallotChallenge(
+        string tallyId,
         IElectionGuardian guardian,
         ElementModQ coefficient,
         AccumulatedBallot accumulated)
     {
+        TallyId = tallyId;
         ObjectId = accumulated.ObjectId;
         GuardianId = guardian.GuardianId;
         SequenceOrder = guardian.SequenceOrder;
-        Coefficient = coefficient;
+        Coefficient = new(coefficient);
         Contests = accumulated
             .ToContestChallengeDictionary();
     }
 
     public BallotChallenge(
+        string tallyId,
         string guardianId,
         LagrangeCoefficient coefficient,
         CiphertextBallot ballot)
     {
+        TallyId = tallyId;
         ObjectId = ballot.ObjectId;
         GuardianId = guardianId;
         SequenceOrder = coefficient.SequenceOrder;
-        Coefficient = coefficient.Coefficient;
+        Coefficient = new(coefficient.Coefficient);
         Contests = ballot
             .ToContestChallengeDictionary();
     }
 
     public BallotChallenge(
+        string tallyId,
         string guardianId,
         LagrangeCoefficient coefficient,
         AccumulatedBallot accumulated)
     {
+        TallyId = tallyId;
         ObjectId = accumulated.ObjectId;
         GuardianId = guardianId;
         SequenceOrder = coefficient.SequenceOrder;
-        Coefficient = coefficient.Coefficient;
+        Coefficient = new(coefficient.Coefficient);
         Contests = accumulated
             .ToContestChallengeDictionary();
     }
@@ -117,7 +131,7 @@ public record BallotChallenge
         ObjectId = other.ObjectId;
         GuardianId = other.GuardianId;
         SequenceOrder = other.SequenceOrder;
-        Coefficient = other.Coefficient;
+        Coefficient = new(other.Coefficient);
         Contests = other.Contests
             .Select(x => new ContestChallenge(x.Value))
             .ToDictionary(x => x.ObjectId);

@@ -12,8 +12,6 @@ namespace ElectionGuard.Decryption.ChallengeResponse;
 /// </summary>
 public record GuardianChallengeResponse : DisposableRecordBase
 {
-    // TODO: tallyId?
-
     /// <summary>
     /// The object id of the guardian.
     /// </summary>
@@ -42,8 +40,9 @@ public record GuardianChallengeResponse : DisposableRecordBase
         GuardianId = guardian.GuardianId;
         SequenceOrder = guardian.SequenceOrder;
         CommitmentOffset = new(commitmentOffset);
-        Tally = tally;
-        Ballots = ballots ?? new List<BallotChallengeResponse>();
+        Tally = new(tally);
+        Ballots = ballots != null
+            ? ballots.Select(x => new BallotChallengeResponse(x)).ToList() : new();
     }
 
     public GuardianChallengeResponse(GuardianChallengeResponse other) : base(other)

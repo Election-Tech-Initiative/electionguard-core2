@@ -13,6 +13,11 @@ public record BallotChallengeResponse
     : DisposableRecordBase, IEquatable<BallotChallengeResponse>
 {
     /// <summary>
+    /// The object id of the tally
+    /// </summary>
+    public string TallyId { get; init; }
+
+    /// <summary>
     /// The object id of the contest
     /// </summary>
     public string ObjectId { get; init; }
@@ -37,20 +42,22 @@ public record BallotChallengeResponse
     public BallotChallengeResponse(
         BallotChallenge challenge)
     {
+        TallyId = challenge.TallyId;
         ObjectId = challenge.ObjectId;
         GuardianId = challenge.GuardianId;
         SequenceOrder = challenge.SequenceOrder;
-        Coefficient = challenge.Coefficient;
+        Coefficient = new(challenge.Coefficient);
         Contests = challenge
             .ToContestChallengeResponseDictionary();
     }
 
     public BallotChallengeResponse(BallotChallengeResponse other) : base(other)
     {
+        TallyId = other.TallyId;
         ObjectId = other.ObjectId;
         GuardianId = other.GuardianId;
         SequenceOrder = other.SequenceOrder;
-        Coefficient = other.Coefficient;
+        Coefficient = new(other.Coefficient);
         Contests = other.Contests
             .ToDictionary(x => x.Key, x => new ContestChallengeResponse(x.Value));
     }

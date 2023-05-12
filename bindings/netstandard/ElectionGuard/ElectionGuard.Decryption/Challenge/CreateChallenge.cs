@@ -48,7 +48,7 @@ public static class CreateChallengeExtensions
         {
             challenges.Add(
                 guardianId,
-                new TallyChallenge(guardianId, coefficient, self.Manifest));
+                new TallyChallenge(guardianId, self.TallyId, coefficient, self.Manifest));
         }
 
         return self.CreateChallenge(accumulatedTally, challenges);
@@ -116,6 +116,7 @@ public static class CreateChallengeExtensions
     /// </summary>
     public static Dictionary<string, List<BallotChallenge>> CreateChallenges(
         this List<CiphertextBallot> self, List<AccumulatedBallot> accumulatedBallot,
+        string tallyId,
         Dictionary<string, LagrangeCoefficient> lagrangeCoefficients,
         CiphertextElectionContext context)
     {
@@ -131,7 +132,7 @@ public static class CreateChallengeExtensions
 
             var ballotAccumulation = accumulatedBallot.First(x => x.ObjectId == ballot.ObjectId);
             var ballotChallenges = ballot.CreateChallenge(
-                ballotAccumulation, lagrangeCoefficients, context);
+                ballotAccumulation, tallyId, lagrangeCoefficients, context);
 
             // iterate over the challenges and add tto the result
             foreach (var (guardianId, challenge) in ballotChallenges)
@@ -148,35 +149,39 @@ public static class CreateChallengeExtensions
 
     public static Dictionary<string, BallotChallenge> CreateChallenge(
         this CiphertextBallot self, AccumulatedBallot accumulatedBallot,
+        string tallyId,
         Dictionary<string, ElectionPublicKey> _guardians,
         CiphertextElectionContext context)
     {
         var coefficients = _guardians.Values.ToList().ComputeLagrangeCoefficients();
         return self.CreateChallenge(
-            accumulatedBallot, coefficients, context.CryptoExtendedBaseHash, context.ElGamalPublicKey);
+            accumulatedBallot, tallyId, coefficients, context.CryptoExtendedBaseHash, context.ElGamalPublicKey);
     }
 
     public static Dictionary<string, BallotChallenge> CreateChallenge(
         this CiphertextBallot self, AccumulatedBallot accumulatedBallot,
+        string tallyId,
         Dictionary<string, ElectionPublicKey> _guardians,
         ElementModQ extendedBaseHash, ElementModP elGamalPublicKey)
     {
         var coefficients = _guardians.Values.ToList().ComputeLagrangeCoefficients();
         return self.CreateChallenge(
-            accumulatedBallot, coefficients, extendedBaseHash, elGamalPublicKey);
+            accumulatedBallot, tallyId, coefficients, extendedBaseHash, elGamalPublicKey);
     }
 
     public static Dictionary<string, BallotChallenge> CreateChallenge(
         this CiphertextBallot self, AccumulatedBallot accumulatedBallot,
+        string tallyId,
         Dictionary<string, LagrangeCoefficient> coefficients,
         CiphertextElectionContext context)
     {
         return self.CreateChallenge(
-            accumulatedBallot, coefficients, context.CryptoExtendedBaseHash, context.ElGamalPublicKey);
+            accumulatedBallot, tallyId, coefficients, context.CryptoExtendedBaseHash, context.ElGamalPublicKey);
     }
 
     public static Dictionary<string, BallotChallenge> CreateChallenge(
         this CiphertextBallot self, AccumulatedBallot accumulatedBallot,
+        string tallyId,
         Dictionary<string, LagrangeCoefficient> lagrangeCoefficients,
         ElementModQ extendedBaseHash, ElementModP elGamalPublicKey)
     {
@@ -186,7 +191,7 @@ public static class CreateChallengeExtensions
         {
             challenges.Add(
                 guardianId,
-                new BallotChallenge(guardianId, coefficient, self));
+                new BallotChallenge(tallyId, guardianId, coefficient, self));
         }
         return self.CreateChallenge(
             accumulatedBallot, challenges, extendedBaseHash, elGamalPublicKey);

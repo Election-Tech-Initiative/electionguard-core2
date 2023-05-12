@@ -11,10 +11,13 @@ namespace ElectionGuard.Decryption.Challenge;
 public record TallyChallenge
     : DisposableRecordBase, IEquatable<TallyChallenge>
 {
-    // TODO: we probably need the tallyId here and in all the other objects where its missing
+    /// <summary>
+    /// The object id of the tally
+    /// </summary>
+    public string TallyId { get; init; }
 
     /// <summary>
-    /// The object id of the contest
+    /// The object id of the guardian
     /// </summary>
     public string GuardianId { get; init; }
 
@@ -31,6 +34,7 @@ public record TallyChallenge
     public Dictionary<string, ContestChallenge> Contests { get; init; } = new Dictionary<string, ContestChallenge>();
 
     public TallyChallenge(
+        string tallyId,
         IElectionGuardian guardian,
         LagrangeCoefficient coefficient,
         InternalManifest manifest)
@@ -40,6 +44,7 @@ public record TallyChallenge
             throw new ArgumentException(
                 $"Guardian sequence order {guardian.SequenceOrder} does not match coefficient sequence order {coefficient.SequenceOrder}");
         }
+        TallyId = tallyId;
         GuardianId = guardian.GuardianId;
         SequenceOrder = guardian.SequenceOrder;
         Coefficient = coefficient.Coefficient;
@@ -47,10 +52,12 @@ public record TallyChallenge
     }
 
     public TallyChallenge(
+        string tallyId,
         IElectionGuardian guardian,
         ElementModQ coefficient,
         InternalManifest manifest)
     {
+        TallyId = tallyId;
         GuardianId = guardian.GuardianId;
         SequenceOrder = guardian.SequenceOrder;
         Coefficient = coefficient;
@@ -58,10 +65,12 @@ public record TallyChallenge
     }
 
     public TallyChallenge(
+        string tallyId,
         string guardianId,
         LagrangeCoefficient coefficient,
         InternalManifest manifest)
     {
+        TallyId = tallyId;
         GuardianId = guardianId;
         SequenceOrder = coefficient.SequenceOrder;
         Coefficient = coefficient.Coefficient;
@@ -69,6 +78,7 @@ public record TallyChallenge
     }
 
     public TallyChallenge(
+        string tallyId,
         IElectionGuardian guardian,
         LagrangeCoefficient coefficient,
         Dictionary<string, ContestChallenge> contests)
@@ -78,10 +88,23 @@ public record TallyChallenge
             throw new ArgumentException(
                 $"Guardian sequence order {guardian.SequenceOrder} does not match coefficient sequence order {coefficient.SequenceOrder}");
         }
+        TallyId = tallyId;
         GuardianId = guardian.GuardianId;
         SequenceOrder = guardian.SequenceOrder;
         Coefficient = new(coefficient.Coefficient);
         Contests = contests
+            .ToDictionary(
+                kvp => kvp.Key,
+                kvp => new ContestChallenge(kvp.Value));
+    }
+
+    public TallyChallenge(TallyChallenge other) : base(other)
+    {
+        TallyId = other.TallyId;
+        GuardianId = other.GuardianId;
+        SequenceOrder = other.SequenceOrder;
+        Coefficient = new(other.Coefficient);
+        Contests = other.Contests
             .ToDictionary(
                 kvp => kvp.Key,
                 kvp => new ContestChallenge(kvp.Value));
