@@ -13,6 +13,6 @@ public partial class EncryptedTallyRecord : DatabaseRecord
     }
 
     public override string ToString() => EncryptedTallyData ?? string.Empty;
-    public static implicit operator string(EncryptedTallyRecord? record) => record?.ToString();
+    public static implicit operator string(EncryptedTallyRecord? record) => record?.ToString() ?? string.Empty;
 
 }

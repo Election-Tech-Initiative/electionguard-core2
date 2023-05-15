@@ -68,6 +68,6 @@ public partial class KeyCeremonyRecord : DatabaseRecord, IDisposable
 
     public void Dispose()
     {
-        JointKey.Dispose();
+        JointKey?.Dispose();
     }
 }

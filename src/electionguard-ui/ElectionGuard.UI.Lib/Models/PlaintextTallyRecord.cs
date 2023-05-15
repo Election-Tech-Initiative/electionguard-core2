@@ -13,6 +13,6 @@ public partial class PlaintextTallyRecord : DatabaseRecord
     }
 
     public override string ToString() => PlaintextTallyData ?? string.Empty;
-    public static implicit operator string(PlaintextTallyRecord? record) => record?.ToString();
+    public static implicit operator string(PlaintextTallyRecord? record) => record?.ToString() ?? string.Empty;
 
 }

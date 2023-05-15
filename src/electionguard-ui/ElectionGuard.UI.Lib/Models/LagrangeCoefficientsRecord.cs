@@ -13,5 +13,5 @@ public partial class LagrangeCoefficientsRecord : DatabaseRecord
     }
 
     public override string ToString() => LagrangeCoefficientsData ?? string.Empty;
-    public static implicit operator string(LagrangeCoefficientsRecord? record) => record?.ToString();
+    public static implicit operator string(LagrangeCoefficientsRecord? record) => record?.ToString() ?? string.Empty;
 }
