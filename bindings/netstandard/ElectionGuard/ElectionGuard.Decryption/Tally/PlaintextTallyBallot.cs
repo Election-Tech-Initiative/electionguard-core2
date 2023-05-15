@@ -27,6 +27,12 @@ public record PlaintextTallyBallot : PlaintextTally, IEquatable<PlaintextTallyBa
 
     }
 
+    public PlaintextTallyBallot(PlaintextTallyBallot ballot)
+        : base(ballot)
+    {
+
+    }
+
     protected PlaintextTallyBallot(PlaintextTally original) : base(original)
     {
     }

@@ -53,7 +53,7 @@ namespace ElectionGuard.Proofs
             {
                 PublicKey = new ElementModP(keyPair.PublicKey);
                 Commitment = BigMath.GPowP(seed);
-                Challenge = BigMath.HashElems(PublicKey, Commitment);
+                Challenge = Hash.HashElems(PublicKey, Commitment);
                 Response = BigMath.APlusBMulCModQ(seed, keyPair.SecretKey, Challenge);
             }
         }
@@ -67,7 +67,7 @@ namespace ElectionGuard.Proofs
             {
                 PublicKey = new ElementModP(keyPair.PublicKey);
                 Commitment = BigMath.GPowP(seed);
-                Challenge = BigMath.HashElems(PublicKey, Commitment);
+                Challenge = Hash.HashElems(PublicKey, Commitment);
                 Response = BigMath.APlusBMulCModQ(seed, keyPair.SecretKey, Challenge);
             }
         }
@@ -82,7 +82,7 @@ namespace ElectionGuard.Proofs
 
                 PublicKey = new ElementModP(keyPair.PublicKey);
                 Commitment = BigMath.GPowP(seed);
-                Challenge = BigMath.HashElems(PublicKey, Commitment);
+                Challenge = Hash.HashElems(PublicKey, Commitment);
                 Response = BigMath.APlusBMulCModQ(seed, keyPair.SecretKey, Challenge);
             }
         }
@@ -94,7 +94,7 @@ namespace ElectionGuard.Proofs
         {
             PublicKey = new ElementModP(keyPair.PublicKey);
             Commitment = BigMath.GPowP(seed);
-            Challenge = BigMath.HashElems(PublicKey, Commitment);
+            Challenge = Hash.HashElems(PublicKey, Commitment);
             Response = BigMath.APlusBMulCModQ(seed, keyPair.SecretKey, Challenge);
         }
 
@@ -119,7 +119,7 @@ namespace ElectionGuard.Proofs
             var inBoundsU = u.IsInBounds();
 
 #pragma warning disable IDE0063 // Use simple 'using' statement. Need to support Net Standard 2.0, which doesn't have this.
-            using (var c = BigMath.HashElems(k, h))
+            using (var c = Hash.HashElems(k, h))
             using (var gp = BigMath.GPowP(u))
             using (var pp = BigMath.PowModP(k, c))
             using (var mp = BigMath.MultModP(h, pp))

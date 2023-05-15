@@ -1,16 +1,21 @@
-using ElectionGuard.UI.Lib.Models;
+using ElectionGuard.Guardians;
 
 namespace ElectionGuard.ElectionSetup;
 
 /// <summary>
 /// A tuple of election key pair, proof and polynomial
 /// </summary>
-public class ElectionKeyPair : DisposableBase
+public class ElectionKeyPair : DisposableBase, IElectionGuardian
 {
     /// <summary>
     /// The id of the owner guardian
     /// </summary>
+    [Obsolete($"use {nameof(IElectionGuardian.GuardianId)}")]
     public string OwnerId { get; set; }
+
+    // TODO: refactor to use IElectionGuardian
+    public string ObjectId => OwnerId;
+    public string GuardianId => OwnerId;
 
     /// <summary>
     /// The sequence order of the owner guardian

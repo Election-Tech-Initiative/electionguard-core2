@@ -1,16 +1,17 @@
+using ElectionGuard.Ballot;
 using ElectionGuard.Decryption.Tally;
 using ElectionGuard.ElectionSetup;
-using ElectionGuard.Encryption.Ballot;
-using ElectionGuard.UI.Lib.Models;
+using ElectionGuard.ElectionSetup.Extensions;
+using ElectionGuard.Guardians;
 
-namespace ElectionGuard.Decryption.Decryption;
+namespace ElectionGuard.Decryption.Shares;
 
 /// <summary>
 /// A Guardian's Partial Decryption of a contest. 
 /// This object is used both for Tally's and Ballot partial decryptions.
 /// </summary>
-public record CiphertextDecryptionContestShare
-    : DisposableRecordBase, IElectionContest, IEquatable<CiphertextDecryptionContestShare>
+public record ContestShare
+    : DisposableRecordBase, IElectionContest, IEquatable<ContestShare>
 {
     /// <summary>
     /// The object id of the contest
@@ -30,52 +31,47 @@ public record CiphertextDecryptionContestShare
     // partial decryption of extended data for the contest
     public ElementModP? ExtendedData { get; init; } = default!;
 
-    // TODO: commitment for generating the cp proof as part of decryption
-    public ElGamalCiphertext? Commitment { get; init; } = default!;
-
     /// <summary>
     /// Collection of Selection Shares
     /// the key is the selection object id
     /// </summary>
-    public Dictionary<string, CiphertextDecryptionSelectionShare> Selections { get; init; } = default!;
+    public Dictionary<string, SelectionShare> Selections { get; init; } = default!;
 
-    public CiphertextDecryptionContestShare(
+    public ContestShare(
         IElectionContest contest,
-        Dictionary<string, CiphertextDecryptionSelectionShare> selections)
+        Dictionary<string, SelectionShare> selections)
     {
         ObjectId = contest.ObjectId;
         SequenceOrder = contest.SequenceOrder;
         DescriptionHash = new(contest.DescriptionHash);
         Selections = selections.Select(
-            x => new CiphertextDecryptionSelectionShare(x.Value))
+            x => new SelectionShare(x.Value))
             .ToDictionary(x => x.ObjectId);
     }
 
-    public CiphertextDecryptionContestShare(
+    public ContestShare(
         IElectionContest contest,
         ElementModP extendedData,
-        ElGamalCiphertext? commitment, // TODO: non-nullable?
-        Dictionary<string, CiphertextDecryptionSelectionShare> selections)
+        Dictionary<string, SelectionShare> selections)
     {
         ObjectId = contest.ObjectId;
         SequenceOrder = contest.SequenceOrder;
         DescriptionHash = new(contest.DescriptionHash);
         ExtendedData = new(extendedData);
-        Commitment = commitment != null ? new(commitment) : null;
         Selections = selections.Select(
-            x => new CiphertextDecryptionSelectionShare(x.Value))
+            x => new SelectionShare(x.Value))
             .ToDictionary(x => x.ObjectId);
     }
 
-    public CiphertextDecryptionContestShare(CiphertextDecryptionContestShare other) : base(other)
+    public ContestShare(ContestShare other) : base(other)
     {
         ObjectId = other.ObjectId;
         SequenceOrder = other.SequenceOrder;
         DescriptionHash = new(other.DescriptionHash);
-        ExtendedData = other.ExtendedData != null ? new(other.ExtendedData) : null;
-        Commitment = other.Commitment != null ? new(other.Commitment) : null;
+        ExtendedData = other.ExtendedData != null
+            ? new(other.ExtendedData) : null;
         Selections = other.Selections.Select(
-            x => new CiphertextDecryptionSelectionShare(x.Value))
+            x => new SelectionShare(x.Value))
             .ToDictionary(x => x.ObjectId);
     }
 
@@ -103,7 +99,7 @@ public record CiphertextDecryptionContestShare
             }
 
             if (!Selections[selection.ObjectId].IsValid(
-                selection, guardian, extendedBaseHash))
+                selection, guardian))
             {
                 return false;
             }
@@ -133,7 +129,7 @@ public record CiphertextDecryptionContestShare
             }
 
             if (!Selections[selection.Key].IsValid(
-                selection.Value, guardian, extendedBaseHash))
+                selection.Value, guardian))
             {
                 return false;
             }
@@ -141,19 +137,16 @@ public record CiphertextDecryptionContestShare
         return true;
     }
 
+    protected override void DisposeManaged()
+    {
+        base.DisposeManaged();
+        Selections.Dispose();
+    }
+
     protected override void DisposeUnmanaged()
     {
         base.DisposeUnmanaged();
         ExtendedData?.Dispose();
-        Commitment?.Dispose();
-        DescriptionHash.Dispose();
-        if (Selections != null)
-        {
-            foreach (var selection in Selections.Values)
-            {
-                selection.Dispose();
-            }
-            Selections.Clear();
-        }
+        DescriptionHash?.Dispose();
     }
 }

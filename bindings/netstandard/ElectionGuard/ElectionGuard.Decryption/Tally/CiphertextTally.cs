@@ -1,9 +1,9 @@
-using ElectionGuard.Encryption.Ballot;
 using ElectionGuard.ElectionSetup;
 using System.Text;
 using ElectionGuard.ElectionSetup.Extensions;
 using System.Diagnostics;
 using Newtonsoft.Json;
+using ElectionGuard.Ballot;
 
 namespace ElectionGuard.Decryption.Tally;
 
@@ -228,13 +228,17 @@ public record CiphertextTally : DisposableRecordBase, IEquatable<CiphertextTally
         return sb.ToString();
     }
 
+    protected override void DisposeManaged()
+    {
+        base.DisposeManaged();
+        Contests?.Dispose();
+    }
+
     protected override void DisposeUnmanaged()
     {
         base.DisposeUnmanaged();
         Manifest?.Dispose();
         Context?.Dispose();
-        Contests?.Dispose();
-        Contests?.Clear();
     }
 
     #region Equality Overrides

@@ -1,3 +1,4 @@
+using ElectionGuard.Decryption.Decryption;
 using ElectionGuard.Decryption.Tally;
 using ElectionGuard.Encryption.Utils.Generators;
 

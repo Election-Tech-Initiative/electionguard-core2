@@ -165,7 +165,7 @@ public class KeyCeremonyGenerator
             var announced = data.Mediator
                 .ShareAnnounced(guardian.GuardianId);
             announced!
-                .ForEach(guardian.SaveGuardianKey);
+                .ForEach(guardian.AddGuardianKey);
         }
 
         // ROUND 2: Partial Key Verification

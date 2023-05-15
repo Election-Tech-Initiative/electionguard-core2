@@ -1,6 +1,7 @@
 
 using ElectionGuard.Encryption.Utils.Generators;
-using ElectionGuard.Encryption.Ballot;
+using ElectionGuard.Decryption.Decryption;
+using ElectionGuard.Ballot;
 
 namespace ElectionGuard.Decryption.Tests.Decryption;
 

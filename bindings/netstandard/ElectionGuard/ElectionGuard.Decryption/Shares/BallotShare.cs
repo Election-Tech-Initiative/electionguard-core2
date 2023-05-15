@@ -1,22 +1,22 @@
 using ElectionGuard.Decryption.Tally;
-using ElectionGuard.UI.Lib.Models;
+using ElectionGuard.Guardians;
 
-namespace ElectionGuard.Decryption.Decryption;
+namespace ElectionGuard.Decryption.Shares;
 
 /// <summary>
 /// a share of a guardian's decryption of a collection of contests for a specific ballot (usually a spoiled ballot)
 /// </summary>
-public record CiphertextDecryptionBallotShare : CiphertextDecryptionTallyShare, IEquatable<CiphertextDecryptionTallyShare>
+public record BallotShare : TallyShare, IEquatable<BallotShare>
 {
     public string BallotId { get; init; }
     public string StyleId { get; init; }
     public ElementModQ ManifestHash { get; init; }
 
-    public CiphertextDecryptionBallotShare(
+    public BallotShare(
         string guardianId,
         string tallyId,
         CiphertextBallot ballot,
-        Dictionary<string, CiphertextDecryptionContestShare> contests)
+        Dictionary<string, ContestShare> contests)
         : base(guardianId, tallyId, contests)
     {
         BallotId = ballot.ObjectId;
@@ -24,7 +24,7 @@ public record CiphertextDecryptionBallotShare : CiphertextDecryptionTallyShare, 
         ManifestHash = new(ballot.ManifestHash);
     }
 
-    public CiphertextDecryptionBallotShare(CiphertextDecryptionBallotShare other) : base(other)
+    public BallotShare(BallotShare other) : base(other)
     {
         BallotId = other.BallotId;
         StyleId = other.StyleId;
@@ -51,7 +51,7 @@ public record CiphertextDecryptionBallotShare : CiphertextDecryptionTallyShare, 
         ElectionPublicKey guardian,
         ElementModQ extendedBaseHash)
     {
-        if (guardian.OwnerId != GuardianId)
+        if (guardian.GuardianId != GuardianId)
         {
             return false;
         }
@@ -97,7 +97,7 @@ public record CiphertextDecryptionBallotShare : CiphertextDecryptionTallyShare, 
     public override bool IsValid(
         CiphertextTally tally, ElectionPublicKey guardian)
     {
-        if (guardian.OwnerId != GuardianId)
+        if (guardian.GuardianId != GuardianId)
         {
             return false;
         }
@@ -142,7 +142,7 @@ public record CiphertextDecryptionBallotShare : CiphertextDecryptionTallyShare, 
         ElementModQ manifestHash,
         ElectionPublicKey guardian)
     {
-        if (guardian.OwnerId != GuardianId)
+        if (guardian.GuardianId != GuardianId)
         {
             return false;
         }
@@ -166,5 +166,11 @@ public record CiphertextDecryptionBallotShare : CiphertextDecryptionTallyShare, 
         // because we do not have ciphertext information from the parameters
 
         return true;
+    }
+
+    protected override void DisposeUnmanaged()
+    {
+        base.DisposeUnmanaged();
+        ManifestHash?.Dispose();
     }
 }

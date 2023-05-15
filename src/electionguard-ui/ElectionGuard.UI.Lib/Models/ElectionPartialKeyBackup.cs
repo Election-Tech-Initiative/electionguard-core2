@@ -5,6 +5,8 @@
 /// </summary>
 public class ElectionPartialKeyBackup : DisposableBase
 {
+    // TODO: implement IElectionGuardian
+
     public string OwnerId { get; set; }
 
     public string DesignatedId { get; set; }

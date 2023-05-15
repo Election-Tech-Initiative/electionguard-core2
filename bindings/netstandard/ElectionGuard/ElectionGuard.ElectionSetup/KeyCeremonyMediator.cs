@@ -1,7 +1,8 @@
 ﻿using System.Diagnostics;
 using ElectionGuard.ElectionSetup.Exceptions;
 using ElectionGuard.ElectionSetup.Extensions;
-using ElectionGuard.UI.Lib.Extensions;
+using ElectionGuard.Extensions;
+using ElectionGuard.Guardians;
 using ElectionGuard.UI.Lib.Models;
 using ElectionGuard.UI.Lib.Services;
 
@@ -452,7 +453,7 @@ public class KeyCeremonyMediator
         return new ElectionJointKey()
         {
             JointPublicKey = ElgamalCombinePublicKeys(publicKeys!),
-            CommitmentHash = BigMath.HashElems(commitments)
+            CommitmentHash = Hash.HashElems(commitments)
         };  // H(K 1,0 , K 2,0 ... , K n,0 )
     }
 
@@ -487,7 +488,7 @@ public class KeyCeremonyMediator
     /// <param name="publicKey">Election public key</param>
     private void ReceiveElectionPublicKey(ElectionPublicKey publicKey)
     {
-        _electionPublicKeys[publicKey.OwnerId] = publicKey;
+        _electionPublicKeys[publicKey.GuardianId] = publicKey;
     }
 
     private static async Task<ulong> GetGuardianSequenceOrderAsync(
@@ -734,7 +735,7 @@ public class KeyCeremonyMediator
             keyCeremonyId);
         foreach (var publicKey in publicKeys)
         {
-            guardian!.SaveGuardianKey(publicKey.PublicKey!);
+            guardian!.AddGuardianKey(publicKey.PublicKey!);
         }
 
         // generate election partial key backups
@@ -795,7 +796,7 @@ public class KeyCeremonyMediator
         var publicKeys = await _publicKeyService.GetAllByKeyCeremonyIdAsync(keyCeremonyId);
         foreach (var publicKey in publicKeys)
         {
-            guardian!.SaveGuardianKey(publicKey.PublicKey!);
+            guardian!.AddGuardianKey(publicKey.PublicKey!);
         }
         List<ElectionPartialKeyVerification> verifications = new();
         // TODO: ISSUE #213 throw on invalid backup

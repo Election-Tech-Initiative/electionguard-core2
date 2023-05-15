@@ -1,12 +1,16 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Runtime.InteropServices;
+using ElectionGuard.Base;
 
 namespace ElectionGuard
 {
+    using NaiveElementModQ = NativeInterface.ElementModQ.ElementModQHandle;
+
     /// <summary>
     /// An element of the smaller `mod q` space, i.e., in [0, Q), where Q is a 256-bit prime.
     /// </summary>
-    public class ElementModQ : DisposableBase, IEquatable<ElementModQ>
+    public class ElementModQ : CryptoHashableBase, IEquatable<ElementModQ>
     {
         /// <summary>
         /// Number of 64-bit ints that make up the 256-bit prime
@@ -27,7 +31,11 @@ namespace ElectionGuard
         /// </summary>
         public bool IsAddressable => Handle != null && !Handle.IsInvalid && !IsDisposed;
 
-        internal NativeInterface.ElementModQ.ElementModQHandle Handle;
+        internal NaiveElementModQ Handle;
+
+        internal override IntPtr Ptr => Handle == null || Handle.IsInvalid
+                    ? throw new ElectionGuardException("handle is null or invalid")
+                    : Handle.DangerousGetHandle();
 
         /// <summary>
         /// Create a `ElementModQ`
@@ -104,7 +112,7 @@ namespace ElectionGuard
             status.ThrowIfError();
         }
 
-        internal ElementModQ(NativeInterface.ElementModQ.ElementModQHandle handle)
+        internal ElementModQ(NaiveElementModQ handle)
         {
             Handle = handle;
         }
@@ -248,6 +256,41 @@ namespace ElectionGuard
             return data;
         }
 
+        /// <summary>
+        /// Reassign this object's handle by taking ownership of the handle from the other object
+        /// but does not explicitly dispose the other object in order to maintain compatibility
+        /// with the `using` directive. This method is similar to `std::move` in C++ since we cannot
+        /// override the assignment operator in csharp.
+        ///
+        /// This is useful for avoiding unnecessary copies of large objects when passing them
+        /// and assigning them to new variables. It is also useful for avoiding unnecessary
+        /// allocations when reassigning objects in a loop.
+        /// </summary>
+        internal void Reassign(ElementModQ other)
+        {
+            if (other == null)
+            {
+                throw new ArgumentNullException(nameof(other));
+            }
+
+            Reassign(other.Handle);
+            other.Handle = null;
+        }
+
+        // TODO: ISSUE #189 - this is a temporary function to handle object reassignment and disposal
+        // this should be removed when the native library is updated to handle this behavior
+        private void Reassign(NaiveElementModQ other)
+        {
+            if (other is null)
+            {
+                return;
+            }
+
+            var old = Handle; // assign the old handle to dispose
+            Handle = other; // assign the new handle to the instance member
+            old.Dispose(); // dispose of the old handle
+        }
+
         public static bool operator ==(ElementModQ a, ElementModQ b)
         {
             if (ReferenceEquals(a, b))
@@ -315,6 +358,38 @@ namespace ElectionGuard
                 throw new ElectionGuardException($"IsInBounds Error Status: {status}");
             }
             return inBounds;
+        }
+
+        /// <summary>
+        /// Multiply by an ElementModP value
+        /// </summary>
+        /// <param name="rhs">right hand side for the multiply</param>
+        public ElementModQ MultModQ(ElementModQ rhs)
+        {
+            var status = BigMath.External.MultModQ(Handle, rhs.Handle,
+                out var value);
+            status.ThrowIfError();
+
+            // BigMath static operators reutrn null if invalid
+            // but instance functions throw an exception
+            value.ThrowIfInvalid();
+            Reassign(value);
+
+            return this;
+        }
+
+        /// <summary>
+        /// Multiply list of ElementModP values
+        /// </summary>
+        /// <param name="keys">list of keys the multiply</param>
+        public ElementModQ MultModQ(IEnumerable<ElementModQ> keys)
+        {
+            foreach (var key in keys)
+            {
+                _ = MultModQ(key);
+            }
+
+            return this;
         }
     }
 }

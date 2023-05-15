@@ -1,7 +1,12 @@
-﻿namespace ElectionGuard.UI.Lib.Models;
+﻿using ElectionGuard.Guardians;
+
+namespace ElectionGuard.UI.Lib.Models;
+
 
 public class GuardianPublicKey : DatabaseRecord, IDisposable
 {
+    // TODO: implement IElectionGuardian by including the sequence order
+
     public string? KeyCeremonyId { get; set; }
 
     public string? GuardianId { get; set; }

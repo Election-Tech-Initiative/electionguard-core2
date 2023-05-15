@@ -2,7 +2,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
-namespace ElectionGuard.Encryption.Ballot
+namespace ElectionGuard.Ballot
 {
     /// <summary>
     /// The result of a ballot validation operation.

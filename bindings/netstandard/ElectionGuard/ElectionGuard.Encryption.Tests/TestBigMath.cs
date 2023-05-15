@@ -114,9 +114,9 @@ namespace ElectionGuard.Encryption.Tests
             var three = new ElementModP(3);
 
             // Act
-            var result1 = BigMath.HashElems(two, three);
-            var result2 = BigMath.HashElems(three, two);
-            var result3 = BigMath.HashElems(two, three);
+            var result1 = Hash.HashElems(two, three);
+            var result2 = Hash.HashElems(three, two);
+            var result3 = Hash.HashElems(two, three);
 
             // Assert
             Assert.AreNotEqual(result1.ToHex(), result2.ToHex());
@@ -135,8 +135,8 @@ namespace ElectionGuard.Encryption.Tests
             dataList.Add(three);
 
             // Act
-            var result1 = BigMath.HashElems(two, three);
-            var result2 = BigMath.HashElems(dataList);
+            var result1 = Hash.HashElems(two, three);
+            var result2 = Hash.HashElems(dataList);
 
             // Assert
             Assert.AreNotEqual(result1.ToHex(), result2.ToHex());
