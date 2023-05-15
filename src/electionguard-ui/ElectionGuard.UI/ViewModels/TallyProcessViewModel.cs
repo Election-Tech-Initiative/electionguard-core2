@@ -1,5 +1,4 @@
-﻿using System.Windows.Input;
-using CommunityToolkit.Mvvm.Input;
+﻿using CommunityToolkit.Mvvm.Input;
 
 namespace ElectionGuard.UI.ViewModels;
 
@@ -12,7 +11,7 @@ public partial class TallyProcessViewModel : BaseViewModel
     private string _tallyId = string.Empty;
 
     [ObservableProperty]
-    private TallyRecord _tally = new();
+    private TallyRecord? _tally = default;
 
     [ObservableProperty]
     private Election _currentElection = new();
@@ -43,21 +42,18 @@ public partial class TallyProcessViewModel : BaseViewModel
         _ballotUploadService = ballotUploadService;
     }
 
-    partial void OnTallyIdChanged(string value)
+    partial void OnTallyChanged(TallyRecord? value)
     {
-        _ = Shell.Current.CurrentPage.Dispatcher.DispatchAsync(async () =>
+        if (value is not null)
         {
-            var firstValue = value;
-            Tally = await _tallyService.GetByTallyIdAsync(firstValue);
-
-            if (Tally != null)
+            _ = Shell.Current.CurrentPage.Dispatcher.DispatchAsync(async () =>
             {
-                JoinedGuardians = await _tallyJoinedService.GetAllByTallyIdAsync(firstValue);
-                var electionId = Tally.ElectionId ?? string.Empty;
+                JoinedGuardians = await _tallyJoinedService.GetAllByTallyIdAsync(value.TallyId);
+                var electionId = value.ElectionId ?? string.Empty;
                 var election = await _electionService.GetByElectionIdAsync(electionId);
                 if (election is null)
                 {
-                    throw new ElectionGuardException($"ElectionId {electionId} not found! Tally {Tally.Id}");
+                    throw new ElectionGuardException($"ElectionId {electionId} not found! Tally {value.Id}");
                     // TODO: put up some error message somewhere, over the rainbow.
                 }
 
@@ -65,8 +61,16 @@ public partial class TallyProcessViewModel : BaseViewModel
 
                 BallotUploads = await _ballotUploadService.GetByElectionIdAsync(electionId);
 
-                JoinedGuardians = await _tallyJoinedService.GetAllByTallyIdAsync(Tally.TallyId);
-            }
+                JoinedGuardians = await _tallyJoinedService.GetAllByTallyIdAsync(value.TallyId);
+            });
+        }
+    }
+
+    partial void OnTallyIdChanged(string value)
+    {
+        _ = Shell.Current.CurrentPage.Dispatcher.DispatchAsync(async () =>
+        {
+            Tally = await _tallyService.GetByTallyIdAsync(value);
         });
     }
 
@@ -84,7 +88,7 @@ public partial class TallyProcessViewModel : BaseViewModel
         JoinedGuardians.Add(joiner);
     }
 
-    private bool CanJoinTally() => Tally.State == TallyState.PendingGuardiansJoin && !CurrentUserJoinedAlready();
+    private bool CanJoinTally() => Tally?.State == TallyState.PendingGuardiansJoin && !CurrentUserJoinedAlready();
 
     private bool CurrentUserJoinedAlready() => JoinedGuardians.SingleOrDefault(g => g.GuardianId == UserName) is object;
 
