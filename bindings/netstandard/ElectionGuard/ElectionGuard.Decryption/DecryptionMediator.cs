@@ -61,9 +61,15 @@ public class DecryptionMediator : DisposableBase
 
     #region Misc Admin
 
+    public void AddBallots(
+        string tallyId, List<CiphertextBallot> ballots)
+    {
+        TallyDecryptions[tallyId].AddBallots(ballots);
+    }
+
     public void AddBallot(string tallyId, CiphertextBallot ballot)
     {
-        TallyDecryptions[tallyId].AddBallot(new(ballot));
+        TallyDecryptions[tallyId].AddBallot(ballot);
     }
 
     public void AddTally(CiphertextTally tally)

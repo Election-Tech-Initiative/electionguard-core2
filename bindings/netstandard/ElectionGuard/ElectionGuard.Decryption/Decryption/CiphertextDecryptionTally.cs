@@ -82,15 +82,20 @@ public record class CiphertextDecryptionTally : DisposableRecordBase
         {
             _guardians.Add(guardian.GuardianId, guardian);
         }
+        AddBallots(ballots);
 
-        foreach (var ballot in ballots)
-        {
-            AddBallot(ballot);
-        }
         DecryptionState = DecryptionState.PendingGuardianShares;
     }
 
     #region Misc Admin
+
+    public void AddBallots(List<CiphertextBallot> ballots)
+    {
+        foreach (var ballot in ballots)
+        {
+            AddBallot(ballot);
+        }
+    }
 
     public void AddBallot(CiphertextBallot ballot)
     {
@@ -609,7 +614,7 @@ public record class CiphertextDecryptionTally : DisposableRecordBase
     {
         if (!_challengedBallots.ContainsKey(ballot.ObjectId))
         {
-            _challengedBallots.Add(ballot.ObjectId, ballot);
+            _challengedBallots.Add(ballot.ObjectId, new(ballot));
         }
     }
 
@@ -617,7 +622,7 @@ public record class CiphertextDecryptionTally : DisposableRecordBase
     {
         if (!_guardians.ContainsKey(guardian.GuardianId))
         {
-            _guardians.Add(guardian.GuardianId, guardian);
+            _guardians.Add(guardian.GuardianId, new(guardian));
         }
     }
 
@@ -625,7 +630,7 @@ public record class CiphertextDecryptionTally : DisposableRecordBase
     {
         if (!_tallyShares.ContainsKey(tallyshare.GuardianId))
         {
-            _tallyShares.Add(tallyshare.GuardianId, tallyshare);
+            _tallyShares.Add(tallyshare.GuardianId, new(tallyshare));
         }
     }
 
@@ -650,7 +655,8 @@ public record class CiphertextDecryptionTally : DisposableRecordBase
         foreach (var guardian in _guardians.Values)
         {
             var share = _tallyShares[guardian.GuardianId];
-            guardianShares.Add(new Tuple<ElectionPublicKey, TallyShare>(guardian, share));
+            guardianShares.Add(
+                new Tuple<ElectionPublicKey, TallyShare>(guardian, share));
         }
         return guardianShares;
     }
