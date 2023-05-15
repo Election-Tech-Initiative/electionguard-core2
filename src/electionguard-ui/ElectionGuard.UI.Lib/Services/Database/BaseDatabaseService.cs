@@ -132,7 +132,7 @@ public class BaseDatabaseService<T> : IDatabaseService<T> where T : DatabaseReco
         try
         {
             var data = DbService.GetCollection<T>(table ?? _collection);
-            return data.Find<T>(UpdateFilter(filter)).ToCursor();
+            return await data.FindAsync<T>(UpdateFilter(filter));
         }
         catch (Exception ex)
         {

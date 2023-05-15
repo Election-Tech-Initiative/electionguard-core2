@@ -19,6 +19,8 @@ public static class ElectionRecordGenerator
 
     public static async Task GenerateEelectionRecord(TallyRecord tally, string outputFolder)
     {
+        ArgumentException.ThrowIfNullOrEmpty(nameof(outputFolder));
+        
         // check the state of the tally
         if (tally.State != TallyState.Complete)
         {
@@ -29,22 +31,22 @@ public static class ElectionRecordGenerator
         var tempFolder = Directory.CreateTempSubdirectory("eg_");
 
         // export the guardians
-        await ExportGuardiansAsync(Path.Combine(tempFolder.FullName, GUARDIAN_FOLDER), tally.KeyCeremonyId);
+        await ExportGuardiansAsync(Path.Combine(tempFolder.FullName, GUARDIAN_FOLDER), tally.KeyCeremonyId!);
 
         // export the devices
-        await ExportDevices(Path.Combine(tempFolder.FullName, DEVICE_FOLDER), tally.ElectionId);
+        await ExportDevices(Path.Combine(tempFolder.FullName, DEVICE_FOLDER), tally.ElectionId!);
 
         // export the ballots
-        await ExportBallotsAsync(Path.Combine(tempFolder.FullName, BALLOT_FOLDER), tally.ElectionId);
+        await ExportBallotsAsync(Path.Combine(tempFolder.FullName, BALLOT_FOLDER), tally.ElectionId!);
 
         // export the top level
-        await ExportSummaryAsync(tempFolder.FullName, tally.ElectionId, tally.TallyId);
+        await ExportSummaryAsync(tempFolder.FullName, tally.ElectionId!, tally.TallyId);
 
         // create the zip from the folder
         var zipFile = Path.Combine(outputFolder, tally.Name!.Replace(" ", "_") + ".zip");
         ZipFile.CreateFromDirectory(tempFolder.FullName, zipFile);
 
-        // delete the temp folder
+        // delete the temp folder1
         Directory.Delete(tempFolder.FullName, true);
     }
 
