@@ -31,7 +31,7 @@ namespace ElectionGuard.Encryption.Utils.Generators
         /// a ballot style.  This example also adds some more metadata 
         /// such as language transaltions for certain objects
         /// </summary>
-        public static Manifest GetFakeManifest()
+        public static Manifest GetFakeManifest(DateTime? startDateTime = null)
         {
             var gpUnits = new List<GeopoliticalUnit>
             {
@@ -142,11 +142,13 @@ namespace ElectionGuard.Encryption.Utils.Generators
                     })
             };
 
+            var start = startDateTime ?? DateTime.UtcNow;
+
             return new Manifest(
                 "jefferson-county-open-primary",
                 ElectionType.Primary,
-                startDate: DateTime.UtcNow,
-                endDate: DateTime.UtcNow.AddDays(1),
+                startDate: start,
+                endDate: start.AddDays(1),
                 gpUnits.ToArray(),
                 parties.ToArray(),
                 candidates.ToArray(),

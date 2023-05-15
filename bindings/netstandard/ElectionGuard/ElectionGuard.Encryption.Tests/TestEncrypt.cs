@@ -1,6 +1,6 @@
 using System;
 using System.Linq;
-using ElectionGuard.Encryption.Ballot;
+using ElectionGuard.Ballot;
 using ElectionGuard.Encryption.Utils.Generators;
 using NUnit.Framework;
 

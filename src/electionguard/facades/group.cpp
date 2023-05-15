@@ -733,63 +733,6 @@ eg_electionguard_status_t eg_element_mod_q_rand_q_new(eg_element_mod_q_t **out_h
 
 #pragma endregion
 
-#pragma region Group Hash Functions
-
-EG_API eg_electionguard_status_t eg_hash_elems_modp_modp(eg_element_mod_p_t *publickey,
-                                                         eg_element_mod_p_t *commitment,
-                                                         eg_element_mod_q_t **out_handle)
-{
-    try {
-        auto *p = AS_TYPE(ElementModP, publickey);
-        auto *c = AS_TYPE(ElementModP, commitment);
-        auto result = hash_elems({p, c});
-
-        *out_handle = AS_TYPE(eg_element_mod_q_t, result.release());
-        return ELECTIONGUARD_STATUS_SUCCESS;
-    } catch (const exception &e) {
-        Log::error(__func__, e);
-        return ELECTIONGUARD_STATUS_ERROR_BAD_ALLOC;
-    }
-}
-
-EG_API eg_electionguard_status_t eg_hash_elems_string_int(char *in_first, uint64_t in_second,
-                                                          eg_element_mod_q_t **out_handle)
-{
-    try {
-        auto first = string(in_first);
-        auto result = hash_elems({first, in_second});
-
-        *out_handle = AS_TYPE(eg_element_mod_q_t, result.release());
-        return ELECTIONGUARD_STATUS_SUCCESS;
-    } catch (const exception &e) {
-        Log::error(__func__, e);
-        return ELECTIONGUARD_STATUS_ERROR_BAD_ALLOC;
-    }
-}
-
-EG_API eg_electionguard_status_t eg_hash_elems_array(eg_element_mod_p_t *in_data[],
-                                                     uint64_t in_data_size,
-                                                     eg_element_mod_q_t **out_handle)
-{
-    try {
-        vector<ElementModP *> elements;
-        elements.reserve(uint64_to_size(in_data_size));
-        for (uint64_t i = 0; i < in_data_size; i++) {
-            auto *element = AS_TYPE(ElementModP, in_data[i]);
-            elements.push_back(element);
-        }
-        auto result = hash_elems(elements);
-
-        *out_handle = AS_TYPE(eg_element_mod_q_t, result.release());
-        return ELECTIONGUARD_STATUS_SUCCESS;
-    } catch (const exception &e) {
-        Log::error(__func__, e);
-        return ELECTIONGUARD_STATUS_ERROR_BAD_ALLOC;
-    }
-}
-
-#pragma endregion
-
 #pragma region Group Serialization Functions
 
 eg_electionguard_status_t eg_constant_to_json(char **out_data, uint64_t *out_size)

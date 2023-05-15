@@ -1,6 +1,7 @@
+using ElectionGuard.Decryption.Shares;
 using ElectionGuard.ElectionSetup;
 using ElectionGuard.ElectionSetup.Extensions;
-using ElectionGuard.UI.Lib.Models;
+using ElectionGuard.Guardians;
 
 namespace ElectionGuard.Decryption.Decryption;
 
@@ -18,12 +19,14 @@ public record class CiphertextDecryptionBallot : DisposableRecordBase, IEquatabl
     /// A collection of partial decryptions submitted by guardians
     /// key is guardian id
     /// </summary>
-    public Dictionary<string, CiphertextDecryptionBallotShare> Shares { get; init; } = new();
+    public Dictionary<string, BallotShare> Shares { get; init; } = new();
 
     /// <summary>
     /// A collection of public keys for guardians that have submitted shares
     /// key is guardian id
     /// </summary>
+
+    // TODO: make this a constructed member and not a serialized member?
     public Dictionary<string, ElectionPublicKey> GuardianPublicKeys { get; init; } = new();
 
     /// <summary>
@@ -44,7 +47,7 @@ public record class CiphertextDecryptionBallot : DisposableRecordBase, IEquatabl
     /// Create a new instance of a CiphertextDecryptionBallot begining with a single share
     /// </summary>
     public CiphertextDecryptionBallot(
-        CiphertextDecryptionBallotShare share,
+        BallotShare share,
         ElectionPublicKey guardianPublicKey)
     {
         BallotId = share.BallotId;
@@ -57,29 +60,33 @@ public record class CiphertextDecryptionBallot : DisposableRecordBase, IEquatabl
     /// Create a new instance of a CiphertextDecryptionBallot begining with a collection of shares
     /// </summary>
     public CiphertextDecryptionBallot(
-        Dictionary<string, CiphertextDecryptionBallotShare> shares,
+        Dictionary<string, BallotShare> shares,
         Dictionary<string, ElectionPublicKey> guardianPublicKeys)
     {
         BallotId = shares.First().Value.BallotId;
         StyleId = shares.First().Value.StyleId;
         ManifestHash = new(shares.First().Value.ManifestHash);
-        Shares = shares.Select(x => new KeyValuePair<string, CiphertextDecryptionBallotShare>(x.Key, new(x.Value))).ToDictionary(x => x.Key, x => x.Value);
-        GuardianPublicKeys = guardianPublicKeys.Select(x => new KeyValuePair<string, ElectionPublicKey>(x.Key, new(x.Value))).ToDictionary(x => x.Key, x => x.Value);
+        Shares = shares.Select(
+            x => new KeyValuePair<string, BallotShare>(x.Key, new(x.Value)))
+            .ToDictionary(x => x.Key, x => x.Value);
+        GuardianPublicKeys = guardianPublicKeys.Select(
+            x => new KeyValuePair<string, ElectionPublicKey>(x.Key, new(x.Value)))
+            .ToDictionary(x => x.Key, x => x.Value);
     }
 
     /// <summary>
     /// Add a new share to the collection of shares
     /// </summary>
-    public void AddShare(CiphertextDecryptionBallotShare share, ElectionPublicKey guardianPublicKey)
+    public void AddShare(BallotShare share, ElectionPublicKey guardianPublicKey)
     {
         if (!IsValid(share, guardianPublicKey))
         {
             throw new ArgumentException("Invalid share");
         }
 
-        if (!GuardianPublicKeys.ContainsKey(guardianPublicKey.OwnerId))
+        if (!GuardianPublicKeys.ContainsKey(guardianPublicKey.GuardianId))
         {
-            GuardianPublicKeys.Add(guardianPublicKey.OwnerId, guardianPublicKey);
+            GuardianPublicKeys.Add(guardianPublicKey.GuardianId, guardianPublicKey);
         }
 
         AddShare(share);
@@ -88,9 +95,11 @@ public record class CiphertextDecryptionBallot : DisposableRecordBase, IEquatabl
     /// <summary>
     /// A convenience accessor to get the collection of shares zipped with the public keys
     /// </summary>
-    public List<Tuple<ElectionPublicKey, CiphertextDecryptionBallotShare>> GetShares()
+
+    // TODO: refactor to only return the shares
+    public List<Tuple<ElectionPublicKey, BallotShare>> GetShares()
     {
-        return Shares.Select(x => new Tuple<ElectionPublicKey, CiphertextDecryptionBallotShare>(
+        return Shares.Select(x => new Tuple<ElectionPublicKey, BallotShare>(
             GuardianPublicKeys[x.Key],
             x.Value
         )).ToList();
@@ -99,19 +108,16 @@ public record class CiphertextDecryptionBallot : DisposableRecordBase, IEquatabl
     /// <summary>
     /// A convenience accessor to get a single share zipped with the public key
     /// </summary>
-    public Tuple<ElectionPublicKey, CiphertextDecryptionBallotShare> GetShare(string guardianId)
+    public BallotShare? GetShare(string guardianId)
     {
-        return new Tuple<ElectionPublicKey, CiphertextDecryptionBallotShare>(
-            GuardianPublicKeys[guardianId],
-            Shares[guardianId]
-        );
+        return Shares[guardianId];
     }
 
     /// <summary>
     /// check if the share is valid for submission. Used when adding a new share.
     /// </summary>
     public bool IsValid(
-        CiphertextDecryptionBallotShare share,
+        BallotShare share,
         ElectionPublicKey guardianPublicKey)
     {
         if (share.BallotId != BallotId)
@@ -129,7 +135,7 @@ public record class CiphertextDecryptionBallot : DisposableRecordBase, IEquatabl
             return false;
         }
 
-        return share.GuardianId == guardianPublicKey.OwnerId;
+        return share.GuardianId == guardianPublicKey.GuardianId;
     }
 
     /// <summary>
@@ -180,18 +186,20 @@ public record class CiphertextDecryptionBallot : DisposableRecordBase, IEquatabl
         return true;
     }
 
+    protected override void DisposeManaged()
+    {
+        base.DisposeManaged();
+        GuardianPublicKeys.Dispose();
+        Shares.Dispose();
+    }
+
     protected override void DisposeUnmanaged()
     {
         base.DisposeUnmanaged();
-        ManifestHash.Dispose();
-        GuardianPublicKeys.Dispose();
-        foreach (var share in Shares)
-        {
-            share.Value.Dispose();
-        }
+        ManifestHash?.Dispose();
     }
 
-    private void AddShare(CiphertextDecryptionBallotShare share)
+    private void AddShare(BallotShare share)
     {
         if (!Shares.ContainsKey(share.GuardianId))
         {

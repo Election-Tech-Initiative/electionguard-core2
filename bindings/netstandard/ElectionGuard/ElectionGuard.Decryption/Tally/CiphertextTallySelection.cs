@@ -1,5 +1,6 @@
+using System.Text;
+using ElectionGuard.Ballot;
 using ElectionGuard.ElectionSetup.Concurrency;
-using ElectionGuard.Encryption.Ballot;
 
 namespace ElectionGuard.Decryption.Tally
 {
@@ -162,13 +163,27 @@ namespace ElectionGuard.Decryption.Tally
             }
         }
 
+        protected override void DisposeManaged()
+        {
+            base.DisposeManaged();
+            _mutex?.Dispose();
+        }
+
         protected override void DisposeUnmanaged()
         {
             base.DisposeUnmanaged();
             DescriptionHash?.Dispose();
             Ciphertext?.Dispose();
-            _mutex?.Dispose();
         }
+
+        public override string ToString()
+        {
+            var builder = new StringBuilder();
+            _ = builder.AppendLine($"Selection : {ObjectId} ({SequenceOrder}) {DescriptionHash}");
+            _ = builder.AppendLine($"Ciphertext: {Ciphertext}");
+            return builder.ToString();
+        }
+
 
         # region Equality
 

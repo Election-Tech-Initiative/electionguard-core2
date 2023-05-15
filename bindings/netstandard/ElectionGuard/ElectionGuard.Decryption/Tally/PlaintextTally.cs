@@ -111,10 +111,19 @@ public record PlaintextTally : DisposableRecordBase, IEquatable<PlaintextTally>
         }
     }
 
-    protected override void DisposeUnmanaged()
+    public PlaintextTally(PlaintextTally other) : base(other)
     {
-        base.DisposeUnmanaged();
+        TallyId = other.TallyId;
+        Name = other.Name;
+        Contests = other.Contests
+            .ToDictionary(
+                kvp => kvp.Key,
+                kvp => new PlaintextTallyContest(kvp.Value));
+    }
 
+    protected override void DisposeManaged()
+    {
+        base.DisposeManaged();
         Contests?.Dispose();
     }
 

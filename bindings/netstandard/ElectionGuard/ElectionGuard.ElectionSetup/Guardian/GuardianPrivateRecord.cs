@@ -11,12 +11,16 @@ public record GuardianPrivateRecord : DisposableRecordBase
 
     public ElectionKeyPair ElectionKeys { get; init; }
 
+    public ElementModQ CommitmentSeed { get; init; }
+
     public GuardianPrivateRecord(
         string guardianId,
-        ElectionKeyPair electionKeys)
+        ElectionKeyPair electionKeys,
+        ElementModQ commitmentSeed)
     {
         GuardianId = guardianId;
         ElectionKeys = new(electionKeys);
+        CommitmentSeed = new(commitmentSeed);
     }
 
     protected override void DisposeUnmanaged()

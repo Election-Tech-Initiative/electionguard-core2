@@ -1,7 +1,6 @@
 ﻿using ElectionGuard.Encryption.Utils.Converters;
 using ElectionGuard.UI.Lib.Models;
 using ElectionGuard.UI.Lib.Services;
-using Newtonsoft.Json;
 
 namespace ElectionGuard.ElectionSetup;
 
@@ -22,6 +21,7 @@ public static class GuardianStorageExtensions
     {
         return new(
             privateGuardianRecord.ElectionKeys,
+            privateGuardianRecord.CommitmentSeed,
             new(keyCeremonyId, numberOfGuardians, quorum));
     }
 
@@ -44,7 +44,8 @@ public static class GuardianStorageExtensions
         var data = storage.FromFile(filePath);
         try
         {
-            var privateGuardian = JsonConvert.DeserializeObject<GuardianPrivateRecord>(data, SerializationSettings.NewtonsoftSettings());
+            var privateGuardian = JsonConvert.DeserializeObject<GuardianPrivateRecord>(
+                data, SerializationSettings.NewtonsoftSettings());
             return privateGuardian != null ?
                 FromPrivateRecord(privateGuardian, keyCeremonyId, guardianCount, quorum) :
                 null;

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Diagnostics.CodeAnalysis;
 using System.Runtime.InteropServices;
+using System.Text;
 // ReSharper disable UnusedMember.Global
 
 namespace ElectionGuard
@@ -289,7 +290,6 @@ namespace ElectionGuard
             Handle = null;
         }
 
-
         /// <Summary>
         /// Export the representation as JSON
         /// </Summary>
@@ -301,6 +301,18 @@ namespace ElectionGuard
             var json = pointer.PtrToStringUTF8();
             _ = NativeInterface.Memory.FreeIntPtr(pointer);
             return json;
+        }
+
+        public override string ToString()
+        {
+            var sb = new StringBuilder();
+            _ = sb.AppendLine($"Guardians              : {NumberOfGuardians} ({Quorum})");
+            _ = sb.AppendLine($"CommitmentHash         : {CommitmentHash}");
+            _ = sb.AppendLine($"ManifestHash           : {ManifestHash}");
+            _ = sb.AppendLine($"CryptoExtendedBaseHash : {CryptoExtendedBaseHash}");
+            _ = sb.AppendLine($"ElGamalPublicKey       : {ElGamalPublicKey}");
+
+            return sb.ToString();
         }
     }
 }

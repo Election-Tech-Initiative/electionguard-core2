@@ -81,7 +81,7 @@ public partial class Guardian
         ElectionPartialKeyBackup guardianBackup, ElectionKeyPair keyPair)
     {
         var encryptionSeed = GetBackupSeed(
-            keyPair.OwnerId,
+            keyPair.GuardianId,
             keyPair.SequenceOrder
         );
 

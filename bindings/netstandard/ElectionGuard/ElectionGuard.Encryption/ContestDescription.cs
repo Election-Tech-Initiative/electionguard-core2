@@ -2,6 +2,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Runtime.InteropServices;
+using ElectionGuard.Ballot;
 
 namespace ElectionGuard
 {
@@ -15,7 +16,7 @@ namespace ElectionGuard
     /// For a given election, the sequence of contests displayed to a user may be different
     /// however that information is not captured by default when encrypting a specific ballot.
     /// </summary>
-    public class ContestDescription : DisposableBase
+    public class ContestDescription : DisposableBase, IElectionContest
     {
         /// <Summary>
         /// Unique internal identifier that's used by other elements to reference this element.
@@ -25,13 +26,13 @@ namespace ElectionGuard
             get
             {
                 var status = NativeInterface.ContestDescription.GetObjectId(
-                    Handle, out IntPtr value);
+                    Handle, out var value);
                 if (status != Status.ELECTIONGUARD_STATUS_SUCCESS)
                 {
                     throw new ElectionGuardException($"ContestDescription Error ObjectId: {status}");
                 }
                 var data = Marshal.PtrToStringAnsi(value);
-                NativeInterface.Memory.FreeIntPtr(value);
+                _ = NativeInterface.Memory.FreeIntPtr(value);
                 return data;
             }
         }
@@ -45,13 +46,13 @@ namespace ElectionGuard
             get
             {
                 var status = NativeInterface.ContestDescription.GetElectoralDistrictId(
-                    Handle, out IntPtr value);
+                    Handle, out var value);
                 if (status != Status.ELECTIONGUARD_STATUS_SUCCESS)
                 {
                     throw new ElectionGuardException($"ContestDescription Error ElectoralDistrictId: {status}");
                 }
                 var data = Marshal.PtrToStringAnsi(value);
-                NativeInterface.Memory.FreeIntPtr(value);
+                _ = NativeInterface.Memory.FreeIntPtr(value);
                 return data;
             }
         }
@@ -115,13 +116,13 @@ namespace ElectionGuard
             get
             {
                 var status = NativeInterface.ContestDescription.GetName(
-                    Handle, out IntPtr value);
+                    Handle, out var value);
                 if (status != Status.ELECTIONGUARD_STATUS_SUCCESS)
                 {
                     throw new ElectionGuardException($"ContestDescription Error Name: {status}");
                 }
                 var data = Marshal.PtrToStringAnsi(value);
-                NativeInterface.Memory.FreeIntPtr(value);
+                _ = NativeInterface.Memory.FreeIntPtr(value);
                 return data;
             }
         }
@@ -134,12 +135,9 @@ namespace ElectionGuard
             get
             {
                 var status = NativeInterface.ContestDescription.GetBallotTitle(
-                    Handle, out NativeInterface.InternationalizedText.InternationalizedTextHandle value);
-                if (status != Status.ELECTIONGUARD_STATUS_SUCCESS)
-                {
-                    throw new ElectionGuardException($"ContestDescription Error BallotTitle: {status}");
-                }
-                return new InternationalizedText(value);
+                    Handle, out var value);
+                status.ThrowIfError();
+                return value.IsInvalid ? null : new InternationalizedText(value);
             }
         }
 
@@ -151,12 +149,9 @@ namespace ElectionGuard
             get
             {
                 var status = NativeInterface.ContestDescription.GetBallotSubTitle(
-                    Handle, out NativeInterface.InternationalizedText.InternationalizedTextHandle value);
-                if (status != Status.ELECTIONGUARD_STATUS_SUCCESS)
-                {
-                    throw new ElectionGuardException($"ContestDescription Error BallotSubTitle: {status}");
-                }
-                return new InternationalizedText(value);
+                    Handle, out var value);
+                status.ThrowIfError();
+                return value.IsInvalid ? null : new InternationalizedText(value);
             }
         }
 

@@ -1,5 +1,5 @@
 ﻿using System.Runtime.InteropServices;
-using ElectionGuard.Encryption.Ballot;
+using ElectionGuard.Ballot;
 
 namespace ElectionGuard
 {

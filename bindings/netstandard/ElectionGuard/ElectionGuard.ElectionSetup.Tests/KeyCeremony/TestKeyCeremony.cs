@@ -45,7 +45,7 @@ public class TestKeyCeremony : DisposableBase
         {
             var announced = mediator.ShareAnnounced(guardian.GuardianId);
             announced!
-                .ForEach(guardian.SaveGuardianKey);
+                .ForEach(guardian.AddGuardianKey);
         }
 
         Assert.That(mediator.AllGuardiansAnnounced());

@@ -14,6 +14,11 @@ public record DisposableRecordBase : IDisposable
     {
     }
 
+    public DisposableRecordBase(DisposableRecordBase other)
+    {
+        _disposedValue = other._disposedValue;
+    }
+
     /// <summary>
     /// dispose managed state (managed objects)
     /// </summary>

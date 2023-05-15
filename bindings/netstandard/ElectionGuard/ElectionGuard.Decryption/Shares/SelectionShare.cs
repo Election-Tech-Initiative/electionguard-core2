@@ -1,13 +1,14 @@
-using ElectionGuard.Encryption.Ballot;
-using ElectionGuard.UI.Lib.Models;
+using ElectionGuard.Ballot;
+using ElectionGuard.Decryption.Extensions;
+using ElectionGuard.Guardians;
 
-namespace ElectionGuard.Decryption.Decryption;
+namespace ElectionGuard.Decryption.Shares;
 
 /// <summary>
 /// A Guardian's Partial Decryption of a selection.
 /// </summary>
-public class CiphertextDecryptionSelectionShare
-    : DisposableBase, IElectionSelection, IEquatable<CiphertextDecryptionSelectionShare>
+public class SelectionShare
+    : DisposableBase, IElectionSelection, IEquatable<SelectionShare>
 {
     /// <summary>
     /// The object id of the selection.
@@ -30,55 +31,53 @@ public class CiphertextDecryptionSelectionShare
     public string GuardianId { get; init; }
 
     /// <summary>
-    /// The Guardian's share of the partial decryption. `M_i` in the spec
+    /// The Guardian's share of the partial decryption. 
+    /// `M_i` in the spec
     /// </summary>
     public ElementModP Share { get; init; }
 
-    /// <summary>
-    /// The proof that the share was decrypted correctly.
-    /// </summary>
-    // TODO: only store commitment and response, not the full proof
-    public ChaumPedersenProof Proof { get; init; }
+    // commitment for generating the cp proof as part of decryption
+    public ElGamalCiphertext Commitment { get; set; } = default!;
 
-    public CiphertextDecryptionSelectionShare(
+    public SelectionShare(
         string objectId,
         ulong sequenceOrder,
         ElementModQ descriptionHash,
         string guardianId,
         ElementModP share,
-        ChaumPedersenProof proof)
+        ElGamalCiphertext commitment)
     {
         ObjectId = objectId;
         SequenceOrder = sequenceOrder;
         DescriptionHash = new(descriptionHash);
         GuardianId = guardianId;
         Share = new(share);
-        Proof = proof;
+        Commitment = new(commitment);
     }
 
-    public CiphertextDecryptionSelectionShare(
+    public SelectionShare(
         ICiphertextSelection selection,
         string guardianId,
         ElementModP share,
-        ChaumPedersenProof proof)
+        ElGamalCiphertext commitment)
     {
         ObjectId = selection.ObjectId;
         SequenceOrder = selection.SequenceOrder;
         DescriptionHash = new(selection.DescriptionHash);
         GuardianId = guardianId;
         Share = new(share);
-        Proof = proof;
+        Commitment = new(commitment);
     }
 
-    public CiphertextDecryptionSelectionShare(
-        CiphertextDecryptionSelectionShare share)
+    public SelectionShare(
+        SelectionShare other)
     {
-        ObjectId = share.ObjectId;
-        SequenceOrder = share.SequenceOrder;
-        DescriptionHash = new(share.DescriptionHash);
-        GuardianId = share.GuardianId;
-        Share = new(share.Share);
-        Proof = share.Proof;
+        ObjectId = other.ObjectId;
+        SequenceOrder = other.SequenceOrder;
+        DescriptionHash = new(other.DescriptionHash);
+        GuardianId = other.GuardianId;
+        Share = new(other.Share);
+        Commitment = new(other.Commitment);
     }
 
     /// <summary>
@@ -89,10 +88,9 @@ public class CiphertextDecryptionSelectionShare
     /// </summary>
     public bool IsValid(
         ICiphertextSelection message,
-        ElectionPublicKey guardian,
-        ElementModQ extendedBaseHash)
+        ElectionPublicKey guardian)
     {
-        if (guardian.OwnerId != GuardianId)
+        if (guardian.GuardianId != GuardianId)
         {
             return false;
         }
@@ -108,40 +106,39 @@ public class CiphertextDecryptionSelectionShare
             return false;
         }
 
-        return IsValidEncryption(
-            message.Ciphertext,
-            guardian.Key!,
-            extendedBaseHash);
+        return true;
     }
 
     /// <summary>
-    /// Verify that this CiphertextDecryptionSelection is valid for a 
-    /// specific ciphertext, guardian public key, and extended base hash.
+    /// Verify that this share is a valid decryption share for a 
+    /// specific ciphertext, challenge, commitment offset, and response.
     /// </summary>
-    public bool IsValidEncryption(
+    public bool IsValidShare(
         ElGamalCiphertext message,
-        ElementModP guardianPublicKey,
-        ElementModQ extendedBaseHash)
+        ElementModQ challenge,
+        ElementModP commitmentOffset,
+        ElementModQ response)
     {
-        var proofIsValid = Proof.IsValid(
-            message,
-            guardianPublicKey,
-            Share,
-            extendedBaseHash);
+        using var recomputedCommitment = this.ComputeCommitment(
+            message.Pad,
+            challenge,
+            commitmentOffset,
+            response);
 
-        return proofIsValid;
+        return recomputedCommitment.Equals(Commitment);
     }
 
     protected override void DisposeUnmanaged()
     {
         base.DisposeUnmanaged();
-        DescriptionHash.Dispose();
-        Share.Dispose();
+        DescriptionHash?.Dispose();
+        Share?.Dispose();
+        Commitment?.Dispose();
     }
 
     #region Equality
 
-    public bool Equals(CiphertextDecryptionSelectionShare? other)
+    public bool Equals(SelectionShare? other)
     {
         if (other is null)
         {
@@ -156,12 +153,13 @@ public class CiphertextDecryptionSelectionShare
         return ObjectId == other.ObjectId &&
                SequenceOrder == other.SequenceOrder &&
                DescriptionHash.Equals(other.DescriptionHash) &&
-               Share.Equals(other.Share); // TODO: proof comparison
+               Share.Equals(other.Share) &&
+               Commitment.Equals(other.Commitment);
     }
 
     public override bool Equals(object? obj)
     {
-        return ReferenceEquals(this, obj) || (obj is CiphertextDecryptionSelectionShare other && Equals(other));
+        return ReferenceEquals(this, obj) || (obj is SelectionShare other && Equals(other));
     }
 
     public override int GetHashCode()
@@ -169,16 +167,15 @@ public class CiphertextDecryptionSelectionShare
         return HashCode.Combine(ObjectId, SequenceOrder, DescriptionHash, Share);
     }
 
-    public static bool operator ==(CiphertextDecryptionSelectionShare? left, CiphertextDecryptionSelectionShare? right)
+    public static bool operator ==(SelectionShare? left, SelectionShare? right)
     {
         return Equals(left, right);
     }
 
-    public static bool operator !=(CiphertextDecryptionSelectionShare? left, CiphertextDecryptionSelectionShare? right)
+    public static bool operator !=(SelectionShare? left, SelectionShare? right)
     {
         return !Equals(left, right);
     }
 
     #endregion
-
 }
