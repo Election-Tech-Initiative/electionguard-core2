@@ -52,6 +52,7 @@ public class MockKeyCeremonyService : MockBaseDatabaseServiceBase<KeyCeremonyRec
         {
             data.Id ??= Guid.NewGuid().ToString();
             KeyCeremonyRecord record = new(data);
+            record.Id = data.Id;
             Collection[record.Id] = record;
             return data;
         }
