@@ -11,7 +11,7 @@ namespace ElectionGuard
     /// of a ciphertext `c` encrypted under a public key `p` and a random nonce `k`.
     ///
     /// The proof is a tuple `(c, k, m)`, where `c` is the ciphertext, `k` is the nonce, and `m` is the
-    /// plaintext. The proof is valid if `c = p^m * g^k` and `m < q`.
+    /// plaintext. The proof is valid if `c = p^m * g^k` and `m &lt; q`.
     /// </remarks>
     /// <note>
     /// This is a simplified version of the Chaum-Pedersen proof that does not include a challenge

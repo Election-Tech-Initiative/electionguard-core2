@@ -1,5 +1,4 @@
-﻿using System.IO.Compression;
-using ElectionGuard.UI.Lib.Models;
+﻿using ElectionGuard.UI.Lib.Models;
 
 namespace ElectionGuard.UI.Lib.Services;
 
@@ -24,7 +23,7 @@ public class DriveService : IStorageService
 
     public void ToFiles(List<FileContents> fileContents)
     {
-        Parallel.ForEach(fileContents, fileContent =>
+        _ = Parallel.ForEach(fileContents, fileContent =>
         {
             ToFile(fileContent.FileName, fileContent.Contents);
         });
@@ -35,7 +34,7 @@ public class DriveService : IStorageService
         if (string.IsNullOrEmpty(fileName)) throw new ArgumentNullException(nameof(fileName));
 
         var filePath = Path.Combine(_rootDirectoryPath, fileName);
-        
+
         if (!File.Exists(filePath)) throw new FileNotFoundException(nameof(filePath));
 
         return File.ReadAllText(filePath);
@@ -45,12 +44,11 @@ public class DriveService : IStorageService
     {
         if (string.IsNullOrEmpty(path)) throw new ArgumentNullException(nameof(path));
 
-        if (! Directory.Exists(path))
+        if (!Directory.Exists(path))
         {
             // create directory
-            Directory.CreateDirectory(path);
-
-            _rootDirectoryPath = path;
+            _ = Directory.CreateDirectory(path);
         }
+        _rootDirectoryPath = path;
     }
 }

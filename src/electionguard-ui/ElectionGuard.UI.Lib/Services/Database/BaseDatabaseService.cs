@@ -114,7 +114,7 @@ public class BaseDatabaseService<T> : IDatabaseService<T> where T : DatabaseReco
         {
             var data = DbService.GetCollection<T>(table ?? _collection);
             var item = await data.FindAsync<T>(UpdateFilter(filter));
-            return item.ToList();
+            return item?.ToList() ?? new();
         }
         catch (Exception ex)
         {

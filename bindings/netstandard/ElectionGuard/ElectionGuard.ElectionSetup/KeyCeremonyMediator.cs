@@ -674,7 +674,7 @@ public class KeyCeremonyMediator
             keyCeremonyId);
 
         // save guardian to local drive / yubikey
-        guardian.Save(keyCeremonyId);
+        GuardianStorageExtensions.Save(guardian, keyCeremonyId);
 
         // get public key
         var publicKey = guardian.SharePublicKey();
