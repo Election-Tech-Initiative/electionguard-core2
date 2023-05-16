@@ -56,6 +56,7 @@ public class MockGuardianPublicKeyService : MockBaseDatabaseServiceBase<Guardian
         {
             data.Id ??= Guid.NewGuid().ToString();
             GuardianPublicKey record = new(data);
+            record.Id = data.Id;
             Collection[record.Id] = record;
             return record;
         }

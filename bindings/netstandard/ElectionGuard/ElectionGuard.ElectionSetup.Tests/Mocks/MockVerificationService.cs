@@ -26,7 +26,9 @@ public class MockVerificationService : MockBaseDatabaseServiceBase<ElectionParti
     public override Task<ElectionPartialKeyVerification> SaveAsync(ElectionPartialKeyVerification data, string? table = null)
     {
         data.Id ??= Guid.NewGuid().ToString();
-        Collection[data.Id] = new(data);
+        ElectionPartialKeyVerification record = new(data);
+        record.Id = data.Id;
+        Collection[record.Id] = record;
         return Task.FromResult(data);
     }
 }
