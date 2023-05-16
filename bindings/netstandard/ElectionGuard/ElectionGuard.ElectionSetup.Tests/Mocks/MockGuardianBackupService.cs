@@ -41,7 +41,8 @@ public class MockGuardianBackupService : MockBaseDatabaseServiceBase<GuardianBac
         {
             Console.WriteLine($"MockGuardianBackupService.SaveAsync {data.GuardianId} -> {data.DesignatedId}");
             data.Id ??= Guid.NewGuid().ToString();
-            Collection[data.Id] = new(data);
+            GuardianBackups record = new(data);
+            Collection[record.Id] = record;
             return data;
         }
     }
