@@ -15,7 +15,14 @@ public static class ElectionRecordGenerator
 
     private static readonly string GUARDIAN_PREFIX = "guardian_";
     private static readonly string DEVICE_PREFIX = "device_";
+    private static readonly string FOLDER_PREFIX = "eg_";
 
+    private static readonly string MANIFEST_FILENAME = "manifest.json";
+    private static readonly string CONTEXT_FILENAME = "context.json";
+    private static readonly string CONSTANTS_FILENAME = "constants.json";
+    private static readonly string COEFFICIENTS_FILENAME = "coefficients.json";
+    private static readonly string TALLY_FILENAME = "tally.json";
+    private static readonly string ENCRYPTED_TALLY_FILENAME = "encrypted_tally.json";
 
     public static async Task GenerateEelectionRecord(TallyRecord tally, string outputFolder)
     {
@@ -28,7 +35,7 @@ public static class ElectionRecordGenerator
         }
 
         // generate temp path to export all of the files to
-        var tempFolder = Directory.CreateTempSubdirectory("eg_");
+        var tempFolder = Directory.CreateTempSubdirectory(FOLDER_PREFIX);
 
         // export the guardians
         await ExportGuardiansAsync(Path.Combine(tempFolder.FullName, GUARDIAN_FOLDER), tally.KeyCeremonyId!);
@@ -102,31 +109,31 @@ public static class ElectionRecordGenerator
         // write manifest
         ManifestService manifestService = new();
         var manifest = await manifestService.GetByElectionIdAsync(electionId);
-        await File.WriteAllTextAsync(Path.Combine(summaryFolder, "manifest.json"), manifest);
+        await File.WriteAllTextAsync(Path.Combine(summaryFolder, MANIFEST_FILENAME), manifest);
 
         // write context
         ContextService contextService = new();
         var context = await contextService.GetByElectionIdAsync(electionId);
-        await File.WriteAllTextAsync(Path.Combine(summaryFolder, "context.json"), context);
+        await File.WriteAllTextAsync(Path.Combine(summaryFolder, CONTEXT_FILENAME), context);
 
         // write constants
         ConstantsService constantsService = new();
         var constants = await constantsService.GetByElectionIdAsync(electionId);
-        await File.WriteAllTextAsync(Path.Combine(summaryFolder, "constants.json"), constants);
+        await File.WriteAllTextAsync(Path.Combine(summaryFolder, CONSTANTS_FILENAME), constants);
 
         // write coefficients
         LagrangeCoefficientsService lagrangeCoefficientsService = new();
         var coefficients = await lagrangeCoefficientsService.GetByTallyIdAsync(tallyId);
-        await File.WriteAllTextAsync(Path.Combine(summaryFolder, "coefficients.json"), coefficients);
+        await File.WriteAllTextAsync(Path.Combine(summaryFolder, COEFFICIENTS_FILENAME), coefficients);
 
         // write plaintext tally
         PlaintextTallyService plaintextTallyService = new();
         var plaintextTally = await plaintextTallyService.GetByTallyIdAsync(tallyId);
-        await File.WriteAllTextAsync(Path.Combine(summaryFolder, "tally.json"), plaintextTally);
+        await File.WriteAllTextAsync(Path.Combine(summaryFolder, TALLY_FILENAME), plaintextTally);
 
         // write encrypted tally
         EncryptedTallyService encryptedTallyService = new();
         var encryptedTally = await encryptedTallyService.GetByTallyIdAsync(tallyId);
-        await File.WriteAllTextAsync(Path.Combine(summaryFolder, "encrypted_tally.json"), encryptedTally);
+        await File.WriteAllTextAsync(Path.Combine(summaryFolder, ENCRYPTED_TALLY_FILENAME), encryptedTally);
     }
 }
