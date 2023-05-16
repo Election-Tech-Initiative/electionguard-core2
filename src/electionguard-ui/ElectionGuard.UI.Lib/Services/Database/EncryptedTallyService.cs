@@ -5,7 +5,7 @@ namespace ElectionGuard.UI.Lib.Services;
 /// <summary>
 /// Data Service for Tallies
 /// </summary>
-public class PlaintextTallyService : BaseDatabaseService<PlaintextTallyRecord>
+public class EncryptedTallyService : BaseDatabaseService<EncryptedTallyRecord>
 {
     /// <summary>
     /// The collection name to use to get/save data into
@@ -15,13 +15,13 @@ public class PlaintextTallyService : BaseDatabaseService<PlaintextTallyRecord>
     /// <summary>
     /// Default constructor that sets the collection name
     /// </summary>
-    public PlaintextTallyService() : base(_collection) { }
+    public EncryptedTallyService() : base(_collection) { }
 
     /// <summary>
     /// Gets plain text tally for an election
     /// </summary>
     /// <param name="tallyId">tally id to search for</param>
-    public async Task<PlaintextTallyRecord?> GetByTallyIdAsync(string tallyId)
+    public async Task<EncryptedTallyRecord?> GetByTallyIdAsync(string tallyId)
     {
         return await GetByFieldAsync(Constants.TallyId, tallyId);
     }

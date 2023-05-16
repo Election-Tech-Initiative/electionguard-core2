@@ -51,7 +51,9 @@ public class MockKeyCeremonyService : MockBaseDatabaseServiceBase<KeyCeremonyRec
         using (await _lock.LockAsync())
         {
             data.Id ??= Guid.NewGuid().ToString();
-            Collection[data.Id] = new(data);
+            KeyCeremonyRecord record = new(data);
+            record.Id = data.Id;
+            Collection[record.Id] = record;
             return data;
         }
     }

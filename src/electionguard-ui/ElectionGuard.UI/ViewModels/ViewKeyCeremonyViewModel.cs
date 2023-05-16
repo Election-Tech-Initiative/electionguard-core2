@@ -38,9 +38,6 @@ public partial class ViewKeyCeremonyViewModel : BaseViewModel
     private string _keyCeremonyId = string.Empty;
 
     [ObservableProperty]
-    private List<GuardianPublicKey> _guardians = new();
-
-    [ObservableProperty]
     private ObservableCollection<GuardianItem> _guardianList = new();
 
     public override async Task OnAppearing()
@@ -60,6 +57,8 @@ public partial class ViewKeyCeremonyViewModel : BaseViewModel
         await base.OnLeavingPage();
         _timer.Tick -= CeremonyPollingTimer_Tick;
         _timer.Stop();
+
+        KeyCeremony?.Dispose();
     }
 
     partial void OnKeyCeremonyIdChanged(string value)
@@ -116,7 +115,7 @@ public partial class ViewKeyCeremonyViewModel : BaseViewModel
             _timer.Stop();
             return;
         }
-        List<GuardianPublicKey> localData = new();
+
         _ = Task.Run(async () =>
         {
             await UpdateGuardiansData();

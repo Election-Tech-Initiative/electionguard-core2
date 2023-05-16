@@ -3,7 +3,7 @@
 /// <summary>
 /// Data for the key ceremony that is saved to the database
 /// </summary>
-public partial class KeyCeremonyRecord : DatabaseRecord
+public partial class KeyCeremonyRecord : DatabaseRecord, IDisposable
 {
     public KeyCeremonyRecord(string name, int numberOfGuardians, int quorum, string admin) : base(nameof(KeyCeremonyRecord))
     {
@@ -66,4 +66,8 @@ public partial class KeyCeremonyRecord : DatabaseRecord
         return new(data.KeyCeremonyId!, data.NumberOfGuardians, data.Quorum);
     }
 
+    public void Dispose()
+    {
+        JointKey?.Dispose();
+    }
 }

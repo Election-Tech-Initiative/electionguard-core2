@@ -13,5 +13,5 @@ public partial class ContextRecord : DatabaseRecord
     }
 
     public override string ToString() => ContextData ?? string.Empty;
-    public static implicit operator string(ContextRecord record) => record.ToString();
+    public static implicit operator string(ContextRecord? record) => record?.ToString() ?? string.Empty;
 }

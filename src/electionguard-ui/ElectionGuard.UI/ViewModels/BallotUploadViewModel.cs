@@ -120,13 +120,13 @@ public partial class BallotUploadViewModel : BaseViewModel
         ulong startDate = ulong.MaxValue;
         ulong endDate = ulong.MinValue;
 
-        _ = Parallel.ForEach(ballots, (currentBallot) =>
+        await Parallel.ForEachAsync(ballots, async (currentBallot, cancel) =>
         {
             try
             {
                 var filename = Path.GetFileName(currentBallot);
                 var ballotData = File.ReadAllText(currentBallot);
-                CiphertextBallot ballot = new(ballotData);
+                using var ballot = new CiphertextBallot(ballotData);
 
                 if (ballot.ManifestHash != _manifestHash)
                 {
@@ -134,7 +134,7 @@ public partial class BallotUploadViewModel : BaseViewModel
                     return;
                 }
 
-                var exists = _ballotService.BallotExists(ballot.BallotCode.ToHex()).Result;
+                var exists = await _ballotService.BallotExistsAsync(ballot.BallotCode.ToHex());
                 if (!exists)
                 {
                     var timestamp = ballot.Timestamp;
@@ -156,7 +156,7 @@ public partial class BallotUploadViewModel : BaseViewModel
                         BallotState = ballot.State,
                         BallotData = ballotData
                     };
-                    _ = _ballotService.SaveAsync(ballotRecord).Result;
+                    _ = await _ballotService.SaveAsync(ballotRecord);
 
                     if (ballot.State == BallotBoxState.Spoiled)
                     {
@@ -166,7 +166,6 @@ public partial class BallotUploadViewModel : BaseViewModel
                     {
                         _ = Interlocked.Increment(ref totalInserted);
                     }
-
                 }
                 else
                 {

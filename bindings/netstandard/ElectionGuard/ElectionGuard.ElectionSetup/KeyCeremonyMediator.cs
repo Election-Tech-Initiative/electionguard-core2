@@ -1,4 +1,4 @@
-using System.Diagnostics;
+﻿using System.Diagnostics;
 using ElectionGuard.ElectionSetup.Exceptions;
 using ElectionGuard.ElectionSetup.Extensions;
 using ElectionGuard.Extensions;
@@ -653,7 +653,7 @@ public class KeyCeremonyMediator
 
         // append guardian joined to key ceremony (db)
 
-        var newRecord = new GuardianPublicKey
+        using var newRecord = new GuardianPublicKey
         {
             KeyCeremonyId = keyCeremonyId,
             GuardianId = currentGuardianUserName,
@@ -674,7 +674,7 @@ public class KeyCeremonyMediator
             keyCeremonyId);
 
         // save guardian to local drive / yubikey
-        guardian.Save(keyCeremonyId);
+        GuardianStorageExtensions.Save(guardian, keyCeremonyId);
 
         // get public key
         var publicKey = guardian.SharePublicKey();

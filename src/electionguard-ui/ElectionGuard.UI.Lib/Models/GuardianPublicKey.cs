@@ -3,7 +3,7 @@
 namespace ElectionGuard.UI.Lib.Models;
 
 
-public class GuardianPublicKey : DatabaseRecord
+public class GuardianPublicKey : DatabaseRecord, IDisposable
 {
     // TODO: implement IElectionGuardian by including the sequence order
 
@@ -22,5 +22,10 @@ public class GuardianPublicKey : DatabaseRecord
         KeyCeremonyId = other.KeyCeremonyId;
         GuardianId = other.GuardianId;
         PublicKey = other.PublicKey != null ? new(other.PublicKey) : null;
+    }
+
+    public void Dispose()
+    {
+        PublicKey?.Dispose();
     }
 }

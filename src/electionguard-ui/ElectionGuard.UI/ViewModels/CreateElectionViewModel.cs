@@ -71,7 +71,7 @@ public partial class CreateElectionViewModel : BaseViewModel
         var multiple = _manifestFiles.Count > 1;
         ErrorMessage = string.Empty;
 
-        _ = Parallel.ForEachAsync(_manifestFiles, async (file, cancel) =>
+        await Parallel.ForEachAsync(_manifestFiles, async (file, cancel) =>
         {
             // create an election for each file
             try

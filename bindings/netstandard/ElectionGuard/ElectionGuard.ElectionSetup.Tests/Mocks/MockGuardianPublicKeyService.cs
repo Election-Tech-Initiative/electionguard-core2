@@ -43,7 +43,7 @@ public class MockGuardianPublicKeyService : MockBaseDatabaseServiceBase<Guardian
             }
 
             Console.WriteLine(
-                $"UpdatePublicKeyAsync update existing {keyCeremonyId} {guardianId}");
+                $"UpdatePublicKeyAsync update existing {keyCeremonyId} {guardianId} {record.Id}");
             record!.PublicKey = key != null ? new(key) : null;
             Collection[record.Id] = record;
         }
@@ -54,12 +54,11 @@ public class MockGuardianPublicKeyService : MockBaseDatabaseServiceBase<Guardian
     {
         using (await _lock.LockAsync())
         {
-            Console.WriteLine(
-                        $"SaveAsync create new {data.KeyCeremonyId} {data.GuardianId}");
             data.Id ??= Guid.NewGuid().ToString();
-            Collection[data.Id] = data;
-
-            return data;
+            GuardianPublicKey record = new(data);
+            record.Id = data.Id;
+            Collection[record.Id] = record;
+            return record;
         }
     }
 }

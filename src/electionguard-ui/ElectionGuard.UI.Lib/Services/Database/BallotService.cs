@@ -28,6 +28,16 @@ public class BallotService : BaseDatabaseService<BallotRecord>
     }
 
     /// <summary>
+    /// Gets ballots for an election
+    /// </summary>
+    /// <param name="electionId">election id to search for</param>
+    public async Task<IAsyncCursor<BallotRecord>> GetCursorByElectionIdAsync(string electionId)
+    {
+        var filter = FilterBuilder.Eq(Constants.ElectionId, electionId);
+        return await GetCursorByFilterAsync(filter);
+    }
+
+    /// <summary>
     /// Gets ballots from a single upload
     /// </summary>
     /// <param name="uploadId">upload id to search for</param>
@@ -40,7 +50,7 @@ public class BallotService : BaseDatabaseService<BallotRecord>
     /// Check to see if the ballot has already been included
     /// </summary>
     /// <param name="ballotCode">ballotcode to find</param>
-    public async Task<bool> BallotExists(string ballotCode)
+    public async Task<bool> BallotExistsAsync(string ballotCode)
     {
         var filterBuilder = Builders<BallotRecord>.Filter;
         var filter = filterBuilder.And(filterBuilder.Eq(Constants.BallotCode, ballotCode));
