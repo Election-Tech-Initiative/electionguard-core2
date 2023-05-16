@@ -55,10 +55,9 @@ public class MockGuardianPublicKeyService : MockBaseDatabaseServiceBase<Guardian
         using (await _lock.LockAsync())
         {
             data.Id ??= Guid.NewGuid().ToString();
-            GuardianPublicKey publicKey = new(data);
-            Collection[publicKey.Id] = publicKey;
-
-            return data;
+            GuardianPublicKey record = new(data);
+            Collection[record.Id] = record;
+            return record;
         }
     }
 }

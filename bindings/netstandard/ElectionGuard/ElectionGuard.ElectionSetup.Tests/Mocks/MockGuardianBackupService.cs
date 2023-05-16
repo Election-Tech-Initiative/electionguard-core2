@@ -43,7 +43,7 @@ public class MockGuardianBackupService : MockBaseDatabaseServiceBase<GuardianBac
             data.Id ??= Guid.NewGuid().ToString();
             GuardianBackups record = new(data);
             Collection[record.Id] = record;
-            return data;
+            return record;
         }
     }
 
