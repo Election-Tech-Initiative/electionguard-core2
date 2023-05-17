@@ -36,8 +36,8 @@ public partial class LoginViewModel : BaseViewModel
 
     public override async Task OnAppearing()
     {
-        SubscribeDbPing();
         await base.OnAppearing();
+        SubscribeDbPing();
     }
 
     public override async Task OnLeavingPage()
