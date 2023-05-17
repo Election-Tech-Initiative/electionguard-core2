@@ -21,9 +21,10 @@ public partial class GuardianHomeViewModel : BaseViewModel
 
     public override async Task OnAppearing()
     {
+        await base.OnAppearing();
+
         _timer.Start();
         PollingTimer_Tick(this, null);
-        await base.OnAppearing();
     }
 
     [ObservableProperty]

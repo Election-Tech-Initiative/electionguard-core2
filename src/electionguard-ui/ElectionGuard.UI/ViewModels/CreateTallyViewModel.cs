@@ -117,4 +117,9 @@ public partial class CreateTallyViewModel : BaseViewModel
         return !string.IsNullOrWhiteSpace(TallyName);
     }
 
+    public override async Task OnAppearing()
+    {
+        await base.OnAppearing();
+    }
+
 }
