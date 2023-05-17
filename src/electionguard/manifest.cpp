@@ -1115,12 +1115,20 @@ namespace electionguard
             }
 
             // TODO: handle optional values
-            if (ballotTitle != nullptr) {
+            if (ballotTitle != nullptr && ballotSubtitle != nullptr) {
                 auto hash = hash_elems({object_id, sequenceOrder, electoralDistrictId,
                                         getVoteVariationTypeString(voteVariation),
                                         ref<CryptoHashable>(*ballotTitle),
                                         ref<CryptoHashable>(*ballotSubtitle), name, numberElected,
                                         votesAllowed, selectionRefs});
+                Log::trace("ContestDescription", hash.get());
+                return hash;
+            }
+            if (ballotTitle != nullptr) {
+                auto hash = hash_elems({object_id, sequenceOrder, electoralDistrictId,
+                                        getVoteVariationTypeString(voteVariation),
+                                        ref<CryptoHashable>(*ballotTitle), nullptr, name,
+                                        numberElected, votesAllowed, selectionRefs});
                 Log::trace("ContestDescription", hash.get());
                 return hash;
             }
@@ -1530,6 +1538,14 @@ namespace electionguard
                    timePointToIsoString(endDate), nullptr, nullptr, geopoliticalUnitRefs, partyRefs,
                    contestRefs, ballotStyleRefs});
                 Log::trace("Manifest:: NO NAME!", hash->toHex());
+                return hash;
+            }
+
+            if (contactInformation == nullptr) {
+                auto hash = hash_elems(
+                  {electionScopeId, getElectionTypeString(type), timePointToIsoString(startDate),
+                   timePointToIsoString(endDate), ref<CryptoHashable>(*name), nullptr,
+                   geopoliticalUnitRefs, partyRefs, contestRefs, ballotStyleRefs});
                 return hash;
             }
 
