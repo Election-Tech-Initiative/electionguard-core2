@@ -107,4 +107,9 @@ public partial class TallyProcessViewModel : BaseViewModel
         HomeCommand.Execute(null);
     }
 
+    public override async Task OnAppearing()
+    {
+        await base.OnAppearing();
+    }
+
 }
