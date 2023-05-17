@@ -376,6 +376,11 @@ public partial class BallotUploadViewModel : BaseViewModel
         });
     }
 
+    public override async Task OnAppearing()
+    {
+        await base.OnAppearing();
+    }
+
     public override async Task OnLeavingPage()
     {
         _timer.Stop();

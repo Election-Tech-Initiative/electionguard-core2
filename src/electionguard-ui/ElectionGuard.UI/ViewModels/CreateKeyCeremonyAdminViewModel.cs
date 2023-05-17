@@ -54,5 +54,11 @@ public partial class CreateKeyCeremonyAdminViewModel : BaseViewModel
         return KeyCeremonyName.Trim().Length > 0 &&
             Quorum <= NumberOfGuardians;
     }
+
+    public override async Task OnAppearing()
+    {
+        await base.OnAppearing();
+    }
+
 }
 
