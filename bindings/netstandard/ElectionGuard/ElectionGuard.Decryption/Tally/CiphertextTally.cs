@@ -1,4 +1,4 @@
-using ElectionGuard.ElectionSetup;
+﻿using ElectionGuard.ElectionSetup;
 using System.Text;
 using ElectionGuard.ElectionSetup.Extensions;
 using System.Diagnostics;
@@ -443,5 +443,24 @@ public static partial class InternalManifestExtensions
                 new CiphertextTallyContest(contestDescription));
         }
         return contests;
+    }
+}
+
+public static partial class CyphertextTallyExtensions
+{
+    /// <summary>
+    /// Converts CiphertextTally to a json string for saving to db
+    /// </summary>
+    public static string ToJson(this CiphertextTally tally)
+    {
+        return JsonConvert.SerializeObject(tally);
+    }
+
+    /// <summary>
+    /// Converts json string back to a CiphertextTally
+    /// </summary>
+    public static CiphertextTally? ToCiphertextTally(this string jsonData)
+    {
+        return JsonConvert.DeserializeObject<CiphertextTally>(jsonData);
     }
 }
