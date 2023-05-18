@@ -53,6 +53,8 @@ internal static class Constants
 
     public readonly static string UpdatedAt = "UpdatedAt";
 
+    public readonly static string IsExportable = "IsExportable";
+
 }
 
 
