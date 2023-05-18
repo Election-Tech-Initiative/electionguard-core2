@@ -302,27 +302,7 @@ namespace ElectionGuard
             isEqual = isEqual && ContestsSize.Equals(other.ContestsSize);
             isEqual = isEqual && BallotStylesSize.Equals(other.BallotStylesSize);
 
-            // TODO: support IEquatable comparison for collections in the Election Manifest
-
-            // if (!isEqual)
-            // {
-            //     return isEqual;
-            // }
-
-            // for (ulong i = 0; i < GeopoliticalUnitsSize; i++)
-            // {
-            //     isEqual = isEqual && GetGeopoliticalUnitAtIndex(i).Equals(other.GetGeopoliticalUnitAtIndex(i));
-            // }
-
-            // for (ulong i = 0; i < ContestsSize; i++)
-            // {
-            //     isEqual = isEqual && GetContestAtIndex(i).Equals(other.GetContestAtIndex(i));
-            // }
-
-            // for (ulong i = 0; i < BallotStylesSize; i++)
-            // {
-            //     isEqual = isEqual && GetBallotStyleAtIndex(i).Equals(other.GetBallotStyleAtIndex(i));
-            // }
+            // TODO: ISSUE #251 support IEquatable comparison for collections in the Election Manifest
 
             return isEqual;
         }
