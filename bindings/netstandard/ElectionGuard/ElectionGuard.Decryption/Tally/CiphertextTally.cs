@@ -144,6 +144,40 @@ public record CiphertextTally : DisposableRecordBase, IEquatable<CiphertextTally
     }
 
     /// <summary>
+    /// Add an existing tally to this tally and recalculate the tally.
+    /// Accepts any tally for the same election that does not include any of the same ballots.
+    /// </summary>
+    public AccumulationResult Accumulate(
+        CiphertextTally tally, bool skipValidation = false)
+    {
+        // add the ballot to the cast or spoil collection
+        var addResult = CanAccumulateTally(tally, skipValidation);
+        if (!addResult.IsValid)
+        {
+            return new AccumulationResult(
+                TallyId,
+                new Dictionary<string, BallotValidationResult>()
+                {
+                    { tally.TallyId, addResult }
+                }
+            );
+        }
+
+        // add the ballots to the cast and spoiled collection
+        CastBallotIds.UnionWith(tally.CastBallotIds);
+        ChallengedBallotIds.UnionWith(tally.ChallengedBallotIds);
+        SpoiledBallotIds.UnionWith(tally.SpoiledBallotIds);
+
+        // accumulate the contests
+        foreach (var (contestId, contest) in tally.Contests)
+        {
+            Contests[contestId].Accumulate(contest);
+        }
+
+        return new AccumulationResult(TallyId, tally.CastBallotIds);
+    }
+
+    /// <summary>
     /// Add a list of ballots to the tally and recalculate the tally.
     /// </summary>
     public AccumulationResult Accumulate(
@@ -178,13 +212,53 @@ public record CiphertextTally : DisposableRecordBase, IEquatable<CiphertextTally
         {
             foreach (var contest in ballot.Contests)
             {
-                tasks.Add(Contests[contest.ObjectId].AccumulateAsync(
-                    contest, cancellationToken));
+                tasks.Add(
+                    Contests[contest.ObjectId].AccumulateAsync(
+                        contest, cancellationToken));
             }
         }
         await Task.WhenAll(tasks);
 
         return new AccumulationResult(TallyId, ballot.ObjectId);
+    }
+
+    /// <summary>
+    /// Add an existing tally to this tally and recalculate the tally.
+    /// Accepts any tally for the same election that does not include any of the same ballots.
+    /// </summary>
+    public async Task<AccumulationResult> AccumulateAsync(
+        CiphertextTally tally, bool skipValidation = false,
+        CancellationToken cancellationToken = default)
+    {
+        // add the ballot to the cast or spoil collection
+        var addResult = CanAccumulateTally(tally, skipValidation);
+        if (!addResult.IsValid)
+        {
+            return new AccumulationResult(
+                TallyId,
+                new Dictionary<string, BallotValidationResult>()
+                {
+                    { tally.TallyId, addResult }
+                }
+            );
+        }
+
+        // add the ballots to the cast and spoiled collection
+        CastBallotIds.UnionWith(tally.CastBallotIds);
+        ChallengedBallotIds.UnionWith(tally.ChallengedBallotIds);
+        SpoiledBallotIds.UnionWith(tally.SpoiledBallotIds);
+
+        // accumulate the contests
+        var tasks = new List<Task>();
+        foreach (var (contestId, contest) in tally.Contests)
+        {
+            tasks.Add(
+                Contests[contestId].AccumulateAsync(
+                    contest, cancellationToken));
+        }
+        await Task.WhenAll(tasks);
+
+        return new AccumulationResult(TallyId, tally.CastBallotIds);
     }
 
     /// <summary>
@@ -295,7 +369,63 @@ public record CiphertextTally : DisposableRecordBase, IEquatable<CiphertextTally
                     $"Ballot {ballot.ObjectId} already added to tally {TallyId}")
             : new BallotValidationResult(true);
     }
+
+    /// <summary>
+    /// Validate that a tally can be added to this tally
+    /// by checking it is for the same election and that there are no duplicate ballots
+    /// </summary>
+    private BallotValidationResult CanAccumulateTally(
+    CiphertextTally tally, bool skipValidation = false)
+    {
+        var results = new List<BallotValidationResult>();
+        if (!skipValidation)
+        {
+            if (TallyId == tally.TallyId)
+            {
+                results.Add(new BallotValidationResult(
+                    $"TallyId {tally.TallyId} matches {TallyId}"));
+            }
+            if (Name == tally.Name)
+            {
+                results.Add(new BallotValidationResult(
+                    $"Tally name {tally.Name} matches {Name}"));
+            }
+            if (!Context.Equals(tally.Context))
+            {
+                results.Add(new BallotValidationResult(
+                    $"Tally context hash {tally.Context.CryptoExtendedBaseHash} does not match {Context.CryptoExtendedBaseHash}"));
+            }
+            if (!Manifest.Equals(tally.Manifest))
+            {
+                results.Add(new BallotValidationResult(
+                    $"Tally manifest hash {tally.Manifest.ManifestHash} does not match {Manifest.ManifestHash}"));
+            }
+        }
+
+        var existingCast = CastBallotIds.Intersect(tally.CastBallotIds);
+        if (existingCast.Any())
+        {
+            results.Add(new BallotValidationResult(
+                $"Tally contains {existingCast.Count()} cast ballots already added to tally {TallyId}"));
+        }
+        var existingChallenged = ChallengedBallotIds.Intersect(tally.ChallengedBallotIds);
+        if (existingChallenged.Any())
+        {
+            results.Add(new BallotValidationResult(
+                $"Tally contains {existingChallenged.Count()} challenged ballots already added to tally {TallyId}"));
+        }
+        var existingSpoiled = SpoiledBallotIds.Intersect(tally.SpoiledBallotIds);
+        if (existingSpoiled.Any())
+        {
+            results.Add(new BallotValidationResult(
+                $"Tally contains {existingSpoiled.Count()} spoiled ballots already added to tally {TallyId}"));
+        }
+
+        return new BallotValidationResult(results.Count == 0 || results.All(i => i.IsValid), results);
+    }
 }
+
+
 
 public static partial class InternalManifestExtensions
 {
