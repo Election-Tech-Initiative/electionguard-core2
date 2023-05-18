@@ -502,9 +502,8 @@ ifeq ($(OPERATING_SYSTEM),Windows)
 		-DCPM_SOURCE_CACHE=$(CPM_SOURCE_CACHE) \
 		-DCMAKE_TOOLCHAIN_FILE=cmake/toolchains/test.cmake
 	cmake --build $(ELECTIONGUARD_BUILD_LIBS_DIR)/$(OPERATING_SYSTEM)/$(PROCESSOR)/$(TARGET)/ --config $(TARGET)
-	$(ELECTIONGUARD_BUILD_LIBS_DIR)/$(OPERATING_SYSTEM)/$(PROCESSOR)/$(TARGET)/test/$(TARGET)/ElectionGuardTests || ERROR="1"
-	$(ELECTIONGUARD_BUILD_LIBS_DIR)/$(OPERATING_SYSTEM)/$(PROCESSOR)/$(TARGET)/test/$(TARGET)/ElectionGuardCTests || ERROR="1"
-	test -z "$$ERROR"
+	$(ELECTIONGUARD_BUILD_LIBS_DIR)/$(OPERATING_SYSTEM)/$(PROCESSOR)/$(TARGET)/test/$(TARGET)/ElectionGuardTests
+	$(ELECTIONGUARD_BUILD_LIBS_DIR)/$(OPERATING_SYSTEM)/$(PROCESSOR)/$(TARGET)/test/$(TARGET)/ElectionGuardCTests
 else
 	cmake -S . -B $(ELECTIONGUARD_BUILD_LIBS_DIR)/$(PROCESSOR)/$(TARGET) \
 		-DCMAKE_BUILD_TYPE=$(TARGET) \
@@ -513,9 +512,8 @@ else
 		-DUSE_32BIT_MATH=$(USE_32BIT_MATH) \
 		-DCMAKE_TOOLCHAIN_FILE=cmake/toolchains/test.cmake
 	cmake --build $(ELECTIONGUARD_BUILD_LIBS_DIR)/$(PROCESSOR)/$(TARGET)
-	$(ELECTIONGUARD_BUILD_LIBS_DIR)/$(PROCESSOR)/$(TARGET)/test/ElectionGuardTests || ERROR="1"
-	$(ELECTIONGUARD_BUILD_LIBS_DIR)/$(PROCESSOR)/$(TARGET)/test/ElectionGuardCTests || ERROR="1"
-	test -z "$$ERROR"
+	$(ELECTIONGUARD_BUILD_LIBS_DIR)/$(PROCESSOR)/$(TARGET)/test/ElectionGuardTests
+	$(ELECTIONGUARD_BUILD_LIBS_DIR)/$(PROCESSOR)/$(TARGET)/test/ElectionGuardCTests
 endif
 
 test-arm64:
@@ -553,10 +551,9 @@ endif
 
 test-netstandard: build-netstandard
 	@echo 🧪 TEST NETSTANDARD $(PROCESSOR) $(TARGET)
-	dotnet test -a $(PROCESSOR) -c $(TARGET) ./bindings/netstandard/ElectionGuard/ElectionGuard.ElectionSetup.Tests/ElectionGuard.ElectionSetup.Tests.csproj || ERROR="1"
-	dotnet test -a $(PROCESSOR) -c $(TARGET) ./bindings/netstandard/ElectionGuard/ElectionGuard.Encryption.Tests/ElectionGuard.Encryption.Tests.csproj || ERROR="1"
-	dotnet test -a $(PROCESSOR) -c $(TARGET) ./bindings/netstandard/ElectionGuard/ElectionGuard.Decryption.Tests/ElectionGuard.Decryption.Tests.csproj || ERROR="1"
-	test -z "$$ERROR"
+	dotnet test -a $(PROCESSOR) -c $(TARGET) ./bindings/netstandard/ElectionGuard/ElectionGuard.ElectionSetup.Tests/ElectionGuard.ElectionSetup.Tests.csproj
+	dotnet test -a $(PROCESSOR) -c $(TARGET) ./bindings/netstandard/ElectionGuard/ElectionGuard.Encryption.Tests/ElectionGuard.Encryption.Tests.csproj
+	dotnet test -a $(PROCESSOR) -c $(TARGET) ./bindings/netstandard/ElectionGuard/ElectionGuard.Decryption.Tests/ElectionGuard.Decryption.Tests.csproj
 
 test-netstandard-arm64:
 ifeq ($(OPERATING_SYSTEM),Windows)
