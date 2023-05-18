@@ -40,4 +40,13 @@ public class CiphertextTallyService : BaseDatabaseService<CiphertextTallyRecord>
         return await GetAllByFilterAsync(filter);
     }
 
+    /// <summary>
+    /// Gets ciphertext tally for a ballot upload
+    /// </summary>
+    /// <param name="uploadId">upload id to search for</param>
+    public async Task<CiphertextTallyRecord?> GetByUploadIdIdAsync(string uploadId)
+    {
+        return await GetByFieldAsync(Constants.UploadId, uploadId);
+    }
+
 }
