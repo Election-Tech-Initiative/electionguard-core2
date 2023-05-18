@@ -287,4 +287,10 @@ public partial class ElectionViewModel : BaseViewModel
         base.Dispose();
         GC.SuppressFinalize(this);
     }
+
+    public override async Task OnAppearing()
+    {
+        await base.OnAppearing();
+    }
+
 }
