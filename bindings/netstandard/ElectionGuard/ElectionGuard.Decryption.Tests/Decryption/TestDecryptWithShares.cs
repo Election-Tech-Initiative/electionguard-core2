@@ -43,7 +43,7 @@ public class TestDecryptWithShares : DisposableBase
     public void Test_Decrypt_With_All_Guardians_Present()
     {
         // Arrange
-        using var mediator = new DecryptionMediator(
+        var mediator = new DecryptionMediator(
             "fake-mediator",
             Data.CiphertextTally,
             Data.KeyCeremony.Guardians.Select(i => i.SharePublicKey()).ToList());
@@ -67,7 +67,7 @@ public class TestDecryptWithShares : DisposableBase
     public void Test_Decrypt_With_Quorum_Guardians_Present()
     {
         // Arrange
-        using var mediator = new DecryptionMediator(
+        var mediator = new DecryptionMediator(
             "fake-mediator",
             Data.CiphertextTally,
             Data.KeyCeremony.Guardians.Select(i => i.SharePublicKey()).ToList());
@@ -91,7 +91,7 @@ public class TestDecryptWithShares : DisposableBase
     public void Test_Save_TestDataOutput()
     {
         // Arrange
-        using var mediator = new DecryptionMediator(
+        var mediator = new DecryptionMediator(
             "fake-mediator",
             Data.CiphertextTally,
             Data.KeyCeremony.Guardians.Select(i => i.SharePublicKey()).ToList(),
