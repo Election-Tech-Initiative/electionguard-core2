@@ -6,9 +6,22 @@ public partial class CiphertextTallyRecord : DatabaseRecord
     private string _tallyId = string.Empty;
 
     [ObservableProperty]
+    private string _electionId = string.Empty;
+
+    [ObservableProperty]
+    private string _uploadId = string.Empty;
+
+    [ObservableProperty]
+    private bool _isExportable = false;
+
+    [ObservableProperty]
     private string? _ciphertextTallyData;
 
     public CiphertextTallyRecord() : base(nameof(CiphertextTallyRecord))
     {
     }
+
+    public override string ToString() => CiphertextTallyData ?? string.Empty;
+    public static implicit operator string(CiphertextTallyRecord? record) => record?.ToString() ?? string.Empty;
+
 }
