@@ -1,6 +1,4 @@
 ﻿using System;
-using System.Diagnostics.CodeAnalysis;
-using System.Runtime.InteropServices;
 using System.Text;
 // ReSharper disable UnusedMember.Global
 
@@ -14,7 +12,7 @@ namespace ElectionGuard
     /// are populated with election-specific information necessary for encrypting the election.
     /// Refer to the [ElectionGuard Specification](https://github.com/microsoft/electionguard) for more information.
     /// </summary>
-    public class CiphertextElectionContext : DisposableBase
+    public class CiphertextElectionContext : DisposableBase, IEquatable<CiphertextElectionContext>
     {
         /// <summary>
         /// Get a linked list containing the extended data of the election.
@@ -314,5 +312,43 @@ namespace ElectionGuard
 
             return sb.ToString();
         }
+
+        #region IEquatable
+
+        public bool Equals(CiphertextElectionContext other)
+        {
+            if (other is null)
+            {
+                return false;
+            }
+
+            if (ReferenceEquals(this, other))
+            {
+                return true;
+            }
+
+            return NumberOfGuardians == other.NumberOfGuardians &&
+                   Quorum == other.Quorum &&
+                   ElGamalPublicKey.Equals(other.ElGamalPublicKey) &&
+                   CommitmentHash.Equals(other.CommitmentHash) &&
+                   ManifestHash.Equals(other.ManifestHash) &&
+                   CryptoBaseHash.Equals(other.CryptoBaseHash) &&
+                   CryptoExtendedBaseHash.Equals(other.CryptoExtendedBaseHash);
+        }
+
+        public override bool Equals(object obj)
+        {
+            return ReferenceEquals(this, obj) || (obj is CiphertextElectionContext other && Equals(other));
+        }
+
+        public override int GetHashCode()
+        {
+            return HashCode.Combine(
+                NumberOfGuardians, Quorum, ElGamalPublicKey,
+                CommitmentHash, ManifestHash, CryptoBaseHash,
+                CryptoExtendedBaseHash);
+        }
+
+        #endregion
     }
 }
