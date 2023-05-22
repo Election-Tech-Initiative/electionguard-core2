@@ -60,7 +60,7 @@ namespace ElectionGuard.Decryption.Tally
             Ciphertext = new(ciphertext);
         }
 
-        public CiphertextTallySelection(CiphertextTallySelection other)
+        public CiphertextTallySelection(ICiphertextSelection other)
         {
             ObjectId = other.ObjectId;
             SequenceOrder = other.SequenceOrder;
@@ -71,7 +71,7 @@ namespace ElectionGuard.Decryption.Tally
         /// <summary>
         /// Homomorphically add the specified value to the message
         /// </summary>
-        public ElGamalCiphertext Accumulate(CiphertextBallotSelection selection)
+        public ElGamalCiphertext Accumulate(ICiphertextSelection selection)
         {
             return selection.ObjectId != ObjectId || selection.DescriptionHash != DescriptionHash
                 ? throw new ArgumentException("Selection does not match")
@@ -82,7 +82,7 @@ namespace ElectionGuard.Decryption.Tally
         /// Homomorphically add the specified value to the message
         /// </summary>
         public async Task<ElGamalCiphertext> AccumulateAsync(
-            CiphertextBallotSelection selection,
+            ICiphertextSelection selection,
             CancellationToken cancellationToken = default)
         {
             using (await _mutex.LockAsync(cancellationToken))
@@ -94,7 +94,7 @@ namespace ElectionGuard.Decryption.Tally
         /// <summary>
         /// Homomorphically add the specified values to the message
         /// </summary>
-        public ElGamalCiphertext Accumulate(List<CiphertextBallotSelection> selections)
+        public ElGamalCiphertext Accumulate(List<ICiphertextSelection> selections)
         {
             return selections.Any(
                 i => i.ObjectId != ObjectId || i.DescriptionHash != DescriptionHash)
@@ -102,8 +102,8 @@ namespace ElectionGuard.Decryption.Tally
                     : Accumulate(selections.Select(i => i.Ciphertext));
         }
 
-        public async Task<ElGamalCiphertext> AccumulateAsync(
-            List<CiphertextBallotSelection> selections,
+        protected async Task<ElGamalCiphertext> AccumulateAsync(
+            List<ICiphertextSelection> selections,
             CancellationToken cancellationToken = default)
         {
             using (await _mutex.LockAsync(cancellationToken))
@@ -115,7 +115,7 @@ namespace ElectionGuard.Decryption.Tally
         /// <summary>
         /// Homomorphically add the specified value to the message
         /// </summary>
-        public ElGamalCiphertext Accumulate(ElGamalCiphertext ciphertext)
+        protected ElGamalCiphertext Accumulate(ElGamalCiphertext ciphertext)
         {
             lock (_lock)
             {
@@ -127,7 +127,7 @@ namespace ElectionGuard.Decryption.Tally
             }
         }
 
-        public async Task<ElGamalCiphertext> AccumulateAsync(
+        protected async Task<ElGamalCiphertext> AccumulateAsync(
             ElGamalCiphertext ciphertext,
             CancellationToken cancellationToken = default)
         {
@@ -140,7 +140,7 @@ namespace ElectionGuard.Decryption.Tally
         /// <summary>
         /// Homomorphically add the specified values to the message
         /// </summary>
-        public ElGamalCiphertext Accumulate(
+        protected ElGamalCiphertext Accumulate(
             IEnumerable<ElGamalCiphertext> ciphertexts)
         {
             lock (_lock)
@@ -153,7 +153,7 @@ namespace ElectionGuard.Decryption.Tally
             }
         }
 
-        public async Task<ElGamalCiphertext> AccumulateAsync(
+        protected async Task<ElGamalCiphertext> AccumulateAsync(
             IEnumerable<ElGamalCiphertext> ciphertexts,
             CancellationToken cancellationToken = default)
         {
