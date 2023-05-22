@@ -79,6 +79,7 @@ public static class MauiProgram
         builder.Services.AddTransient<ConstantsService>();
         builder.Services.AddTransient<BallotUploadService>();
         builder.Services.AddTransient<BallotService>();
+        builder.Services.AddTransient<CiphertextTallyService>();
 
         // setup view models
         builder.Services.AddTransient<LoginViewModel>();
