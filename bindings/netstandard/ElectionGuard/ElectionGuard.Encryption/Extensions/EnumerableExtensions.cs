@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Security.Cryptography.X509Certificates;
 using System.Threading.Tasks;
 
 namespace ElectionGuard.Extensions
@@ -46,6 +47,11 @@ namespace ElectionGuard.Extensions
                 (source[next], source[k]) = (source[k], source[next]);
             }
             return source;
+        }
+
+        public static bool IsNullOrEmpty<T>(this IList<T> source)
+        {
+            return source is null || source.Count == 0;
         }
 
         public static IEnumerable<(T item, ulong index)> WithIndex<T>(this IEnumerable<T> source)

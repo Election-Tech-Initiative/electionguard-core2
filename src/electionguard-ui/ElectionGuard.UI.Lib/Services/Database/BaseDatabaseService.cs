@@ -37,6 +37,19 @@ public class BaseDatabaseService<T> : IDatabaseService<T> where T : DatabaseReco
     /// <param name="data">data to be saved</param>
     /// <param name="table">Optional parameter to allow data type to use a different collection</param>
     /// <returns></returns>
+    public virtual async Task<IEnumerable<T>> SaveManyAsync(IEnumerable<T> data, string? table = null)
+    {
+        var collection = DbService.GetCollection<T>(table ?? _collection);
+        await collection.InsertManyAsync(data);
+        return data;
+    }
+
+    /// <summary>
+    /// Save the data into the collection
+    /// </summary>
+    /// <param name="data">data to be saved</param>
+    /// <param name="table">Optional parameter to allow data type to use a different collection</param>
+    /// <returns></returns>
     public virtual async Task<T> SaveAsync(T data, string? table = null)
     {
         var collection = DbService.GetCollection<T>(table ?? _collection);

@@ -459,8 +459,14 @@ public static partial class CyphertextTallyExtensions
     /// <summary>
     /// Converts json string back to a CiphertextTally
     /// </summary>
-    public static CiphertextTally? ToCiphertextTally(this string jsonData)
+    /// <param name="jsonData">data to be deserialized</param>
+    /// <exception cref="ArgumentException">When the data is unable to be deserialized into <see cref="CiphertextTally"/></exception>
+    public static CiphertextTally ToCiphertextTally(this string jsonData)
     {
-        return JsonConvert.DeserializeObject<CiphertextTally>(jsonData);
+        ArgumentException.ThrowIfNullOrEmpty(jsonData, nameof(jsonData));
+
+        var tally = JsonConvert.DeserializeObject<CiphertextTally>(jsonData);
+
+        return tally ?? throw new ArgumentException(nameof(jsonData));
     }
 }

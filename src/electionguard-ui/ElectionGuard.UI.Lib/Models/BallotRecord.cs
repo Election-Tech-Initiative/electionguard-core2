@@ -26,4 +26,9 @@ public partial class BallotRecord : DatabaseRecord
     public BallotRecord() : base(nameof(BallotRecord))
     {
     }
+
+    public override string ToString()
+    {
+        return BallotData ?? string.Empty;
+    }
 }

@@ -23,7 +23,9 @@ public class CiphertextTallyService : BaseDatabaseService<CiphertextTallyRecord>
     /// <param name="tallyId">tally id to search for</param>
     public async Task<CiphertextTallyRecord?> GetByTallyIdAsync(string tallyId)
     {
-        var filter = FilterBuilder.And(FilterBuilder.Eq(Constants.TallyId, tallyId), FilterBuilder.Eq(Constants.IsExportable, true));
+        var filter = FilterBuilder.And(
+            FilterBuilder.Eq(Constants.TallyId, tallyId),
+            FilterBuilder.Eq(Constants.IsExportable, true));
         return (await GetAllByFilterAsync(filter)).LastOrDefault();
     }
 
@@ -36,7 +38,7 @@ public class CiphertextTallyService : BaseDatabaseService<CiphertextTallyRecord>
         var filter = FilterBuilder.And(
             FilterBuilder.Eq(Constants.ElectionId, electionId),
             FilterBuilder.Eq(Constants.IsExportable, false),
-            FilterBuilder.Eq(Constants.TallyId, ""));
+            FilterBuilder.Eq(Constants.TallyId, string.Empty));
         return await GetAllByFilterAsync(filter);
     }
 
