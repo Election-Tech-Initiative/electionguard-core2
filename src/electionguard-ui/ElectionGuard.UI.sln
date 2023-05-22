@@ -21,6 +21,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ElectionGuard.Decryption", 
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ElectionGuard.UI.Test", "ElectionGuard.UI.Test\ElectionGuard.UI.Test.csproj", "{108ACA29-BCC3-421E-9DF5-B87182CF5710}"
 EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ElectionGuard.Decryption.Tests", "..\..\bindings\netstandard\ElectionGuard\ElectionGuard.Decryption.Tests\ElectionGuard.Decryption.Tests.csproj", "{72F8C1CA-FDD7-4B7B-A08A-C16589EEA187}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|arm64 = Debug|arm64
@@ -120,6 +122,18 @@ Global
 		{108ACA29-BCC3-421E-9DF5-B87182CF5710}.Release|x64.Build.0 = Release|x64
 		{108ACA29-BCC3-421E-9DF5-B87182CF5710}.Release|x86.ActiveCfg = Release|x86
 		{108ACA29-BCC3-421E-9DF5-B87182CF5710}.Release|x86.Build.0 = Release|x86
+		{72F8C1CA-FDD7-4B7B-A08A-C16589EEA187}.Debug|arm64.ActiveCfg = Debug|arm64
+		{72F8C1CA-FDD7-4B7B-A08A-C16589EEA187}.Debug|arm64.Build.0 = Debug|arm64
+		{72F8C1CA-FDD7-4B7B-A08A-C16589EEA187}.Debug|x64.ActiveCfg = Debug|x64
+		{72F8C1CA-FDD7-4B7B-A08A-C16589EEA187}.Debug|x64.Build.0 = Debug|x64
+		{72F8C1CA-FDD7-4B7B-A08A-C16589EEA187}.Debug|x86.ActiveCfg = Debug|x86
+		{72F8C1CA-FDD7-4B7B-A08A-C16589EEA187}.Debug|x86.Build.0 = Debug|x86
+		{72F8C1CA-FDD7-4B7B-A08A-C16589EEA187}.Release|arm64.ActiveCfg = Release|arm64
+		{72F8C1CA-FDD7-4B7B-A08A-C16589EEA187}.Release|arm64.Build.0 = Release|arm64
+		{72F8C1CA-FDD7-4B7B-A08A-C16589EEA187}.Release|x64.ActiveCfg = Release|x64
+		{72F8C1CA-FDD7-4B7B-A08A-C16589EEA187}.Release|x64.Build.0 = Release|x64
+		{72F8C1CA-FDD7-4B7B-A08A-C16589EEA187}.Release|x86.ActiveCfg = Release|x86
+		{72F8C1CA-FDD7-4B7B-A08A-C16589EEA187}.Release|x86.Build.0 = Release|x86
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

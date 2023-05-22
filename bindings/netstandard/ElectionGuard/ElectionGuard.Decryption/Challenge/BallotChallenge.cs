@@ -128,6 +128,7 @@ public record BallotChallenge
 
     public BallotChallenge(BallotChallenge other) : base(other)
     {
+        TallyId = other.TallyId;
         ObjectId = other.ObjectId;
         GuardianId = other.GuardianId;
         SequenceOrder = other.SequenceOrder;

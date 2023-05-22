@@ -17,6 +17,6 @@ db.ballots.createIndex({ BallotCode: 1, DataType: 1 });
 db.ballots.createIndex({ SerialNumber: 1, ElectionId: 1, DataType: 1 });
 
 db.tallies.createIndex({ Name: 1, DataType: 1 });
-db.tallies.createIndex({ ElectionId: 1, DataType: 1 });
-db.tallies.createIndex({ TallyId: 1, DataType: 1 });
+db.tallies.createIndex({ ElectionId: 1, DataType: 1, IsExportable: 1, TallyId: 1 });
+db.tallies.createIndex({ TallyId: 1, DataType: 1, IsExportable: 1 });
 db.tallies.createIndex({ State: 1, DataType: 1 });

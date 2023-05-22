@@ -140,19 +140,19 @@ public static class GuardianChallengeResponseExtensions
         if (challenge.ObjectId != share.ObjectId)
         {
             throw new KeyNotFoundException(
-                $"Selection challenge does not match selection {share.ObjectId}");
+                $"Selection challenge {challenge.ObjectId} does not match selection {share.ObjectId}");
         }
 
         if (challenge.GuardianId != guardian.GuardianId)
         {
             throw new KeyNotFoundException(
-                $"Selection challenge does not match guardian {guardian.GuardianId}");
+                $"Selection challenge {challenge.GuardianId} does not match guardian {guardian.GuardianId}");
         }
 
         if (share.GuardianId != guardian.GuardianId)
         {
             throw new KeyNotFoundException(
-                $"Selection challenge does not match guardian {guardian.GuardianId}");
+                $"Selection share {share.GuardianId} does not match guardian {guardian.GuardianId}");
         }
 
         var response = guardian.CreateResponse(share, challenge.Challenge);

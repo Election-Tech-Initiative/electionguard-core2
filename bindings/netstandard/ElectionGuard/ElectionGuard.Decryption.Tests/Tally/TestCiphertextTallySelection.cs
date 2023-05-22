@@ -2,6 +2,32 @@
 
 namespace ElectionGuard.Decryption.Tests.Tally;
 
+public class CiphertextTallySelectionHarness : CiphertextTallySelection
+{
+    public CiphertextTallySelectionHarness(
+        string objectId, ulong sequenceOrder, ElementModQ descriptionHash)
+        : base(objectId, sequenceOrder, descriptionHash)
+    {
+    }
+
+    public CiphertextTallySelectionHarness(SelectionDescription selection)
+        : base(selection)
+    {
+    }
+
+    public CiphertextTallySelectionHarness(
+        SelectionDescription selection, ElGamalCiphertext ciphertext)
+        : base(selection, ciphertext)
+    {
+    }
+
+    public ElGamalCiphertext AccumulateCiphertexts(List<ElGamalCiphertext> ciphertexts)
+    {
+        return Accumulate(ciphertexts);
+    }
+
+}
+
 public class TestCiphertextTallySelection
 {
     private readonly ElementModQ nonce = Constants.ONE_MOD_Q;
@@ -26,9 +52,9 @@ public class TestCiphertextTallySelection
             .Select(_ => ElGamal.Encrypt(vote, nonce, publicKey)).ToList();
 
         // Act
-        var subject = new CiphertextTallySelection(
+        var subject = new CiphertextTallySelectionHarness(
             "some_object_id", 0, Constants.ONE_MOD_Q);
-        _ = subject.Accumulate(ciphertexts);
+        _ = subject.AccumulateCiphertexts(ciphertexts);
 
         // Assert
         var plaintext = subject.Ciphertext.Decrypt(keyPair.SecretKey);
