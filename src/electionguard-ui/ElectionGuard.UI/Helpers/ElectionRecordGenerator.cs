@@ -1,8 +1,5 @@
 ﻿using System.IO.Compression;
 using System.Text.Json;
-using CommunityToolkit.Mvvm.DependencyInjection;
-using ElectionGuard.ElectionSetup;
-using ElectionGuard.UI.Lib.Services;
 using MongoDB.Driver;
 
 namespace ElectionGuard.UI.Helpers;

@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace ElectionGuard.UI.Lib.Models
+﻿namespace ElectionGuard.UI.Lib.Models
 {
     public partial class ChallengeResponseRecord : DatabaseRecord
     {

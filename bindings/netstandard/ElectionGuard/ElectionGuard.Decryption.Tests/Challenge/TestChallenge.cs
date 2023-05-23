@@ -1,6 +1,5 @@
 
 using ElectionGuard.Encryption.Utils.Generators;
-using ElectionGuard.ElectionSetup.Tests.Generators;
 using ElectionGuard.Decryption.Decryption;
 using ElectionGuard.Decryption.Shares;
 using ElectionGuard.Decryption.ChallengeResponse;

@@ -1,5 +1,3 @@
-using ElectionGuard.UI.Lib.Services;
-
 namespace ElectionGuard.UI.Services;
 
 public class ConfigurationService : IConfigurationService

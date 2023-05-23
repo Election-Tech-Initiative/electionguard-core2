@@ -1,5 +1,4 @@
 using CommunityToolkit.Mvvm.DependencyInjection;
-using ElectionGuard.UI.Lib.Services;
 
 namespace ElectionGuard.UI.Services;
 
