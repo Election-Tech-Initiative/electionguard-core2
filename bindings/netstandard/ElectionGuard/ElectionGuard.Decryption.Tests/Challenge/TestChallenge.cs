@@ -1,4 +1,4 @@
-
+﻿
 using ElectionGuard.Encryption.Utils.Generators;
 using ElectionGuard.Decryption.Decryption;
 using ElectionGuard.Decryption.Shares;
@@ -7,6 +7,7 @@ using ElectionGuard.Decryption.Extensions;
 using ElectionGuard.Decryption.Accumulation;
 using ElectionGuard.Decryption.Challenge;
 using ElectionGuard.Decryption.Tests.Decryption;
+using ElectionGuard.ElectionSetup.Tests.Generators;
 
 namespace ElectionGuard.Decryption.Tests.Challenge;
 

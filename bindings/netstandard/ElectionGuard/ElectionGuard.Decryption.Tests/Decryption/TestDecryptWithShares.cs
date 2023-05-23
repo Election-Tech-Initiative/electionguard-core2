@@ -1,6 +1,7 @@
-
+﻿
 using ElectionGuard.Encryption.Utils.Generators;
 using ElectionGuard.Decryption.Tests.Tally;
+using ElectionGuard.ElectionSetup.Tests.Generators;
 
 namespace ElectionGuard.Decryption.Tests.Decryption;
 
