@@ -86,6 +86,8 @@ public static class MauiProgram
         builder.Services.AddTransient<ChallengeService>();
         builder.Services.AddTransient<ChallengeResponseService>();
         builder.Services.AddTransient<PlaintextTallyService>();
+        builder.Services.AddTransient<TallyManager>();
+        builder.Services.AddTransient<ITallyStateMachine, TallyStateMachine>();
 
         // setup view models
         builder.Services.AddTransient<LoginViewModel>();

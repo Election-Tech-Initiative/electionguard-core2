@@ -75,7 +75,6 @@ public record CiphertextTally : DisposableRecordBase, IEquatable<CiphertextTally
         Contests = manifest.ToCiphertextTallyContestDictionary();
     }
 
-    [JsonConstructor]
     public CiphertextTally(
         string tallyId,
         string name,
@@ -100,6 +99,33 @@ public record CiphertextTally : DisposableRecordBase, IEquatable<CiphertextTally
                     entry => entry.Key,
                     entry => entry.Value);
     }
+
+    [JsonConstructor]
+    public CiphertextTally(
+        string tallyId,
+        string name,
+        string context,
+        string manifest,
+        HashSet<string> castBallotIds,
+        HashSet<string> challengedBallotIds,
+        HashSet<string> spoiledBallotIds,
+        Dictionary<string, CiphertextTallyContest> contests)
+    {
+        TallyId = tallyId;
+        Name = name;
+        Context = new(context);
+        Manifest = new(manifest);
+        CastBallotIds = new HashSet<string>(castBallotIds);
+        ChallengedBallotIds = new HashSet<string>(challengedBallotIds);
+        SpoiledBallotIds = new HashSet<string>(spoiledBallotIds);
+        Contests = contests.Select(
+            entry => new KeyValuePair<string, CiphertextTallyContest>(
+                entry.Key,
+                new CiphertextTallyContest(entry.Value))).ToDictionary(
+                    entry => entry.Key,
+                    entry => entry.Value);
+    }
+
 
     public CiphertextTally(CiphertextTally other) : base(other)
     {

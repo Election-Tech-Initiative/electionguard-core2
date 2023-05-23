@@ -85,7 +85,8 @@ namespace ElectionGuard.UI.Services
                 throw new ElectionGuardException(nameof(manifestRecord));
             }
 
-            using InternalManifest manifest = new(manifestRecord.ToString());
+            using Manifest tempManifest = new(manifestRecord.ToString());
+            using InternalManifest manifest = new(tempManifest);
 
 
             var tallies = await _ciphertextTallyService.GetAllByElectionIdAsync(electionId);
@@ -98,10 +99,16 @@ namespace ElectionGuard.UI.Services
 
             foreach (var tallyRecord in tallies)
             {
-                using var partialTally = tallyRecord.ToString().ToCiphertextTally();
+                try
+                {
+                    using var partialTally = tallyRecord.ToString().ToCiphertextTally();
 
-                // TODO: make this threadsafe
-                _ = await ciphertextTally.AccumulateAsync(partialTally);
+                    // TODO: make this threadsafe
+                    _ = await ciphertextTally.AccumulateAsync(partialTally);
+                }
+                catch (Exception ex) 
+                {
+                }
             }
 
             // save ciphertextTally as bit T tally

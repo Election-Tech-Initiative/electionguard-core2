@@ -6,10 +6,10 @@ namespace ElectionGuard.UI.Services;
 public class TallyStateMachine : ITallyStateMachine
 {
     private TallyRecord _tally = new();
-    private Dictionary<bool, List<StateMachineStep<TallyState>>> _steps;
+    private Dictionary<bool, List<StateMachineStep<TallyState>>> _steps = new();
     private bool _isRunning = false;
 
-    private AuthenticationService _authenticationService;
+    private IAuthenticationService _authenticationService;
     private readonly ChallengeResponseService _challengeResponseService;
     private readonly DecryptionShareService _decryptionShareService;
     private readonly TallyJoinedService _tallyJoinedService;
@@ -17,7 +17,7 @@ public class TallyStateMachine : ITallyStateMachine
     private TallyManager _tallyManager;
 
     public TallyStateMachine(
-        AuthenticationService authenticationService,
+        IAuthenticationService authenticationService,
         ChallengeResponseService challengeResponseService,
         DecryptionShareService decryptionShareService,
         TallyService tallyService,

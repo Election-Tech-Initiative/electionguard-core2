@@ -13,6 +13,8 @@ public partial class TallyProcessViewModel : BaseViewModel
     private string _tallyId = string.Empty;
 
     [ObservableProperty]
+    [NotifyCanExecuteChangedFor(nameof(JoinTallyCommand))]
+    [NotifyCanExecuteChangedFor(nameof(RejectTallyCommand))]
     private TallyRecord? _tally = default;
 
     [ObservableProperty]
@@ -22,7 +24,7 @@ public partial class TallyProcessViewModel : BaseViewModel
     private List<BallotUpload> _ballotUploads = new();
 
     [ObservableProperty]
-    [NotifyCanExecuteChangedFor(nameof(JoinTallyCommand))]
+    [NotifyCanExecuteChangedFor(nameof(StartTallyCommand))]
     private List<GuardianTallyItem> _joinedGuardians = new();
 
     private readonly ElectionService _electionService;
@@ -142,10 +144,7 @@ public partial class TallyProcessViewModel : BaseViewModel
         await base.OnAppearing();
         _timer.Tick += CeremonyPollingTimer_Tick;
 
-        if (!_timer.IsRunning && Tally?.State != TallyState.PendingGuardiansJoin)
-        {
-            _timer.Start();
-        }
+        _timer.Start();
     }
     private void CeremonyPollingTimer_Tick(object? sender, EventArgs e)
     {
