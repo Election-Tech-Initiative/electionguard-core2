@@ -28,11 +28,6 @@ namespace ElectionGuard.UI.Services
         private readonly ChallengeService _challengeService;
         private readonly PlaintextTallyService _plaintextTallyService;
 
-        /// <summary>
-        /// Accumulative tally
-        /// </summary>
-        private CiphertextTally? _ciphertextTally;
-
         public TallyManager(
             TallyMediator tallyMediator,
             ContextService contextService,
