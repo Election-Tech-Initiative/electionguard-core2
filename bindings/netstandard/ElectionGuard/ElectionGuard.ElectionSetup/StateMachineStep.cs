@@ -15,11 +15,16 @@ public class StateMachineStep<T> where T : struct, IConvertible
     /// <summary>
     /// 
     /// </summary>
-    public Func<Task>? RunStep { get; set; }
+    public Func<Task> RunStep { get; set; } = new(DoNotRun);
 
     /// <summary>
     /// Function to be called to check if the step needs to be run by the user
     /// </summary>
-    public Func<Task<bool>>? ShouldRunStep { get; set; }
+    public Func<Task<bool>> ShouldRunStep { get; set; } = new(DoNotRun);
+
+    private static async Task<bool> DoNotRun()
+    {
+        return await Task.FromResult(false);
+    }
 }
 
