@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Security.Cryptography.X509Certificates;
 using System.Threading.Tasks;
 
 namespace ElectionGuard.Extensions
@@ -70,6 +69,12 @@ namespace ElectionGuard.Extensions
             {
                 item.Dispose();
             }
+        }
+
+        public static void Dispose(this IDictionary<string, IDisposable> source)
+        {
+            source.Values.Dispose();
+            source.Clear();
         }
     }
 }
