@@ -1,4 +1,5 @@
 ﻿using ElectionGuard.ElectionSetup;
+using ElectionGuard.ElectionSetup.Extensions;
 using ElectionGuard.Extensions;
 
 namespace ElectionGuard.Decryption.Shares;
@@ -19,6 +20,6 @@ protected override void DisposeManaged()
 {
     base.DisposeManaged();
     TallyShare.Dispose();
-    BallotShares.Values.Dispose();
+    BallotShares.Dispose();
 }
 }
