@@ -35,4 +35,11 @@ public class ChallengeResponseService : BaseDatabaseService<ChallengeResponseRec
 
         return (await GetAllByFilterAsync(filter)).FirstOrDefault();
     }
+
+    public async Task<long> GetCountByTallyAsync(string tallyId)
+    {
+        var filter = FilterBuilder.Eq(Constants.TallyId, tallyId);
+        return await CountByFilterAsync(filter);
+    }
+
 }
