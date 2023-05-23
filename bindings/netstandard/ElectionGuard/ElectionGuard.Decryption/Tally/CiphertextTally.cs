@@ -4,6 +4,7 @@ using ElectionGuard.ElectionSetup.Extensions;
 using System.Diagnostics;
 using Newtonsoft.Json;
 using ElectionGuard.Ballot;
+using ElectionGuard.Encryption.Utils.Converters;
 
 namespace ElectionGuard.Decryption.Tally;
 
@@ -16,7 +17,7 @@ public record CiphertextTally : DisposableRecordBase, IEquatable<CiphertextTally
     /// <summary>
     /// The unique identifier for the tally.
     /// </summary>
-    public string TallyId { get; init; } = Guid.NewGuid().ToString();
+    public string TallyId { get; init; }
 
     /// <summary>
     /// The name of the tally.
@@ -75,37 +76,12 @@ public record CiphertextTally : DisposableRecordBase, IEquatable<CiphertextTally
         Contests = manifest.ToCiphertextTallyContestDictionary();
     }
 
+    [JsonConstructor]
     public CiphertextTally(
         string tallyId,
         string name,
         CiphertextElectionContext context,
         InternalManifest manifest,
-        HashSet<string> castBallotIds,
-        HashSet<string> challengedBallotIds,
-        HashSet<string> spoiledBallotIds,
-        Dictionary<string, CiphertextTallyContest> contests)
-    {
-        TallyId = tallyId;
-        Name = name;
-        Context = new(context);
-        Manifest = new(manifest);
-        CastBallotIds = new HashSet<string>(castBallotIds);
-        ChallengedBallotIds = new HashSet<string>(challengedBallotIds);
-        SpoiledBallotIds = new HashSet<string>(spoiledBallotIds);
-        Contests = contests.Select(
-            entry => new KeyValuePair<string, CiphertextTallyContest>(
-                entry.Key,
-                new CiphertextTallyContest(entry.Value))).ToDictionary(
-                    entry => entry.Key,
-                    entry => entry.Value);
-    }
-
-    [JsonConstructor]
-    public CiphertextTally(
-        string tallyId,
-        string name,
-        string context,
-        string manifest,
         HashSet<string> castBallotIds,
         HashSet<string> challengedBallotIds,
         HashSet<string> spoiledBallotIds,
@@ -479,7 +455,7 @@ public static partial class CyphertextTallyExtensions
     /// </summary>
     public static string ToJson(this CiphertextTally tally)
     {
-        return JsonConvert.SerializeObject(tally);
+        return JsonConvert.SerializeObject(tally, SerializationSettings.NewtonsoftSettings());
     }
 
     /// <summary>
@@ -491,7 +467,7 @@ public static partial class CyphertextTallyExtensions
     {
         ArgumentException.ThrowIfNullOrEmpty(jsonData, nameof(jsonData));
 
-        var tally = JsonConvert.DeserializeObject<CiphertextTally>(jsonData);
+        var tally = JsonConvert.DeserializeObject<CiphertextTally>(jsonData, SerializationSettings.NewtonsoftSettings());
 
         return tally ?? throw new ArgumentException(nameof(jsonData));
     }

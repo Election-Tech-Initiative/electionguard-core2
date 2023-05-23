@@ -4,6 +4,7 @@ using ElectionGuard.Decryption.ChallengeResponse;
 using ElectionGuard.Decryption.Shares;
 using ElectionGuard.Decryption.Tally;
 using ElectionGuard.ElectionSetup;
+using ElectionGuard.Encryption.Utils.Converters;
 using ElectionGuard.Extensions;
 using MongoDB.Driver;
 using Newtonsoft.Json;
@@ -95,7 +96,7 @@ namespace ElectionGuard.UI.Services
                 throw new ElectionGuardException(nameof(tallies));
             }
 
-            var ciphertextTally = _tallyMediator.CreateTally(tallyId, context, manifest);
+            var ciphertextTally = _tallyMediator.CreateTally(tallyId, tally.Name!, context, manifest);
 
             foreach (var tallyRecord in tallies)
             {
@@ -108,6 +109,7 @@ namespace ElectionGuard.UI.Services
                 }
                 catch (Exception ex) 
                 {
+                    throw;
                 }
             }
 
@@ -143,7 +145,7 @@ namespace ElectionGuard.UI.Services
                     {
                         TallyId = tallyId,
                         GuardianId = ch.Key,
-                        ChallengeData = JsonConvert.SerializeObject(ch.Value),
+                        ChallengeData = JsonConvert.SerializeObject(ch.Value, SerializationSettings.NewtonsoftSettings()),
                     });
 
             _ = await _challengeService.SaveManyAsync(challenges);
@@ -165,7 +167,7 @@ namespace ElectionGuard.UI.Services
             var responses = await _challengeResponseService.GetAllByTallyIdAsync(tallyId);
             foreach (var responseRecord in responses)
             {
-                var response = JsonConvert.DeserializeObject<GuardianChallengeResponse>(responseRecord)!;
+                var response = JsonConvert.DeserializeObject<GuardianChallengeResponse>(responseRecord, SerializationSettings.NewtonsoftSettings())!;
                 mediator.SubmitResponse(tallyId, response);
             }
 
@@ -178,7 +180,7 @@ namespace ElectionGuard.UI.Services
             var plaintextTallyRecord = new PlaintextTallyRecord()
             {
                 TallyId = tallyId,
-                PlaintextTallyData = JsonConvert.SerializeObject(result.Tally),
+                PlaintextTallyData = JsonConvert.SerializeObject(result.Tally, SerializationSettings.NewtonsoftSettings()),
             };
 
             _ = await _plaintextTallyService.SaveAsync(plaintextTallyRecord);
@@ -234,7 +236,10 @@ namespace ElectionGuard.UI.Services
             var challengeBallots = await GetBallotsByState(electionId, BallotBoxState.Challenged);
             var decryptionShares = guardian.ComputeDecryptionShares(mediator.Tallies[tallyId], challengeBallots);
 
-            mediator.SubmitShares(decryptionShares, challengeBallots);
+            if (challengeBallots.Count > 0)
+            {
+                mediator.SubmitShares(decryptionShares, challengeBallots);
+            }
 
             await SaveShare(guardianId, tallyId, decryptionShares);
         }
@@ -248,15 +253,15 @@ namespace ElectionGuard.UI.Services
             var challengeRecord = await _challengeService.GetByGuardianIdAsync(tallyId, guardianId) ?? throw new ArgumentException(nameof(guardianId));
             var shareRecord = await _decryptionShareService.GetByGuardianIdAsync(tallyId, guardianId) ?? throw new ArgumentException(nameof(guardianId));
 
-            var challenge = JsonConvert.DeserializeObject<GuardianChallenge>(challengeRecord.ChallengeData) ?? throw new ArgumentException(nameof(guardianId)); ;
-            var share = JsonConvert.DeserializeObject<GuardianShare>(shareRecord.ShareData) ?? throw new ArgumentException(nameof(guardianId)); ;
+            var challenge = JsonConvert.DeserializeObject<GuardianChallenge>(challengeRecord.ChallengeData, SerializationSettings.NewtonsoftSettings()) ?? throw new ArgumentException(nameof(guardianId)); ;
+            var share = JsonConvert.DeserializeObject<GuardianShare>(shareRecord.ShareData, SerializationSettings.NewtonsoftSettings()) ?? throw new ArgumentException(nameof(guardianId)); ;
 
             var response = guardian.ComputeChallengeResponse(share, challenge);
             var responseRecord = new ChallengeResponseRecord()
             {
                 TallyId = tallyId,
                 GuardianId = guardianId,
-                ResponseData = JsonConvert.SerializeObject(response),
+                ResponseData = JsonConvert.SerializeObject(response, SerializationSettings.NewtonsoftSettings()),
             };
 
             _ = await _challengeResponseService.SaveAsync(responseRecord);
@@ -268,7 +273,7 @@ namespace ElectionGuard.UI.Services
             {
                 TallyId = tallyId,
                 GuardianId = guardianId,
-                ShareData = JsonConvert.SerializeObject(decryptionShare),
+                ShareData = JsonConvert.SerializeObject(decryptionShare, SerializationSettings.NewtonsoftSettings()),
             };
 
             await _decryptionShareService.SaveAsync(shareRecord);
@@ -278,7 +283,7 @@ namespace ElectionGuard.UI.Services
         {
             var share = await _decryptionShareService.GetByGuardianIdAsync(tallyId, guardianId) ?? throw new Exception(nameof(tallyId));
 
-            var shareData = JsonConvert.DeserializeObject<DecryptionShare>(share.ShareData)!;
+            var shareData = JsonConvert.DeserializeObject<DecryptionShare>(share.ShareData, SerializationSettings.NewtonsoftSettings())!;
             var challengeBallots = await GetBallotsByState(electionId, BallotBoxState.Challenged);
             mediator.SubmitShares(shareData, challengeBallots);
         }
@@ -290,7 +295,7 @@ namespace ElectionGuard.UI.Services
 
             foreach (var share in shares)
             {
-                var shareData = JsonConvert.DeserializeObject<DecryptionShare>(share.ShareData)!;
+                var shareData = JsonConvert.DeserializeObject<DecryptionShare>(share.ShareData, SerializationSettings.NewtonsoftSettings())!;
                 mediator.SubmitShares(shareData, challengeBallots);
             }
         }
@@ -316,7 +321,18 @@ namespace ElectionGuard.UI.Services
             KeyCeremonyRecord keyCeremony = await _keyCeremonyService.GetByKeyCeremonyIdAsync(electionRecord.KeyCeremonyId!)
                 ?? throw new ArgumentException(nameof(electionId));
 
-            return GuardianStorageExtensions.Load(userId, keyCeremony) ?? throw new ElectionGuardException(nameof(userId));
+            var guardian = GuardianStorageExtensions.Load(userId, keyCeremony) ?? throw new ElectionGuardException(nameof(userId));
+
+            var publicKeys = (await _GuardianPublicKeyService
+                .GetAllByKeyCeremonyIdAsync(electionRecord!.KeyCeremonyId!))
+                .Select(gpk => gpk.PublicKey!).ToList();
+
+            foreach (var publicKey in publicKeys)
+            {
+                guardian.AddGuardianKey(publicKey);
+            }
+
+            return guardian;
         }
         #endregion
     }

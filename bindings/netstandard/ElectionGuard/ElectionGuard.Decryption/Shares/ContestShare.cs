@@ -1,8 +1,9 @@
-using ElectionGuard.Ballot;
+﻿using ElectionGuard.Ballot;
 using ElectionGuard.Decryption.Tally;
 using ElectionGuard.ElectionSetup;
 using ElectionGuard.ElectionSetup.Extensions;
 using ElectionGuard.Guardians;
+using Newtonsoft.Json;
 
 namespace ElectionGuard.Decryption.Shares;
 
@@ -49,6 +50,7 @@ public record ContestShare
             .ToDictionary(x => x.ObjectId);
     }
 
+    [JsonConstructor]
     public ContestShare(
         IElectionContest contest,
         ElementModP extendedData,

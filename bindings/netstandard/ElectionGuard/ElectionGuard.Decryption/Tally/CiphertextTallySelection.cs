@@ -1,6 +1,7 @@
-using System.Text;
+﻿using System.Text;
 using ElectionGuard.Ballot;
 using ElectionGuard.ElectionSetup.Concurrency;
+using Newtonsoft.Json;
 
 namespace ElectionGuard.Decryption.Tally;
 
@@ -33,6 +34,16 @@ public class CiphertextTallySelection : DisposableBase,
 
     private readonly AsyncLock _mutex = new();
     private readonly object _lock = new();
+
+    [JsonConstructor]
+    public CiphertextTallySelection(
+        string objectId, ulong sequenceOrder, ElementModQ descriptionHash, ElGamalCiphertext ciphertext)
+    {
+        ObjectId = objectId;
+        SequenceOrder = sequenceOrder;
+        DescriptionHash = new(descriptionHash);
+        Ciphertext = new(ciphertext);
+    }
 
     public CiphertextTallySelection(
         string objectId, ulong sequenceOrder, ElementModQ descriptionHash)
