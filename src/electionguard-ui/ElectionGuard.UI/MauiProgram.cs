@@ -1,4 +1,5 @@
 ﻿using CommunityToolkit.Maui;
+using ElectionGuard.Decryption;
 using ElectionGuard.UI.Services;
 using Microsoft.Extensions.Logging;
 
@@ -80,6 +81,11 @@ public static class MauiProgram
         builder.Services.AddTransient<BallotUploadService>();
         builder.Services.AddTransient<BallotService>();
         builder.Services.AddTransient<CiphertextTallyService>();
+        builder.Services.AddTransient<TallyMediator>();
+        builder.Services.AddTransient<DecryptionShareService>();
+        builder.Services.AddTransient<ChallengeService>();
+        builder.Services.AddTransient<ChallengeResponseService>();
+        builder.Services.AddTransient<PlaintextTallyService>();
 
         // setup view models
         builder.Services.AddTransient<LoginViewModel>();

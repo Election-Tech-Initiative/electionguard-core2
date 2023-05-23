@@ -1,4 +1,5 @@
 ﻿using CommunityToolkit.Mvvm.Input;
+using ElectionGuard.UI.Services;
 
 namespace ElectionGuard.UI.ViewModels;
 
@@ -23,23 +24,26 @@ public partial class TallyProcessViewModel : BaseViewModel
     [NotifyCanExecuteChangedFor(nameof(JoinTallyCommand))]
     private List<TallyJoinedRecord> _joinedGuardians = new();
 
-    private ElectionService _electionService;
-    private TallyService _tallyService;
-    private BallotUploadService _ballotUploadService;
-    private TallyJoinedService _tallyJoinedService;
+    private readonly ElectionService _electionService;
+    private readonly TallyService _tallyService;
+    private readonly BallotUploadService _ballotUploadService;
+    private readonly TallyManager _tallyManager;
+    private readonly TallyJoinedService _tallyJoinedService;
 
     public TallyProcessViewModel(
         IServiceProvider serviceProvider,
         TallyService tallyService,
         TallyJoinedService tallyJoinedService,
         ElectionService electionService,
-        BallotUploadService ballotUploadService) :
+        BallotUploadService ballotUploadService,
+        TallyManager tallyManager) :
         base("TallyProcess", serviceProvider)
     {
         _tallyService = tallyService;
         _electionService = electionService;
         _tallyJoinedService = tallyJoinedService;
         _ballotUploadService = ballotUploadService;
+        _tallyManager = tallyManager;
     }
 
     partial void OnTallyChanged(TallyRecord? value)
@@ -91,6 +95,9 @@ public partial class TallyProcessViewModel : BaseViewModel
     private bool CanJoinTally() => Tally?.State == TallyState.PendingGuardiansJoin && !CurrentUserJoinedAlready();
 
     private bool CurrentUserJoinedAlready() => JoinedGuardians.SingleOrDefault(g => g.GuardianId == UserName) is object;
+
+    // guardian pulls big T tally from mongo
+    // Tally + Tally.
 
     [RelayCommand(CanExecute = nameof(CanJoinTally))]
     private async Task RejectTally()

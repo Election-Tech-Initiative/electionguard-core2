@@ -36,9 +36,25 @@
                 Text="{helper:Translate ProcessTallyJoinNo}" />
         </VerticalStackLayout>
         <!--  List of guardians joined for all  -->
+        <VerticalStackLayout Grid.Row="1" Margin="0,0,50,0">
+            <CollectionView x:Name="GuardiansJoinedView" ItemsSource="{Binding JoinedGuardians}">
+                <CollectionView.Header>
+                    <Grid>
+                        <Label Text="Guardian" />
+                    </Grid>
+                </CollectionView.Header>
+                <CollectionView.ItemTemplate>
+                    <DataTemplate x:DataType="model:TallyJoinedRecord">
+                        <Grid BackgroundColor="{Binding ., Converter={StaticResource AlternateRowColorConverter}, ConverterParameter={x:Reference UploadCollectionView}}" ColumnDefinitions="1.5*, 2*, *, *, *, *, *">
+                            <Label Text="{Binding GuardianId}" />
+                        </Grid>
+                    </DataTemplate>
+                </CollectionView.ItemTemplate>
+            </CollectionView>
+        </VerticalStackLayout>
         <!--  status of tally  -->
         <!--  datagrid below  -->
-        <VerticalStackLayout Grid.Row="1" Margin="0,0,50,0">
+        <VerticalStackLayout Grid.Row="2" Margin="0,0,50,0">
             <Label Style="{StaticResource H2}" Text="{helper:Translate BallotsText}" />
             <ScrollView>
                 <CollectionView x:Name="UploadCollectionView" ItemsSource="{Binding BallotUploads}">

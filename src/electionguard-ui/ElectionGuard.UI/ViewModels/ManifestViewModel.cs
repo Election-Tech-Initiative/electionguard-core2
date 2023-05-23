@@ -1,7 +1,4 @@
-﻿using CommunityToolkit.Mvvm.ComponentModel;
-using CommunityToolkit.Mvvm.Input;
-
-namespace ElectionGuard.UI.ViewModels;
+﻿namespace ElectionGuard.UI.ViewModels;
 
 public record PartyDisplay(string Name, string Abbreviation, string PartyId);
 public record CandidateDisplay(string Name, string Party, string CandidateId);
