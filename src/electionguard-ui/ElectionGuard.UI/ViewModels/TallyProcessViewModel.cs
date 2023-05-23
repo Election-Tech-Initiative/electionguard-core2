@@ -142,7 +142,7 @@ public partial class TallyProcessViewModel : BaseViewModel
         await base.OnAppearing();
         _timer.Tick += CeremonyPollingTimer_Tick;
 
-        if (!_timer.IsRunning && Tally.State != TallyState.PendingGuardiansJoin)
+        if (!_timer.IsRunning && Tally?.State != TallyState.PendingGuardiansJoin)
         {
             _timer.Start();
         }
