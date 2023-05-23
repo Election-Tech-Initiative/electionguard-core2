@@ -2,22 +2,21 @@
 using MongoDB.Bson.Serialization.Attributes;
 
 
-namespace ElectionGuard.UI.Lib.Models
+namespace ElectionGuard.UI.Lib.Models;
+
+public class DatabaseRecord : ObservableObject
 {
-    public class DatabaseRecord : ObservableObject
+    [BsonRepresentation(BsonType.ObjectId)]
+    public string Id { get; set; }
+
+    public string DataType { get; set; }
+
+    public bool SoftDeleted { get; set; }
+
+    public DatabaseRecord(string dataType)
     {
-        [BsonRepresentation(BsonType.ObjectId)]
-        public string Id { get; set; }
-
-        public string DataType { get; set; }
-
-        public bool SoftDeleted { get; set; }
-
-        public DatabaseRecord(string dataType)
-        {
-            Id = MongoDB.Bson.ObjectId.GenerateNewId().ToString();
-            DataType = dataType;
-            SoftDeleted = false;
-        }
+        Id = MongoDB.Bson.ObjectId.GenerateNewId().ToString();
+        DataType = dataType;
+        SoftDeleted = false;
     }
 }
