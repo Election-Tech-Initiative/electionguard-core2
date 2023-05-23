@@ -96,9 +96,11 @@ public class TallyStateMachine : ITallyStateMachine
     #endregion
 
     #region Run Steps
-    private Task RespondChallenge()
+    private async Task RespondChallenge()
     {
-        throw new NotImplementedException();
+        await _tallyManager.ComputeChallengeResponse(
+            _authenticationService.UserName!,
+            _tally);
     }
 
     private async Task DecryptShares()
@@ -111,23 +113,31 @@ public class TallyStateMachine : ITallyStateMachine
 
     private async Task VerifyChallenge()
     {
+        await _tallyService.UpdateStateAsync(_tally.TallyId, TallyState.AdminVerifyChallenge);
+
         await _tallyManager.ValidateChallengeResponse(_tally);
+
+        await _tallyService.UpdateStateAsync(_tally.TallyId, TallyState.Complete);
     }
 
     private async Task GenerateChallenge()
     {
+        await _tallyService.UpdateStateAsync(_tally.TallyId, TallyState.AdminGenerateChallenge);
+
         await _tallyManager.CreateChallenge(_tally);
+
+        await _tallyService.UpdateStateAsync(_tally.TallyId, TallyState.PendingGuardianRespondChallenge);
     }
 
     private async Task AccumulateTally()
     {
+        await _tallyService.UpdateStateAsync(_tally.TallyId, TallyState.AdminAccumulateTally);
+
         await _tallyManager.AccumulateAllUploadTallies(_tally);
+
+        await _tallyService.UpdateStateAsync(_tally.TallyId, TallyState.PendingGuardianDecryptShares);
     }
 
-    private Task StartTally()
-    {
-        await _tallyService.UpdateStateAsync(_tally, TallyState.AdminAccumulateTally);
-    }
     #endregion
 
     private void GenerateGuardianSteps()
@@ -158,24 +168,38 @@ public class TallyStateMachine : ITallyStateMachine
             {
                 State = TallyState.PendingGuardiansJoin,
                 ShouldRunStep = ShouldStartTally,
-                RunStep = StartTally,
+                RunStep = AccumulateTally,
             },
             new()
             {
-                State = TallyState.AdminStartsTally,
+                State = TallyState.PendingGuardianDecryptShares,
+                ShouldRunStep = ShouldGenerateChallenge,
+                RunStep = GenerateChallenge,
+            },
+            new()
+            {
+                State = TallyState.PendingGuardianRespondChallenge,
+                ShouldRunStep = ShouldVerifyChallenge,
+                RunStep = VerifyChallenge,
+            },
+
+            // these are error states, allowing the tally to continue if failure occurs
+            new()
+            {
+                State = TallyState.AdminAccumulateTally,
                 ShouldRunStep = AlwaysRun,
                 RunStep = AccumulateTally,
             },
             new()
             {
                 State = TallyState.AdminGenerateChallenge,
-                ShouldRunStep = ShouldGenerateChallenge,
+                ShouldRunStep = AlwaysRun,
                 RunStep = GenerateChallenge,
             },
             new()
             {
                 State = TallyState.AdminVerifyChallenge,
-                ShouldRunStep = ShouldVerifyChallenge,
+                ShouldRunStep = AlwaysRun,
                 RunStep = VerifyChallenge,
             }
         };
