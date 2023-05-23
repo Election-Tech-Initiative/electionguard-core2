@@ -68,6 +68,7 @@ public class TallyStateMachine : ITallyStateMachine
         return await Task.FromResult(true);
     }
 
+    #region Should Run
     private async Task<bool> ShouldDecryptShares()
     {
         return !await _decryptionShareService.GetExistsByTallyAsync(_tally.TallyId, _authenticationService.UserName ?? string.Empty);
@@ -83,7 +84,7 @@ public class TallyStateMachine : ITallyStateMachine
 
     private async Task<bool> ShouldRespondChallenge()
     {
-        return ! await _challengeResponseService.GetExistsByTallyAsync(
+        return !await _challengeResponseService.GetExistsByTallyAsync(
             _tally.TallyId,
             _authenticationService.UserName ?? string.Empty);
     }
@@ -92,7 +93,9 @@ public class TallyStateMachine : ITallyStateMachine
     {
         return await Task.FromResult(_authenticationService.IsAdmin && _tally.State != TallyState.AdminVerifyChallenge);
     }
+    #endregion
 
+    #region Run Steps
     private Task RespondChallenge()
     {
         throw new NotImplementedException();
@@ -123,8 +126,9 @@ public class TallyStateMachine : ITallyStateMachine
 
     private Task StartTally()
     {
-        _tallyService.SetState(_tally, TallyState.AdminAccumulateTally);
+        await _tallyService.UpdateStateAsync(_tally, TallyState.AdminAccumulateTally);
     }
+    #endregion
 
     private void GenerateGuardianSteps()
     {
