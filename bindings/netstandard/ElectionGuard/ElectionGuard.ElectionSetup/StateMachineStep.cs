@@ -5,12 +5,12 @@ namespace ElectionGuard.ElectionSetup;
 /// <summary>
 /// Data structure for keeping track of the steps needed for admin/guardians
 /// </summary>
-public class StateMachineStep
+public class StateMachineStep<T> where T : struct, IConvertible
 {
     /// <summary>
     /// The state of the KeyCeremony that this step needs to be run on
     /// </summary>
-    public KeyCeremonyState State { get; set; }
+    public T State { get; set; }
 
     /// <summary>
     /// 

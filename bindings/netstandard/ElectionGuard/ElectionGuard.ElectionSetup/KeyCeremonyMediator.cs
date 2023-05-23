@@ -78,8 +78,8 @@ public class KeyCeremonyMediator
     protected readonly IGuardianPublicKeyService _publicKeyService;
     protected readonly IVerificationService _verificationService;
 
-    private readonly List<StateMachineStep> _adminSteps = new();
-    private readonly List<StateMachineStep> _guardianSteps = new();
+    private readonly List<StateMachineStep<KeyCeremonyState>> _adminSteps = new();
+    private readonly List<StateMachineStep<KeyCeremonyState>> _guardianSteps = new();
 
     // HACK: This only works as a mutex because we are using 5s long polling.
     // TODO: figure out a more graceful way to support long polling 
@@ -106,42 +106,42 @@ public class KeyCeremonyMediator
     private void CreateAdminSteps()
     {
         _adminSteps.Add(
-            new StateMachineStep()
+            new StateMachineStep<KeyCeremonyState>()
             {
                 State = KeyCeremonyState.PendingGuardiansJoin,
                 RunStep = RunStep2,
                 ShouldRunStep = ShouldAdminStartStep2
             });
         _adminSteps.Add(
-            new StateMachineStep()
+            new StateMachineStep<KeyCeremonyState>()
             {
                 State = KeyCeremonyState.PendingAdminAnnounce,
                 RunStep = RunStep2,
                 ShouldRunStep = AlwaysRun
             });
         _adminSteps.Add(
-            new StateMachineStep()
+            new StateMachineStep<KeyCeremonyState>()
             {
                 State = KeyCeremonyState.PendingGuardianBackups,
                 RunStep = RunStep4,
                 ShouldRunStep = ShouldAdminStartStep4
             });
         _adminSteps.Add(
-            new StateMachineStep()
+            new StateMachineStep<KeyCeremonyState>()
             {
                 State = KeyCeremonyState.PendingAdminToShareBackups,
                 RunStep = RunStep4,
                 ShouldRunStep = AlwaysRun
             });
         _adminSteps.Add(
-            new StateMachineStep()
+            new StateMachineStep<KeyCeremonyState>()
             {
                 State = KeyCeremonyState.PendingGuardiansVerifyBackups,
                 RunStep = RunStep6,
                 ShouldRunStep = ShouldAdminStartStep6
             });
         _adminSteps.Add(
-            new StateMachineStep()
+            new StateMachineStep<KeyCeremonyState>()
             {
                 State = KeyCeremonyState.PendingAdminToPublishJointKey,
                 RunStep = RunStep6,
@@ -152,21 +152,21 @@ public class KeyCeremonyMediator
     private void CreateGuardianSteps()
     {
         _guardianSteps.Add(
-            new StateMachineStep()
+            new StateMachineStep<KeyCeremonyState>()
             {
                 State = KeyCeremonyState.PendingGuardiansJoin,
                 RunStep = RunStep1,
                 ShouldRunStep = ShouldGuardianRunStep1
             });
         _guardianSteps.Add(
-            new StateMachineStep()
+            new StateMachineStep<KeyCeremonyState>()
             {
                 State = KeyCeremonyState.PendingGuardianBackups,
                 RunStep = RunStep3,
                 ShouldRunStep = ShouldGuardianRunStep3
             });
         _guardianSteps.Add(
-            new StateMachineStep()
+            new StateMachineStep<KeyCeremonyState>()
             {
                 State = KeyCeremonyState.PendingGuardiansVerifyBackups,
                 RunStep = RunStep5,
