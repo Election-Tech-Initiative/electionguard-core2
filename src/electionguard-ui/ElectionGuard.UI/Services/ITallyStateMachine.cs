@@ -1,7 +1,6 @@
 ﻿namespace ElectionGuard.UI.Services;
 
-internal interface ITallyStateMachine
-
+public interface ITallyStateMachine
 {
     TallyState CurrentState { get; }
     string TallyId { get; set; }
