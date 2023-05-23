@@ -53,17 +53,17 @@ public partial class TallyProcessViewModel : BaseViewModel
         _challengeResponseService = challengeResponseService;
     }
 
-    partial void OnTallyChanged(TallyRecord? value)
+    partial void OnTallyChanged(TallyRecord? oldValue, TallyRecord? newValue)
     {
-        if (value is not null)
+        if (newValue is not null && oldValue?.TallyId != newValue?.TallyId)
         {
             _ = Shell.Current.CurrentPage.Dispatcher.DispatchAsync(async () =>
             {
-                var electionId = value.ElectionId ?? string.Empty;
+                var electionId = newValue.ElectionId ?? string.Empty;
                 var election = await _electionService.GetByElectionIdAsync(electionId);
                 if (election is null)
                 {
-                    throw new ElectionGuardException($"ElectionId {electionId} not found! Tally {value.Id}");
+                    throw new ElectionGuardException($"ElectionId {electionId} not found! Tally {newValue.Id}");
                     // TODO: put up some error message somewhere, over the rainbow.
                 }
 
@@ -93,6 +93,11 @@ public partial class TallyProcessViewModel : BaseViewModel
         };
 
         await _tallyJoinedService.JoinTallyAsync(joiner);
+
+        if (!_timer.IsRunning)
+        {
+            _timer.Start();
+        }
     }
 
     private bool CanJoinTally() => Tally?.State == TallyState.PendingGuardiansJoin && !CurrentUserJoinedAlready();
@@ -112,12 +117,17 @@ public partial class TallyProcessViewModel : BaseViewModel
         };
 
         await _tallyJoinedService.JoinTallyAsync(joiner);
+        
         HomeCommand.Execute(null);
     }
 
     [RelayCommand(CanExecute = nameof(CanStartTally))]
     private async Task StartTally()
     {
+        if (!_timer.IsRunning)
+        {
+            _timer.Start();
+        }
     }
 
     private bool CanStartTally()
@@ -132,7 +142,7 @@ public partial class TallyProcessViewModel : BaseViewModel
         await base.OnAppearing();
         _timer.Tick += CeremonyPollingTimer_Tick;
 
-        if (!_timer.IsRunning)
+        if (!_timer.IsRunning && Tally.State != TallyState.PendingGuardiansJoin)
         {
             _timer.Start();
         }
