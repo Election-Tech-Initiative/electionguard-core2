@@ -41,6 +41,7 @@ public class BallotService : BaseDatabaseService<BallotRecord>
     /// Gets ballots for an election
     /// </summary>
     /// <param name="electionId">election id to search for</param>
+    /// <param name="state">State to filter the ballots</param>
     public async Task<IAsyncCursor<BallotRecord>> GetCursorBallotsByElectionIdStateAsync(string electionId, BallotBoxState state)
     {
         var filter = FilterBuilder.And(
