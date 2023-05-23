@@ -42,4 +42,13 @@ public class ChallengeResponseService : BaseDatabaseService<ChallengeResponseRec
         return await CountByFilterAsync(filter);
     }
 
+    public async Task<bool> GetExistsByTallyAsync(string tallyId, string guardianId)
+    {
+        var filter = FilterBuilder.And(
+            FilterBuilder.Eq(Constants.TallyId, tallyId),
+            FilterBuilder.Eq(Constants.GuardianId, guardianId)
+            );
+        return await ExistsByFilterAsync(filter);
+    }
+
 }

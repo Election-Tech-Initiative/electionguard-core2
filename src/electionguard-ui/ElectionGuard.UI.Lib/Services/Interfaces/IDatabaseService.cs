@@ -67,6 +67,7 @@ internal static class Constants
 public interface IDatabaseService<T>
 {
     Task<long> CountByFilterAsync(FilterDefinition<T> filter, string? table = null);
+    Task<bool> ExistsByFilterAsync(FilterDefinition<T> filter, string? table = null);
     Task<List<T>> GetAllAsync(string? table = null);
     Task<List<T>> GetAllByFilterAsync(FilterDefinition<T> filter, string? table = null);
     Task<List<T>> GetAllByFieldAsync(string fieldName, object fieldValue, string? table = null);
