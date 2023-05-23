@@ -1,4 +1,4 @@
-using ElectionGuard.Ballot;
+﻿using ElectionGuard.Ballot;
 using ElectionGuard.Decryption.Tally;
 using ElectionGuard.ElectionSetup;
 
@@ -13,14 +13,14 @@ public static class CreateSharesExtensions
     /// Conmpute decryption shares for a tally and a list of ballots. 
     /// Usially the list of ballots is the spoiled ballots in the tally.
     /// </summary>
-    public static Tuple<TallyShare, Dictionary<string, BallotShare>> ComputeDecryptionShares(
+    public static DecryptionShare ComputeDecryptionShares(
         this Guardian guardian,
         CiphertextTally tally,
         List<CiphertextBallot> ballots)
     {
         var share = guardian.ComputeDecryptionShare(tally)!;
         var shares = guardian.ComputeDecryptionShares(tally.TallyId, ballots)!;
-        return new Tuple<TallyShare, Dictionary<string, BallotShare>>(share, shares);
+        return new(share, shares);
     }
 
     /// <summary>

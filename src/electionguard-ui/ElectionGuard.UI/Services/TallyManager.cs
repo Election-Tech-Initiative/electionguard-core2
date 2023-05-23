@@ -117,6 +117,12 @@ namespace ElectionGuard.UI.Services
                 });
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="electionId"></param>
+        /// <param name="tallyId"></param>
+        /// <returns></returns>
         public async Task CreateChallenge(string electionId, string tallyId)
         {
             var mediator = await CreateDecryptionMediator(_adminUser, electionId, tallyId);
@@ -168,9 +174,6 @@ namespace ElectionGuard.UI.Services
 
         }
 
-        public async Task DecryptTally()
-        {
-        }
         #endregion
 
         #region Guardian Steps
@@ -215,7 +218,6 @@ namespace ElectionGuard.UI.Services
 
             var challengeBallots = await GetBallotsByState(electionId, BallotBoxState.Challenged);
             var decryptionShares = guardian.ComputeDecryptionShares(mediator.Tallies[tallyId], challengeBallots);
-            var (tallyShare, ballotShares) = decryptionShares;
 
             mediator.SubmitShares(decryptionShares, challengeBallots);
 
@@ -242,7 +244,7 @@ namespace ElectionGuard.UI.Services
             _ = await _challengeResponseService.SaveAsync(responseRecord);
         }
 
-        private async Task SaveShare(string guardianId, string tallyId, Tuple<TallyShare, Dictionary<string, BallotShare>> decryptionShare)
+        private async Task SaveShare(string guardianId, string tallyId, DecryptionShare decryptionShare)
         {
             var shareRecord = new DecryptionShareRecord()
             {
@@ -258,7 +260,7 @@ namespace ElectionGuard.UI.Services
         {
             var share = await _decryptionShareService.GetByGuardianIdAsync(tallyId, guardianId) ?? throw new Exception(nameof(tallyId));
 
-            var shareData = JsonConvert.DeserializeObject<Tuple<TallyShare, Dictionary<string, BallotShare>>>(share.ShareData)!;
+            var shareData = JsonConvert.DeserializeObject<DecryptionShare>(share.ShareData)!;
             var challengeBallots = await GetBallotsByState(electionId, BallotBoxState.Challenged);
             mediator.SubmitShares(shareData, challengeBallots);
         }
@@ -270,7 +272,7 @@ namespace ElectionGuard.UI.Services
 
             foreach (var share in shares)
             {
-                var shareData = JsonConvert.DeserializeObject<Tuple<TallyShare, Dictionary<string, BallotShare>>>(share.ShareData)!;
+                var shareData = JsonConvert.DeserializeObject<DecryptionShare>(share.ShareData)!;
                 mediator.SubmitShares(shareData, challengeBallots);
             }
         }
