@@ -55,6 +55,8 @@ internal static class Constants
 
     public readonly static string IsExportable = "IsExportable";
 
+    public readonly static string BallotState = "BallotState";
+
 }
 
 
