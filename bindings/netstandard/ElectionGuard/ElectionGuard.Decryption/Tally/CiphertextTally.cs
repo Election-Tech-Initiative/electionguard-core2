@@ -55,12 +55,12 @@ public record CiphertextTally : DisposableRecordBase, IEquatable<CiphertextTally
     public CiphertextTally(
         string name,
         CiphertextElectionContext context,
-        InternalManifest manifest)
+        InternalManifest manifest) : this(
+            tallyId: Guid.NewGuid().ToString(),
+            name: name,
+            context: context,
+            manifest: manifest)
     {
-        Name = name;
-        Context = new(context);
-        Manifest = new(manifest);
-        Contests = manifest.ToCiphertextTallyContestDictionary();
     }
 
     public CiphertextTally(
