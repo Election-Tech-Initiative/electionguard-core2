@@ -1,6 +1,4 @@
-
-
-using System;
+﻿using System;
 using Newtonsoft.Json;
 
 namespace ElectionGuard.Encryption.Utils.Converters
@@ -10,7 +8,7 @@ namespace ElectionGuard.Encryption.Utils.Converters
         public override ElementModQ ReadJson(JsonReader reader, Type objectType, ElementModQ existingValue, bool hasExistingValue, JsonSerializer serializer)
         {
             var value = (string)reader.Value;
-            return new ElementModQ(value);
+            return value != null ? new ElementModQ(value) : null;
         }
 
         public override void WriteJson(JsonWriter writer, ElementModQ value, JsonSerializer serializer)

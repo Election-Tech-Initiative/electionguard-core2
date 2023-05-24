@@ -1,10 +1,11 @@
-
+﻿
 using ElectionGuard.Decryption.Challenge;
 using ElectionGuard.ElectionSetup;
 using ElectionGuard.ElectionSetup.Extensions;
 using ElectionGuard.Decryption.Shares;
 using ElectionGuard.Ballot;
 using ElectionGuard.Base;
+using Newtonsoft.Json;
 
 namespace ElectionGuard.Decryption.ChallengeResponse;
 
@@ -31,6 +32,18 @@ public record ContestChallengeResponse
     {
         ObjectId = objectId;
         SequenceOrder = sequenceOrder;
+    }
+
+    [JsonConstructor]
+    public ContestChallengeResponse(
+        string objectId,
+        ulong sequenceOrder,
+        Dictionary<string, SelectionChallengeResponse> selections)
+    {
+        ObjectId = objectId;
+        SequenceOrder = sequenceOrder;
+        Selections = selections
+            .ToDictionary(x => x.Key, x => new SelectionChallengeResponse(x.Value));
     }
 
     public ContestChallengeResponse(

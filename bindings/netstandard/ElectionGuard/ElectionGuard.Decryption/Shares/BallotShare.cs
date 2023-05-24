@@ -17,6 +17,20 @@ public record BallotShare : TallyShare, IEquatable<BallotShare>
     public BallotShare(
         string guardianId,
         string tallyId,
+        string objectId,
+        string styleId,
+        ElementModQ manifestHash,
+        Dictionary<string, ContestShare> contests)
+        : base(guardianId, tallyId, contests)
+    {
+        BallotId = objectId;
+        StyleId = styleId;
+        ManifestHash = new(manifestHash);
+    }
+
+    public BallotShare(
+        string guardianId,
+        string tallyId,
         CiphertextBallot ballot,
         Dictionary<string, ContestShare> contests)
         : base(guardianId, tallyId, contests)

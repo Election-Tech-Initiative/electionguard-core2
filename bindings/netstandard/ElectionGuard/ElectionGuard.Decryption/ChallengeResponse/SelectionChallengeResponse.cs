@@ -1,9 +1,10 @@
-using ElectionGuard.Ballot;
+﻿using ElectionGuard.Ballot;
 using ElectionGuard.Decryption.Challenge;
 using ElectionGuard.Decryption.Extensions;
 using ElectionGuard.Decryption.Shares;
 using ElectionGuard.ElectionSetup;
 using ElectionGuard.Guardians;
+using Newtonsoft.Json;
 
 namespace ElectionGuard.Decryption.ChallengeResponse;
 
@@ -33,6 +34,19 @@ public record SelectionChallengeResponse : DisposableRecordBase
     // 𝑣𝑖 in the spec
     /// </summary>
     public ElementModQ Response { get; init; }
+
+    [JsonConstructor]
+    public SelectionChallengeResponse(
+        string objectId,
+        string guardianId,
+        ulong sequenceOrder,
+        ElementModQ response)
+    {
+        ObjectId = objectId;
+        SequenceOrder = sequenceOrder;
+        GuardianId = guardianId;
+        Response = new(response);
+    }
 
     public SelectionChallengeResponse(
         IElectionGuardian guardian,

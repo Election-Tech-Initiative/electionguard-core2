@@ -1,8 +1,9 @@
-using ElectionGuard.Ballot;
+﻿using ElectionGuard.Ballot;
 using ElectionGuard.Decryption.Accumulation;
 using ElectionGuard.ElectionSetup;
 using ElectionGuard.ElectionSetup.Extensions;
 using ElectionGuard.Guardians;
+using Newtonsoft.Json;
 
 namespace ElectionGuard.Decryption.Challenge;
 
@@ -80,6 +81,27 @@ public record BallotChallenge
         Contests = ballot
             .ToContestChallengeDictionary();
     }
+
+    [JsonConstructor]
+    public BallotChallenge(
+        string tallyId,
+        string objectId,
+        string guardianId,
+        ulong sequenceOrder,
+        ElementModQ coefficient,
+        Dictionary<string, ContestChallenge> contests)
+    {
+        TallyId = tallyId;
+        ObjectId = objectId;
+        GuardianId = guardianId;
+        SequenceOrder = sequenceOrder;
+        Coefficient = new(coefficient);
+        Contests = contests
+            .ToDictionary(
+                kvp => kvp.Key,
+                kvp => new ContestChallenge(kvp.Value));
+    }
+
 
     public BallotChallenge(
         string tallyId,

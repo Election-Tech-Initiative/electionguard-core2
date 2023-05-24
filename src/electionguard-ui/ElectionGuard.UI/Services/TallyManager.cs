@@ -157,9 +157,9 @@ namespace ElectionGuard.UI.Services
             var tallyId = tally.TallyId!;
 
             var mediator = await CreateDecryptionMediator(_adminUser, tally);
-            var challengeBallots = await GetBallotsByState(electionId, BallotBoxState.Challenged);
+            //var challengeBallots = await GetBallotsByState(electionId, BallotBoxState.Challenged);
 
-            mediator.AddBallots(tallyId, challengeBallots!);
+            //mediator.AddBallots(tallyId, challengeBallots!);
             await LoadAllShares(mediator, tallyId, electionId);
 
             mediator.CreateChallenge(tallyId);
@@ -250,12 +250,16 @@ namespace ElectionGuard.UI.Services
             var electionId = tally.ElectionId!;
             var tallyId = tally.TallyId!;
 
+            var mediator = await CreateDecryptionMediator(guardianId, tally);
+            await LoadAllShares(mediator, tallyId, electionId);
+
             using var guardian = await HydrateGuardian(guardianId, electionId);
             var challengeRecord = await _challengeService.GetByGuardianIdAsync(tallyId, guardianId) ?? throw new ArgumentException(nameof(guardianId));
-            var shareRecord = await _decryptionShareService.GetByGuardianIdAsync(tallyId, guardianId) ?? throw new ArgumentException(nameof(guardianId));
+            //var shareRecord = await _decryptionShareService.GetByGuardianIdAsync(tallyId, guardianId) ?? throw new ArgumentException(nameof(guardianId));
 
             var challenge = JsonConvert.DeserializeObject<GuardianChallenge>(challengeRecord.ChallengeData, SerializationSettings.NewtonsoftSettings()) ?? throw new ArgumentException(nameof(guardianId)); ;
-            var share = JsonConvert.DeserializeObject<GuardianShare>(shareRecord.ShareData, SerializationSettings.NewtonsoftSettings()) ?? throw new ArgumentException(nameof(guardianId)); ;
+            //var decryptShare = JsonConvert.DeserializeObject<GuardianShare>(shareRecord.ShareData, SerializationSettings.NewtonsoftSettings()) ?? throw new ArgumentException(nameof(guardianId)); ;
+            var share = mediator.GetShare(tallyId, guardianId)!;
 
             var response = guardian.ComputeChallengeResponse(share, challenge);
             var responseRecord = new ChallengeResponseRecord()

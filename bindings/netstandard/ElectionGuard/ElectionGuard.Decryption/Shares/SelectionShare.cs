@@ -1,6 +1,7 @@
-using ElectionGuard.Ballot;
+﻿using ElectionGuard.Ballot;
 using ElectionGuard.Decryption.Extensions;
 using ElectionGuard.Guardians;
+using Newtonsoft.Json;
 
 namespace ElectionGuard.Decryption.Shares;
 
@@ -39,6 +40,7 @@ public class SelectionShare
     // commitment for generating the cp proof as part of decryption
     public ElGamalCiphertext Commitment { get; set; } = default!;
 
+    [JsonConstructor]
     public SelectionShare(
         string objectId,
         ulong sequenceOrder,

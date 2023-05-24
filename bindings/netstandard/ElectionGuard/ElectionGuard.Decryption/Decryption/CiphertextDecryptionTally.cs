@@ -1,4 +1,4 @@
-using ElectionGuard.Decryption.Accumulation;
+﻿using ElectionGuard.Decryption.Accumulation;
 using ElectionGuard.Decryption.Challenge;
 using ElectionGuard.Decryption.ChallengeResponse;
 using ElectionGuard.Decryption.Extensions;
@@ -419,8 +419,7 @@ public record class CiphertextDecryptionTally : DisposableRecordBase
                 share,
                 _challenges[guardianId]))
             {
-                Console.WriteLine("Invalid challenge response for guardian " + guardianId);
-                return false;
+                throw new ElectionGuardException("Invalid challenge response for guardian " + guardianId);
             }
         }
 

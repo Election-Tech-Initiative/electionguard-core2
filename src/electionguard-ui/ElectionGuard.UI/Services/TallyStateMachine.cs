@@ -1,4 +1,5 @@
-﻿using ElectionGuard.ElectionSetup;
+﻿using ElectionGuard.Decryption.Shares;
+using ElectionGuard.ElectionSetup;
 using ElectionGuard.UI.Lib.Models;
 
 namespace ElectionGuard.UI.Services;
@@ -95,7 +96,10 @@ public class TallyStateMachine : ITallyStateMachine
 
     private async Task<bool> ShouldVerifyChallenge()
     {
-        return await Task.FromResult(_authenticationService.IsAdmin && _tally.State != TallyState.AdminVerifyChallenge);
+        var joinedGuardians = await _tallyJoinedService.GetCountByTallyJoinedAsync(_tally.TallyId);
+        var challengeResponse = await _challengeResponseService.GetCountByTallyAsync(_tally.TallyId);
+
+        return challengeResponse == joinedGuardians;
     }
     #endregion
 
