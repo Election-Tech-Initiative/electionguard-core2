@@ -211,6 +211,7 @@ namespace ElectionGuard.UI.Services
 
             var mediator = new DecryptionMediator(userId, ciphertextTally, publicKeys);
             await AddSpoiledBallots(mediator, electionId, tallyId);
+            await AddChallengedBallots(mediator, electionId, tallyId);
 
             return mediator;
         }
@@ -306,6 +307,14 @@ namespace ElectionGuard.UI.Services
             var spoiledBallots = await GetBallotsByState(electionId, BallotBoxState.Spoiled);
 
             mediator.AddBallots(tallyId, spoiledBallots);
+        }
+
+        private async Task AddChallengedBallots(DecryptionMediator mediator, string electionId, string tallyId)
+        {
+            // TODO: You would think we should dispose this. The mediator will handle that, eventually.
+            var challengedBallots = await GetBallotsByState(electionId, BallotBoxState.Challenged);
+
+            mediator.AddBallots(tallyId, challengedBallots);
         }
 
         private async Task<List<CiphertextBallot>> GetBallotsByState(string electionId, BallotBoxState state)
