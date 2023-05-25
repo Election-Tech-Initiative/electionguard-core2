@@ -276,6 +276,17 @@ public record class CiphertextDecryptionTally : DisposableRecordBase
 
     #region Challenge
 
+    public void LoadChallenge(string guardianId, GuardianChallenge challenge)
+    {
+        _challenges.Add(guardianId, challenge);
+        if(_challenges.Count == _guardians.Count)
+        {
+            // state transition
+            DecryptionState = DecryptionState.PendingGuardianChallengeResponses;
+        }
+    }
+
+
     /// <summary>
     /// Create a challenge for each available guardian that includes the tally and ballot challenges
     /// which are offset by the lagrange coefficients for the guardian.
@@ -419,6 +430,9 @@ public record class CiphertextDecryptionTally : DisposableRecordBase
                 share,
                 _challenges[guardianId]))
             {
+//                DecryptionState = DecryptionState.PendingAdminComputeProofs;
+
+                return false;
                 throw new ElectionGuardException("Invalid challenge response for guardian " + guardianId);
             }
         }
@@ -613,7 +627,7 @@ public record class CiphertextDecryptionTally : DisposableRecordBase
     {
         if (!_challengedBallots.ContainsKey(ballot.ObjectId))
         {
-            _challengedBallots.Add(ballot.ObjectId, new(ballot));
+            _challengedBallots.Add(ballot.ObjectId, ballot);
         }
     }
 

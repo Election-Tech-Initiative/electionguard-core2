@@ -9,10 +9,10 @@ namespace ElectionGuard.Encryption.Utils.Converters
         public override ElGamalCiphertext ReadJson(JsonReader reader, Type objectType, ElGamalCiphertext existingValue, bool hasExistingValue, JsonSerializer serializer)
         {
             var jObject = serializer.Deserialize<JObject>(reader);
-            var publicKey = jObject["pad"].Value<string>();
-            var secretKey = jObject["data"].Value<string>();
+            var pad = jObject["pad"].Value<string>();
+            var data = jObject["data"].Value<string>();
 
-            return new ElGamalCiphertext(new ElementModP(secretKey), new ElementModP(publicKey));
+            return new ElGamalCiphertext(new ElementModP(pad), new ElementModP(data));
         }
 
         public override void WriteJson(JsonWriter writer, ElGamalCiphertext value, JsonSerializer serializer)
