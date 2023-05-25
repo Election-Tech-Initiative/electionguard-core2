@@ -25,7 +25,7 @@ public partial class TallyProcessViewModel : BaseViewModel
 
     [ObservableProperty]
     [NotifyCanExecuteChangedFor(nameof(StartTallyCommand))]
-    private List<GuardianTallyItem> _joinedGuardians = new();
+    private ObservableCollection<GuardianTallyItem> _joinedGuardians = new();
 
     private readonly ElectionService _electionService;
     private readonly TallyService _tallyService;
@@ -72,6 +72,8 @@ public partial class TallyProcessViewModel : BaseViewModel
                 CurrentElection = election;
 
                 BallotUploads = await _ballotUploadService.GetByElectionIdAsync(electionId);
+                
+                await UpdateTallyData();
             });
         }
     }

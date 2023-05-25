@@ -19,14 +19,14 @@
         </ResourceDictionary>
     </ContentPage.Resources>
 
-    <Grid RowDefinitions="auto, *" Style="{StaticResource NarrowCenteredGrid}">
+    <Grid RowDefinitions="auto, auto, *" Style="{StaticResource NarrowCenteredGrid}">
         <VerticalStackLayout Grid.Row="0">
             <Label Style="{StaticResource H2}" Text="Election Name" />
             <Label Text="{Binding CurrentElection.Name}" />
             <Label Style="{StaticResource H2}" Text="Tally Name" />
             <Label Text="{Binding Tally.Name}" />
             <Label Style="{StaticResource H2}" Text="Status" />
-            <Label Style="{Binding Tally.State}" />
+            <Label Text="{Binding Tally.State}" />
             <!--  RO view of Tally filter (future work)  -->
             <Button
                 Command="{Binding JoinTallyCommand}"
@@ -39,16 +39,46 @@
         </VerticalStackLayout>
         <!--  List of guardians joined for all  -->
         <VerticalStackLayout Grid.Row="1" Margin="0,0,50,0">
-            <CollectionView x:Name="GuardiansJoinedView" ItemsSource="{Binding JoinedGuardians}">
-                <CollectionView.Header>
-                    <Grid>
-                        <Label Text="Guardian" />
-                    </Grid>
-                </CollectionView.Header>
+            <CollectionView ItemsSource="{Binding JoinedGuardians}" SelectionMode="None">
+                <CollectionView.EmptyView>
+                    <controls:NoContentView Text="{helper:Translate NoGuardians}" />
+                </CollectionView.EmptyView>
                 <CollectionView.ItemTemplate>
-                    <DataTemplate x:DataType="model:TallyJoinedRecord">
-                        <Grid BackgroundColor="{Binding ., Converter={StaticResource AlternateRowColorConverter}, ConverterParameter={x:Reference UploadCollectionView}}" ColumnDefinitions="1.5*, 2*, *, *, *, *, *">
-                            <Label Text="{Binding GuardianId}" />
+                    <DataTemplate x:DataType="models:GuardianTallyItem">
+                        <Grid
+                            Margin="15,5,0,5"
+                            Padding="10"
+                            BackgroundColor="{Binding IsSelf, Converter={StaticResource GuardianBackgroundConverter}}"
+                            ColumnDefinitions="*, 50, 50, 50">
+                            <Label
+                                Grid.Column="0"
+                                FontSize="Medium"
+                                Text="{Binding Name}"
+                                VerticalOptions="Center" />
+                            <Image
+                                Grid.Column="1"
+                                Margin="10,0,10,0"
+                                Source="key.png"
+                                ToolTipProperties.Text="{helper:Translate JoinedText}"
+                                WidthRequest="32" />
+                            <Image
+                                Grid.Column="2"
+                                Margin="10,0,10,0"
+                                Source="{Binding HasDecryptShares, Converter={StaticResource BackupConverter}}"
+                                ToolTipProperties.Text="{helper:Translate BackupText}"
+                                WidthRequest="32" />
+                            <Image
+                                Grid.Column="3"
+                                Margin="10,0,10,0"
+                                Source="notverify.png"
+                                ToolTipProperties.Text="{helper:Translate Verified}"
+                                WidthRequest="32" />
+                            <Image
+                                Grid.Column="3"
+                                Margin="10,0,10,0"
+                                IsVisible="{Binding HasResponse}"
+                                Source="{Binding HasResponse, Converter={StaticResource BadVerifyConverter}}"
+                                WidthRequest="32" />
                         </Grid>
                     </DataTemplate>
                 </CollectionView.ItemTemplate>
