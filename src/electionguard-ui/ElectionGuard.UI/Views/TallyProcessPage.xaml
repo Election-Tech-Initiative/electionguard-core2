@@ -25,6 +25,8 @@
             <Label Text="{Binding CurrentElection.Name}" />
             <Label Style="{StaticResource H2}" Text="Tally Name" />
             <Label Text="{Binding Tally.Name}" />
+            <Label Style="{StaticResource H2}" Text="Status" />
+            <Label Style="{Binding Tally.State}" />
             <!--  RO view of Tally filter (future work)  -->
             <Button
                 Command="{Binding JoinTallyCommand}"
