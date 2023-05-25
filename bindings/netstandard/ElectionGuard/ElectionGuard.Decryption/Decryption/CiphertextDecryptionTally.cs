@@ -430,10 +430,8 @@ public record class CiphertextDecryptionTally : DisposableRecordBase
                 share,
                 _challenges[guardianId]))
             {
-//                DecryptionState = DecryptionState.PendingAdminComputeProofs;
-
+                Console.WriteLine("Invalid challenge response for guardian " + guardianId);
                 return false;
-                throw new ElectionGuardException("Invalid challenge response for guardian " + guardianId);
             }
         }
 
