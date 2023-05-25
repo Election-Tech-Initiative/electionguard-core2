@@ -1,4 +1,4 @@
-using Newtonsoft.Json;
+﻿using Newtonsoft.Json;
 using Newtonsoft.Json.Serialization;
 
 namespace ElectionGuard.Encryption.Utils.Converters
@@ -23,6 +23,7 @@ namespace ElectionGuard.Encryption.Utils.Converters
             settings.Converters.Add(new InternalManifestConverter());
             settings.Converters.Add(new ManifestConverter());
             settings.Converters.Add(new PlaintextBallotConverter());
+            settings.Converters.Add(new ElGamalCiphertextConverter());
             return settings;
         }
     }

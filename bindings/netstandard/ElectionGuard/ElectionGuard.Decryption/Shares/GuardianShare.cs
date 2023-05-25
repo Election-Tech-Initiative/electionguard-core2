@@ -1,6 +1,7 @@
-using ElectionGuard.ElectionSetup;
+﻿using ElectionGuard.ElectionSetup;
 using ElectionGuard.Extensions;
 using ElectionGuard.Guardians;
+using Newtonsoft.Json;
 
 namespace ElectionGuard.Decryption.Shares;
 
@@ -16,6 +17,19 @@ public record GuardianShare : DisposableRecordBase
     public TallyShare Tally { get; init; }
 
     public List<BallotShare> Ballots { get; init; }
+
+    [JsonConstructor]
+    public GuardianShare(
+        string guardianId,
+        ulong sequenceOrder,
+        TallyShare tally,
+        List<BallotShare> ballots)
+    {
+        GuardianId = guardianId;
+        SequenceOrder = sequenceOrder;
+        Tally = tally;
+        Ballots = ballots;
+    }
 
     public GuardianShare(
         IElectionGuardian guardian,

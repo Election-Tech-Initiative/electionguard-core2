@@ -1,7 +1,8 @@
-using ElectionGuard.Ballot;
+﻿using ElectionGuard.Ballot;
 using ElectionGuard.ElectionSetup;
 using ElectionGuard.ElectionSetup.Extensions;
 using ElectionGuard.Guardians;
+using Newtonsoft.Json;
 
 namespace ElectionGuard.Decryption.Challenge;
 
@@ -62,6 +63,24 @@ public record TallyChallenge
         SequenceOrder = guardian.SequenceOrder;
         Coefficient = coefficient;
         Contests = manifest.ToContestChallengeDictionary();
+    }
+
+    [JsonConstructor]
+    public TallyChallenge(
+        string tallyId,
+        string guardianId,
+        ulong sequenceOrder,
+        ElementModQ coefficient,
+        Dictionary<string, ContestChallenge> contests)
+    {
+        TallyId = tallyId;
+        GuardianId = guardianId;
+        SequenceOrder = sequenceOrder;
+        Coefficient = coefficient;
+        Contests = contests
+            .ToDictionary(
+                kvp => kvp.Key,
+                kvp => new ContestChallenge(kvp.Value));
     }
 
     public TallyChallenge(

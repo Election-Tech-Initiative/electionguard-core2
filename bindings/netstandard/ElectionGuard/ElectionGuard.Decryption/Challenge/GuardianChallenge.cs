@@ -1,6 +1,7 @@
-using ElectionGuard.ElectionSetup;
+﻿using ElectionGuard.ElectionSetup;
 using ElectionGuard.Extensions;
 using ElectionGuard.Guardians;
+using Newtonsoft.Json;
 
 namespace ElectionGuard.Decryption.Challenge;
 
@@ -36,6 +37,20 @@ public record GuardianChallenge : DisposableRecordBase
     {
         GuardianId = guardian.GuardianId;
         SequenceOrder = guardian.SequenceOrder;
+        Tally = new(tally);
+        Ballots = ballots != null
+            ? ballots.Select(x => new BallotChallenge(x)).ToList() : new();
+    }
+
+    [JsonConstructor]
+    public GuardianChallenge(
+        string guardianId,
+        ulong sequenceOrder,
+        TallyChallenge tally,
+        List<BallotChallenge>? ballots)
+    {
+        GuardianId = guardianId;
+        SequenceOrder = sequenceOrder;
         Tally = new(tally);
         Ballots = ballots != null
             ? ballots.Select(x => new BallotChallenge(x)).ToList() : new();

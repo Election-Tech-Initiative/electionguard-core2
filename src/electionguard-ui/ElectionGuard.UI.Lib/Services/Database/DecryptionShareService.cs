@@ -35,4 +35,20 @@ public class DecryptionShareService : BaseDatabaseService<DecryptionShareRecord>
 
         return (await GetAllByFilterAsync(filter)).FirstOrDefault();
     }
+
+    public async Task<long> GetCountByTallyAsync(string tallyId)
+    {
+        var filter = FilterBuilder.Eq(Constants.TallyId, tallyId);
+        return await CountByFilterAsync(filter);
+    }
+
+    public async Task<bool> GetExistsByTallyAsync(string tallyId, string guardianId)
+    {
+        var filter = FilterBuilder.And(
+            FilterBuilder.Eq(Constants.TallyId, tallyId),
+            FilterBuilder.Eq(Constants.GuardianId, guardianId)
+            );
+        return await ExistsByFilterAsync(filter);
+    }
+
 }

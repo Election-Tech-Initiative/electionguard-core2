@@ -1,4 +1,5 @@
-using ElectionGuard.Ballot;
+﻿using ElectionGuard.Ballot;
+using Newtonsoft.Json;
 using ElectionGuard.ElectionSetup.Extensions;
 
 namespace ElectionGuard.Decryption.Tally;
@@ -31,6 +32,7 @@ public class CiphertextTallyContest : DisposableBase, ICiphertextContest, IEquat
 
     IReadOnlyList<ICiphertextSelection> ICiphertextContest.Selections => Selections.Values.ToList();
 
+    [JsonConstructor]
     public CiphertextTallyContest(
         string objectId, ulong sequenceOrder, ElementModQ descriptionHash,
         Dictionary<string, CiphertextTallySelection> selections)

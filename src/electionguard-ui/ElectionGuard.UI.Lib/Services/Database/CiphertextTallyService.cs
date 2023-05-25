@@ -15,7 +15,7 @@ public class CiphertextTallyService : BaseDatabaseService<CiphertextTallyRecord>
     /// <summary>
     /// Default constructor that sets the collection name
     /// </summary>
-    public CiphertextTallyService() : base(_collection) { }
+    public CiphertextTallyService() : base(_collection, nameof(CiphertextTallyRecord)) { }
 
     /// <summary>
     /// Gets ciphertext tally for an election

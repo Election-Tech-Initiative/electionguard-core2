@@ -1,5 +1,6 @@
-using ElectionGuard.Decryption.Tally;
+﻿using ElectionGuard.Decryption.Tally;
 using ElectionGuard.Guardians;
+using Newtonsoft.Json;
 
 namespace ElectionGuard.Decryption.Shares;
 
@@ -11,6 +12,21 @@ public record BallotShare : TallyShare, IEquatable<BallotShare>
     public string BallotId { get; init; }
     public string StyleId { get; init; }
     public ElementModQ ManifestHash { get; init; }
+
+    [JsonConstructor]
+    public BallotShare(
+        string guardianId,
+        string tallyId,
+        string objectId,
+        string styleId,
+        ElementModQ manifestHash,
+        Dictionary<string, ContestShare> contests)
+        : base(guardianId, tallyId, contests)
+    {
+        BallotId = objectId;
+        StyleId = styleId;
+        ManifestHash = new(manifestHash);
+    }
 
     public BallotShare(
         string guardianId,

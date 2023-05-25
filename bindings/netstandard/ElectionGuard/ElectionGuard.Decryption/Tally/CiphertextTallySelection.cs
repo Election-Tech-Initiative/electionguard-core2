@@ -1,6 +1,7 @@
-using System.Text;
+﻿using System.Text;
 using ElectionGuard.Ballot;
 using ElectionGuard.ElectionSetup.Concurrency;
+using Newtonsoft.Json;
 
 namespace ElectionGuard.Decryption.Tally;
 
@@ -34,38 +35,38 @@ public class CiphertextTallySelection : DisposableBase,
     private readonly AsyncLock _mutex = new();
     private readonly object _lock = new();
 
+    [JsonConstructor]
     public CiphertextTallySelection(
-        string objectId, ulong sequenceOrder, ElementModQ descriptionHash)
+        string objectId, ulong sequenceOrder, ElementModQ descriptionHash, ElGamalCiphertext ciphertext)
     {
         ObjectId = objectId;
         SequenceOrder = sequenceOrder;
         DescriptionHash = new(descriptionHash);
-        Ciphertext = new ElGamalCiphertext(Constants.ONE_MOD_P, Constants.ONE_MOD_P);
+        Ciphertext = new(ciphertext);
+    }
+
+    public CiphertextTallySelection(
+        string objectId,
+        ulong sequenceOrder,
+        ElementModQ descriptionHash) :
+        this(objectId, sequenceOrder, descriptionHash, new ElGamalCiphertext(Constants.ONE_MOD_P, Constants.ONE_MOD_P))
+    {
     }
 
     public CiphertextTallySelection(SelectionDescription selection)
+        : this(selection.ObjectId, selection.SequenceOrder, selection.CryptoHash())
     {
-        ObjectId = selection.ObjectId;
-        SequenceOrder = selection.SequenceOrder;
-        DescriptionHash = new(selection.CryptoHash());
-        Ciphertext = new ElGamalCiphertext(Constants.ONE_MOD_P, Constants.ONE_MOD_P);
     }
 
     public CiphertextTallySelection(
         SelectionDescription selection, ElGamalCiphertext ciphertext)
+        : this(selection.ObjectId, selection.SequenceOrder, selection.CryptoHash(), ciphertext)
     {
-        ObjectId = selection.ObjectId;
-        SequenceOrder = selection.SequenceOrder;
-        DescriptionHash = new(selection.CryptoHash());
-        Ciphertext = new(ciphertext);
     }
 
     public CiphertextTallySelection(ICiphertextSelection other)
+        : this(other.ObjectId, other.SequenceOrder, other.DescriptionHash, other.Ciphertext)
     {
-        ObjectId = other.ObjectId;
-        SequenceOrder = other.SequenceOrder;
-        DescriptionHash = new(other.DescriptionHash);
-        Ciphertext = new(other.Ciphertext);
     }
 
     /// <summary>

@@ -214,6 +214,17 @@ public class BaseDatabaseService<T> : IDatabaseService<T> where T : DatabaseReco
     }
 
     /// <summary>
+    /// Get existance of documents that match the filter
+    /// </summary>
+    /// <param name="filter">filter used to search</param>
+    /// <param name="table">collection to use</param>
+    public async Task<bool> ExistsByFilterAsync(FilterDefinition<T> filter, string? table = null)
+    {
+        var data = DbService.GetCollection<T>(table ?? _collection);
+        return await data.CountDocumentsAsync(UpdateFilter(filter)) != 0;
+    }
+
+    /// <summary>
     /// 
     /// </summary>
     /// <param name="filter">filter to use to find the item to delete</param>

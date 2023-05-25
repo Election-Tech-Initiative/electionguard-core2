@@ -46,7 +46,7 @@ public class BallotService : BaseDatabaseService<BallotRecord>
     {
         var filter = FilterBuilder.And(
             FilterBuilder.Eq(Constants.ElectionId, electionId),
-            FilterBuilder.Eq(Constants.State, state));
+            FilterBuilder.Eq(Constants.BallotState, state));
         return await GetCursorByFilterAsync(filter);
     }
 

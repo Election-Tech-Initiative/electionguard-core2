@@ -223,6 +223,10 @@ public class DecryptionMediator : DisposableBase
     {
         return TallyDecryptions[tallyId].CreateChallenge(skipValidation);
     }
+    public void LoadChallenge(string tallyId, string guardianId, GuardianChallenge challenge)
+    {
+        TallyDecryptions[tallyId].LoadChallenge(guardianId, challenge);
+    }
 
     #endregion
 
