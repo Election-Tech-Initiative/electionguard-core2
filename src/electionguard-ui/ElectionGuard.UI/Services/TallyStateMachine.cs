@@ -62,6 +62,7 @@ public class TallyStateMachine : ITallyStateMachine
         }
     }
 
+    #region Should Run
     private async Task<bool> ShouldStartTally()
     {
         var joinedGuardians = await _tallyJoinedService.GetCountByTallyJoinedAsync(_tally.TallyId);
@@ -73,7 +74,6 @@ public class TallyStateMachine : ITallyStateMachine
         return await Task.FromResult(true);
     }
 
-    #region Should Run
     private async Task<bool> ShouldDecryptShares()
     {
         return !await _decryptionShareService.GetExistsByTallyAsync(_tally.TallyId, _authenticationService.UserName ?? string.Empty);
