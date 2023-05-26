@@ -11,7 +11,7 @@ public static class CreateSharesExtensions
 {
     /// <summary>
     /// Conmpute decryption shares for a tally and a list of ballots. 
-    /// Usially the list of ballots is the spoiled ballots in the tally.
+    /// Usially the list of ballots is the challenged ballots in the tally.
     /// </summary>
     public static DecryptionShare ComputeDecryptionShares(
         this Guardian guardian,
