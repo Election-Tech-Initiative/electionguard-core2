@@ -7,7 +7,6 @@ using ElectionGuard.ElectionSetup;
 using ElectionGuard.Encryption.Utils.Converters;
 using ElectionGuard.Extensions;
 using ElectionGuard.Guardians;
-using ElectionGuard.UI.Lib.Models;
 using MongoDB.Driver;
 using Newtonsoft.Json;
 
@@ -21,7 +20,6 @@ namespace ElectionGuard.UI.Services
         private readonly TallyMediator _tallyMediator;
         private readonly ContextService _contextService;
         private readonly ManifestService _manifestService;
-        private readonly ElectionService _electionService;
         private readonly GuardianPublicKeyService _guardianPublicKeyService;
         private readonly BallotService _ballotService;
         private readonly KeyCeremonyService _keyCeremonyService;
@@ -36,7 +34,6 @@ namespace ElectionGuard.UI.Services
             TallyMediator tallyMediator,
             ContextService contextService,
             ManifestService manifestService,
-            ElectionService electionService,
             BallotService ballotService,
             KeyCeremonyService keyCeremonyService,
             DecryptionShareService decryptionShareService,
@@ -51,7 +48,6 @@ namespace ElectionGuard.UI.Services
             _tallyMediator = tallyMediator;
             _contextService = contextService;
             _manifestService = manifestService;
-            _electionService = electionService;
             _guardianPublicKeyService = guardianPublicKeyService;
             _challengeService = challengeService;
             _challengeResponseService = challengeResponseService;
@@ -74,10 +70,10 @@ namespace ElectionGuard.UI.Services
         /// <exception cref="ElectionGuardException"></exception>
         public async Task AccumulateAllUploadTallies(TallyRecord tally)
         {
-            var electionId = tally.ElectionId;
-            var tallyId = tally.TallyId;
+            ArgumentException.ThrowIfNullOrEmpty(tally.ElectionId);
+            ArgumentException.ThrowIfNullOrEmpty(tally.Name);
 
-            var contextRecord = await _contextService.GetByElectionIdAsync(electionId);
+            var contextRecord = await _contextService.GetByElectionIdAsync(tally.ElectionId);
             if (contextRecord is null || string.IsNullOrEmpty(contextRecord.ToString()))
             {
                 throw new ElectionGuardException(nameof(contextRecord));
@@ -85,7 +81,7 @@ namespace ElectionGuard.UI.Services
 
             using CiphertextElectionContext context = new(contextRecord);
 
-            var manifestRecord = await _manifestService.GetByElectionIdAsync(electionId);
+            var manifestRecord = await _manifestService.GetByElectionIdAsync(tally.ElectionId);
             if (manifestRecord is null || string.IsNullOrEmpty(manifestRecord.ToString()))
             {
                 throw new ElectionGuardException(nameof(manifestRecord));
@@ -94,28 +90,20 @@ namespace ElectionGuard.UI.Services
             using Manifest tempManifest = new(manifestRecord.ToString());
             using InternalManifest manifest = new(tempManifest);
 
-
-            var tallies = await _ciphertextTallyService.GetAllByElectionIdAsync(electionId);
+            var tallies = await _ciphertextTallyService.GetAllByElectionIdAsync(tally.ElectionId);
             if (tallies.IsNullOrEmpty())
             {
                 throw new ElectionGuardException(nameof(tallies));
             }
 
-            var ciphertextTally = _tallyMediator.CreateTally(tallyId, tally.Name!, context, manifest);
+            var ciphertextTally = _tallyMediator.CreateTally(tally.TallyId, tally.Name, context, manifest);
 
             foreach (var tallyRecord in tallies)
             {
-                try
-                {
-                    using var partialTally = tallyRecord.ToString().ToCiphertextTally();
+                using var partialTally = tallyRecord.ToString().ToCiphertextTally();
 
-                    // TODO: make this threadsafe
-                    _ = await ciphertextTally.AccumulateAsync(partialTally);
-                }
-                catch (Exception ex) 
-                {
-                    throw;
-                }
+                // TODO: make this threadsafe
+                _ = await ciphertextTally.AccumulateAsync(partialTally);
             }
 
             // save ciphertextTally as bit T tally
@@ -124,7 +112,7 @@ namespace ElectionGuard.UI.Services
                 {
                     IsExportable = true,
                     CiphertextTallyData = ciphertextTally.ToJson(),
-                    ElectionId = electionId,
+                    ElectionId = tally.ElectionId,
                     TallyId = ciphertextTally.TallyId,
                 });
         }
@@ -137,18 +125,17 @@ namespace ElectionGuard.UI.Services
         /// <returns></returns>
         public async Task CreateChallenge(TallyRecord tally)
         {
-            var electionId = tally.ElectionId!;
-            var tallyId = tally.TallyId!;
+            ArgumentException.ThrowIfNullOrEmpty(tally.ElectionId);
 
             var mediator = await CreateDecryptionMediator(_adminUser, tally);
-            await LoadAllShares(mediator, tallyId, electionId);
+            await LoadAllShares(mediator, tally);
 
             var challenges = mediator
-                .CreateChallenge(tallyId)
+                .CreateChallenge(tally.TallyId)
                 .Select(ch =>
                     new ChallengeRecord()
                     {
-                        TallyId = tallyId,
+                        TallyId = tally.TallyId,
                         GuardianId = ch.Key,
                         ChallengeData = JsonConvert.SerializeObject(ch.Value, SerializationSettings.NewtonsoftSettings()),
                     });
@@ -158,42 +145,43 @@ namespace ElectionGuard.UI.Services
 
         public async Task ValidateChallengeResponse(TallyRecord tally)
         {
-            var electionId = tally.ElectionId!;
-            var tallyId = tally.TallyId!;
+            ArgumentException.ThrowIfNullOrEmpty(tally.ElectionId);
 
             var mediator = await CreateDecryptionMediator(_adminUser, tally);
-            await LoadAllShares(mediator, tallyId, electionId);
+            await LoadAllShares(mediator, tally);
 
-            mediator.AccumulateShares(tallyId);
+            mediator.AccumulateShares(tally.TallyId);
             // mediator.CreateChallenge(tallyId);
-            var challengeRecords = await _challengeService.GetAllByTallyIdAsync(tallyId) ?? throw new ArgumentException(nameof(tallyId));
+            var challengeRecords = await _challengeService.GetAllByTallyIdAsync(tally.TallyId) ?? throw new ArgumentException(nameof(tally.TallyId));
             foreach (var challengeRecord in challengeRecords)
             {
-                var challenge = JsonConvert.DeserializeObject<GuardianChallenge>(challengeRecord.ChallengeData, SerializationSettings.NewtonsoftSettings()) ?? throw new ArgumentException(nameof(tallyId)); ;
-                mediator.LoadChallenge(tallyId, challenge.GuardianId, challenge);
+                var challenge = JsonConvert.DeserializeObject<GuardianChallenge>(
+                    challengeRecord.ChallengeData, SerializationSettings.NewtonsoftSettings()) ??
+                    throw new ArgumentException(nameof(tally.TallyId));
+
+                mediator.LoadChallenge(tally.TallyId, challenge.GuardianId, challenge);
             }
 
-            var responses = await _challengeResponseService.GetAllByTallyIdAsync(tallyId);
+            var responses = await _challengeResponseService.GetAllByTallyIdAsync(tally.TallyId);
             foreach (var responseRecord in responses)
             {
                 var response = JsonConvert.DeserializeObject<GuardianChallengeResponse>(responseRecord, SerializationSettings.NewtonsoftSettings())!;
-                mediator.SubmitResponse(tallyId, response);
+                mediator.SubmitResponse(tally.TallyId, response);
             }
 
-            if (!mediator.ValidateResponses(tallyId))
+            if (!mediator.ValidateResponses(tally.TallyId))
             {
                 throw new ElectionGuardException("did not validate");
             }
 
-            var result = mediator.Decrypt(tallyId);
+            var result = mediator.Decrypt(tally.TallyId);
             var plaintextTallyRecord = new PlaintextTallyRecord()
             {
-                TallyId = tallyId,
+                TallyId = tally.TallyId,
                 PlaintextTallyData = JsonConvert.SerializeObject(result.Tally, SerializationSettings.NewtonsoftSettings()),
             };
 
             _ = await _plaintextTallyService.SaveAsync(plaintextTallyRecord);
-
         }
 
         #endregion
@@ -201,26 +189,24 @@ namespace ElectionGuard.UI.Services
         #region Guardian Steps
         private async Task<DecryptionMediator> CreateDecryptionMediator(string userId, TallyRecord tally)
         {
-            var electionId = tally.ElectionId!;
-            var tallyId = tally.TallyId!;
+            ArgumentException.ThrowIfNullOrEmpty(tally.KeyCeremonyId);
+            ArgumentException.ThrowIfNullOrEmpty(tally.ElectionId);
 
-            var ciphertextTallyRecord = await _ciphertextTallyService.GetByTallyIdAsync(tallyId);
-            var electionRecord = await _electionService.GetByElectionIdAsync(electionId);
+            var ciphertextTallyRecord = await _ciphertextTallyService.GetByTallyIdAsync(tally.TallyId);
             var publicKeys = (await _guardianPublicKeyService
-                .GetAllByKeyCeremonyIdAsync(electionRecord!.KeyCeremonyId!))
+                .GetAllByKeyCeremonyIdAsync(tally.KeyCeremonyId))
                 .Select(gpk => gpk.PublicKey!).ToList();
 
             if (ciphertextTallyRecord is null || !ciphertextTallyRecord.IsExportable || publicKeys.IsNullOrEmpty())
             {
-                // TODO: clean this mess
-                throw new ArgumentException("all of them");
+                throw new ArgumentException("Bad Ciphertext Tally");
             }
 
             using var ciphertextTally = ciphertextTallyRecord.ToString().ToCiphertextTally();
 
             var mediator = new DecryptionMediator(userId, ciphertextTally, publicKeys);
-            await AddSpoiledBallots(mediator, electionId, tallyId);
-            await AddChallengedBallots(mediator, electionId, tallyId);
+            await AddSpoiledBallots(mediator, tally);
+            await AddChallengedBallots(mediator, tally);
 
             return mediator;
         }
@@ -233,43 +219,41 @@ namespace ElectionGuard.UI.Services
         /// <param name="tallyId"></param>
         public async Task DecryptShare(string guardianId, TallyRecord tally)
         {
-            var electionId = tally.ElectionId!;
-            var tallyId = tally.TallyId;
-
             ArgumentException.ThrowIfNullOrEmpty(guardianId);
+            ArgumentException.ThrowIfNullOrEmpty(tally.ElectionId);
 
-            var mediator = await CreateDecryptionMediator(guardianId, tally);
-            using var guardian = await HydrateGuardian(guardianId, electionId, mediator.Guardians);
+            using var mediator = await CreateDecryptionMediator(guardianId, tally);
+            using var guardian = await HydrateGuardian(guardianId, tally, mediator.Guardians);
 
-            var challengeBallots = await GetBallotsByState(electionId, BallotBoxState.Challenged);
-            var decryptionShares = guardian.ComputeDecryptionShares(mediator.Tallies[tallyId], challengeBallots);
+            var challengeBallots = (await GetBallotsByState(tally.ElectionId, BallotBoxState.Challenged)).ToList();
+            using var decryptionShares = guardian.ComputeDecryptionShares(mediator.Tallies[tally.TallyId], challengeBallots);
 
             if (challengeBallots.Count > 0)
             {
                 mediator.SubmitShares(decryptionShares, challengeBallots);
             }
 
-            await SaveShare(guardianId, tallyId, decryptionShares);
+            await SaveShare(guardianId, tally, decryptionShares);
         }
 
         public async Task ComputeChallengeResponse(string guardianId, TallyRecord tally)
         {
-            var electionId = tally.ElectionId!;
-            var tallyId = tally.TallyId!;
+            ArgumentException.ThrowIfNullOrEmpty(tally.ElectionId);
 
-            var mediator = await CreateDecryptionMediator(guardianId, tally);
-            await LoadAllShares(mediator, tallyId, electionId);
+            using var mediator = await CreateDecryptionMediator(guardianId, tally);
+            await LoadAllShares(mediator, tally);
 
-            using var guardian = await HydrateGuardian(guardianId, electionId, mediator.Guardians);
-            var challengeRecord = await _challengeService.GetByGuardianIdAsync(tallyId, guardianId) ?? throw new ArgumentException(nameof(guardianId));
+            using var guardian = await HydrateGuardian(guardianId, tally, mediator.Guardians);
+            var challengeRecord = await _challengeService.GetByGuardianIdAsync(tally.TallyId, guardianId) ?? throw new ArgumentException(nameof(guardianId));
 
-            var challenge = JsonConvert.DeserializeObject<GuardianChallenge>(challengeRecord.ChallengeData, SerializationSettings.NewtonsoftSettings()) ?? throw new ArgumentException(nameof(guardianId)); ;
-            var share = mediator.GetShare(tallyId, guardianId)!;
+            using var challenge = JsonConvert.DeserializeObject<GuardianChallenge>(challengeRecord.ChallengeData, SerializationSettings.NewtonsoftSettings()) ?? throw new ArgumentException(nameof(guardianId)); ;
+            var share = mediator.GetShare(tally.TallyId, guardianId)!;
 
-            var response = guardian.ComputeChallengeResponse(share, challenge);
+            using var response = guardian.ComputeChallengeResponse(share, challenge);
+
             var responseRecord = new ChallengeResponseRecord()
             {
-                TallyId = tallyId,
+                TallyId = tally.TallyId,
                 GuardianId = guardianId,
                 ResponseData = JsonConvert.SerializeObject(response, SerializationSettings.NewtonsoftSettings()),
             };
@@ -277,79 +261,83 @@ namespace ElectionGuard.UI.Services
             _ = await _challengeResponseService.SaveAsync(responseRecord);
         }
 
-        private async Task SaveShare(string guardianId, string tallyId, DecryptionShare decryptionShare)
+        private async Task SaveShare(string guardianId, TallyRecord tally, DecryptionShare decryptionShare)
         {
             var shareRecord = new DecryptionShareRecord()
             {
-                TallyId = tallyId,
+                TallyId = tally.TallyId,
                 GuardianId = guardianId,
                 ShareData = JsonConvert.SerializeObject(decryptionShare, SerializationSettings.NewtonsoftSettings()),
             };
 
-            await _decryptionShareService.SaveAsync(shareRecord);
+            _ = await _decryptionShareService.SaveAsync(shareRecord);
         }
 
-        private async Task LoadShare(DecryptionMediator mediator, string guardianId, string tallyId, string electionId)
+        private async Task LoadAllShares(DecryptionMediator mediator, TallyRecord tally)
         {
-            var share = await _decryptionShareService.GetByGuardianIdAsync(tallyId, guardianId) ?? throw new Exception(nameof(tallyId));
+            ArgumentException.ThrowIfNullOrEmpty(tally.ElectionId);
 
-            var shareData = JsonConvert.DeserializeObject<DecryptionShare>(share.ShareData, SerializationSettings.NewtonsoftSettings())!;
-            var challengeBallots = await GetBallotsByState(electionId, BallotBoxState.Challenged);
-            mediator.SubmitShares(shareData, challengeBallots);
-        }
-
-        private async Task LoadAllShares(DecryptionMediator mediator, string tallyId, string electionId)
-        {
-            var challengeBallots = await GetBallotsByState(electionId, BallotBoxState.Challenged);
-            var shares = await _decryptionShareService.GetAllByTallyIdAsync(tallyId);
+            var challengeBallots = await GetBallotsByState(tally.ElectionId, BallotBoxState.Challenged);
+            var shares = await _decryptionShareService.GetAllByTallyIdAsync(tally.TallyId);
 
             foreach (var share in shares)
             {
                 var shareData = JsonConvert.DeserializeObject<DecryptionShare>(share.ShareData, SerializationSettings.NewtonsoftSettings())!;
-                mediator.SubmitShares(shareData, challengeBallots);
+                mediator.SubmitShares(shareData, challengeBallots.ToList());
             }
         }
 
-        private async Task AddSpoiledBallots(DecryptionMediator mediator, string electionId, string tallyId)
+        private async Task AddSpoiledBallots(DecryptionMediator mediator, TallyRecord tally)
         {
-            // letting the mediator dispose of this data
-            var spoiledBallots = await GetBallotsByState(electionId, BallotBoxState.Spoiled);
-
-            mediator.AddBallots(tallyId, spoiledBallots);
+            await AddBallots(mediator, tally, BallotBoxState.Spoiled);
         }
 
-        private async Task AddChallengedBallots(DecryptionMediator mediator, string electionId, string tallyId)
+        private async Task AddChallengedBallots(DecryptionMediator mediator, TallyRecord tally)
         {
-            // letting the mediator dispose of this data
-            var challengedBallots = await GetBallotsByState(electionId, BallotBoxState.Challenged);
-
-            mediator.AddBallots(tallyId, challengedBallots);
+            await AddBallots(mediator, tally, BallotBoxState.Challenged);
         }
 
-        private async Task<List<CiphertextBallot>> GetBallotsByState(string electionId, BallotBoxState state)
+        private async Task AddBallots(DecryptionMediator mediator, TallyRecord tally, BallotBoxState ballotBoxState)
+        {
+            ArgumentException.ThrowIfNullOrEmpty(tally.ElectionId);
+
+            if (ballotBoxState is not BallotBoxState.Spoiled and not BallotBoxState.Challenged)
+            {
+                throw new ArgumentOutOfRangeException(nameof(ballotBoxState));
+            }
+
+            // letting the mediator dispose of this data
+            var challengedBallots = await GetBallotsByState(tally.ElectionId, ballotBoxState);
+
+            mediator.AddBallots(tally.TallyId, challengedBallots.ToList());
+        }
+
+        private async Task<IEnumerable<CiphertextBallot>> GetBallotsByState(string electionId, BallotBoxState state)
         {
             var spoiledBallotCursor = await _ballotService.GetCursorBallotsByElectionIdStateAsync(electionId, state);
-            return spoiledBallotCursor.ToList().Select(br => new CiphertextBallot(br.ToString())).ToList();
+            return spoiledBallotCursor.ToList().Select(br => new CiphertextBallot(br.ToString()));
         }
 
         private async Task<Guardian> HydrateGuardian(
             string userId,
-            string electionId,
+            TallyRecord tally,
             Dictionary<string, ElectionPublicKey>? publicKeys = null)
         {
-            Election electionRecord = await _electionService.GetByElectionIdAsync(electionId)
-                ?? throw new ArgumentException(nameof(electionId));
-            KeyCeremonyRecord keyCeremony = await _keyCeremonyService.GetByKeyCeremonyIdAsync(electionRecord.KeyCeremonyId!)
-                ?? throw new ArgumentException(nameof(electionId));
+            ArgumentException.ThrowIfNullOrEmpty(tally.KeyCeremonyId);
+            ArgumentException.ThrowIfNullOrEmpty(tally.ElectionId);
 
-            Dictionary<string, ElectionPartialKeyBackup>? otherBackups = new();
-            var backups = await _guardianBackupService.GetByGuardianIdAsync(keyCeremony.KeyCeremonyId!, userId);
-            foreach (var backup in backups!)
-            {
-                otherBackups.Add(backup.GuardianId!, backup.Backup!);
-            }
 
-            var guardian = GuardianStorageExtensions.Load(userId, keyCeremony, publicKeys, otherBackups) ?? throw new ElectionGuardException(nameof(userId));
+            var keyCeremony = await _keyCeremonyService.GetByKeyCeremonyIdAsync(tally.KeyCeremonyId) ??
+                throw new ArgumentException(nameof(tally.ElectionId));
+
+            var backups = await _guardianBackupService.GetByGuardianIdAsync(keyCeremony.KeyCeremonyId!, userId) ??
+                throw new ArgumentException(nameof(keyCeremony.KeyCeremonyId));
+
+            var guardian = GuardianStorageExtensions.Load(
+                userId,
+                keyCeremony,
+                publicKeys,
+                backups.ToDictionary(k => k.GuardianId!, v => v.Backup!)) ?? throw new ElectionGuardException(nameof(userId));
             return guardian;
         }
         #endregion
