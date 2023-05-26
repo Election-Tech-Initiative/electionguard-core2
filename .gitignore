@@ -159,3 +159,18 @@ bindings/netstandard/ElectionGuard/*.user
 lint-results.xml
 
 database/
+!src/electionguard-ui/ElectionGuard.UI.Lib/Services/Database
+
+node_modules/
+
+dist/
+
+bindings/typescript/src/wasm/electionguard.wasm.js
+
+.npmrc
+
+bindings/typescript/src/wasm/electionguard.wasm.wasm
+
+apps/angular-demo/.vscode/
+
+bindings/typescript/src/wasm/electionguard.wasm.worker.js

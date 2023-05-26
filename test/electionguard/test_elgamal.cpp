@@ -1,5 +1,4 @@
 #include "../../src/electionguard/log.hpp"
-#include "../../src/electionguard/nonces.hpp"
 #include "utils/constants.hpp"
 
 #include <doctest/doctest.h>
@@ -7,6 +6,7 @@
 #include <electionguard/convert.hpp>
 #include <electionguard/elgamal.hpp>
 #include <electionguard/group.hpp>
+#include <electionguard/nonces.hpp>
 #include <electionguard/precompute_buffers.hpp>
 #include <stdexcept>
 
@@ -101,9 +101,9 @@ TEST_CASE("elgamalEncrypt simple encrypt 0 compared with elgamalEncrypt_with_pre
     CHECK((*publicKey < P()));
 
     // cause a two triples and a quad to be populated
-    PrecomputeBufferContext::init(1);
-    PrecomputeBufferContext::populate(*keypair->getPublicKey());
-    PrecomputeBufferContext::stop_populate();
+    PrecomputeBufferContext::initialize(*keypair->getPublicKey(), 1);
+    PrecomputeBufferContext::start();
+    PrecomputeBufferContext::stop();
 
     // this function runs off to look in the precomputed values buffer and if
     // it finds what it needs the the returned class will contain those values
@@ -126,7 +126,7 @@ TEST_CASE("elgamalEncrypt simple encrypt 0 compared with elgamalEncrypt_with_pre
     CHECK((0UL == decrypted1));
     auto decrypted2 = cipherText2->decrypt(secret);
     CHECK((0UL == decrypted2));
-    PrecomputeBufferContext::empty_queues();
+    PrecomputeBufferContext::clear();
 }
 
 TEST_CASE("elgamalEncrypt_with_precomputed simple encrypt 0 decrypts with secret")
@@ -139,9 +139,9 @@ TEST_CASE("elgamalEncrypt_with_precomputed simple encrypt 0 decrypts with secret
     CHECK((*publicKey < P()));
 
     // cause a two triples and a quad to be populated
-    PrecomputeBufferContext::init(1);
-    PrecomputeBufferContext::populate(*keypair->getPublicKey());
-    PrecomputeBufferContext::stop_populate();
+    PrecomputeBufferContext::initialize(*keypair->getPublicKey(), 1);
+    PrecomputeBufferContext::start();
+    PrecomputeBufferContext::stop();
 
     // this function runs off to look in the precomputed values buffer and if
     // it finds what it needs the the returned class will contain those values
@@ -159,7 +159,7 @@ TEST_CASE("elgamalEncrypt_with_precomputed simple encrypt 0 decrypts with secret
     // Assert
     auto decrypted = cipherText->decrypt(secret);
     CHECK((0UL == decrypted));
-    PrecomputeBufferContext::empty_queues();
+    PrecomputeBufferContext::clear();
 }
 
 TEST_CASE("elgamalEncrypt simple encrypt 1 decrypts with secret")
@@ -547,9 +547,9 @@ TEST_CASE("HashedElGamalCiphertext encrypt and decrypt string data with padding 
     // cause precomputed entries that will be used by the selection
     // encryptions, that should be more than enough and on teardown
     // the rest will be removed.
-    PrecomputeBufferContext::init(3);
-    PrecomputeBufferContext::populate(*keypair->getPublicKey());
-    PrecomputeBufferContext::stop_populate();
+    PrecomputeBufferContext::initialize(*keypair->getPublicKey(), 3);
+    PrecomputeBufferContext::start();
+    PrecomputeBufferContext::stop();
 
     auto HEGResult =
       hashedElgamalEncrypt(plaintext, *nonce, *publicKey, *cryptoExtendedBaseHash, BYTES_512, true);
@@ -568,7 +568,7 @@ TEST_CASE("HashedElGamalCiphertext encrypt and decrypt string data with padding 
     vector<uint8_t> new_plaintext = newHEG->decrypt(secret, *cryptoExtendedBaseHash, true);
 
     CHECK(plaintext == new_plaintext);
-    PrecomputeBufferContext::empty_queues();
+    PrecomputeBufferContext::clear();
 }
 
 TEST_CASE("elgamalEncrypt_with_precomputed encrypt 1, decrypts with secret")
@@ -581,9 +581,9 @@ TEST_CASE("elgamalEncrypt_with_precomputed encrypt 1, decrypts with secret")
     CHECK((*publicKey < P()));
 
     // cause a two triples and a quad to be populated
-    PrecomputeBufferContext::init(1);
-    PrecomputeBufferContext::populate(*keypair->getPublicKey());
-    PrecomputeBufferContext::stop_populate();
+    PrecomputeBufferContext::initialize(*keypair->getPublicKey(), 1);
+    PrecomputeBufferContext::start();
+    PrecomputeBufferContext::stop();
 
     // this function runs off to look in the precomputed values buffer and if
     // it finds what it needs the the returned class will contain those values
@@ -595,7 +595,7 @@ TEST_CASE("elgamalEncrypt_with_precomputed encrypt 1, decrypts with secret")
 
     auto decrypted = cipherText->decrypt(*secret);
     CHECK(1UL == decrypted);
-    PrecomputeBufferContext::empty_queues();
+    PrecomputeBufferContext::clear();
 }
 
 TEST_CASE("HashedElGamalCiphertext encrypt and decrypt with hard coded data for interop")

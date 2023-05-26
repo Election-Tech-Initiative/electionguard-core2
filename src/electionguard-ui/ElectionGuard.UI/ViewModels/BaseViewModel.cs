@@ -20,23 +20,33 @@ public partial class BaseViewModel : ObservableObject, IDisposable
     [ObservableProperty]
     private string _pageTitle = "";
 
-    protected IDispatcherTimer _timer;
+    protected IDispatcherTimer? _timer;
 
     private void InitTimer()
     {
-        _timer = Dispatcher.GetForCurrentThread()!.CreateTimer();
-        _timer.Interval = TimeSpan.FromSeconds(UISettings.LONG_POLLING_INTERVAL);
-        _timer.IsRepeating = true;
+        _timer = Dispatcher.GetForCurrentThread()?.CreateTimer();
+        if (_timer is not null)
+        {
+            _timer.Interval = TimeSpan.FromSeconds(UISettings.LONG_POLLING_INTERVAL);
+            _timer.IsRepeating = true;
+        }
     }
 
     public virtual async Task OnAppearing()
     {
-        _timer.Start();
+        UserName = AuthenticationService.UserName;
+        IsAdmin = AuthenticationService.IsAdmin;
+        SetPageTitle();
+
+        LocalizationService.OnLanguageChanged += OnLanguageChanged;
+
+        _timer?.Start();
         await Task.Yield();
     }
 
     public virtual async Task OnLeavingPage()
     {
+        LocalizationService.OnLanguageChanged -= OnLanguageChanged;
         await Task.Yield();
     }
 
@@ -45,6 +55,7 @@ public partial class BaseViewModel : ObservableObject, IDisposable
     {
         await OnLeavingPage();
         await NavigationService.GoToPage(typeof(LoginViewModel));
+        Dispose();
     }
 
     [RelayCommand]
@@ -78,18 +89,12 @@ public partial class BaseViewModel : ObservableObject, IDisposable
         AuthenticationService = serviceProvider.GetInstance<IAuthenticationService>();
 
         AppVersion = ConfigurationService.GetVersion();
-        UserName = AuthenticationService.UserName;
-        IsAdmin = AuthenticationService.IsAdmin;
-        SetPageTitle();
-
-        LocalizationService.OnLanguageChanged += OnLanguageChanged;
 
         InitTimer();
     }
 
     public virtual void Dispose()
     {
-        LocalizationService.OnLanguageChanged -= OnLanguageChanged;
         GC.SuppressFinalize(this);
     }
 

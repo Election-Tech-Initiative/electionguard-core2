@@ -112,7 +112,7 @@
 	  <NoStdLib></NoStdLib>
 	  <PlatformTarget></PlatformTarget>
 	  <WarningsNotAsErrors></WarningsNotAsErrors>
-	  <Nullable></Nullable>
+	  <Nullable>enable</Nullable>
 	</PropertyGroup>
 	<PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
 	  <IntermediateOutputPath></IntermediateOutputPath>
@@ -140,7 +140,7 @@
 	  <NoStdLib></NoStdLib>
 	  <PlatformTarget>anycpu</PlatformTarget>
 	  <WarningsNotAsErrors></WarningsNotAsErrors>
-	  <Nullable></Nullable>
+	  <Nullable>enable</Nullable>
 	</PropertyGroup>
 	<ItemGroup>
 		<!-- App Icon -->
@@ -169,6 +169,7 @@
 	</ItemGroup>
 
 	<ItemGroup>
+	  <ProjectReference Include="..\..\..\bindings\netstandard\ElectionGuard\ElectionGuard.Decryption\ElectionGuard.Decryption.csproj" />
 	  <ProjectReference Include="..\..\..\bindings\netstandard\ElectionGuard\ElectionGuard.ElectionSetup\ElectionGuard.ElectionSetup.csproj" />
 	  <ProjectReference Include="..\..\..\bindings\netstandard\ElectionGuard\ElectionGuard.Encryption\ElectionGuard.Encryption.csproj">
 	    <CopyLocalSatelliteAssemblies>True</CopyLocalSatelliteAssemblies>
@@ -228,4 +229,17 @@
 	    <Generator>MSBuild:Compile</Generator>
 	  </MauiXaml>
 	</ItemGroup>
+
+	<PropertyGroup Label="Library Paths">
+    <ElectionGuardLibs>..\..\..\build\libs</ElectionGuardLibs>
+  </PropertyGroup>
+  <ItemGroup Label="C++ Built Libraries">
+    <None Name="Windows (MSVC)" Visible="false" Include="$(ElectionGuardLibs)\Windows\x64\$(Configuration)\src\$(Configuration)\*.dll*" CopyToOutputDirectory="PreserveNewest" />
+    <None Name="Windows HACL (MSVC)" Visible="false" Include="$(ElectionGuardLibs)\Windows\x64\$(Configuration)\libs\hacl\$(Configuration)\*.dll*" CopyToOutputDirectory="PreserveNewest" />
+    <None Name="Windows Symbols (MSVC)" Visible="false" Include="$(ElectionGuardLibs)\Windows\x64\$(Configuration)\src\$(Configuration)\*.pdb*" CopyToOutputDirectory="PreserveNewest" />
+
+		<None Name="MacOS" Visible="false" Include="$(ElectionGuardLibs)\MacCatalyst\arm64\$(Configuration)\src\*.dylib" CopyToOutputDirectory="PreserveNewest" />
+    <None Name="MacOS HACL" Visible="false" Include="$(ElectionGuardLibs)\MacCatalyst\arm64\$(Configuration)\libs\hacl\*.dylib" CopyToOutputDirectory="PreserveNewest" />
+  </ItemGroup>
+
 </Project>

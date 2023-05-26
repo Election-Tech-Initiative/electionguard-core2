@@ -1,6 +1,4 @@
 ﻿using CommunityToolkit.Mvvm.Input;
-using ElectionGuard.UI.Lib.Services;
-using MongoDB.Driver.Core.Clusters;
 
 namespace ElectionGuard.UI.ViewModels;
 
@@ -115,6 +113,11 @@ public partial class CreateTallyViewModel : BaseViewModel
     private bool CanCreateTally()
     {
         return !string.IsNullOrWhiteSpace(TallyName);
+    }
+
+    public override async Task OnAppearing()
+    {
+        await base.OnAppearing();
     }
 
 }

@@ -16,14 +16,14 @@ set(SOURCES_std
 	${PROJECT_SOURCE_DIR}/src/msvc/Hacl_Streaming_Blake2.c
 	${PROJECT_SOURCE_DIR}/src/msvc/Hacl_Bignum.c
 	${PROJECT_SOURCE_DIR}/src/msvc/Hacl_Bignum256.c
-    ${PROJECT_SOURCE_DIR}/src/msvc/Hacl_Bignum256_32.c
+	${PROJECT_SOURCE_DIR}/src/msvc/Hacl_Bignum256_32.c
 	${PROJECT_SOURCE_DIR}/src/msvc/Hacl_Bignum32.c
-    ${PROJECT_SOURCE_DIR}/src/msvc/Hacl_Bignum4096.c
+	${PROJECT_SOURCE_DIR}/src/msvc/Hacl_Bignum4096.c
 	${PROJECT_SOURCE_DIR}/src/msvc/Hacl_GenericField64.c
 	${PROJECT_SOURCE_DIR}/src/msvc/Hacl_Bignum4096_32.c
-    ${PROJECT_SOURCE_DIR}/src/msvc/Hacl_Bignum64.c
+	${PROJECT_SOURCE_DIR}/src/msvc/Hacl_Bignum64.c
 	${PROJECT_SOURCE_DIR}/src/msvc/Hacl_GenericField32.c
-    ${PROJECT_SOURCE_DIR}/src/msvc/Hacl_GenericField64.c
+	${PROJECT_SOURCE_DIR}/src/msvc/Hacl_GenericField64.c
 	${PROJECT_SOURCE_DIR}/src/msvc/Hacl_Chacha20Poly1305_32.c
 	${PROJECT_SOURCE_DIR}/src/msvc/Hacl_Chacha20.c
 	${PROJECT_SOURCE_DIR}/src/msvc/Hacl_Streaming_Poly1305_32.c
@@ -32,11 +32,8 @@ set(SOURCES_std
 	${PROJECT_SOURCE_DIR}/src/msvc/Hacl_K256_ECDSA.c
 	${PROJECT_SOURCE_DIR}/src/msvc/Hacl_EC_K256.c
 	${PROJECT_SOURCE_DIR}/src/msvc/Hacl_FFDHE.c
-	${PROJECT_SOURCE_DIR}/src/msvc/Hacl_SHA3.c
-	${PROJECT_SOURCE_DIR}/src/msvc/Hacl_Streaming_SHA3.c
-	${PROJECT_SOURCE_DIR}/src/msvc/Hacl_Streaming_SHA1.c
+	${PROJECT_SOURCE_DIR}/src/msvc/Hacl_Hash_SHA3.c
 	${PROJECT_SOURCE_DIR}/src/msvc/Hacl_Hash_MD5.c
-	${PROJECT_SOURCE_DIR}/src/msvc/Hacl_Streaming_MD5.c
 	${PROJECT_SOURCE_DIR}/src/msvc/Hacl_HKDF.c
 	${PROJECT_SOURCE_DIR}/src/msvc/Hacl_RSAPSS.c
 	${PROJECT_SOURCE_DIR}/src/msvc/Hacl_HPKE_Curve51_CP32_SHA256.c
@@ -91,7 +88,6 @@ set(SOURCES_vec128
 	${PROJECT_SOURCE_DIR}/src/msvc/Hacl_HPKE_P256_CP128_SHA256.c
 )
 set(SOURCES_m32
-	
 )
 set(SOURCES_vale
 	${PROJECT_SOURCE_DIR}/src/msvc/Hacl_Curve25519_64.c
@@ -213,7 +209,6 @@ set(INCLUDES
 	${PROJECT_SOURCE_DIR}/include/msvc/Hacl_Streaming_SHA1.h
 	${PROJECT_SOURCE_DIR}/include/msvc/internal/Hacl_Hash_MD5.h
 	${PROJECT_SOURCE_DIR}/include/msvc/Hacl_Hash_MD5.h
-	${PROJECT_SOURCE_DIR}/include/msvc/Hacl_Streaming_MD5.h
 	${PROJECT_SOURCE_DIR}/include/msvc/Hacl_Hash_MD5.h
 	${PROJECT_SOURCE_DIR}/include/msvc/Hacl_HKDF.h
 	${PROJECT_SOURCE_DIR}/include/msvc/Hacl_HKDF_Blake2s_128.h
@@ -334,7 +329,6 @@ set(PUBLIC_INCLUDES
 	${PROJECT_SOURCE_DIR}/include/msvc/Hacl_Hash_SHA1.h
 	${PROJECT_SOURCE_DIR}/include/msvc/Hacl_Streaming_SHA1.h
 	${PROJECT_SOURCE_DIR}/include/msvc/Hacl_Hash_MD5.h
-	${PROJECT_SOURCE_DIR}/include/msvc/Hacl_Streaming_MD5.h
 	${PROJECT_SOURCE_DIR}/include/msvc/Hacl_Hash_MD5.h
 	${PROJECT_SOURCE_DIR}/include/msvc/Hacl_HKDF.h
 	${PROJECT_SOURCE_DIR}/include/msvc/Hacl_HKDF_Blake2s_128.h

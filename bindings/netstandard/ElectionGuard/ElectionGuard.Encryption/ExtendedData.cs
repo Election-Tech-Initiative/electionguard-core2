@@ -5,7 +5,6 @@ using System.Runtime.InteropServices;
 
 namespace ElectionGuard
 {
-    using NativeDisjunctiveChaumPedersenProof = NativeInterface.DisjunctiveChaumPedersenProof.DisjunctiveChaumPedersenProofHandle;
     // Declare native types for convenience
     using NativeExtendedData = NativeInterface.ExtendedData.ExtendedDataHandle;
 

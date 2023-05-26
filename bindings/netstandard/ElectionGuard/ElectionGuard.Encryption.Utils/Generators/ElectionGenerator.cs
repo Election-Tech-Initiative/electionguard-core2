@@ -1,4 +1,6 @@
 
+using System;
+
 namespace ElectionGuard.Encryption.Utils.Generators
 {
     public class TestElectionData : DisposableBase
@@ -72,16 +74,14 @@ namespace ElectionGuard.Encryption.Utils.Generators
             return new EncryptionDevice(12345UL, 23456UL, 34567UL, "Location");
         }
 
-        /// <summary>
-        /// Generates fake election data
-        /// </summary>
         public static TestElectionData GenerateFakeElectionData(
-            ulong numberOfGuardians = 1,
-            ulong quorum = 1,
+            ulong numberOfGuardians,
+            ulong quorum,
+            Manifest manifest,
             bool useRandom = false)
         {
+            Console.WriteLine($"Generating fake election data {numberOfGuardians} guardians, {quorum} quorum");
             var keyPair = GenerateFakeKeyPair(useRandom);
-            var manifest = ManifestGenerator.GetManifestFromFile();
             var internalManifest = new InternalManifest(manifest);
             var context = GetFakeContext(
                 numberOfGuardians, quorum,
@@ -96,6 +96,19 @@ namespace ElectionGuard.Encryption.Utils.Generators
                 KeyPair = keyPair,
                 Device = device
             };
+        }
+
+        /// <summary>
+        /// Generates fake election data
+        /// </summary>
+        public static TestElectionData GenerateFakeElectionData(
+            ulong numberOfGuardians = 1,
+            ulong quorum = 1,
+            bool useRandom = false)
+        {
+            return GenerateFakeElectionData(
+                numberOfGuardians, quorum,
+                ManifestGenerator.GetManifestFromFile(), useRandom);
         }
     }
 }

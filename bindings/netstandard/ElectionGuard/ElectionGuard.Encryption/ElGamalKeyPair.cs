@@ -1,4 +1,4 @@
-﻿
+
 namespace ElectionGuard
 {
     /// <summary>
@@ -16,11 +16,7 @@ namespace ElectionGuard
                 var status = NativeInterface.ElGamalKeyPair.GetPublicKey(
                     Handle, out var value);
                 status.ThrowIfError();
-                if (value.IsInvalid)
-                {
-                    return null;
-                }
-                return new ElementModP(value);
+                return value.IsInvalid ? null : new ElementModP(value);
             }
         }
 
@@ -34,11 +30,7 @@ namespace ElectionGuard
                 var status = NativeInterface.ElGamalKeyPair.GetSecretKey(
                     Handle, out var value);
                 status.ThrowIfError();
-                if (value.IsInvalid)
-                {
-                    return null;
-                }
-                return new ElementModQ(value);
+                return value.IsInvalid ? null : new ElementModQ(value);
             }
         }
 
@@ -54,6 +46,7 @@ namespace ElectionGuard
             var status = NativeInterface.ElGamalKeyPair.New(
                 secretKey.Handle, out Handle);
             status.ThrowIfError();
+            Handle.ThrowIfInvalid();
         }
 
         public ElGamalKeyPair(ElementModQ secretKey, ElementModP publicKey)
@@ -61,6 +54,11 @@ namespace ElectionGuard
             var status = NativeInterface.ElGamalKeyPair.New(
                 secretKey.Handle, publicKey.Handle, out Handle);
             status.ThrowIfError();
+            Handle.ThrowIfInvalid();
+        }
+
+        public ElGamalKeyPair(ElGamalKeyPair other) : this(other.SecretKey, other.PublicKey)
+        {
         }
 
         /// <Summary>

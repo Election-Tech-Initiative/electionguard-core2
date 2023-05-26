@@ -5,8 +5,13 @@
 /// </summary>
 public enum TallyState
 {
-    DoesNotExist = 0,
-    PendingGuardiansJoin = 1,
-    PendingAdminToTallyVerify = 2,
-    Complete = 3
+    DoesNotExist,
+    PendingGuardiansJoin,
+    AdminStartsTally,
+    AdminAccumulateTally,
+    PendingGuardianDecryptShares,
+    AdminGenerateChallenge,
+    PendingGuardianRespondChallenge,
+    AdminVerifyChallenge,
+    Complete,
 }

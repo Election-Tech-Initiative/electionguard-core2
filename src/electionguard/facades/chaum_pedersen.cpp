@@ -8,12 +8,16 @@ extern "C" {
 #include "electionguard/chaum_pedersen.h"
 }
 
+using electionguard::ChaumPedersenProof;
 using electionguard::ConstantChaumPedersenProof;
 using electionguard::DisjunctiveChaumPedersenProof;
 using electionguard::ElementModP;
 using electionguard::ElementModQ;
 using electionguard::ElGamalCiphertext;
 using electionguard::Log;
+
+using std::make_unique;
+using std::move;
 
 #pragma region DisjunctiveChaumPedersenProof
 
@@ -223,11 +227,10 @@ EG_API eg_electionguard_status_t eg_constant_chaum_pedersen_proof_get_response(
     return ELECTIONGUARD_STATUS_SUCCESS;
 }
 
-eg_electionguard_status_t
-eg_constant_chaum_pedersen_proof_make(eg_elgamal_ciphertext_t *in_message, eg_element_mod_q_t *in_r,
-                                      eg_element_mod_p_t *in_k, eg_element_mod_q_t *in_seed,
-                                      eg_element_mod_q_t *in_hash_header, uint64_t in_constant,
-                                      eg_constant_chaum_pedersen_proof_t **out_handle)
+eg_electionguard_status_t eg_constant_chaum_pedersen_proof_make(
+  eg_elgamal_ciphertext_t *in_message, eg_element_mod_q_t *in_r, eg_element_mod_p_t *in_k,
+  eg_element_mod_q_t *in_seed, eg_element_mod_q_t *in_hash_header, uint64_t in_constant,
+  bool in_should_use_precomputed_values, eg_constant_chaum_pedersen_proof_t **out_handle)
 {
     if (in_message == nullptr || in_r == nullptr || in_k == nullptr || in_seed == nullptr ||
         in_hash_header == nullptr) {
@@ -241,8 +244,8 @@ eg_constant_chaum_pedersen_proof_make(eg_elgamal_ciphertext_t *in_message, eg_el
     auto *hashHeader = AS_TYPE(ElementModQ, in_hash_header);
 
     try {
-        auto proof =
-          ConstantChaumPedersenProof::make(*ciphertext, *r, *k, *seed, *hashHeader, in_constant);
+        auto proof = ConstantChaumPedersenProof::make(
+          *ciphertext, *r, *k, *seed, *hashHeader, in_constant, in_should_use_precomputed_values);
         *out_handle = AS_TYPE(eg_constant_chaum_pedersen_proof_t, proof.release());
         return ELECTIONGUARD_STATUS_SUCCESS;
     } catch (const exception &e) {
@@ -262,6 +265,93 @@ bool eg_constant_chaum_pedersen_proof_is_valid(eg_constant_chaum_pedersen_proof_
     auto *k = AS_TYPE(ElementModP, in_k);
     auto *q = AS_TYPE(ElementModQ, in_q);
     return AS_TYPE(ConstantChaumPedersenProof, handle)->isValid(*ciphertext, *k, *q);
+}
+
+#pragma endregion
+
+#pragma region ChaumPedersenProof
+
+eg_electionguard_status_t eg_chaum_pedersen_proof_free(eg_chaum_pedersen_proof_t *handle)
+{
+    if (handle == nullptr) {
+        return ELECTIONGUARD_STATUS_ERROR_INVALID_ARGUMENT;
+    }
+
+    delete AS_TYPE(ChaumPedersenProof, handle); // NOLINT(cppcoreguidelines-owning-memory)
+    handle = nullptr;
+    return ELECTIONGUARD_STATUS_SUCCESS;
+}
+
+EG_API eg_electionguard_status_t eg_chaum_pedersen_proof_get_pad(
+  eg_chaum_pedersen_proof_t *handle, eg_element_mod_p_t **out_element_ref)
+{
+    auto *element = AS_TYPE(ChaumPedersenProof, handle)->getPad();
+    *out_element_ref = AS_TYPE(eg_element_mod_p_t, element);
+    return ELECTIONGUARD_STATUS_SUCCESS;
+}
+
+EG_API eg_electionguard_status_t eg_chaum_pedersen_proof_get_data(
+  eg_chaum_pedersen_proof_t *handle, eg_element_mod_p_t **out_element_ref)
+{
+    auto *element = AS_TYPE(ChaumPedersenProof, handle)->getData();
+    *out_element_ref = AS_TYPE(eg_element_mod_p_t, element);
+    return ELECTIONGUARD_STATUS_SUCCESS;
+}
+
+EG_API eg_electionguard_status_t eg_chaum_pedersen_proof_get_challenge(
+  eg_chaum_pedersen_proof_t *handle, eg_element_mod_q_t **out_element_ref)
+{
+    auto *element = AS_TYPE(ChaumPedersenProof, handle)->getChallenge();
+    *out_element_ref = AS_TYPE(eg_element_mod_q_t, element);
+    return ELECTIONGUARD_STATUS_SUCCESS;
+}
+
+EG_API eg_electionguard_status_t eg_chaum_pedersen_proof_get_response(
+  eg_chaum_pedersen_proof_t *handle, eg_element_mod_q_t **out_element_ref)
+{
+    auto *element = AS_TYPE(ChaumPedersenProof, handle)->getResponse();
+    *out_element_ref = AS_TYPE(eg_element_mod_q_t, element);
+    return ELECTIONGUARD_STATUS_SUCCESS;
+}
+
+eg_electionguard_status_t eg_chaum_pedersen_proof_make(eg_elgamal_ciphertext_t *in_commitment,
+                                                       eg_element_mod_q_t *in_challenge,
+                                                       eg_element_mod_q_t *in_response,
+                                                       eg_chaum_pedersen_proof_t **out_handle)
+{
+    if (in_commitment == nullptr || in_challenge == nullptr || in_response == nullptr) {
+        return ELECTIONGUARD_STATUS_ERROR_INVALID_ARGUMENT;
+    }
+
+    auto commitment = AS_TYPE(ElGamalCiphertext, in_commitment)->clone();
+    auto challenge = AS_TYPE(ElementModQ, in_challenge)->clone();
+    auto response = AS_TYPE(ElementModQ, in_response)->clone();
+
+    try {
+        auto proof =
+          make_unique<ChaumPedersenProof>(move(commitment), move(challenge), move(response));
+        *out_handle = AS_TYPE(eg_chaum_pedersen_proof_t, proof.release());
+        return ELECTIONGUARD_STATUS_SUCCESS;
+    } catch (const exception &e) {
+        Log::error(":eg_constant_chaum_pedersen_proof_make", e);
+        return ELECTIONGUARD_STATUS_ERROR_BAD_ALLOC;
+    }
+}
+
+bool eg_chaum_pedersen_proof_is_valid(eg_chaum_pedersen_proof_t *handle,
+                                      eg_elgamal_ciphertext_t *in_ciphertext,
+                                      eg_element_mod_p_t *in_k, eg_element_mod_p_t *in_m,
+                                      eg_element_mod_q_t *in_q)
+{
+    if (handle == nullptr || in_ciphertext == nullptr || in_k == nullptr || in_m == nullptr ||
+        in_q == nullptr) {
+        return false;
+    }
+    auto *ciphertext = AS_TYPE(ElGamalCiphertext, in_ciphertext);
+    auto *k = AS_TYPE(ElementModP, in_k);
+    auto *m = AS_TYPE(ElementModP, in_m);
+    auto *q = AS_TYPE(ElementModQ, in_q);
+    return AS_TYPE(ChaumPedersenProof, handle)->isValid(*ciphertext, *k, *m, *q);
 }
 
 #pragma endregion

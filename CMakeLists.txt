@@ -60,6 +60,7 @@ set(IDE_FOLDER "")
 # ---- Sources ----
 add_subdirectory(libs/hacl)
 add_subdirectory(src)
+add_subdirectory(src/electionguard/wasm)
 
 if(OPTION_ENABLE_TESTS)
     # TODO: move mocks to their own folder

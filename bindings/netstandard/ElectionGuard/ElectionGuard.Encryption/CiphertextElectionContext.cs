@@ -1,6 +1,5 @@
 ﻿using System;
-using System.Diagnostics.CodeAnalysis;
-using System.Runtime.InteropServices;
+using System.Text;
 // ReSharper disable UnusedMember.Global
 
 namespace ElectionGuard
@@ -13,8 +12,52 @@ namespace ElectionGuard
     /// are populated with election-specific information necessary for encrypting the election.
     /// Refer to the [ElectionGuard Specification](https://github.com/microsoft/electionguard) for more information.
     /// </summary>
-    public class CiphertextElectionContext : DisposableBase
+    public class CiphertextElectionContext : DisposableBase, IEquatable<CiphertextElectionContext>
     {
+        /// <summary>
+        /// Get a linked list containing the extended data of the election.
+        /// </summary>
+        public ContextConfiguration Configuration
+        {
+            get
+            {
+                var status = NativeInterface.CiphertextElectionContext.GetConfiguration(
+                    Handle, out var value);
+                status.ThrowIfError();
+                return value.IsInvalid ? null : new ContextConfiguration(value);
+            }
+        }
+
+        /// <summary>
+        /// The number of guardians necessary to generate the public key
+        /// </summary>
+        public ulong NumberOfGuardians
+        {
+            get
+            {
+                ulong value = 0;
+                var status = NativeInterface.CiphertextElectionContext.GetNumberOfGuardians(
+                    Handle, ref value);
+                status.ThrowIfError();
+                return value;
+            }
+        }
+
+        /// <summary>
+        /// The quorum of guardians necessary to decrypt an election.  Must be less than `number_of_guardians`
+        /// </summary>
+        public ulong Quorum
+        {
+            get
+            {
+                ulong value = 0;
+                var status = NativeInterface.CiphertextElectionContext.GetQuorum(
+                    Handle, ref value);
+                status.ThrowIfError();
+                return value;
+            }
+        }
+
         /// <summary>
         /// the `joint public key (K)` in the [ElectionGuard Spec](https://github.com/microsoft/electionguard/wiki)
         /// </summary>
@@ -23,9 +66,9 @@ namespace ElectionGuard
             get
             {
                 var status = NativeInterface.CiphertextElectionContext.GetElGamalPublicKey(
-                    Handle, out NativeInterface.ElementModP.ElementModPHandle value);
+                    Handle, out var value);
                 status.ThrowIfError();
-                return new ElementModP(value);
+                return value.IsInvalid ? null : new ElementModP(value);
             }
         }
 
@@ -38,9 +81,9 @@ namespace ElectionGuard
             get
             {
                 var status = NativeInterface.CiphertextElectionContext.GetCommitmentHash(
-                    Handle, out NativeInterface.ElementModQ.ElementModQHandle value);
+                    Handle, out var value);
                 status.ThrowIfError();
-                return new ElementModQ(value);
+                return value.IsInvalid ? null : new ElementModQ(value);
             }
         }
 
@@ -52,9 +95,9 @@ namespace ElectionGuard
             get
             {
                 var status = NativeInterface.CiphertextElectionContext.GetManifestHash(
-                    Handle, out NativeInterface.ElementModQ.ElementModQHandle value);
+                    Handle, out var value);
                 status.ThrowIfError();
-                return new ElementModQ(value);
+                return value.IsInvalid ? null : new ElementModQ(value);
             }
         }
 
@@ -66,9 +109,9 @@ namespace ElectionGuard
             get
             {
                 var status = NativeInterface.CiphertextElectionContext.GetCryptoBaseHash(
-                    Handle, out NativeInterface.ElementModQ.ElementModQHandle value);
+                    Handle, out var value);
                 status.ThrowIfError();
-                return new ElementModQ(value);
+                return value.IsInvalid ? null : new ElementModQ(value);
             }
         }
 
@@ -80,9 +123,9 @@ namespace ElectionGuard
             get
             {
                 var status = NativeInterface.CiphertextElectionContext.GetCryptoExtendedBaseHash(
-                    Handle, out NativeInterface.ElementModQ.ElementModQHandle value);
+                    Handle, out var value);
                 status.ThrowIfError();
-                return new ElementModQ(value);
+                return value.IsInvalid ? null : new ElementModQ(value);
             }
         }
 
@@ -94,23 +137,9 @@ namespace ElectionGuard
             get
             {
                 var status = NativeInterface.CiphertextElectionContext.GetExtendedData(
-                    Handle, out NativeInterface.LinkedList.LinkedListHandle value);
+                    Handle, out var value);
                 status.ThrowIfError();
-                return new LinkedList(value);
-            }
-        }
-
-        /// <summary>
-        /// Get a linked list containing the extended data of the election.
-        /// </summary>
-        public ContextConfiguration Configuration
-        {
-            get
-            {
-                var status = NativeInterface.CiphertextElectionContext.GetConfiguration(
-                    Handle, out NativeInterface.ContextConfiguration.ContextConfigurationHandle value);
-                status.ThrowIfError();
-                return new ContextConfiguration(value);
+                return value.IsInvalid ? null : new LinkedList(value);
             }
         }
 
@@ -136,7 +165,8 @@ namespace ElectionGuard
         /// <param name="commitmentHash"> the hash of the commitments the guardians make to each other </param>
         /// <param name="manifestHash"> the hash of the election metadata </param>
         /// </summary>
-        public CiphertextElectionContext(ulong numberOfGuardians,
+        public CiphertextElectionContext(
+            ulong numberOfGuardians,
             ulong quorum,
             ElementModP publicKey,
             ElementModQ commitmentHash,
@@ -156,9 +186,31 @@ namespace ElectionGuard
         /// <param name="publicKey"> the public key of the election </param>
         /// <param name="commitmentHash"> the hash of the commitments the guardians make to each other </param>
         /// <param name="manifestHash"> the hash of the election metadata </param>
+        /// </summary>
+        public CiphertextElectionContext(
+            ulong numberOfGuardians,
+            ulong quorum,
+            ElectionJointKey jointKey,
+            ElementModQ manifestHash)
+        {
+            var status = NativeInterface.CiphertextElectionContext.Make(
+                numberOfGuardians, quorum, jointKey.JointPublicKey.Handle,
+                jointKey.CommitmentHash.Handle, manifestHash.Handle, out Handle);
+            status.ThrowIfError();
+        }
+
+        /// <summary>
+        ///  Makes a CiphertextElectionContext object.
+        ///
+        /// <param name="numberOfGuardians"> The number of guardians necessary to generate the public key </param>
+        /// <param name="quorum"> The quorum of guardians necessary to decrypt an election.  Must be less than `number_of_guardians` </param>
+        /// <param name="publicKey"> the public key of the election </param>
+        /// <param name="commitmentHash"> the hash of the commitments the guardians make to each other </param>
+        /// <param name="manifestHash"> the hash of the election metadata </param>
         /// <param name="config"> the context configuration</param>
         /// </summary>
-        public CiphertextElectionContext(ulong numberOfGuardians,
+        public CiphertextElectionContext(
+            ulong numberOfGuardians,
             ulong quorum,
             ElementModP publicKey,
             ElementModQ commitmentHash,
@@ -221,7 +273,9 @@ namespace ElectionGuard
             status.ThrowIfError();
         }
 
-
+        public CiphertextElectionContext(CiphertextElectionContext other) : this(other.ToJson())
+        {
+        }
 
 #pragma warning disable CS1591 // Missing XML comment for publicly visible type or member
         protected override void DisposeUnmanaged()
@@ -234,18 +288,67 @@ namespace ElectionGuard
             Handle = null;
         }
 
-
         /// <Summary>
         /// Export the representation as JSON
         /// </Summary>
         public string ToJson()
         {
             var status = NativeInterface.CiphertextElectionContext.ToJson(
-                Handle, out IntPtr pointer, out _);
+                Handle, out var pointer, out _);
             status.ThrowIfError();
             var json = pointer.PtrToStringUTF8();
-            NativeInterface.Memory.FreeIntPtr(pointer);
+            _ = NativeInterface.Memory.FreeIntPtr(pointer);
             return json;
         }
+
+        public override string ToString()
+        {
+            var sb = new StringBuilder();
+            _ = sb.AppendLine($"Guardians              : {NumberOfGuardians} ({Quorum})");
+            _ = sb.AppendLine($"CommitmentHash         : {CommitmentHash}");
+            _ = sb.AppendLine($"ManifestHash           : {ManifestHash}");
+            _ = sb.AppendLine($"CryptoExtendedBaseHash : {CryptoExtendedBaseHash}");
+            _ = sb.AppendLine($"ElGamalPublicKey       : {ElGamalPublicKey}");
+
+            return sb.ToString();
+        }
+
+        #region IEquatable
+
+        public bool Equals(CiphertextElectionContext other)
+        {
+            if (other is null)
+            {
+                return false;
+            }
+
+            if (ReferenceEquals(this, other))
+            {
+                return true;
+            }
+
+            return NumberOfGuardians == other.NumberOfGuardians &&
+                   Quorum == other.Quorum &&
+                   ElGamalPublicKey.Equals(other.ElGamalPublicKey) &&
+                   CommitmentHash.Equals(other.CommitmentHash) &&
+                   ManifestHash.Equals(other.ManifestHash) &&
+                   CryptoBaseHash.Equals(other.CryptoBaseHash) &&
+                   CryptoExtendedBaseHash.Equals(other.CryptoExtendedBaseHash);
+        }
+
+        public override bool Equals(object obj)
+        {
+            return ReferenceEquals(this, obj) || (obj is CiphertextElectionContext other && Equals(other));
+        }
+
+        public override int GetHashCode()
+        {
+            return HashCode.Combine(
+                NumberOfGuardians, Quorum, ElGamalPublicKey,
+                CommitmentHash, ManifestHash, CryptoBaseHash,
+                CryptoExtendedBaseHash);
+        }
+
+        #endregion
     }
 }

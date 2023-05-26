@@ -213,6 +213,20 @@ EG_API eg_electionguard_status_t eg_hashed_elgamal_ciphertext_decrypt_with_secre
   eg_element_mod_q_t *in_description_hash, bool in_look_for_padding, uint8_t **out_data,
   uint64_t *out_size);
 
+/**
+ * @brief Partially Decrypts an ElGamal ciphertext with a known ElGamal secret key.
+ *
+ *       𝑀_i = C0^𝑠𝑖 mod 𝑝 in the spec
+ * 
+ * @param[in] handle The handle to the ElGamal ciphertext.
+ * @param[in] in_secret_key The corresponding ElGamal secret key.
+ * @param[out] out_partial_decryption A partial decryption of the encrypted value.
+ * @return EG_API 
+ */
+EG_API eg_electionguard_status_t eg_hashed_elgamal_ciphertext_partial_decrypt(
+  eg_hashed_elgamal_ciphertext_t *handle, eg_element_mod_q_t *in_secret_key,
+  eg_element_mod_p_t **out_partial_decryption);
+
 #endif
 
 #ifndef HashedElgamalEncrypt

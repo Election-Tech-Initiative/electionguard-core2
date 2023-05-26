@@ -1,4 +1,5 @@
 ﻿using CommunityToolkit.Maui;
+using ElectionGuard.Decryption;
 using ElectionGuard.UI.Services;
 using Microsoft.Extensions.Logging;
 
@@ -62,6 +63,8 @@ public static class MauiProgram
         builder.Services.AddSingleton<ILocalizationService, LocalizationService>();
         // NavigationService has to be singleton because it stores the current page and vm
         builder.Services.AddSingleton<INavigationService, NavigationService>();
+        builder.Services.AddTransient<IStorageService, DriveService>();
+        builder.Services.AddTransient<ZipStorageService>();
 
         // setup database services
         builder.Services.AddTransient<KeyCeremonyService>();
@@ -71,11 +74,20 @@ public static class MauiProgram
         builder.Services.AddTransient<UserService>();
         builder.Services.AddTransient<ElectionService>();
         builder.Services.AddTransient<TallyService>();
+        builder.Services.AddTransient<TallyJoinedService>();
         builder.Services.AddTransient<ManifestService>();
         builder.Services.AddTransient<ContextService>();
         builder.Services.AddTransient<ConstantsService>();
         builder.Services.AddTransient<BallotUploadService>();
         builder.Services.AddTransient<BallotService>();
+        builder.Services.AddTransient<CiphertextTallyService>();
+        builder.Services.AddTransient<TallyMediator>();
+        builder.Services.AddTransient<DecryptionShareService>();
+        builder.Services.AddTransient<ChallengeService>();
+        builder.Services.AddTransient<ChallengeResponseService>();
+        builder.Services.AddTransient<PlaintextTallyService>();
+        builder.Services.AddTransient<TallyManager>();
+        builder.Services.AddTransient<ITallyStateMachine, TallyStateMachine>();
 
         // setup view models
         builder.Services.AddTransient<LoginViewModel>();

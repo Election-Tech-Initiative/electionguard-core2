@@ -1,0 +1,55 @@
+﻿using ElectionGuard.UI.Lib.Models;
+using MongoDB.Driver;
+
+namespace ElectionGuard.UI.Lib.Services;
+
+/// <summary>
+/// Data Service for Elections
+/// </summary>
+public class ElectionService : BaseDatabaseService<Election>
+{
+    /// <summary>
+    /// The collection name to use to get/save data into
+    /// </summary>
+    private readonly static string _collection = Constants.TableElections;
+
+    /// <summary>
+    /// Default constructor that sets the collection name
+    /// </summary>
+    public ElectionService() : base(_collection, nameof(Election)) { }
+
+    /// <summary>
+    /// Gets an election
+    /// </summary>
+    /// <param name="electionId">election id to search for</param>
+    public async Task<Election?> GetByElectionIdAsync(string electionId)
+    {
+        return await GetByFieldAsync(Constants.ElectionId, electionId);
+    }
+
+    /// <summary>
+    /// Check if an election exists
+    /// </summary>
+    /// <param name="electionName">name of the election to search for</param>
+    public async Task<bool> ElectionNameExists(string electionName)
+    {
+        var election = await GetByNameAsync(electionName);
+        return election != null;
+    }
+
+    /// <summary>
+    /// Updated the current date of the latest export
+    /// </summary>
+    /// <param name="electionId">election id to use</param>
+    /// <param name="date">date to save</param>
+    virtual public async Task UpdateEncryptionExportDateAsync(string electionId, DateTime date)
+    {
+        var filterBuilder = Builders<Election>.Filter;
+        var filter = filterBuilder.And(filterBuilder.Eq(Constants.ElectionId, electionId));
+
+        var updateBuilder = Builders<Election>.Update;
+        var update = updateBuilder.Set(Constants.ExportEncryptionDateTime, date);
+
+        await UpdateAsync(filter, update);
+    }
+}

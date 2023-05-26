@@ -482,6 +482,31 @@ namespace electionguard
         return plaintext;
     }
 
+    /// <Summary>
+    /// Partially Decrypts an ElGamal ciphertext with a known ElGamal secret key.
+    /// 𝑀_i = C0^P𝑖 mod 𝑝 in the spec
+    ///
+    /// <param name="secretKey">The corresponding ElGamal secret key.</param>
+    /// <returns>A partial decryption of the plaintext value</returns
+    /// </Summary>
+    unique_ptr<ElementModP> HashedElGamalCiphertext::partialDecrypt(const ElementModQ &secretKey)
+    {
+        return pow_mod_p(*pimpl->pad, secretKey);
+    }
+
+    /// <Summary>
+    /// Partially Decrypts an ElGamal ciphertext with a known ElGamal secret key.
+    /// 𝑀_i = C0^P𝑖 mod 𝑝 in the spec
+    ///
+    /// <param name="secretKey">The corresponding ElGamal secret key.</param>
+    /// <returns>A partial decryption of the plaintext value</returns
+    /// </Summary>
+    unique_ptr<ElementModP>
+    HashedElGamalCiphertext::partialDecrypt(const ElementModQ &secretKey) const
+    {
+        return pow_mod_p(*pimpl->pad, secretKey);
+    }
+
     unique_ptr<HashedElGamalCiphertext> HashedElGamalCiphertext::clone() const
     {
         return make_unique<HashedElGamalCiphertext>(pimpl->pad->clone(), pimpl->data, pimpl->mac);
@@ -492,7 +517,8 @@ namespace electionguard
     unique_ptr<HashedElGamalCiphertext>
     hashedElgamalEncrypt(std::vector<uint8_t> message, const ElementModQ &nonce,
                          const ElementModP &publicKey, const ElementModQ &encryption_seed,
-                         padded_data_size_t max_len, bool allow_truncation)
+                         padded_data_size_t max_len, bool allow_truncation,
+                         bool shouldUsePrecomputedValues /* = false */)
     {
         vector<uint8_t> ciphertext;
         vector<uint8_t> plaintext_on_boundary;
@@ -552,14 +578,19 @@ namespace electionguard
 
         unique_ptr<ElementModP> g_to_r = nullptr;
         unique_ptr<ElementModP> publicKey_to_r = nullptr;
-        // check if the are precompute values rather than doing the exponentiations here
-        unique_ptr<Triple> triple = PrecomputeBufferContext::getTriple();
-        if (triple != nullptr) {
-            g_to_r = triple->get_g_to_exp();
-            publicKey_to_r = triple->get_pubkey_to_exp();
-        } else {
-            g_to_r = g_pow_p(nonce);
 
+        if (shouldUsePrecomputedValues) {
+            // check if the are precompute values rather than doing the exponentiations here
+            auto triple = PrecomputeBufferContext::popTriple();
+            if (triple != nullptr && triple.has_value()) {
+                g_to_r = triple.value()->get_g_to_exp();
+                publicKey_to_r = triple.value()->get_pubkey_to_exp();
+            }
+        }
+
+        // fallback to doing the exponentiations here
+        if (g_to_r == nullptr || publicKey_to_r == nullptr) {
+            g_to_r = g_pow_p(nonce);
             publicKey_to_r = pow_mod_p(publicKey, nonce);
         }
 

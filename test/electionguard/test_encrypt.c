@@ -74,7 +74,7 @@ bool test_encrypt_selection(void)
 
     // Act
     eg_ciphertext_ballot_selection_t *result = NULL;
-    if (eg_encrypt_selection(plaintext, metadata, public_key, one_mod_q, nonce, false, true,
+    if (eg_encrypt_selection(plaintext, metadata, public_key, one_mod_q, nonce, false, true, false,
                              &result)) {
         assert(false);
     }
@@ -188,7 +188,7 @@ bool test_encrypt_ballot_simple_succeeds(void)
     // Act
 
     eg_ciphertext_ballot_t *ciphertext = NULL;
-    if (eg_encrypt_ballot(ballot, metadata, context, device_hash, true, &ciphertext)) {
+    if (eg_encrypt_ballot(ballot, metadata, context, device_hash, true, false, &ciphertext)) {
         assert(false);
     }
 
@@ -272,7 +272,7 @@ bool test_encrypt_ballot_simple_cast_removes_nonces(void)
     // Act
 
     eg_ciphertext_ballot_t *ciphertext = NULL;
-    if (eg_encrypt_ballot(ballot, metadata, context, device_hash, true, &ciphertext)) {
+    if (eg_encrypt_ballot(ballot, metadata, context, device_hash, true, false, &ciphertext)) {
         assert(false);
     }
 

@@ -500,5 +500,16 @@
   </data>
   <data name="VotesText" xml:space="preserve">
     <value>Votes</value>
+  <data name="ExportDriveWarning" xml:space="preserve">
+    <value>Please ensure the EGDrive removable storage is connected to the device. Please note, this will replace any encryption package currently on all EGDrive devices</value>
+  </data>
+  <data name="ExportDriveWarningTitle" xml:space="preserve">
+    <value>Export Encryption Package</value>
+  </data>
+  <data name="ProcessTallyJoinNo" xml:space="preserve">
+    <value>No, Do not Join Tally</value>
+  </data>
+  <data name="ProcessTallyJoinYes" xml:space="preserve">
+    <value>Yes, Join Tally</value>
   </data>
 </root>

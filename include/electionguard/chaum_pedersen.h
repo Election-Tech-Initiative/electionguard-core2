@@ -237,7 +237,7 @@ EG_API eg_electionguard_status_t eg_constant_chaum_pedersen_proof_get_response(
 EG_API eg_electionguard_status_t eg_constant_chaum_pedersen_proof_make(
   eg_elgamal_ciphertext_t *in_message, eg_element_mod_q_t *in_r, eg_element_mod_p_t *in_k,
   eg_element_mod_q_t *in_seed, eg_element_mod_q_t *in_hash_header, uint64_t in_constant,
-  eg_constant_chaum_pedersen_proof_t **out_handle);
+  bool in_should_use_precomputed_values, eg_constant_chaum_pedersen_proof_t **out_handle);
 
 /**
  * Validates a "constant" Chaum-Pedersen (selection-limit) proof.
@@ -250,6 +250,86 @@ EG_API bool eg_constant_chaum_pedersen_proof_is_valid(eg_constant_chaum_pedersen
                                                       eg_elgamal_ciphertext_t *in_message,
                                                       eg_element_mod_p_t *in_k,
                                                       eg_element_mod_q_t *in_q);
+
+#endif
+
+#ifndef ChaumPedersenProof
+
+struct eg_chaum_pedersen_proof_s;
+
+/**
+* The Generic Chaum PedersenProof is a Non-Interactive Zero-Knowledge Proof
+* that represents the proof of knowing a secret value.
+*
+* The proof is used during decryption to prove that the guardains have shared knowledge
+* of the election secret key. Note the secret key is not computed directly
+* but instead each guardian computes a share of the secret key and consequently
+* also computes a sahre of the proof.
+*
+* Produces a proof that a given value corresponds to a specific encryption.
+* computes: 𝑀 =𝐴^𝑠𝑖 mod 𝑝 and 𝐾𝑖 = 𝑔^𝑠𝑖 mod 𝑝
+*
+* This object should not be made directly.  Use ChaumPedersenProof::make
+*
+* see: TODO: include spec link
+*/
+typedef struct eg_chaum_pedersen_proof_s eg_chaum_pedersen_proof_t;
+
+// No constructor provided.  Use `eg_constant_chaum_pedersen_make`
+
+EG_API eg_electionguard_status_t eg_chaum_pedersen_proof_free(eg_chaum_pedersen_proof_t *handle);
+
+/**
+ * a in the spec
+ * 
+ * @param[out] out_element_ref An opaque pointer to the ElementModP pad.  
+ *                           The value is a reference and is not owned by the caller
+ */
+EG_API eg_electionguard_status_t eg_chaum_pedersen_proof_get_pad(
+  eg_chaum_pedersen_proof_t *handle, eg_element_mod_p_t **out_element_ref);
+
+/**
+ * b in the spec
+ * 
+ * @param[out] out_element_ref An opaque pointer to the ElementModP data.  
+ *                           The value is a reference and is not owned by the caller
+ */
+EG_API eg_electionguard_status_t eg_chaum_pedersen_proof_get_data(
+  eg_chaum_pedersen_proof_t *handle, eg_element_mod_p_t **out_element_ref);
+
+/**
+ * c in the spec
+ * 
+ * @param[out] out_element_ref An opaque pointer to the ElementModQ challenge.  
+ *                           The value is a reference and is not owned by the caller
+ */
+EG_API eg_electionguard_status_t eg_chaum_pedersen_proof_get_challenge(
+  eg_chaum_pedersen_proof_t *handle, eg_element_mod_q_t **out_element_ref);
+
+/**
+ * v in the spec
+ * 
+ * @param[out] out_element_ref An opaque pointer to the ElementModQ response.  
+ *                           The value is a reference and is not owned by the caller
+ */
+EG_API eg_electionguard_status_t eg_chaum_pedersen_proof_get_response(
+  eg_chaum_pedersen_proof_t *handle, eg_element_mod_q_t **out_element_ref);
+
+EG_API eg_electionguard_status_t eg_chaum_pedersen_proof_make(
+  eg_elgamal_ciphertext_t *in_commitment, eg_element_mod_q_t *in_challenge,
+  eg_element_mod_q_t *in_response, eg_chaum_pedersen_proof_t **out_handle);
+
+/**
+ * Validates a "constant" Chaum-Pedersen (selection-limit) proof.
+ *
+ * @param[in] in_message The ciphertext message
+ * @param[in] in_k The public key of the election
+ * @param[in] in_q The extended base hash of the election
+ */
+EG_API bool eg_chaum_pedersen_proof_is_valid(eg_chaum_pedersen_proof_t *handle,
+                                             eg_elgamal_ciphertext_t *in_message,
+                                             eg_element_mod_p_t *in_k, eg_element_mod_p_t *in_m,
+                                             eg_element_mod_q_t *in_q);
 
 #endif
 

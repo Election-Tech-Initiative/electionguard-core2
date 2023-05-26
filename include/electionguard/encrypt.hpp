@@ -7,6 +7,7 @@
 #include "export.h"
 #include "group.hpp"
 #include "manifest.hpp"
+#include "nonces.hpp"
 
 #include <memory>
 
@@ -101,9 +102,23 @@ namespace electionguard
 
         /// <summary>
         /// Encrypt the specified ballot using the cached election context.
+        ///
+        /// This method accepts a ballot representation that only includes `True` selections.
+        /// It will fill missing selections for a contest with `False` values, and generate `placeholder`
+        /// selections to represent the number of seats available for a given contest.  By adding `placeholder`
+        /// votes
+        ///
+        /// This method also allows for ballots to exclude passing contests for which the voter made no selections.
+        /// It will fill missing contests with `False` selections and generate `placeholder` selections that are marked `True`.
+        ///
+        /// This function can also take advantage of PrecomputeBuffers to speed up the encryption process.
+        /// when using precomputed values, the application looks in the `PrecomputeBufferContext` for values
+        /// and uses them for the encryptions. You must preload the `PrecomputeBufferContext` prior to calling this function
+        /// with `shouldUsePrecomputedValues` set to `true`, otherwise the function will fall back to realtime generation.
         /// </summary>
         std::unique_ptr<CiphertextBallot> encrypt(const PlaintextBallot &ballot,
-                                                  bool shouldVerifyProofs = true) const;
+                                                  bool shouldVerifyProofs = true,
+                                                  bool usePrecomputedValues = false) const;
 
         /// <summary>
         /// Encrypt the specified ballot into its compact form using the cached election context.
@@ -135,22 +150,8 @@ namespace electionguard
     encryptSelection(const PlaintextBallotSelection &selection,
                      const SelectionDescription &description, const ElementModP &elgamalPublicKey,
                      const ElementModQ &cryptoExtendedBaseHash, const ElementModQ &nonceSeed,
-                     bool isPlaceholder = false, bool shouldVerifyProofs = true);
-
-    /// <summary>
-    /// Gets overvote and write in information from the selections in a contest
-    /// puts the information in a json string. The internalManifest is needed because
-    /// it has the candidates and the candidate holds the indicator if a
-    /// selection is a write in.
-    ///
-    /// <param name="contest">the contest in valid input form</param>
-    /// <param name="internalManifest">the `InternalManifest` which defines this ballot's structure</param>
-    /// <param name="is_overvote">indicates if an overvote was detected</param>
-    /// <returns>string holding the json with the write ins</returns>
-    /// </summary>
-    std::string getOvervoteAndWriteIns(const PlaintextBallotContest &contest,
-                                       const InternalManifest &internalManifest,
-                                       eg_valid_contest_return_type_t is_overvote);
+                     bool isPlaceholder = false, bool shouldVerifyProofs = true,
+                     bool shouldUsePrecomputedValues = false);
 
     /// <summary>
     /// Encrypt a specific `BallotContest` in the context of a specific `Ballot`
@@ -169,13 +170,15 @@ namespace electionguard
     ///                          for this contest. this value can be (or derived from) the
     ///                          Ballot nonce, but no relationship is required</param>
     /// <param name="shouldVerifyProofs">specify if the proofs should be verified prior to returning (default True)</param>
+    /// <param name="shouldUsePrecomputedValues">specify if the encryption generation should use precomputed values (default False)</param>
     /// <returns>A `CiphertextBallotContest`</returns>
     /// </summary>
     EG_API std::unique_ptr<CiphertextBallotContest>
     encryptContest(const PlaintextBallotContest &contest, const InternalManifest &internalManifest,
                    const ContestDescriptionWithPlaceholders &description,
                    const ElementModP &elgamalPublicKey, const ElementModQ &cryptoExtendedBaseHash,
-                   const ElementModQ &nonceSeed, bool shouldVerifyProofs = true);
+                   const ElementModQ &nonceSeed, bool shouldVerifyProofs = true,
+                   bool shouldUsePrecomputedValues = false);
 
     /// <summary>
     /// Encrypt the contests of a specific `Ballot` in the context of a specific `CiphertextElectionContext`
@@ -193,12 +196,13 @@ namespace electionguard
     /// <param name="context">all the cryptographic context for the election</param>
     /// <param name="nonceSeed">the random value used to seed the `Nonce` for all contests on the ballot</param>
     /// <param name="shouldVerifyProofs">specify if the proofs should be verified prior to returning (default True)</param>
+    /// <param name="shouldUsePrecomputedValues">specify if the encryption generation should use precomputed values (default False)</param>
     /// <returns>A collection of `CiphertextBallotContest`</returns>
     /// </summary>
     EG_API std::vector<std::unique_ptr<CiphertextBallotContest>>
     encryptContests(const PlaintextBallot &ballot, const InternalManifest &internalManifest,
                     const CiphertextElectionContext &context, const ElementModQ &nonceSeed,
-                    bool shouldVerifyProofs = true);
+                    bool shouldVerifyProofs = true, bool shouldUsePrecomputedValues = false);
 
     /// <summary>
     /// Encrypt a specific `Ballot` in the context of a specific `CiphertextElectionContext`
@@ -211,6 +215,18 @@ namespace electionguard
     /// This method also allows for ballots to exclude passing contests for which the voter made no selections.
     /// It will fill missing contests with `False` selections and generate `placeholder` selections that are marked `True`.
     ///
+    /// Additionally, if the nonce is provided it will be used to determinisitcally construct
+    /// the ballot in real-time (i.e. the same nonce will always produce the same ballot).
+    /// If the nonce is not provided, the secret generating mechanism of the OS provides its own.
+    ///
+    /// This function can also take advantage of PrecomputeBuffers to speed up the encryption process.
+    /// when using precomputed values, the application looks in the `PrecomputeBufferContext` for values
+    /// and uses them for the encryptions. You must preload the `PrecomputeBufferContext` prior to calling this function
+    /// with `shouldUsePrecomputedValues` set to `true`, otherwise the function will fall back to realtime generation.
+    ///
+    /// Because PrecomputeBuffers require a random nonce, calling this function with `shouldUsePrecomputedValues`
+    /// set to `true` while also providing a nonce will result in an error.
+    ///
     /// <param name="ballot">the selection in the valid input form</param>
     /// <param name="internalManifest">the `InternalManifest` which defines this ballot's structure</param>
     /// <param name="context">all the cryptographic context for the election</param>
@@ -218,13 +234,14 @@ namespace electionguard
     /// <param name="nonce">an optional value used to seed the `Nonce` generated for this ballot
     ///                     if this value is not provided, the secret generating mechanism of the OS provides its own</param>
     /// <param name="shouldVerifyProofs">specify if the proofs should be verified prior to returning (default True)</param>
+    /// <param name="shouldUsePrecomputedValues">specify if precomputed values should be used (default True)</param>
     /// <returns>A `CiphertextBallot`</returns>
     /// </summary>
     EG_API std::unique_ptr<CiphertextBallot>
     encryptBallot(const PlaintextBallot &ballot, const InternalManifest &internalManifest,
                   const CiphertextElectionContext &context, const ElementModQ &ballotCodeSeed,
                   std::unique_ptr<ElementModQ> nonce = nullptr, uint64_t timestamp = 0,
-                  bool shouldVerifyProofs = true);
+                  bool shouldVerifyProofs = true, bool shouldUsePrecomputedValues = false);
 
     /// <summary>
     /// Encrypt a specific `Ballot` in the context of a specific `CiphertextElectionContext`

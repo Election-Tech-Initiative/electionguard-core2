@@ -1,8 +1,8 @@
 #include "electionguard/chaum_pedersen.hpp"
 
-#include "log.hpp"
-#include "nonces.hpp"
+#include "electionguard/nonces.hpp"
 #include "electionguard/precompute_buffers.hpp"
+#include "log.hpp"
 
 #include <cstdlib>
 #include <cstring>
@@ -10,9 +10,11 @@
 #include <map>
 #include <stdexcept>
 
+using electionguard::ONE_MOD_Q;
 using std::invalid_argument;
 using std::make_unique;
 using std::map;
+using std::move;
 using std::string;
 using std::unique_ptr;
 
@@ -171,11 +173,10 @@ namespace electionguard
         return make_zero(message, r, k, q, seed);
     }
 
-    unique_ptr<DisjunctiveChaumPedersenProof>
-    DisjunctiveChaumPedersenProof::make_with_precomputed(const ElGamalCiphertext &message,
-                                    unique_ptr<TwoTriplesAndAQuadruple> precomputedTwoTriplesAndAQuad,
-                                    const ElementModQ &q,
-                                    uint64_t plaintext)
+    unique_ptr<DisjunctiveChaumPedersenProof> DisjunctiveChaumPedersenProof::make_with_precomputed(
+      const ElGamalCiphertext &message,
+      unique_ptr<TwoTriplesAndAQuadruple> precomputedTwoTriplesAndAQuad, const ElementModQ &q,
+      uint64_t plaintext)
     {
         unique_ptr<DisjunctiveChaumPedersenProof> result;
 
@@ -370,9 +371,9 @@ namespace electionguard
     }
 
     unique_ptr<DisjunctiveChaumPedersenProof>
-    DisjunctiveChaumPedersenProof::make_zero_with_precomputed(const ElGamalCiphertext &message,
-                                    unique_ptr<TwoTriplesAndAQuadruple> precomputedTwoTriplesAndAQuad,
-                                    const ElementModQ &q)
+    DisjunctiveChaumPedersenProof::make_zero_with_precomputed(
+      const ElGamalCiphertext &message,
+      unique_ptr<TwoTriplesAndAQuadruple> precomputedTwoTriplesAndAQuad, const ElementModQ &q)
     {
         auto *alpha = message.getPad();
         auto *beta = message.getData();
@@ -388,12 +389,12 @@ namespace electionguard
         auto u = triple2->get_exp();
         auto v = quad->get_exp1();
         auto w = quad->get_exp2();
-        
+
         auto a0 = triple2->get_g_to_exp();                      // 𝑔^𝑢 mod 𝑝
         auto b0 = triple2->get_pubkey_to_exp();                 // 𝐾^𝑢 mod 𝑝
         auto a1 = quad->get_g_to_exp1();                        // 𝑔^v mod 𝑝
-        auto b1 = quad->get_g_to_exp2_mult_by_pubkey_to_exp1();  // g^w⋅K^v mod p
- 
+        auto b1 = quad->get_g_to_exp2_mult_by_pubkey_to_exp1(); // g^w⋅K^v mod p
+
         // Compute the challenge
         auto c = hash_elems(
           {&const_cast<ElementModQ &>(q), alpha, beta, a0.get(), b0.get(), a1.get(), b1.get()});
@@ -466,12 +467,12 @@ namespace electionguard
     }
 
     unique_ptr<DisjunctiveChaumPedersenProof>
-    DisjunctiveChaumPedersenProof::make_one_with_precomputed(const ElGamalCiphertext &message,
-                                    unique_ptr<TwoTriplesAndAQuadruple> precomputedTwoTriplesAndAQuad,
-                                    const ElementModQ &q)
+    DisjunctiveChaumPedersenProof::make_one_with_precomputed(
+      const ElGamalCiphertext &message,
+      unique_ptr<TwoTriplesAndAQuadruple> precomputedTwoTriplesAndAQuad, const ElementModQ &q)
     {
         unique_ptr<DisjunctiveChaumPedersenProof> result;
-        
+
         auto *alpha = message.getPad();
         auto *beta = message.getData();
 
@@ -496,8 +497,8 @@ namespace electionguard
         auto c = hash_elems(
           {&const_cast<ElementModQ &>(q), alpha, beta, a0.get(), b0.get(), a1.get(), b1.get()});
 
-        auto c0 = sub_mod_q(Q(), *w);          // c_0=(q-w)  mod q
-        auto c1 = add_mod_q(*c, *w);           // c_1=(c+w)  mod q
+        auto c0 = sub_mod_q(Q(), *w);           // c_0=(q-w)  mod q
+        auto c1 = add_mod_q(*c, *w);            // c_1=(c+w)  mod q
         auto v0 = a_plus_bc_mod_q(*v, *c0, *r); // v_0=(v+c_0⋅R)  mod q
         auto v1 = a_plus_bc_mod_q(*u, *c1, *r); // v_1=(u+c_1⋅R)  mod q
 
@@ -575,26 +576,34 @@ namespace electionguard
     unique_ptr<ConstantChaumPedersenProof>
     ConstantChaumPedersenProof::make(const ElGamalCiphertext &message, const ElementModQ &r,
                                      const ElementModP &k, const ElementModQ &seed,
-                                     const ElementModQ &hash_header, uint64_t constant)
+                                     const ElementModQ &hash_header, uint64_t constant,
+                                     bool shouldUsePrecomputedValues /* = false */)
     {
         Log::trace("ConstantChaumPedersenProof:: making proof");
         auto *alpha = message.getPad();
         auto *beta = message.getData();
 
-        // Derive nonce from seed and the constant string below
-        auto nonces = make_unique<Nonces>(seed, "constant-chaum-pedersen-proof");
         unique_ptr<ElementModQ> u;
 
         // Compute the NIZKP
         unique_ptr<ElementModP> a; //𝑔^𝑢 mod 𝑝
         unique_ptr<ElementModP> b; // 𝐾^𝑢 mod 𝑝
-        // check if the are precompute values rather than doing the exponentiations here
-        unique_ptr<Triple> triple = PrecomputeBufferContext::getTriple();
-        if (triple != nullptr) {
-            u = triple->get_exp();
-            a = triple->get_g_to_exp();
-            b = triple->get_pubkey_to_exp();
-        } else {
+
+        if (shouldUsePrecomputedValues) {
+            Log::debug("ConstantChaumPedersenProof:: using precomputed values. Your seed value is "
+                       "ignored and is no longer deterministic.");
+            // check if the are precompute values rather than doing the exponentiations here
+            auto triple = PrecomputeBufferContext::popTriple();
+            if (triple != nullptr && triple.has_value()) {
+                u = triple.value()->get_exp();
+                a = triple.value()->get_g_to_exp();
+                b = triple.value()->get_pubkey_to_exp();
+            }
+        }
+        // if there are no precomputed values, do the exponentiations here
+        if (u == nullptr || a == nullptr || b == nullptr) {
+            // Derive nonce from seed and the constant string below
+            auto nonces = make_unique<Nonces>(seed, "constant-chaum-pedersen-proof");
             u = nonces->get(0);
             a = g_pow_p(*u);      //𝑔^𝑢 mod 𝑝
             b = pow_mod_p(k, *u); // 𝐾^𝑢 mod 𝑝
@@ -677,4 +686,137 @@ namespace electionguard
         return success;
     }
 #pragma endregion
+
+#pragma region ConstantChaumPedersenProof
+
+    struct ChaumPedersenProof::Impl {
+        unique_ptr<ElGamalCiphertext> commitment;
+        unique_ptr<ElementModQ> challenge;
+        unique_ptr<ElementModQ> response;
+
+        Impl(unique_ptr<ElGamalCiphertext> commitment, unique_ptr<ElementModQ> challenge,
+             unique_ptr<ElementModQ> response)
+            : commitment(move(commitment)), challenge(move(challenge)), response(move(response))
+        {
+        }
+
+        [[nodiscard]] unique_ptr<ChaumPedersenProof::Impl> clone() const
+        {
+            auto _commitment = commitment->clone();
+            auto _challenge = make_unique<ElementModQ>(*challenge);
+            auto _response = make_unique<ElementModQ>(*response);
+
+            return make_unique<ChaumPedersenProof::Impl>(move(_commitment), move(_challenge),
+                                                         move(_response));
+        }
+    };
+
+    // Lifecycle Methods
+
+    ChaumPedersenProof::ChaumPedersenProof(const ChaumPedersenProof &other)
+        : pimpl(other.pimpl->clone())
+    {
+    }
+
+    ChaumPedersenProof::ChaumPedersenProof(unique_ptr<ElGamalCiphertext> commitment,
+                                           unique_ptr<ElementModQ> challenge,
+                                           unique_ptr<ElementModQ> response)
+        : pimpl(new Impl(move(commitment), move(challenge), move(response)))
+    {
+    }
+
+    ChaumPedersenProof::ChaumPedersenProof(unique_ptr<ElementModP> pad,
+                                           unique_ptr<ElementModP> data,
+                                           unique_ptr<ElementModQ> challenge,
+                                           unique_ptr<ElementModQ> response)
+        : pimpl(new Impl(make_unique<ElGamalCiphertext>(move(pad), move(data)), move(challenge),
+                         move(response)))
+    {
+    }
+
+    ChaumPedersenProof::~ChaumPedersenProof() = default;
+
+    // Operator Overloads
+
+    ChaumPedersenProof &ChaumPedersenProof::operator=(ChaumPedersenProof other)
+    {
+        swap(pimpl, other.pimpl);
+        return *this;
+    }
+
+    // Property Getters
+
+    ElementModP *ChaumPedersenProof::getPad() const { return pimpl->commitment->getPad(); }
+    ElementModP *ChaumPedersenProof::getData() const { return pimpl->commitment->getData(); }
+    ElementModQ *ChaumPedersenProof::getChallenge() const { return pimpl->challenge.get(); }
+    ElementModQ *ChaumPedersenProof::getResponse() const { return pimpl->response.get(); }
+
+    // Public Methods
+
+    bool ChaumPedersenProof::isValid(const ElGamalCiphertext &message, const ElementModP &k,
+                                     const ElementModP &m, const ElementModQ &q)
+    {
+        Log::trace("ChaumPedersenProof::isValid: checking validity");
+        auto *alpha = message.getPad();
+        auto *beta = message.getData();
+
+        auto *a_ptr = pimpl->commitment->getPad();
+        auto *b_ptr = pimpl->commitment->getData();
+        auto *c_ptr = pimpl->challenge.get();
+
+        auto a = *pimpl->commitment->getPad();
+        auto b = *pimpl->commitment->getData();
+        auto c = *pimpl->challenge;
+        auto v = *pimpl->response;
+
+        auto inBounds_alpha = alpha->isValidResidue();
+        auto inBounds_beta = beta->isValidResidue();
+        auto inBounds_a = a.isValidResidue();
+        auto inBounds_b = b.isValidResidue();
+        auto inBounds_c = c.isInBounds();
+        auto inBounds_v = v.isInBounds();
+
+        // TODO: actual implementation
+
+        // auto consistent_c =
+        //   (c == *hash_elems({&const_cast<ElementModQ &>(q), alpha, beta, a_ptr, b_ptr}));
+
+        // // 𝑔^𝑉 = 𝑎 ⋅ 𝐴^𝐶 mod 𝑝
+        // auto consistent_gv = (*g_pow_p(v) == *mul_mod_p(a, *pow_mod_p(*alpha, c)));
+
+        // // 𝑔^𝐿 ⋅ 𝐾^𝑣 = 𝑏 ⋅ 𝐵^𝐶 mod 𝑝
+        // auto consistent_kv = (*mul_mod_p(*g_pow_p(*mul_mod_p({c_ptr, constant_q.get()})),
+        //                                  *pow_mod_p(k, v)) == *mul_mod_p(b, *pow_mod_p(*beta, c)));
+
+        // auto success = inBounds_alpha && inBounds_beta && inBounds_a && inBounds_b && inBounds_c &&
+        //                inBounds_v && consistent_c && consistent_gv && consistent_kv;
+
+        // if (!success) {
+
+        //     map<string, bool> printMap{
+        //       {"inBounds_alpha", inBounds_alpha}, {"inBounds_beta", inBounds_beta},
+        //       {"inBounds_a", inBounds_a},         {"inBounds_b", inBounds_b},
+        //       {"inBounds_c", inBounds_c},         {"inBounds_v", inBounds_v},
+        //       {"consistent_c", consistent_c},     {"consistent_gv", consistent_gv},
+        //       {"consistent_kv", consistent_kv},
+        //     };
+
+        //     Log::info("found an invalid Constant Chaum-Pedersen proof", printMap);
+
+        //     Log::debug("k->get", k.toHex());
+        //     Log::debug("q->get", q.toHex());
+        //     Log::debug("alpha->get", alpha->toHex());
+        //     Log::debug("beta->get", beta->toHex());
+        //     Log::debug("a->get", a.toHex());
+        //     Log::debug("b->get", b.toHex());
+        //     Log::debug("c->get", c.toHex());
+        //     Log::debug("v->get", v.toHex());
+
+        //     return false;
+        // }
+        // Log::trace("ConstantChaumPedersenProof::isValid: TRUE!");
+        return true;
+    }
+#pragma endregion
+
 } // namespace electionguard

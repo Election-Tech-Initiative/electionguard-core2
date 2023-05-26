@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Runtime.InteropServices;
+using ElectionGuard.Ballot;
 
 namespace ElectionGuard
 {
@@ -10,7 +11,7 @@ namespace ElectionGuard
     /// with the rest zero, so if a voter deliberately undervotes, one or more of the placeholder counters will
     /// become one. This allows the `ConstantChaumPedersenProof` to verify correctly for undervoted contests.)
     /// </summary>
-    public class ContestDescriptionWithPlaceholders : DisposableBase
+    public class ContestDescriptionWithPlaceholders : DisposableBase, IElectionContest
     {
         /// <Summary>
         /// Unique internal identifier that's used by other elements to reference this element.
@@ -183,6 +184,8 @@ namespace ElectionGuard
                 return value;
             }
         }
+
+        public ElementModQ DescriptionHash => CryptoHash();
 
         /// <Summary>
         /// The collection of placeholders for this contest

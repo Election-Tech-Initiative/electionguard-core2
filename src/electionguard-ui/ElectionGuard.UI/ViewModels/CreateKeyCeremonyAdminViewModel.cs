@@ -1,5 +1,4 @@
-using CommunityToolkit.Mvvm.Input;
-using ElectionGuard.UI.Lib.Models;
+﻿using CommunityToolkit.Mvvm.Input;
 
 namespace ElectionGuard.UI.ViewModels;
 
@@ -40,7 +39,7 @@ public partial class CreateKeyCeremonyAdminViewModel : BaseViewModel
             return;
         }
 
-        var keyCeremony = new KeyCeremonyRecord(KeyCeremonyName, Quorum, NumberOfGuardians, this.UserName!);
+        var keyCeremony = new KeyCeremonyRecord(KeyCeremonyName, NumberOfGuardians, Quorum, this.UserName!);
         var ret = await _keyCeremonyService.SaveAsync(keyCeremony);
         var keyCeremonyId = ret.KeyCeremonyId!;
         await NavigationService.GoToPage(typeof(ViewKeyCeremonyViewModel), new Dictionary<string, object>
@@ -54,5 +53,11 @@ public partial class CreateKeyCeremonyAdminViewModel : BaseViewModel
         return KeyCeremonyName.Trim().Length > 0 &&
             Quorum <= NumberOfGuardians;
     }
+
+    public override async Task OnAppearing()
+    {
+        await base.OnAppearing();
+    }
+
 }
 

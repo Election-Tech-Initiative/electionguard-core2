@@ -21,7 +21,7 @@ CPMAddPackage(
     NAME hacl
     GITHUB_REPOSITORY addressxception/hacl-packages
     VERSION 0.6.0
-    GIT_TAG 4a465b5fdc2b18ffbca493a0abad40eec015da45
+    GIT_TAG 0669c5553a0a619b1c70414aea2ebcc5f875ac13
     OPTIONS "HACL_CUSTOM_CONFIG_FILE_PATH ${HACL_CUSTOM_CONFIG_FILE_PATH}"
 )
 
@@ -38,7 +38,12 @@ endif()
 # ---- Library Sources ----
 include(${PROJECT_SOURCE_DIR}/libs/hacl/sources.cmake)
 
-add_library(${HACL_CPP_TARGET_NAME} SHARED ${SOURCES_hacl_cpp})
+if(ELECTIONGUARD_BUILD_SHARED)
+    add_library(${HACL_CPP_TARGET_NAME} SHARED ${SOURCES_hacl_cpp})
+else()
+    add_library(${HACL_CPP_TARGET_NAME} STATIC ${SOURCES_hacl_cpp})
+endif()
+
 add_library(${HACL_CPP_ALIAS_NAME} ALIAS ${HACL_CPP_TARGET_NAME})
 set_target_properties(${HACL_CPP_TARGET_NAME} PROPERTIES
     VERSION ${hacl_VERSION}
@@ -67,7 +72,11 @@ else()
     )
 endif()
 
-target_link_libraries(${HACL_CPP_TARGET_NAME} PRIVATE hacl)
+if(ELECTIONGUARD_BUILD_SHARED)
+    target_link_libraries(${HACL_CPP_TARGET_NAME} PRIVATE hacl)
+else()
+    target_link_libraries(${HACL_CPP_TARGET_NAME} PRIVATE hacl_static)
+endif()
 
 # Export
 install(
@@ -91,7 +100,7 @@ if(MSVC)
     add_custom_command(
         TARGET ${HACL_CPP_TARGET_NAME} POST_BUILD
         COMMAND ${CMAKE_COMMAND} -E copy_directory
-        ${hacl_BINARY_DIR}/Release
+        ${hacl_BINARY_DIR}/${CMAKE_BUILD_TYPE}
         $<TARGET_FILE_DIR:${HACL_CPP_TARGET_NAME}>
     )
 else()

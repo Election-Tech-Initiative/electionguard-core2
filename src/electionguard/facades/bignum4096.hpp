@@ -24,13 +24,13 @@ namespace electionguard::facades
     {
       public:
         // use 32-bit math
-        explicit Bignum4096(uint32_t *elem);
+        explicit Bignum4096(const uint32_t *elem);
 
         // use 64-bit math, or use 32-bit if USE_32BIT_MATH is defined
-        explicit Bignum4096(uint64_t *elem);
+        explicit Bignum4096(const uint64_t *elem);
 
         // derive the math type from the constructor parameter
-        explicit Bignum4096(uint64_t *elem, bool prefer32BitMath);
+        explicit Bignum4096(const uint64_t *elem, bool prefer32BitMath);
         ~Bignum4096();
 
         static bool use32BitMath;

@@ -47,9 +47,9 @@ eg_electionguard_status_t eg_elgamal_keypair_from_secret_new(eg_element_mod_q_t 
     }
 }
 
-EG_API eg_electionguard_status_t eg_elgamal_keypair_from_pair_new(eg_element_mod_q_t *in_secret_key,
-                                                                  eg_element_mod_p_t *in_public_key,
-                                                                  eg_elgamal_keypair_t **out_handle)
+eg_electionguard_status_t eg_elgamal_keypair_from_pair_new(eg_element_mod_q_t *in_secret_key,
+                                                           eg_element_mod_p_t *in_public_key,
+                                                           eg_elgamal_keypair_t **out_handle)
 {
     if (in_secret_key == nullptr || in_public_key == nullptr) {
         return ELECTIONGUARD_STATUS_ERROR_INVALID_ARGUMENT;
@@ -422,6 +422,23 @@ eg_electionguard_status_t eg_hashed_elgamal_ciphertext_decrypt_with_secret(
         *out_data = dynamicCopy(result, &size);
         *out_size = (uint64_t)size;
 
+        return ELECTIONGUARD_STATUS_SUCCESS;
+    } catch (const exception &e) {
+        Log::error(__func__, e);
+        return ELECTIONGUARD_STATUS_ERROR_RUNTIME_ERROR;
+    }
+}
+
+eg_electionguard_status_t
+eg_hashed_elgamal_ciphertext_partial_decrypt(eg_hashed_elgamal_ciphertext_t *handle,
+                                             eg_element_mod_q_t *in_secret_key,
+                                             eg_element_mod_p_t **out_partial_decryption)
+{
+    try {
+        auto *secretKey = AS_TYPE(ElementModQ, in_secret_key);
+        auto partialDecryption =
+          AS_TYPE(HashedElGamalCiphertext, handle)->partialDecrypt(*secretKey);
+        *out_partial_decryption = AS_TYPE(eg_element_mod_p_t, partialDecryption.release());
         return ELECTIONGUARD_STATUS_SUCCESS;
     } catch (const exception &e) {
         Log::error(__func__, e);

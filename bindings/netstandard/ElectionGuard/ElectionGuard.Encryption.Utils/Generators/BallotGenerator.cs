@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Generic;
-using System.Linq;
 
 namespace ElectionGuard.Encryption.Utils.Generators
 {
@@ -332,6 +331,133 @@ namespace ElectionGuard.Encryption.Utils.Generators
             }
 
             return new PlaintextBallot(ballotId, styleId, contests.ToArray());
+        }
+
+        public static List<PlaintextBallot> GetFakeBallots(
+            InternalManifest manifest,
+            int count)
+        {
+            Console.WriteLine($"GetFakeBallots {count}");
+            var ballots = new List<PlaintextBallot>();
+            for (var i = 0; i < count; i++)
+            {
+                ballots.Add(GetFakeBallot(manifest, $"fake-ballot-{i}"));
+            }
+
+            return ballots;
+        }
+
+        public static List<PlaintextBallot> GetFakeBallots(
+            InternalManifest manifest,
+            Random random,
+            int count
+            )
+        {
+            Console.WriteLine($"GetFakeBallots {count}");
+            var ballots = new List<PlaintextBallot>();
+            for (var i = 0; i < count; i++)
+            {
+                ballots.Add(GetFakeBallot(manifest, random, $"fake-ballot-{i}"));
+            }
+
+            return ballots;
+        }
+
+        // get encrypted ballots using production values for the seed and nonce
+        public static List<CiphertextBallot> GetFakeCiphertextBallots(
+            InternalManifest manifest,
+            CiphertextElectionContext context,
+            EncryptionDevice device,
+            int count)
+        {
+            Console.WriteLine($"GetFakeCiphertextBallots {count}");
+            var ballots = new List<CiphertextBallot>();
+            for (var i = 0; i < count; i++)
+            {
+                var ballot = GetFakeBallot(manifest);
+                var ciphertext = Encrypt.Ballot(
+                    ballot, manifest, context,
+                    device.GetHash(), shouldVerifyProofs: false);
+                ballots.Add(ciphertext);
+            }
+
+            return ballots;
+        }
+
+        // get encrypted ballots using production values for the seed and nonce
+        public static List<CiphertextBallot> GetFakeCiphertextBallots(
+           InternalManifest manifest,
+            CiphertextElectionContext context,
+            EncryptionDevice device,
+            List<PlaintextBallot> palintext)
+        {
+            Console.WriteLine($"GetFakeCiphertextBallots {palintext.Count}");
+            var ballots = new List<CiphertextBallot>();
+            for (var i = 0; i < palintext.Count; i++)
+            {
+                var ballot = palintext[i];
+                var ciphertext = Encrypt.Ballot(
+                    ballot, manifest, context,
+                    device.GetHash(), shouldVerifyProofs: false);
+                ballots.Add(ciphertext);
+            }
+
+            return ballots;
+        }
+
+        // get encrypted ballots using the same seed and nonce for all ballots
+        public static List<CiphertextBallot> GetFakeCiphertextBallots(
+           InternalManifest manifest,
+            CiphertextElectionContext context,
+            List<PlaintextBallot> plaintext,
+            ElementModQ seed,
+            ElementModQ nonce)
+        {
+            Console.WriteLine($"GetFakeCiphertextBallots: withNonces {plaintext.Count}");
+            ulong timestamp = 1;
+            var ballots = new List<CiphertextBallot>();
+            for (var i = 0; i < plaintext.Count; i++)
+            {
+                var ballot = plaintext[i];
+                var ciphertext = Encrypt.Ballot(
+                    ballot,
+                    manifest,
+                    context,
+                    seed,
+                    nonce,
+                    timestamp,
+                    shouldVerifyProofs: false,
+                    usePrecomputedValues: false);
+                ballots.Add(ciphertext);
+            }
+
+            return ballots;
+        }
+
+        // get encrypted ballots using a predefined random number generator
+        public static List<CiphertextBallot> GetFakeCiphertextBallots(
+           InternalManifest manifest,
+            CiphertextElectionContext context,
+            List<PlaintextBallot> plaintext,
+            Random random)
+        {
+            Console.WriteLine($"GetFakeCiphertextBallots: withRandom {plaintext.Count}");
+            var ballots = new List<CiphertextBallot>();
+            for (var i = 0; i < plaintext.Count; i++)
+            {
+                var ballot = plaintext[i];
+                var ciphertext = Encrypt.Ballot(
+                    ballot,
+                    manifest,
+                    context,
+                    random.NextElementModQ(),
+                    random.NextElementModQ(),
+                    shouldVerifyProofs: false,
+                    usePrecomputedValues: false);
+                ballots.Add(ciphertext);
+            }
+
+            return ballots;
         }
     }
 }

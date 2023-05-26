@@ -1,4 +1,5 @@
-﻿using NativeElGamalCiphertext = ElectionGuard.NativeInterface.ElGamalCiphertext.ElGamalCiphertextHandle;
+﻿using System;
+using NativeElGamalCiphertext = ElectionGuard.NativeInterface.ElGamalCiphertext.ElGamalCiphertextHandle;
 
 namespace ElectionGuard
 {
@@ -7,7 +8,7 @@ namespace ElectionGuard
     /// homomorphic addition). Create one with `elgamal_encrypt`. Add them with `elgamal_add`.
     /// Decrypt using one of the supplied instance methods.
     /// </summary>
-    public class ElGamalCiphertext : DisposableBase
+    public class ElGamalCiphertext : DisposableBase, IEquatable<ElGamalCiphertext>
     {
         /// <Summary>
         /// The pad value also referred to as A, a, 𝑎, or alpha in the spec.
@@ -19,11 +20,7 @@ namespace ElectionGuard
                 var status = NativeInterface.ElGamalCiphertext.GetPad(
                     Handle, out var value);
                 status.ThrowIfError();
-                if (value.IsInvalid)
-                {
-                    return null;
-                }
-                return new ElementModP(value);
+                return value.IsInvalid ? null : new ElementModP(value);
             }
         }
 
@@ -37,11 +34,7 @@ namespace ElectionGuard
                 var status = NativeInterface.ElGamalCiphertext.GetData(
                     Handle, out var value);
                 status.ThrowIfError();
-                if (value.IsInvalid)
-                {
-                    return null;
-                }
-                return new ElementModP(value);
+                return value.IsInvalid ? null : new ElementModP(value);
             }
         }
 
@@ -55,13 +48,14 @@ namespace ElectionGuard
                 var status = NativeInterface.ElGamalCiphertext.GetCryptoHash(
                     Handle, out var value);
                 status.ThrowIfError();
-                if (value.IsInvalid)
-                {
-                    return null;
-                }
-                return new ElementModQ(value);
+                return value.IsInvalid ? null : new ElementModQ(value);
             }
         }
+
+        /// <summary>
+        /// Determines if the element is valid and has not been cleaned up
+        /// </summary>
+        public bool IsAddressable => Handle != null && !Handle.IsInvalid && !IsDisposed;
 
         internal NativeElGamalCiphertext Handle;
 
@@ -70,14 +64,29 @@ namespace ElectionGuard
             var status = NativeInterface.ElGamalCiphertext.New(
                 pad.Handle, data.Handle, out var handle);
             status.ThrowIfError();
+            handle.ThrowIfInvalid();
+            Handle = handle;
+        }
+
+        public ElGamalCiphertext(ElGamalCiphertext other)
+        {
+            var status = NativeInterface.ElGamalCiphertext.New(
+                other.Pad.Handle, other.Data.Handle, out var handle);
+            status.ThrowIfError();
+            handle.ThrowIfInvalid();
             Handle = handle;
         }
 
         internal ElGamalCiphertext(NativeElGamalCiphertext handle)
         {
+            handle.ThrowIfInvalid();
             Handle = handle;
         }
 
+        /// <summary>
+        /// Homomorphically accumulates other ElGamal ciphertext by pairwise multiplication
+        /// and returns the result without modifying the original.
+        /// </summary>
         public ElGamalCiphertext Add(ElGamalCiphertext other)
         {
             var status = NativeInterface.ElGamalCiphertext.Add(
@@ -145,16 +154,7 @@ namespace ElectionGuard
             var status = NativeInterface.ElGamalCiphertext.PartialDecrypt(
                 Handle, secretKey.Handle, out var value);
             status.ThrowIfError();
-            if (value.IsInvalid)
-            {
-                return null;
-            }
-            return new ElementModP(value);
-        }
-
-        public override string ToString()
-        {
-            return $"ElGamalCiphertext(Pad: {Pad}, Data: {Data}, CryptoHash: {CryptoHash})";
+            return value.IsInvalid ? null : new ElementModP(value);
         }
 
 #pragma warning disable CS1591 // Missing XML comment for publicly visible type or member
@@ -171,5 +171,70 @@ namespace ElectionGuard
             Handle.Dispose();
             Handle = null;
         }
+
+        public override string ToString()
+        {
+            return $"ElGamalCiphertext(Pad: {Pad}, Data: {Data}, CryptoHash: {CryptoHash})";
+        }
+
+        # region IEquatable
+
+        /// <inheritdoc />
+        public static bool operator ==(ElGamalCiphertext a, ElGamalCiphertext b)
+        {
+            if (ReferenceEquals(a, b))
+            {
+                return true;
+            }
+
+            if (a is null || b is null)
+            {
+                return false;
+            }
+
+            return a.Pad == b.Pad && a.Data == b.Data;
+        }
+
+        public static bool operator !=(ElGamalCiphertext a, ElGamalCiphertext b)
+        {
+            return !(a == b);
+        }
+
+        /// <summary>
+        /// Check to see if the object is equal to the current instance 
+        /// </summary>
+        /// <param name="obj"></param>
+        /// <returns></returns>
+        public override bool Equals(object obj)
+        {
+            return Equals(obj as ElGamalCiphertext);
+        }
+
+        public bool Equals(ElGamalCiphertext other)
+        {
+            if (other is null)
+            {
+                return false;
+            }
+
+            if (ReferenceEquals(this, other))
+            {
+                return true;
+            }
+
+            return Pad == other.Pad && Data == other.Data;
+        }
+
+        /// <summary>
+        /// Generates a hashcode for the class
+        /// </summary>
+        /// <returns>the hashcode</returns>
+        public override int GetHashCode()
+        {
+            var hashCode = new HashCode();
+            hashCode.Add(ToString());
+            return hashCode.GetHashCode();
+        }
+        #endregion
     }
 }

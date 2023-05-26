@@ -5,7 +5,7 @@ using System.Collections.Generic;
 namespace ElectionGuard
 {
     /// <summary>
-    /// An ElectionguardEnumerator is an IReadonlyList<T> implementation
+    /// An ElectionguardEnumerator is an IReadonlyList implementation
     /// that can be used to enumerate various native collections on ElectionGuard objects
     /// </summary>
     public class ElectionGuardEnumerator<T>
@@ -19,7 +19,6 @@ namespace ElectionGuard
         /// </summary>
         /// <param name="sizeResolver">The function that resolves the collection size</param>
         /// <param name="itemResolver">The function that resolves the item at the specified index</param>
-        /// </summary>
         public ElectionGuardEnumerator(
             Func<int> sizeResolver, Func<int, T> itemResolver)
         {

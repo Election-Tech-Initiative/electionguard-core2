@@ -23,6 +23,8 @@ internal static class Constants
 
     public readonly static string GuardianId = "GuardianId";
 
+    public readonly static string Joined = "Joined";
+
     public readonly static string Id = "Id";
 
     public readonly static string KeyCeremonyId = "KeyCeremonyId";
@@ -51,6 +53,10 @@ internal static class Constants
 
     public readonly static string UpdatedAt = "UpdatedAt";
 
+    public readonly static string IsExportable = "IsExportable";
+
+    public readonly static string BallotState = "BallotState";
+
 }
 
 
@@ -60,9 +66,10 @@ internal static class Constants
 /// the specific Service created by this interface.
 /// </summary>
 /// <typeparam name="T">Data type to use for the service</typeparam>
-internal interface IDatabaseService<T>
+public interface IDatabaseService<T>
 {
     Task<long> CountByFilterAsync(FilterDefinition<T> filter, string? table = null);
+    Task<bool> ExistsByFilterAsync(FilterDefinition<T> filter, string? table = null);
     Task<List<T>> GetAllAsync(string? table = null);
     Task<List<T>> GetAllByFilterAsync(FilterDefinition<T> filter, string? table = null);
     Task<List<T>> GetAllByFieldAsync(string fieldName, object fieldValue, string? table = null);

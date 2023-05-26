@@ -1,5 +1,3 @@
-using System;
-
 namespace ElectionGuard
 {
     using NativeContextConfig = NativeInterface.ContextConfiguration.ContextConfigurationHandle;
@@ -23,7 +21,7 @@ namespace ElectionGuard
         {
             get
             {
-                bool value = true;
+                var value = true;
                 var status = NativeInterface.ContextConfiguration.GetAllowedOverVotes(
                     Handle, ref value);
                 status.ThrowIfError();
@@ -33,11 +31,11 @@ namespace ElectionGuard
         /// <summary>
         /// Determines the maximum number of votes that an election can have, Defaults to 1000000
         /// </summary>
-        public UInt64 MaxBallots
+        public ulong MaxBallots
         {
             get
             {
-                UInt64 value = 1;
+                ulong value = 1;
                 var status = NativeInterface.ContextConfiguration.GetMaxBallots(
                     Handle, ref value);
                 status.ThrowIfError();
@@ -50,7 +48,7 @@ namespace ElectionGuard
         /// </summary>
         /// <param name="allowOverVotes">if overvotes are allowed</param>
         /// <param name="maxVotes">maximum number of votes</param>
-        public ContextConfiguration(bool allowOverVotes, UInt64 maxVotes)
+        public ContextConfiguration(bool allowOverVotes, ulong maxVotes)
         {
             var status = NativeInterface.ContextConfiguration.Make(
                 allowOverVotes, maxVotes, out Handle);
@@ -64,11 +62,13 @@ namespace ElectionGuard
         {
             base.DisposeUnmanaged();
 
-            if (Handle == null || Handle.IsInvalid) return;
+            if (Handle == null || Handle.IsInvalid)
+            {
+                return;
+            }
+
             Handle.Dispose();
             Handle = null;
         }
-
-
     }
 }

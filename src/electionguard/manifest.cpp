@@ -1115,12 +1115,20 @@ namespace electionguard
             }
 
             // TODO: handle optional values
-            if (ballotTitle != nullptr) {
+            if (ballotTitle != nullptr && ballotSubtitle != nullptr) {
                 auto hash = hash_elems({object_id, sequenceOrder, electoralDistrictId,
                                         getVoteVariationTypeString(voteVariation),
                                         ref<CryptoHashable>(*ballotTitle),
                                         ref<CryptoHashable>(*ballotSubtitle), name, numberElected,
                                         votesAllowed, selectionRefs});
+                Log::trace("ContestDescription", hash.get());
+                return hash;
+            }
+            if (ballotTitle != nullptr) {
+                auto hash = hash_elems({object_id, sequenceOrder, electoralDistrictId,
+                                        getVoteVariationTypeString(voteVariation),
+                                        ref<CryptoHashable>(*ballotTitle), nullptr, name,
+                                        numberElected, votesAllowed, selectionRefs});
                 Log::trace("ContestDescription", hash.get());
                 return hash;
             }
@@ -1533,6 +1541,14 @@ namespace electionguard
                 return hash;
             }
 
+            if (contactInformation == nullptr) {
+                auto hash = hash_elems(
+                  {electionScopeId, getElectionTypeString(type), timePointToIsoString(startDate),
+                   timePointToIsoString(endDate), ref<CryptoHashable>(*name), nullptr,
+                   geopoliticalUnitRefs, partyRefs, contestRefs, ballotStyleRefs});
+                return hash;
+            }
+
             auto hash =
               hash_elems({electionScopeId, getElectionTypeString(type),
                           timePointToIsoString(startDate), timePointToIsoString(endDate),
@@ -1794,8 +1810,6 @@ namespace electionguard
 
     vector<uint8_t> Manifest::toMsgPack() const { return ManifestSerializer::toMsgPack(*this); }
 
-    string Manifest::toJson() { return ManifestSerializer::toJson(*this); }
-
     string Manifest::toJson() const { return ManifestSerializer::toJson(*this); }
 
     unique_ptr<Manifest> Manifest::fromJson(string data)
@@ -1967,8 +1981,6 @@ namespace electionguard
     {
         return InternalManifestSerializer::toMsgPack(*this);
     }
-
-    string InternalManifest::toJson() { return InternalManifestSerializer::toJson(*this); }
 
     string InternalManifest::toJson() const { return InternalManifestSerializer::toJson(*this); }
 

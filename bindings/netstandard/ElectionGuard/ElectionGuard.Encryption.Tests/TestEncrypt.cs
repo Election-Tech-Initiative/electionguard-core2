@@ -1,6 +1,6 @@
 using System;
 using System.Linq;
-using ElectionGuard.Encryption.Ballot;
+using ElectionGuard.Ballot;
 using ElectionGuard.Encryption.Utils.Generators;
 using NUnit.Framework;
 
@@ -66,6 +66,28 @@ namespace ElectionGuard.Encryption.Tests
             var msgPack = ciphertext.ToMsgPack();
             var fromMsgPack = new CiphertextBallot(msgPack, BinarySerializationEncoding.MsgPack);
             Assert.That(ciphertext.ObjectId == fromMsgPack.ObjectId);
+        }
+
+        [Test]
+        public void Test_Encrypt_Ballot_Simple_Reencrypt_Creates_Same_Ballot()
+        {
+            // Arrange
+            var data = ElectionGenerator.GenerateFakeElectionData();
+
+
+            var ballot = BallotGenerator.GetFakeBallot(data.InternalManifest);
+            var codeSeed = Constants.TWO_MOD_Q;
+
+            // Act
+            var ciphertext = Encrypt.Ballot(ballot, data.InternalManifest, data.Context, codeSeed);
+            var timestamp = ciphertext.Timestamp;
+            var nonce = ciphertext.Nonce;
+
+            var reencryption = Encrypt.Ballot(
+                ballot, data.InternalManifest, data.Context, codeSeed, nonce, timestamp);
+
+            // Assert
+            Assert.That(reencryption.BallotCode == ciphertext.BallotCode);
         }
 
         [Test]

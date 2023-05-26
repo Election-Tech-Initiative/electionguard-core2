@@ -21,7 +21,7 @@ public partial class ViewKeyCeremonyViewModel : BaseViewModel
         base("ViewKeyCeremony", serviceProvider)
     {
         _keyCeremonyService = keyCeremonyService;
-        _guardianService = guardianService;
+        _publicKeyService = guardianService;
         _backupService = backupService;
         _verificationService = verificationService;
 
@@ -36,9 +36,6 @@ public partial class ViewKeyCeremonyViewModel : BaseViewModel
 
     [ObservableProperty]
     private string _keyCeremonyId = string.Empty;
-
-    [ObservableProperty]
-    private List<GuardianPublicKey> _guardians = new();
 
     [ObservableProperty]
     private ObservableCollection<GuardianItem> _guardianList = new();
@@ -60,6 +57,8 @@ public partial class ViewKeyCeremonyViewModel : BaseViewModel
         await base.OnLeavingPage();
         _timer.Tick -= CeremonyPollingTimer_Tick;
         _timer.Stop();
+
+        KeyCeremony?.Dispose();
     }
 
     partial void OnKeyCeremonyIdChanged(string value)
@@ -81,7 +80,14 @@ public partial class ViewKeyCeremonyViewModel : BaseViewModel
         {
             IsJoinVisible = (!AuthenticationService.IsAdmin && (value.State == KeyCeremonyState.PendingGuardiansJoin));
 
-            _mediator = new KeyCeremonyMediator("mediator", UserName!, value);
+            _mediator = new KeyCeremonyMediator(
+                mediatorId: "mediator",
+                userId: this.UserName!,
+                keyCeremony: value,
+                keyCeremonyService: _keyCeremonyService,
+                backupService: _backupService,
+                publicKeyService: _publicKeyService,
+                verificationService: _verificationService);
 
             if (!IsJoinVisible)
             {
@@ -109,11 +115,11 @@ public partial class ViewKeyCeremonyViewModel : BaseViewModel
             _timer.Stop();
             return;
         }
-        List<GuardianPublicKey> localData = new();
+
         _ = Task.Run(async () =>
         {
-            await _mediator!.RunKeyCeremony(IsAdmin);
             await UpdateGuardiansData();
+            await _mediator!.RunKeyCeremony(IsAdmin);
         });
     }
 
@@ -122,7 +128,7 @@ public partial class ViewKeyCeremonyViewModel : BaseViewModel
         // if we have fewer than max number, see if anyone else joined
         if (GuardianList.Count != KeyCeremony.NumberOfGuardians)
         {
-            var localData = await _guardianService.GetAllByKeyCeremonyIdAsync(KeyCeremonyId);
+            var localData = await _publicKeyService.GetAllByKeyCeremonyIdAsync(KeyCeremonyId);
 
             foreach (var item in localData)
             {
@@ -146,7 +152,7 @@ public partial class ViewKeyCeremonyViewModel : BaseViewModel
     }
 
     private readonly KeyCeremonyService _keyCeremonyService;
-    private readonly GuardianPublicKeyService _guardianService;
+    private readonly GuardianPublicKeyService _publicKeyService;
     private readonly GuardianBackupService _backupService;
     private readonly VerificationService _verificationService;
 }

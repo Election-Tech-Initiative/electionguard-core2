@@ -38,19 +38,19 @@
         /// Encrypt the specified ballot using the cached election context.
         /// </summary>
         public CiphertextBallot Encrypt(
-            PlaintextBallot plaintext, bool verifyProofs = false)
+            PlaintextBallot plaintext, bool verifyProofs = false, bool usePrecomputedValues = false)
         {
             if (verifyProofs)
             {
                 var status = NativeInterface.EncryptionMediator.EncryptAndVerify(
-                    Handle, plaintext.Handle, out var ciphertext);
+                    Handle, plaintext.Handle, usePrecomputedValues, out var ciphertext);
                 status.ThrowIfError();
                 return new CiphertextBallot(ciphertext);
             }
             else
             {
                 var status = NativeInterface.EncryptionMediator.Encrypt(
-                    Handle, plaintext.Handle, out var ciphertext);
+                    Handle, plaintext.Handle, usePrecomputedValues, out var ciphertext);
                 status.ThrowIfError();
                 return new CiphertextBallot(ciphertext);
             }
