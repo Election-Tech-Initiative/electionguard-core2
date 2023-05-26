@@ -37,6 +37,19 @@ public class BaseDatabaseService<T> : IDatabaseService<T> where T : DatabaseReco
     /// <param name="data">data to be saved</param>
     /// <param name="table">Optional parameter to allow data type to use a different collection</param>
     /// <returns></returns>
+    public virtual async Task<IEnumerable<T>> SaveManyAsync(IEnumerable<T> data, string? table = null)
+    {
+        var collection = DbService.GetCollection<T>(table ?? _collection);
+        await collection.InsertManyAsync(data);
+        return data;
+    }
+
+    /// <summary>
+    /// Save the data into the collection
+    /// </summary>
+    /// <param name="data">data to be saved</param>
+    /// <param name="table">Optional parameter to allow data type to use a different collection</param>
+    /// <returns></returns>
     public virtual async Task<T> SaveAsync(T data, string? table = null)
     {
         var collection = DbService.GetCollection<T>(table ?? _collection);
@@ -198,6 +211,17 @@ public class BaseDatabaseService<T> : IDatabaseService<T> where T : DatabaseReco
     {
         var data = DbService.GetCollection<T>(table ?? _collection);
         return await data.CountDocumentsAsync(UpdateFilter(filter));
+    }
+
+    /// <summary>
+    /// Get existance of documents that match the filter
+    /// </summary>
+    /// <param name="filter">filter used to search</param>
+    /// <param name="table">collection to use</param>
+    public async Task<bool> ExistsByFilterAsync(FilterDefinition<T> filter, string? table = null)
+    {
+        var data = DbService.GetCollection<T>(table ?? _collection);
+        return await data.CountDocumentsAsync(UpdateFilter(filter)) != 0;
     }
 
     /// <summary>

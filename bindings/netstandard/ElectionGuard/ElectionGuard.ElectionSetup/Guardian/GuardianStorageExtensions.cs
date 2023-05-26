@@ -1,4 +1,5 @@
 ﻿using ElectionGuard.Encryption.Utils.Converters;
+using ElectionGuard.Guardians;
 using ElectionGuard.UI.Lib.Models;
 using ElectionGuard.UI.Lib.Services;
 
@@ -17,12 +18,16 @@ public static class GuardianStorageExtensions
         GuardianPrivateRecord privateGuardianRecord,
         string keyCeremonyId,
         int numberOfGuardians,
-        int quorum)
+        int quorum,
+        Dictionary<string, ElectionPublicKey>? publicKeys = null,
+        Dictionary<string, ElectionPartialKeyBackup>? otherBackups = null)
     {
         return new(
             privateGuardianRecord.ElectionKeys,
             privateGuardianRecord.CommitmentSeed,
-            new(keyCeremonyId, numberOfGuardians, quorum));
+            new(keyCeremonyId, numberOfGuardians, quorum),
+            publicKeys,
+            otherBackups);
     }
 
     /// <summary>
@@ -33,7 +38,13 @@ public static class GuardianStorageExtensions
     /// <param name="guardianCount">count of guardians</param>
     /// <param name="quorum">minimum needed number of guardians</param>
     /// <returns></returns>
-    public static Guardian? Load(string guardianId, string keyCeremonyId, int guardianCount, int quorum)
+    public static Guardian? Load(
+        string guardianId,
+        string keyCeremonyId,
+        int guardianCount,
+        int quorum,
+        Dictionary<string, ElectionPublicKey>? publicKeys = null,
+        Dictionary<string, ElectionPartialKeyBackup>? otherBackups = null)
     {
         var storage = StorageService.GetInstance();
 
@@ -46,8 +57,9 @@ public static class GuardianStorageExtensions
         {
             var privateGuardian = JsonConvert.DeserializeObject<GuardianPrivateRecord>(
                 data, SerializationSettings.NewtonsoftSettings());
+
             return privateGuardian != null ?
-                FromPrivateRecord(privateGuardian, keyCeremonyId, guardianCount, quorum) :
+                FromPrivateRecord(privateGuardian, keyCeremonyId, guardianCount, quorum, publicKeys, otherBackups) :
                 null;
         }
         catch (Exception ex)
@@ -61,9 +73,13 @@ public static class GuardianStorageExtensions
     /// </summary>
     /// <param name="guardianId">guardian id</param>
     /// <param name="keyCeremony">key ceremony record</param>
-    public static Guardian? Load(string guardianId, KeyCeremonyRecord keyCeremony)
+    public static Guardian? Load(
+        string guardianId,
+        KeyCeremonyRecord keyCeremony,
+        Dictionary<string, ElectionPublicKey>? publicKeys = null,
+        Dictionary<string, ElectionPartialKeyBackup>? otherBackups = null)
     {
-        return Load(guardianId, keyCeremony.KeyCeremonyId!, keyCeremony.NumberOfGuardians, keyCeremony.Quorum);
+        return Load(guardianId, keyCeremony.KeyCeremonyId!, keyCeremony.NumberOfGuardians, keyCeremony.Quorum, publicKeys, otherBackups);
     }
 
     /// <summary>

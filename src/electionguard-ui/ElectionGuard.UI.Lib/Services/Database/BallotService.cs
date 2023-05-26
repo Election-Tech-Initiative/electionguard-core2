@@ -38,6 +38,19 @@ public class BallotService : BaseDatabaseService<BallotRecord>
     }
 
     /// <summary>
+    /// Gets ballots for an election
+    /// </summary>
+    /// <param name="electionId">election id to search for</param>
+    /// <param name="state">State to filter the ballots</param>
+    public async Task<IAsyncCursor<BallotRecord>> GetCursorBallotsByElectionIdStateAsync(string electionId, BallotBoxState state)
+    {
+        var filter = FilterBuilder.And(
+            FilterBuilder.Eq(Constants.ElectionId, electionId),
+            FilterBuilder.Eq(Constants.BallotState, state));
+        return await GetCursorByFilterAsync(filter);
+    }
+
+    /// <summary>
     /// Gets ballots from a single upload
     /// </summary>
     /// <param name="uploadId">upload id to search for</param>

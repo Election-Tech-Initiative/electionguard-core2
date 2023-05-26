@@ -1,6 +1,4 @@
-﻿using System.Data.Common;
-using System.Runtime.InteropServices.JavaScript;
-using CommunityToolkit.Mvvm.Input;
+﻿using CommunityToolkit.Mvvm.Input;
 
 namespace ElectionGuard.UI.ViewModels;
 

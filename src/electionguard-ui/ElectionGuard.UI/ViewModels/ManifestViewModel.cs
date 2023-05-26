@@ -1,5 +1,4 @@
-﻿using CommunityToolkit.Mvvm.ComponentModel;
-using CommunityToolkit.Mvvm.Input;
+﻿using System.Text;
 
 namespace ElectionGuard.UI.ViewModels;
 
@@ -7,7 +6,7 @@ public record PartyDisplay(string Name, string Abbreviation, string PartyId);
 public record CandidateDisplay(string Name, string Party, string CandidateId);
 public record BallotStyleDisplay(string Name, List<string> GeoPoliticalUnits);
 public record GeopoliticalUnitDisplay(string Name, string GPType, string GeopoliticalUnitId);
-public record ContestDisplay(string Name, string Variation, ulong NumberElected, ulong VotesAllowed, List<CandidateDisplay> Selections);
+public record ContestDisplay(string Name, string Variation, ulong NumberElected, ulong VotesAllowed, string Selections);
 
 
 public partial class ManifestViewModel : BaseViewModel
@@ -46,13 +45,13 @@ public partial class ManifestViewModel : BaseViewModel
 
     partial void OnManifestFileChanged(string value)
     {
-        if (string.IsNullOrEmpty(ManifestFile))
+        if (string.IsNullOrEmpty(value))
         {
             Manifest = null;
             return;
         }
 
-        this.Manifest = new Manifest(File.ReadAllText(ManifestFile));
+        this.Manifest = new Manifest(File.ReadAllText(value));
     }
 
     partial void OnManifestChanged(Manifest value)
@@ -113,18 +112,17 @@ public partial class ManifestViewModel : BaseViewModel
         for (ulong i = 0; i < Manifest.ContestsSize; i++)
         {
             var local = Manifest.GetContestAtIndex(i);
-            var selections = new List<CandidateDisplay>();
+            var selections = new StringBuilder();
             for (ulong j = 0; j < local.SelectionsSize; j++)
             {
                 var selection = local.GetSelectionAtIndex(j);
                 var candidate = Candidates.FirstOrDefault(c => c.CandidateId == selection.CandidateId);
-                if (candidate == null)
+                if (candidate != null)
                 {
-                    candidate = new CandidateDisplay("", "", "");
+                    selections.AppendLine($"{candidate.Name} ({candidate.Party})");
                 }
-                selections.Add(candidate);
             }
-            Contests.Add(new ContestDisplay(local.Name, local.VoteVariationType.ToString(), local.NumberElected, local.VotesAllowed, selections));
+            Contests.Add(new ContestDisplay(local.Name, local.VoteVariationType.ToString(), local.NumberElected, local.VotesAllowed, selections.ToString()));
         }
     }
 

@@ -32,6 +32,8 @@ public partial class CreateElectionViewModel : BaseViewModel
 
     public override async Task OnAppearing()
     {
+        await base.OnAppearing();
+
         KeyCeremonies = await _keyCeremonyService.GetAllCompleteAsync();
     }
 

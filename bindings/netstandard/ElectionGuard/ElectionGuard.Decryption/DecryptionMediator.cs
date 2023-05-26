@@ -1,4 +1,4 @@
-using ElectionGuard.Decryption.Challenge;
+﻿using ElectionGuard.Decryption.Challenge;
 using ElectionGuard.Decryption.ChallengeResponse;
 using ElectionGuard.Decryption.Decryption;
 using ElectionGuard.Decryption.Shares;
@@ -142,12 +142,12 @@ public class DecryptionMediator : DisposableBase
     /// Submit a tally share and a list of ballot shares
     /// </summary>
     public void SubmitShares(
-        Tuple<TallyShare, Dictionary<string, BallotShare>> shares,
+        DecryptionShare shares,
         List<CiphertextBallot> ballots
          )
     {
-        SubmitShare(shares.Item1);
-        SubmitShares(shares.Item2.Values
+        SubmitShare(shares.TallyShare);
+        SubmitShares(shares.BallotShares.Values
             .Select(i => new BallotShare(i)).ToList(),
             ballots.Select(i => new CiphertextBallot(i)).ToList());
     }
@@ -222,6 +222,10 @@ public class DecryptionMediator : DisposableBase
     public Dictionary<string, GuardianChallenge> CreateChallenge(string tallyId, bool skipValidation = false)
     {
         return TallyDecryptions[tallyId].CreateChallenge(skipValidation);
+    }
+    public void LoadChallenge(string tallyId, string guardianId, GuardianChallenge challenge)
+    {
+        TallyDecryptions[tallyId].LoadChallenge(guardianId, challenge);
     }
 
     #endregion

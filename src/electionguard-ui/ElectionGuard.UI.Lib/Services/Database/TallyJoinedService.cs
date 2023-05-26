@@ -35,4 +35,23 @@ public class TallyJoinedService : BaseDatabaseService<TallyJoinedRecord>
         var list = await GetAllByFilterAsync(filter);
         return list.Select(t => t.TallyId!).ToList();
     }
+
+    public async Task<long> GetCountByTallyJoinedAsync(string tallyId)
+    {
+        var filter = FilterBuilder.And(
+                FilterBuilder.Eq(Constants.TallyId, tallyId),
+                FilterBuilder.Eq(Constants.Joined, true));
+
+        return await CountByFilterAsync(filter);
+    }
+
+    public async Task<bool> GetExistsByTallyAsync(string tallyId, string guardianId)
+    {
+        var filter = FilterBuilder.And(
+            FilterBuilder.Eq(Constants.TallyId, tallyId),
+            FilterBuilder.Eq(Constants.GuardianId, guardianId)
+            );
+        return await ExistsByFilterAsync(filter);
+    }
+
 }
