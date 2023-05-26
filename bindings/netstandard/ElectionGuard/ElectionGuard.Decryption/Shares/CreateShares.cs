@@ -11,15 +11,15 @@ public static class CreateSharesExtensions
 {
     /// <summary>
     /// Conmpute decryption shares for a tally and a list of ballots. 
-    /// Usially the list of ballots is the challenged ballots in the tally.
+    /// Usually the list of ballots is the challenged ballots in the tally.
     /// </summary>
     public static DecryptionShare ComputeDecryptionShares(
         this Guardian guardian,
         CiphertextTally tally,
-        List<CiphertextBallot> ballots)
+        List<CiphertextBallot> challengeBallots)
     {
         var share = guardian.ComputeDecryptionShare(tally)!;
-        var shares = guardian.ComputeDecryptionShares(tally.TallyId, ballots)!;
+        var shares = guardian.ComputeDecryptionShares(tally.TallyId, challengeBallots)!;
         return new(share, shares);
     }
 
