@@ -20,7 +20,6 @@ namespace ElectionGuard.UI.Services
         private readonly TallyMediator _tallyMediator;
         private readonly ContextService _contextService;
         private readonly ManifestService _manifestService;
-        private readonly ElectionService _electionService;
         private readonly GuardianPublicKeyService _guardianPublicKeyService;
         private readonly BallotService _ballotService;
         private readonly KeyCeremonyService _keyCeremonyService;
@@ -35,7 +34,6 @@ namespace ElectionGuard.UI.Services
             TallyMediator tallyMediator,
             ContextService contextService,
             ManifestService manifestService,
-            ElectionService electionService,
             BallotService ballotService,
             KeyCeremonyService keyCeremonyService,
             DecryptionShareService decryptionShareService,
@@ -50,7 +48,6 @@ namespace ElectionGuard.UI.Services
             _tallyMediator = tallyMediator;
             _contextService = contextService;
             _manifestService = manifestService;
-            _electionService = electionService;
             _guardianPublicKeyService = guardianPublicKeyService;
             _challengeService = challengeService;
             _challengeResponseService = challengeResponseService;
@@ -273,20 +270,7 @@ namespace ElectionGuard.UI.Services
                 ShareData = JsonConvert.SerializeObject(decryptionShare, SerializationSettings.NewtonsoftSettings()),
             };
 
-            await _decryptionShareService.SaveAsync(shareRecord);
-        }
-
-        private async Task LoadShare(DecryptionMediator mediator, string guardianId, TallyRecord tally)
-        {
-            ArgumentException.ThrowIfNullOrEmpty(tally.ElectionId);
-
-            var share = await _decryptionShareService.GetByGuardianIdAsync(tally.TallyId, guardianId) ??
-                throw new Exception(nameof(tally.TallyId));
-
-            var shareData = JsonConvert.DeserializeObject<DecryptionShare>(share.ShareData, SerializationSettings.NewtonsoftSettings()) ??
-                throw new ArgumentException(nameof(share.ShareData));
-            var challengeBallots = await GetBallotsByState(tally.ElectionId, BallotBoxState.Challenged);
-            mediator.SubmitShares(shareData, challengeBallots.ToList());
+            _ = await _decryptionShareService.SaveAsync(shareRecord);
         }
 
         private async Task LoadAllShares(DecryptionMediator mediator, TallyRecord tally)
@@ -317,7 +301,7 @@ namespace ElectionGuard.UI.Services
         {
             ArgumentException.ThrowIfNullOrEmpty(tally.ElectionId);
 
-            if (ballotBoxState != BallotBoxState.Spoiled && ballotBoxState != BallotBoxState.Challenged)
+            if (ballotBoxState is not BallotBoxState.Spoiled and not BallotBoxState.Challenged)
             {
                 throw new ArgumentOutOfRangeException(nameof(ballotBoxState));
             }
