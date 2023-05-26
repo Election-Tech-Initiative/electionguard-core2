@@ -23,7 +23,9 @@ public partial class GuardianHomeViewModel : BaseViewModel
     {
         await base.OnAppearing();
 
+        _timer.Tick += PollingTimer_Tick;
         _timer.Start();
+
         PollingTimer_Tick(this, null);
     }
 
