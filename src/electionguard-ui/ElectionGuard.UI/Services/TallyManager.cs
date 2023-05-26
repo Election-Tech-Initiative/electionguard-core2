@@ -1,5 +1,4 @@
-﻿using System;
-using ElectionGuard.Decryption;
+﻿using ElectionGuard.Decryption;
 using ElectionGuard.Decryption.Challenge;
 using ElectionGuard.Decryption.ChallengeResponse;
 using ElectionGuard.Decryption.Shares;
@@ -8,7 +7,6 @@ using ElectionGuard.ElectionSetup;
 using ElectionGuard.Encryption.Utils.Converters;
 using ElectionGuard.Extensions;
 using ElectionGuard.Guardians;
-using ElectionGuard.UI.Lib.Models;
 using MongoDB.Driver;
 using Newtonsoft.Json;
 
