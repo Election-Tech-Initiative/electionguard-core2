@@ -1,7 +1,8 @@
-using ElectionGuard.Ballot;
+﻿using ElectionGuard.Ballot;
 using ElectionGuard.Base;
 using ElectionGuard.ElectionSetup;
 using ElectionGuard.ElectionSetup.Extensions;
+using Newtonsoft.Json;
 
 namespace ElectionGuard.Decryption.Challenge;
 
@@ -40,6 +41,7 @@ public record ContestChallenge
         SequenceOrder = contest.SequenceOrder;
     }
 
+    [JsonConstructor]
     public ContestChallenge(
         string objectId,
         ulong sequenceOrder,

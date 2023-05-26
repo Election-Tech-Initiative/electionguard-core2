@@ -1,8 +1,5 @@
 ﻿using System.IO.Compression;
 using System.Text.Json;
-using CommunityToolkit.Mvvm.DependencyInjection;
-using ElectionGuard.ElectionSetup;
-using ElectionGuard.UI.Lib.Services;
 using MongoDB.Driver;
 
 namespace ElectionGuard.UI.Helpers;
@@ -131,9 +128,9 @@ public static class ElectionRecordGenerator
         var plaintextTally = await plaintextTallyService.GetByTallyIdAsync(tallyId);
         await File.WriteAllTextAsync(Path.Combine(summaryFolder, TALLY_FILENAME), plaintextTally);
 
-        // write encrypted tally
-        EncryptedTallyService encryptedTallyService = new();
-        var encryptedTally = await encryptedTallyService.GetByTallyIdAsync(tallyId);
-        await File.WriteAllTextAsync(Path.Combine(summaryFolder, ENCRYPTED_TALLY_FILENAME), encryptedTally);
+        // write ciphertext tally
+        CiphertextTallyService ciphertextTallyService = new();
+        var ciphertextTally = await ciphertextTallyService.GetByTallyIdAsync(tallyId);
+        await File.WriteAllTextAsync(Path.Combine(summaryFolder, ENCRYPTED_TALLY_FILENAME), ciphertextTally);
     }
 }

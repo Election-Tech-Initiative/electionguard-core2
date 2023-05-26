@@ -26,4 +26,7 @@ public partial class BallotRecord : DatabaseRecord
     public BallotRecord() : base(nameof(BallotRecord))
     {
     }
+
+    public override string ToString() => BallotData ?? string.Empty;
+    public static implicit operator string(BallotRecord? record) => record?.ToString() ?? string.Empty;
 }

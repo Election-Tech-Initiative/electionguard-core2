@@ -116,6 +116,10 @@ namespace electionguard
 
     static unique_ptr<ContactInformation> contactInformationFromJson(const json &j)
     {
+        if (j.is_null()) {
+            return nullptr;
+        }
+
         vector<string> addressLine;
         if (j.contains("address_line") && !j["address_line"].is_null()) {
             for (const auto &i : j["address_line"]) {

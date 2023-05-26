@@ -1,7 +1,8 @@
-using ElectionGuard.Ballot;
+﻿using ElectionGuard.Ballot;
 using ElectionGuard.Decryption.Accumulation;
 using ElectionGuard.ElectionSetup;
 using ElectionGuard.Guardians;
+using Newtonsoft.Json;
 
 namespace ElectionGuard.Decryption.Challenge;
 
@@ -112,6 +113,7 @@ public record SelectionChallenge : DisposableRecordBase
         Challenge = BigMath.MultModQ(challenge, coefficient);
     }
 
+    [JsonConstructor]
     public SelectionChallenge(
         string selectionId,
         string guardianId,

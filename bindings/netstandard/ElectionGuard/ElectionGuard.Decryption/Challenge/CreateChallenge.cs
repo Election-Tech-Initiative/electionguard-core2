@@ -48,7 +48,7 @@ public static class CreateChallengeExtensions
         {
             challenges.Add(
                 guardianId,
-                new TallyChallenge(guardianId, self.TallyId, coefficient, self.Manifest));
+                new TallyChallenge(self.TallyId, guardianId, coefficient, self.Manifest));
         }
 
         return self.CreateChallenge(accumulatedTally, challenges);

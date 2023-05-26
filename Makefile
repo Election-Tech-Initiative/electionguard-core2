@@ -121,6 +121,7 @@ ifeq ($(OPERATING_SYSTEM),Linux)
 	sudo apt install -y clang-tidy
 	sudo apt install -y ninja-build
 	sudo apt install -y valgrind
+	sudo apt install -y unzip
 endif
 ifeq ($(OPERATING_SYSTEM),Windows)
 	@echo 🏁 WINDOWS INSTALL

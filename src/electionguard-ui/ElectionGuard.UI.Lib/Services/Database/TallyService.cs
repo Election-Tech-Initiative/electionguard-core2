@@ -55,8 +55,7 @@ public class TallyService : BaseDatabaseService<TallyRecord>
     /// <param name="keyCeremonyId">key ceremony id to update</param>
     virtual public async Task UpdateCompleteAsync(string tallyId)
     {
-        var filterBuilder = Builders<TallyRecord>.Filter;
-        var filter = filterBuilder.And(filterBuilder.Eq(Constants.TallyId, tallyId));
+        var filter = FilterBuilder.And(FilterBuilder.Eq(Constants.TallyId, tallyId));
 
         var updateBuilder = Builders<TallyRecord>.Update;
         var update = updateBuilder.Set(Constants.State, TallyState.Complete)
@@ -65,4 +64,20 @@ public class TallyService : BaseDatabaseService<TallyRecord>
 
         await UpdateAsync(filter, update);
     }
+
+    /// <summary>
+    /// Update the state of the TallyRecord
+    /// </summary>
+    /// <param name="tallyId">tally id to use</param>
+    /// <param name="state">new state to put the tally into</param>
+    public virtual async Task UpdateStateAsync(string tallyId, TallyState state)
+    {
+        var filter = FilterBuilder.And(FilterBuilder.Eq(Constants.TallyId, tallyId));
+
+        var updateBuilder = Builders<TallyRecord>.Update;
+        var update = updateBuilder.Set(Constants.State, state);
+
+        await UpdateAsync(filter, update);
+    }
+
 }

@@ -2,7 +2,9 @@
 using System.Text.Json;
 using CommunityToolkit.Maui.Storage;
 using CommunityToolkit.Mvvm.Input;
-using ElectionGuard.UI.Helpers;
+using ElectionGuard.Decryption;
+using ElectionGuard.Decryption.Tally;
+
 namespace ElectionGuard.UI.ViewModels;
 
 [QueryProperty(ElectionIdParam, nameof(ElectionId))]
@@ -34,23 +36,31 @@ public partial class BallotUploadViewModel : BaseViewModel
     private string _ballotFolderName = string.Empty;
 
     [ObservableProperty]
-    private string _resultsText;
+    private string _resultsText = string.Empty;
 
     [ObservableProperty]
-    private string _uploadText;
+    private string _uploadText = string.Empty;
 
     private uint _serialNumber;
 
-    private ElementModQ _manifestHash;
+    private ElementModQ? _manifestHash;
 
+    private InternalManifest? _internalManifest;
+
+    
+    private CiphertextElectionContext? _context;
 
     partial void OnElectionIdChanged(string value)
     {
-        Task.Run(async() =>
+        _ = Task.Run(async () =>
         {
             var record = await _manifestService.GetByElectionIdAsync(value);
             using var manifest = new Manifest(record.ManifestData);
             _manifestHash = new(manifest.CryptoHash());
+            _internalManifest = new InternalManifest(manifest);
+
+            var contextRecord = await _contextService.GetByElectionIdAsync(value);
+            _context = new CiphertextElectionContext(contextRecord?.ContextData);
         });
     }
 
@@ -58,14 +68,14 @@ public partial class BallotUploadViewModel : BaseViewModel
     private void Manual()
     {
         ShowPanel = BallotUploadPanel.ManualUpload;
-        _timer.Stop();
+        _timer?.Stop();
     }
 
     [RelayCommand]
     private void Auto()
     {
         ShowPanel = BallotUploadPanel.AutoUpload;
-        _timer.Start();
+        _timer?.Start();
     }
 
     [RelayCommand]
@@ -119,6 +129,14 @@ public partial class BallotUploadViewModel : BaseViewModel
         long totalSpoiled = 0;
         ulong startDate = ulong.MaxValue;
         ulong endDate = ulong.MinValue;
+        object tallyLock = new();
+
+        var mediator = new TallyMediator();
+        var ciphertextTally = mediator.CreateTally(Guid.NewGuid().ToString(), 
+            "subtally",
+            _context!,
+            _internalManifest!);
+
 
         await Parallel.ForEachAsync(ballots, async (currentBallot, cancel) =>
         {
@@ -166,6 +184,10 @@ public partial class BallotUploadViewModel : BaseViewModel
                     {
                         _ = Interlocked.Increment(ref totalInserted);
                     }
+                    lock (tallyLock)
+                    {
+                        var result = ciphertextTally.Accumulate(ballot, false);
+                    }
                 }
                 else
                 {
@@ -174,7 +196,7 @@ public partial class BallotUploadViewModel : BaseViewModel
                 _ = Interlocked.Increment(ref totalCount);
                 UploadText = $"{AppResources.SuccessText} {totalCount} / {ballots.Length} {AppResources.Success2Text}";
             }
-            catch (Exception)
+            catch (Exception ex)
             {
             }
         });
@@ -191,9 +213,18 @@ public partial class BallotUploadViewModel : BaseViewModel
         try
         {
             _ = await _uploadService.SaveAsync(upload);
-            _timer.Stop();
+            _timer?.Stop();
             ResultsText = $"{AppResources.SuccessText} {totalCount} {AppResources.Success2Text}";
             ShowPanel = BallotUploadPanel.Results;
+
+            var record = new CiphertextTallyRecord()
+            {
+                ElectionId = ElectionId,
+                UploadId = upload.UploadId!,
+                IsExportable = false,
+                CiphertextTallyData = ciphertextTally.ToJson()
+            };
+            _ = await _ciphertextTallyService.SaveAsync(record);
         }
         catch (Exception)
         {
@@ -263,26 +294,35 @@ public partial class BallotUploadViewModel : BaseViewModel
         ResultsText = string.Empty;
         UploadText = string.Empty;
         _lastDrive = -1;
-        _timer.Start();
+        _timer?.Start();
     }
 
     private readonly BallotUploadService _uploadService;
     private readonly BallotService _ballotService;
     private readonly ManifestService _manifestService;
-    private bool _importing = false;
+    private readonly ContextService _contextService;
+    private readonly CiphertextTallyService _ciphertextTallyService;
+    private bool _importing;
     private long _lastDrive = -1;
 
-    public BallotUploadViewModel(IServiceProvider serviceProvider, BallotUploadService uploadService, BallotService ballotService, ManifestService manifestService) : base("BallotUploadText", serviceProvider)
+    public BallotUploadViewModel(IServiceProvider serviceProvider,
+        BallotUploadService uploadService,
+        BallotService ballotService,
+        ManifestService manifestService,
+        ContextService contextService,
+        CiphertextTallyService ciphertextTallyService) : base("BallotUploadText", serviceProvider)
     {
         _uploadService = uploadService;
         _ballotService = ballotService;
         _manifestService = manifestService;
+        _contextService = contextService;
+        _ciphertextTallyService = ciphertextTallyService;
 
-        _timer.Tick += _timer_Tick;
-        _timer.Start();
+        _timer!.Tick += _timer_Tick;
+        _timer?.Start();
     }
 
-    private void _timer_Tick(object sender, EventArgs e)
+    private void _timer_Tick(object? sender, EventArgs e)
     {
         if (_importing)
         {
@@ -290,7 +330,7 @@ public partial class BallotUploadViewModel : BaseViewModel
         }
         _importing = true;
 
-        Task.Run(async () =>
+        _ = Task.Run(async () =>
         {
             // check for a usb drive
             var drives = DriveInfo.GetDrives();
@@ -349,7 +389,7 @@ public partial class BallotUploadViewModel : BaseViewModel
                     var ballotPath = Path.Combine(drive.Name, "artifacts", "encrypted_ballots");
                     if (!Directory.Exists(ballotPath))
                     {
-                        DeviceFile = null;
+                        DeviceFile = string.Empty;
                         _importing = false;
                         return;
                     }
@@ -383,8 +423,12 @@ public partial class BallotUploadViewModel : BaseViewModel
 
     public override async Task OnLeavingPage()
     {
-        _timer.Stop();
-        _timer.Tick -= _timer_Tick;
+        _internalManifest?.Dispose();
+        _manifestHash?.Dispose();
+        _context?.Dispose();
+
+        _timer?.Stop();
+        _timer!.Tick -= _timer_Tick;
         await base.OnLeavingPage();
     }
 }

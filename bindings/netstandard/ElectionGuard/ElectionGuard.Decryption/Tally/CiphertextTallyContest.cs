@@ -1,4 +1,5 @@
-using ElectionGuard.Ballot;
+﻿using ElectionGuard.Ballot;
+using Newtonsoft.Json;
 using ElectionGuard.ElectionSetup.Extensions;
 
 namespace ElectionGuard.Decryption.Tally;
@@ -31,6 +32,7 @@ public class CiphertextTallyContest : DisposableBase, ICiphertextContest, IEquat
 
     IReadOnlyList<ICiphertextSelection> ICiphertextContest.Selections => Selections.Values.ToList();
 
+    [JsonConstructor]
     public CiphertextTallyContest(
         string objectId, ulong sequenceOrder, ElementModQ descriptionHash,
         Dictionary<string, CiphertextTallySelection> selections)
@@ -89,6 +91,18 @@ public class CiphertextTallyContest : DisposableBase, ICiphertextContest, IEquat
         }
     }
 
+    public void Accumulate(CiphertextTallyContest contest)
+    {
+        if (!Selections.Keys.All(contest.Selections.Keys.Contains))
+        {
+            throw new ArgumentException("Selections do not match contest");
+        }
+        foreach (var (selectionId, selection) in contest.Selections)
+        {
+            _ = Selections[selectionId].Accumulate(selection);
+        }
+    }
+
     /// <summary>
     /// Accumulate a CiphertextBallotContest into the CiphertextTallyContest
     /// </summary>
@@ -115,6 +129,25 @@ public class CiphertextTallyContest : DisposableBase, ICiphertextContest, IEquat
         {
             tasks.Add(
                 Selections[selection.ObjectId].AccumulateAsync(
+                    selection, cancellationToken)
+            );
+        }
+        await Task.WhenAll(tasks);
+    }
+
+    public async Task AccumulateAsync(CiphertextTallyContest contest,
+        CancellationToken cancellationToken = default)
+    {
+        if (!Selections.Keys.All(contest.Selections.Keys.Contains))
+        {
+            throw new ArgumentException("Selections do not match contest");
+        }
+
+        var tasks = new List<Task>();
+        foreach (var (selectionId, selection) in contest.Selections)
+        {
+            tasks.Add(
+                Selections[selectionId].AccumulateAsync(
                     selection, cancellationToken)
             );
         }

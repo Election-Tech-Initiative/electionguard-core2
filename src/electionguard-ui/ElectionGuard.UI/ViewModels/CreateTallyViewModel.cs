@@ -1,6 +1,4 @@
 ﻿using CommunityToolkit.Mvvm.Input;
-using ElectionGuard.UI.Lib.Services;
-using MongoDB.Driver.Core.Clusters;
 
 namespace ElectionGuard.UI.ViewModels;
 
