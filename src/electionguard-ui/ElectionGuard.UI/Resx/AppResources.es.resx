@@ -536,6 +536,7 @@
   </data>
   <data name="Status" xml:space="preserve">
     <value>Estado</value>
+    </data>
   <data name="TallyAllChallengesResponded" xml:space="preserve">
     <value>¡Todos los Guardianes respondieron al Desafío!</value>
   </data>
