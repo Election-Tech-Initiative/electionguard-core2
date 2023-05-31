@@ -68,15 +68,7 @@ public partial class ViewTallyViewModel : BaseViewModel
             {
                 throw new ElectionGuardException($"Plaintext tally not found! Tally {value}");
             }
-            try
-            {
-                this.PlaintextTally = JsonConvert.DeserializeObject<PlaintextTally>(plaintextRecord, SerializationSettings.NewtonsoftSettings());
-
-            }
-            catch (Exception ex)
-            {
-                throw;
-            }
+            this.PlaintextTally = JsonConvert.DeserializeObject<PlaintextTally>(plaintextRecord);
         });
     }
 

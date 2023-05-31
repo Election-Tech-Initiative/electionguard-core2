@@ -53,9 +53,6 @@ public partial class ElectionViewModel : BaseViewModel
     [ObservableProperty]
     private ManifestRecord? _manifestRecord;
 
-    //[ObservableProperty]
-    //private PlaintextBallotContest _CurrentContest = new("contest", null);
-
     [ObservableProperty]
     private string? _manifestName;
 
@@ -127,7 +124,7 @@ public partial class ElectionViewModel : BaseViewModel
             MainThread.BeginInvokeOnMainThread(async () =>
                 await NavigationService.GoToPage(typeof(ViewTallyViewModel), new Dictionary<string, object>
                 {
-                { "TallyId", value.TallyId! }
+                    { "TallyId", value.TallyId! }
                 }));
         }
         else if (value.State != TallyState.Abandoned)

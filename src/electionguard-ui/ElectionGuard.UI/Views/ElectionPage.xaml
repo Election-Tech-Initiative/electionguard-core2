@@ -161,6 +161,7 @@
                             VerticalOptions="End" />
                     </Grid>
                     <CollectionView x:Name="UploadCollectionView" ItemsSource="{Binding BallotUploads}">
+                        <!-- section commented out to want to maui to fix
                         <CollectionView.Header>
                             <Grid>
                                 <Grid ColumnDefinitions="1.5*, 2*, *, *, *, *, *, *">
@@ -208,7 +209,7 @@
                                     StrokeThickness="2"
                                     VerticalOptions="End" />
                             </Grid>
-                        </CollectionView.Header>
+                        </CollectionView.Header>-->
                         <CollectionView.ItemTemplate>
                             <DataTemplate x:DataType="model:BallotUpload">
                                 <Grid BackgroundColor="{Binding ., Converter={StaticResource AlternateRowColorConverter}, ConverterParameter={x:Reference UploadCollectionView}}" ColumnDefinitions="1.5*, 2*, *, *, *, *, *, *">
@@ -253,6 +254,7 @@
                                 </Grid>
                             </DataTemplate>
                         </CollectionView.ItemTemplate>
+                        <!-- section commented out to want to maui to fix
                         <CollectionView.Footer>
                             <Grid BackgroundColor="{StaticResource Gray400}" ColumnDefinitions="3.5*, *, *, *, *, *, *">
                                 <Label
@@ -297,7 +299,7 @@
                                     HorizontalTextAlignment="Center"
                                     Text="{Binding BallotCountTotal}" />
                             </Grid>
-                        </CollectionView.Footer>
+                        </CollectionView.Footer>-->
                     </CollectionView>
                     <Grid BackgroundColor="{StaticResource Gray400}" ColumnDefinitions="3.5*, *, *, *, *, *, *">
                         <Label
@@ -381,6 +383,7 @@
                 ItemsSource="{Binding Tallies}"
                 SelectedItem="{Binding CurrentTally}"
                 SelectionMode="Single">
+                <!-- section commented out to want to maui to fix
                 <CollectionView.Header>
                     <Grid>
                         <Grid ColumnDefinitions="1.5*, 3*, 50">
@@ -398,7 +401,7 @@
                             StrokeThickness="2"
                             VerticalOptions="End" />
                     </Grid>
-                </CollectionView.Header>
+                </CollectionView.Header>-->
                 <CollectionView.ItemTemplate>
                     <DataTemplate x:DataType="model:TallyRecord">
                         <Grid BackgroundColor="{Binding ., Converter={StaticResource AlternateRowColorConverter}, ConverterParameter={x:Reference TallyCollectionView}}" ColumnDefinitions="1.5*, 3*, 50">
@@ -413,6 +416,7 @@
                         </Grid>
                     </DataTemplate>
                 </CollectionView.ItemTemplate>
+                <!-- section commented out to want to maui to fix
                 <CollectionView.Footer>
                     <Grid BackgroundColor="{StaticResource Gray400}">
                         <Label
@@ -421,7 +425,7 @@
                             FontAttributes="Bold,Italic"
                             Text=" " />
                     </Grid>
-                </CollectionView.Footer>
+                </CollectionView.Footer>-->
             </CollectionView>
             <Grid BackgroundColor="{StaticResource Gray400}">
                 <Label
