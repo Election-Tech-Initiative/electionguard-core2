@@ -504,4 +504,25 @@
   <data name="ProcessTallyJoinYes" xml:space="preserve">
     <value>¡Únete a Tally!</value>
   </data>
+  <data name="TallyAllChallengesResponded" xml:space="preserve">
+    <value>¡Todos los Guardianes respondieron al Desafío!</value>
+  </data>
+  <data name="TallyAllDecryptionsComputed" xml:space="preserve">
+    <value>¡Todas las acciones de Guardian calculadas!</value>
+  </data>
+  <data name="TallyChallengeCreated" xml:space="preserve">
+    <value>Desafío creado</value>
+  </data>
+  <data name="TallyComplete" xml:space="preserve">
+    <value>¡Verificado y resultados calculados!</value>
+  </data>
+  <data name="TallyQuorumReachedText" xml:space="preserve">
+    <value>¡Se ha alcanzado el quórum!</value>
+  </data>
+  <data name="TallySubtalliesCombined" xml:space="preserve">
+    <value>¡Las papeletas han sido contadas!</value>
+  </data>
+  <data name="TallyChecklist" xml:space="preserve">
+    <value>¡Proceso de recuento!</value>
+  </data>
 </root>
