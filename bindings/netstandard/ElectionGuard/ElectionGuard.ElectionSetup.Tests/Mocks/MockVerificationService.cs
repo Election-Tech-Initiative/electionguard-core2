@@ -1,5 +1,6 @@
-using ElectionGuard.UI.Lib.Models;
+﻿using ElectionGuard.UI.Lib.Models;
 using ElectionGuard.UI.Lib.Services;
+using MongoDB.Driver;
 
 namespace ElectionGuard.ElectionSetup.Tests.Mocks;
 
@@ -23,7 +24,7 @@ public class MockVerificationService : MockBaseDatabaseServiceBase<ElectionParti
         return Task.FromResult(records ?? null);
     }
 
-    public override Task<ElectionPartialKeyVerification> SaveAsync(ElectionPartialKeyVerification data, string? table = null)
+    public override Task<ElectionPartialKeyVerification> SaveAsync(ElectionPartialKeyVerification data, FilterDefinition<ElectionPartialKeyVerification>? customFilter = null, string? table = null)
     {
         data.Id ??= Guid.NewGuid().ToString();
         ElectionPartialKeyVerification record = new(data);
