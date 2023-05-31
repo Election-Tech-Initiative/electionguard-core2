@@ -1,5 +1,4 @@
-﻿using System.Security.Cryptography.X509Certificates;
-using ElectionGuard.Decryption;
+﻿using ElectionGuard.Decryption;
 using ElectionGuard.Decryption.Challenge;
 using ElectionGuard.Decryption.ChallengeResponse;
 using ElectionGuard.Decryption.Decryption;
@@ -10,7 +9,6 @@ using ElectionGuard.ElectionSetup;
 using ElectionGuard.Encryption.Utils.Converters;
 using ElectionGuard.Extensions;
 using ElectionGuard.Guardians;
-using ElectionGuard.UI.Lib.Services;
 using MongoDB.Driver;
 using Newtonsoft.Json;
 

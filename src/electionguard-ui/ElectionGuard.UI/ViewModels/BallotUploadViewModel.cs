@@ -182,9 +182,9 @@ public partial class BallotUploadViewModel : BaseViewModel
 
                     _ = ballot.State switch
                     {
-                        BallotBoxState.Cast => _ = Interlocked.Increment(ref totalInserted),
-                        BallotBoxState.Challenged => _ = Interlocked.Increment(ref totalChallenged),
-                        BallotBoxState.Spoiled => _ = Interlocked.Increment(ref totalSpoiled),
+                        BallotBoxState.Cast => Interlocked.Increment(ref totalInserted),
+                        BallotBoxState.Challenged => Interlocked.Increment(ref totalChallenged),
+                        BallotBoxState.Spoiled => Interlocked.Increment(ref totalSpoiled),
                         _ => throw new NotImplementedException()
                     };
 
