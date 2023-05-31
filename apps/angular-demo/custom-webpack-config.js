@@ -8,7 +8,10 @@ module.exports = {
         fallback: {
             crypto: false,
             fs: false,
-            path: false
+            os: false,
+            path: false,
+            perf_hooks: false,
+            worker_threads: false
         },
     },
 };
