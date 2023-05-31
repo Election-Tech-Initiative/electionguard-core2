@@ -5,8 +5,6 @@
 /// </summary>
 public record PlaintextTallyBallot : PlaintextTally, IEquatable<PlaintextTallyBallot>
 {
-    public string BallotCode { get; init; } = string.Empty;
-
     public PlaintextTallyBallot(
         string tallyId, string name, List<ContestDescriptionWithPlaceholders> contests)
         : base(tallyId, name, contests)
@@ -26,7 +24,6 @@ public record PlaintextTallyBallot : PlaintextTally, IEquatable<PlaintextTallyBa
         CiphertextBallot ballot)
         : base(tallyId, ballot)
     {
-        BallotCode = ballot.BallotCode.ToHex();
     }
 
     public PlaintextTallyBallot(PlaintextTallyBallot ballot)
