@@ -15,7 +15,7 @@ public class PlaintextSpoiledBallotService : BaseDatabaseService<PlaintextSpoile
     /// <summary>
     /// Default constructor that sets the collection name
     /// </summary>
-    public PlaintextSpoiledBallotService() : base(_collection) { }
+    public PlaintextSpoiledBallotService() : base(_collection, nameof(PlaintextSpoiledBallotRecord)) { }
 
     /// <summary>
     /// Gets plain text tally for an election

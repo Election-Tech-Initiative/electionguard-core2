@@ -15,7 +15,7 @@ public class PlaintextTallyService : BaseDatabaseService<PlaintextTallyRecord>
     /// <summary>
     /// Default constructor that sets the collection name
     /// </summary>
-    public PlaintextTallyService() : base(_collection) { }
+    public PlaintextTallyService() : base(_collection, nameof(PlaintextTallyRecord)) { }
 
     /// <summary>
     /// Gets plain text tally for an election
@@ -25,5 +25,12 @@ public class PlaintextTallyService : BaseDatabaseService<PlaintextTallyRecord>
     {
         return await GetByFieldAsync(Constants.TallyId, tallyId);
     }
+
+    public Task<PlaintextTallyRecord> SaveAsync(PlaintextTallyRecord data)
+    {
+        var filter = FilterBuilder.Eq(Constants.TallyId, data.TallyId);
+        return SaveAsync(data, filter);
+    }
+
 
 }

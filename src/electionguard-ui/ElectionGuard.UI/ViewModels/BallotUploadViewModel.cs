@@ -126,16 +126,19 @@ public partial class BallotUploadViewModel : BaseViewModel
         long totalInserted = 0;
         long totalDuplicated = 0;
         long totalRejected = 0;
+        long totalChallenged = 0;
         long totalSpoiled = 0;
         ulong startDate = ulong.MaxValue;
         ulong endDate = ulong.MinValue;
         object tallyLock = new();
 
         var mediator = new TallyMediator();
-        var ciphertextTally = mediator.CreateTally(Guid.NewGuid().ToString(), 
+        var ciphertextTally = mediator.CreateTally(Guid.NewGuid().ToString(),
             "subtally",
             _context!,
             _internalManifest!);
+
+        UploadText = $"{AppResources.Uploading} {ballots.Length} {AppResources.Success2Text}";
 
 
         await Parallel.ForEachAsync(ballots, async (currentBallot, cancel) =>
@@ -176,17 +179,29 @@ public partial class BallotUploadViewModel : BaseViewModel
                     };
                     _ = await _ballotService.SaveAsync(ballotRecord);
 
-                    if (ballot.State == BallotBoxState.Spoiled)
+
+                    switch (ballot.State)
                     {
-                        _ = Interlocked.Increment(ref totalSpoiled);
+                        case BallotBoxState.Cast:
+                            _ = Interlocked.Increment(ref totalInserted);
+                            break;
+                        case BallotBoxState.Challenged:
+                            _ = Interlocked.Increment(ref totalChallenged);
+                            break;
+                        case BallotBoxState.Spoiled:
+                            _ = Interlocked.Increment(ref totalSpoiled);
+                            break;
+                        case BallotBoxState.NotSet:
+                            break;
+                        case BallotBoxState.Unknown:
+                            break;
+                        default:
+                            break;
                     }
-                    else
-                    {
-                        _ = Interlocked.Increment(ref totalInserted);
-                    }
+
                     lock (tallyLock)
                     {
-                        var result = ciphertextTally.Accumulate(ballot, false);
+                        var result = ciphertextTally.Accumulate(ballot, true);
                     }
                 }
                 else
@@ -207,6 +222,7 @@ public partial class BallotUploadViewModel : BaseViewModel
         upload.BallotDuplicated = totalDuplicated;
         upload.BallotRejected = totalRejected;
         upload.BallotSpoiled = totalSpoiled;
+        upload.BallotChallenged = totalChallenged;
         upload.BallotsStart = DateTime.UnixEpoch.AddSeconds(startDate);
         upload.BallotsEnd = DateTime.UnixEpoch.AddSeconds(endDate);
 

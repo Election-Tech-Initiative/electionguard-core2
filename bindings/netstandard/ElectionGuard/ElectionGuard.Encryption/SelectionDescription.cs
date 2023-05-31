@@ -1,5 +1,6 @@
 ﻿using System.Runtime.InteropServices;
 using ElectionGuard.Ballot;
+using Newtonsoft.Json;
 
 namespace ElectionGuard
 {
@@ -92,6 +93,18 @@ namespace ElectionGuard
         {
             var status = NativeInterface.SelectionDescription.New(
                 objectId, candidateId, sequenceOrder, out Handle);
+            if (status != Status.ELECTIONGUARD_STATUS_SUCCESS)
+            {
+                throw new ElectionGuardException($"SelectionDescription Error Status: {status}");
+            }
+        }
+
+        [JsonConstructor]
+        public SelectionDescription(
+            string objectId, ulong sequenceOrder)
+        {
+            var status = NativeInterface.SelectionDescription.New(
+                objectId, "", sequenceOrder, out Handle);
             if (status != Status.ELECTIONGUARD_STATUS_SUCCESS)
             {
                 throw new ElectionGuardException($"SelectionDescription Error Status: {status}");

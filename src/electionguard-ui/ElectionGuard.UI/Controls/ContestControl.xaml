@@ -19,6 +19,30 @@
             HorizontalOptions="{Binding HorizontalOptions}"
             Style="{StaticResource FormLabel}"
             Text="{Binding Name}" />
+        <Grid>
+            <Grid ColumnDefinitions="4*, 2*, *, *">
+                <Label
+                    Grid.Column="0"
+                    FontAttributes="Bold"
+                    Text="{helper:Translate ChoiceText}" />
+                <Label
+                    Grid.Column="1"
+                    FontAttributes="Bold"
+                    Text="{helper:Translate PartyText}" />
+                <Label
+                    Grid.Column="2"
+                    FontAttributes="Bold"
+                    Text="{helper:Translate VotesText}" />
+                <Label
+                    Grid.Column="3"
+                    FontAttributes="Bold"
+                    Text="{helper:Translate PercentText}" />
+            </Grid>
+            <Line
+                BackgroundColor="{StaticResource Gray950}"
+                StrokeThickness="2"
+                VerticalOptions="End" />
+        </Grid>
         <CollectionView x:Name="UploadCollectionView" ItemsSource="{Binding Selections}">
             <CollectionView.Header>
                 <Grid>
@@ -88,5 +112,22 @@
                 </Grid>
             </CollectionView.Footer>
         </CollectionView>
+        <Grid BackgroundColor="{StaticResource Gray400}" ColumnDefinitions="4*, 2*, *, *">
+            <Label
+                Grid.Column="0"
+                Margin="10"
+                FontAttributes="Bold,Italic"
+                Text="{helper:Translate TotalText}" />
+            <Label
+                Grid.Column="2"
+                Margin="10"
+                FontAttributes="Bold"
+                Text="{Binding TotalVotes}" />
+            <Label
+                Grid.Column="3"
+                Margin="10"
+                FontAttributes="Bold"
+                Text="100.0%" />
+        </Grid>
     </VerticalStackLayout>
 </ContentView>

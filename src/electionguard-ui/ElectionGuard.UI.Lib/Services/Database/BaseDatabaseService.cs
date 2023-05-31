@@ -50,9 +50,11 @@ public class BaseDatabaseService<T> : IDatabaseService<T> where T : DatabaseReco
     /// <param name="data">data to be saved</param>
     /// <param name="table">Optional parameter to allow data type to use a different collection</param>
     /// <returns></returns>
-    public virtual async Task<T> SaveAsync(T data, string? table = null)
+    public virtual async Task<T> SaveAsync(T data, FilterDefinition<T>? customFilter = null, string? table = null)
     {
         var collection = DbService.GetCollection<T>(table ?? _collection);
+        var filter = FilterBuilder.Eq(Constants.Id, data.Id);
+        await collection.DeleteOneAsync(UpdateFilter(customFilter ?? filter));
         await collection.InsertOneAsync(data);
         return data;
     }

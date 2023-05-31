@@ -53,8 +53,8 @@ public partial class ElectionViewModel : BaseViewModel
     [ObservableProperty]
     private ManifestRecord? _manifestRecord;
 
-    [ObservableProperty]
-    private PlaintextBallotContest _CurrentContest = new("contest", null);
+    //[ObservableProperty]
+    //private PlaintextBallotContest _CurrentContest = new("contest", null);
 
     [ObservableProperty]
     private string? _manifestName;
@@ -70,6 +70,11 @@ public partial class ElectionViewModel : BaseViewModel
     [NotifyCanExecuteChangedFor(nameof(CreateTallyCommand))]
     [NotifyCanExecuteChangedFor(nameof(ReviewChallengedCommand))]
     private long _ballotSpoiledTotal = 0;
+
+    [ObservableProperty]
+    [NotifyCanExecuteChangedFor(nameof(CreateTallyCommand))]
+    [NotifyCanExecuteChangedFor(nameof(ReviewChallengedCommand))]
+    private long _ballotChallengedTotal = 0;
 
     [ObservableProperty]
     private long _ballotDuplicateTotal = 0;
@@ -112,11 +117,27 @@ public partial class ElectionViewModel : BaseViewModel
 
     partial void OnCurrentTallyChanged(TallyRecord? value)
     {
-        MainThread.BeginInvokeOnMainThread(async () =>
+        if (value is null)
+        {
+            return;
+        }
+
+        if (value.State == TallyState.Complete)
+        {
+            MainThread.BeginInvokeOnMainThread(async () =>
+                await NavigationService.GoToPage(typeof(ViewTallyViewModel), new Dictionary<string, object>
+                {
+                { "TallyId", value.TallyId! }
+                }));
+        }
+        else if (value.State != TallyState.Abandoned)
+        {
+            MainThread.BeginInvokeOnMainThread(async () =>
             await NavigationService.GoToPage(typeof(TallyProcessViewModel), new Dictionary<string, object>
             {
                 { "TallyId", value.TallyId! }
             }));
+        }
     }
 
 
@@ -134,6 +155,7 @@ public partial class ElectionViewModel : BaseViewModel
                 BallotCountTotal = 0;
                 BallotAddedTotal = 0;
                 BallotSpoiledTotal = 0;
+                BallotChallengedTotal = 0;
                 BallotDuplicateTotal = 0;
                 BallotRejectedTotal = 0;
                 uploads.ForEach((upload) =>
@@ -141,6 +163,7 @@ public partial class ElectionViewModel : BaseViewModel
                     BallotUploads.Add(upload);
                     BallotCountTotal += upload.BallotCount;
                     BallotAddedTotal += upload.BallotImported;
+                    BallotChallengedTotal += upload.BallotChallenged;
                     BallotSpoiledTotal += upload.BallotSpoiled;
                     BallotDuplicateTotal += upload.BallotDuplicated;
                     BallotRejectedTotal += upload.BallotRejected;

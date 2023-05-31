@@ -195,9 +195,6 @@
   <data name="AddBallots" xml:space="preserve">
     <value>Papeletas</value>
   </data>
-  <data name="BallotCountText" xml:space="preserve">
-    <value>¡Recuento de papeletas!</value>
-  </data>
   <data name="BallotStylesText" xml:space="preserve">
     <value>¡Estilos de papeleta!</value>
   </data>
@@ -503,5 +500,41 @@
   </data>
   <data name="ProcessTallyJoinYes" xml:space="preserve">
     <value>¡Únete a Tally!</value>
+  </data>
+  <data name="ChoiceText" xml:space="preserve">
+    <value>Opción</value>
+  </data>
+  <data name="PartyText" xml:space="preserve">
+    <value>Entidad</value>
+  </data>
+  <data name="PercentText" xml:space="preserve">
+    <value>%!</value>
+  </data>
+  <data name="VotesText" xml:space="preserve">
+    <value>Votos</value>
+  </data>
+  <data name="ViewTally" xml:space="preserve">
+    <value>Conteo</value>
+  </data>
+  <data name="ExportTally" xml:space="preserve">
+    <value>¡Exportar registro de elección!</value>
+  </data>
+  <data name="Uploading" xml:space="preserve">
+    <value>Cargando...</value>
+  </data>
+  <data name="BallotCountText" xml:space="preserve">
+    <value>Recuento</value>
+  </data>
+  <data name="ChallengedText" xml:space="preserve">
+    <value>Cuestionado</value>
+  </data>
+  <data name="ElectionNameText" xml:space="preserve">
+    <value>Elección</value>
+  </data>
+  <data name="JoinedGuardians" xml:space="preserve">
+    <value>¡Únete a los Guardianes!</value>
+  </data>
+  <data name="Status" xml:space="preserve">
+    <value>Estado</value>
   </data>
 </root>
