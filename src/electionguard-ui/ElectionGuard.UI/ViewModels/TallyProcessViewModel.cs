@@ -27,6 +27,9 @@ public partial class TallyProcessViewModel : BaseViewModel
     [NotifyCanExecuteChangedFor(nameof(StartTallyCommand))]
     private ObservableCollection<GuardianTallyItem> _joinedGuardians = new();
 
+    [ObservableProperty]
+    private TallyCeremonyChecklist _checklist = new();
+
     private readonly ElectionService _electionService;
     private readonly TallyService _tallyService;
     private readonly BallotUploadService _ballotUploadService;
@@ -57,11 +60,11 @@ public partial class TallyProcessViewModel : BaseViewModel
 
     partial void OnTallyChanged(TallyRecord? oldValue, TallyRecord? newValue)
     {
-        if (newValue is not null && oldValue?.TallyId != newValue?.TallyId)
+        if (newValue != null && oldValue?.TallyId != newValue?.TallyId)
         {
             _ = Shell.Current.CurrentPage.Dispatcher.DispatchAsync(async () =>
             {
-                var electionId = newValue.ElectionId ?? string.Empty;
+                var electionId = newValue!.ElectionId ?? string.Empty;
                 var election = await _electionService.GetByElectionIdAsync(electionId);
                 if (election is null)
                 {
@@ -72,7 +75,7 @@ public partial class TallyProcessViewModel : BaseViewModel
                 CurrentElection = election;
 
                 BallotUploads = await _ballotUploadService.GetByElectionIdAsync(electionId);
-                
+
                 await UpdateTallyData();
             });
         }
@@ -98,15 +101,21 @@ public partial class TallyProcessViewModel : BaseViewModel
 
         await _tallyJoinedService.JoinTallyAsync(joiner);
 
-        if (!_timer.IsRunning)
+        if (!(_timer?.IsRunning ?? true))
         {
             _timer.Start();
         }
     }
 
-    private bool CanJoinTally() => Tally?.State == TallyState.PendingGuardiansJoin && !CurrentUserJoinedAlready();
+    private bool CanJoinTally()
+    {
+        return Tally?.State == TallyState.PendingGuardiansJoin && !CurrentUserJoinedAlready();
+    }
 
-    private bool CurrentUserJoinedAlready() => JoinedGuardians.SingleOrDefault(g => g.Name == UserName) is object;
+    private bool CurrentUserJoinedAlready()
+    {
+        return JoinedGuardians.SingleOrDefault(g => g.Name == UserName) is not null;
+    }
 
     // guardian pulls big T tally from mongo
     // Tally + Tally.
@@ -121,17 +130,20 @@ public partial class TallyProcessViewModel : BaseViewModel
         };
 
         await _tallyJoinedService.JoinTallyAsync(joiner);
-        
+
         HomeCommand.Execute(null);
     }
 
     [RelayCommand(CanExecute = nameof(CanStartTally))]
     private async Task StartTally()
     {
-        if (!_timer.IsRunning)
+        _ = await Task.FromResult(() =>
         {
-            _timer.Start();
-        }
+            if (!(_timer?.IsRunning ?? true))
+            {
+                _timer?.Start();
+            }
+        });
     }
 
     private bool CanStartTally()
@@ -144,33 +156,41 @@ public partial class TallyProcessViewModel : BaseViewModel
     public override async Task OnAppearing()
     {
         await base.OnAppearing();
-        _timer.Tick += CeremonyPollingTimer_Tick;
+        _timer!.Tick += CeremonyPollingTimer_Tick;
 
-        _timer.Start();
+        _timer?.Start();
     }
     private void CeremonyPollingTimer_Tick(object? sender, EventArgs e)
     {
-        if(Tally is null)
+        if (Tally is null)
         {
             return;
         }
 
         if (Tally.State == TallyState.Complete)
         {
-            _timer.Stop();
+            _timer?.Stop();
             return;
         }
 
         _ = Task.Run(async () =>
         {
             Tally = await _tallyService.GetByTallyIdAsync(TallyId);
-            await UpdateTallyData();
-            await _tallyRunner.Run(Tally);
+            if (Tally != null)
+            {
+                await UpdateTallyData();
+                await _tallyRunner.Run(Tally);
+            }
         });
     }
 
     private async Task UpdateTallyData()
     {
+        if (Tally == null)
+        {
+            return;
+        }
+
         // if we have fewer than max number, see if anyone else joined
         if (JoinedGuardians.Count != Tally?.NumberOfGuardians)
         {
@@ -190,6 +210,15 @@ public partial class TallyProcessViewModel : BaseViewModel
             guardian.HasResponse = await _challengeResponseService.GetExistsByTallyAsync(TallyId, guardian.Name);
             guardian.IsSelf = guardian.Name == UserName!;
         }
+
+        var sharesComputed = JoinedGuardians.Count(g => g.HasDecryptShares);
+        var challengesResponded = JoinedGuardians.Count(g => g.HasResponse);
+
+        Checklist = new TallyCeremonyChecklist(
+            Tally!,
+            sharesComputed,
+            challengesResponded
+            );
     }
 
 }
