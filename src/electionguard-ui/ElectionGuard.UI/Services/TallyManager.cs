@@ -207,7 +207,7 @@ namespace ElectionGuard.UI.Services
             var coefficientsRecord = new LagrangeCoefficientsRecord()
             {
                 TallyId = tally.TallyId,
-                LagrangeCoefficientsData = JsonConvert.SerializeObject(coefficients, SerializationSettings.NewtonsoftSettings())
+                LagrangeCoefficientsData = JsonConvert.SerializeObject(coefficients)
             };
             _ = await _lagrangeCoefficientsService.SaveAsync(coefficientsRecord);
         }
@@ -223,7 +223,7 @@ namespace ElectionGuard.UI.Services
                     TallyId = tally.TallyId,
                     ElectionId = tally.ElectionId,
                     BallotCode = challenged.Name,
-                    BallotData = JsonConvert.SerializeObject(challenged, SerializationSettings.NewtonsoftSettings())
+                    BallotData = JsonConvert.SerializeObject(challenged)
                 };
                 _ = await _challengedBallotService.SaveAsync(record);
             }
