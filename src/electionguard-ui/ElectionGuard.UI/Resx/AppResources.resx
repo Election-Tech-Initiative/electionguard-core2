@@ -127,7 +127,7 @@
     <value>What Do You Want To Do?</value>
   </data>
   <data name="BallotCountText" xml:space="preserve">
-    <value>Ballot Count</value>
+    <value>Count</value>
   </data>
   <data name="BallotsText" xml:space="preserve">
     <value>Ballots</value>
@@ -489,6 +489,18 @@
   <data name="ReviewSpoiledText" xml:space="preserve">
     <value>Review Challenge</value>
   </data>
+  <data name="ChoiceText" xml:space="preserve">
+    <value>Choice</value>
+  </data>
+  <data name="PartyText" xml:space="preserve">
+    <value>Party</value>
+  </data>
+  <data name="PercentText" xml:space="preserve">
+    <value>%</value>
+  </data>
+  <data name="VotesText" xml:space="preserve">
+    <value>Votes</value>
+  </data>
   <data name="ExportDriveWarning" xml:space="preserve">
     <value>Please ensure the EGDrive removable storage is connected to the device. Please note, this will replace any encryption package currently on all EGDrive devices</value>
   </data>
@@ -500,6 +512,27 @@
   </data>
   <data name="ProcessTallyJoinYes" xml:space="preserve">
     <value>Yes, Join Tally</value>
+  </data>
+  <data name="ViewTally" xml:space="preserve">
+    <value>View Tally</value>
+  </data>
+  <data name="ChallengedText" xml:space="preserve">
+    <value>Challenged</value>
+  </data>
+  <data name="ElectionNameText" xml:space="preserve">
+    <value>Election Name</value>
+  </data>
+  <data name="ExportTally" xml:space="preserve">
+    <value>Export Election Record</value>
+  </data>
+  <data name="JoinedGuardians" xml:space="preserve">
+    <value>Joined Guardians</value>
+  </data>
+  <data name="Status" xml:space="preserve">
+    <value>Status</value>
+  </data>
+  <data name="Uploading" xml:space="preserve">
+    <value>Uploading</value>
   </data>
   <data name="TallyAllChallengesResponded" xml:space="preserve">
     <value>All Guardians responded to Challenge</value>

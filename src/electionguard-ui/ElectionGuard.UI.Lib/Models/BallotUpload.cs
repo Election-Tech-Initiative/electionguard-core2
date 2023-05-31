@@ -33,6 +33,9 @@ public partial class BallotUpload : DatabaseRecord
     private long _ballotImported;
 
     [ObservableProperty]
+    private long _ballotChallenged;
+
+    [ObservableProperty]
     private long _ballotSpoiled;
 
     [ObservableProperty]

@@ -1,5 +1,6 @@
-using System.Text;
+﻿using System.Text;
 using ElectionGuard.Ballot;
+using Newtonsoft.Json;
 
 namespace ElectionGuard.Decryption.Tally;
 
@@ -72,6 +73,7 @@ public class PlaintextTallySelection
 
     }
 
+    [JsonConstructor]
     public PlaintextTallySelection(
         string objectId,
         ulong sequenceOrder,

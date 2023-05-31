@@ -15,5 +15,5 @@ public class UserService : BaseDatabaseService<User>
     /// <summary>
     /// Default constructor that sets the collection name
     /// </summary>
-    public UserService() : base(_collection) { }
+    public UserService() : base(_collection, nameof(User)) { }
 }

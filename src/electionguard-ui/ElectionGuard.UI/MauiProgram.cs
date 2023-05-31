@@ -80,12 +80,14 @@ public static class MauiProgram
         builder.Services.AddTransient<ConstantsService>();
         builder.Services.AddTransient<BallotUploadService>();
         builder.Services.AddTransient<BallotService>();
+        builder.Services.AddTransient<ChallengedBallotService>();
         builder.Services.AddTransient<CiphertextTallyService>();
         builder.Services.AddTransient<TallyMediator>();
         builder.Services.AddTransient<DecryptionShareService>();
         builder.Services.AddTransient<ChallengeService>();
         builder.Services.AddTransient<ChallengeResponseService>();
         builder.Services.AddTransient<PlaintextTallyService>();
+        builder.Services.AddTransient<LagrangeCoefficientsService>();
         builder.Services.AddTransient<TallyManager>();
         builder.Services.AddTransient<ITallyStateMachine, TallyStateMachine>();
 
@@ -102,6 +104,7 @@ public static class MauiProgram
         builder.Services.AddTransient<BallotUploadViewModel>();
         builder.Services.AddTransient<CreateTallyViewModel>();
         builder.Services.AddTransient<TallyProcessViewModel>();
+        builder.Services.AddTransient<ViewTallyViewModel>();
 
         // setup views
         builder.Services.AddTransient<LoginPage>();
@@ -115,6 +118,7 @@ public static class MauiProgram
         builder.Services.AddTransient<BallotUploadPage>();
         builder.Services.AddTransient<CreateTallyPage>();
         builder.Services.AddTransient<TallyProcessPage>();
+        builder.Services.AddTransient<ViewTallyPage>();
 
         // popup pages
         builder.Services.AddTransient<SettingsPage>();

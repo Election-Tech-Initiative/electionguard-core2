@@ -1,6 +1,8 @@
 ﻿using ElectionGuard.Decryption;
 using ElectionGuard.Decryption.Challenge;
 using ElectionGuard.Decryption.ChallengeResponse;
+using ElectionGuard.Decryption.Decryption;
+using ElectionGuard.Decryption.Extensions;
 using ElectionGuard.Decryption.Shares;
 using ElectionGuard.Decryption.Tally;
 using ElectionGuard.ElectionSetup;
@@ -22,6 +24,7 @@ namespace ElectionGuard.UI.Services
         private readonly ManifestService _manifestService;
         private readonly GuardianPublicKeyService _guardianPublicKeyService;
         private readonly BallotService _ballotService;
+        private readonly ChallengedBallotService _challengedBallotService;
         private readonly KeyCeremonyService _keyCeremonyService;
         private readonly DecryptionShareService _decryptionShareService;
         private readonly CiphertextTallyService _ciphertextTallyService;
@@ -29,12 +32,14 @@ namespace ElectionGuard.UI.Services
         private readonly ChallengeService _challengeService;
         private readonly PlaintextTallyService _plaintextTallyService;
         private readonly GuardianBackupService _guardianBackupService;
+        private readonly LagrangeCoefficientsService _lagrangeCoefficientsService;
 
         public TallyManager(
             TallyMediator tallyMediator,
             ContextService contextService,
             ManifestService manifestService,
             BallotService ballotService,
+            ChallengedBallotService challengedBallotService,
             KeyCeremonyService keyCeremonyService,
             DecryptionShareService decryptionShareService,
             GuardianPublicKeyService guardianPublicKeyService,
@@ -42,7 +47,8 @@ namespace ElectionGuard.UI.Services
             ChallengeResponseService challengeResponseService,
             PlaintextTallyService plaintextTallyService,
             CiphertextTallyService ciphertextTallyService,
-            GuardianBackupService guardianBackupService)
+            GuardianBackupService guardianBackupService,
+            LagrangeCoefficientsService lagrangeCoefficientsService)
         {
             // TODO: ABC order
             _tallyMediator = tallyMediator;
@@ -53,10 +59,13 @@ namespace ElectionGuard.UI.Services
             _challengeResponseService = challengeResponseService;
             _ciphertextTallyService = ciphertextTallyService;
             _ballotService = ballotService;
+            _challengedBallotService = challengedBallotService;
             _keyCeremonyService = keyCeremonyService;
             _decryptionShareService = decryptionShareService;
             _plaintextTallyService = plaintextTallyService;
             _guardianBackupService = guardianBackupService;
+            _lagrangeCoefficientsService = lagrangeCoefficientsService;
+
         }
 
         #region Admin Steps
@@ -150,7 +159,7 @@ namespace ElectionGuard.UI.Services
             var mediator = await CreateDecryptionMediator(_adminUser, tally);
             await LoadAllShares(mediator, tally);
 
-            mediator.AccumulateShares(tally.TallyId);
+            mediator.AccumulateShares(tally.TallyId, true);
             // mediator.CreateChallenge(tallyId);
             var challengeRecords = await _challengeService.GetAllByTallyIdAsync(tally.TallyId) ?? throw new ArgumentException(nameof(tally.TallyId));
             foreach (var challengeRecord in challengeRecords)
@@ -174,14 +183,50 @@ namespace ElectionGuard.UI.Services
                 throw new ElectionGuardException("did not validate");
             }
 
-            var result = mediator.Decrypt(tally.TallyId);
+            using var result = mediator.Decrypt(tally.TallyId, true);
             var plaintextTallyRecord = new PlaintextTallyRecord()
             {
                 TallyId = tally.TallyId,
-                PlaintextTallyData = JsonConvert.SerializeObject(result.Tally),
+                PlaintextTallyData = JsonConvert.SerializeObject(result.Tally).Replace("\r\n", string.Empty),
             };
-
             _ = await _plaintextTallyService.SaveAsync(plaintextTallyRecord);
+
+            if (result.ChallengedBallots is not null)
+            {
+                await SaveChallengedBallots(tally, result);
+            }
+
+            await SaveCoefficients(tally, mediator);
+        }
+
+        private async Task SaveCoefficients(TallyRecord tally, DecryptionMediator mediator)
+        {
+            var publicKeys = mediator.Guardians.Values.ToList();
+            var coefficients = publicKeys.ComputeLagrangeCoefficients().ToDictionary(c => c.Key, c => c.Value.Coefficient.ToHex());
+
+            var coefficientsRecord = new LagrangeCoefficientsRecord()
+            {
+                TallyId = tally.TallyId,
+                LagrangeCoefficientsData = JsonConvert.SerializeObject(coefficients)
+            };
+            _ = await _lagrangeCoefficientsService.SaveAsync(coefficientsRecord);
+        }
+
+        private async Task SaveChallengedBallots(TallyRecord tally, DecryptionResult result)
+        {
+            ArgumentException.ThrowIfNullOrEmpty(tally.ElectionId);
+
+            foreach (var challenged in result.ChallengedBallots!)
+            {
+                var record = new ChallengedBallotRecord()
+                {
+                    TallyId = tally.TallyId,
+                    ElectionId = tally.ElectionId,
+                    BallotCode = challenged.Name,
+                    BallotData = JsonConvert.SerializeObject(challenged)
+                };
+                _ = await _challengedBallotService.SaveAsync(record);
+            }
         }
 
         #endregion
