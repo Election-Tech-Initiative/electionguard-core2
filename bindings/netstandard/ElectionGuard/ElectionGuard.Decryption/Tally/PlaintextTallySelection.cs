@@ -73,20 +73,6 @@ public class PlaintextTallySelection
 
     }
 
-    //public PlaintextTallySelection(
-    //    string objectId,
-    //    ulong sequenceOrder,
-    //    string descriptionHash,
-    //    ulong tally,
-    //    string value)
-    //{
-    //    ObjectId = objectId;
-    //    SequenceOrder = sequenceOrder;
-    //    DescriptionHash = new(descriptionHash);
-    //    Tally = tally;
-    //    Value = new(value);
-    //}
-
     [JsonConstructor]
     public PlaintextTallySelection(
         string objectId,

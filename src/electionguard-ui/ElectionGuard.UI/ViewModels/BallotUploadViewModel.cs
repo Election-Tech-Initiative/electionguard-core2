@@ -180,24 +180,13 @@ public partial class BallotUploadViewModel : BaseViewModel
                     _ = await _ballotService.SaveAsync(ballotRecord);
 
 
-                    switch (ballot.State)
+                    _ = ballot.State switch
                     {
-                        case BallotBoxState.Cast:
-                            _ = Interlocked.Increment(ref totalInserted);
-                            break;
-                        case BallotBoxState.Challenged:
-                            _ = Interlocked.Increment(ref totalChallenged);
-                            break;
-                        case BallotBoxState.Spoiled:
-                            _ = Interlocked.Increment(ref totalSpoiled);
-                            break;
-                        case BallotBoxState.NotSet:
-                            break;
-                        case BallotBoxState.Unknown:
-                            break;
-                        default:
-                            break;
-                    }
+                        BallotBoxState.Cast => _ = Interlocked.Increment(ref totalInserted),
+                        BallotBoxState.Challenged => _ = Interlocked.Increment(ref totalChallenged),
+                        BallotBoxState.Spoiled => _ = Interlocked.Increment(ref totalSpoiled),
+                        _ => throw new NotImplementedException()
+                    };
 
                     lock (tallyLock)
                     {
