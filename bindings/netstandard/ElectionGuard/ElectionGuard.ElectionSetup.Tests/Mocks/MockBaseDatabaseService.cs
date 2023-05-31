@@ -51,6 +51,11 @@ public abstract class MockBaseDatabaseServiceBase<T> : DisposableBase, IDatabase
 
     public abstract Task<T> SaveAsync(T data, string? table = null);
 
+    public Task<T> SaveAsync(T data, FilterDefinition<T>? customFilter = null, string? table = null)
+    {
+        throw new NotImplementedException();
+    }
+
     public Task UpdateAsync(FilterDefinition<T> filter, UpdateDefinition<T> update, string? table = null)
     {
         throw new NotImplementedException();
