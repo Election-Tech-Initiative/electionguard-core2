@@ -25,8 +25,6 @@
             <Label Text="{Binding CurrentElection.Name}" />
             <Label Style="{StaticResource H2}" Text="{helper:Translate TallyNameText}" />
             <Label Text="{Binding Tally.Name}" />
-            <Label Style="{StaticResource H2}" Text="{helper:Translate Status}" />
-            <Label Text="{Binding Tally.State}" />
             <!--  RO view of Tally filter (future work)  -->
             <Button
                 Command="{Binding JoinTallyCommand}"
@@ -229,5 +227,71 @@
                 </CollectionView.ItemTemplate>
             </CollectionView>
         </VerticalStackLayout>
+        <VerticalStackLayout
+            Grid.Row="0"
+            Grid.RowSpan="3"
+            Grid.Column="2">
+            <Label Style="{StaticResource H2}" Text="{helper:Translate TallyChecklist}" />
+            <HorizontalStackLayout Margin="10">
+                <Label Text="1." VerticalTextAlignment="Center" />
+                <CheckBox IsChecked="{Binding Checklist.QuorumReached}" IsEnabled="False" />
+                <Label
+                    LineBreakMode="WordWrap"
+                    Text="{helper:Translate TallyQuorumReachedText}"
+                    VerticalTextAlignment="Center" />
+            </HorizontalStackLayout>
+            <Line Background="Black" />
+            <HorizontalStackLayout Margin="10">
+                <Label Text="2." VerticalTextAlignment="Center" />
+                <CheckBox IsChecked="{Binding Checklist.SubtaliesCombined}" IsEnabled="False" />
+                <Label
+                    LineBreakMode="WordWrap"
+                    Text="{helper:Translate TallySubtalliesCombined}"
+                    VerticalTextAlignment="Center"
+                    WidthRequest="200" />
+            </HorizontalStackLayout>
+            <Line Background="Black" />
+            <HorizontalStackLayout Margin="10">
+                <Label Text="3." VerticalTextAlignment="Center" />
+                <CheckBox IsChecked="{Binding Checklist.AllDecryptionSharesComputed}" IsEnabled="False" />
+                <Label
+                    LineBreakMode="WordWrap"
+                    Text="{helper:Translate TallyAllDecryptionsComputed}"
+                    VerticalTextAlignment="Center"
+                    WidthRequest="200" />
+            </HorizontalStackLayout>
+            <Line Background="Black" />
+            <HorizontalStackLayout Margin="10">
+                <Label Text="4." VerticalTextAlignment="Center" />
+                <CheckBox IsChecked="{Binding Checklist.ChallengeCreated}" IsEnabled="False" />
+                <Label
+                    LineBreakMode="WordWrap"
+                    Text="{helper:Translate TallyChallengeCreated}"
+                    VerticalTextAlignment="Center"
+                    WidthRequest="200" />
+            </HorizontalStackLayout>
+            <Line Background="Black" />
+            <HorizontalStackLayout Margin="10">
+                <Label Text="5." VerticalTextAlignment="Center" />
+                <CheckBox IsChecked="{Binding Checklist.AllChallengesResponded}" IsEnabled="False" />
+                <Label
+                    LineBreakMode="WordWrap"
+                    Text="{helper:Translate TallyAllChallengesResponded}"
+                    VerticalTextAlignment="Center"
+                    WidthRequest="200" />
+            </HorizontalStackLayout>
+            <Line Background="Black" />
+            <HorizontalStackLayout Margin="10">
+                <Label Text="6." VerticalTextAlignment="Center" />
+                <CheckBox IsChecked="{Binding Checklist.TallyComplete}" IsEnabled="False" />
+                <Label
+                    LineBreakMode="WordWrap"
+                    Text="{helper:Translate TallyComplete}"
+                    VerticalTextAlignment="Center"
+                    WidthRequest="200" />
+            </HorizontalStackLayout>
+            <Line Background="Black" />
+        </VerticalStackLayout>
+
     </Grid>
 </views:ContentPageBase>

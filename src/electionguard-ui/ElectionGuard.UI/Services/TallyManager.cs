@@ -66,7 +66,7 @@ namespace ElectionGuard.UI.Services
             _decryptionShareService = decryptionShareService;
             _plaintextTallyService = plaintextTallyService;
             _guardianBackupService = guardianBackupService;
-            _lagrangeCoefficientsService = lagrangeCoefficientsService; 
+            _lagrangeCoefficientsService = lagrangeCoefficientsService;
 
         }
 
@@ -148,7 +148,7 @@ namespace ElectionGuard.UI.Services
                     {
                         TallyId = tally.TallyId,
                         GuardianId = ch.Key,
-                        ChallengeData = JsonConvert.SerializeObject(ch.Value, SerializationSettings.NewtonsoftSettings()),
+                        ChallengeData = JsonConvert.SerializeObject(ch.Value),
                     });
 
             _ = await _challengeService.SaveManyAsync(challenges);
@@ -167,8 +167,8 @@ namespace ElectionGuard.UI.Services
             foreach (var challengeRecord in challengeRecords)
             {
                 var challenge = JsonConvert.DeserializeObject<GuardianChallenge>(
-                    challengeRecord.ChallengeData, SerializationSettings.NewtonsoftSettings()) ??
-                    throw new ArgumentException(nameof(tally.TallyId));
+                    challengeRecord.ChallengeData) ??
+                     throw new ArgumentException(nameof(tally.TallyId));
 
                 mediator.LoadChallenge(tally.TallyId, challenge.GuardianId, challenge);
             }
@@ -176,7 +176,7 @@ namespace ElectionGuard.UI.Services
             var responses = await _challengeResponseService.GetAllByTallyIdAsync(tally.TallyId);
             foreach (var responseRecord in responses)
             {
-                var response = JsonConvert.DeserializeObject<GuardianChallengeResponse>(responseRecord, SerializationSettings.NewtonsoftSettings())!;
+                var response = JsonConvert.DeserializeObject<GuardianChallengeResponse>(responseRecord)!;
                 mediator.SubmitResponse(tally.TallyId, response);
             }
 
@@ -189,7 +189,7 @@ namespace ElectionGuard.UI.Services
             var plaintextTallyRecord = new PlaintextTallyRecord()
             {
                 TallyId = tally.TallyId,
-                PlaintextTallyData = JsonConvert.SerializeObject(result.Tally, SerializationSettings.NewtonsoftSettings()).Replace("\r\n", string.Empty),
+                PlaintextTallyData = JsonConvert.SerializeObject(result.Tally).Replace("\r\n", string.Empty),
             };
             _ = await _plaintextTallyService.SaveAsync(plaintextTallyRecord);
 
@@ -293,7 +293,7 @@ namespace ElectionGuard.UI.Services
             using var guardian = await HydrateGuardian(guardianId, tally, mediator.Guardians);
             var challengeRecord = await _challengeService.GetByGuardianIdAsync(tally.TallyId, guardianId) ?? throw new ArgumentException(nameof(guardianId));
 
-            using var challenge = JsonConvert.DeserializeObject<GuardianChallenge>(challengeRecord.ChallengeData, SerializationSettings.NewtonsoftSettings()) ?? throw new ArgumentException(nameof(guardianId)); ;
+            using var challenge = JsonConvert.DeserializeObject<GuardianChallenge>(challengeRecord.ChallengeData) ?? throw new ArgumentException(nameof(guardianId)); ;
             var share = mediator.GetShare(tally.TallyId, guardianId)!;
 
             using var response = guardian.ComputeChallengeResponse(share, challenge);
@@ -302,7 +302,7 @@ namespace ElectionGuard.UI.Services
             {
                 TallyId = tally.TallyId,
                 GuardianId = guardianId,
-                ResponseData = JsonConvert.SerializeObject(response, SerializationSettings.NewtonsoftSettings()),
+                ResponseData = JsonConvert.SerializeObject(response),
             };
 
             _ = await _challengeResponseService.SaveAsync(responseRecord);
@@ -314,7 +314,7 @@ namespace ElectionGuard.UI.Services
             {
                 TallyId = tally.TallyId,
                 GuardianId = guardianId,
-                ShareData = JsonConvert.SerializeObject(decryptionShare, SerializationSettings.NewtonsoftSettings()),
+                ShareData = JsonConvert.SerializeObject(decryptionShare),
             };
 
             _ = await _decryptionShareService.SaveAsync(shareRecord);
@@ -329,7 +329,7 @@ namespace ElectionGuard.UI.Services
 
             foreach (var share in shares)
             {
-                var shareData = JsonConvert.DeserializeObject<DecryptionShare>(share.ShareData, SerializationSettings.NewtonsoftSettings())!;
+                var shareData = JsonConvert.DeserializeObject<DecryptionShare>(share.ShareData)!;
                 mediator.SubmitShares(shareData, challengeBallots.ToList());
             }
         }

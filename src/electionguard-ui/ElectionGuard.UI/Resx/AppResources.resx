@@ -533,5 +533,25 @@
   </data>
   <data name="Uploading" xml:space="preserve">
     <value>Uploading</value>
+  <data name="TallyAllChallengesResponded" xml:space="preserve">
+    <value>All Guardians responded to Challenge</value>
+  </data>
+  <data name="TallyAllDecryptionsComputed" xml:space="preserve">
+    <value>All Guardian Shares Calculated</value>
+  </data>
+  <data name="TallyChallengeCreated" xml:space="preserve">
+    <value>Challenge Created</value>
+  </data>
+  <data name="TallyChecklist" xml:space="preserve">
+    <value>Tally Process</value>
+  </data>
+  <data name="TallyComplete" xml:space="preserve">
+    <value>Tally Verified and results computed</value>
+  </data>
+  <data name="TallyQuorumReachedText" xml:space="preserve">
+    <value>Quorum has been reached</value>
+  </data>
+  <data name="TallySubtalliesCombined" xml:space="preserve">
+    <value>Ballots have been tallied</value>
   </data>
 </root>

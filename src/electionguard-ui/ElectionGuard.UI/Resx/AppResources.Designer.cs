@@ -1132,6 +1132,51 @@ namespace ElectionGuard.UI.Resx {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to All Guardians responded to Challenge.
+        /// </summary>
+        internal static string TallyAllChallengesResponded {
+            get {
+                return ResourceManager.GetString("TallyAllChallengesResponded", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to All Guardian Shares Calculated.
+        /// </summary>
+        internal static string TallyAllDecryptionsComputed {
+            get {
+                return ResourceManager.GetString("TallyAllDecryptionsComputed", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Challenge Created.
+        /// </summary>
+        internal static string TallyChallengeCreated {
+            get {
+                return ResourceManager.GetString("TallyChallengeCreated", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Tally Process.
+        /// </summary>
+        internal static string TallyChecklist {
+            get {
+                return ResourceManager.GetString("TallyChecklist", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Tally Verified and results computed.
+        /// </summary>
+        internal static string TallyComplete {
+            get {
+                return ResourceManager.GetString("TallyComplete", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Tally Name.
         /// </summary>
         internal static string TallyNameText {
@@ -1146,6 +1191,24 @@ namespace ElectionGuard.UI.Resx {
         internal static string TallyProcess {
             get {
                 return ResourceManager.GetString("TallyProcess", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Quorum has been reached.
+        /// </summary>
+        internal static string TallyQuorumReachedText {
+            get {
+                return ResourceManager.GetString("TallyQuorumReachedText", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Ballots have been tallied.
+        /// </summary>
+        internal static string TallySubtalliesCombined {
+            get {
+                return ResourceManager.GetString("TallySubtalliesCombined", resourceCulture);
             }
         }
         
