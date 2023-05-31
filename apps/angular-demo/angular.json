@@ -95,7 +95,11 @@
               "browserTarget": "angular-demo:build:production"
             },
             "development": {
-              "browserTarget": "angular-demo:build:development"
+              "browserTarget": "angular-demo:build:development",
+              "headers": {
+                "Cross-Origin-Opener-Policy":"same-origin",
+                "Cross-Origin-Embedder-Policy":"require-corp"
+              }
             }
           },
           "defaultConfiguration": "development"
