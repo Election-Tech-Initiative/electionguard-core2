@@ -28,9 +28,9 @@ public static class DecryptionMediatorExtensions
         // Create Shares
         foreach (var guardian in quorumOfGuardians)
         {
-            var shares = guardian.ComputeDecryptionShares(
+            var share = guardian.ComputeDecryptionShare(
                 data.CiphertextTally);
-            mediator.SubmitShare(shares.TallyShare);
+            mediator.SubmitShare(share!);
         }
 
         return VerifyProofsAndDecrypt(mediator, data, quorumOfGuardians);

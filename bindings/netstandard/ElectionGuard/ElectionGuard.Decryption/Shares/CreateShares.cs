@@ -24,17 +24,6 @@ public static class CreateSharesExtensions
     }
 
     /// <summary>
-    /// Conmpute decryption shares for a tally
-    /// </summary>
-    public static DecryptionShare ComputeDecryptionShares(
-        this Guardian guardian,
-        CiphertextTally tally)
-    {
-        var share = guardian.ComputeDecryptionShare(tally)!;
-        return new(share);
-    }
-
-    /// <summary>
     /// Compute decryption shares for a list of ballots.
     /// </summary>
     public static Dictionary<string, BallotShare> ComputeDecryptionShares(
