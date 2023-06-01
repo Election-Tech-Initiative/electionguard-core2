@@ -9,7 +9,6 @@ ELECTIONGUARD_APP_CLI_DIR=$(ELECTIONGUARD_APPS_DIR)/electionguard-cli
 ELECTIONGUARD_BINDING_NETSTANDARD_DIR=$(ELECTIONGUARD_BINDING_DIR)/netstandard/ElectionGuard
 ELECTIONGUARD_BINDING_LIB_DIR=$(ELECTIONGUARD_BINDING_NETSTANDARD_DIR)/ElectionGuard.Encryption
 ELECTIONGUARD_BINDING_BENCH_DIR=$(ELECTIONGUARD_BINDING_NETSTANDARD_DIR)/ElectionGuard.Encryption.Bench
-ELECTIONGUARD_APP_CLI_DIR=$(ELECTIONGUARD_APPS_DIR)/electionguard-cli/ElectionGuard.CLI
 ELECTIONGUARD_BINDING_TEST_DIR=$(ELECTIONGUARD_BINDING_NETSTANDARD_DIR)/ElectionGuard.Encryption.Tests
 ELECTIONGUARD_BINDING_UTILS_DIR=$(ELECTIONGUARD_BINDING_NETSTANDARD_DIR)/ElectionGuard.Encryption.Utils
 ELECTIONGUARD_BUILD_DIR=$(subst \,/,$(realpath .))/build
@@ -262,7 +261,7 @@ endif
 build-cli:
 	@echo 🖥️ BUILD CLI $(OPERATING_SYSTEM) $(PROCESSOR) $(TARGET)
 	cd ./apps/electionguard-cli && dotnet restore
-	dotnet build -c $(TARGET) ./apps/electionguard-cli/ElectionGuard.CLI.sln /p:Platform=$(PROCESSOR)
+	dotnet build -c $(TARGET) $(ELECTIONGUARD_APP_CLI_DIR)/ElectionGuard.CLI.sln /p:Platform=$(PROCESSOR)
 
 build-ui: build-maccatalyst build-netstandard
 	@echo 🖥️ BUILD UI $(OPERATING_SYSTEM) $(PROCESSOR) $(TARGET)
