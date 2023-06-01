@@ -1,5 +1,6 @@
-using ElectionGuard.Ballot;
+﻿using ElectionGuard.Ballot;
 using ElectionGuard.ElectionSetup.Extensions;
+using Newtonsoft.Json;
 
 namespace ElectionGuard.Decryption.Tally;
 
@@ -28,6 +29,7 @@ public class PlaintextTallyContest : DisposableBase, IElectionContest, IEquatabl
     /// </summary>
     public Dictionary<string, PlaintextTallySelection> Selections { get; init; }
 
+    [JsonConstructor]
     public PlaintextTallyContest(
         string objectId, ulong sequenceOrder, ElementModQ descriptionHash,
         Dictionary<string, PlaintextTallySelection> selections)

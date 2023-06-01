@@ -76,7 +76,7 @@ public interface IDatabaseService<T>
     Task<T?> GetByIdAsync(string id, string? table = null);
     Task<T?> GetByNameAsync(string name, string? table = null);
     Task<T?> GetByFieldAsync(string fieldName, object fieldValue, string? table = null);
-    Task<T> SaveAsync(T data, string? table = null);
+    Task<T> SaveAsync(T data, FilterDefinition<T>? customFilter = null, string? table = null);
     Task UpdateAsync(FilterDefinition<T> filter, UpdateDefinition<T> update, string? table = null);
     FilterDefinition<T> UpdateFilter(FilterDefinition<T> filter, bool getDeleted = false);
 }

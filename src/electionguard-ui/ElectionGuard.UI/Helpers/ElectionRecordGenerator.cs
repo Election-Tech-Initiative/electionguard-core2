@@ -9,6 +9,7 @@ public static class ElectionRecordGenerator
     private static readonly string GUARDIAN_FOLDER = "guardians";
     private static readonly string DEVICE_FOLDER = "encryption_devices";
     private static readonly string BALLOT_FOLDER = "submitted_ballots";
+    private static readonly string CHALLENGED_FOLDER = "spoiled_ballots";
 
     private static readonly string GUARDIAN_PREFIX = "guardian_";
     private static readonly string DEVICE_PREFIX = "device_";
@@ -21,7 +22,7 @@ public static class ElectionRecordGenerator
     private static readonly string TALLY_FILENAME = "tally.json";
     private static readonly string ENCRYPTED_TALLY_FILENAME = "encrypted_tally.json";
 
-    public static async Task GenerateEelectionRecord(TallyRecord tally, string outputFolder)
+    public static async Task GenerateElectionRecordAsync(TallyRecord tally, string outputFolder)
     {
         ArgumentException.ThrowIfNullOrEmpty(nameof(outputFolder));
         
@@ -42,6 +43,9 @@ public static class ElectionRecordGenerator
 
         // export the ballots
         await ExportBallotsAsync(Path.Combine(tempFolder.FullName, BALLOT_FOLDER), tally.ElectionId!);
+
+        // export the challenged ballots v2 / spoiled ballots v1
+        await ExportChallengedBallotsAsync(Path.Combine(tempFolder.FullName, CHALLENGED_FOLDER), tally.ElectionId!);
 
         // export the top level
         await ExportSummaryAsync(tempFolder.FullName, tally.ElectionId!, tally.TallyId);
@@ -87,6 +91,25 @@ public static class ElectionRecordGenerator
         Directory.CreateDirectory(ballotFolder);
 
         BallotService ballotService = new();
+        using var cursor = await ballotService.GetCursorByElectionIdAsync(electionId);
+
+        await cursor.ForEachAsync(document =>
+        {
+            var ballotCode = document.BallotCode;
+            var fileName = $"{ballotCode}.json";
+            var filePath = Path.Combine(ballotFolder, fileName);
+
+            using var writer = new StreamWriter(filePath);
+            var json = document.BallotData;
+            writer.WriteLine(json);
+        });
+    }
+
+    private static async Task ExportChallengedBallotsAsync(string ballotFolder, string electionId)
+    {
+        Directory.CreateDirectory(ballotFolder);
+
+        ChallengedBallotService ballotService = new();
         using var cursor = await ballotService.GetCursorByElectionIdAsync(electionId);
 
         await cursor.ForEachAsync(document =>

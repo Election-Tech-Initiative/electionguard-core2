@@ -1,4 +1,5 @@
-using System.Runtime.InteropServices;
+﻿using System.Runtime.InteropServices;
+using Newtonsoft.Json;
 
 namespace ElectionGuard
 {
@@ -89,6 +90,16 @@ namespace ElectionGuard
             var commitment = new ElGamalCiphertext(other.Pad, other.Data);
             var status = External.ChaumPedersenProof.Make(
                 commitment.Handle, other.Challenge.Handle, other.Response.Handle, out Handle);
+            commitment.Dispose();
+            status.ThrowIfError();
+        }
+
+        [JsonConstructor]
+        public ChaumPedersenProof(ElementModP pad, ElementModP data, ElementModQ challenge, ElementModQ response)
+        {
+            var commitment = new ElGamalCiphertext(pad, data);
+            var status = External.ChaumPedersenProof.Make(
+                commitment.Handle, challenge.Handle, response.Handle, out Handle);
             commitment.Dispose();
             status.ThrowIfError();
         }

@@ -14,4 +14,5 @@ public enum TallyState
     PendingGuardianRespondChallenge,
     AdminVerifyChallenge,
     Complete,
+    Abandoned
 }

@@ -30,6 +30,9 @@ public partial class TallyRecord : DatabaseRecord
     private TallyState _state;
 
     [ObservableProperty]
+    private bool _viewed;
+
+    [ObservableProperty]
     private DateTime? _lastExport = null;
 
     [ObservableProperty]

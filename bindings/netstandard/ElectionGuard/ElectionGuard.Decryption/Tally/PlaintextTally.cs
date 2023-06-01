@@ -1,7 +1,9 @@
-using System.Text;
+﻿using System.Text;
 using ElectionGuard.Decryption.Decryption;
 using ElectionGuard.ElectionSetup;
 using ElectionGuard.ElectionSetup.Extensions;
+using ElectionGuard.UI.Lib.Models;
+using Newtonsoft.Json;
 
 namespace ElectionGuard.Decryption.Tally;
 
@@ -93,6 +95,23 @@ public record PlaintextTally : DisposableRecordBase, IEquatable<PlaintextTally>
         TallyId = tallyId;
         Name = ballot.ObjectId;
         Contests = ballot.ToPlaintextTallyContestDictionary();
+    }
+
+    [JsonConstructor]
+    public PlaintextTally(
+        string tallyId,
+        string name,
+        Dictionary<string, PlaintextTallyContest> contests)
+    {
+        TallyId = tallyId;
+        Name = name;
+
+        foreach (var contestId in contests.Keys)
+        {
+            Contests.Add(
+                contestId,
+                new PlaintextTallyContest(contests[contestId]));
+        }
     }
 
     public PlaintextTally(

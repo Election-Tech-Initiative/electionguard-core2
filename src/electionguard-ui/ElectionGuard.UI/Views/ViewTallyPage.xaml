@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <views:ContentPageBase
-    x:Class="ElectionGuard.UI.Views.TallyProcessPage"
+    x:Class="ElectionGuard.UI.Views.ViewTallyPage"
     xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
     xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
     xmlns:controls="clr-namespace:ElectionGuard.UI.Controls"
@@ -10,8 +10,8 @@
     xmlns:toolkit="http://schemas.microsoft.com/dotnet/2022/maui/toolkit"
     xmlns:viewModels="clr-namespace:ElectionGuard.UI.ViewModels"
     xmlns:views="using:ElectionGuard.UI.Views"
-    x:DataType="viewModels:TallyProcessViewModel"
-    x:TypeArguments="viewModels:TallyProcessViewModel"
+    x:DataType="viewModels:ViewTallyViewModel"
+    x:TypeArguments="viewModels:ViewTallyViewModel"
     ControlTemplate="{StaticResource PageTemplate}">
     <ContentPage.Resources>
         <ResourceDictionary>
@@ -20,20 +20,20 @@
     </ContentPage.Resources>
 
     <Grid RowDefinitions="auto, auto, *" Style="{StaticResource NarrowCenteredGrid}">
-        <VerticalStackLayout Grid.Row="0">
+        <VerticalStackLayout Grid.Row="0" Style="{StaticResource NarrowCenteredPage}">
+            <Grid>
+                <VerticalStackLayout HorizontalOptions="StartAndExpand">
+                    <Label Style="{StaticResource H2}" Text="{helper:Translate TallyNameText}" />
+                    <Label Text="{Binding Tally.Name}" />
+                </VerticalStackLayout>
+                <Button
+                    Command="{Binding ExportTallyCommand}"
+                    HeightRequest="40"
+                    HorizontalOptions="End"
+                    Text="{helper:Translate ExportTally}" />
+            </Grid>
             <Label Style="{StaticResource H2}" Text="{helper:Translate ElectionNameText}" />
             <Label Text="{Binding CurrentElection.Name}" />
-            <Label Style="{StaticResource H2}" Text="{helper:Translate TallyNameText}" />
-            <Label Text="{Binding Tally.Name}" />
-            <!--  RO view of Tally filter (future work)  -->
-            <Button
-                Command="{Binding JoinTallyCommand}"
-                IsVisible="{Binding IsAdmin, Converter={StaticResource InvertedBoolConverter}}"
-                Text="{helper:Translate ProcessTallyJoinYes}" />
-            <Button
-                Command="{Binding RejectTallyCommand}"
-                IsVisible="{Binding IsAdmin, Converter={StaticResource InvertedBoolConverter}}"
-                Text="{helper:Translate ProcessTallyJoinNo}" />
         </VerticalStackLayout>
         <!--  List of guardians joined for all  -->
         <VerticalStackLayout Grid.Row="1" Margin="0,0,50,0">
@@ -76,7 +76,7 @@
                                 Grid.Column="3"
                                 Margin="10,0,10,0"
                                 IsVisible="{Binding HasResponse}"
-                                Source="{Binding HasResponse, Converter={StaticResource BadVerifyConverter}}"
+                                Source="verify.png"
                                 WidthRequest="32" />
                         </Grid>
                     </DataTemplate>
@@ -85,10 +85,10 @@
         </VerticalStackLayout>
         <!--  status of tally  -->
         <!--  datagrid below  -->
-        <VerticalStackLayout Grid.Row="2" Margin="0,0,50,0">
+        <!--<VerticalStackLayout Grid.Row="2" Margin="0,0,50,0">
             <Label Style="{StaticResource H2}" Text="{helper:Translate BallotsText}" />
             <Grid>
-                <Grid ColumnDefinitions="1.5*, 2*, *, *, *, *, *, *">
+                <Grid ColumnDefinitions="1.5*, 2*, *, *, *, *, *">
                     <Label
                         Grid.Column="0"
                         FontAttributes="Bold"
@@ -100,32 +100,22 @@
                     <Label
                         Grid.Column="2"
                         FontAttributes="Bold"
-                        HorizontalTextAlignment="Center"
                         Text="{helper:Translate AddedText}" />
                     <Label
                         Grid.Column="3"
                         FontAttributes="Bold"
-                        HorizontalTextAlignment="Center"
-                        Text="{helper:Translate ChallengedText}" />
+                        Text="{helper:Translate SpoiledText}" />
                     <Label
                         Grid.Column="4"
                         FontAttributes="Bold"
-                        HorizontalTextAlignment="Center"
-                        Text="{helper:Translate SpoiledText}" />
+                        Text="{helper:Translate DuplicatedText}" />
                     <Label
                         Grid.Column="5"
                         FontAttributes="Bold"
-                        HorizontalTextAlignment="Center"
-                        Text="{helper:Translate DuplicatedText}" />
+                        Text="{helper:Translate RejectedText}" />
                     <Label
                         Grid.Column="6"
                         FontAttributes="Bold"
-                        HorizontalTextAlignment="Center"
-                        Text="{helper:Translate RejectedText}" />
-                    <Label
-                        Grid.Column="7"
-                        FontAttributes="Bold"
-                        HorizontalTextAlignment="Center"
                         Text="{helper:Translate BallotCountText}" />
                 </Grid>
                 <Line
@@ -136,7 +126,7 @@
             <CollectionView x:Name="UploadCollectionView" ItemsSource="{Binding BallotUploads}">
                 <CollectionView.Header>
                     <Grid>
-                        <Grid ColumnDefinitions="1.5*, 2*, *, *, *, *, *, *">
+                        <Grid ColumnDefinitions="1.5*, 2*, *, *, *, *, *">
                             <Label
                                 Grid.Column="0"
                                 FontAttributes="Bold"
@@ -152,27 +142,18 @@
                             <Label
                                 Grid.Column="3"
                                 FontAttributes="Bold"
-                                HorizontalTextAlignment="Center"
-                                Text="{helper:Translate ChallengedText}" />
+                                Text="{helper:Translate SpoiledText}" />
                             <Label
                                 Grid.Column="4"
                                 FontAttributes="Bold"
-                                HorizontalTextAlignment="Center"
-                                Text="{helper:Translate SpoiledText}" />
+                                Text="{helper:Translate DuplicatedText}" />
                             <Label
                                 Grid.Column="5"
                                 FontAttributes="Bold"
-                                HorizontalTextAlignment="Center"
-                                Text="{helper:Translate DuplicatedText}" />
+                                Text="{helper:Translate RejectedText}" />
                             <Label
                                 Grid.Column="6"
                                 FontAttributes="Bold"
-                                HorizontalTextAlignment="Center"
-                                Text="{helper:Translate RejectedText}" />
-                            <Label
-                                Grid.Column="7"
-                                FontAttributes="Bold"
-                                HorizontalTextAlignment="Center"
                                 Text="{helper:Translate BallotCountText}" />
                         </Grid>
                         <Line
@@ -183,7 +164,7 @@
                 </CollectionView.Header>
                 <CollectionView.ItemTemplate>
                     <DataTemplate x:DataType="model:BallotUpload">
-                        <Grid BackgroundColor="{Binding ., Converter={StaticResource AlternateRowColorConverter}, ConverterParameter={x:Reference UploadCollectionView}}" ColumnDefinitions="1.5*, 2*, *, *, *, *, *, *">
+                        <Grid BackgroundColor="{Binding ., Converter={StaticResource AlternateRowColorConverter}, ConverterParameter={x:Reference UploadCollectionView}}" ColumnDefinitions="1.5*, 2*, *, *, *, *, *">
                             <Label
                                 Grid.Column="0"
                                 Margin="10"
@@ -195,103 +176,59 @@
                             <Label
                                 Grid.Column="2"
                                 Margin="10"
-                                HorizontalTextAlignment="Center"
                                 Text="{Binding BallotImported}" />
                             <Label
                                 Grid.Column="3"
                                 Margin="10"
-                                HorizontalTextAlignment="Center"
-                                Text="{Binding BallotChallenged}" />
+                                Text="{Binding BallotSpoiled}" />
                             <Label
                                 Grid.Column="4"
                                 Margin="10"
-                                HorizontalTextAlignment="Center"
-                                Text="{Binding BallotSpoiled}" />
+                                Text="{Binding BallotDuplicated}" />
                             <Label
                                 Grid.Column="5"
                                 Margin="10"
-                                HorizontalTextAlignment="Center"
-                                Text="{Binding BallotDuplicated}" />
+                                Text="{Binding BallotRejected}" />
                             <Label
                                 Grid.Column="6"
                                 Margin="10"
-                                HorizontalTextAlignment="Center"
-                                Text="{Binding BallotRejected}" />
-                            <Label
-                                Grid.Column="7"
-                                Margin="10"
-                                HorizontalTextAlignment="Center"
                                 Text="{Binding BallotCount}" />
                         </Grid>
                     </DataTemplate>
                 </CollectionView.ItemTemplate>
             </CollectionView>
-        </VerticalStackLayout>
-        <VerticalStackLayout
-            Grid.Row="0"
-            Grid.RowSpan="3"
-            Grid.Column="2">
-            <Label Style="{StaticResource H2}" Text="{helper:Translate TallyChecklist}" />
-            <HorizontalStackLayout Margin="10">
-                <Label Text="1." VerticalTextAlignment="Center" />
-                <CheckBox IsChecked="{Binding Checklist.QuorumReached}" IsEnabled="False" />
+            <Grid BackgroundColor="{StaticResource Gray400}" ColumnDefinitions="3.5*, *, *, *, *, *">
                 <Label
-                    LineBreakMode="WordWrap"
-                    Text="{helper:Translate TallyQuorumReachedText}"
-                    VerticalTextAlignment="Center" />
-            </HorizontalStackLayout>
-            <Line Background="Black" />
-            <HorizontalStackLayout Margin="10">
-                <Label Text="2." VerticalTextAlignment="Center" />
-                <CheckBox IsChecked="{Binding Checklist.SubtaliesCombined}" IsEnabled="False" />
+                    Grid.Column="0"
+                    Margin="10"
+                    FontAttributes="Bold,Italic"
+                    Text="{helper:Translate TotalText}" />
                 <Label
-                    LineBreakMode="WordWrap"
-                    Text="{helper:Translate TallySubtalliesCombined}"
-                    VerticalTextAlignment="Center"
-                    WidthRequest="200" />
-            </HorizontalStackLayout>
-            <Line Background="Black" />
-            <HorizontalStackLayout Margin="10">
-                <Label Text="3." VerticalTextAlignment="Center" />
-                <CheckBox IsChecked="{Binding Checklist.AllDecryptionSharesComputed}" IsEnabled="False" />
+                    Grid.Column="1"
+                    Margin="10"
+                    FontAttributes="Bold"
+                    Text="{Binding BallotAddedTotal}" />
                 <Label
-                    LineBreakMode="WordWrap"
-                    Text="{helper:Translate TallyAllDecryptionsComputed}"
-                    VerticalTextAlignment="Center"
-                    WidthRequest="200" />
-            </HorizontalStackLayout>
-            <Line Background="Black" />
-            <HorizontalStackLayout Margin="10">
-                <Label Text="4." VerticalTextAlignment="Center" />
-                <CheckBox IsChecked="{Binding Checklist.ChallengeCreated}" IsEnabled="False" />
+                    Grid.Column="2"
+                    Margin="10"
+                    FontAttributes="Bold"
+                    Text="{Binding BallotSpoiledTotal}" />
                 <Label
-                    LineBreakMode="WordWrap"
-                    Text="{helper:Translate TallyChallengeCreated}"
-                    VerticalTextAlignment="Center"
-                    WidthRequest="200" />
-            </HorizontalStackLayout>
-            <Line Background="Black" />
-            <HorizontalStackLayout Margin="10">
-                <Label Text="5." VerticalTextAlignment="Center" />
-                <CheckBox IsChecked="{Binding Checklist.AllChallengesResponded}" IsEnabled="False" />
+                    Grid.Column="3"
+                    Margin="10"
+                    FontAttributes="Bold"
+                    Text="{Binding BallotDuplicateTotal}" />
                 <Label
-                    LineBreakMode="WordWrap"
-                    Text="{helper:Translate TallyAllChallengesResponded}"
-                    VerticalTextAlignment="Center"
-                    WidthRequest="200" />
-            </HorizontalStackLayout>
-            <Line Background="Black" />
-            <HorizontalStackLayout Margin="10">
-                <Label Text="6." VerticalTextAlignment="Center" />
-                <CheckBox IsChecked="{Binding Checklist.TallyComplete}" IsEnabled="False" />
+                    Grid.Column="4"
+                    Margin="10"
+                    FontAttributes="Bold"
+                    Text="{Binding BallotRejectedTotal}" />
                 <Label
-                    LineBreakMode="WordWrap"
-                    Text="{helper:Translate TallyComplete}"
-                    VerticalTextAlignment="Center"
-                    WidthRequest="200" />
-            </HorizontalStackLayout>
-            <Line Background="Black" />
-        </VerticalStackLayout>
-
+                    Grid.Column="5"
+                    Margin="10"
+                    FontAttributes="Bold"
+                    Text="{Binding BallotCountTotal}" />
+            </Grid>
+        </VerticalStackLayout>-->
     </Grid>
 </views:ContentPageBase>
