@@ -131,7 +131,7 @@ bool test_encrypt_selection(void)
     return true;
 }
 
-bool test_encrypt_contest()
+bool test_encrypt_contest(void)
 {
     // TODO
     return true;

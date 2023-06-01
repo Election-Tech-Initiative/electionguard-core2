@@ -5,7 +5,7 @@ ELECTIONGUARD_CACHE=$(subst \,/,$(realpath .))/.cache
 ELECTIONGUARD_APPS_DIR=$(realpath .)/apps
 ELECTIONGUARD_BINDING_DIR=$(realpath .)/bindings
 ELECTIONGUARD_DATA_DIR=$(realpath .)/data
-ELECTIONGUARD_APP_CLI_DIR=$(ELECTIONGUARD_APPS_DIR)/electionguard-cli/ElectionGuard.CLI
+ELECTIONGUARD_APP_CLI_DIR=$(ELECTIONGUARD_APPS_DIR)/electionguard-cli
 ELECTIONGUARD_BINDING_NETSTANDARD_DIR=$(ELECTIONGUARD_BINDING_DIR)/netstandard/ElectionGuard
 ELECTIONGUARD_BINDING_LIB_DIR=$(ELECTIONGUARD_BINDING_NETSTANDARD_DIR)/ElectionGuard.Encryption
 ELECTIONGUARD_BINDING_BENCH_DIR=$(ELECTIONGUARD_BINDING_NETSTANDARD_DIR)/ElectionGuard.Encryption.Bench
@@ -107,7 +107,7 @@ ifeq ($(OPERATING_SYSTEM),Darwin)
 	brew install include-what-you-use
 	brew install llvm
 	brew install ninja
-	test -f /usr/local/bin/clang-tidy || sudo ln -s "$(shell brew --prefix llvm)/bin/clang-tidy" "/usr/local/bin/clang-tidy"
+	test -f /usr/local/bin/clang-tidy || sudo ln -sf "$(shell brew --prefix llvm)/bin/clang-tidy" "/usr/local/bin/clang-tidy"
 endif
 ifeq ($(OPERATING_SYSTEM),Linux)
 	@echo 🐧 LINUX INSTALL
@@ -262,7 +262,7 @@ endif
 build-cli:
 	@echo 🖥️ BUILD CLI $(OPERATING_SYSTEM) $(PROCESSOR) $(TARGET)
 	cd ./apps/electionguard-cli && dotnet restore
-	dotnet build -c $(TARGET) ./apps/electionguard-cli/ElectionGuard.CLI.sln /p:Platform=$(PROCESSOR)
+	dotnet build -c $(TARGET) $(ELECTIONGUARD_APP_CLI_DIR)/ElectionGuard.CLI.sln /p:Platform=$(PROCESSOR)
 
 build-ui: build-maccatalyst build-netstandard
 	@echo 🖥️ BUILD UI $(OPERATING_SYSTEM) $(PROCESSOR) $(TARGET)
@@ -302,33 +302,8 @@ else
 	if [ -d "$(ELECTIONGUARD_BUILD_DIR)" ]; then rm -rf $(ELECTIONGUARD_BUILD_DIR)/*; fi
 	if [ ! -d "$(ELECTIONGUARD_BUILD_DIR)" ]; then mkdir $(ELECTIONGUARD_BUILD_DIR); fi
 
-	if [ -d "$(ELECTIONGUARD_APP_CLI_DIR)/bin" ]; then rm -rf $(ELECTIONGUARD_APP_CLI_DIR)/bin/*; fi
-	if [ ! -d "$(ELECTIONGUARD_APP_CLI_DIR)/bin" ]; then mkdir $(ELECTIONGUARD_APP_CLI_DIR)/bin; fi
-	if [ -d "$(ELECTIONGUARD_APP_CLI_DIR)/obj" ]; then rm -rf $(ELECTIONGUARD_APP_CLI_DIR)/obj/*; fi
-	if [ ! -d "$(ELECTIONGUARD_APP_CLI_DIR)/obj" ]; then mkdir $(ELECTIONGUARD_APP_CLI_DIR)/obj; fi
-
-	if [ -d "$(ELECTIONGUARD_BINDING_LIB_DIR)/bin" ]; then rm -rf $(ELECTIONGUARD_BINDING_LIB_DIR)/bin/*; fi
-	if [ ! -d "$(ELECTIONGUARD_BINDING_LIB_DIR)/bin" ]; then mkdir $(ELECTIONGUARD_BINDING_LIB_DIR)/bin; fi
-	if [ -d "$(ELECTIONGUARD_BINDING_LIB_DIR)/obj" ]; then rm -rf $(ELECTIONGUARD_BINDING_LIB_DIR)/obj/*; fi
-	if [ ! -d "$(ELECTIONGUARD_BINDING_LIB_DIR)/obj" ]; then mkdir $(ELECTIONGUARD_BINDING_LIB_DIR)/obj; fi
-
-	if [ -d "$(ELECTIONGUARD_BINDING_BENCH_DIR)/bin" ]; then rm -rf $(ELECTIONGUARD_BINDING_BENCH_DIR)/bin/*; fi
-	if [ ! -d "$(ELECTIONGUARD_BINDING_BENCH_DIR)/bin" ]; then mkdir $(ELECTIONGUARD_BINDING_BENCH_DIR)/bin; fi
-	if [ -d "$(ELECTIONGUARD_BINDING_BENCH_DIR)/obj" ]; then rm -rf $(ELECTIONGUARD_BINDING_BENCH_DIR)/obj/*; fi
-	if [ ! -d "$(ELECTIONGUARD_BINDING_BENCH_DIR)/obj" ]; then mkdir $(ELECTIONGUARD_BINDING_BENCH_DIR)/obj; fi
-
-	if [ -d "$(ELECTIONGUARD_BINDING_TEST_DIR)/bin" ]; then rm -rf $(ELECTIONGUARD_BINDING_TEST_DIR)/bin/*; fi
-	if [ ! -d "$(ELECTIONGUARD_BINDING_TEST_DIR)/bin" ]; then mkdir $(ELECTIONGUARD_BINDING_TEST_DIR)/bin; fi
-	if [ -d "$(ELECTIONGUARD_BINDING_TEST_DIR)/obj" ]; then rm -rf $(ELECTIONGUARD_BINDING_TEST_DIR)/obj/*; fi
-	if [ ! -d "$(ELECTIONGUARD_BINDING_TEST_DIR)/obj" ]; then mkdir $(ELECTIONGUARD_BINDING_TEST_DIR)/obj; fi
-
-	if [ -d "$(ELECTIONGUARD_BINDING_UTILS_DIR)/bin" ]; then rm -rf $(ELECTIONGUARD_BINDING_UTILS_DIR)/bin/*; fi
-	if [ ! -d "$(ELECTIONGUARD_BINDING_UTILS_DIR)/bin" ]; then mkdir $(ELECTIONGUARD_BINDING_UTILS_DIR)/bin; fi
-	if [ -d "$(ELECTIONGUARD_BINDING_UTILS_DIR)/obj" ]; then rm -rf $(ELECTIONGUARD_BINDING_UTILS_DIR)/obj/*; fi
-	if [ ! -d "$(ELECTIONGUARD_BINDING_UTILS_DIR)/obj" ]; then mkdir $(ELECTIONGUARD_BINDING_UTILS_DIR)/obj; fi
-
-	if [ ! -d "$(ELECTIONGUARD_BINDING_UTILS_DIR)/obj" ]; then mkdir $(ELECTIONGUARD_BINDING_UTILS_DIR)/obj; fi
-
+	@echo 🗑️ Creating Output Directories
+	if [ ! -d "$(ELECTIONGUARD_BUILD_LIBS_DIR)" ]; then mkdir $(ELECTIONGUARD_BUILD_LIBS_DIR); fi
 	if [ ! -d "$(ELECTIONGUARD_BUILD_LIBS_DIR)/Android" ]; then mkdir $(ELECTIONGUARD_BUILD_LIBS_DIR)/Android; fi
 	if [ ! -d "$(ELECTIONGUARD_BUILD_LIBS_DIR)/Ios" ]; then mkdir $(ELECTIONGUARD_BUILD_LIBS_DIR)/Ios; fi
 	if [ ! -d "$(ELECTIONGUARD_BUILD_LIBS_DIR)/Darwin" ]; then mkdir $(ELECTIONGUARD_BUILD_LIBS_DIR)/Darwin; fi
@@ -339,6 +314,7 @@ endif
 
 clean-netstandard:
 	@echo 🗑️ CLEAN NETSTANDARD
+	dotnet clean $(ELECTIONGUARD_APP_CLI_DIR)/ElectionGuard.CLI.sln
 	dotnet clean ./bindings/netstandard/ElectionGuard/ElectionGuard.sln
 
 clean-ui:
