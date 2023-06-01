@@ -36,7 +36,7 @@ public class TestDecryptWithShares : DisposableBase
     }
 
     // Decrypt only the tally
-    [Test, Category("OneShot")]
+    [Test]
     public void Test_Decrypt_Tally_With_All_Guardians_Present()
     {
         // Arrange
