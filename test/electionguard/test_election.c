@@ -17,7 +17,7 @@ bool test_election(void)
     return test_assign_extended_data_to_ciphertext_election_context();
 }
 
-bool test_assign_extended_data_to_ciphertext_election_context()
+bool test_assign_extended_data_to_ciphertext_election_context(void)
 {
     printf("\n -------- test_assign_extended_data_to_ciphertext_election_context --------- \n");
 
