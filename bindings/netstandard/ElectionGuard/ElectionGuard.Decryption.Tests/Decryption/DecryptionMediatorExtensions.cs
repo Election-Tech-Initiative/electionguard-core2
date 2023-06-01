@@ -12,6 +12,31 @@ public static class DecryptionMediatorExtensions
     /// Run the decryption process
     /// </summary>
     public static DecryptionResult RunDecryptionProcess(
+    this DecryptionMediator mediator,
+        TestDecryptionData data,
+        List<Guardian> quorumOfGuardians,
+        bool tallyOnly = false)
+    {
+        return tallyOnly
+            ? mediator.RunDecryptionTallyOnly(data, quorumOfGuardians)
+            : mediator.RunDecryptionProcessWithBallots(data, quorumOfGuardians);
+    }
+
+    public static DecryptionResult RunDecryptionTallyOnly(
+    this DecryptionMediator mediator, TestDecryptionData data, List<Guardian> quorumOfGuardians)
+    {
+        // Create Shares
+        foreach (var guardian in quorumOfGuardians)
+        {
+            var shares = guardian.ComputeDecryptionShares(
+                data.CiphertextTally);
+            mediator.SubmitShare(shares.TallyShare);
+        }
+
+        return VerifyProofsAndDecrypt(mediator, data, quorumOfGuardians);
+    }
+
+    public static DecryptionResult RunDecryptionProcessWithBallots(
     this DecryptionMediator mediator, TestDecryptionData data, List<Guardian> quorumOfGuardians)
     {
         var spoiledBallots = data.CiphertextBallots.Where(i => i.IsSpoiled).ToList();
@@ -34,6 +59,14 @@ public static class DecryptionMediatorExtensions
             mediator.SubmitShares(shares, challengedBallots);
         }
 
+        return VerifyProofsAndDecrypt(mediator, data, quorumOfGuardians);
+    }
+
+    private static DecryptionResult VerifyProofsAndDecrypt(
+        DecryptionMediator mediator,
+        TestDecryptionData data,
+        List<Guardian> quorumOfGuardians)
+    {
         // create challenges
         var challenges = mediator.CreateChallenge(data.CiphertextTally.TallyId);
         foreach (var guardian in quorumOfGuardians)
