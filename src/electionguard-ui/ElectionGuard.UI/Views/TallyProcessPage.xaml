@@ -19,8 +19,8 @@
         </ResourceDictionary>
     </ContentPage.Resources>
 
-    <Grid RowDefinitions="auto, auto, *" Style="{StaticResource NarrowCenteredGrid}">
-        <VerticalStackLayout Grid.Row="0">
+    <Grid ColumnDefinitions="*, 2*, *" RowDefinitions="auto, auto, *">
+        <VerticalStackLayout Grid.Row="0" Grid.Column="1">
             <Label Style="{StaticResource H2}" Text="{helper:Translate ElectionNameText}" />
             <Label Text="{Binding CurrentElection.Name}" />
             <Label Style="{StaticResource H2}" Text="{helper:Translate TallyNameText}" />
@@ -36,7 +36,10 @@
                 Text="{helper:Translate ProcessTallyJoinNo}" />
         </VerticalStackLayout>
         <!--  List of guardians joined for all  -->
-        <VerticalStackLayout Grid.Row="1" Margin="0,0,50,0">
+        <VerticalStackLayout
+            Grid.Row="1"
+            Grid.Column="1"
+            Margin="0,0,50,0">
             <Label Style="{StaticResource H2}" Text="{helper:Translate JoinedGuardians}" />
             <CollectionView ItemsSource="{Binding JoinedGuardians}" SelectionMode="None">
                 <CollectionView.EmptyView>
@@ -85,7 +88,10 @@
         </VerticalStackLayout>
         <!--  status of tally  -->
         <!--  datagrid below  -->
-        <VerticalStackLayout Grid.Row="2" Margin="0,0,50,0">
+        <VerticalStackLayout
+            Grid.Row="2"
+            Grid.Column="1"
+            Margin="0,0,50,0">
             <Label Style="{StaticResource H2}" Text="{helper:Translate BallotsText}" />
             <Grid>
                 <Grid ColumnDefinitions="1.5*, 2*, *, *, *, *, *, *">
@@ -230,7 +236,8 @@
         <VerticalStackLayout
             Grid.Row="0"
             Grid.RowSpan="3"
-            Grid.Column="2">
+            Grid.Column="2"
+            HorizontalOptions="End">
             <Label Style="{StaticResource H2}" Text="{helper:Translate TallyChecklist}" />
             <HorizontalStackLayout Margin="10">
                 <Label Text="1." VerticalTextAlignment="Center" />
