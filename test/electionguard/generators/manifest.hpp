@@ -88,9 +88,16 @@ namespace electionguard::tools::generators
             selections.push_back(
               make_unique<SelectionDescription>("write-in-selection", "write-in", 2UL));
 
-            return make_unique<ContestDescription>(objectId, electoralDistrictId, sequenceOrder,
-                                                   VoteVariationType::one_of_m, numberElected, name,
-                                                   move(selections));
+            // simulate a contest with a title an no subtitle
+            vector<unique_ptr<Language>> languages = {};
+            languages.push_back(make_unique<Language>(name, "en"));
+            auto title = make_unique<InternationalizedText>(move(languages));
+
+            auto votesAllowed = numberElected;
+
+            return make_unique<ContestDescription>(
+              objectId, electoralDistrictId, sequenceOrder, VoteVariationType::one_of_m,
+              numberElected, votesAllowed, name, move(title), nullptr, move(selections));
         }
         // TODO: rename these
         static unique_ptr<Manifest> getJeffersonCountyManifest_Minimal()

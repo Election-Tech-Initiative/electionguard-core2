@@ -3,10 +3,10 @@
 
 #include <assert.h>
 #include <electionguard/ballot.h>
+#include <electionguard/ciphertext_ballot_selection.generated.h>
 #include <electionguard/plaintext_ballot.generated.h>
 #include <electionguard/plaintext_ballot_contest.generated.h>
 #include <electionguard/plaintext_ballot_selection.generated.h>
-#include <electionguard/ciphertext_ballot_selection.generated.h>
 #include <stdlib.h>
 
 bool strings_are_equal(char *expected, char *actual);
@@ -21,9 +21,8 @@ bool test_ballot(void)
 {
     printf("\n -------- test_ballot.c --------- \n");
     return test_plaintext_simple_ballot_is_valid() && test_ballot_property_getters() &&
-           test_ballot_serialization() &&
-           test_plaintext_ballot_selection_is_valid() &
-             test_plaintext_ballot_selection_is_invalid();
+           test_ballot_serialization() && test_plaintext_ballot_selection_is_valid() &&
+           test_plaintext_ballot_selection_is_invalid();
 }
 
 bool test_plaintext_simple_ballot_is_valid(void)
@@ -52,7 +51,7 @@ bool test_plaintext_simple_ballot_is_valid(void)
     return true;
 }
 
-bool test_ballot_property_getters()
+bool test_ballot_property_getters(void)
 {
     printf("\n -------- test_ballot_property_getters --------- \n");
 
@@ -207,7 +206,7 @@ bool test_plaintext_ballot_selection_is_invalid(void)
     return different_object_ids_fail() && vote_out_of_range_fails();
 }
 
-bool different_object_ids_fail()
+bool different_object_ids_fail(void)
 {
     printf("\n -------- different_object_ids_fail --------- \n");
 
@@ -228,7 +227,7 @@ bool different_object_ids_fail()
     return true;
 }
 
-bool vote_out_of_range_fails()
+bool vote_out_of_range_fails(void)
 {
     printf("\n -------- vote_out_of_range_fails --------- \n");
 

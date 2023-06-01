@@ -1093,13 +1093,20 @@ namespace electionguard
                 _selections.push_back(make_unique<SelectionDescription>(*element));
             }
 
-            // TODO: handle optional values
             if (ballotTitle != nullptr) {
                 auto _ballotTitle = make_unique<InternationalizedText>(*ballotTitle);
-                auto _ballotSubtitle = make_unique<InternationalizedText>(*ballotSubtitle);
-                return make_unique<ContestDescription::Impl>(
-                  object_id, electoralDistrictId, sequenceOrder, voteVariation, numberElected,
-                  votesAllowed, name, move(_ballotTitle), move(_ballotSubtitle), move(_selections));
+                unique_ptr<InternationalizedText> _ballotSubtitle;
+                if (ballotSubtitle != nullptr) {
+                    _ballotSubtitle = make_unique<InternationalizedText>(*ballotSubtitle);
+                    return make_unique<ContestDescription::Impl>(
+                      object_id, electoralDistrictId, sequenceOrder, voteVariation, numberElected,
+                      votesAllowed, name, move(_ballotTitle), move(_ballotSubtitle),
+                      move(_selections));
+                } else {
+                    return make_unique<ContestDescription::Impl>(
+                      object_id, electoralDistrictId, sequenceOrder, voteVariation, numberElected,
+                      votesAllowed, name, move(_ballotTitle), nullptr, move(_selections));
+                }
             }
             return make_unique<ContestDescription::Impl>(object_id, electoralDistrictId,
                                                          sequenceOrder, voteVariation,
