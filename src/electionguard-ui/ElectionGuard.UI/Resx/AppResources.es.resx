@@ -572,5 +572,7 @@
   </data>
   <data name="AbandonTallyTitle" xml:space="preserve">
     <value>¡Cuenta cancelada!</value>
+  <data name="ResultsText" xml:space="preserve">
+    <value>Resultados</value>
   </data>
 </root>

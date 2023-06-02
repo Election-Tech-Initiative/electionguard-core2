@@ -108,6 +108,8 @@ namespace ElectionGuard
             }
         }
 
+        public bool IsWriteIn => NativeInterface.Candidate.GetIsWriteIn(Handle);
+
         internal NativeInterface.Candidate.CandidateHandle Handle;
 
         internal Candidate(

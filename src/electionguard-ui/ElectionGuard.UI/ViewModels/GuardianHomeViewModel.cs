@@ -90,7 +90,7 @@ public partial class GuardianHomeViewModel : BaseViewModel
         Tallies.Clear();
         foreach (var item in tallies)
         {
-            if (!rejected.Contains(item.TallyId))
+            if (!rejected.Contains(item.TallyId) && item.State < TallyState.Complete)
             {
                 Tallies.Add(item);
             }

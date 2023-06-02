@@ -569,5 +569,7 @@
   </data>
   <data name="AbandonTallyTitle" xml:space="preserve">
     <value>Tally Canceled</value>
+  <data name="ResultsText" xml:space="preserve">
+    <value>Results</value>
   </data>
 </root>
