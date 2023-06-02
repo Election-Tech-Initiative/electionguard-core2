@@ -68,7 +68,7 @@ public partial class TallyProcessViewModel : BaseViewModel
 
     partial void OnJoinedGuardiansChanged(ObservableCollection<GuardianTallyItem> value)
     {
-        CanUserJoinTally = CanJoinTally();
+        CanUserJoinTally = CanJoinTally(); // needs to be aware of who joined the tally.
     }
 
     partial void OnTallyChanged(TallyRecord? oldValue, TallyRecord? newValue)
@@ -86,22 +86,28 @@ public partial class TallyProcessViewModel : BaseViewModel
             {
                 await Shell.Current.CurrentPage.DisplayAlert(AppResources.AbandonTallyTitle, AppResources.AbandonTallyText, AppResources.OkText);
                 await NavigationService.GoHome();
+
+                return;
             }
 
-            var electionId = newValue!.ElectionId ?? string.Empty;
-            var election = await _electionService.GetByElectionIdAsync(electionId);
-
-            ElectionGuardException.ThrowIfNull(election, $"ElectionId {electionId} not found! Tally {newValue.Id}"); // This should never happen.
-
-            CurrentElection = election;
-
-            BallotUploads = await _ballotUploadService.GetByElectionIdAsync(electionId);
-
+            await UpdateElection(newValue);
             await UpdateTallyData();
 
-            // Needs to be last.
+            // Needs to be last. Needs to be aware of tally state change.
             CanUserJoinTally = CanJoinTally();
         });
+    }
+
+    private async Task UpdateElection(TallyRecord? newValue)
+    {
+        var electionId = newValue!.ElectionId ?? string.Empty;
+        var election = await _electionService.GetByElectionIdAsync(electionId);
+
+        ElectionGuardException.ThrowIfNull(election, $"ElectionId {electionId} not found! Tally {newValue.Id}"); // This should never happen.
+
+        CurrentElection = election;
+
+        BallotUploads = await _ballotUploadService.GetByElectionIdAsync(electionId);
     }
 
     partial void OnTallyIdChanged(string value)
