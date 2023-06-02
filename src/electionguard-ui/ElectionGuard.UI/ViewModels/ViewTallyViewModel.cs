@@ -213,4 +213,13 @@ public partial class ViewTallyViewModel : BaseViewModel
             Contests.Add(contestItem);
         }
     }
+
+    public override async Task OnLeavingPage()
+    {
+        OriginalManifest?.Dispose();
+        CurrentManifest?.Dispose();
+        PlaintextTally?.Dispose();
+
+        await base.OnLeavingPage();
+    }
 }
