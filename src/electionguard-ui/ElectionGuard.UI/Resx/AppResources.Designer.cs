@@ -934,6 +934,15 @@ namespace ElectionGuard.UI.Resx {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Cancel Tally.
+        /// </summary>
+        internal static string ProcessTallyAbandon {
+            get {
+                return ResourceManager.GetString("ProcessTallyAbandon", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to No, Do not Join Tally.
         /// </summary>
         internal static string ProcessTallyJoinNo {
@@ -948,6 +957,15 @@ namespace ElectionGuard.UI.Resx {
         internal static string ProcessTallyJoinYes {
             get {
                 return ResourceManager.GetString("ProcessTallyJoinYes", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Start Tally.
+        /// </summary>
+        internal static string ProcessTallyStartTally {
+            get {
+                return ResourceManager.GetString("ProcessTallyStartTally", resourceCulture);
             }
         }
         

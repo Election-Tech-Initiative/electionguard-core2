@@ -555,4 +555,10 @@
   <data name="TallySubtalliesCombined" xml:space="preserve">
     <value>Ballots have been tallied</value>
   </data>
+  <data name="ProcessTallyAbandon" xml:space="preserve">
+    <value>Cancel Tally</value>
+  </data>
+  <data name="ProcessTallyStartTally" xml:space="preserve">
+    <value>Start Tally</value>
+  </data>
 </root>

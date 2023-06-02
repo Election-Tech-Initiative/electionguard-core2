@@ -16,6 +16,7 @@
     <ContentPage.Resources>
         <ResourceDictionary>
             <toolkit:InvertedBoolConverter x:Key="InvertedBoolConverter" />
+            <helper:TallyNotStartedConverter x:Key="TallyNotStartedConverter" />
         </ResourceDictionary>
     </ContentPage.Resources>
 
@@ -25,15 +26,18 @@
             <Label Text="{Binding CurrentElection.Name}" />
             <Label Style="{StaticResource H2}" Text="{helper:Translate TallyNameText}" />
             <Label Text="{Binding Tally.Name}" />
-            <!--  RO view of Tally filter (future work)  -->
-            <Button
-                Command="{Binding JoinTallyCommand}"
-                IsVisible="{Binding IsAdmin, Converter={StaticResource InvertedBoolConverter}}"
-                Text="{helper:Translate ProcessTallyJoinYes}" />
-            <Button
-                Command="{Binding RejectTallyCommand}"
-                IsVisible="{Binding IsAdmin, Converter={StaticResource InvertedBoolConverter}}"
-                Text="{helper:Translate ProcessTallyJoinNo}" />
+            <VerticalStackLayout IsVisible="{Binding CanUserJoinTally}">
+                <!--  RO view of Tally filter (future work)  -->
+                <Button Command="{Binding JoinTallyCommand}" Text="{helper:Translate ProcessTallyJoinYes}" />
+                <Button Command="{Binding RejectTallyCommand}" Text="{helper:Translate ProcessTallyJoinNo}" />
+            </VerticalStackLayout>
+            <!--  Admin buttons  -->
+            <VerticalStackLayout IsVisible="{Binding IsAdmin}">
+                <Button
+                    Command="{Binding StartTallyCommand}"
+                    IsVisible="{Binding Tally.State, Converter={StaticResource TallyNotStartedConverter}}"
+                    Text="{helper:Translate ProcessTallyStartTally}" />
+            </VerticalStackLayout>
         </VerticalStackLayout>
         <!--  List of guardians joined for all  -->
         <VerticalStackLayout

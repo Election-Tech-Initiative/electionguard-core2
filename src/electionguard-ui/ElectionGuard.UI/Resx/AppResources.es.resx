@@ -558,4 +558,10 @@
   <data name="TallyChecklist" xml:space="preserve">
     <value>¡Proceso de recuento!</value>
   </data>
+  <data name="ProcessTallyAbandon" xml:space="preserve">
+    <value>¡Cancela Tally!</value>
+  </data>
+  <data name="ProcessTallyStartTally" xml:space="preserve">
+    <value>¡Empieza Tally!</value>
+  </data>
 </root>

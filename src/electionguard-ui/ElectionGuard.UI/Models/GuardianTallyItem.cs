@@ -13,4 +13,6 @@ public partial class GuardianTallyItem : ObservableObject
 
     [ObservableProperty]
     private bool _isSelf;
+
+    public bool Joined { get; internal set; }
 }

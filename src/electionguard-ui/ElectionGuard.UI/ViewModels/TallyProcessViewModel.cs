@@ -13,7 +13,14 @@ public partial class TallyProcessViewModel : BaseViewModel
     private string _tallyId = string.Empty;
 
     [ObservableProperty]
+    private bool _canUserJoinTally;
+
+    [ObservableProperty]
+    private bool _canUserStartTally;
+
+    [ObservableProperty]
     [NotifyCanExecuteChangedFor(nameof(JoinTallyCommand))]
+    [NotifyCanExecuteChangedFor(nameof(StartTallyCommand))]
     [NotifyCanExecuteChangedFor(nameof(RejectTallyCommand))]
     private TallyRecord? _tally = default;
 
@@ -58,27 +65,37 @@ public partial class TallyProcessViewModel : BaseViewModel
         _challengeResponseService = challengeResponseService;
     }
 
+    partial void OnJoinedGuardiansChanged(ObservableCollection<GuardianTallyItem> value)
+    {
+        CanUserJoinTally = CanJoinTally();
+    }
+
     partial void OnTallyChanged(TallyRecord? oldValue, TallyRecord? newValue)
     {
-        if (newValue != null && oldValue?.TallyId != newValue?.TallyId)
+        if (newValue is null || oldValue?.TallyId == newValue?.TallyId)
         {
-            _ = Shell.Current.CurrentPage.Dispatcher.DispatchAsync(async () =>
-            {
-                var electionId = newValue!.ElectionId ?? string.Empty;
-                var election = await _electionService.GetByElectionIdAsync(electionId);
-                if (election is null)
-                {
-                    throw new ElectionGuardException($"ElectionId {electionId} not found! Tally {newValue.Id}");
-                    // TODO: put up some error message somewhere, over the rainbow.
-                }
-
-                CurrentElection = election;
-
-                BallotUploads = await _ballotUploadService.GetByElectionIdAsync(electionId);
-
-                await UpdateTallyData();
-            });
+            return;
         }
+
+        JoinedGuardians.Clear();
+
+        _ = Shell.Current.CurrentPage.Dispatcher.DispatchAsync(async () =>
+        {
+            var electionId = newValue!.ElectionId ?? string.Empty;
+            var election = await _electionService.GetByElectionIdAsync(electionId);
+            if (election is null)
+            {
+                throw new ElectionGuardException($"ElectionId {electionId} not found! Tally {newValue.Id}");
+                // TODO: put up some error message somewhere, over the rainbow.
+            }
+
+            CurrentElection = election;
+
+            BallotUploads = await _ballotUploadService.GetByElectionIdAsync(electionId);
+
+            await UpdateTallyData();
+            CanUserJoinTally = CanJoinTally();
+        });
     }
 
     partial void OnTallyIdChanged(string value)
@@ -109,7 +126,9 @@ public partial class TallyProcessViewModel : BaseViewModel
 
     private bool CanJoinTally()
     {
-        return Tally?.State == TallyState.PendingGuardiansJoin && !CurrentUserJoinedAlready();
+        return Tally?.State == TallyState.PendingGuardiansJoin &&
+            !CurrentUserJoinedAlready() &&
+            !base.AuthenticationService.IsAdmin;
     }
 
     private bool CurrentUserJoinedAlready()
@@ -137,19 +156,23 @@ public partial class TallyProcessViewModel : BaseViewModel
     [RelayCommand(CanExecute = nameof(CanStartTally))]
     private async Task StartTally()
     {
-        _ = await Task.FromResult(() =>
-        {
-            if (!(_timer?.IsRunning ?? true))
-            {
-                _timer?.Start();
-            }
-        });
+        await _tallyService.UpdateStateAsync(Tally.TallyId, TallyState.TallyStarted);
+        Tally.State = TallyState.TallyStarted;
     }
 
     private bool CanStartTally()
     {
+        if(Tally == null || JoinedGuardians.Count() == 0)
+        {
+            return false;
+        }
+
         // add count >= quorum
-        return Tally?.State == TallyState.PendingGuardiansJoin && !CurrentUserJoinedAlready();
+        var quorumReached = JoinedGuardians.Count(g => g.Joined) >= Tally.Quorum;
+
+        return Tally?.State == TallyState.PendingGuardiansJoin &&
+            AuthenticationService.IsAdmin &&
+            quorumReached;
     }
 
 
@@ -196,11 +219,18 @@ public partial class TallyProcessViewModel : BaseViewModel
         {
             var localData = await _tallyJoinedService.GetAllByTallyIdAsync(TallyId);
 
+
+            // TODO: clean this up using LINQ magic.
             foreach (var item in localData)
             {
-                if (!JoinedGuardians.Any(g => g.Name == item.GuardianId))
+                if (JoinedGuardians.Any(g => g.Name != item.GuardianId))
                 {
-                    JoinedGuardians.Add(new GuardianTallyItem() { Name = item.GuardianId });
+                    JoinedGuardians.Add(
+                        new GuardianTallyItem
+                        { 
+                          Name = item.GuardianId,
+                          Joined = item.Joined,
+                        });
                 }
             }
         }

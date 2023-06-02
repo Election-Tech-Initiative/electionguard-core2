@@ -63,10 +63,17 @@ public class TallyStateMachine : ITallyStateMachine
     }
 
     #region Should Run
-    private async Task<bool> ShouldStartTally()
+    private async Task<bool> ShouldAutoStartTally()
     {
-        var joinedGuardians = await _tallyJoinedService.GetCountByTallyJoinedAsync(_tally.TallyId);
-        return joinedGuardians >= _tally.Quorum;
+        const bool GUARDIAN_JOINED_TALLY = true;
+
+        var joinedGuardians = await _tallyJoinedService.GetGuardianCountByTallyAsync(_tally.TallyId);
+        var allJoinedGuardians = joinedGuardians[GUARDIAN_JOINED_TALLY] + joinedGuardians[!GUARDIAN_JOINED_TALLY];
+
+        var isQuorumReached = joinedGuardians[GUARDIAN_JOINED_TALLY] >= _tally.Quorum;
+        var haveAllGuardiansJoined = allJoinedGuardians == _tally.NumberOfGuardians;
+
+        return isQuorumReached && haveAllGuardiansJoined;
     }
 
     private async Task<bool> AlwaysRun()
@@ -104,6 +111,12 @@ public class TallyStateMachine : ITallyStateMachine
     #endregion
 
     #region Run Steps
+    
+    private async Task StartTally()
+    {
+        await _tallyService.UpdateStateAsync(_tally.TallyId, TallyState.TallyStarted);
+    }
+
     private async Task RespondChallenge()
     {
         await _tallyManager.ComputeChallengeResponse(
@@ -175,7 +188,13 @@ public class TallyStateMachine : ITallyStateMachine
             new()
             {
                 State = TallyState.PendingGuardiansJoin,
-                ShouldRunStep = ShouldStartTally,
+                ShouldRunStep = ShouldAutoStartTally,
+                RunStep = StartTally,
+            },
+            new()
+            {
+                State = TallyState.TallyStarted,
+                ShouldRunStep = AlwaysRun,
                 RunStep = AccumulateTally,
             },
             new()

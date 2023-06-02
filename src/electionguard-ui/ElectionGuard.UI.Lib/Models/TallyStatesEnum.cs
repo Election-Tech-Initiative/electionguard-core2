@@ -7,7 +7,7 @@ public enum TallyState
 {
     DoesNotExist,
     PendingGuardiansJoin,
-    AdminStartsTally,
+    TallyStarted,
     AdminAccumulateTally,
     PendingGuardianDecryptShares,
     AdminGenerateChallenge,
