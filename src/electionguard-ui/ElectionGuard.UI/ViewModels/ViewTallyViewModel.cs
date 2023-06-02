@@ -1,12 +1,8 @@
-﻿using System.Text;
-using CommunityToolkit.Maui.Storage;
+﻿using CommunityToolkit.Maui.Storage;
 using CommunityToolkit.Mvvm.Input;
 using ElectionGuard.Decryption.Tally;
-using ElectionGuard.Encryption.Utils.Converters;
-using ElectionGuard.UI.Lib.Models;
 using ElectionGuard.UI.Models;
 using Newtonsoft.Json;
-using static MongoDB.Driver.WriteConcern;
 
 namespace ElectionGuard.UI.ViewModels;
 
@@ -38,9 +34,6 @@ public partial class ViewTallyViewModel : BaseViewModel
 
     [ObservableProperty]
     private ObservableCollection<ContestItem> _contests = new();
-
-    [ObservableProperty]
-    private ContestItem _FirstContest = new();
 
     private readonly ElectionService _electionService;
     private readonly TallyService _tallyService;
@@ -152,15 +145,13 @@ public partial class ViewTallyViewModel : BaseViewModel
     [RelayCommand]
     private async Task ExportTally()
     {
-        CancellationToken token = new CancellationToken();
+        var token = new CancellationToken();
         var outputResult = await FolderPicker.PickAsync(token);
         if (outputResult.IsSuccessful)
         {
             await ElectionRecordGenerator.GenerateElectionRecordAsync(Tally!, outputResult.Folder!.Path);
         }
     }
-
-
 
     private void GenerateContestData()
     {
@@ -183,7 +174,6 @@ public partial class ViewTallyViewModel : BaseViewModel
             var party = parties.FirstOrDefault(p => p.PartyId == local.PartyId) ?? new PartyDisplay(string.Empty, string.Empty, string.Empty); ;
             candidates.Add(new(local.Name.GetTextAt(0).Value, party.Name, local.ObjectId, local.IsWriteIn));
         }
-
 
         foreach (var (key, item) in PlaintextTally.Contests)
         {
@@ -222,7 +212,5 @@ public partial class ViewTallyViewModel : BaseViewModel
 
             Contests.Add(contestItem);
         }
-        FirstContest = Contests.First();
     }
-
 }
