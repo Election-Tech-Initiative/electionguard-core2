@@ -35,6 +35,29 @@ public class TestDecryptWithShares : DisposableBase
         Data.Dispose();
     }
 
+    // Decrypt only the tally
+    [Test]
+    public void Test_Decrypt_Tally_With_All_Guardians_Present()
+    {
+        // Arrange
+        var mediator = new DecryptionMediator(
+            "fake-mediator",
+            Data.CiphertextTally,
+            Data.KeyCeremony.Guardians.Select(i => i.SharePublicKey()).ToList());
+
+        // Act
+        var guardians = Data.KeyCeremony.Guardians
+                .ToList();
+        var result = mediator.RunDecryptionProcess(Data, guardians, tallyOnly: true);
+
+        // Assert
+        var plaintextChallengedBallots = Data.PlaintextBallots
+            .Where(i => Data.CiphertextTally.ChallengedBallotIds.Contains(i.ObjectId))
+            .Select(i => i.ToTallyBallot(Data.CiphertextTally)).ToList();
+        Assert.That(result.Tally, Is.EqualTo(Data.PlaintextTally));
+        Assert.That(result.ChallengedBallots!.Count, Is.EqualTo(0));
+    }
+
     [Test]
     public void Test_Decrypt_With_All_Guardians_Present()
     {
@@ -43,7 +66,6 @@ public class TestDecryptWithShares : DisposableBase
             "fake-mediator",
             Data.CiphertextTally,
             Data.KeyCeremony.Guardians.Select(i => i.SharePublicKey()).ToList());
-
 
         // Act
         var guardians = Data.KeyCeremony.Guardians
