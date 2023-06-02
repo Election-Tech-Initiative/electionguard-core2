@@ -22,6 +22,15 @@ public class BallotService : BaseDatabaseService<BallotRecord>
     /// Gets ballots for an election
     /// </summary>
     /// <param name="electionId">election id to search for</param>
+    public async Task<BallotRecord?> GetByOjectIdAsync(string electionId)
+    {
+        return await GetByFieldAsync(Constants.ObjectId, electionId);
+    }
+
+    /// <summary>
+    /// Gets ballots for an election
+    /// </summary>
+    /// <param name="electionId">election id to search for</param>
     public async Task<List<BallotRecord>> GetByElectionIdAsync(string electionId)
     {
         return await GetAllByFieldAsync(Constants.ElectionId, electionId);
@@ -50,7 +59,13 @@ public class BallotService : BaseDatabaseService<BallotRecord>
         return await GetCursorByFilterAsync(filter);
     }
 
-
+    public async Task<long> GetCountBallotsByElectionIdStateAsync(string electionId, BallotBoxState state)
+    {
+        var filter = FilterBuilder.And(
+            FilterBuilder.Eq(Constants.ElectionId, electionId),
+            FilterBuilder.Eq(Constants.BallotState, state));
+        return await CountByFilterAsync(filter);
+    }
 
     /// <summary>
     /// Gets ballots from a single upload
