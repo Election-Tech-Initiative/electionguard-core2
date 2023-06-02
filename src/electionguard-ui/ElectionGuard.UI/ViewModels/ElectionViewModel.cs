@@ -167,7 +167,7 @@ public partial class ElectionViewModel : BaseViewModel
                 });
 
                 Tallies.Clear();
-                var tallies = await _tallyService.GetByElectionIdAsync(value?.ElectionId);
+                var tallies = await _tallyService.GetAllActiveByElectionIdAsync(value?.ElectionId);
                 foreach (var item in tallies)
                 {
                     Tallies.Add(item);
