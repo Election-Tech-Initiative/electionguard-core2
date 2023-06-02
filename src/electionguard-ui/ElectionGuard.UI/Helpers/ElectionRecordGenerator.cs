@@ -109,12 +109,14 @@ public static class ElectionRecordGenerator
     {
         Directory.CreateDirectory(ballotFolder);
 
-        ChallengedBallotService ballotService = new();
-        using var cursor = await ballotService.GetCursorByElectionIdAsync(electionId);
+        BallotService ballotService = new();
+        ChallengedBallotService challengedBallotService = new();
+        using var cursor = await challengedBallotService.GetCursorByElectionIdAsync(electionId);
 
-        await cursor.ForEachAsync(document =>
+        await cursor.ForEachAsync(async document =>
         {
-            var ballotCode = document.BallotCode;
+            var ballot = await ballotService.GetByOjectIdAsync(document.BallotCode);
+            var ballotCode = ballot?.BallotCode;
             var fileName = $"{ballotCode}.json";
             var filePath = Path.Combine(ballotFolder, fileName);
 

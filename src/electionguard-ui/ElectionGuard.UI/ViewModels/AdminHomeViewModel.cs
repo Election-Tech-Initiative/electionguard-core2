@@ -60,7 +60,7 @@ public partial class AdminHomeViewModel : BaseViewModel
         await NavigationService.GoToPage(typeof(CreateKeyCeremonyAdminViewModel));
     }
 
-    [RelayCommand]
+    [RelayCommand(AllowConcurrentExecutions = true)]
     private async Task CreateElection()
     {
         await NavigationService.GoToPage(typeof(CreateElectionViewModel));

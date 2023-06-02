@@ -1,11 +1,8 @@
 ﻿using CommunityToolkit.Maui.Storage;
 using CommunityToolkit.Mvvm.Input;
 using ElectionGuard.Decryption.Tally;
-using ElectionGuard.Encryption.Utils.Converters;
-using ElectionGuard.UI.Lib.Models;
 using ElectionGuard.UI.Models;
 using Newtonsoft.Json;
-using static MongoDB.Driver.WriteConcern;
 
 namespace ElectionGuard.UI.ViewModels;
 
@@ -24,13 +21,23 @@ public partial class ViewTallyViewModel : BaseViewModel
     private Election? _currentElection = default;
 
     [ObservableProperty]
+    private Manifest? _originalManifest = default;
+
+    [ObservableProperty]
+    private InternalManifest? _currentManifest = default;
+
+    [ObservableProperty]
     private PlaintextTally? _plaintextTally = default;
 
     [ObservableProperty]
     private ObservableCollection<GuardianTallyItem> _joinedGuardians = new();
 
+    [ObservableProperty]
+    private ObservableCollection<ContestItem> _contests = new();
+
     private readonly ElectionService _electionService;
     private readonly TallyService _tallyService;
+    private readonly ManifestService _manifestService;
     private readonly BallotUploadService _ballotUploadService;
     private readonly TallyJoinedService _tallyJoinedService;
     private readonly DecryptionShareService _decryptionShareService;
@@ -45,11 +52,13 @@ public partial class ViewTallyViewModel : BaseViewModel
         BallotUploadService ballotUploadService,
         DecryptionShareService decryptionShareService,
         PlaintextTallyService plaintextTallyService,
+        ManifestService manifestService,
         ChallengeResponseService challengeResponseService) :
         base("ViewTally", serviceProvider)
     {
         _tallyService = tallyService;
         _electionService = electionService;
+        _manifestService = manifestService;
         _tallyJoinedService = tallyJoinedService;
         _ballotUploadService = ballotUploadService;
         _decryptionShareService = decryptionShareService;
@@ -74,20 +83,38 @@ public partial class ViewTallyViewModel : BaseViewModel
 
     partial void OnTallyChanged(TallyRecord? oldValue, TallyRecord? newValue)
     {
-        if (newValue is not null && oldValue?.TallyId != newValue?.TallyId)
+        if (newValue is not null)
         {
+            ArgumentException.ThrowIfNullOrEmpty(newValue.ElectionId);
+
             _ = Shell.Current.CurrentPage.Dispatcher.DispatchAsync(async () =>
             {
                 var electionId = newValue.ElectionId ?? string.Empty;
                 var election = await _electionService.GetByElectionIdAsync(electionId);
-                if (election is null)
-                {
-                    throw new ElectionGuardException($"ElectionId {electionId} not found! Tally {newValue.TallyId}");
-                    // TODO: put up some error message somewhere, over the rainbow.
-                }
+                ElectionGuardException.ThrowIfNull(election, $"ElectionId {electionId} not found! Tally {newValue.TallyId}");
+
                 CurrentElection = election;
 
                 await UpdateTallyData();
+            });
+        }
+    }
+
+    partial void OnCurrentElectionChanged(Election? oldValue, Election? newValue)
+    {
+        if (newValue is not null)
+        {
+            ArgumentException.ThrowIfNullOrEmpty(newValue.ElectionId);
+
+            _ = Shell.Current.CurrentPage.Dispatcher.DispatchAsync(async () =>
+            {
+                var manifest = await _manifestService.GetByElectionIdAsync(newValue.ElectionId);
+                ElectionGuardException.ThrowIfNull(manifest, $"Could not load manifest for election {newValue.ElectionId}");
+
+                OriginalManifest = JsonConvert.DeserializeObject<Manifest>(manifest);
+                CurrentManifest = new(OriginalManifest);
+
+                GenerateContestData();
             });
         }
     }
@@ -115,11 +142,10 @@ public partial class ViewTallyViewModel : BaseViewModel
         }
     }
 
-
     [RelayCommand]
     private async Task ExportTally()
     {
-        CancellationToken token = new CancellationToken();
+        var token = new CancellationToken();
         var outputResult = await FolderPicker.PickAsync(token);
         if (outputResult.IsSuccessful)
         {
@@ -127,4 +153,73 @@ public partial class ViewTallyViewModel : BaseViewModel
         }
     }
 
+    private void GenerateContestData()
+    {
+        ElectionGuardException.ThrowIfNull(CurrentManifest);
+        ElectionGuardException.ThrowIfNull(OriginalManifest);
+        ElectionGuardException.ThrowIfNull(PlaintextTally);
+
+        List<PartyDisplay> parties = new();
+        List<CandidateDisplay> candidates = new();
+
+        for (ulong i = 0; i < OriginalManifest.PartiesSize; i++)
+        {
+            var local = OriginalManifest.GetPartyAtIndex(i);
+            parties.Add(new(local.Name.GetTextAt(0).Value, local.Abbreviation, local.ObjectId));
+        }
+
+        for (ulong i = 0; i < OriginalManifest.CandidatesSize; i++)
+        {
+            var local = OriginalManifest.GetCandidateAtIndex(i);
+            var party = parties.FirstOrDefault(p => p.PartyId == local.PartyId) ?? new PartyDisplay(string.Empty, string.Empty, string.Empty); ;
+            candidates.Add(new(local.Name.GetTextAt(0).Value, party.Name, local.ObjectId, local.IsWriteIn));
+        }
+
+        foreach (var (key, item) in PlaintextTally.Contests)
+        {
+            var contest = CurrentManifest.Contests.Single(c => c.ObjectId == item.ObjectId);
+            var contestItem = new ContestItem() { Name = contest.Name, TotalVotes = contest.VotesAllowed * (ulong)Tally.CastBallotCount };
+            ulong writeInTotal = 0;
+            ulong overVoteTotal = 0;
+            ulong underVoteTotal = 0;
+            ulong totalVotes = 0;
+
+            foreach (var (skey, selection) in item.Selections)
+            {
+                var candidateId = selection.ObjectId.Replace($"{item.ObjectId}-", string.Empty);
+                var candidate = candidates.Single(c => c.CandidateId == candidateId);
+                var percent = (float)selection.Tally / (contest.VotesAllowed * (ulong)Tally.CastBallotCount) * 100;
+                if (!candidate.isWritein)
+                {
+                    contestItem.Selections.Add(new() { Name = candidate.Name, Party = candidate.Party, Votes = selection.Tally, Percent = percent });
+                }
+                else
+                {
+                    writeInTotal += selection.Tally;
+                }
+                totalVotes += selection.Tally;
+            }
+            if (writeInTotal > 0)
+            {
+                var percent = (float)writeInTotal / (contest.VotesAllowed * (ulong)Tally.CastBallotCount) * 100;
+                contestItem.Selections.Add(new() { Name = "Write-ins", Party = string.Empty, Votes = writeInTotal, Percent = percent });
+            }
+            underVoteTotal = (contest.VotesAllowed * (ulong)Tally.CastBallotCount) - totalVotes;
+            var underPercent = (float)underVoteTotal / (contest.VotesAllowed * (ulong)Tally.CastBallotCount) * 100;
+            contestItem.Selections.Add(new() { Name = "Undervotes", Party = string.Empty, Votes = underVoteTotal, Percent = underPercent });
+            var overPercent = (float)overVoteTotal / (contest.VotesAllowed * (ulong)Tally.CastBallotCount) * 100;
+            contestItem.Selections.Add(new() { Name = "Overvotes", Party = string.Empty, Votes = overVoteTotal, Percent = overPercent });
+
+            Contests.Add(contestItem);
+        }
+    }
+
+    public override async Task OnLeavingPage()
+    {
+        OriginalManifest?.Dispose();
+        CurrentManifest?.Dispose();
+        PlaintextTally?.Dispose();
+
+        await base.OnLeavingPage();
+    }
 }
