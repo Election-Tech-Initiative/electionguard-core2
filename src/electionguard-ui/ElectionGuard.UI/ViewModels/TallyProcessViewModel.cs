@@ -1,4 +1,5 @@
 ﻿using CommunityToolkit.Mvvm.Input;
+using ElectionGuard.UI.Lib.Extensions;
 using ElectionGuard.UI.Models;
 using ElectionGuard.UI.Services;
 
@@ -259,22 +260,17 @@ public partial class TallyProcessViewModel : BaseViewModel
         // if we have fewer than max number, see if anyone else joined
         if (JoinedGuardians.Count != Tally?.NumberOfGuardians)
         {
-            var localData = await _tallyJoinedService.GetAllByTallyIdAsync(TallyId);
-
-
-            // TODO: clean this up using LINQ magic.
-            foreach (var item in localData)
-            {
-                if (JoinedGuardians.Any(g => g.Name != item.GuardianId))
+            var newGuardians =
+                from joinedGuardian in await _tallyJoinedService.GetAllByTallyIdAsync(TallyId)
+                let tallyItem = new GuardianTallyItem
                 {
-                    JoinedGuardians.Add(
-                        new GuardianTallyItem
-                        {
-                            Name = item.GuardianId,
-                            Joined = item.Joined,
-                        });
+                    Name = joinedGuardian.GuardianId,
+                    Joined = joinedGuardian.Joined,
                 }
-            }
+                where !JoinedGuardians.Contains(tallyItem)
+                select tallyItem;
+            
+            JoinedGuardians.AddRange(newGuardians);
         }
         foreach (var guardian in JoinedGuardians)
         {
