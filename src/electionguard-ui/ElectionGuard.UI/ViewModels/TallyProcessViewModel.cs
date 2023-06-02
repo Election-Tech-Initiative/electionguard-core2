@@ -22,6 +22,7 @@ public partial class TallyProcessViewModel : BaseViewModel
     [NotifyCanExecuteChangedFor(nameof(JoinTallyCommand))]
     [NotifyCanExecuteChangedFor(nameof(StartTallyCommand))]
     [NotifyCanExecuteChangedFor(nameof(RejectTallyCommand))]
+    [NotifyCanExecuteChangedFor(nameof(AbandonTallyCommand))]
     private TallyRecord? _tally = default;
 
     [ObservableProperty]
@@ -94,6 +95,7 @@ public partial class TallyProcessViewModel : BaseViewModel
             BallotUploads = await _ballotUploadService.GetByElectionIdAsync(electionId);
 
             await UpdateTallyData();
+
             CanUserJoinTally = CanJoinTally();
         });
     }
@@ -158,6 +160,31 @@ public partial class TallyProcessViewModel : BaseViewModel
     {
         await _tallyService.UpdateStateAsync(Tally.TallyId, TallyState.TallyStarted);
         Tally.State = TallyState.TallyStarted;
+    }
+
+    [RelayCommand(CanExecute = nameof(CanAbandon))]
+    public async Task AbandonTally()
+    {
+        if (Tally == null)
+        {
+            // should never hit this. handles null case.
+            await NavigationService.GoHome();
+            return;
+        }
+
+        await _tallyService.UpdateStateAsync(TallyId, TallyState.Abandoned);
+
+        await NavigationService.GoToPage(typeof(ElectionViewModel), new()
+        {
+            { ElectionViewModel.CurrentElectionParam, Tally.ElectionId! },
+        });
+
+    }
+
+    private bool CanAbandon()
+    {
+        return AuthenticationService.IsAdmin &&
+            Tally?.State == TallyState.PendingGuardiansJoin;
     }
 
     private bool CanStartTally()
