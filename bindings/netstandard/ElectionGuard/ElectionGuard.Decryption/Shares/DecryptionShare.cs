@@ -1,6 +1,7 @@
 ﻿using ElectionGuard.ElectionSetup;
 using ElectionGuard.ElectionSetup.Extensions;
 using ElectionGuard.Extensions;
+using Newtonsoft.Json;
 
 namespace ElectionGuard.Decryption.Shares;
 
@@ -18,6 +19,7 @@ public record DecryptionShare : DisposableRecordBase
         BallotShares = new Dictionary<string, BallotShare>();
     }
 
+    [JsonConstructor]
     public DecryptionShare(
         TallyShare tallyShare,
         Dictionary<string, BallotShare> ballotShares)
