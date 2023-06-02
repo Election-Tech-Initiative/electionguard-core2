@@ -50,7 +50,13 @@ public class BallotService : BaseDatabaseService<BallotRecord>
         return await GetCursorByFilterAsync(filter);
     }
 
-
+    public async Task<long> GetCountBallotsByElectionIdStateAsync(string electionId, BallotBoxState state)
+    {
+        var filter = FilterBuilder.And(
+            FilterBuilder.Eq(Constants.ElectionId, electionId),
+            FilterBuilder.Eq(Constants.BallotState, state));
+        return await CountByFilterAsync(filter);
+    }
 
     /// <summary>
     /// Gets ballots from a single upload

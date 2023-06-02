@@ -558,4 +558,7 @@
   <data name="TallyChecklist" xml:space="preserve">
     <value>¡Proceso de recuento!</value>
   </data>
+  <data name="ResultsText" xml:space="preserve">
+    <value>Resultados</value>
+  </data>
 </root>

@@ -988,6 +988,15 @@ namespace ElectionGuard.UI.Resx {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Results.
+        /// </summary>
+        internal static string ResultsText {
+            get {
+                return ResourceManager.GetString("ResultsText", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Review Challenge.
         /// </summary>
         internal static string ReviewSpoiledText {
