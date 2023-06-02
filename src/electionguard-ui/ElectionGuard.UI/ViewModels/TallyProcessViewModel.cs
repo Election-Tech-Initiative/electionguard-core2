@@ -1,8 +1,6 @@
-﻿using CommunityToolkit.Maui.Views;
-using CommunityToolkit.Mvvm.Input;
+﻿using CommunityToolkit.Mvvm.Input;
 using ElectionGuard.UI.Models;
 using ElectionGuard.UI.Services;
-using Microsoft.Maui.Controls.Compatibility.Platform.UWP;
 
 namespace ElectionGuard.UI.ViewModels;
 
@@ -92,11 +90,8 @@ public partial class TallyProcessViewModel : BaseViewModel
 
             var electionId = newValue!.ElectionId ?? string.Empty;
             var election = await _electionService.GetByElectionIdAsync(electionId);
-            if (election is null)
-            {
-                throw new ElectionGuardException($"ElectionId {electionId} not found! Tally {newValue.Id}");
-                // TODO: put up some error message somewhere, over the rainbow.
-            }
+
+            ElectionGuardException.ThrowIfNull(election, $"ElectionId {electionId} not found! Tally {newValue.Id}"); // This should never happen.
 
             CurrentElection = election;
 
@@ -139,7 +134,7 @@ public partial class TallyProcessViewModel : BaseViewModel
     {
         return Tally?.State == TallyState.PendingGuardiansJoin &&
             !CurrentUserJoinedAlready() &&
-            !base.AuthenticationService.IsAdmin;
+            !AuthenticationService.IsAdmin;
     }
 
     private bool CurrentUserJoinedAlready()
@@ -167,6 +162,11 @@ public partial class TallyProcessViewModel : BaseViewModel
     [RelayCommand(CanExecute = nameof(CanStartTally))]
     private async Task StartTally()
     {
+        if (Tally is null)
+        {
+            return;
+        }
+
         await _tallyService.UpdateStateAsync(Tally.TallyId, TallyState.TallyStarted);
         Tally.State = TallyState.TallyStarted;
     }
@@ -198,7 +198,7 @@ public partial class TallyProcessViewModel : BaseViewModel
 
     private bool CanStartTally()
     {
-        if(Tally == null || JoinedGuardians.Count() == 0)
+        if (Tally == null || JoinedGuardians.Count == 0)
         {
             return false;
         }
@@ -263,9 +263,9 @@ public partial class TallyProcessViewModel : BaseViewModel
                 {
                     JoinedGuardians.Add(
                         new GuardianTallyItem
-                        { 
-                          Name = item.GuardianId,
-                          Joined = item.Joined,
+                        {
+                            Name = item.GuardianId,
+                            Joined = item.Joined,
                         });
                 }
             }
