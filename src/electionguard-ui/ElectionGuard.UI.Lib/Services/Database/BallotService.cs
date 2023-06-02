@@ -22,6 +22,15 @@ public class BallotService : BaseDatabaseService<BallotRecord>
     /// Gets ballots for an election
     /// </summary>
     /// <param name="electionId">election id to search for</param>
+    public async Task<BallotRecord?> GetByOjectIdAsync(string electionId)
+    {
+        return await GetByFieldAsync(Constants.ObjectId, electionId);
+    }
+
+    /// <summary>
+    /// Gets ballots for an election
+    /// </summary>
+    /// <param name="electionId">election id to search for</param>
     public async Task<List<BallotRecord>> GetByElectionIdAsync(string electionId)
     {
         return await GetAllByFieldAsync(Constants.ElectionId, electionId);
