@@ -564,4 +564,13 @@
   <data name="ProcessTallyStartTally" xml:space="preserve">
     <value>¡Empieza Tally!</value>
   </data>
+  <data name="OkText" xml:space="preserve">
+    <value>Aceptar</value>
+  </data>
+  <data name="AbandonTallyText" xml:space="preserve">
+    <value>Tally ha sido cancelada por el administrador de elecciones. Consulte el administrador para obtener detalles adicionales.!</value>
+  </data>
+  <data name="AbandonTallyTitle" xml:space="preserve">
+    <value>¡Cuenta cancelada!</value>
+  </data>
 </root>

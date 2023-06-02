@@ -1,6 +1,8 @@
-﻿using CommunityToolkit.Mvvm.Input;
+﻿using CommunityToolkit.Maui.Views;
+using CommunityToolkit.Mvvm.Input;
 using ElectionGuard.UI.Models;
 using ElectionGuard.UI.Services;
+using Microsoft.Maui.Controls.Compatibility.Platform.UWP;
 
 namespace ElectionGuard.UI.ViewModels;
 
@@ -82,6 +84,12 @@ public partial class TallyProcessViewModel : BaseViewModel
 
         _ = Shell.Current.CurrentPage.Dispatcher.DispatchAsync(async () =>
         {
+            if (newValue?.State == TallyState.Abandoned)
+            {
+                await Shell.Current.CurrentPage.DisplayAlert(AppResources.AbandonTallyTitle, AppResources.AbandonTallyText, AppResources.OkText);
+                await NavigationService.GoHome();
+            }
+
             var electionId = newValue!.ElectionId ?? string.Empty;
             var election = await _electionService.GetByElectionIdAsync(electionId);
             if (election is null)
@@ -96,6 +104,7 @@ public partial class TallyProcessViewModel : BaseViewModel
 
             await UpdateTallyData();
 
+            // Needs to be last.
             CanUserJoinTally = CanJoinTally();
         });
     }

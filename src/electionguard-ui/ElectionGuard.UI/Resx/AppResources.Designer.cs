@@ -61,6 +61,24 @@ namespace ElectionGuard.UI.Resx {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Tally has been canceled by election administrator. See administrator for addional details..
+        /// </summary>
+        internal static string AbandonTallyText {
+            get {
+                return ResourceManager.GetString("AbandonTallyText", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Tally Canceled.
+        /// </summary>
+        internal static string AbandonTallyTitle {
+            get {
+                return ResourceManager.GetString("AbandonTallyTitle", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Add Ballots.
         /// </summary>
         internal static string AddBallots {
@@ -840,6 +858,15 @@ namespace ElectionGuard.UI.Resx {
         internal static string NumberOfGuardians {
             get {
                 return ResourceManager.GetString("NumberOfGuardians", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Ok.
+        /// </summary>
+        internal static string OkText {
+            get {
+                return ResourceManager.GetString("OkText", resourceCulture);
             }
         }
         
