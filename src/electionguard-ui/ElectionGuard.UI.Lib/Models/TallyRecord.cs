@@ -21,10 +21,13 @@ public partial class TallyRecord : DatabaseRecord
     private int _numberOfGuardians;
 
     [ObservableProperty]
-    private long _ballotCount;
+    private long _castBallotCount;
 
     [ObservableProperty]
-    private long _ballotUploadCount;
+    private long _challengedBallotCount;
+
+    [ObservableProperty]
+    private long _spoiledBallotCount;
 
     [ObservableProperty]
     private TallyState _state;
