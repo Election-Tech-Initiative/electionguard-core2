@@ -20,12 +20,17 @@ public class TallyService : BaseDatabaseService<TallyRecord>
     public TallyService() : base(_collection, nameof(TallyRecord)) { }
 
     /// <summary>
-    /// Gets tallies for an election
+    /// Gets tallies for an election, including completed tallies.
     /// </summary>
     /// <param name="electionId">election id to search for</param>
-    public async Task<List<TallyRecord>> GetByElectionIdAsync(string electionId)
+    public async Task<List<TallyRecord>> GetAllActiveByElectionIdAsync(string electionId)
     {
-        return await GetAllByFieldAsync(Constants.ElectionId, electionId);
+        var filter = FilterBuilder.And(
+            FilterBuilder.Eq(Constants.ElectionId, electionId),
+            FilterBuilder.Ne(Constants.State, TallyState.Abandoned));
+
+        return await GetAllByFilterAsync(filter);
+
     }
 
     /// <summary>
