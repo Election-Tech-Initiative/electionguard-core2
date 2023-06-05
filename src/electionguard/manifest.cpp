@@ -2012,11 +2012,15 @@ namespace electionguard
     InternalManifest::generateContestsWithPlaceholders(const Manifest &description)
     {
         vector<unique_ptr<ContestDescriptionWithPlaceholders>> contests;
+
+        //generate placeholders for each contest
         for (const auto &contest : description.getContests()) {
 
             vector<unique_ptr<SelectionDescription>> placeholders;
             placeholders.reserve(contest.get().getNumberElected());
             uint32_t maxSequenceOrder = 0;
+
+            // determine how many placeholders we need to generate
             for (const auto &selection : contest.get().getSelections()) {
                 auto sequenceOrder = selection.get().getSequenceOrder();
                 if (sequenceOrder > maxSequenceOrder) {
@@ -2026,6 +2030,7 @@ namespace electionguard
 
             maxSequenceOrder += 1;
 
+            // generate the placeholder selections
             for (uint64_t i = 0; i < contest.get().getNumberElected(); i++) {
                 auto placeholder =
                   generatePlaceholderSelectionFrom(contest.get(), maxSequenceOrder + i);

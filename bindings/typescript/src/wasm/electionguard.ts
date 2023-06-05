@@ -144,6 +144,15 @@ export type InternalManifestStatic = {
   fromJson(json: string): InternalManifestHandle;
 };
 
+export type ManifestFunctionsStatic = {
+  InternalManifestFromElectionManifestJson(
+    json: string
+  ): InternalManifestHandle;
+  InternalManifestFromElectionManifest(
+    manifest: ManifestHandle
+  ): InternalManifestHandle;
+};
+
 export type PrecomputeBuffersStatic = {
   clear(): void;
 
@@ -167,6 +176,7 @@ export interface ElectionguardModule extends EmscriptenModule {
   GroupFunctions: GroupFunctionStatic;
   Manifest: ManifestStatic;
   InternalManifest: InternalManifestStatic;
+  ManifestFunctions: ManifestFunctionsStatic;
   PrecomputeBufferContext: PrecomputeBuffersStatic;
 }
 const createModule: EmscriptenModuleFactory<ElectionguardModule> =

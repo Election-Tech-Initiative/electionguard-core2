@@ -9,6 +9,7 @@ import {
   EncryptionMediator,
   GroupFunctions,
   InternalManifest,
+  Manifest,
   PlaintextBallot,
   initialize as egInitialize,
 } from '@infernored/electionguard-experimental';
@@ -96,16 +97,18 @@ export class ElectionguardService implements OnInit {
   }> {
     const ciphertextElectionContext = (test_data as unknown as any).election
       .context;
-    const internalManifest = (test_data as unknown as any).election
-      .internal_manifest;
+    const manifest_data = (test_data as unknown as any).election.manifest;
+
+    // import the manifest
+    const manifest = await Manifest.fromJson(JSON.stringify(manifest_data));
 
     const context = await ElectionContext.fromJson(
       JSON.stringify(ciphertextElectionContext)
     );
-    const manifest = await InternalManifest.fromJson(
-      JSON.stringify(internalManifest)
-    );
 
-    return { context, manifest };
+    // convert the manifest to an internal manifest
+    const internalManifest = await InternalManifest.fromManifest(manifest);
+
+    return { context, manifest: internalManifest };
   }
 }

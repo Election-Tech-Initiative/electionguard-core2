@@ -1,6 +1,6 @@
 {
     "name": "@infernored/electionguard-experimental",
-    "version": "1.75.8",
+    "version": "1.75.9",
     "description": "Library for encrypting ballots for the ElectionGuard voting system",
     "author": "Microsoft <electionguard@microsoft.com>",
     "license": "MIT",
