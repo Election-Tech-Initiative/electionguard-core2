@@ -81,7 +81,7 @@ public partial class BallotUploadViewModel : BaseViewModel
     [RelayCommand]
     private async Task Cancel()
     {
-        await NavigationService.GoToPage(typeof(ElectionViewModel));
+        await NavigationService.GoToPage(typeof(ElectionViewModel), new() { { ElectionViewModel.ElectionIdParam, ElectionId } });
     }
 
     [RelayCommand(CanExecute = nameof(CanUpload))]
