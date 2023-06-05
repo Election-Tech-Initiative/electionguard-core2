@@ -561,4 +561,7 @@
   <data name="ResultsText" xml:space="preserve">
     <value>Resultados</value>
   </data>
+  <data name="WriteinText" xml:space="preserve">
+    <value>¡Escribe al candidato!</value>
+  </data>
 </root>

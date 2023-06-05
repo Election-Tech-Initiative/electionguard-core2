@@ -22,7 +22,7 @@ public partial class ManifestViewModel : BaseViewModel
     private Manifest? _manifest;
 
     [ObservableProperty]
-    private string _manifestName;
+    private string _manifestName = string.Empty;
 
     [ObservableProperty]
     private string _manifestFile = string.Empty;
@@ -82,7 +82,7 @@ public partial class ManifestViewModel : BaseViewModel
             var name = local.Name.GetTextAt(0).Value;
             if(name == string.Empty)
             {
-                name = "Writein";
+                name = AppResources.WriteinText;
             }
             Candidates.Add(new(name, party.Name, local.ObjectId));
         }
