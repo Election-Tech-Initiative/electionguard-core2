@@ -61,10 +61,11 @@ public class TallyStateMachine : ITallyStateMachine
         const bool GUARDIAN_JOINED_TALLY = true;
 
         var joinedGuardians = await _tallyJoinedService.GetGuardianCountByTallyAsync(tally.TallyId);
-        var allJoinedGuardians = joinedGuardians[GUARDIAN_JOINED_TALLY] + joinedGuardians[!GUARDIAN_JOINED_TALLY];
+        joinedGuardians.TryGetValue(GUARDIAN_JOINED_TALLY, out var consentCount);
+        joinedGuardians.TryGetValue(!GUARDIAN_JOINED_TALLY, out var rejectCount);
 
-        var isQuorumReached = joinedGuardians[GUARDIAN_JOINED_TALLY] >= tally.Quorum;
-        var haveAllGuardiansJoined = allJoinedGuardians == tally.NumberOfGuardians;
+        var isQuorumReached = consentCount >= tally.Quorum;
+        var haveAllGuardiansJoined = (consentCount + rejectCount) == tally.NumberOfGuardians;
 
         return isQuorumReached && haveAllGuardiansJoined;
     }
