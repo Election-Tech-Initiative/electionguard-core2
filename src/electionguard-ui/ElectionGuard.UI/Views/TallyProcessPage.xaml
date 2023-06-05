@@ -32,7 +32,7 @@
                     Grid.Column="1"
                     Command="{Binding AbandonTallyCommand}"
                     HorizontalOptions="End"
-                    IsVisible="{Binding Tally.State, Converter=TallyCanBeAbandonedConverter}"
+                    IsVisible="{Binding Tally.State, Converter={StaticResource TallyCanBeAbandonedConverter}"
                     Text="{helper:Translate ProcessTallyAbandonTally}"
                     VerticalOptions="Start" />
             </Grid>
