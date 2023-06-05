@@ -101,14 +101,20 @@ public partial class TallyProcessViewModel : BaseViewModel
 
     private async Task UpdateElection(TallyRecord? newValue)
     {
-        var electionId = newValue!.ElectionId ?? string.Empty;
-        var election = await _electionService.GetByElectionIdAsync(electionId);
+        if (newValue is null)
+        {
+            throw new ArgumentException($"{nameof(UpdateElection)}: Invalid {typeof(TallyRecord)}");
+        }
 
-        ElectionGuardException.ThrowIfNull(election, $"ElectionId {electionId} not found! Tally {newValue.Id}"); // This should never happen.
+        ArgumentException.ThrowIfNullOrEmpty(newValue.ElectionId, nameof(newValue.ElectionId));
+
+        var election = await _electionService.GetByElectionIdAsync(newValue.ElectionId);
+
+        ElectionGuardException.ThrowIfNull(election, $"ElectionId {newValue.ElectionId} not found! Tally {newValue.Id}"); // This should never happen.
 
         CurrentElection = election;
 
-        BallotUploads = await _ballotUploadService.GetByElectionIdAsync(electionId);
+        BallotUploads = await _ballotUploadService.GetByElectionIdAsync(newValue.ElectionId);
     }
 
     partial void OnTallyIdChanged(string value)
@@ -192,9 +198,8 @@ public partial class TallyProcessViewModel : BaseViewModel
 
         await NavigationService.GoToPage(typeof(ElectionViewModel), new()
         {
-            { ElectionViewModel.CurrentElectionParam, Tally.ElectionId! },
+            { ElectionViewModel.CurrentElectionParam, CurrentElection },
         });
-
     }
 
     private bool CanAbandon()

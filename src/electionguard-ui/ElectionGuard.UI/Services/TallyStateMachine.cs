@@ -50,10 +50,6 @@ public class TallyStateMachine : ITallyStateMachine
                 {
                     await currentStep.RunStep();
                 }
-                catch(Exception ex)
-                {
-
-                }
                 finally
                 {
                     _isRunning = false;
