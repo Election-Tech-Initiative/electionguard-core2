@@ -40,6 +40,6 @@ public class StateMachineStep<T, Q> : StateMachineStep<T>
 
     public new Func<Q, Task> RunStep { get; set; } = new(DoNotRun);
 
-    public new static Func<Q, Task<bool>> DoNotRun = async (Q val) => await Task.FromResult(false);
-    public new static Func<Q, Task<bool>> AlwaysRun = async (Q val) => await Task.FromResult(true);
+    public new static Func<Q, Task<bool>> DoNotRun = async (Q _) => await StateMachineStep<T>.DoNotRun();
+    public new static Func<Q, Task<bool>> AlwaysRun = async (Q _) => await StateMachineStep<T>.AlwaysRun();
 }
