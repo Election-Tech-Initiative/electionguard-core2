@@ -1469,6 +1469,7 @@ namespace electionguard
 
     struct Manifest::Impl {
         string electionScopeId;
+        string specVersion;
         ElectionType type;
         system_clock::time_point startDate;
         system_clock::time_point endDate;
@@ -1480,14 +1481,15 @@ namespace electionguard
         unique_ptr<InternationalizedText> name;
         unique_ptr<ContactInformation> contactInformation;
 
-        Impl(const string &electionScopeId, ElectionType type, system_clock::time_point startDate,
-             system_clock::time_point endDate,
+        Impl(const string &electionScopeId, const string &specVersion, ElectionType type,
+             system_clock::time_point startDate, system_clock::time_point endDate,
              vector<unique_ptr<GeopoliticalUnit>> geopoliticalUnits,
              vector<unique_ptr<Party>> parties, vector<unique_ptr<Candidate>> candidates,
              vector<unique_ptr<ContestDescription>> contests,
              vector<unique_ptr<BallotStyle>> ballotStyles)
-            : electionScopeId(electionScopeId), geopoliticalUnits(move(geopoliticalUnits)),
-              parties(move(parties)), candidates(move(candidates)), contests(move(contests)),
+            : electionScopeId(electionScopeId), specVersion(specVersion),
+              geopoliticalUnits(move(geopoliticalUnits)), parties(move(parties)),
+              candidates(move(candidates)), contests(move(contests)),
               ballotStyles(move(ballotStyles))
         {
             this->type = type;
@@ -1495,15 +1497,16 @@ namespace electionguard
             this->endDate = endDate;
         }
 
-        Impl(const string &electionScopeId, ElectionType type, system_clock::time_point startDate,
-             system_clock::time_point endDate,
+        Impl(const string &electionScopeId, const string &specVersion, ElectionType type,
+             system_clock::time_point startDate, system_clock::time_point endDate,
              vector<unique_ptr<GeopoliticalUnit>> geopoliticalUnits,
              vector<unique_ptr<Party>> parties, vector<unique_ptr<Candidate>> candidates,
              vector<unique_ptr<ContestDescription>> contests,
              vector<unique_ptr<BallotStyle>> ballotStyles, unique_ptr<InternationalizedText> name,
              unique_ptr<ContactInformation> contactInformation)
-            : electionScopeId(electionScopeId), geopoliticalUnits(move(geopoliticalUnits)),
-              parties(move(parties)), candidates(move(candidates)), contests(move(contests)),
+            : electionScopeId(electionScopeId), specVersion(specVersion),
+              geopoliticalUnits(move(geopoliticalUnits)), parties(move(parties)),
+              candidates(move(candidates)), contests(move(contests)),
               ballotStyles(move(ballotStyles)), name(move(name)),
               contactInformation(move(contactInformation))
         {
@@ -1571,18 +1574,19 @@ namespace electionguard
 
     Manifest::Manifest(Manifest &&other) : pimpl(move(other.pimpl)) {}
 
-    Manifest::Manifest(const string &electionScopeId, ElectionType type,
+    Manifest::Manifest(const string &electionScopeId, const string &specVersion, ElectionType type,
                        system_clock::time_point startDate, system_clock::time_point endDate,
                        vector<unique_ptr<GeopoliticalUnit>> geopoliticalUnits,
                        vector<unique_ptr<Party>> parties, vector<unique_ptr<Candidate>> candidates,
                        vector<unique_ptr<ContestDescription>> contests,
                        vector<unique_ptr<BallotStyle>> ballotStyles)
-        : pimpl(new Impl(electionScopeId, type, startDate, endDate, move(geopoliticalUnits),
-                         move(parties), move(candidates), move(contests), move(ballotStyles)))
+        : pimpl(new Impl(electionScopeId, specVersion, type, startDate, endDate,
+                         move(geopoliticalUnits), move(parties), move(candidates), move(contests),
+                         move(ballotStyles)))
     {
     }
 
-    Manifest::Manifest(const string &electionScopeId, ElectionType type,
+    Manifest::Manifest(const string &electionScopeId, const string &specVersion, ElectionType type,
                        system_clock::time_point startDate, system_clock::time_point endDate,
                        vector<unique_ptr<GeopoliticalUnit>> geopoliticalUnits,
                        vector<unique_ptr<Party>> parties, vector<unique_ptr<Candidate>> candidates,
@@ -1590,9 +1594,9 @@ namespace electionguard
                        vector<unique_ptr<BallotStyle>> ballotStyles,
                        unique_ptr<InternationalizedText> name,
                        unique_ptr<ContactInformation> contactInformation)
-        : pimpl(new Impl(electionScopeId, type, startDate, endDate, move(geopoliticalUnits),
-                         move(parties), move(candidates), move(contests), move(ballotStyles),
-                         move(name), move(contactInformation)))
+        : pimpl(new Impl(electionScopeId, specVersion, type, startDate, endDate,
+                         move(geopoliticalUnits), move(parties), move(candidates), move(contests),
+                         move(ballotStyles), move(name), move(contactInformation)))
     {
     }
 
@@ -1607,6 +1611,7 @@ namespace electionguard
     // Property Getters
 
     string Manifest::getElectionScopeId() const { return pimpl->electionScopeId; }
+    string Manifest::getSpecVersion() const { return pimpl->specVersion; }
     ElectionType Manifest::getElectionType() const { return pimpl->type; }
     system_clock::time_point Manifest::getStartDate() const { return pimpl->startDate; }
     system_clock::time_point Manifest::getEndDate() const { return pimpl->endDate; }

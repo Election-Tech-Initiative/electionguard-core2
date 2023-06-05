@@ -832,16 +832,16 @@ namespace electionguard
       public:
         Manifest(const Manifest &other);
         Manifest(Manifest &&other);
-        explicit Manifest(const std::string &electionScopeId, ElectionType type,
-                          std::chrono::system_clock::time_point startDate,
+        explicit Manifest(const std::string &electionScopeId, const std::string &specVersion,
+                          ElectionType type, std::chrono::system_clock::time_point startDate,
                           std::chrono::system_clock::time_point endDate,
                           std::vector<std::unique_ptr<GeopoliticalUnit>> geopoliticalUnits,
                           std::vector<std::unique_ptr<Party>> parties,
                           std::vector<std::unique_ptr<Candidate>> candidates,
                           std::vector<std::unique_ptr<ContestDescription>> contests,
                           std::vector<std::unique_ptr<BallotStyle>> ballotStyles);
-        explicit Manifest(const std::string &electionScopeId, ElectionType type,
-                          std::chrono::system_clock::time_point startDate,
+        explicit Manifest(const std::string &electionScopeId, const std::string &specVersion,
+                          ElectionType type, std::chrono::system_clock::time_point startDate,
                           std::chrono::system_clock::time_point endDate,
                           std::vector<std::unique_ptr<GeopoliticalUnit>> geopoliticalUnits,
                           std::vector<std::unique_ptr<Party>> parties,
@@ -861,6 +861,11 @@ namespace electionguard
         /// such as a state or city.
         /// </summary>
         std::string getElectionScopeId() const;
+
+        /// <summary>
+        /// get the specification version for this manifest
+        /// </summary>
+        std::string getSpecVersion() const;
 
         /// <summary>
         /// Enumerated type of election, such as partisan-primary or open-primary.

@@ -1773,6 +1773,7 @@ namespace ElectionGuard
                 CallingConvention = CallingConvention.Cdecl, SetLastError = true)]
             internal static extern Status New(
                 [MarshalAs(UnmanagedType.LPStr)] string electionScopeId,
+                [MarshalAs(UnmanagedType.LPStr)] string specVersion,
                 ElectionType electionType,
                 ulong startDate,
                 ulong endDate,
@@ -1797,6 +1798,7 @@ namespace ElectionGuard
                 CallingConvention = CallingConvention.Cdecl, SetLastError = true)]
             internal static extern Status New(
                 [MarshalAs(UnmanagedType.LPStr)] string electionScopeId,
+                [MarshalAs(UnmanagedType.LPStr)] string specVersion,
                 ElectionType electionType,
                 ulong startDate,
                 ulong endDate,
