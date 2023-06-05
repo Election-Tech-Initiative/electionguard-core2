@@ -20,7 +20,7 @@ public class TallyService : BaseDatabaseService<TallyRecord>
     public TallyService() : base(_collection, nameof(TallyRecord)) { }
 
     /// <summary>
-    /// Gets tallies for an election
+    /// Gets tallies for an election, including completed tallies.
     /// </summary>
     /// <param name="electionId">election id to search for</param>
     public async Task<List<TallyRecord>> GetAllActiveByElectionIdAsync(string electionId)
