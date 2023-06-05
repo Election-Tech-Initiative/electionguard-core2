@@ -1,4 +1,5 @@
-﻿using ElectionGuard.Decryption.Shares;
+﻿using System.Threading;
+using ElectionGuard.Decryption.Shares;
 using ElectionGuard.ElectionSetup;
 using ElectionGuard.UI.Lib.Models;
 
@@ -7,7 +8,7 @@ namespace ElectionGuard.UI.Services;
 public class TallyStateMachine : ITallyStateMachine
 {
     private Dictionary<bool, List<StateMachineStep<TallyState, TallyRecord>>> _steps = new();
-    private bool _isRunning = false;
+    private object mutex = new();
 
     private IAuthenticationService _authenticationService;
     private readonly ChallengeResponseService _challengeResponseService;
@@ -36,21 +37,20 @@ public class TallyStateMachine : ITallyStateMachine
 
     public async Task Run(TallyRecord tally)
     {
-        if (!_isRunning)
+        if (Monitor.TryEnter(mutex))
         {
-            var steps = _steps[_authenticationService.IsAdmin];
-            var currentStep = steps.SingleOrDefault(s => s.State == tally.State);
-            if (currentStep is not null && await currentStep.ShouldRunStep(tally))
+            try
             {
-                _isRunning = true;
-                try
+                var steps = _steps[_authenticationService.IsAdmin];
+                var currentStep = steps.SingleOrDefault(s => s.State == tally.State);
+                if (currentStep is not null && await currentStep.ShouldRunStep(tally))
                 {
                     await currentStep.RunStep(tally);
                 }
-                finally
-                {
-                    _isRunning = false;
-                }
+            }
+            finally
+            {
+                Monitor.Exit(mutex);
             }
         }
     }
