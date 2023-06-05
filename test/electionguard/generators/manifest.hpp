@@ -126,7 +126,7 @@ namespace electionguard::tools::generators
               make_unique<BallotStyle>("jefferson-county-ballot-style", gpunitIds));
 
             return make_unique<Manifest>(
-              "jefferson-county-open-primary", ElectionType::primary,
+              "jefferson-county-open-primary", "1.0", ElectionType::primary,
               std::chrono::system_clock::now(), std::chrono::system_clock::now(), move(gpUnits),
               move(parties), move(candidates), move(contests), move(ballotStyles));
         }
@@ -169,7 +169,7 @@ namespace electionguard::tools::generators
               make_unique<BallotStyle>("jefferson-county-school-district-1", schoolGPUnitIds));
 
             return make_unique<Manifest>(
-              "jefferson-county-open-primary", ElectionType::primary,
+              "jefferson-county-open-primary", "1.0", ElectionType::primary,
               std::chrono::system_clock::now(), std::chrono::system_clock::now(), move(gpUnits),
               move(parties), move(candidates), move(contests), move(ballotStyles));
         }

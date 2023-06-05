@@ -12,8 +12,8 @@
 
 extern "C" {
 
-#include "electionguard/manifest.h"
 #include "electionguard/manifest.generated.h"
+#include "electionguard/manifest.h"
 }
 
 using electionguard::AnnotatedString;
@@ -1624,9 +1624,9 @@ eg_electionguard_status_t eg_contest_description_with_placeholders_selection_for
 #pragma region Manifest
 
 eg_electionguard_status_t
-eg_election_manifest_new(char *in_election_scope_id, eg_election_type_t in_election_type,
-                         uint64_t in_start_date, uint64_t in_end_date,
-                         eg_geopolitical_unit_t *in_geopolitical_units[],
+eg_election_manifest_new(char *in_election_scope_id, char *in_spec_version,
+                         eg_election_type_t in_election_type, uint64_t in_start_date,
+                         uint64_t in_end_date, eg_geopolitical_unit_t *in_geopolitical_units[],
                          uint64_t in_geopolitical_units_size, eg_party_t *in_parties[],
                          uint64_t in_parties_size, eg_candidate_t *in_candidates[],
                          uint64_t in_candidates_size, eg_contest_description_t *in_contests[],
@@ -1635,6 +1635,7 @@ eg_election_manifest_new(char *in_election_scope_id, eg_election_type_t in_elect
 {
     try {
         auto scopeId = string(in_election_scope_id);
+        auto specVersion = string(in_spec_version);
 
         std::chrono::system_clock::time_point startDate(std::chrono::milliseconds{in_start_date});
         std::chrono::system_clock::time_point endDate(std::chrono::milliseconds{in_end_date});
@@ -1679,9 +1680,9 @@ eg_election_manifest_new(char *in_election_scope_id, eg_election_type_t in_elect
             ballotStyles.push_back(std::move(annotated));
         }
 
-        auto result = make_unique<Manifest>(scopeId, (ElectionType)in_election_type, startDate,
-                                            endDate, move(gpUnits), move(parties), move(candidates),
-                                            move(contests), move(ballotStyles));
+        auto result = make_unique<Manifest>(scopeId, specVersion, (ElectionType)in_election_type,
+                                            startDate, endDate, move(gpUnits), move(parties),
+                                            move(candidates), move(contests), move(ballotStyles));
 
         *out_handle = AS_TYPE(eg_election_manifest_t, result.release());
         return ELECTIONGUARD_STATUS_SUCCESS;
@@ -1692,8 +1693,8 @@ eg_election_manifest_new(char *in_election_scope_id, eg_election_type_t in_elect
 }
 
 eg_electionguard_status_t eg_election_manifest_new_with_contact(
-  char *in_election_scope_id, eg_election_type_t in_election_type, uint64_t in_start_date,
-  uint64_t in_end_date, eg_geopolitical_unit_t *in_geopolitical_units[],
+  char *in_election_scope_id, char *in_spec_version, eg_election_type_t in_election_type,
+  uint64_t in_start_date, uint64_t in_end_date, eg_geopolitical_unit_t *in_geopolitical_units[],
   uint64_t in_geopolitical_units_size, eg_party_t *in_parties[], uint64_t in_parties_size,
   eg_candidate_t *in_candidates[], uint64_t in_candidates_size,
   eg_contest_description_t *in_contests[], uint64_t in_contests_size,
@@ -1703,6 +1704,8 @@ eg_electionguard_status_t eg_election_manifest_new_with_contact(
 {
     try {
         auto scopeId = string(in_election_scope_id);
+        auto specVersion = string(in_spec_version);
+
         std::chrono::system_clock::time_point startDate(std::chrono::milliseconds{in_start_date});
         std::chrono::system_clock::time_point endDate(std::chrono::milliseconds{in_end_date});
 
@@ -1750,8 +1753,8 @@ eg_electionguard_status_t eg_election_manifest_new_with_contact(
         auto contactInfo = AS_TYPE(ContactInformation, in_contact_info);
 
         auto result = make_unique<Manifest>(
-          scopeId, (ElectionType)in_election_type, startDate, endDate, move(gpUnits), move(parties),
-          move(candidates), move(contests), move(ballotStyles),
+          scopeId, specVersion, (ElectionType)in_election_type, startDate, endDate, move(gpUnits),
+          move(parties), move(candidates), move(contests), move(ballotStyles),
           make_unique<InternationalizedText>(std::move(*name)),
           make_unique<ContactInformation>(std::move(*contactInfo)));
 
