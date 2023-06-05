@@ -24,7 +24,6 @@ public partial class GuardianTallyItem : ObservableObject, IEquatable<GuardianTa
         if (other is null)
             return false;
 
-        return Name == other.Name &&
-            Joined == other.Joined;
+        return Name == other.Name;
     }
 }
