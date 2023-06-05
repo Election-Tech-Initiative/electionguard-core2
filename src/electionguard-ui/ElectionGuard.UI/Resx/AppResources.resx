@@ -573,4 +573,7 @@
   <data name="ResultsText" xml:space="preserve">
     <value>Results</value>
   </data>
+  <data name="WriteinText" xml:space="preserve">
+    <value>Writein Candidate</value>
+  </data>
 </root>

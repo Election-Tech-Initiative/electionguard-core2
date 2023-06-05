@@ -1420,6 +1420,15 @@ namespace ElectionGuard.UI.Resx {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Writein Candidate.
+        /// </summary>
+        internal static string WriteinText {
+            get {
+                return ResourceManager.GetString("WriteinText", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Yes.
         /// </summary>
         internal static string YesText {
