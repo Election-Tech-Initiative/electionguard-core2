@@ -36,6 +36,17 @@ public class TallyJoinedService : BaseDatabaseService<TallyJoinedRecord>
         return list.Select(t => t.TallyId!).ToList();
     }
 
+    /// <summary>
+    /// Get counts of guardian participation and consent to be part of a tally
+    /// </summary>
+    public async Task<Dictionary<bool, int>> GetGuardianCountByTallyAsync(string tallyId)
+    {
+        var filter = FilterBuilder.Eq(Constants.TallyId, tallyId);
+
+        List<TallyJoinedRecord> guardiansParticipating = await GetAllByFilterAsync(filter) ?? new();
+        return guardiansParticipating.GroupBy(g => g.Joined).ToDictionary(g => g.Key, g => g.Count());
+    }
+
     public async Task<long> GetCountByTallyJoinedAsync(string tallyId)
     {
         var filter = FilterBuilder.And(

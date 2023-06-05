@@ -22,7 +22,7 @@ public partial class ManifestViewModel : BaseViewModel
     private Manifest? _manifest;
 
     [ObservableProperty]
-    private string _manifestName;
+    private string _manifestName = string.Empty;
 
     [ObservableProperty]
     private string _manifestFile = string.Empty;
@@ -78,12 +78,13 @@ public partial class ManifestViewModel : BaseViewModel
         for (ulong i = 0; i < value.CandidatesSize; i++)
         {
             var local = Manifest.GetCandidateAtIndex(i);
-            var party = Parties.FirstOrDefault(p => p.PartyId == local.PartyId);
-            if (party == null)
+            var party = Parties.FirstOrDefault(p => p.PartyId == local.PartyId) ?? new PartyDisplay(string.Empty, string.Empty, string.Empty);
+            var name = local.Name.GetTextAt(0).Value;
+            if(name == string.Empty)
             {
-                party = new PartyDisplay("", "", "");
+                name = AppResources.WriteinText;
             }
-            Candidates.Add(new(local.Name.GetTextAt(0).Value, party.Name, local.ObjectId));
+            Candidates.Add(new(name, party.Name, local.ObjectId));
         }
 
         for (ulong i = 0; i < value.GeopoliticalUnitsSize; i++)
@@ -99,11 +100,7 @@ public partial class ManifestViewModel : BaseViewModel
             var geopoliticalUnits = local.GeopoliticalUnitIds;
             for (ulong j = 0; j < local.GeopoliticalUnitIdsSize; j++)
             {
-                var unit = GeopoliticalUnits.FirstOrDefault(u => u.GeopoliticalUnitId == local.GetGeopoliticalUnitIdAtIndex(j));
-                if (unit == null)
-                {
-                    unit = new("", "", "");
-                }
+                var unit = GeopoliticalUnits.FirstOrDefault(u => u.GeopoliticalUnitId == local.GetGeopoliticalUnitIdAtIndex(j)) ?? new(string.Empty, string.Empty, string.Empty);
                 gpunits.Add(unit.Name);
             }
             BallotStyles.Add(new(local.ObjectId, gpunits));
@@ -119,7 +116,12 @@ public partial class ManifestViewModel : BaseViewModel
                 var candidate = Candidates.FirstOrDefault(c => c.CandidateId == selection.CandidateId);
                 if (candidate != null)
                 {
-                    selections.AppendLine($"{candidate.Name} ({candidate.Party})");
+                    selections.Append($"{candidate.Name}");
+                    if (string.IsNullOrEmpty(candidate.Party))
+                    {
+                        selections.Append($" ({candidate.Party})");
+                    }
+                    selections.AppendLine();
                 }
             }
             Contests.Add(new ContestDisplay(local.Name, local.VoteVariationType.ToString(), local.NumberElected, local.VotesAllowed, selections.ToString()));

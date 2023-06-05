@@ -558,7 +558,25 @@
   <data name="TallyChecklist" xml:space="preserve">
     <value>¡Proceso de recuento!</value>
   </data>
+  <data name="ProcessTallyAbandon" xml:space="preserve">
+    <value>¡Cancela Tally!</value>
+  </data>
+  <data name="ProcessTallyStartTally" xml:space="preserve">
+    <value>¡Empieza Tally!</value>
+  </data>
+  <data name="OkText" xml:space="preserve">
+    <value>Aceptar</value>
+  </data>
+  <data name="AbandonTallyText" xml:space="preserve">
+    <value>Tally ha sido cancelada por el administrador de elecciones. Consulte el administrador para obtener detalles adicionales.!</value>
+  </data>
+  <data name="AbandonTallyTitle" xml:space="preserve">
+    <value>¡Cuenta cancelada!</value>
+  </data>
   <data name="ResultsText" xml:space="preserve">
     <value>Resultados</value>
+  </data>
+  <data name="WriteinText" xml:space="preserve">
+    <value>¡Escribe al candidato!</value>
   </data>
 </root>

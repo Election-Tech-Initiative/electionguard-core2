@@ -16,6 +16,8 @@ public class TallyCeremonyChecklist
         (State == TallyState.PendingGuardianRespondChallenge && _challengesResponded == _quorum));
     public bool TallyComplete => State == TallyState.Complete;
 
+    public bool IsAbandoned => State == TallyState.Abandoned;
+
     public TallyState State { get; set; }
 
     private readonly int _quorum;
