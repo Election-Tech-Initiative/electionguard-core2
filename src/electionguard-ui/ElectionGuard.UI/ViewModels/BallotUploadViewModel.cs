@@ -81,7 +81,7 @@ public partial class BallotUploadViewModel : BaseViewModel
     [RelayCommand]
     private async Task Cancel()
     {
-        await NavigationService.GoToPage(typeof(ElectionViewModel));
+        await NavigationService.GoToPage(typeof(ElectionViewModel), new() { { ElectionViewModel.ElectionIdParam, ElectionId } });
     }
 
     [RelayCommand(CanExecute = nameof(CanUpload))]
@@ -155,18 +155,19 @@ public partial class BallotUploadViewModel : BaseViewModel
                     return;
                 }
 
+                var timestamp = ballot.Timestamp;
+                if (timestamp < startDate)
+                {
+                    _ = Interlocked.Exchange(ref startDate, timestamp);
+                }
+                if (timestamp > endDate)
+                {
+                    _ = Interlocked.Exchange(ref endDate, timestamp);
+                }
+
                 var exists = await _ballotService.BallotExistsAsync(ballot.BallotCode.ToHex());
                 if (!exists)
                 {
-                    var timestamp = ballot.Timestamp;
-                    if (timestamp < startDate)
-                    {
-                        _ = Interlocked.Exchange(ref startDate, timestamp);
-                    }
-                    if (timestamp > endDate)
-                    {
-                        _ = Interlocked.Exchange(ref endDate, timestamp);
-                    }
                     BallotRecord ballotRecord = new()
                     {
                         ElectionId = ElectionId,

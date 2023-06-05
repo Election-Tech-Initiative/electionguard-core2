@@ -5,8 +5,12 @@ using ElectionGuard.UI.Models;
 namespace ElectionGuard.UI.ViewModels;
 
 [QueryProperty(CurrentElectionParam, nameof(CurrentElection))]
+[QueryProperty(ElectionIdParam, nameof(ElectionId))]
 public partial class ElectionViewModel : BaseViewModel
 {
+    public const string CurrentElectionParam = "CurrentElection";
+    public const string ElectionIdParam = "ElectionId";
+
     private readonly IStorageService _storageService;
     private readonly IStorageService _driveService;
     private readonly KeyCeremonyService _keyCeremonyService;
@@ -43,6 +47,9 @@ public partial class ElectionViewModel : BaseViewModel
     [ObservableProperty]
     [NotifyCanExecuteChangedFor(nameof(AddBallotsCommand))]
     private Election? _currentElection;
+
+    [ObservableProperty]
+    private string _electionId;
 
     [ObservableProperty]
     private Manifest? _manifest;
@@ -106,7 +113,6 @@ public partial class ElectionViewModel : BaseViewModel
     [ObservableProperty]
     private TallyRecord? _currentTally;
 
-
     partial void OnBallotsUploadedDateTimeChanged(DateTime value)
     {
         Step2Complete = true;
@@ -136,7 +142,6 @@ public partial class ElectionViewModel : BaseViewModel
             }));
         }
     }
-
 
     partial void OnCurrentElectionChanged(Election? value)
     {
@@ -182,6 +187,16 @@ public partial class ElectionViewModel : BaseViewModel
             {
             }
         });
+    }
+
+    partial void OnElectionIdChanged(string value)
+    {
+        if (string.IsNullOrEmpty(value))
+        {
+            return;
+        }
+
+        _ = Shell.Current.CurrentPage.Dispatcher.DispatchAsync(async () => CurrentElection = await _electionService.GetByElectionIdAsync(value));
     }
 
     [RelayCommand(CanExecute = nameof(CanCreateTally))]
@@ -302,8 +317,6 @@ public partial class ElectionViewModel : BaseViewModel
         Manifest = new Manifest(value.ManifestData);
         ManifestName = Manifest.Name.GetTextAt(0).Value;
     }
-
-    public const string CurrentElectionParam = "CurrentElection";
 
     public override void Dispose()
     {
