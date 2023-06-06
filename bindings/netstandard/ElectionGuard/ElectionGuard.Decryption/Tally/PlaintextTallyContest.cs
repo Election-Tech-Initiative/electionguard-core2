@@ -1,5 +1,6 @@
+﻿using ElectionGuard.Ballot;
 using ElectionGuard.ElectionSetup.Extensions;
-using ElectionGuard.Encryption.Ballot;
+using Newtonsoft.Json;
 
 namespace ElectionGuard.Decryption.Tally;
 
@@ -28,6 +29,7 @@ public class PlaintextTallyContest : DisposableBase, IElectionContest, IEquatabl
     /// </summary>
     public Dictionary<string, PlaintextTallySelection> Selections { get; init; }
 
+    [JsonConstructor]
     public PlaintextTallyContest(
         string objectId, ulong sequenceOrder, ElementModQ descriptionHash,
         Dictionary<string, PlaintextTallySelection> selections)
@@ -35,7 +37,8 @@ public class PlaintextTallyContest : DisposableBase, IElectionContest, IEquatabl
         ObjectId = objectId;
         SequenceOrder = sequenceOrder;
         DescriptionHash = new(descriptionHash);
-        Selections = selections;
+        Selections = selections
+            .ToDictionary(x => x.Key, x => new PlaintextTallySelection(x.Value));
     }
 
     public PlaintextTallyContest(
@@ -65,11 +68,25 @@ public class PlaintextTallyContest : DisposableBase, IElectionContest, IEquatabl
         Selections = contest.ToPlaintextTallySelectionDictionary();
     }
 
+    public PlaintextTallyContest(PlaintextTallyContest other)
+    {
+        ObjectId = other.ObjectId;
+        SequenceOrder = other.SequenceOrder;
+        DescriptionHash = new(other.DescriptionHash);
+        Selections = other.Selections
+            .ToDictionary(x => x.Key, x => new PlaintextTallySelection(x.Value));
+    }
+
+    protected override void DisposeManaged()
+    {
+        base.DisposeManaged();
+        Selections?.Dispose();
+    }
+
     protected override void DisposeUnmanaged()
     {
-        Selections?.Dispose();
-        Selections?.Clear();
         base.DisposeUnmanaged();
+        DescriptionHash?.Dispose();
     }
 
     #region IEquatable

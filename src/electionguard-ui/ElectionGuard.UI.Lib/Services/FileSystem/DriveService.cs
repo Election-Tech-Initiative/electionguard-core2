@@ -1,30 +1,54 @@
-﻿namespace ElectionGuard.UI.Lib.Services;
+﻿using ElectionGuard.UI.Lib.Models;
 
-/// <summary>
-/// Class to read and write file to the hard drive
-/// </summary>
+namespace ElectionGuard.UI.Lib.Services;
+
 public class DriveService : IStorageService
 {
-    /// <summary>
-    /// Read in the contents of a file
-    /// </summary>
-    /// <param name="filename">filename including path</param>
-    /// <returns>the string data from the file</returns>
-    public string FromFile(string filename)
+    private string _rootDirectoryPath;
+
+    public DriveService(string rootDirectoryPath)
     {
-        return File.ReadAllText(filename);
+        _rootDirectoryPath = rootDirectoryPath;
     }
 
-    /// <summary>
-    /// Write a string to a file on a drive
-    /// </summary>
-    /// <param name="path">folder where the file will be created</param>
-    /// <param name="filename">name of the file</param>
-    /// <param name="data">data to save into file</param>
-    public void ToFile(string path, string filename, string data)
+    public DriveService() : this(Path.GetTempPath())
     {
-        Directory.CreateDirectory(path);
-        var name = Path.Combine(path, filename);
-        File.WriteAllText(name, data);
+    }
+
+    public void ToFile(string fileName, string content)
+    {
+        var filePath = Path.Combine(_rootDirectoryPath, fileName);
+        File.WriteAllText(filePath, content);
+    }
+
+    public void ToFiles(List<FileContents> fileContents)
+    {
+        _ = Parallel.ForEach(fileContents, fileContent =>
+        {
+            ToFile(fileContent.FileName, fileContent.Contents);
+        });
+    }
+
+    public string FromFile(string fileName)
+    {
+        if (string.IsNullOrEmpty(fileName)) throw new ArgumentNullException(nameof(fileName));
+
+        var filePath = Path.Combine(_rootDirectoryPath, fileName);
+
+        if (!File.Exists(filePath)) throw new FileNotFoundException(nameof(filePath));
+
+        return File.ReadAllText(filePath);
+    }
+
+    public void UpdatePath(string path)
+    {
+        if (string.IsNullOrEmpty(path)) throw new ArgumentNullException(nameof(path));
+
+        if (!Directory.Exists(path))
+        {
+            // create directory
+            _ = Directory.CreateDirectory(path);
+        }
+        _rootDirectoryPath = path;
     }
 }

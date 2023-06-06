@@ -1,6 +1,7 @@
-using ElectionGuard.ElectionSetup.Concurrency;
+﻿using ElectionGuard.ElectionSetup.Concurrency;
 using ElectionGuard.UI.Lib.Models;
 using ElectionGuard.UI.Lib.Services;
+using MongoDB.Driver;
 
 namespace ElectionGuard.ElectionSetup.Tests.Mocks;
 
@@ -45,14 +46,16 @@ public class MockKeyCeremonyService : MockBaseDatabaseServiceBase<KeyCeremonyRec
             Collection[keyCeremonyId] = record;
         }
     }
-
-    public override async Task<KeyCeremonyRecord> SaveAsync(KeyCeremonyRecord data, string? table = null)
+    public override async Task<KeyCeremonyRecord> SaveAsync(KeyCeremonyRecord data, FilterDefinition<KeyCeremonyRecord>? customFilter = null, string? table = null)
     {
         using (await _lock.LockAsync())
         {
             data.Id ??= Guid.NewGuid().ToString();
-            Collection[data.Id] = new(data);
+            KeyCeremonyRecord record = new(data);
+            record.Id = data.Id;
+            Collection[record.Id] = record;
             return data;
         }
     }
+
 }

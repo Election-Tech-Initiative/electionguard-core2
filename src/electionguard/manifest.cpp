@@ -1093,13 +1093,20 @@ namespace electionguard
                 _selections.push_back(make_unique<SelectionDescription>(*element));
             }
 
-            // TODO: handle optional values
             if (ballotTitle != nullptr) {
                 auto _ballotTitle = make_unique<InternationalizedText>(*ballotTitle);
-                auto _ballotSubtitle = make_unique<InternationalizedText>(*ballotSubtitle);
-                return make_unique<ContestDescription::Impl>(
-                  object_id, electoralDistrictId, sequenceOrder, voteVariation, numberElected,
-                  votesAllowed, name, move(_ballotTitle), move(_ballotSubtitle), move(_selections));
+                unique_ptr<InternationalizedText> _ballotSubtitle;
+                if (ballotSubtitle != nullptr) {
+                    _ballotSubtitle = make_unique<InternationalizedText>(*ballotSubtitle);
+                    return make_unique<ContestDescription::Impl>(
+                      object_id, electoralDistrictId, sequenceOrder, voteVariation, numberElected,
+                      votesAllowed, name, move(_ballotTitle), move(_ballotSubtitle),
+                      move(_selections));
+                } else {
+                    return make_unique<ContestDescription::Impl>(
+                      object_id, electoralDistrictId, sequenceOrder, voteVariation, numberElected,
+                      votesAllowed, name, move(_ballotTitle), nullptr, move(_selections));
+                }
             }
             return make_unique<ContestDescription::Impl>(object_id, electoralDistrictId,
                                                          sequenceOrder, voteVariation,
@@ -1115,12 +1122,20 @@ namespace electionguard
             }
 
             // TODO: handle optional values
-            if (ballotTitle != nullptr) {
+            if (ballotTitle != nullptr && ballotSubtitle != nullptr) {
                 auto hash = hash_elems({object_id, sequenceOrder, electoralDistrictId,
                                         getVoteVariationTypeString(voteVariation),
                                         ref<CryptoHashable>(*ballotTitle),
                                         ref<CryptoHashable>(*ballotSubtitle), name, numberElected,
                                         votesAllowed, selectionRefs});
+                Log::trace("ContestDescription", hash.get());
+                return hash;
+            }
+            if (ballotTitle != nullptr) {
+                auto hash = hash_elems({object_id, sequenceOrder, electoralDistrictId,
+                                        getVoteVariationTypeString(voteVariation),
+                                        ref<CryptoHashable>(*ballotTitle), nullptr, name,
+                                        numberElected, votesAllowed, selectionRefs});
                 Log::trace("ContestDescription", hash.get());
                 return hash;
             }
@@ -1454,6 +1469,7 @@ namespace electionguard
 
     struct Manifest::Impl {
         string electionScopeId;
+        string specVersion;
         ElectionType type;
         system_clock::time_point startDate;
         system_clock::time_point endDate;
@@ -1465,14 +1481,15 @@ namespace electionguard
         unique_ptr<InternationalizedText> name;
         unique_ptr<ContactInformation> contactInformation;
 
-        Impl(const string &electionScopeId, ElectionType type, system_clock::time_point startDate,
-             system_clock::time_point endDate,
+        Impl(const string &electionScopeId, const string &specVersion, ElectionType type,
+             system_clock::time_point startDate, system_clock::time_point endDate,
              vector<unique_ptr<GeopoliticalUnit>> geopoliticalUnits,
              vector<unique_ptr<Party>> parties, vector<unique_ptr<Candidate>> candidates,
              vector<unique_ptr<ContestDescription>> contests,
              vector<unique_ptr<BallotStyle>> ballotStyles)
-            : electionScopeId(electionScopeId), geopoliticalUnits(move(geopoliticalUnits)),
-              parties(move(parties)), candidates(move(candidates)), contests(move(contests)),
+            : electionScopeId(electionScopeId), specVersion(specVersion),
+              geopoliticalUnits(move(geopoliticalUnits)), parties(move(parties)),
+              candidates(move(candidates)), contests(move(contests)),
               ballotStyles(move(ballotStyles))
         {
             this->type = type;
@@ -1480,15 +1497,16 @@ namespace electionguard
             this->endDate = endDate;
         }
 
-        Impl(const string &electionScopeId, ElectionType type, system_clock::time_point startDate,
-             system_clock::time_point endDate,
+        Impl(const string &electionScopeId, const string &specVersion, ElectionType type,
+             system_clock::time_point startDate, system_clock::time_point endDate,
              vector<unique_ptr<GeopoliticalUnit>> geopoliticalUnits,
              vector<unique_ptr<Party>> parties, vector<unique_ptr<Candidate>> candidates,
              vector<unique_ptr<ContestDescription>> contests,
              vector<unique_ptr<BallotStyle>> ballotStyles, unique_ptr<InternationalizedText> name,
              unique_ptr<ContactInformation> contactInformation)
-            : electionScopeId(electionScopeId), geopoliticalUnits(move(geopoliticalUnits)),
-              parties(move(parties)), candidates(move(candidates)), contests(move(contests)),
+            : electionScopeId(electionScopeId), specVersion(specVersion),
+              geopoliticalUnits(move(geopoliticalUnits)), parties(move(parties)),
+              candidates(move(candidates)), contests(move(contests)),
               ballotStyles(move(ballotStyles)), name(move(name)),
               contactInformation(move(contactInformation))
         {
@@ -1533,6 +1551,14 @@ namespace electionguard
                 return hash;
             }
 
+            if (contactInformation == nullptr) {
+                auto hash = hash_elems(
+                  {electionScopeId, getElectionTypeString(type), timePointToIsoString(startDate),
+                   timePointToIsoString(endDate), ref<CryptoHashable>(*name), nullptr,
+                   geopoliticalUnitRefs, partyRefs, contestRefs, ballotStyleRefs});
+                return hash;
+            }
+
             auto hash =
               hash_elems({electionScopeId, getElectionTypeString(type),
                           timePointToIsoString(startDate), timePointToIsoString(endDate),
@@ -1548,18 +1574,19 @@ namespace electionguard
 
     Manifest::Manifest(Manifest &&other) : pimpl(move(other.pimpl)) {}
 
-    Manifest::Manifest(const string &electionScopeId, ElectionType type,
+    Manifest::Manifest(const string &electionScopeId, const string &specVersion, ElectionType type,
                        system_clock::time_point startDate, system_clock::time_point endDate,
                        vector<unique_ptr<GeopoliticalUnit>> geopoliticalUnits,
                        vector<unique_ptr<Party>> parties, vector<unique_ptr<Candidate>> candidates,
                        vector<unique_ptr<ContestDescription>> contests,
                        vector<unique_ptr<BallotStyle>> ballotStyles)
-        : pimpl(new Impl(electionScopeId, type, startDate, endDate, move(geopoliticalUnits),
-                         move(parties), move(candidates), move(contests), move(ballotStyles)))
+        : pimpl(new Impl(electionScopeId, specVersion, type, startDate, endDate,
+                         move(geopoliticalUnits), move(parties), move(candidates), move(contests),
+                         move(ballotStyles)))
     {
     }
 
-    Manifest::Manifest(const string &electionScopeId, ElectionType type,
+    Manifest::Manifest(const string &electionScopeId, const string &specVersion, ElectionType type,
                        system_clock::time_point startDate, system_clock::time_point endDate,
                        vector<unique_ptr<GeopoliticalUnit>> geopoliticalUnits,
                        vector<unique_ptr<Party>> parties, vector<unique_ptr<Candidate>> candidates,
@@ -1567,9 +1594,9 @@ namespace electionguard
                        vector<unique_ptr<BallotStyle>> ballotStyles,
                        unique_ptr<InternationalizedText> name,
                        unique_ptr<ContactInformation> contactInformation)
-        : pimpl(new Impl(electionScopeId, type, startDate, endDate, move(geopoliticalUnits),
-                         move(parties), move(candidates), move(contests), move(ballotStyles),
-                         move(name), move(contactInformation)))
+        : pimpl(new Impl(electionScopeId, specVersion, type, startDate, endDate,
+                         move(geopoliticalUnits), move(parties), move(candidates), move(contests),
+                         move(ballotStyles), move(name), move(contactInformation)))
     {
     }
 
@@ -1584,6 +1611,7 @@ namespace electionguard
     // Property Getters
 
     string Manifest::getElectionScopeId() const { return pimpl->electionScopeId; }
+    string Manifest::getSpecVersion() const { return pimpl->specVersion; }
     ElectionType Manifest::getElectionType() const { return pimpl->type; }
     system_clock::time_point Manifest::getStartDate() const { return pimpl->startDate; }
     system_clock::time_point Manifest::getEndDate() const { return pimpl->endDate; }

@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Runtime.InteropServices;
+using ElectionGuard.Base;
 
 namespace ElectionGuard
 {
@@ -9,7 +10,7 @@ namespace ElectionGuard
     /// <summary>
     /// An element of the larger `mod p` space, i.e., in [0, P), where P is a 4096-bit prime.
     /// </summary>
-    public class ElementModP : DisposableBase, IEquatable<ElementModP>
+    public class ElementModP : CryptoHashableBase, IEquatable<ElementModP>
     {
         /// <summary>
         /// Number of 64-bit ints that make up the 4096-bit prime
@@ -31,6 +32,10 @@ namespace ElectionGuard
         public bool IsAddressable => Handle != null && !Handle.IsInvalid && !IsDisposed;
 
         internal NaiveElementModP Handle;
+
+        internal override IntPtr Ptr => Handle == null || Handle.IsInvalid
+                    ? throw new ElectionGuardException("handle is null or invalid")
+                    : Handle.DangerousGetHandle();
 
         /// <summary>
         /// Creates a `ElementModP` object
@@ -274,6 +279,27 @@ namespace ElectionGuard
             return data;
         }
 
+        /// <summary>
+        /// Reassign this object's handle by taking ownership of the handle from the other object
+        /// but does not explicitly dispose the other object in order to maintain compatibility
+        /// with the `using` directive. This method is similar to `std::move` in C++ since we cannot
+        /// override the assignment operator in csharp.
+        ///
+        /// This is useful for avoiding unnecessary copies of large objects when passing them
+        /// and assigning them to new variables. It is also useful for avoiding unnecessary
+        /// allocations when reassigning objects in a loop.
+        /// </summary>
+        internal void Reassign(ElementModP other)
+        {
+            if (other == null)
+            {
+                throw new ArgumentNullException(nameof(other));
+            }
+
+            Reassign(other.Handle);
+            other.Handle = null;
+        }
+
         // TODO: ISSUE #189 - this is a temporary function to handle object reassignment and disposal
         // this should be removed when the native library is updated to handle this behavior
         private void Reassign(NaiveElementModP other)
@@ -367,7 +393,7 @@ namespace ElectionGuard
         }
 
         /// <summary>
-        /// Multiply by an ElementModP value
+        /// Multiply by an ElementModP value. This function reassigns the product to this object
         /// </summary>
         /// <param name="rhs">right hand side for the multiply</param>
         public ElementModP MultModP(ElementModP rhs)
@@ -385,7 +411,7 @@ namespace ElectionGuard
         }
 
         /// <summary>
-        /// Multiply list of ElementModP values
+        /// Multiply list of ElementModP values. This function reassigns the product to this object
         /// </summary>
         /// <param name="keys">list of keys the multiply</param>
         public ElementModP MultModP(IEnumerable<ElementModP> keys)
@@ -399,7 +425,7 @@ namespace ElectionGuard
         }
 
         /// <summary>
-        /// Raise a ElementModP value to an ElementModP exponent
+        /// Raise a ElementModP value to an ElementModP exponent. This function reassigns the exponentiation to this object
         /// </summary>
         /// <param name="e">exponent to raise the base by</param>
         public ElementModP PowModP(ElementModQ e)

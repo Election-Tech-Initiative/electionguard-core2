@@ -1,16 +1,25 @@
-using ElectionGuard.UI.Lib.Models;
+﻿using ElectionGuard.Guardians;
 
 namespace ElectionGuard.ElectionSetup;
 
 /// <summary>
 /// A tuple of election key pair, proof and polynomial
 /// </summary>
-public class ElectionKeyPair : DisposableBase
+public class ElectionKeyPair : DisposableBase, IElectionGuardian
 {
     /// <summary>
     /// The id of the owner guardian
     /// </summary>
-    public string OwnerId { get; set; }
+    [Obsolete($"use {nameof(IElectionGuardian.GuardianId)}")]
+    public string OwnerId
+    {
+        get => GuardianId;
+        set => GuardianId = value;
+    }
+
+    public string ObjectId => GuardianId;
+
+    public string GuardianId { get; set; }
 
     /// <summary>
     /// The sequence order of the owner guardian
@@ -37,7 +46,7 @@ public class ElectionKeyPair : DisposableBase
         ulong sequenceOrder,
         int quorum)
     {
-        OwnerId = ownerId;
+        GuardianId = ownerId;
         SequenceOrder = sequenceOrder;
         using var randQ = BigMath.RandQ();
         KeyPair = new(randQ);
@@ -55,7 +64,7 @@ public class ElectionKeyPair : DisposableBase
         int quorum,
         ElGamalKeyPair keyPair)
     {
-        OwnerId = ownerId;
+        GuardianId = ownerId;
         SequenceOrder = sequenceOrder;
         KeyPair = new(keyPair);
         Polynomial = new(quorum, keyPair);
@@ -68,7 +77,7 @@ public class ElectionKeyPair : DisposableBase
         ElGamalKeyPair keyPair,
         Random random)
     {
-        OwnerId = ownerId;
+        GuardianId = ownerId;
         SequenceOrder = sequenceOrder;
         KeyPair = new(keyPair);
         Polynomial = new(quorum, keyPair, random);
@@ -85,7 +94,7 @@ public class ElectionKeyPair : DisposableBase
         ulong sequenceOrder,
         ElectionPolynomial polynomial)
     {
-        OwnerId = ownerId;
+        GuardianId = ownerId;
         SequenceOrder = sequenceOrder;
         Polynomial = new(polynomial);
 
@@ -105,7 +114,7 @@ public class ElectionKeyPair : DisposableBase
         ElGamalKeyPair keyPair,
         ElectionPolynomial polynomial)
     {
-        OwnerId = ownerId;
+        GuardianId = ownerId;
         SequenceOrder = sequenceOrder;
         KeyPair = new(keyPair.SecretKey, keyPair.PublicKey);
         Polynomial = new(polynomial);
@@ -115,7 +124,7 @@ public class ElectionKeyPair : DisposableBase
 
     public ElectionKeyPair(ElectionKeyPair other)
     {
-        OwnerId = other.OwnerId;
+        GuardianId = other.GuardianId;
         SequenceOrder = other.SequenceOrder;
         KeyPair = new(other.KeyPair.SecretKey, other.KeyPair.PublicKey);
         Polynomial = new(other.Polynomial);
@@ -126,7 +135,7 @@ public class ElectionKeyPair : DisposableBase
     public ElectionPublicKey Share()
     {
         return new(
-            OwnerId,
+            GuardianId,
             SequenceOrder,
             KeyPair.PublicKey,
             Polynomial.Commitments,

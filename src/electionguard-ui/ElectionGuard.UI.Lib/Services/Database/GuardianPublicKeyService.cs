@@ -1,5 +1,6 @@
 ﻿using MongoDB.Driver;
 using ElectionGuard.UI.Lib.Models;
+using ElectionGuard.Guardians;
 
 namespace ElectionGuard.UI.Lib.Services;
 
@@ -72,5 +73,10 @@ public class GuardianPublicKeyService : BaseDatabaseService<GuardianPublicKey>, 
         return list.FirstOrDefault();
     }
 
+    public async Task<List<string>> GetKeyCeremonyIdsAsync(string guardianId)
+    {
+        var list = await GetAllByFieldAsync(Constants.GuardianId, guardianId);
+        return list.Select(g => g.KeyCeremonyId!).ToList();
+    }
 
 }

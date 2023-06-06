@@ -1,4 +1,5 @@
 ﻿using ElectionGuard.UI.Lib.Models;
+using MongoDB.Bson;
 using MongoDB.Driver;
 
 namespace ElectionGuard.UI.Lib.Services;
@@ -36,9 +37,24 @@ public class BaseDatabaseService<T> : IDatabaseService<T> where T : DatabaseReco
     /// <param name="data">data to be saved</param>
     /// <param name="table">Optional parameter to allow data type to use a different collection</param>
     /// <returns></returns>
-    public virtual async Task<T> SaveAsync(T data, string? table = null)
+    public virtual async Task<IEnumerable<T>> SaveManyAsync(IEnumerable<T> data, string? table = null)
     {
         var collection = DbService.GetCollection<T>(table ?? _collection);
+        await collection.InsertManyAsync(data);
+        return data;
+    }
+
+    /// <summary>
+    /// Save the data into the collection
+    /// </summary>
+    /// <param name="data">data to be saved</param>
+    /// <param name="table">Optional parameter to allow data type to use a different collection</param>
+    /// <returns></returns>
+    public virtual async Task<T> SaveAsync(T data, FilterDefinition<T>? customFilter = null, string? table = null)
+    {
+        var collection = DbService.GetCollection<T>(table ?? _collection);
+        var filter = FilterBuilder.Eq(Constants.Id, data.Id);
+        await collection.DeleteOneAsync(UpdateFilter(customFilter ?? filter));
         await collection.InsertOneAsync(data);
         return data;
     }
@@ -85,6 +101,21 @@ public class BaseDatabaseService<T> : IDatabaseService<T> where T : DatabaseReco
         return await GetAllByFilterAsync(filter, table);
     }
 
+    /// <summary>
+    /// Get the document from the database with the provided value for a field
+    /// </summary>
+    /// <param name="fieldName">Field name to search for</param>
+    /// <param name="fieldValues">List of values to match for search</param>
+    /// <param name="table">Optional parameter to allow data type to use a different collection</param>
+    /// <returns>List of the documents found in the given collection that matches the given field</returns>
+    public async Task<List<T>> GetAllByFieldInListAsync(string fieldName, BsonArray fieldValues, string? table = null)
+    {
+        var filter = FilterBuilder.In(fieldName, fieldValues);
+        return await GetAllByFilterAsync(filter, table);
+    }
+
+
+
     public FilterDefinitionBuilder<T> FilterBuilder => Builders<T>.Filter;
 
     /// <summary>
@@ -98,13 +129,32 @@ public class BaseDatabaseService<T> : IDatabaseService<T> where T : DatabaseReco
         {
             var data = DbService.GetCollection<T>(table ?? _collection);
             var item = await data.FindAsync<T>(UpdateFilter(filter));
-            return item.ToList();
+            return item?.ToList() ?? new();
         }
         catch (Exception ex)
         {
             throw new ElectionGuardException("Error getting all by filter", ex);
         }
     }
+
+    /// <summary>
+    /// Get all of a data type from a given collection using a filter
+    /// </summary>
+    /// <param name="table">Optional parameter to allow data type to use a different collection</param>
+    /// <returns>List of the documents found in the given collection</returns>
+    public async Task<IAsyncCursor<T>> GetCursorByFilterAsync(FilterDefinition<T> filter, string? table = null)
+    {
+        try
+        {
+            var data = DbService.GetCollection<T>(table ?? _collection);
+            return await data.FindAsync<T>(UpdateFilter(filter));
+        }
+        catch (Exception ex)
+        {
+            throw new ElectionGuardException("Error getting all by filter", ex);
+        }
+    }
+
 
     /// <summary>
     /// Get the document from the database with the provided id
@@ -163,6 +213,17 @@ public class BaseDatabaseService<T> : IDatabaseService<T> where T : DatabaseReco
     {
         var data = DbService.GetCollection<T>(table ?? _collection);
         return await data.CountDocumentsAsync(UpdateFilter(filter));
+    }
+
+    /// <summary>
+    /// Get existance of documents that match the filter
+    /// </summary>
+    /// <param name="filter">filter used to search</param>
+    /// <param name="table">collection to use</param>
+    public async Task<bool> ExistsByFilterAsync(FilterDefinition<T> filter, string? table = null)
+    {
+        var data = DbService.GetCollection<T>(table ?? _collection);
+        return await data.CountDocumentsAsync(UpdateFilter(filter)) != 0;
     }
 
     /// <summary>

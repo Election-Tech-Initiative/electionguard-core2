@@ -43,10 +43,14 @@ char *election_json =
   "id-candidate-3\",\"sequence_order\":2}],\"electoral_district_id\":\"some-geopoltical-unit-"
   "id\",\"name\":\"some-candidate-contest-name\",\"number_elected\":2,\"object_id\":\"some-"
   "candidate-contest-object-id\",\"sequence_order\":1,\"vote_variation\":\"one_of_m\"}],"
-  "\"election_scope_id\":\"some-scope-id\",\"end_date\":\"2021-02-04T13:30:10Z\","
-  "\"geopolitical_units\":[{\"name\":\"some-gp-unit-name\",\"object_id\":\"some-geopoltical-"
-  "unit-id\",\"type\":\"unknown\"}],\"parties\":[{\"object_id\":\"some-party-id-1\"},{\"object_"
-  "id\":\"some-party-id-2\"}],\"start_date\":\"2021-02-04T13:30:10Z\",\"type\":\"unknown\"}";
+  "\"election_scope_id\":\"some-scope-id\",\"spec_version\":\"1.0\",\"end_date\":\"2021-02-04T13:"
+  "30:10Z\","
+  "\"geopolitical_units\":[{\"name\":\"some-gp-unit-"
+  "name\",\"object_id\":\"some-geopoltical-"
+  "unit-id\",\"type\":\"unknown\"}],\"parties\":[{"
+  "\"object_id\":\"some-party-id-1\"},{\"object_"
+  "id\":\"some-party-id-2\"}],\"start_date\":\"2021-02-"
+  "04T13:30:10Z\",\"type\":\"unknown\"}";
 
 char *election_json_no_logo =
   "{\"ballot_styles\":[{\"geopolitical_unit_ids\":[\"some-geopoltical-unit-id\"],\"object_id\":"
@@ -64,10 +68,14 @@ char *election_json_no_logo =
   "id-candidate-3\",\"sequence_order\":2}],\"electoral_district_id\":\"some-geopoltical-unit-"
   "id\",\"name\":\"some-candidate-contest-name\",\"number_elected\":2,\"object_id\":\"some-"
   "candidate-contest-object-id\",\"sequence_order\":1,\"vote_variation\":\"one_of_m\"}],"
-  "\"election_scope_id\":\"some-scope-id\",\"end_date\":\"2021-02-04T13:30:10Z\","
-  "\"geopolitical_units\":[{\"name\":\"some-gp-unit-name\",\"object_id\":\"some-geopoltical-"
-  "unit-id\",\"type\":\"unknown\"}],\"parties\":[{\"object_id\":\"some-party-id-1\", \"logo_uri\": "
-  "null},{\"object_id\":\"some-party-id-2\"}],\"start_date\":\"2021-02-04T13:30:10Z\",\"type\":"
+  "\"election_scope_id\":\"some-scope-id\",\"spec_version\":\"1.0\",\"end_date\":\"2021-02-04T13:"
+  "30:10Z\","
+  "\"geopolitical_units\":[{\"name\":\"some-gp-unit-"
+  "name\",\"object_id\":\"some-geopoltical-"
+  "unit-id\",\"type\":\"unknown\"}],\"parties\":[{"
+  "\"object_id\":\"some-party-id-1\", \"logo_uri\": "
+  "null},{\"object_id\":\"some-party-id-2\"}],\"start_"
+  "date\":\"2021-02-04T13:30:10Z\",\"type\":"
   "\"unknown\"}";
 
 bool test_simple_manifest_is_valid(void)

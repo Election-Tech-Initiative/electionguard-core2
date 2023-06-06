@@ -116,6 +116,10 @@ namespace electionguard
 
     static unique_ptr<ContactInformation> contactInformationFromJson(const json &j)
     {
+        if (j.is_null()) {
+            return nullptr;
+        }
+
         vector<string> addressLine;
         if (j.contains("address_line") && !j["address_line"].is_null()) {
             for (const auto &i : j["address_line"]) {
@@ -543,6 +547,7 @@ namespace electionguard
             static unique_ptr<electionguard::Manifest> toObject(json j)
             {
                 auto electionScopeId = j["election_scope_id"].get<string>();
+                auto specVersion = j["spec_version"].get<string>();
                 auto type = j["type"].get<string>();
                 auto startDate = j["start_date"].get<string>();
                 auto endDate = j["end_date"].get<string>();
@@ -560,15 +565,16 @@ namespace electionguard
                     auto contactInformation = contactInformationFromJson(j["contact_information"]);
 
                     return make_unique<electionguard::Manifest>(
-                      electionScopeId, getElectionType(type), timePointFromIsoString(startDate),
-                      timePointFromIsoString(endDate), move(geopoliticalUnits), move(parties),
-                      move(candidates), move(contests), move(ballotStyles), move(name),
-                      move(contactInformation));
+                      electionScopeId, specVersion, getElectionType(type),
+                      timePointFromIsoString(startDate), timePointFromIsoString(endDate),
+                      move(geopoliticalUnits), move(parties), move(candidates), move(contests),
+                      move(ballotStyles), move(name), move(contactInformation));
                 }
                 return make_unique<electionguard::Manifest>(
-                  electionScopeId, getElectionType(type), timePointFromIsoString(startDate),
-                  timePointFromIsoString(endDate), move(geopoliticalUnits), move(parties),
-                  move(candidates), move(contests), move(ballotStyles));
+                  electionScopeId, specVersion, getElectionType(type),
+                  timePointFromIsoString(startDate), timePointFromIsoString(endDate),
+                  move(geopoliticalUnits), move(parties), move(candidates), move(contests),
+                  move(ballotStyles));
             }
 
           public:

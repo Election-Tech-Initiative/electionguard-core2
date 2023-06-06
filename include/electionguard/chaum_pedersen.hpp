@@ -282,6 +282,9 @@ namespace electionguard
       public:
         ChaumPedersenProof(const ChaumPedersenProof &other);
         ChaumPedersenProof(const ChaumPedersenProof &&other);
+        ChaumPedersenProof(std::unique_ptr<ElGamalCiphertext> commitment,
+                           std::unique_ptr<ElementModQ> challenge,
+                           std::unique_ptr<ElementModQ> response);
         ChaumPedersenProof(std::unique_ptr<ElementModP> pad, std::unique_ptr<ElementModP> data,
                            std::unique_ptr<ElementModQ> challenge,
                            std::unique_ptr<ElementModQ> response);
@@ -314,30 +317,30 @@ namespace electionguard
         /// make function for a `ChaumPedersenProof`
         ///
         /// Produces a proof that a given value corresponds to a specific encryption.
-        /// computes: 𝑀 =𝐴^𝑠𝑖 mod 𝑝 and 𝐾𝑖 = 𝑔^𝑠𝑖 mod 𝑝
+        /// computes: 𝑀' =𝐴^𝑠 mod 𝑝 and 𝑀 = 𝐵𝑀'^-1 mod 𝑝
         ///
         /// <param name="message"> The ciphertext message</param>
         /// <param name="s">The nonce or secret used to derive the value</param>
         /// <param name="m">The value to prove (usually the partial decryption)</param>
         /// <param name="seed"> A value used when generating the challenge</param>
         /// <param name="hash_header">Used to generate other random values here,
-        ///                           usually the election extended base hash (𝑄')</param>
+        ///                           usually the hash of election extended base hash (𝑄')</param>
         /// <param name="constant">The constant value to prove</param>
         /// <returns>A unique pointer</returns>
         /// </Summary>
-        static std::unique_ptr<ChaumPedersenProof> make(const ElGamalCiphertext &message,
-                                                        const ElementModQ &s, const ElementModP &m,
-                                                        const ElementModQ &seed,
-                                                        const ElementModQ &hash_header);
+        // static std::unique_ptr<ChaumPedersenProof> make(const ElGamalCiphertext &message,
+        //                                                 const ElGamalCiphertext &commitment,
+        //                                                 const ElementModP &m,
+        //                                                 const ElementModP &elGamalPublicKey,
+        //                                                 const ElementModQ &hash_header);
 
         /// <Summary>
         /// Validates a `ChaumPedersenProof`
         ///
         /// Validates:
-        /// - The given value 𝑣𝑖 is in the set Z𝑞
-        /// - The given values 𝑎𝑖 and 𝑏𝑖 are both in the set Z𝑞^𝑟
-        /// - The challenge value 𝑐 satisfies 𝑐 = 𝐻(𝑄, (𝐴, 𝐵), (𝑎 , 𝑏 ), 𝑀 ).
-        /// - that the equations 𝑔^𝑣𝑖 = 𝑎𝑖𝐾^𝑐𝑖 mod 𝑝 and 𝐴^𝑣𝑖 = 𝑏𝑖𝑀𝑖^𝑐𝑖 mod 𝑝 are satisfied.
+        /// - The given value 𝑣 is in the set Z𝑞
+        /// - The challenge value 𝑐 satisfies 𝑐 = 𝐻(06,𝑄';𝐾,(𝐴,𝐵),(𝑎,𝑏),𝑀').
+        /// - that the equations 𝑎 = 𝑔^𝑣 · 𝐾^𝑐 mod 𝑝 and 𝑏 = 𝐴^𝑣 · 𝑀'^𝑐 mod 𝑝 are satisfied.
         /// <param name="message"> The ciphertext message</param>
         /// <param name="k">The public key corresponding to the private key used to encrypt</param>
         /// <param name="m">The value being checked for validity

@@ -1,4 +1,5 @@
 ﻿using CommunityToolkit.Maui;
+using ElectionGuard.Decryption;
 using ElectionGuard.UI.Services;
 using Microsoft.Extensions.Logging;
 
@@ -62,6 +63,8 @@ public static class MauiProgram
         builder.Services.AddSingleton<ILocalizationService, LocalizationService>();
         // NavigationService has to be singleton because it stores the current page and vm
         builder.Services.AddSingleton<INavigationService, NavigationService>();
+        builder.Services.AddTransient<IStorageService, DriveService>();
+        builder.Services.AddTransient<ZipStorageService>();
 
         // setup database services
         builder.Services.AddTransient<KeyCeremonyService>();
@@ -77,13 +80,22 @@ public static class MauiProgram
         builder.Services.AddTransient<ConstantsService>();
         builder.Services.AddTransient<BallotUploadService>();
         builder.Services.AddTransient<BallotService>();
+        builder.Services.AddTransient<ChallengedBallotService>();
+        builder.Services.AddTransient<CiphertextTallyService>();
+        builder.Services.AddTransient<TallyMediator>();
+        builder.Services.AddTransient<DecryptionShareService>();
+        builder.Services.AddTransient<ChallengeService>();
+        builder.Services.AddTransient<ChallengeResponseService>();
+        builder.Services.AddTransient<PlaintextTallyService>();
+        builder.Services.AddTransient<LagrangeCoefficientsService>();
+        builder.Services.AddTransient<TallyManager>();
+        builder.Services.AddTransient<ITallyStateMachine, TallyStateMachine>();
 
         // setup view models
         builder.Services.AddTransient<LoginViewModel>();
         builder.Services.AddTransient<GuardianHomeViewModel>();
         builder.Services.AddTransient<AdminHomeViewModel>();
         builder.Services.AddSingleton<ElectionViewModel>();
-        builder.Services.AddTransient<EncryptionPackageExportViewModel>();
         builder.Services.AddTransient<SettingsViewModel>();
         builder.Services.AddTransient<CreateKeyCeremonyAdminViewModel>();
         builder.Services.AddTransient<ViewKeyCeremonyViewModel>();
@@ -93,6 +105,7 @@ public static class MauiProgram
         builder.Services.AddTransient<CreateTallyViewModel>();
         builder.Services.AddTransient<CreateMultiTallyViewModel>();
         builder.Services.AddTransient<TallyProcessViewModel>();
+        builder.Services.AddTransient<ViewTallyViewModel>();
 
         // setup views
         builder.Services.AddTransient<LoginPage>();
@@ -107,7 +120,7 @@ public static class MauiProgram
         builder.Services.AddTransient<CreateTallyPage>();
         builder.Services.AddTransient<CreateMultiTallyPage>();
         builder.Services.AddTransient<TallyProcessPage>();
-        builder.Services.AddTransient<EncryptionExportPage>();
+        builder.Services.AddTransient<ViewTallyPage>();
 
         // popup pages
         builder.Services.AddTransient<SettingsPage>();

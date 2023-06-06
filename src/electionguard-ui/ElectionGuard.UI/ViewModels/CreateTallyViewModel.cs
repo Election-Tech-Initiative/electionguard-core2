@@ -1,6 +1,4 @@
 ﻿using CommunityToolkit.Mvvm.Input;
-using ElectionGuard.UI.Lib.Services;
-using MongoDB.Driver.Core.Clusters;
 
 namespace ElectionGuard.UI.ViewModels;
 
@@ -14,14 +12,23 @@ public partial class CreateTallyViewModel : BaseViewModel
     private ManifestService _manifestService;
     private KeyCeremonyService _keyCeremonyService;
     private BallotUploadService _ballotUploadService;
+    private BallotService _ballotService;
 
-    public CreateTallyViewModel(IServiceProvider serviceProvider, TallyService tallyService, ManifestService manifestService, ElectionService electionService, KeyCeremonyService keyCeremonyService, BallotUploadService ballotUploadService) : base("CreateTally", serviceProvider)
+    public CreateTallyViewModel(
+        IServiceProvider serviceProvider,
+        TallyService tallyService,
+        ManifestService manifestService,
+        ElectionService electionService,
+        KeyCeremonyService keyCeremonyService,
+        BallotUploadService ballotUploadService,
+        BallotService ballotService) : base("CreateTally", serviceProvider)
     {
         _tallyService = tallyService;
         _manifestService = manifestService;
         _electionService = electionService;
         _keyCeremonyService = keyCeremonyService;
         _ballotUploadService = ballotUploadService;
+        _ballotService = ballotService;
     }
 
     [ObservableProperty]
@@ -43,10 +50,10 @@ public partial class CreateTallyViewModel : BaseViewModel
     }
 
     [ObservableProperty]
-    private Election _currentElection;
+    private Election _currentElection = new();
 
     [ObservableProperty]
-    private KeyCeremonyRecord _currentKeyCeremony;
+    private KeyCeremonyRecord? _currentKeyCeremony;
 
     [ObservableProperty]
     private Manifest _currentManifest;
@@ -87,8 +94,9 @@ public partial class CreateTallyViewModel : BaseViewModel
     private async Task CreateTally()
     {
         // calculate ballot count and upload count
-        var ballotCount = 0;
-        var uploadCount = 0;
+        var ballotCount = await _ballotService.GetCountBallotsByElectionIdStateAsync(ElectionId, BallotBoxState.Cast);
+        var challengedCount = await _ballotService.GetCountBallotsByElectionIdStateAsync(ElectionId, BallotBoxState.Challenged);
+        var spoiledCount = await _ballotService.GetCountBallotsByElectionIdStateAsync(ElectionId, BallotBoxState.Spoiled);
 
         TallyRecord newTally = new()
         {
@@ -97,8 +105,9 @@ public partial class CreateTallyViewModel : BaseViewModel
             KeyCeremonyId = CurrentElection.KeyCeremonyId,
             Quorum = CurrentKeyCeremony.Quorum,
             NumberOfGuardians = CurrentKeyCeremony.NumberOfGuardians,
-            BallotCount = ballotCount,
-            BallotUploadCount = uploadCount,
+            CastBallotCount = ballotCount,
+            ChallengedBallotCount = challengedCount,
+            SpoiledBallotCount = spoiledCount,
             State = TallyState.PendingGuardiansJoin,
         };
 
@@ -115,6 +124,11 @@ public partial class CreateTallyViewModel : BaseViewModel
     private bool CanCreateTally()
     {
         return !string.IsNullOrWhiteSpace(TallyName);
+    }
+
+    public override async Task OnAppearing()
+    {
+        await base.OnAppearing();
     }
 
 }

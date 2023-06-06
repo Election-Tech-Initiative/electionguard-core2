@@ -31,6 +31,7 @@ TEST_CASE("Can serialize Sample Manifest")
 
     // Assert
     CHECK(subject->getElectionScopeId().compare(result->getElectionScopeId()) == 0);
+    CHECK(subject->getSpecVersion().compare(result->getSpecVersion()) == 0);
     CHECK(subject->crypto_hash()->toHex() == result->crypto_hash()->toHex());
     CHECK(result->isValid() == true);
 }

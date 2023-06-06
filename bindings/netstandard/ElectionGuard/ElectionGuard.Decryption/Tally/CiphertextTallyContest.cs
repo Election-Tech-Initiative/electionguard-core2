@@ -1,5 +1,6 @@
+﻿using ElectionGuard.Ballot;
+using Newtonsoft.Json;
 using ElectionGuard.ElectionSetup.Extensions;
-using ElectionGuard.Encryption.Ballot;
 
 namespace ElectionGuard.Decryption.Tally;
 
@@ -7,7 +8,7 @@ namespace ElectionGuard.Decryption.Tally;
 /// A CiphertextTallyContest is a container for associating a collection 
 /// of CiphertextTallySelection to a specific ContestDescription
 /// </summary>
-public class CiphertextTallyContest : DisposableBase, IElectionContest, IEquatable<CiphertextTallyContest>
+public class CiphertextTallyContest : DisposableBase, ICiphertextContest, IEquatable<CiphertextTallyContest>
 {
     /// <summary>
     /// The object id of the contest
@@ -29,6 +30,9 @@ public class CiphertextTallyContest : DisposableBase, IElectionContest, IEquatab
     /// </summary>
     public Dictionary<string, CiphertextTallySelection> Selections { get; init; }
 
+    IReadOnlyList<ICiphertextSelection> ICiphertextContest.Selections => Selections.Values.ToList();
+
+    [JsonConstructor]
     public CiphertextTallyContest(
         string objectId, ulong sequenceOrder, ElementModQ descriptionHash,
         Dictionary<string, CiphertextTallySelection> selections)
@@ -47,12 +51,12 @@ public class CiphertextTallyContest : DisposableBase, IElectionContest, IEquatab
         Selections = contest.ToCiphertextTallySelectionDictionary();
     }
 
-    public CiphertextTallyContest(ContestDescriptionWithPlaceholders contestDescription)
+    public CiphertextTallyContest(ContestDescriptionWithPlaceholders contest)
     {
-        ObjectId = contestDescription.ObjectId;
-        SequenceOrder = contestDescription.SequenceOrder;
-        DescriptionHash = contestDescription.CryptoHash();
-        Selections = contestDescription.ToCiphertextTallySelectionDictionary();
+        ObjectId = contest.ObjectId;
+        SequenceOrder = contest.SequenceOrder;
+        DescriptionHash = contest.CryptoHash();
+        Selections = contest.ToCiphertextTallySelectionDictionary();
     }
 
     public CiphertextTallyContest(CiphertextTallyContest other)
@@ -84,6 +88,18 @@ public class CiphertextTallyContest : DisposableBase, IElectionContest, IEquatab
         foreach (var selection in ballotSelections)
         {
             _ = Selections[selection.ObjectId].Accumulate(selection);
+        }
+    }
+
+    public void Accumulate(CiphertextTallyContest contest)
+    {
+        if (!Selections.Keys.All(contest.Selections.Keys.Contains))
+        {
+            throw new ArgumentException("Selections do not match contest");
+        }
+        foreach (var (selectionId, selection) in contest.Selections)
+        {
+            _ = Selections[selectionId].Accumulate(selection);
         }
     }
 
@@ -119,6 +135,25 @@ public class CiphertextTallyContest : DisposableBase, IElectionContest, IEquatab
         await Task.WhenAll(tasks);
     }
 
+    public async Task AccumulateAsync(CiphertextTallyContest contest,
+        CancellationToken cancellationToken = default)
+    {
+        if (!Selections.Keys.All(contest.Selections.Keys.Contains))
+        {
+            throw new ArgumentException("Selections do not match contest");
+        }
+
+        var tasks = new List<Task>();
+        foreach (var (selectionId, selection) in contest.Selections)
+        {
+            tasks.Add(
+                Selections[selectionId].AccumulateAsync(
+                    selection, cancellationToken)
+            );
+        }
+        await Task.WhenAll(tasks);
+    }
+
     /// <summary>
     /// Accumulate a collection of CiphertextBallotContest into the CiphertextTallyContest
     /// </summary>
@@ -143,11 +178,15 @@ public class CiphertextTallyContest : DisposableBase, IElectionContest, IEquatab
         }
     }
 
+    protected override void DisposeManaged()
+    {
+        base.DisposeManaged();
+        Selections.Dispose();
+    }
+
     protected override void DisposeUnmanaged()
     {
         base.DisposeUnmanaged();
-        Selections?.Dispose();
-        Selections?.Clear();
         DescriptionHash?.Dispose();
     }
 

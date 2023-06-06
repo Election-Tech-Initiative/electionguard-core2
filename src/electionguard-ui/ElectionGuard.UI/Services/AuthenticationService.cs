@@ -1,5 +1,4 @@
-﻿using ElectionGuard.UI.Lib.Services;
-using System.Globalization;
+﻿using System.Globalization;
 
 namespace ElectionGuard.UI.Services;
 
@@ -20,7 +19,7 @@ public class AuthenticationService : IAuthenticationService
         {
             App.CurrentUser = new();
             App.CurrentUser.Name = username;
-            var isAdmin = username.ToLower(CultureInfo.CurrentCulture).Contains("admin");
+            var isAdmin = username.ToLower(CultureInfo.CurrentCulture).Contains(UISettings.AdminUser);
             App.CurrentUser.IsAdmin = isAdmin;
         });
     }

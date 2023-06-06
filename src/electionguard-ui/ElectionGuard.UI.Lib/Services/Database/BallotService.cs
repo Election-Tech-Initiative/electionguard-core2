@@ -22,9 +22,49 @@ public class BallotService : BaseDatabaseService<BallotRecord>
     /// Gets ballots for an election
     /// </summary>
     /// <param name="electionId">election id to search for</param>
+    public async Task<BallotRecord?> GetByOjectIdAsync(string electionId)
+    {
+        return await GetByFieldAsync(Constants.ObjectId, electionId);
+    }
+
+    /// <summary>
+    /// Gets ballots for an election
+    /// </summary>
+    /// <param name="electionId">election id to search for</param>
     public async Task<List<BallotRecord>> GetByElectionIdAsync(string electionId)
     {
         return await GetAllByFieldAsync(Constants.ElectionId, electionId);
+    }
+
+    /// <summary>
+    /// Gets ballots for an election
+    /// </summary>
+    /// <param name="electionId">election id to search for</param>
+    public async Task<IAsyncCursor<BallotRecord>> GetCursorByElectionIdAsync(string electionId)
+    {
+        var filter = FilterBuilder.Eq(Constants.ElectionId, electionId);
+        return await GetCursorByFilterAsync(filter);
+    }
+
+    /// <summary>
+    /// Gets ballots for an election
+    /// </summary>
+    /// <param name="electionId">election id to search for</param>
+    /// <param name="state">State to filter the ballots</param>
+    public async Task<IAsyncCursor<BallotRecord>> GetCursorBallotsByElectionIdStateAsync(string electionId, BallotBoxState state)
+    {
+        var filter = FilterBuilder.And(
+            FilterBuilder.Eq(Constants.ElectionId, electionId),
+            FilterBuilder.Eq(Constants.BallotState, state));
+        return await GetCursorByFilterAsync(filter);
+    }
+
+    public async Task<long> GetCountBallotsByElectionIdStateAsync(string electionId, BallotBoxState state)
+    {
+        var filter = FilterBuilder.And(
+            FilterBuilder.Eq(Constants.ElectionId, electionId),
+            FilterBuilder.Eq(Constants.BallotState, state));
+        return await CountByFilterAsync(filter);
     }
 
     /// <summary>
@@ -40,7 +80,7 @@ public class BallotService : BaseDatabaseService<BallotRecord>
     /// Check to see if the ballot has already been included
     /// </summary>
     /// <param name="ballotCode">ballotcode to find</param>
-    public async Task<bool> BallotExists(string ballotCode)
+    public async Task<bool> BallotExistsAsync(string ballotCode)
     {
         var filterBuilder = Builders<BallotRecord>.Filter;
         var filter = filterBuilder.And(filterBuilder.Eq(Constants.BallotCode, ballotCode));
@@ -50,16 +90,12 @@ public class BallotService : BaseDatabaseService<BallotRecord>
     }
 
     /// <summary>
-    /// Check to see if the ballot has already been included
+    /// Get a ballot based on its ballot code
     /// </summary>
     /// <param name="ballotCode">ballotcode to find</param>
-    public async Task<bool> GetByBallotCodeAsync(string ballotCode)
+    public async Task<BallotRecord?> GetByBallotCodeAsync(string ballotCode)
     {
-        var filterBuilder = Builders<BallotRecord>.Filter;
-        var filter = filterBuilder.And(filterBuilder.Eq(Constants.BallotCode, ballotCode));
-
-        var ballotCount = await CountByFilterAsync(filter);
-        return ballotCount > 0;
+        return await GetByFieldAsync(Constants.BallotCode, ballotCode);
     }
 
     /// <summary>
@@ -73,5 +109,4 @@ public class BallotService : BaseDatabaseService<BallotRecord>
 
         await MarkAsDeletedAsync(filter);
     }
-
 }

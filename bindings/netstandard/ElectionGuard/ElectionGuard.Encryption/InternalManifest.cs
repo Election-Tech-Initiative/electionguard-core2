@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.InteropServices;
 
@@ -9,7 +10,7 @@ namespace ElectionGuard
     /// the components that ElectionGuard uses for conducting an election.  The key component is the
     /// `contests` collection, which applies placeholder selections to the `Manifest` contests
     /// </summary>
-    public class InternalManifest : DisposableBase
+    public class InternalManifest : DisposableBase, IEquatable<InternalManifest>
     {
         /// <summary>
         /// The hash of the election manifest
@@ -279,6 +280,41 @@ namespace ElectionGuard
             Marshal.Copy(data, byteArray, 0, (int)size);
             _ = NativeInterface.Memory.DeleteIntPtr(data);
             return byteArray;
+        }
+
+        #endregion
+
+        #region IEquatable
+
+        public bool Equals(InternalManifest other)
+        {
+            if (other is null)
+            {
+                return false;
+            }
+            if (ReferenceEquals(this, other))
+            {
+                return true;
+            }
+
+            var isEqual = ManifestHash.Equals(other.ManifestHash);
+            isEqual = isEqual && GeopoliticalUnitsSize.Equals(other.GeopoliticalUnitsSize);
+            isEqual = isEqual && ContestsSize.Equals(other.ContestsSize);
+            isEqual = isEqual && BallotStylesSize.Equals(other.BallotStylesSize);
+
+            // TODO: ISSUE #251 support IEquatable comparison for collections in the Election Manifest
+
+            return isEqual;
+        }
+
+        public override bool Equals(object obj)
+        {
+            return ReferenceEquals(this, obj) || (obj is InternalManifest other && Equals(other));
+        }
+
+        public override int GetHashCode()
+        {
+            return HashCode.Combine(ManifestHash, GeopoliticalUnitsSize, ContestsSize, BallotStylesSize);
         }
 
         #endregion

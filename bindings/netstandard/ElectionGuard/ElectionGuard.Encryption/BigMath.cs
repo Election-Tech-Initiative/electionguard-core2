@@ -1,5 +1,3 @@
-using System;
-using System.Collections.Generic;
 using System.Runtime.InteropServices;
 
 namespace ElectionGuard
@@ -258,55 +256,6 @@ namespace ElectionGuard
 
         #endregion
 
-        #region Group Hash Functions
-
-        /// <summary>
-        /// Hash together the ElementModP values
-        /// </summary>
-        /// <param name="publickey">first value for the hash</param>
-        /// <param name="commitment">second value for the hash</param>
-        public static ElementModQ HashElems(ElementModP publickey, ElementModP commitment)
-        {
-            var status = External.HashElems(publickey.Handle, commitment.Handle,
-                out var value);
-            status.ThrowIfError();
-            return value.IsInvalid ? null : new ElementModQ(value);
-        }
-
-        /// <summary>
-        /// Hash together the ElementModP values
-        /// </summary>
-        /// <param name="id">first value for the hash</param>
-        /// <param name="sequence">second value for the hash</param>
-        public static ElementModQ HashElems(string id, ulong sequence)
-        {
-            var status = External.HashElems(id, sequence,
-                out var value);
-            status.ThrowIfError();
-            return value.IsInvalid ? null : new ElementModQ(value);
-        }
-
-        /// <summary>
-        /// Hash together the ElementModP values
-        /// </summary>
-        /// <param name="data">List of ElementModP to hash together</param>
-        public static ElementModQ HashElems(List<ElementModP> data)
-        {
-            var dataPointers = new IntPtr[data.Count];
-            for (var i = 0; i < data.Count; i++)
-            {
-                dataPointers[i] = data[i].Handle.Ptr;
-                data[i].Dispose();
-            }
-
-            var status = External.HashElems(dataPointers, (ulong)data.Count,
-                out var value);
-            status.ThrowIfError();
-            return value.IsInvalid ? null : new ElementModQ(value);
-        }
-
-        #endregion
-
         internal static class External
         {
             #region ElementModP Group Math Functions
@@ -465,43 +414,6 @@ namespace ElectionGuard
                 CallingConvention = CallingConvention.Cdecl,
                 SetLastError = true)]
             internal static extern Status RandQ(out NativeInterface.ElementModQ.ElementModQHandle handle);
-
-            #endregion
-
-            #region Group Hash Functions
-
-            [DllImport(
-                NativeInterface.DllName,
-                EntryPoint = "eg_hash_elems_modp_modp",
-                CallingConvention = CallingConvention.Cdecl,
-                SetLastError = true)]
-            internal static extern Status HashElems(
-                NativeInterface.ElementModP.ElementModPHandle publickey,
-                NativeInterface.ElementModP.ElementModPHandle commitment,
-                out NativeInterface.ElementModQ.ElementModQHandle handle
-                );
-
-            [DllImport(
-                NativeInterface.DllName,
-                EntryPoint = "eg_hash_elems_string_int",
-                CallingConvention = CallingConvention.Cdecl,
-                SetLastError = true)]
-            internal static extern Status HashElems(
-                string publickey,
-                ulong commitment,
-                out NativeInterface.ElementModQ.ElementModQHandle handle
-                );
-
-            [DllImport(
-                NativeInterface.DllName,
-                EntryPoint = "eg_hash_elems_array",
-                CallingConvention = CallingConvention.Cdecl,
-                SetLastError = true)]
-            internal static extern Status HashElems(
-                [MarshalAs(UnmanagedType.LPArray)] IntPtr[] inData,
-                ulong inDataSize,
-                out NativeInterface.ElementModQ.ElementModQHandle handle
-                );
 
             #endregion
         }

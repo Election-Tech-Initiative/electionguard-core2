@@ -1,4 +1,4 @@
-namespace ElectionGuard.Decryption.Tally;
+﻿namespace ElectionGuard.Decryption.Tally;
 
 /// <summary>
 /// The plaintext representation of all contests in a ballot.
@@ -23,6 +23,11 @@ public record PlaintextTallyBallot : PlaintextTally, IEquatable<PlaintextTallyBa
         string tallyId,
         CiphertextBallot ballot)
         : base(tallyId, ballot)
+    {
+    }
+
+    public PlaintextTallyBallot(PlaintextTallyBallot ballot)
+        : base(ballot)
     {
 
     }

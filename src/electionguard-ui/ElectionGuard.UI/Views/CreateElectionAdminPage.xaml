@@ -22,14 +22,24 @@
             Text="{Binding ErrorMessage}" />
         <StackLayout Style="{StaticResource FormControl}">
             <Label Style="{StaticResource FormLabel}" Text="{helper:Translate KeyCeremonyText}" />
-            <Picker
-                ItemDisplayBinding="{Binding Name}"
-                ItemsSource="{Binding KeyCeremonies}"
-                SelectedIndexChanged="Picker_SelectedIndexChanged"
-                SelectedItem="{Binding KeyCeremony}"
-                TextColor="{StaticResource Gray950}"
-                TitleColor="{StaticResource Primary}"
-                WidthRequest="600" />
+            <Grid WidthRequest="600">
+                <!--  This entry is due to a bug with picker in Windows.  The text gets reset to white on a mouse over  -->
+                <!--  This uses the code behind to work around.  The command still does the work for the actual process  -->
+                <Entry
+                    x:Name="keyEntry"
+                    InputTransparent="True"
+                    IsReadOnly="True" />
+                <Picker
+                    x:Name="keyPicker"
+                    ItemDisplayBinding="{Binding Name}"
+                    ItemsSource="{Binding KeyCeremonies}"
+                    SelectedIndexChanged="Picker_SelectedIndexChanged"
+                    SelectedItem="{Binding KeyCeremony}"
+                    WidthRequest="600"
+                    ZIndex="-1" />
+            </Grid>
+
+
         </StackLayout>
         <StackLayout Style="{StaticResource FormControl}">
             <Label Style="{StaticResource FormLabel}" Text="{helper:Translate ManifestText}" />

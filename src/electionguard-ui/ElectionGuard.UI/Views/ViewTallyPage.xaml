@@ -1,0 +1,112 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<views:ContentPageBase
+    x:Class="ElectionGuard.UI.Views.ViewTallyPage"
+    xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+    xmlns:controls="clr-namespace:ElectionGuard.UI.Controls"
+    xmlns:helper="clr-namespace:ElectionGuard.UI.Helpers"
+    xmlns:model="clr-namespace:ElectionGuard.UI.Lib.Models;assembly=ElectionGuard.UI.Lib"
+    xmlns:models="clr-namespace:ElectionGuard.UI.Models"
+    xmlns:toolkit="http://schemas.microsoft.com/dotnet/2022/maui/toolkit"
+    xmlns:viewModels="clr-namespace:ElectionGuard.UI.ViewModels"
+    xmlns:views="using:ElectionGuard.UI.Views"
+    x:DataType="viewModels:ViewTallyViewModel"
+    x:TypeArguments="viewModels:ViewTallyViewModel"
+    ControlTemplate="{StaticResource PageTemplate}">
+    <ContentPage.Resources>
+        <ResourceDictionary>
+            <toolkit:InvertedBoolConverter x:Key="InvertedBoolConverter" />
+        </ResourceDictionary>
+    </ContentPage.Resources>
+
+    <Grid
+        RowDefinitions="auto, *"
+        Style="{StaticResource NarrowCenteredGrid}"
+        WidthRequest="700">
+        <VerticalStackLayout Grid.Row="0" Margin="0,0,0,10">
+            <Grid>
+                <VerticalStackLayout HorizontalOptions="StartAndExpand">
+                    <Label Style="{StaticResource H2}" Text="{helper:Translate TallyNameText}" />
+                    <Label Text="{Binding Tally.Name}" />
+                </VerticalStackLayout>
+                <Button
+                    Command="{Binding ExportTallyCommand}"
+                    HeightRequest="40"
+                    HorizontalOptions="End"
+                    Text="{helper:Translate ExportTally}" />
+            </Grid>
+        </VerticalStackLayout>
+        <ScrollView Grid.Row="1" VerticalScrollBarVisibility="Always">
+            <Grid RowDefinitions="auto, auto, auto, auto, auto, *">
+                <Label
+                    Grid.Row="0"
+                    Style="{StaticResource H2}"
+                    Text="{helper:Translate ElectionNameText}" />
+                <Label Grid.Row="1" Text="{Binding CurrentElection.Name}" />
+                <Label
+                    Grid.Row="2"
+                    Style="{StaticResource H2}"
+                    Text="{helper:Translate JoinedGuardians}" />
+                <CollectionView
+                    Grid.Row="3"
+                    HorizontalOptions="Center"
+                    ItemsSource="{Binding JoinedGuardians}"
+                    SelectionMode="None"
+                    WidthRequest="450">
+                    <CollectionView.ItemTemplate>
+                        <DataTemplate x:DataType="models:GuardianTallyItem">
+                            <Grid ColumnDefinitions="*, 50, 50, 50">
+                                <Label
+                                    Grid.Column="0"
+                                    FontSize="Medium"
+                                    Text="{Binding Name}"
+                                    VerticalOptions="Center" />
+                                <Image
+                                    Grid.Column="1"
+                                    Margin="10,0,10,0"
+                                    Source="key.png"
+                                    ToolTipProperties.Text="{helper:Translate JoinedText}"
+                                    WidthRequest="32" />
+                                <Image
+                                    Grid.Column="2"
+                                    Margin="10,0,10,0"
+                                    Source="{Binding HasDecryptShares, Converter={StaticResource BackupConverter}}"
+                                    ToolTipProperties.Text="{helper:Translate BackupText}"
+                                    WidthRequest="32" />
+                                <Image
+                                    Grid.Column="3"
+                                    Margin="10,0,10,0"
+                                    Source="notverify.png"
+                                    ToolTipProperties.Text="{helper:Translate Verified}"
+                                    WidthRequest="32" />
+                                <Image
+                                    Grid.Column="3"
+                                    Margin="10,0,10,0"
+                                    IsVisible="{Binding HasResponse}"
+                                    Source="verify.png"
+                                    WidthRequest="32" />
+                            </Grid>
+                        </DataTemplate>
+                    </CollectionView.ItemTemplate>
+                </CollectionView>
+                <Label
+                    Grid.Row="4"
+                    Style="{StaticResource H2}"
+                    Text="{helper:Translate ResultsText}" />
+                <ListView
+                    x:Name="UploadCollectionView"
+                    Grid.Row="5"
+                    ItemsSource="{Binding Contests}"
+                    VerticalScrollBarVisibility="Never">
+                    <ListView.ItemTemplate>
+                        <DataTemplate x:DataType="model:ContestItem">
+                            <ViewCell>
+                                <controls:ContestControl BindingContext="{Binding .}" />
+                            </ViewCell>
+                        </DataTemplate>
+                    </ListView.ItemTemplate>
+                </ListView>
+            </Grid>
+        </ScrollView>
+    </Grid>
+</views:ContentPageBase>

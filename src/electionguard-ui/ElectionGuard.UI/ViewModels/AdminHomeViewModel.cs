@@ -15,6 +15,8 @@ public partial class AdminHomeViewModel : BaseViewModel
 
     public override async Task OnAppearing()
     {
+        await base.OnAppearing();
+
         var keyCeremonies = await _keyCeremonyService.GetAllNotCompleteAsync();
         if (keyCeremonies is not null)
         {

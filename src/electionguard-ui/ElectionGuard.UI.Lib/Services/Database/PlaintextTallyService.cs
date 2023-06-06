@@ -1,12 +1,11 @@
 ﻿using ElectionGuard.UI.Lib.Models;
-using MongoDB.Driver;
 
 namespace ElectionGuard.UI.Lib.Services;
 
 /// <summary>
 /// Data Service for Tallies
 /// </summary>
-public class PlainTallyService : BaseDatabaseService<PlaintextTallyRecord>
+public class PlaintextTallyService : BaseDatabaseService<PlaintextTallyRecord>
 {
     /// <summary>
     /// The collection name to use to get/save data into
@@ -16,7 +15,7 @@ public class PlainTallyService : BaseDatabaseService<PlaintextTallyRecord>
     /// <summary>
     /// Default constructor that sets the collection name
     /// </summary>
-    public PlainTallyService() : base(_collection) { }
+    public PlaintextTallyService() : base(_collection, nameof(PlaintextTallyRecord)) { }
 
     /// <summary>
     /// Gets plain text tally for an election
@@ -26,5 +25,12 @@ public class PlainTallyService : BaseDatabaseService<PlaintextTallyRecord>
     {
         return await GetByFieldAsync(Constants.TallyId, tallyId);
     }
+
+    public Task<PlaintextTallyRecord> SaveAsync(PlaintextTallyRecord data)
+    {
+        var filter = FilterBuilder.Eq(Constants.TallyId, data.TallyId);
+        return SaveAsync(data, filter);
+    }
+
 
 }

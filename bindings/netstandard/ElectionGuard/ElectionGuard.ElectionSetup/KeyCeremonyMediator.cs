@@ -1,7 +1,8 @@
-using System.Diagnostics;
+﻿using System.Diagnostics;
 using ElectionGuard.ElectionSetup.Exceptions;
 using ElectionGuard.ElectionSetup.Extensions;
-using ElectionGuard.UI.Lib.Extensions;
+using ElectionGuard.Extensions;
+using ElectionGuard.Guardians;
 using ElectionGuard.UI.Lib.Models;
 using ElectionGuard.UI.Lib.Services;
 
@@ -77,8 +78,8 @@ public class KeyCeremonyMediator
     protected readonly IGuardianPublicKeyService _publicKeyService;
     protected readonly IVerificationService _verificationService;
 
-    private readonly List<KeyCeremonyStep> _adminSteps = new();
-    private readonly List<KeyCeremonyStep> _guardianSteps = new();
+    private readonly List<StateMachineStep<KeyCeremonyState>> _adminSteps = new();
+    private readonly List<StateMachineStep<KeyCeremonyState>> _guardianSteps = new();
 
     // HACK: This only works as a mutex because we are using 5s long polling.
     // TODO: figure out a more graceful way to support long polling 
@@ -105,42 +106,42 @@ public class KeyCeremonyMediator
     private void CreateAdminSteps()
     {
         _adminSteps.Add(
-            new KeyCeremonyStep()
+            new StateMachineStep<KeyCeremonyState>()
             {
                 State = KeyCeremonyState.PendingGuardiansJoin,
                 RunStep = RunStep2,
                 ShouldRunStep = ShouldAdminStartStep2
             });
         _adminSteps.Add(
-            new KeyCeremonyStep()
+            new StateMachineStep<KeyCeremonyState>()
             {
                 State = KeyCeremonyState.PendingAdminAnnounce,
                 RunStep = RunStep2,
                 ShouldRunStep = AlwaysRun
             });
         _adminSteps.Add(
-            new KeyCeremonyStep()
+            new StateMachineStep<KeyCeremonyState>()
             {
                 State = KeyCeremonyState.PendingGuardianBackups,
                 RunStep = RunStep4,
                 ShouldRunStep = ShouldAdminStartStep4
             });
         _adminSteps.Add(
-            new KeyCeremonyStep()
+            new StateMachineStep<KeyCeremonyState>()
             {
                 State = KeyCeremonyState.PendingAdminToShareBackups,
                 RunStep = RunStep4,
                 ShouldRunStep = AlwaysRun
             });
         _adminSteps.Add(
-            new KeyCeremonyStep()
+            new StateMachineStep<KeyCeremonyState>()
             {
                 State = KeyCeremonyState.PendingGuardiansVerifyBackups,
                 RunStep = RunStep6,
                 ShouldRunStep = ShouldAdminStartStep6
             });
         _adminSteps.Add(
-            new KeyCeremonyStep()
+            new StateMachineStep<KeyCeremonyState>()
             {
                 State = KeyCeremonyState.PendingAdminToPublishJointKey,
                 RunStep = RunStep6,
@@ -151,21 +152,21 @@ public class KeyCeremonyMediator
     private void CreateGuardianSteps()
     {
         _guardianSteps.Add(
-            new KeyCeremonyStep()
+            new StateMachineStep<KeyCeremonyState>()
             {
                 State = KeyCeremonyState.PendingGuardiansJoin,
                 RunStep = RunStep1,
                 ShouldRunStep = ShouldGuardianRunStep1
             });
         _guardianSteps.Add(
-            new KeyCeremonyStep()
+            new StateMachineStep<KeyCeremonyState>()
             {
                 State = KeyCeremonyState.PendingGuardianBackups,
                 RunStep = RunStep3,
                 ShouldRunStep = ShouldGuardianRunStep3
             });
         _guardianSteps.Add(
-            new KeyCeremonyStep()
+            new StateMachineStep<KeyCeremonyState>()
             {
                 State = KeyCeremonyState.PendingGuardiansVerifyBackups,
                 RunStep = RunStep5,
@@ -452,7 +453,7 @@ public class KeyCeremonyMediator
         return new ElectionJointKey()
         {
             JointPublicKey = ElgamalCombinePublicKeys(publicKeys!),
-            CommitmentHash = BigMath.HashElems(commitments)
+            CommitmentHash = Hash.HashElems(commitments)
         };  // H(K 1,0 , K 2,0 ... , K n,0 )
     }
 
@@ -487,7 +488,7 @@ public class KeyCeremonyMediator
     /// <param name="publicKey">Election public key</param>
     private void ReceiveElectionPublicKey(ElectionPublicKey publicKey)
     {
-        _electionPublicKeys[publicKey.OwnerId] = publicKey;
+        _electionPublicKeys[publicKey.GuardianId] = publicKey;
     }
 
     private static async Task<ulong> GetGuardianSequenceOrderAsync(
@@ -652,7 +653,7 @@ public class KeyCeremonyMediator
 
         // append guardian joined to key ceremony (db)
 
-        var newRecord = new GuardianPublicKey
+        using var newRecord = new GuardianPublicKey
         {
             KeyCeremonyId = keyCeremonyId,
             GuardianId = currentGuardianUserName,
@@ -673,7 +674,7 @@ public class KeyCeremonyMediator
             keyCeremonyId);
 
         // save guardian to local drive / yubikey
-        guardian.Save(keyCeremonyId);
+        GuardianStorageExtensions.Save(guardian, keyCeremonyId);
 
         // get public key
         var publicKey = guardian.SharePublicKey();
@@ -734,7 +735,7 @@ public class KeyCeremonyMediator
             keyCeremonyId);
         foreach (var publicKey in publicKeys)
         {
-            guardian!.SaveGuardianKey(publicKey.PublicKey!);
+            guardian!.AddGuardianKey(publicKey.PublicKey!);
         }
 
         // generate election partial key backups
@@ -795,7 +796,7 @@ public class KeyCeremonyMediator
         var publicKeys = await _publicKeyService.GetAllByKeyCeremonyIdAsync(keyCeremonyId);
         foreach (var publicKey in publicKeys)
         {
-            guardian!.SaveGuardianKey(publicKey.PublicKey!);
+            guardian!.AddGuardianKey(publicKey.PublicKey!);
         }
         List<ElectionPartialKeyVerification> verifications = new();
         // TODO: ISSUE #213 throw on invalid backup

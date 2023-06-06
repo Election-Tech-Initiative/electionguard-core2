@@ -43,7 +43,7 @@ public class ElectionService : BaseDatabaseService<Election>
     /// </summary>
     /// <param name="electionId">election id to use</param>
     /// <param name="date">date to save</param>
-    virtual public async Task UpdateExportDateAsync(string electionId, DateTime date)
+    virtual public async Task UpdateEncryptionExportDateAsync(string electionId, DateTime date)
     {
         var filterBuilder = Builders<Election>.Filter;
         var filter = filterBuilder.And(filterBuilder.Eq(Constants.ElectionId, electionId));

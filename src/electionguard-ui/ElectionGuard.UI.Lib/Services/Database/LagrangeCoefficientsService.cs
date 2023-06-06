@@ -1,5 +1,4 @@
 ﻿using ElectionGuard.UI.Lib.Models;
-using MongoDB.Driver;
 
 namespace ElectionGuard.UI.Lib.Services;
 
@@ -16,7 +15,7 @@ public class LagrangeCoefficientsService : BaseDatabaseService<LagrangeCoefficie
     /// <summary>
     /// Default constructor that sets the collection name
     /// </summary>
-    public LagrangeCoefficientsService() : base(_collection) { }
+    public LagrangeCoefficientsService() : base(_collection, nameof(LagrangeCoefficientsRecord)) { }
 
     /// <summary>
     /// Gets Lagrange Coefficients for an election

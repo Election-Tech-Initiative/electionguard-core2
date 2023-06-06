@@ -1,5 +1,5 @@
 using System.Collections.Generic;
-using ElectionGuard.Encryption.Ballot;
+using ElectionGuard.Ballot;
 
 namespace ElectionGuard
 {
@@ -17,7 +17,7 @@ namespace ElectionGuard
     /// seed nonce, both values can be regenerated.  If the `nonce` for this contest is completely random,
     /// then it is required in order to regenerate the proof.
     /// </summary>
-    public partial class CiphertextBallotContest : DisposableBase, IElectionContest
+    public partial class CiphertextBallotContest : DisposableBase, ICiphertextContest
     {
         /// <summary>
         /// The collection of selections for the contest
@@ -27,6 +27,11 @@ namespace ElectionGuard
                 () => (int)SelectionsSize,
                 (index) => GetSelectionAtIndex((ulong)index)
             );
+
+        /// <summary>
+        /// The collection of selections for the contest explicitly implemented as the interface
+        /// </summary>
+        IReadOnlyList<ICiphertextSelection> ICiphertextContest.Selections => Selections;
 
         /// <summary>
         /// The hashed elgamal ciphertext is the encrypted extended data (overvote information
@@ -42,6 +47,7 @@ namespace ElectionGuard
                 return value.IsInvalid ? null : new HashedElGamalCiphertext(value);
             }
         }
+
 
         internal CiphertextBallotContest(External.CiphertextBallotContestHandle handle)
         {

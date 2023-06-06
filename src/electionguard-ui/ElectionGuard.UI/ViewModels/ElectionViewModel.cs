@@ -1,30 +1,55 @@
-﻿using System.Linq;
-using CommunityToolkit.Mvvm.DependencyInjection;
+﻿using CommunityToolkit.Mvvm.DependencyInjection;
 using CommunityToolkit.Mvvm.Input;
+using ElectionGuard.UI.Models;
 
 namespace ElectionGuard.UI.ViewModels;
 
 [QueryProperty(CurrentElectionParam, nameof(CurrentElection))]
+[QueryProperty(ElectionIdParam, nameof(ElectionId))]
 public partial class ElectionViewModel : BaseViewModel
 {
-    private KeyCeremonyService _keyCeremonyService;
-    private ManifestService _manifestService;
-    private BallotUploadService _uploadService;
-    private ElectionService _electionService;
-    private TallyService _tallyService;
+    public const string CurrentElectionParam = "CurrentElection";
+    public const string ElectionIdParam = "ElectionId";
 
-    public ElectionViewModel(IServiceProvider serviceProvider, KeyCeremonyService keyCeremonyService, ManifestService manifestService, BallotUploadService uploadService, ElectionService electionService, TallyService tallyService) : base(null, serviceProvider)
+    private readonly IStorageService _storageService;
+    private readonly IStorageService _driveService;
+    private readonly KeyCeremonyService _keyCeremonyService;
+    private readonly ManifestService _manifestService;
+    private readonly BallotUploadService _uploadService;
+    private readonly ElectionService _electionService;
+    private readonly TallyService _tallyService;
+    private readonly ConstantsService _constantsService;
+    private readonly ContextService _contextService;
+
+    public ElectionViewModel(
+        IServiceProvider serviceProvider,
+        KeyCeremonyService keyCeremonyService,
+        ManifestService manifestService,
+        ContextService contextService,
+        ConstantsService constantsService,
+        BallotUploadService uploadService,
+        ElectionService electionService,
+        TallyService tallyService,
+        ZipStorageService zipStorageService,
+        IStorageService driveService) : base(null, serviceProvider)
     {
         _keyCeremonyService = keyCeremonyService;
         _manifestService = manifestService;
         _uploadService = uploadService;
         _electionService = electionService;
         _tallyService = tallyService;
+        _constantsService = constantsService;
+        _contextService = contextService;
+        _storageService = zipStorageService;
+        _driveService = driveService;
     }
 
     [ObservableProperty]
     [NotifyCanExecuteChangedFor(nameof(AddBallotsCommand))]
     private Election? _currentElection;
+
+    [ObservableProperty]
+    private string _electionId;
 
     [ObservableProperty]
     private Manifest? _manifest;
@@ -49,6 +74,11 @@ public partial class ElectionViewModel : BaseViewModel
     [NotifyCanExecuteChangedFor(nameof(CreateTallyCommand))]
     [NotifyCanExecuteChangedFor(nameof(ReviewChallengedCommand))]
     private long _ballotSpoiledTotal = 0;
+
+    [ObservableProperty]
+    [NotifyCanExecuteChangedFor(nameof(CreateTallyCommand))]
+    [NotifyCanExecuteChangedFor(nameof(ReviewChallengedCommand))]
+    private long _ballotChallengedTotal = 0;
 
     [ObservableProperty]
     private long _ballotDuplicateTotal = 0;
@@ -83,12 +113,35 @@ public partial class ElectionViewModel : BaseViewModel
     [ObservableProperty]
     private TallyRecord? _currentTally;
 
-
     partial void OnBallotsUploadedDateTimeChanged(DateTime value)
     {
         Step2Complete = true;
     }
 
+    partial void OnCurrentTallyChanged(TallyRecord? value)
+    {
+        if (value is null)
+        {
+            return;
+        }
+
+        if (value.State == TallyState.Complete)
+        {
+            MainThread.BeginInvokeOnMainThread(async () =>
+                await NavigationService.GoToPage(typeof(ViewTallyViewModel), new Dictionary<string, object>
+                {
+                    { "TallyId", value.TallyId! }
+                }));
+        }
+        else if (value.State != TallyState.Abandoned)
+        {
+            MainThread.BeginInvokeOnMainThread(async () =>
+            await NavigationService.GoToPage(typeof(TallyProcessViewModel), new Dictionary<string, object>
+            {
+                { "TallyId", value.TallyId! }
+            }));
+        }
+    }
 
     partial void OnCurrentElectionChanged(Election? value)
     {
@@ -104,6 +157,7 @@ public partial class ElectionViewModel : BaseViewModel
                 BallotCountTotal = 0;
                 BallotAddedTotal = 0;
                 BallotSpoiledTotal = 0;
+                BallotChallengedTotal = 0;
                 BallotDuplicateTotal = 0;
                 BallotRejectedTotal = 0;
                 uploads.ForEach((upload) =>
@@ -111,27 +165,38 @@ public partial class ElectionViewModel : BaseViewModel
                     BallotUploads.Add(upload);
                     BallotCountTotal += upload.BallotCount;
                     BallotAddedTotal += upload.BallotImported;
+                    BallotChallengedTotal += upload.BallotChallenged;
                     BallotSpoiledTotal += upload.BallotSpoiled;
                     BallotDuplicateTotal += upload.BallotDuplicated;
                     BallotRejectedTotal += upload.BallotRejected;
                 });
 
                 Tallies.Clear();
-                var tallies = await _tallyService.GetByElectionIdAsync(value?.ElectionId);
+                var tallies = await _tallyService.GetAllActiveByElectionIdAsync(value?.ElectionId);
                 foreach (var item in tallies)
                 {
                     Tallies.Add(item);
                 }
 
-                Step1Complete = CurrentElection.ExportEncryptionDateTime != null;
+                Step1Complete = CurrentElection?.ExportEncryptionDateTime != null;
                 Step2Complete = BallotAddedTotal + BallotSpoiledTotal > 0;
                 Step4Complete = Tallies.Count > 0;
                 Step5Complete = Tallies.Count(t => t.LastExport != null) > 0;
             }
-            catch (Exception ex)
+            catch (Exception)
             {
             }
         });
+    }
+
+    partial void OnElectionIdChanged(string value)
+    {
+        if (string.IsNullOrEmpty(value))
+        {
+            return;
+        }
+
+        _ = Shell.Current.CurrentPage.Dispatcher.DispatchAsync(async () => CurrentElection = await _electionService.GetByElectionIdAsync(value));
     }
 
     [RelayCommand(CanExecute = nameof(CanCreateTally))]
@@ -145,7 +210,10 @@ public partial class ElectionViewModel : BaseViewModel
         await NavigationService.GoToPage(typeof(CreateTallyViewModel), pageParams);
     }
 
-    private bool CanCreateTally() => BallotCountTotal > 0 || BallotSpoiledTotal > 0;
+    private bool CanCreateTally()
+    {
+        return BallotCountTotal > 0 || BallotSpoiledTotal > 0;
+    }
 
     [RelayCommand(CanExecute = nameof(CanUpload))]
     private async Task AddBallots()
@@ -158,8 +226,10 @@ public partial class ElectionViewModel : BaseViewModel
         await NavigationService.GoToPage(typeof(BallotUploadViewModel), pageParams);
     }
 
-    private bool CanUpload() => CurrentElection?.ExportEncryptionDateTime != null;
-
+    private bool CanUpload()
+    {
+        return CurrentElection?.ExportEncryptionDateTime != null;
+    }
 
     [RelayCommand(CanExecute = nameof(CanReview))]
     private async Task ReviewChallenged()
@@ -167,24 +237,68 @@ public partial class ElectionViewModel : BaseViewModel
         // add code to go to the Challenged ballot page
     }
 
-    private bool CanReview() => BallotSpoiledTotal > 0;
-
+    private bool CanReview()
+    {
+        return BallotSpoiledTotal > 0;
+    }
 
     [RelayCommand]
     private async Task ExportEncryption()
     {
-        var pageParams = new Dictionary<string, object>
-            {
-                { BallotUploadViewModel.ElectionIdParam, CurrentElection.ElectionId }
-            };
+        const string egDriveLabel = "egdrive";
 
-        // TODO create the zip for the election
+        var answer = await Shell.Current.CurrentPage.DisplayAlert(
+            AppResources.ExportDriveWarningTitle,
+            AppResources.ExportDriveWarning,
+            AppResources.YesText,
+            AppResources.NoText);
 
-        // await NavigationService.GoToPage(typeof(BallotUploadViewModel), pageParams);
-        await _electionService.UpdateExportDateAsync(CurrentElection.ElectionId, DateTime.Now);
+        if (!answer)
+        {
+            return;
+        }
 
-        // this is for testing only and will be removed
-        CurrentElection.ExportEncryptionDateTime = DateTime.Now;
+        // check for any usb drives named egDrive
+        var egDrives = from drive in DriveInfo.GetDrives()
+                       where drive != null
+                       where drive.DriveType == DriveType.Removable
+                       where drive.VolumeLabel.ToLower() == egDriveLabel
+                       select drive;
+
+        var context = await _contextService.GetByElectionIdAsync(CurrentElection.ElectionId);
+        var constants = await _constantsService.GetByElectionIdAsync(CurrentElection.ElectionId);
+        var manifest = await _manifestService.GetByElectionIdAsync(CurrentElection.ElectionId);
+
+        if (context == null || constants == null || manifest == null)
+        {
+            // there's a data problem. This should never happen.
+            return;
+        }
+
+        var encryptionPackage = new EncryptionPackage(context, constants, manifest);
+
+        foreach (var drive in egDrives)
+        {
+            const string artifactFolder = "artifacts";
+
+            var destinationFolder = Path.Combine(drive.Name, artifactFolder);
+            _ = Directory.CreateDirectory(destinationFolder);
+
+            _driveService.UpdatePath(destinationFolder);
+            _driveService.ToFiles(encryptionPackage);
+
+        }
+
+        if (egDrives.Count() >= 0)
+        {
+            await MarkCurrentElectionAsExported();
+        }
+    }
+
+    private async Task MarkCurrentElectionAsExported()
+    {
+        CurrentElection.ExportEncryptionDateTime = DateTime.UtcNow;
+        await _electionService.UpdateEncryptionExportDateAsync(CurrentElection.ElectionId, CurrentElection.ExportEncryptionDateTime.Value);
         AddBallotsCommand.NotifyCanExecuteChanged();
         Step1Complete = true;
     }
@@ -204,11 +318,15 @@ public partial class ElectionViewModel : BaseViewModel
         ManifestName = Manifest.Name.GetTextAt(0).Value;
     }
 
-    public const string CurrentElectionParam = "CurrentElection";
-
     public override void Dispose()
     {
         base.Dispose();
         GC.SuppressFinalize(this);
     }
+
+    public override async Task OnAppearing()
+    {
+        await base.OnAppearing();
+    }
+
 }

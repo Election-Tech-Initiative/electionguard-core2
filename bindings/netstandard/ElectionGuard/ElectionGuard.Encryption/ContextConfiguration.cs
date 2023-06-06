@@ -1,5 +1,3 @@
-using System;
-
 namespace ElectionGuard
 {
     using NativeContextConfig = NativeInterface.ContextConfiguration.ContextConfigurationHandle;

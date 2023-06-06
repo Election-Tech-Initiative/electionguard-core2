@@ -1,4 +1,7 @@
-using ElectionGuard.Encryption.Ballot;
+﻿using System.Text;
+using ElectionGuard.Ballot;
+using Newtonsoft.Json;
+
 namespace ElectionGuard.Decryption.Tally;
 
 /// <summary>
@@ -30,6 +33,11 @@ public class PlaintextTallySelection
     /// </summary>
     public ElementModP Value { get; set; }
 
+    /// <summary>
+    /// The proof that the decrypted representation of the sum of all ballots for the selection is correct
+    /// </summary>
+    public ChaumPedersenProof? Proof { get; set; }
+
     public PlaintextTallySelection(
         IElectionSelection selection) : this(
             selection.ObjectId,
@@ -56,34 +64,62 @@ public class PlaintextTallySelection
     public PlaintextTallySelection(
         IElectionSelection selection,
         ulong tally,
-        ElementModP value) : this(
+        ElementModP value, ChaumPedersenProof proof) : this(
             selection.ObjectId,
             selection.SequenceOrder,
             selection.DescriptionHash,
-            tally, value)
+            tally, value, proof)
     {
 
     }
 
+    [JsonConstructor]
     public PlaintextTallySelection(
         string objectId,
         ulong sequenceOrder,
         ElementModQ descriptionHash,
         ulong tally,
-        ElementModP value)
+        ElementModP value,
+        ChaumPedersenProof? proof = null)
     {
         ObjectId = objectId;
         SequenceOrder = sequenceOrder;
         DescriptionHash = new(descriptionHash);
         Tally = tally;
         Value = new(value);
+        if (proof is not null)
+        {
+            Proof = new(proof);
+        }
+    }
+
+    public PlaintextTallySelection(
+        PlaintextTallySelection other) : this(
+            other.ObjectId,
+            other.SequenceOrder,
+            other.DescriptionHash,
+            other.Tally,
+            other.Value,
+            other.Proof)
+    {
+
     }
 
     protected override void DisposeUnmanaged()
     {
         base.DisposeManaged();
-        DescriptionHash.Dispose();
-        Value.Dispose();
+        DescriptionHash?.Dispose();
+        Value?.Dispose();
+        Proof?.Dispose();
+    }
+
+    public override string ToString()
+    {
+        var builder = new StringBuilder();
+        _ = builder.AppendLine($"Selection: {ObjectId} ({SequenceOrder}) {DescriptionHash}");
+        _ = builder.AppendLine($"     Vote: {Tally}");
+        _ = builder.AppendLine($"    Value: {Value}");
+        return builder.ToString();
     }
 
     # region IEquatable

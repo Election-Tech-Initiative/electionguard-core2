@@ -1,4 +1,4 @@
-using System.Collections.Concurrent;
+﻿using System.Collections.Concurrent;
 using ElectionGuard.UI.Lib.Models;
 using ElectionGuard.UI.Lib.Services;
 using MongoDB.Driver;
@@ -10,6 +10,11 @@ public abstract class MockBaseDatabaseServiceBase<T> : DisposableBase, IDatabase
     protected readonly ConcurrentDictionary<string, T> Collection = new();
 
     public Task<long> CountByFilterAsync(FilterDefinition<T> filter, string? table = null)
+    {
+        throw new NotImplementedException();
+    }
+
+    public Task<bool> ExistsByFilterAsync(FilterDefinition<T> filter, string? table = null)
     {
         throw new NotImplementedException();
     }
@@ -44,7 +49,7 @@ public abstract class MockBaseDatabaseServiceBase<T> : DisposableBase, IDatabase
         throw new NotImplementedException();
     }
 
-    public abstract Task<T> SaveAsync(T data, string? table = null);
+    public abstract Task<T> SaveAsync(T data, FilterDefinition<T>? customFilter = null, string? table = null);
 
     public Task UpdateAsync(FilterDefinition<T> filter, UpdateDefinition<T> update, string? table = null)
     {

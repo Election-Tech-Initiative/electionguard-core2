@@ -1,11 +1,11 @@
-using ElectionGuard.Decryption.Decryption;
+﻿using ElectionGuard.Decryption.Decryption;
 using ElectionGuard.Decryption.Tally;
 using ElectionGuard.Decryption.Tests.Tally;
 using ElectionGuard.ElectionSetup.Tests.Generators;
 using ElectionGuard.Encryption.Utils.Generators;
 using ElectionGuard.Encryption.Utils.Converters;
 using Newtonsoft.Json;
-using ElectionGuard.UI.Lib.Extensions;
+using ElectionGuard.Extensions;
 
 namespace ElectionGuard.Decryption.Tests.Decryption;
 
@@ -29,7 +29,10 @@ public class TestDecryptionData : DisposableBase
         Manifest manifest,
         int castBallotCount,
         int challengedBallotCount,
-        int spoiledBallotCount, Random? random = null)
+        int spoiledBallotCount,
+        ElementModQ? seed = null,
+        ElementModQ? nonce = null,
+        Random? random = null)
     {
         random ??= new Random(1);
         var ballotCount = castBallotCount + challengedBallotCount + spoiledBallotCount;
@@ -53,7 +56,12 @@ public class TestDecryptionData : DisposableBase
         // generate the ballots
         var plaintextBallots = BallotGenerator.GetFakeBallots(
             election.InternalManifest, random, ballotCount);
-        var ciphertextBallots = BallotGenerator.GetFakeCiphertextBallots(
+
+        // encrypt the ballots
+        var ciphertextBallots = seed != null && nonce != null ?
+        BallotGenerator.GetFakeCiphertextBallots(
+            election.InternalManifest, election.Context, plaintextBallots, seed, nonce)
+        : BallotGenerator.GetFakeCiphertextBallots(
             election.InternalManifest, election.Context, plaintextBallots, random);
 
         // cast, challenge and spoil the ballots

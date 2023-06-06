@@ -3,18 +3,30 @@
 public partial class GuardianHomeViewModel : BaseViewModel
 {
     private readonly KeyCeremonyService _keyCeremonyService;
+    private readonly GuardianPublicKeyService _guardianService;
+    private readonly TallyService _tallyService;
+    private readonly TallyJoinedService _tallyJoinedService;
 
-    public GuardianHomeViewModel(IServiceProvider serviceProvider, KeyCeremonyService keyCeremonyService) : base("GuardianHome", serviceProvider)
+    public GuardianHomeViewModel(IServiceProvider serviceProvider, 
+        KeyCeremonyService keyCeremonyService,
+        GuardianPublicKeyService guardianService,
+        TallyService tallyService,
+        TallyJoinedService tallyJoinedService) : base("GuardianHome", serviceProvider)
     {
         _keyCeremonyService = keyCeremonyService;
-        // create some fake tallies to add to the list
-}
+        _guardianService = guardianService;
+        _tallyService = tallyService;
+        _tallyJoinedService = tallyJoinedService;
+    }
 
-public override async Task OnAppearing()
+    public override async Task OnAppearing()
     {
-        _timer.Start();
-        PollingTimer_Tick(this, null);
         await base.OnAppearing();
+
+        _timer.Tick += PollingTimer_Tick;
+        _timer.Start();
+
+        PollingTimer_Tick(this, null);
     }
 
     [ObservableProperty]
@@ -38,11 +50,29 @@ public override async Task OnAppearing()
 
     partial void OnCurrentKeyCeremonyChanged(KeyCeremonyRecord? value)
     {
-        if (CurrentKeyCeremony == null) return;
+        if (value == null)
+        {
+            return;
+        }
+
         MainThread.BeginInvokeOnMainThread(async() =>
             await NavigationService.GoToPage(typeof(ViewKeyCeremonyViewModel), new Dictionary<string, object>
             {
-                { "KeyCeremonyId", CurrentKeyCeremony.KeyCeremonyId! }
+                { "KeyCeremonyId", value.KeyCeremonyId! }
+            }));
+    }
+
+    partial void OnCurrentTallyChanged(TallyRecord? value)
+    {
+        if (value == null)
+        {
+            return;
+        }
+
+        MainThread.BeginInvokeOnMainThread(async () =>
+            await NavigationService.GoToPage(typeof(TallyProcessViewModel), new Dictionary<string, object>
+            {
+                { "TallyId", value.TallyId! }
             }));
     }
 
@@ -54,7 +84,16 @@ public override async Task OnAppearing()
         {
             KeyCeremonies.Add(item);
         }
+
+        var tallies = await _tallyService.GetAllByKeyCeremoniesAsync(await _guardianService.GetKeyCeremonyIdsAsync(UserName!));
+        var rejected = await _tallyJoinedService.GetGuardianRejectedIdsAsync(UserName!);
+        Tallies.Clear();
+        foreach (var item in tallies)
+        {
+            if (!rejected.Contains(item.TallyId) && item.State < TallyState.Complete)
+            {
+                Tallies.Add(item);
+            }
+        }
     }
-
-
 }

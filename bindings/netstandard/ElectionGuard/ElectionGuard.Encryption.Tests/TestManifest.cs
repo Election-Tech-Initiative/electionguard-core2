@@ -139,6 +139,7 @@ namespace ElectionGuard.Encryption.Tests
 
             var result = new Manifest(
                 "test-manifest",
+                "1.0",
                 ElectionType.General,
                 DateTime.Now.AddDays(1),
                 DateTime.Now.AddDays(1).AddDays(1),
@@ -176,6 +177,7 @@ namespace ElectionGuard.Encryption.Tests
 
             var result = new Manifest(
                 "test-manifest",
+                "1.0",
                 ElectionType.General,
                 DateTime.Now,
                 DateTime.Now,

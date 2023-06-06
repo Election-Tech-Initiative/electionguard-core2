@@ -194,21 +194,6 @@ EG_API eg_electionguard_status_t eg_element_mod_q_rand_q_new(eg_element_mod_q_t 
 
 #endif
 
-#ifndef ElementModP Group Hash Functions
-
-EG_API eg_electionguard_status_t eg_hash_elems_modp_modp(eg_element_mod_p_t *publickey,
-                                                         eg_element_mod_p_t *commitment,
-                                                         eg_element_mod_q_t **out_handle);
-
-EG_API eg_electionguard_status_t eg_hash_elems_string_int(char *publickey, uint64_t commitment,
-                                                          eg_element_mod_q_t **out_handle);
-
-EG_API eg_electionguard_status_t eg_hash_elems_array(eg_element_mod_p_t *in_data[],
-                                                     uint64_t in_data_size,
-                                                     eg_element_mod_q_t **out_handle);
-
-#endif
-
 #ifdef __cplusplus
 }
 #endif

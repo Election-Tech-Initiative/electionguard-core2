@@ -169,6 +169,7 @@
 	</ItemGroup>
 
 	<ItemGroup>
+	  <ProjectReference Include="..\..\..\bindings\netstandard\ElectionGuard\ElectionGuard.Decryption\ElectionGuard.Decryption.csproj" />
 	  <ProjectReference Include="..\..\..\bindings\netstandard\ElectionGuard\ElectionGuard.ElectionSetup\ElectionGuard.ElectionSetup.csproj" />
 	  <ProjectReference Include="..\..\..\bindings\netstandard\ElectionGuard\ElectionGuard.Encryption\ElectionGuard.Encryption.csproj">
 	    <CopyLocalSatelliteAssemblies>True</CopyLocalSatelliteAssemblies>
@@ -178,13 +179,13 @@
 	</ItemGroup>
 
 	<ItemGroup>
+	  <Compile Update="Controls\ContestControl.xaml.cs">
+	    <DependentUpon>ContestControl.xaml</DependentUpon>
+	  </Compile>
 	  <Compile Update="Resx\AppResources.Designer.cs">
 	    <DesignTime>True</DesignTime>
 	    <AutoGen>True</AutoGen>
 	    <DependentUpon>AppResources.resx</DependentUpon>
-	  </Compile>
-	  <Compile Update="Views\EncryptionExportPage.xaml.cs">
-	    <DependentUpon>EncryptionExportPage.xaml</DependentUpon>
 	  </Compile>
 	  <Compile Update="Views\CreateElectionAdminPage.xaml.cs">
 	    <DependentUpon>CreateElectionAdminPage.xaml</DependentUpon>
@@ -219,6 +220,9 @@
 	</ItemGroup>
 	<ItemGroup>
 	  <MauiXaml Update="Controls\ExpanderControl.xaml">
+	    <Generator>MSBuild:Compile</Generator>
+	  </MauiXaml>
+	  <MauiXaml Update="Controls\ContestControl.xaml">
 	    <Generator>MSBuild:Compile</Generator>
 	  </MauiXaml>
 	  <MauiXaml Update="Controls\LabelValueControl.xaml">

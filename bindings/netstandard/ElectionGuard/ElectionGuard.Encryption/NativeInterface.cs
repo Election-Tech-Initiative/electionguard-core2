@@ -1324,6 +1324,10 @@ namespace ElectionGuard
             internal static extern Status CryptoHash(
                 CandidateHandle handle,
                 out ElementModQ.ElementModQHandle crypto_hash);
+
+            [DllImport(DllName, EntryPoint = "eg_candidate_get_is_write_in",
+                CallingConvention = CallingConvention.Cdecl, SetLastError = true)]
+            internal static extern bool GetIsWriteIn(CandidateHandle handle);
         }
 
         #endregion
@@ -1769,6 +1773,7 @@ namespace ElectionGuard
                 CallingConvention = CallingConvention.Cdecl, SetLastError = true)]
             internal static extern Status New(
                 [MarshalAs(UnmanagedType.LPStr)] string electionScopeId,
+                [MarshalAs(UnmanagedType.LPStr)] string specVersion,
                 ElectionType electionType,
                 ulong startDate,
                 ulong endDate,
@@ -1793,6 +1798,7 @@ namespace ElectionGuard
                 CallingConvention = CallingConvention.Cdecl, SetLastError = true)]
             internal static extern Status New(
                 [MarshalAs(UnmanagedType.LPStr)] string electionScopeId,
+                [MarshalAs(UnmanagedType.LPStr)] string specVersion,
                 ElectionType electionType,
                 ulong startDate,
                 ulong endDate,

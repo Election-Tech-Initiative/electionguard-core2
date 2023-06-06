@@ -195,9 +195,6 @@
   <data name="AddBallots" xml:space="preserve">
     <value>Papeletas</value>
   </data>
-  <data name="BallotCountText" xml:space="preserve">
-    <value>¡Recuento de papeletas!</value>
-  </data>
   <data name="BallotStylesText" xml:space="preserve">
     <value>¡Estilos de papeleta!</value>
   </data>
@@ -491,5 +488,95 @@
   </data>
   <data name="ReviewSpoiledText" xml:space="preserve">
     <value>¡Revisa el desafío!</value>
+  </data>
+  <data name="ExportDriveWarning" xml:space="preserve">
+    <value>Asegúrese de que el almacenamiento extraíble de EGDrive esté conectado al dispositivo. ¡Tenga en cuenta que esto reemplazará cualquier paquete de cifrado actualmente en todos los dispositivos EGDrive!</value>
+  </data>
+  <data name="ExportDriveWarningTitle" xml:space="preserve">
+    <value>¡Exportar paquete de cifrado!</value>
+  </data>
+  <data name="ProcessTallyJoinNo" xml:space="preserve">
+    <value>¡No, no te unas a Tally!</value>
+  </data>
+  <data name="ProcessTallyJoinYes" xml:space="preserve">
+    <value>¡Únete a Tally!</value>
+  </data>
+  <data name="ChoiceText" xml:space="preserve">
+    <value>Opción</value>
+  </data>
+  <data name="PartyText" xml:space="preserve">
+    <value>Entidad</value>
+  </data>
+  <data name="PercentText" xml:space="preserve">
+    <value>%!</value>
+  </data>
+  <data name="VotesText" xml:space="preserve">
+    <value>Votos</value>
+  </data>
+  <data name="ViewTally" xml:space="preserve">
+    <value>Conteo</value>
+  </data>
+  <data name="ExportTally" xml:space="preserve">
+    <value>¡Exportar registro de elección!</value>
+  </data>
+  <data name="Uploading" xml:space="preserve">
+    <value>Cargando...</value>
+  </data>
+  <data name="BallotCountText" xml:space="preserve">
+    <value>Recuento</value>
+  </data>
+  <data name="ChallengedText" xml:space="preserve">
+    <value>Cuestionado</value>
+  </data>
+  <data name="ElectionNameText" xml:space="preserve">
+    <value>Elección</value>
+  </data>
+  <data name="JoinedGuardians" xml:space="preserve">
+    <value>¡Únete a los Guardianes!</value>
+  </data>
+  <data name="Status" xml:space="preserve">
+    <value>Estado</value>
+    </data>
+  <data name="TallyAllChallengesResponded" xml:space="preserve">
+    <value>¡Todos los Guardianes respondieron al Desafío!</value>
+  </data>
+  <data name="TallyAllDecryptionsComputed" xml:space="preserve">
+    <value>¡Todas las acciones de Guardian calculadas!</value>
+  </data>
+  <data name="TallyChallengeCreated" xml:space="preserve">
+    <value>Desafío creado</value>
+  </data>
+  <data name="TallyComplete" xml:space="preserve">
+    <value>¡Verificado y resultados calculados!</value>
+  </data>
+  <data name="TallyQuorumReachedText" xml:space="preserve">
+    <value>¡Se ha alcanzado el quórum!</value>
+  </data>
+  <data name="TallySubtalliesCombined" xml:space="preserve">
+    <value>¡Las papeletas han sido contadas!</value>
+  </data>
+  <data name="TallyChecklist" xml:space="preserve">
+    <value>¡Proceso de recuento!</value>
+  </data>
+  <data name="ProcessTallyAbandon" xml:space="preserve">
+    <value>¡Cancela Tally!</value>
+  </data>
+  <data name="ProcessTallyStartTally" xml:space="preserve">
+    <value>¡Empieza Tally!</value>
+  </data>
+  <data name="OkText" xml:space="preserve">
+    <value>Aceptar</value>
+  </data>
+  <data name="AbandonTallyText" xml:space="preserve">
+    <value>Tally ha sido cancelada por el administrador de elecciones. Consulte el administrador para obtener detalles adicionales.!</value>
+  </data>
+  <data name="AbandonTallyTitle" xml:space="preserve">
+    <value>¡Cuenta cancelada!</value>
+  </data>
+  <data name="ResultsText" xml:space="preserve">
+    <value>Resultados</value>
+  </data>
+  <data name="WriteinText" xml:space="preserve">
+    <value>¡Escribe al candidato!</value>
   </data>
 </root>
