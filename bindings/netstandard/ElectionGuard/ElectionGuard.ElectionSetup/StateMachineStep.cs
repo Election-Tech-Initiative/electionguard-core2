@@ -22,9 +22,24 @@ public class StateMachineStep<T> where T : struct, IConvertible
     /// </summary>
     public Func<Task<bool>> ShouldRunStep { get; set; } = new(DoNotRun);
 
-    private static async Task<bool> DoNotRun()
+    public static async Task<bool> DoNotRun()
     {
         return await Task.FromResult(false);
     }
+
+    public static async Task<bool> AlwaysRun()
+    {
+        return await Task.FromResult(true);
+    }
 }
 
+public class StateMachineStep<T, Q> : StateMachineStep<T>
+    where T : struct, IConvertible 
+{
+    public new Func<Q, Task<bool>> ShouldRunStep { get; set; } = new(DoNotRun);
+
+    public new Func<Q, Task> RunStep { get; set; } = new(DoNotRun);
+
+    public new static Func<Q, Task<bool>> DoNotRun = async (Q _) => await StateMachineStep<T>.DoNotRun();
+    public new static Func<Q, Task<bool>> AlwaysRun = async (Q _) => await StateMachineStep<T>.AlwaysRun();
+}
