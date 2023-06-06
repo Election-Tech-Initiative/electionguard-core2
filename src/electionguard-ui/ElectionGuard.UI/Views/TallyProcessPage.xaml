@@ -4,6 +4,7 @@
     xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
     xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
     xmlns:controls="clr-namespace:ElectionGuard.UI.Controls"
+    xmlns:converter="clr-namespace:ElectionGuard.UI.Converters"
     xmlns:helper="clr-namespace:ElectionGuard.UI.Helpers"
     xmlns:model="clr-namespace:ElectionGuard.UI.Lib.Models;assembly=ElectionGuard.UI.Lib"
     xmlns:models="clr-namespace:ElectionGuard.UI.Models"
@@ -16,8 +17,8 @@
     <ContentPage.Resources>
         <ResourceDictionary>
             <toolkit:InvertedBoolConverter x:Key="InvertedBoolConverter" />
-            <helper:TallyNotStartedConverter x:Key="TallyNotStartedConverter" />
-            <helper:TallyCanBeAbandonedConverter x:Key="TallyCanBeAbandonedConverter" />
+            <converter:TallyNotStartedConverter x:Key="TallyNotStartedConverter" />
+            <converter:TallyCanBeAbandonedConverter x:Key="TallyCanBeAbandonedConverter" />
         </ResourceDictionary>
     </ContentPage.Resources>
 
@@ -32,7 +33,7 @@
                     Grid.Column="1"
                     Command="{Binding AbandonTallyCommand}"
                     HorizontalOptions="End"
-                    IsVisible="{Binding Tally.State, Converter={StaticResource TallyCanBeAbandonedConverter}}"
+                    IsVisible="{Binding Tally.State, Converter={StaticResource TallyCanBeAbandonedConverter}, ConverterParameter={Binding IsAdmin}}"
                     Text="{helper:Translate ProcessTallyAbandonTally}"
                     VerticalOptions="Start" />
             </Grid>
