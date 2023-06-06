@@ -1,4 +1,6 @@
-﻿namespace ElectionGuard.UI.Lib.Models;
+﻿using System.Collections.ObjectModel;
+
+namespace ElectionGuard.UI.Lib.Models;
 
 public partial class ElectionItem : ObservableObject
 {

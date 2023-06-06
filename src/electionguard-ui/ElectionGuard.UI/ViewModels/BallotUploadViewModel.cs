@@ -142,8 +142,6 @@ public partial class BallotUploadViewModel : BaseViewModel
 
         await Parallel.ForEachAsync(ballots, async (currentBallot, cancel) =>
         {
-            await Parallel.ForEachAsync(ballots, async (currentBallot, cancellationToken) =>
-            {
             var filename = Path.GetFileName(currentBallot);
             var ballotData = File.ReadAllText(currentBallot);
             using var ballot = new CiphertextBallot(ballotData);
@@ -193,16 +191,10 @@ public partial class BallotUploadViewModel : BaseViewModel
                         var result = ciphertextTally.Accumulate(ballot, true);
                     }
                 }
-                catch (Exception ex)
-                {
             }
             _ = Interlocked.Increment(ref totalCount);
             UploadText = $"{AppResources.SuccessText} {totalCount} / {ballots.Length} {AppResources.Success2Text}";
-        }
-            catch (Exception ex)
-            {
-        }
-    });
+        });
 
         // update totals before saving
         upload.BallotCount = totalCount;
@@ -217,8 +209,8 @@ public partial class BallotUploadViewModel : BaseViewModel
         try
         {
             _ = await _uploadService.SaveAsync(upload);
-    _timer?.Stop();
-    ResultsText = $"{AppResources.SuccessText} {totalCount} {AppResources.Success2Text}";
+            _timer?.Stop();
+            ResultsText = $"{AppResources.SuccessText} {totalCount} {AppResources.Success2Text}";
             ShowPanel = BallotUploadPanel.Results;
 
             var record = new CiphertextTallyRecord()
@@ -228,103 +220,103 @@ public partial class BallotUploadViewModel : BaseViewModel
                 IsExportable = false,
                 CiphertextTallyData = ciphertextTally.ToJson()
             };
-    _ = await _ciphertextTallyService.SaveAsync(record);
-}
+            _ = await _ciphertextTallyService.SaveAsync(record);
+        }
         catch (Exception)
         {
         }
     }
 
     private bool CanUpload()
-{
-    return DeviceFile != string.Empty && BallotFolder != string.Empty;
-}
-
-[RelayCommand]
-private async Task PickDeviceFile()
-{
-    var customFileType = new FilePickerFileType(
-            new Dictionary<DevicePlatform, IEnumerable<string>>
-            {
-                    { DevicePlatform.WinUI, new[] { ".json" } }, // file extension
-                    { DevicePlatform.macOS, new[] { "json" } }, // UTType values
-            });
-    var options = new PickOptions() { FileTypes = customFileType, PickerTitle = AppResources.SelectManifest };
-    FileErrorMessage = string.Empty;
-    var file = await FilePicker.PickAsync(options);
-    if (file == null)
     {
-        FileErrorMessage = "No file was picked";
-        // if the picking was canceled then do not change anything
-        return;
+        return DeviceFile != string.Empty && BallotFolder != string.Empty;
     }
-    // check if it is a device file
-    try
+
+    [RelayCommand]
+    private async Task PickDeviceFile()
     {
-        var data = File.ReadAllText(file.FullPath, Encoding.UTF8);
-        EncryptionDevice device = new(data);
-        DeviceFile = file.FullPath;
+        var customFileType = new FilePickerFileType(
+                new Dictionary<DevicePlatform, IEnumerable<string>>
+                {
+                        { DevicePlatform.WinUI, new[] { ".json" } }, // file extension
+                        { DevicePlatform.macOS, new[] { "json" } }, // UTType values
+                });
+        var options = new PickOptions() { FileTypes = customFileType, PickerTitle = AppResources.SelectManifest };
+        FileErrorMessage = string.Empty;
+        var file = await FilePicker.PickAsync(options);
+        if (file == null)
+        {
+            FileErrorMessage = "No file was picked";
+            // if the picking was canceled then do not change anything
+            return;
+        }
+        // check if it is a device file
+        try
+        {
+            var data = File.ReadAllText(file.FullPath, Encoding.UTF8);
+            EncryptionDevice device = new(data);
+            DeviceFile = file.FullPath;
+        }
+        catch (Exception)
+        {
+            FileErrorMessage = "File is not a device file";
+        }
     }
-    catch (Exception)
+
+    [RelayCommand]
+    private async Task PickBallotFolder()
     {
-        FileErrorMessage = "File is not a device file";
+        CancellationToken token = new();
+        try
+        {
+            var folder = await FolderPicker.Default.PickAsync(token);
+            BallotFolder = folder.Folder.Path;
+            BallotFolderName = folder.Folder.Name;
+            FolderErrorMessage = string.Empty;
+            // verify folder
+        }
+        catch (Exception ex)
+        {
+            BallotFolder = string.Empty;
+            BallotFolderName = string.Empty;
+            FolderErrorMessage = ex.Message;
+        }
     }
-}
 
-[RelayCommand]
-private async Task PickBallotFolder()
-{
-    CancellationToken token = new();
-    try
+    [RelayCommand]
+    private void UploadMore()
     {
-        var folder = await FolderPicker.Default.PickAsync(token);
-        BallotFolder = folder.Folder.Path;
-        BallotFolderName = folder.Folder.Name;
-        FolderErrorMessage = string.Empty;
-        // verify folder
+        ShowPanel = BallotUploadPanel.AutoUpload;
+        ResultsText = string.Empty;
+        UploadText = string.Empty;
+        _lastDrive = -1;
+        _timer?.Start();
     }
-    catch (Exception ex)
-    {
-        BallotFolder = string.Empty;
-        BallotFolderName = string.Empty;
-        FolderErrorMessage = ex.Message;
+
+    private readonly BallotUploadService _uploadService;
+    private readonly BallotService _ballotService;
+    private readonly ManifestService _manifestService;
+    private readonly ContextService _contextService;
+    private readonly CiphertextTallyService _ciphertextTallyService;
+    private bool _importing;
+    private long _lastDrive = -1;
+
+    public BallotUploadViewModel(IServiceProvider serviceProvider,
+        BallotUploadService uploadService,
+        BallotService ballotService,
+        ManifestService manifestService,
+        ContextService contextService,
+        CiphertextTallyService ciphertextTallyService) : base("BallotUploadText", serviceProvider)
+        {
+        _uploadService = uploadService;
+        _ballotService = ballotService;
+        _manifestService = manifestService;
+        _contextService = contextService;
+        _ciphertextTallyService = ciphertextTallyService;
+
+        _timer!.Tick += _timer_Tick;
+        _timer?.Start();
     }
-}
-
-[RelayCommand]
-private void UploadMore()
-{
-    ShowPanel = BallotUploadPanel.AutoUpload;
-    ResultsText = string.Empty;
-    UploadText = string.Empty;
-    _lastDrive = -1;
-    _timer?.Start();
-}
-
-private readonly BallotUploadService _uploadService;
-private readonly BallotService _ballotService;
-private readonly ManifestService _manifestService;
-private readonly ContextService _contextService;
-private readonly CiphertextTallyService _ciphertextTallyService;
-private bool _importing;
-private long _lastDrive = -1;
-
-public BallotUploadViewModel(IServiceProvider serviceProvider,
-    BallotUploadService uploadService,
-    BallotService ballotService,
-    ManifestService manifestService,
-    ContextService contextService,
-    CiphertextTallyService ciphertextTallyService) : base("BallotUploadText", serviceProvider)
-    {
-    _uploadService = uploadService;
-    _ballotService = ballotService;
-    _manifestService = manifestService;
-    _contextService = contextService;
-    _ciphertextTallyService = ciphertextTallyService;
-
-    _timer!.Tick += _timer_Tick;
-    _timer?.Start();
-}
 
 private void _timer_Tick(object? sender, EventArgs e)
 {
@@ -420,19 +412,19 @@ private void _timer_Tick(object? sender, EventArgs e)
     });
 }
 
-public override async Task OnAppearing()
-{
-    await base.OnAppearing();
-}
+    public override async Task OnAppearing()
+    {
+        await base.OnAppearing();
+    }
 
-public override async Task OnLeavingPage()
-{
-    _internalManifest?.Dispose();
-    _manifestHash?.Dispose();
-    _context?.Dispose();
+    public override async Task OnLeavingPage()
+    {
+        _internalManifest?.Dispose();
+        _manifestHash?.Dispose();
+        _context?.Dispose();
 
-    _timer?.Stop();
-    _timer!.Tick -= _timer_Tick;
-    await base.OnLeavingPage();
-}
+        _timer?.Stop();
+        _timer!.Tick -= _timer_Tick;
+        await base.OnLeavingPage();
+    }
 }
