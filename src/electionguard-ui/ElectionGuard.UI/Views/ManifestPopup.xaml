@@ -9,356 +9,157 @@
     xmlns:vm="clr-namespace:ElectionGuard.UI.ViewModels"
     CanBeDismissedByTappingOutsideOfPopup="False"
     Size="550, 800">
-    <VerticalStackLayout>
-        <Button Clicked="Button_Clicked" Text="Close" />
-        <Frame>
-            <VerticalStackLayout Padding="20" MaximumHeightRequest="750">
-                <toolkit:Expander IsExpanded="True">
-                    <toolkit:Expander.Header>
-                        <Grid
-                            Margin="5"
-                            Padding="5"
-                            BackgroundColor="{StaticResource Primary}"
-                            HeightRequest="45">
-                            <Label
-                                FontAttributes="Bold"
-                                FontSize="Medium"
-                                Text="{helper:Translate InformationText}"
-                                VerticalOptions="Center" />
-                            <Image
-                                HeightRequest="25"
-                                HorizontalOptions="End"
-                                Source="expand.png"
-                                VerticalOptions="Center">
-                                <Image.Triggers>
-                                    <DataTrigger
-                                        Binding="{Binding Source={RelativeSource AncestorType={x:Type toolkit:Expander}}, Path=IsExpanded}"
-                                        TargetType="Image"
-                                        Value="True">
-                                        <Setter Property="Source" Value="collapse.png" />
-                                    </DataTrigger>
-                                </Image.Triggers>
-                            </Image>
-                        </Grid>
-                    </toolkit:Expander.Header>
-                    <toolkit:Expander.Content>
-                        <Grid Margin="15,0,15,0">
-                            <Label Text="{Binding ManifestName}" />
-                        </Grid>
-                    </toolkit:Expander.Content>
-                </toolkit:Expander>
-                <toolkit:Expander IsExpanded="True" MaximumHeightRequest="400">
-                    <toolkit:Expander.Header>
-                        <Grid
-                            Margin="5"
-                            Padding="5"
-                            BackgroundColor="{StaticResource Primary}"
-                            HeightRequest="45">
-                            <HorizontalStackLayout>
-                                <Label
-                                    FontAttributes="Bold"
-                                    FontSize="Medium"
-                                    Text="{helper:Translate PartiesText}"
-                                    VerticalOptions="Center" />
-                                <Label
-                                    FontAttributes="Bold"
-                                    FontSize="Medium"
-                                    HorizontalOptions="FillAndExpand"
-                                    Text="{Binding Manifest.PartiesSize, StringFormat=' - {0}'}" />
-                            </HorizontalStackLayout>
-                            <Image
-                                HeightRequest="25"
-                                HorizontalOptions="End"
-                                Source="expand.png"
-                                VerticalOptions="Center">
-                                <Image.Triggers>
-                                    <DataTrigger
-                                        Binding="{Binding Source={RelativeSource AncestorType={x:Type toolkit:Expander}}, Path=IsExpanded}"
-                                        TargetType="Image"
-                                        Value="True">
-                                        <Setter Property="Source" Value="collapse.png" />
-                                    </DataTrigger>
-                                </Image.Triggers>
-                            </Image>
-                        </Grid>
-                    </toolkit:Expander.Header>
-                    <toolkit:Expander.Content>
-                        <CollectionView Margin="15,0,15,0" ItemsSource="{Binding Parties}">
-                            <CollectionView.ItemTemplate>
-                                <DataTemplate x:DataType="vm:PartyDisplay">
-                                    <Frame
-                                        Margin="0,0,0,10"
-                                        BackgroundColor="{StaticResource Gray100}"
-                                        HasShadow="True">
-                                        <toolkit:UniformItemsLayout>
-                                            <Label Text="{Binding Name}" />
-                                            <Label Text="{Binding Abbreviation}" />
-                                        </toolkit:UniformItemsLayout>
-                                    </Frame>
-                                </DataTemplate>
-                            </CollectionView.ItemTemplate>
-                        </CollectionView>
-                    </toolkit:Expander.Content>
-                </toolkit:Expander>
-                <toolkit:Expander IsExpanded="True" MaximumHeightRequest="400">
-                    <toolkit:Expander.Header>
-                        <Grid
-                            Margin="5"
-                            Padding="5"
-                            BackgroundColor="{StaticResource Primary}"
-                            HeightRequest="45">
-                            <HorizontalStackLayout>
-                                <Label
-                                    FontAttributes="Bold"
-                                    FontSize="Medium"
-                                    Text="{helper:Translate CandidatesText}"
-                                    VerticalOptions="Center" />
-                                <Label
-                                    FontAttributes="Bold"
-                                    FontSize="Medium"
-                                    HorizontalOptions="FillAndExpand"
-                                    Text="{Binding Manifest.CandidatesSize, StringFormat=' - {0}'}" />
-                            </HorizontalStackLayout>
-                            <Image
-                                HeightRequest="25"
-                                HorizontalOptions="EndAndExpand"
-                                Source="expand.png"
-                                VerticalOptions="Center">
-                                <Image.Triggers>
-                                    <DataTrigger
-                                        Binding="{Binding Source={RelativeSource AncestorType={x:Type toolkit:Expander}}, Path=IsExpanded}"
-                                        TargetType="Image"
-                                        Value="True">
-                                        <Setter Property="Source" Value="collapse.png" />
-                                    </DataTrigger>
-                                </Image.Triggers>
-                            </Image>
-                        </Grid>
-                    </toolkit:Expander.Header>
-                    <toolkit:Expander.Content>
-                        <CollectionView Margin="15,0,15,0" ItemsSource="{Binding Candidates}">
-                            <CollectionView.ItemTemplate>
-                                <DataTemplate x:DataType="vm:CandidateDisplay">
-                                    <Frame
-                                        Margin="0,0,0,10"
-                                        BackgroundColor="{StaticResource Gray100}"
-                                        HasShadow="True">
-                                        <toolkit:UniformItemsLayout HorizontalOptions="FillAndExpand">
-                                            <Label Text="{Binding Name}" />
-                                            <Label Text="{Binding Party}" />
-                                        </toolkit:UniformItemsLayout>
-                                    </Frame>
-                                </DataTemplate>
-                            </CollectionView.ItemTemplate>
-                        </CollectionView>
-                    </toolkit:Expander.Content>
-                </toolkit:Expander>
-                <toolkit:Expander IsExpanded="True" MaximumHeightRequest="400">
-                    <toolkit:Expander.Header>
-                        <Grid
-                            Margin="5"
-                            Padding="5"
-                            BackgroundColor="{StaticResource Primary}"
-                            HeightRequest="45">
-                            <HorizontalStackLayout>
-                                <Label
-                                    FontAttributes="Bold"
-                                    FontSize="Medium"
-                                    Text="{helper:Translate BallotStylesText}"
-                                    VerticalOptions="Center" />
-                                <Label
-                                    FontAttributes="Bold"
-                                    FontSize="Medium"
-                                    HorizontalOptions="FillAndExpand"
-                                    Text="{Binding Manifest.BallotStylesSize, StringFormat=' - {0}'}" />
-                            </HorizontalStackLayout>
-                            <Image
-                                HeightRequest="25"
-                                HorizontalOptions="End"
-                                Source="expand.png"
-                                VerticalOptions="Center">
-                                <Image.Triggers>
-                                    <DataTrigger
-                                        Binding="{Binding Source={RelativeSource AncestorType={x:Type toolkit:Expander}}, Path=IsExpanded}"
-                                        TargetType="Image"
-                                        Value="True">
-                                        <Setter Property="Source" Value="collapse.png" />
-                                    </DataTrigger>
-                                </Image.Triggers>
-                            </Image>
-                        </Grid>
-                    </toolkit:Expander.Header>
-                    <toolkit:Expander.Content>
-                        <Label Text="not showing styles" />
-                        <!--<CollectionView
-                            Margin="15,0,15,0"
-                            HeightRequest="400"
-                            ItemsSource="{Binding BallotStyles}"
-                            MaximumHeightRequest="400">
-                            <CollectionView.ItemTemplate>
-                                <DataTemplate x:DataType="vm:BallotStyleDisplay">
+    <Grid RowDefinitions="auto, *">
+        <Button
+            Grid.Row="0"
+            Clicked="Button_Clicked"
+            Text="Close" />
+        <ScrollView Grid.Row="1" VerticalScrollBarVisibility="Always">
+            <Grid RowDefinitions="auto, auto, auto, auto, auto, auto, auto">
+                <VerticalStackLayout Grid.Row="0">
+                    <Grid Style="{StaticResource Title}">
+                        <Label Style="{StaticResource H2W}" Text="{helper:Translate InformationText}" />
+                    </Grid>
+                    <Grid Margin="15,0,15,0">
+                        <Label Style="{StaticResource H3}" Text="{Binding ManifestName}" />
+                    </Grid>
+                </VerticalStackLayout>
+                <VerticalStackLayout Grid.Row="1">
+                    <Grid Style="{StaticResource Title}">
+                        <Label Style="{StaticResource H2W}" Text="{helper:Translate PartiesText}" />
+                    </Grid>
+                    <CollectionView Margin="15,0,15,0" ItemsSource="{Binding Parties}">
+                        <CollectionView.ItemTemplate>
+                            <DataTemplate x:DataType="vm:PartyDisplay">
+                                <Frame
+                                    Margin="0,0,0,10"
+                                    BackgroundColor="{StaticResource Gray100}"
+                                    HasShadow="True">
+                                    <toolkit:UniformItemsLayout>
+                                        <Label Text="{Binding Name}" />
+                                        <Label Text="{Binding Abbreviation}" />
+                                    </toolkit:UniformItemsLayout>
+                                </Frame>
+                            </DataTemplate>
+                        </CollectionView.ItemTemplate>
+                    </CollectionView>
+                </VerticalStackLayout>
+                <VerticalStackLayout Grid.Row="2">
+                    <Grid Style="{StaticResource Title}">
+                        <Label Style="{StaticResource H2W}" Text="{helper:Translate CandidatesText}" />
+                    </Grid>
+                    <CollectionView Margin="15,0,15,0" ItemsSource="{Binding Candidates}">
+                        <CollectionView.ItemTemplate>
+                            <DataTemplate x:DataType="vm:CandidateDisplay">
+                                <Frame
+                                    Margin="0,0,0,10"
+                                    BackgroundColor="{StaticResource Gray100}"
+                                    HasShadow="True">
+                                    <toolkit:UniformItemsLayout HorizontalOptions="FillAndExpand">
+                                        <Label Text="{Binding Name}" />
+                                        <Label Text="{Binding Party}" />
+                                    </toolkit:UniformItemsLayout>
+                                </Frame>
+                            </DataTemplate>
+                        </CollectionView.ItemTemplate>
+                    </CollectionView>
+                </VerticalStackLayout>
+                <VerticalStackLayout Grid.Row="3">
+                    <Grid Style="{StaticResource Title}">
+                        <Label Style="{StaticResource H2W}" Text="{helper:Translate BallotStylesText}" />
+                    </Grid>
+                    <ListView Margin="15,0,15,0" ItemsSource="{Binding BallotStyles}">
+                        <ListView.ItemTemplate>
+                            <DataTemplate x:DataType="vm:BallotStyleDisplay">
+                                <ViewCell>
                                     <Frame
                                         Margin="0,0,0,10"
                                         BackgroundColor="{StaticResource Gray100}"
                                         HasShadow="True">
                                         <VerticalStackLayout>
                                             <Label Text="{Binding Name}" />
-                                            <CollectionView Margin="15,0,15,0" ItemsSource="{Binding GeoPoliticalUnits}">
-                                                <CollectionView.ItemTemplate>
-                                                    <DataTemplate x:DataType="vm:BallotStyleDisplay">
-                                                        <Label Text="{Binding .}" />
+                                            <ListView Margin="15,10,15,0" ItemsSource="{Binding GeoPoliticalUnits}">
+                                                <ListView.ItemTemplate>
+                                                    <DataTemplate>
+                                                        <ViewCell>
+                                                            <Frame
+                                                                Margin="0,0,0,10"
+                                                                BackgroundColor="{StaticResource Gray100}"
+                                                                HasShadow="True">
+                                                                <Label Grid.Column="0" Text="{Binding .}" />
+                                                            </Frame>
+                                                        </ViewCell>
                                                     </DataTemplate>
-                                                </CollectionView.ItemTemplate>
-                                            </CollectionView>
+                                                </ListView.ItemTemplate>
+                                            </ListView>
                                         </VerticalStackLayout>
                                     </Frame>
-                                </DataTemplate>
-                            </CollectionView.ItemTemplate>
-                        </CollectionView>-->
-                    </toolkit:Expander.Content>
-                </toolkit:Expander>
-                <toolkit:Expander IsExpanded="True" MaximumHeightRequest="400">
-                    <toolkit:Expander.Header>
-                        <Grid
-                            Margin="5"
-                            Padding="5"
-                            BackgroundColor="{StaticResource Primary}"
-                            HeightRequest="45">
-                            <HorizontalStackLayout>
-                                <Label
-                                    FontAttributes="Bold"
-                                    FontSize="Medium"
-                                    Text="{helper:Translate GeopoliticalUnitsText}"
-                                    VerticalOptions="Center" />
-                                <Label
-                                    FontAttributes="Bold"
-                                    FontSize="Medium"
-                                    HorizontalOptions="FillAndExpand"
-                                    Text="{Binding Manifest.GeopoliticalUnitsSize, StringFormat=' - {0}'}" />
-                            </HorizontalStackLayout>
-                            <Image
-                                HeightRequest="25"
-                                HorizontalOptions="End"
-                                Source="expand.png"
-                                VerticalOptions="Center">
-                                <Image.Triggers>
-                                    <DataTrigger
-                                        Binding="{Binding Source={RelativeSource AncestorType={x:Type toolkit:Expander}}, Path=IsExpanded}"
-                                        TargetType="Image"
-                                        Value="True">
-                                        <Setter Property="Source" Value="collapse.png" />
-                                    </DataTrigger>
-                                </Image.Triggers>
-                            </Image>
-                        </Grid>
-                    </toolkit:Expander.Header>
-                    <toolkit:Expander.Content>
-                        <CollectionView Margin="15,0,15,0" ItemsSource="{Binding GeopoliticalUnits}">
-                            <CollectionView.ItemTemplate>
-                                <DataTemplate x:DataType="vm:GeopoliticalUnitDisplay">
-                                    <Frame
-                                        Margin="0,0,0,10"
-                                        BackgroundColor="{StaticResource Gray100}"
-                                        HasShadow="True">
-                                        <Grid ColumnDefinitions="2*, *">
-                                            <Label Grid.Column="0" Text="{Binding Name}" />
-                                            <Label Grid.Column="1" Text="{Binding GPType}" />
-                                        </Grid>
-                                    </Frame>
-                                </DataTemplate>
-                            </CollectionView.ItemTemplate>
-                        </CollectionView>
-                    </toolkit:Expander.Content>
-                </toolkit:Expander>
-                <toolkit:Expander IsExpanded="True" MaximumHeightRequest="400">
-                    <toolkit:Expander.Header>
-                        <Grid
-                            Margin="5"
-                            Padding="5"
-                            BackgroundColor="{StaticResource Primary}"
-                            HeightRequest="45">
-                            <HorizontalStackLayout>
-                                <Label
-                                    FontAttributes="Bold"
-                                    FontSize="Medium"
-                                    Text="{helper:Translate ContestsText}"
-                                    VerticalOptions="Center" />
-                                <Label
-                                    FontAttributes="Bold"
-                                    FontSize="Medium"
-                                    HorizontalOptions="FillAndExpand"
-                                    Text="{Binding Manifest.ContestsSize, StringFormat=' - {0}'}" />
-                            </HorizontalStackLayout>
-                            <Image
-                                HeightRequest="25"
-                                HorizontalOptions="End"
-                                Source="expand.png"
-                                VerticalOptions="Center">
-                                <Image.Triggers>
-                                    <DataTrigger
-                                        Binding="{Binding Source={RelativeSource AncestorType={x:Type toolkit:Expander}}, Path=IsExpanded}"
-                                        TargetType="Image"
-                                        Value="True">
-                                        <Setter Property="Source" Value="collapse.png" />
-                                    </DataTrigger>
-                                </Image.Triggers>
-                            </Image>
-                        </Grid>
-                    </toolkit:Expander.Header>
-                    <toolkit:Expander.Content>
-                        <CollectionView Margin="15,0,15,0" ItemsSource="{Binding Contests}">
-                            <CollectionView.ItemTemplate>
-                                <DataTemplate x:DataType="vm:ContestDisplay">
-                                    <Frame
-                                        Margin="0,0,0,10"
-                                        BackgroundColor="{StaticResource Gray100}"
-                                        HasShadow="True">
-                                        <Grid ColumnDefinitions="2*, *, *" RowDefinitions="auto, auto, *">
-                                            <Label
-                                                Grid.Row="0"
-                                                Grid.ColumnSpan="3"
-                                                Text="{Binding Name}" />
-                                            <Label
-                                                Grid.Row="1"
-                                                Grid.Column="0"
-                                                Text="{Binding Variation}" />
-                                            <Label
-                                                Grid.Row="1"
-                                                Grid.Column="1"
-                                                Text="{Binding NumberElected}" />
-                                            <Label
-                                                Grid.Row="1"
-                                                Grid.Column="2"
-                                                Text="{Binding VotesAllowed}" />
+                                </ViewCell>
+                            </DataTemplate>
+                        </ListView.ItemTemplate>
+                    </ListView>
+                </VerticalStackLayout>
+                <VerticalStackLayout Grid.Row="4">
+                    <Grid Style="{StaticResource Title}">
+                        <Label Style="{StaticResource H2W}" Text="{helper:Translate GeopoliticalUnitsText}" />
+                    </Grid>
+                    <CollectionView Margin="15,0,15,0" ItemsSource="{Binding GeopoliticalUnits}">
+                        <CollectionView.ItemTemplate>
+                            <DataTemplate x:DataType="vm:GeopoliticalUnitDisplay">
+                                <Frame
+                                    Margin="0,0,0,10"
+                                    BackgroundColor="{StaticResource Gray100}"
+                                    HasShadow="True">
+                                    <Grid ColumnDefinitions="2*, *">
+                                        <Label Grid.Column="0" Text="{Binding Name}" />
+                                        <Label Grid.Column="1" Text="{Binding GPType}" />
+                                    </Grid>
+                                </Frame>
+                            </DataTemplate>
+                        </CollectionView.ItemTemplate>
+                    </CollectionView>
+                </VerticalStackLayout>
+                <VerticalStackLayout Grid.Row="5">
+                    <Grid Style="{StaticResource Title}">
+                        <Label Style="{StaticResource H2W}" Text="{helper:Translate ContestsText}" />
+                    </Grid>
+                    <CollectionView Margin="15,0,15,0" ItemsSource="{Binding Contests}">
+                        <CollectionView.ItemTemplate>
+                            <DataTemplate x:DataType="vm:ContestDisplay">
+                                <Frame
+                                    Margin="0,0,0,10"
+                                    BackgroundColor="{StaticResource Gray100}"
+                                    HasShadow="True">
+                                    <Grid ColumnDefinitions="2*, *, *" RowDefinitions="auto, auto, *">
+                                        <Label
+                                            Grid.Row="0"
+                                            Grid.ColumnSpan="3"
+                                            Text="{Binding Name}" />
+                                        <Label
+                                            Grid.Row="1"
+                                            Grid.Column="0"
+                                            Text="{Binding Variation}" />
+                                        <Label
+                                            Grid.Row="1"
+                                            Grid.Column="1"
+                                            Text="{Binding NumberElected}" />
+                                        <Label
+                                            Grid.Row="1"
+                                            Grid.Column="2"
+                                            Text="{Binding VotesAllowed}" />
 
-                                            <Label
-                                                Grid.Row="2"
-                                                Grid.ColumnSpan="3"
-                                                Margin="15,0,15,0"
-                                                Text="{Binding Selections}" />
-
-                                            <!-- <CollectionView
-                                                Grid.Row="2"
-                                                Grid.ColumnSpan="3"
-                                                Margin="15,0,15,0"
-                                                ItemsSource="{Binding Selections}">
-                                                <CollectionView.ItemTemplate>
-                                                    <DataTemplate x:DataType="vm:CandidateDisplay">
-                                                        <toolkit:UniformItemsLayout>
-                                                            <Label Text="{Binding Name}" />
-                                                            <Label Text="{Binding Party}" />
-                                                        </toolkit:UniformItemsLayout>
-                                                    </DataTemplate>
-                                                </CollectionView.ItemTemplate>
-                                            </CollectionView>-->
-                                        </Grid>
-                                    </Frame>
-                                </DataTemplate>
-                            </CollectionView.ItemTemplate>
-                        </CollectionView>
-                    </toolkit:Expander.Content>
-                </toolkit:Expander>
-            </VerticalStackLayout>
-        </Frame>
-    </VerticalStackLayout>
+                                        <Label
+                                            Grid.Row="2"
+                                            Grid.ColumnSpan="3"
+                                            Margin="15,0,15,0"
+                                            Text="{Binding Selections}" />
+                                    </Grid>
+                                </Frame>
+                            </DataTemplate>
+                        </CollectionView.ItemTemplate>
+                    </CollectionView>
+                </VerticalStackLayout>
+            </Grid>
+        </ScrollView>
+    </Grid>
 </toolkit:Popup>

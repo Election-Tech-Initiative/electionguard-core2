@@ -146,6 +146,7 @@ namespace ElectionGuard.Encryption.Utils.Generators
 
             return new Manifest(
                 "jefferson-county-open-primary",
+                "1.0",
                 ElectionType.Primary,
                 startDate: start,
                 endDate: start.AddDays(1),

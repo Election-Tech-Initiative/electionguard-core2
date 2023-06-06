@@ -1,4 +1,5 @@
-﻿using ElectionGuard.Decryption.Shares;
+﻿using System.Threading;
+using ElectionGuard.Decryption.Shares;
 using ElectionGuard.ElectionSetup;
 using ElectionGuard.UI.Lib.Models;
 
@@ -6,9 +7,8 @@ namespace ElectionGuard.UI.Services;
 
 public class TallyStateMachine : ITallyStateMachine
 {
-    private TallyRecord _tally = new();
-    private Dictionary<bool, List<StateMachineStep<TallyState>>> _steps = new();
-    private bool _isRunning = false;
+    private Dictionary<bool, List<StateMachineStep<TallyState, TallyRecord>>> _steps = new();
+    private object mutex = new();
 
     private IAuthenticationService _authenticationService;
     private readonly ChallengeResponseService _challengeResponseService;
@@ -37,120 +37,122 @@ public class TallyStateMachine : ITallyStateMachine
 
     public async Task Run(TallyRecord tally)
     {
-        if (!_isRunning)
+        if (Monitor.TryEnter(mutex))
         {
-            _tally = tally;
-
-            var steps = _steps[_authenticationService.IsAdmin];
-            var currentStep = steps.SingleOrDefault(s => s.State == _tally.State);
-            if (currentStep is not null && await currentStep.ShouldRunStep())
+            try
             {
-                _isRunning = true;
-                try
+                var steps = _steps[_authenticationService.IsAdmin];
+                var currentStep = steps.SingleOrDefault(s => s.State == tally.State);
+                if (currentStep is not null && await currentStep.ShouldRunStep(tally))
                 {
-                    await currentStep.RunStep();
+                    await currentStep.RunStep(tally);
                 }
-                catch(Exception ex)
-                {
-
-                }
-                finally
-                {
-                    _isRunning = false;
-                }
+            }
+            finally
+            {
+                Monitor.Exit(mutex);
             }
         }
     }
 
     #region Should Run
-    private async Task<bool> ShouldStartTally()
+    private async Task<bool> ShouldAutoStartTally(TallyRecord tally)
     {
-        var joinedGuardians = await _tallyJoinedService.GetCountByTallyJoinedAsync(_tally.TallyId);
-        return joinedGuardians >= _tally.Quorum;
+        const bool GUARDIAN_JOINED_TALLY = true;
+
+        var joinedGuardians = await _tallyJoinedService.GetGuardianCountByTallyAsync(tally.TallyId);
+        joinedGuardians.TryGetValue(GUARDIAN_JOINED_TALLY, out var consentCount);
+        joinedGuardians.TryGetValue(!GUARDIAN_JOINED_TALLY, out var rejectCount);
+
+        var isQuorumReached = consentCount >= tally.Quorum;
+        var haveAllGuardiansJoined = (consentCount + rejectCount) == tally.NumberOfGuardians;
+
+        return isQuorumReached && haveAllGuardiansJoined;
     }
 
-    private async Task<bool> AlwaysRun()
+    private async Task<bool> ShouldDecryptShares(TallyRecord tally)
     {
-        return await Task.FromResult(true);
+        return !await _decryptionShareService.GetExistsByTallyAsync(tally.TallyId, _authenticationService.UserName ?? string.Empty);
     }
 
-    private async Task<bool> ShouldDecryptShares()
+    private async Task<bool> ShouldGenerateChallenge(TallyRecord tally)
     {
-        return !await _decryptionShareService.GetExistsByTallyAsync(_tally.TallyId, _authenticationService.UserName ?? string.Empty);
-    }
-
-    private async Task<bool> ShouldGenerateChallenge()
-    {
-        var joinedGuardians = await _tallyJoinedService.GetCountByTallyJoinedAsync(_tally.TallyId);
-        var decryptionShares = await _decryptionShareService.GetCountByTallyAsync(_tally.TallyId);
+        var joinedGuardians = await _tallyJoinedService.GetCountByTallyJoinedAsync(tally.TallyId);
+        var decryptionShares = await _decryptionShareService.GetCountByTallyAsync(tally.TallyId);
 
         return decryptionShares == joinedGuardians;
     }
 
-    private async Task<bool> ShouldRespondChallenge()
+    private async Task<bool> ShouldRespondChallenge(TallyRecord tally)
     {
         return !await _challengeResponseService.GetExistsByTallyAsync(
-            _tally.TallyId,
+            tally.TallyId,
             _authenticationService.UserName ?? string.Empty);
     }
 
-    private async Task<bool> ShouldVerifyChallenge()
+    private async Task<bool> ShouldVerifyChallenge(TallyRecord tally)
     {
-        var joinedGuardians = await _tallyJoinedService.GetCountByTallyJoinedAsync(_tally.TallyId);
-        var challengeResponse = await _challengeResponseService.GetCountByTallyAsync(_tally.TallyId);
+        var joinedGuardians = await _tallyJoinedService.GetCountByTallyJoinedAsync(tally.TallyId);
+        var challengeResponse = await _challengeResponseService.GetCountByTallyAsync(tally.TallyId);
 
         return challengeResponse == joinedGuardians;
     }
     #endregion
 
     #region Run Steps
-    private async Task RespondChallenge()
+    
+    private async Task StartTally(TallyRecord tally)
+    {
+        await _tallyService.UpdateStateAsync(tally.TallyId, TallyState.TallyStarted);
+    }
+
+    private async Task RespondChallenge(TallyRecord tally)
     {
         await _tallyManager.ComputeChallengeResponse(
             _authenticationService.UserName!,
-            _tally);
+            tally);
     }
 
-    private async Task DecryptShares()
+    private async Task DecryptShares(TallyRecord tally)
     {
         await _tallyManager.DecryptShare(
             _authenticationService.UserName!,
-            _tally
+            tally
             );
     }
 
-    private async Task VerifyChallenge()
+    private async Task VerifyChallenge(TallyRecord tally)
     {
-        await _tallyService.UpdateStateAsync(_tally.TallyId, TallyState.AdminVerifyChallenge);
+        await _tallyService.UpdateStateAsync(tally.TallyId, TallyState.AdminVerifyChallenge);
 
-        await _tallyManager.ValidateChallengeResponse(_tally);
+        await _tallyManager.ValidateChallengeResponse(tally);
 
-        await _tallyService.UpdateStateAsync(_tally.TallyId, TallyState.Complete);
+        await _tallyService.UpdateStateAsync(tally.TallyId, TallyState.Complete);
     }
 
-    private async Task GenerateChallenge()
+    private async Task GenerateChallenge(TallyRecord tally)
     {
-        await _tallyService.UpdateStateAsync(_tally.TallyId, TallyState.AdminGenerateChallenge);
+        await _tallyService.UpdateStateAsync(tally.TallyId, TallyState.AdminGenerateChallenge);
 
-        await _tallyManager.CreateChallenge(_tally);
+        await _tallyManager.CreateChallenge(tally);
 
-        await _tallyService.UpdateStateAsync(_tally.TallyId, TallyState.PendingGuardianRespondChallenge);
+        await _tallyService.UpdateStateAsync(tally.TallyId, TallyState.PendingGuardianRespondChallenge);
     }
 
-    private async Task AccumulateTally()
+    private async Task AccumulateTally(TallyRecord tally)
     {
-        await _tallyService.UpdateStateAsync(_tally.TallyId, TallyState.AdminAccumulateTally);
+        await _tallyService.UpdateStateAsync(tally.TallyId, TallyState.AdminAccumulateTally);
 
-        await _tallyManager.AccumulateAllUploadTallies(_tally);
+        await _tallyManager.AccumulateAllUploadTallies(tally);
 
-        await _tallyService.UpdateStateAsync(_tally.TallyId, TallyState.PendingGuardianDecryptShares);
+        await _tallyService.UpdateStateAsync(tally.TallyId, TallyState.PendingGuardianDecryptShares);
     }
 
     #endregion
 
     private void GenerateGuardianSteps()
     {
-        var guardianSteps = new List<StateMachineStep<TallyState>>()
+        var guardianSteps = new List<StateMachineStep<TallyState, TallyRecord>>()
         {
             new()
             {
@@ -170,12 +172,18 @@ public class TallyStateMachine : ITallyStateMachine
     }
     private void GenerateAdminSteps()
     {
-        var adminSteps = new List<StateMachineStep<TallyState>>()
+        var adminSteps = new List<StateMachineStep<TallyState, TallyRecord>>()
         {
             new()
             {
                 State = TallyState.PendingGuardiansJoin,
-                ShouldRunStep = ShouldStartTally,
+                ShouldRunStep = ShouldAutoStartTally,
+                RunStep = StartTally,
+            },
+            new()
+            {
+                State = TallyState.TallyStarted,
+                ShouldRunStep = StateMachineStep<TallyState, TallyRecord>.AlwaysRun,
                 RunStep = AccumulateTally,
             },
             new()
@@ -195,19 +203,19 @@ public class TallyStateMachine : ITallyStateMachine
             new()
             {
                 State = TallyState.AdminAccumulateTally,
-                ShouldRunStep = AlwaysRun,
+                ShouldRunStep = StateMachineStep<TallyState, TallyRecord>.AlwaysRun,
                 RunStep = AccumulateTally,
             },
             new()
             {
                 State = TallyState.AdminGenerateChallenge,
-                ShouldRunStep = AlwaysRun,
+                ShouldRunStep = StateMachineStep < TallyState, TallyRecord >.AlwaysRun,
                 RunStep = GenerateChallenge,
             },
             new()
             {
                 State = TallyState.AdminVerifyChallenge,
-                ShouldRunStep = AlwaysRun,
+                ShouldRunStep = StateMachineStep < TallyState, TallyRecord >.AlwaysRun,
                 RunStep = VerifyChallenge,
             }
         };

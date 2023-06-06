@@ -756,8 +756,8 @@ struct eg_election_manifest_s;
 typedef struct eg_election_manifest_s eg_election_manifest_t;
 
 EG_API eg_electionguard_status_t eg_election_manifest_new(
-  char *in_election_scope_id, eg_election_type_t in_election_type, uint64_t in_start_date,
-  uint64_t in_end_date, eg_geopolitical_unit_t *in_geopolitical_units[],
+  char *in_election_scope_id, char *in_spec_version, eg_election_type_t in_election_type,
+  uint64_t in_start_date, uint64_t in_end_date, eg_geopolitical_unit_t *in_geopolitical_units[],
   uint64_t in_geopolitical_units_size, eg_party_t *in_parties[], uint64_t in_parties_size,
   eg_candidate_t *in_candidates[], uint64_t in_candidates_size,
   eg_contest_description_t *in_contests[], uint64_t in_contests_size,
@@ -765,8 +765,8 @@ EG_API eg_electionguard_status_t eg_election_manifest_new(
   eg_election_manifest_t **out_handle);
 
 EG_API eg_electionguard_status_t eg_election_manifest_new_with_contact(
-  char *in_election_scope_id, eg_election_type_t in_election_type, uint64_t in_start_date,
-  uint64_t in_end_date, eg_geopolitical_unit_t *in_geopolitical_units[],
+  char *in_election_scope_id, char *in_spec_version, eg_election_type_t in_election_type,
+  uint64_t in_start_date, uint64_t in_end_date, eg_geopolitical_unit_t *in_geopolitical_units[],
   uint64_t in_geopolitical_units_size, eg_party_t *in_parties[], uint64_t in_parties_size,
   eg_candidate_t *in_candidates[], uint64_t in_candidates_size,
   eg_contest_description_t *in_contests[], uint64_t in_contests_size,

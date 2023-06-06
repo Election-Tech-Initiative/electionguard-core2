@@ -4,6 +4,7 @@
     xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
     xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
     xmlns:controls="clr-namespace:ElectionGuard.UI.Controls"
+    xmlns:converter="clr-namespace:ElectionGuard.UI.Converters"
     xmlns:helper="clr-namespace:ElectionGuard.UI.Helpers"
     xmlns:model="clr-namespace:ElectionGuard.UI.Lib.Models;assembly=ElectionGuard.UI.Lib"
     xmlns:models="clr-namespace:ElectionGuard.UI.Models"
@@ -16,24 +17,40 @@
     <ContentPage.Resources>
         <ResourceDictionary>
             <toolkit:InvertedBoolConverter x:Key="InvertedBoolConverter" />
+            <converter:TallyNotStartedConverter x:Key="TallyNotStartedConverter" />
+            <converter:TallyCanBeAbandonedConverter x:Key="TallyCanBeAbandonedConverter" />
         </ResourceDictionary>
     </ContentPage.Resources>
 
     <Grid ColumnDefinitions="*, 2*, *" RowDefinitions="auto, auto, *">
         <VerticalStackLayout Grid.Row="0" Grid.Column="1">
-            <Label Style="{StaticResource H2}" Text="{helper:Translate ElectionNameText}" />
-            <Label Text="{Binding CurrentElection.Name}" />
+            <Grid ColumnDefinitions="3*,*">
+                <VerticalStackLayout>
+                    <Label Style="{StaticResource H2}" Text="{helper:Translate ElectionNameText}" />
+                    <Label Text="{Binding CurrentElection.Name}" />
+                </VerticalStackLayout>
+                <Button
+                    Grid.Column="1"
+                    Command="{Binding AbandonTallyCommand}"
+                    HorizontalOptions="End"
+                    IsVisible="{Binding Tally.State, Converter={StaticResource TallyCanBeAbandonedConverter}, ConverterParameter={Binding IsAdmin}}"
+                    Text="{helper:Translate ProcessTallyAbandonTally}"
+                    VerticalOptions="Start" />
+            </Grid>
             <Label Style="{StaticResource H2}" Text="{helper:Translate TallyNameText}" />
             <Label Text="{Binding Tally.Name}" />
-            <!--  RO view of Tally filter (future work)  -->
-            <Button
-                Command="{Binding JoinTallyCommand}"
-                IsVisible="{Binding IsAdmin, Converter={StaticResource InvertedBoolConverter}}"
-                Text="{helper:Translate ProcessTallyJoinYes}" />
-            <Button
-                Command="{Binding RejectTallyCommand}"
-                IsVisible="{Binding IsAdmin, Converter={StaticResource InvertedBoolConverter}}"
-                Text="{helper:Translate ProcessTallyJoinNo}" />
+            <VerticalStackLayout IsVisible="{Binding CanUserJoinTally}">
+                <!--  RO view of Tally filter (future work)  -->
+                <Button Command="{Binding JoinTallyCommand}" Text="{helper:Translate ProcessTallyJoinYes}" />
+                <Button Command="{Binding RejectTallyCommand}" Text="{helper:Translate ProcessTallyJoinNo}" />
+            </VerticalStackLayout>
+            <!--  Admin buttons  -->
+            <VerticalStackLayout IsVisible="{Binding IsAdmin}">
+                <Button
+                    Command="{Binding StartTallyCommand}"
+                    IsVisible="{Binding Tally.State, Converter={StaticResource TallyNotStartedConverter}}"
+                    Text="{helper:Translate ProcessTallyStartTally}" />
+            </VerticalStackLayout>
         </VerticalStackLayout>
         <!--  List of guardians joined for all  -->
         <VerticalStackLayout

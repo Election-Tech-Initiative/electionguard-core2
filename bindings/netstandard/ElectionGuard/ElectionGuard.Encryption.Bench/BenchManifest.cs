@@ -21,7 +21,7 @@ namespace ElectionGuard.Encryption.Bench
                 var subject = new InternationalizedText(languages);
 
                 // Assert
-                subject.GetTextAt(0);
+                _ = subject.GetTextAt(0);
             });
         }
     }
