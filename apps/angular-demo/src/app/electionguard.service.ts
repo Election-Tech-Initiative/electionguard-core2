@@ -48,8 +48,12 @@ export class ElectionguardService implements OnInit {
       this._isReady = true;
     }
 
+    this.logger.log('ElectionguardService configure');
+
     // simulate loading the election config data from the server
     const { context, manifest } = await this.fetchElectionConfigData();
+
+    this.logger.log('ElectionguardService configure: loading device');
 
     // simulate loading the device data
     const device = await EncryptionDevice.fromJson(
@@ -58,6 +62,8 @@ export class ElectionguardService implements OnInit {
 
     // create the encryption mediator
     this._mediator = await EncryptionMediator.make(manifest, context, device);
+
+    this.logger.log('ElectionguardService configure: complete');
   }
 
   // Encrypt a ballot
@@ -108,6 +114,8 @@ export class ElectionguardService implements OnInit {
 
     // convert the manifest to an internal manifest
     const internalManifest = await InternalManifest.fromManifest(manifest);
+
+    this.logger.log(`electionguard fetchElectionConfigData: complete`);
 
     return { context, manifest: internalManifest };
   }
