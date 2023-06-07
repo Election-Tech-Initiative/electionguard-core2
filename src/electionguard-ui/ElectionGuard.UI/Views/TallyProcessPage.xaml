@@ -63,13 +63,18 @@
             Grid.Column="1"
             Margin="0,0,50,0">
             <Label Style="{StaticResource H2}" Text="{helper:Translate JoinedGuardians}" />
-            <CollectionView ItemsSource="{Binding JoinedGuardians}" SelectionMode="None">
+            <CollectionView
+                HorizontalOptions="CenterAndExpand"
+                ItemsSource="{Binding JoinedGuardians}"
+                MaximumWidthRequest="600"
+                MinimumWidthRequest="450"
+                SelectionMode="None">
                 <CollectionView.EmptyView>
                     <controls:NoContentView Text="{helper:Translate NoGuardians}" />
                 </CollectionView.EmptyView>
                 <CollectionView.ItemTemplate>
                     <DataTemplate x:DataType="models:GuardianTallyItem">
-                        <Grid BackgroundColor="{Binding IsSelf, Converter={StaticResource GuardianBackgroundConverter}}" ColumnDefinitions="*, 50, 50, 50">
+                        <Grid BackgroundColor="{Binding IsSelf, Converter={StaticResource GuardianBackgroundConverter}}" ColumnDefinitions="*, 30, 50,50">
                             <Label
                                 Grid.Column="0"
                                 FontSize="Medium"
@@ -77,23 +82,30 @@
                                 VerticalOptions="Center" />
                             <Image
                                 Grid.Column="1"
+                                IsVisible="{Binding Joined, Converter={StaticResource InvertedBoolConverter}}"
+                                Source="redkey.png"
+                                ToolTipProperties.Text="{helper:Translate RejectedText}"
+                                WidthRequest="32" />
+                            <Image
+                                Grid.Column="1"
+                                IsVisible="{Binding Joined}"
                                 Source="key.png"
                                 ToolTipProperties.Text="{helper:Translate JoinedText}"
                                 WidthRequest="32" />
                             <Image
                                 Grid.Column="2"
+                                IsVisible="{Binding Joined}"
                                 Source="{Binding HasDecryptShares, Converter={StaticResource BackupConverter}}"
                                 ToolTipProperties.Text="{helper:Translate BackupText}"
                                 WidthRequest="32" />
                             <Image
                                 Grid.Column="3"
-                                Margin="10,0,10,0"
+                                IsVisible="{Binding HasResponse}"
                                 Source="notverify.png"
                                 ToolTipProperties.Text="{helper:Translate Verified}"
                                 WidthRequest="32" />
                             <Image
                                 Grid.Column="3"
-                                Margin="10,0,10,0"
                                 IsVisible="{Binding HasResponse}"
                                 Source="{Binding HasResponse, Converter={StaticResource BadVerifyConverter}}"
                                 WidthRequest="32" />
