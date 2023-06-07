@@ -21,7 +21,7 @@
 
   <ItemGroup>
     <PackageReference Include="CommandLineParser" Version="2.9.1" />
-    <PackageReference Include="ElectionGuard.Encryption" Version="1.0.7" />
+    <PackageReference Include="ElectionGuard.Encryption" Version="1.75.10" />
   </ItemGroup>
 
   <PropertyGroup Label="Debug" Condition=" '$(Configuration)' == 'Debug' ">

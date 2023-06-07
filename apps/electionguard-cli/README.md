@@ -16,7 +16,7 @@ make build-cli
 
 # test the command line tool
 cd /apps/electionguard-cli
-dotnet run -c ./path/to/context.json -m ./path/to/manifest.json -b ./path/to/plaintext-ballots -d ./path/to/device.json -o ./path/to/results
+dotnet run encrypt -c ./path/to/context.json -m ./path/to/manifest.json -b ./path/to/plaintext-ballots -d ./path/to/device.json -o ./path/to/results
 
 # pack the tool for local use
 dotnet pack
