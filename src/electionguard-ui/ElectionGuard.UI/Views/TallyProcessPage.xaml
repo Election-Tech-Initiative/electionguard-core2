@@ -74,7 +74,7 @@
                 </CollectionView.EmptyView>
                 <CollectionView.ItemTemplate>
                     <DataTemplate x:DataType="models:GuardianTallyItem">
-                        <Grid BackgroundColor="{Binding IsSelf, Converter={StaticResource GuardianBackgroundConverter}}" ColumnDefinitions="*, 30, 50,50">
+                        <Grid BackgroundColor="{Binding IsSelf, Converter={StaticResource GuardianBackgroundConverter}}" ColumnDefinitions="*, 50, 50,50">
                             <Label
                                 Grid.Column="0"
                                 FontSize="Medium"
