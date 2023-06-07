@@ -37,23 +37,32 @@ public class TallyStateMachine : ITallyStateMachine
 
     public async Task Run(TallyRecord tally)
     {
-        if (Monitor.TryEnter(mutex))
+        bool lockTaken = false;
+
+        try
         {
-            try
+            Monitor.TryEnter(mutex, 1, ref lockTaken);
+            if (lockTaken)
             {
                 var steps = _steps[_authenticationService.IsAdmin];
                 var currentStep = steps.SingleOrDefault(s => s.State == tally.State);
+
                 if (currentStep is not null && await currentStep.ShouldRunStep(tally))
                 {
                     await currentStep.RunStep(tally);
                 }
             }
-            finally
+        }
+        finally
+        {
+            if (lockTaken)
             {
                 Monitor.Exit(mutex);
             }
         }
     }
+
+
 
     #region Should Run
     private async Task<bool> ShouldAutoStartTally(TallyRecord tally)
@@ -100,7 +109,7 @@ public class TallyStateMachine : ITallyStateMachine
     #endregion
 
     #region Run Steps
-    
+
     private async Task StartTally(TallyRecord tally)
     {
         await _tallyService.UpdateStateAsync(tally.TallyId, TallyState.TallyStarted);
