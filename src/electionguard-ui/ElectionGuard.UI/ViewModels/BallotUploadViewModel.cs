@@ -132,12 +132,12 @@ public partial class BallotUploadViewModel : BaseViewModel
             CreatedBy = UserName,
         };
 
-        long totalCount = 0;
-        long totalImported = 0;
-        long totalDuplicated = 0;
-        long totalRejected = 0;
-        long totalChallenged = 0;
-        long totalSpoiled = 0;
+        var totalCount = 0L;
+        var totalImported = 0L;
+        var totalDuplicated = 0L;
+        var totalRejected = 0L;
+        var totalChallenged = 0L;
+        var totalSpoiled = 0L;
         var startDate = ulong.MaxValue;
         var endDate = ulong.MinValue;
         object tallyLock = new();
