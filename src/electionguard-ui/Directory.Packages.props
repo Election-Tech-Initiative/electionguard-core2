@@ -2,7 +2,7 @@
   <ItemGroup>
     <PackageVersion Include="CommunityToolkit.Maui" Version="5.1.0" />
     <PackageVersion Include="CommunityToolkit.Mvvm" Version="8.2.0" />
-    <PackageVersion Include="ElectionGuard.Encryption" Version="1.0.1" />
+    <PackageVersion Include="ElectionGuard.Encryption" Version="1.75.10" />
     <PackageVersion Include="Microsoft.Extensions.Logging.Debug" Version="7.0.0" />
     <PackageVersion Include="MongoDB.Driver" Version="2.19.1" />
     <PackageVersion Include="Shouldly" Version="4.1.0" />

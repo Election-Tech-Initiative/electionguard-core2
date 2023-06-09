@@ -10,10 +10,6 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ElectionGuard.CLI", "ElectionGuard.CLI.csproj", "{0771316F-7C71-4795-90DF-705EC63442ED}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ElectionGuard.Encryption", "..\..\bindings\netstandard\ElectionGuard\ElectionGuard.Encryption\ElectionGuard.Encryption.csproj", "{2D30F432-87CC-4210-8FC9-C33955E2B8C2}"
-EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ElectionGuard.Encryption.Utils", "..\..\bindings\netstandard\ElectionGuard\ElectionGuard.Encryption.Utils\ElectionGuard.Encryption.Utils.csproj", "{DC458180-40A5-48D6-83E7-E4EAFA45D7F6}"
-EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|arm64 = Debug|arm64
@@ -36,30 +32,6 @@ Global
 		{0771316F-7C71-4795-90DF-705EC63442ED}.Release|x64.Build.0 = Release|x64
 		{0771316F-7C71-4795-90DF-705EC63442ED}.Release|x86.ActiveCfg = Release|x86
 		{0771316F-7C71-4795-90DF-705EC63442ED}.Release|x86.Build.0 = Release|x86
-		{2D30F432-87CC-4210-8FC9-C33955E2B8C2}.Debug|arm64.ActiveCfg = Debug|arm64
-		{2D30F432-87CC-4210-8FC9-C33955E2B8C2}.Debug|arm64.Build.0 = Debug|arm64
-		{2D30F432-87CC-4210-8FC9-C33955E2B8C2}.Debug|x64.ActiveCfg = Debug|x64
-		{2D30F432-87CC-4210-8FC9-C33955E2B8C2}.Debug|x64.Build.0 = Debug|x64
-		{2D30F432-87CC-4210-8FC9-C33955E2B8C2}.Debug|x86.ActiveCfg = Debug|x86
-		{2D30F432-87CC-4210-8FC9-C33955E2B8C2}.Debug|x86.Build.0 = Debug|x86
-		{2D30F432-87CC-4210-8FC9-C33955E2B8C2}.Release|arm64.ActiveCfg = Release|arm64
-		{2D30F432-87CC-4210-8FC9-C33955E2B8C2}.Release|arm64.Build.0 = Release|arm64
-		{2D30F432-87CC-4210-8FC9-C33955E2B8C2}.Release|x64.ActiveCfg = Release|x64
-		{2D30F432-87CC-4210-8FC9-C33955E2B8C2}.Release|x64.Build.0 = Release|x64
-		{2D30F432-87CC-4210-8FC9-C33955E2B8C2}.Release|x86.ActiveCfg = Release|x86
-		{2D30F432-87CC-4210-8FC9-C33955E2B8C2}.Release|x86.Build.0 = Release|x86
-		{DC458180-40A5-48D6-83E7-E4EAFA45D7F6}.Debug|arm64.ActiveCfg = Debug|arm64
-		{DC458180-40A5-48D6-83E7-E4EAFA45D7F6}.Debug|arm64.Build.0 = Debug|arm64
-		{DC458180-40A5-48D6-83E7-E4EAFA45D7F6}.Debug|x64.ActiveCfg = Debug|x64
-		{DC458180-40A5-48D6-83E7-E4EAFA45D7F6}.Debug|x64.Build.0 = Debug|x64
-		{DC458180-40A5-48D6-83E7-E4EAFA45D7F6}.Debug|x86.ActiveCfg = Debug|x86
-		{DC458180-40A5-48D6-83E7-E4EAFA45D7F6}.Debug|x86.Build.0 = Debug|x86
-		{DC458180-40A5-48D6-83E7-E4EAFA45D7F6}.Release|arm64.ActiveCfg = Release|arm64
-		{DC458180-40A5-48D6-83E7-E4EAFA45D7F6}.Release|arm64.Build.0 = Release|arm64
-		{DC458180-40A5-48D6-83E7-E4EAFA45D7F6}.Release|x64.ActiveCfg = Release|x64
-		{DC458180-40A5-48D6-83E7-E4EAFA45D7F6}.Release|x64.Build.0 = Release|x64
-		{DC458180-40A5-48D6-83E7-E4EAFA45D7F6}.Release|x86.ActiveCfg = Release|x86
-		{DC458180-40A5-48D6-83E7-E4EAFA45D7F6}.Release|x86.Build.0 = Release|x86
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -70,14 +42,5 @@ Global
 	GlobalSection(MonoDevelopProperties) = preSolution
 		Policies = $0
 		$0.TextStylePolicy = $3
-		$1.inheritsSet = null
-		$1.scope = application/x-msbuild
-		$0.XmlFormattingPolicy = $4
-		$2.inheritsSet = null
-		$2.scope = application/x-msbuild
-		$3.inheritsSet = null
-		$3.scope = application/xml
-		$4.scope = application/xml
-		$0.StandardHeader = $5
 	EndGlobalSection
 EndGlobal

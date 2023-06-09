@@ -25,7 +25,7 @@ public static class ElectionRecordGenerator
     public static async Task GenerateElectionRecordAsync(TallyRecord tally, string outputFolder)
     {
         ArgumentException.ThrowIfNullOrEmpty(nameof(outputFolder));
-        
+
         // check the state of the tally
         if (tally.State != TallyState.Complete)
         {

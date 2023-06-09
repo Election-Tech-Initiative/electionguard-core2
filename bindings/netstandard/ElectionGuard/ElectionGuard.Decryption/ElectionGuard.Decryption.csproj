@@ -10,7 +10,10 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\ElectionGuard.Encryption\ElectionGuard.Encryption.csproj" />
+    <PackageReference Include="ElectionGuard.Encryption" Version="1.75.10" />
+  </ItemGroup>
+
+  <ItemGroup>
     <ProjectReference Include="..\ElectionGuard.ElectionSetup\ElectionGuard.ElectionSetup.csproj" />
   </ItemGroup>
 
