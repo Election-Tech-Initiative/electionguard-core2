@@ -142,58 +142,68 @@ public partial class BallotUploadViewModel : BaseViewModel
 
         await Parallel.ForEachAsync(ballots, async (currentBallot, cancel) =>
         {
+            try
+            {
             var filename = Path.GetFileName(currentBallot);
             var ballotData = File.ReadAllText(currentBallot);
             using var ballot = new CiphertextBallot(ballotData);
 
+            var timestamp = ballot.Timestamp;
+            if (timestamp < startDate)
+            {
+                _ = Interlocked.Exchange(ref startDate, timestamp);
+            }
+            if (timestamp > endDate)
+            {
+                _ = Interlocked.Exchange(ref endDate, timestamp);
+            }
+
             if (ballot.ManifestHash != _manifestHash)
             {
-                var filename = Path.GetFileName(currentBallot);
-                var ballotData = File.ReadAllText(currentBallot);
-                CiphertextBallot ballot = new(ballotData);
+                _ = Interlocked.Increment(ref totalRejected);
+                return;
+            }
 
-                var timestamp = ballot.Timestamp;
-                if (timestamp < startDate)
+            var exists = await _ballotService.BallotExistsAsync(ballot.BallotCode.ToHex());
+            if (!exists)
+            {
+                BallotRecord ballotRecord = new()
                 {
-                    _ = Interlocked.Exchange(ref startDate, timestamp);
-                }
-                if (timestamp > endDate)
+                    ElectionId = ElectionId,
+                    TimeStamp = DateTime.UnixEpoch.AddSeconds(timestamp),
+                    UploadId = upload.UploadId,
+                    FileName = filename,
+                    BallotCode = ballot.BallotCode.ToHex(),
+                    BallotState = ballot.State,
+                    BallotData = ballotData
+                };
+                _ = await _ballotService.SaveAsync(ballotRecord);
+
+
+                _ = ballot.State switch
                 {
-                    _ = Interlocked.Exchange(ref endDate, timestamp);
-                }
+                    BallotBoxState.Cast => Interlocked.Increment(ref totalInserted),
+                    BallotBoxState.Challenged => Interlocked.Increment(ref totalChallenged),
+                    BallotBoxState.Spoiled => Interlocked.Increment(ref totalSpoiled),
+                    _ => throw new NotImplementedException()
+                };
 
-                var exists = await _ballotService.BallotExistsAsync(ballot.BallotCode.ToHex());
-                if (!exists)
+                lock (tallyLock)
                 {
-                    BallotRecord ballotRecord = new()
-                    {
-                        ElectionId = ElectionId,
-                        TimeStamp = DateTime.UnixEpoch.AddSeconds(timestamp),
-                        UploadId = upload.UploadId,
-                        FileName = filename,
-                        BallotCode = ballot.BallotCode.ToHex(),
-                        BallotState = ballot.State,
-                        BallotData = ballotData
-                    };
-                    _ = await _ballotService.SaveAsync(ballotRecord);
-
-
-                    _ = ballot.State switch
-                    {
-                        BallotBoxState.Cast => Interlocked.Increment(ref totalInserted),
-                        BallotBoxState.Challenged => Interlocked.Increment(ref totalChallenged),
-                        BallotBoxState.Spoiled => Interlocked.Increment(ref totalSpoiled),
-                        _ => throw new NotImplementedException()
-                    };
-
-                    lock (tallyLock)
-                    {
-                        var result = ciphertextTally.Accumulate(ballot, true);
-                    }
+                    var result = ciphertextTally.Accumulate(ballot, true);
                 }
+            }
+            else
+            {
+                _ = Interlocked.Increment(ref totalDuplicated);
             }
             _ = Interlocked.Increment(ref totalCount);
             UploadText = $"{AppResources.SuccessText} {totalCount} / {ballots.Length} {AppResources.Success2Text}";
+            }
+            catch(Exception ex) 
+            {
+                _ = Interlocked.Increment(ref totalRejected);
+            }
         });
 
         // update totals before saving
@@ -307,7 +317,7 @@ public partial class BallotUploadViewModel : BaseViewModel
         ManifestService manifestService,
         ContextService contextService,
         CiphertextTallyService ciphertextTallyService) : base("BallotUploadText", serviceProvider)
-        {
+    {
         _uploadService = uploadService;
         _ballotService = ballotService;
         _manifestService = manifestService;

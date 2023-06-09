@@ -257,13 +257,14 @@ public partial class CreateElectionViewModel : BaseViewModel
             ManifestErrorMessage = $"{AppResources.ErrorManifest}: {message}\n{AppResources.RemovingList}";
         }
 
-        if (_manifestFiles.Count == 1)
-        {
-            var vm = (ManifestViewModel)Ioc.Default.GetService(typeof(ManifestViewModel));
-            vm.ManifestFile = _manifestFiles.First().FullPath;
+        // commenting out the display of the manifest until we can get it not throwing an exception
+        //if (_manifestFiles.Count == 1)
+        //{
+        //    var vm = (ManifestViewModel)Ioc.Default.GetService(typeof(ManifestViewModel));
+        //    vm.ManifestFile = _manifestFiles.First().FullPath;
 
-            await NavigationService.GoToModal(typeof(ManifestViewModel));
-        }
+        //    await NavigationService.GoToModal(typeof(ManifestViewModel));
+        //}
     }
 
 }

@@ -38,8 +38,6 @@
                     WidthRequest="600"
                     ZIndex="-1" />
             </Grid>
-
-
         </StackLayout>
         <StackLayout Style="{StaticResource FormControl}">
             <Label Style="{StaticResource FormLabel}" Text="{helper:Translate ManifestText}" />

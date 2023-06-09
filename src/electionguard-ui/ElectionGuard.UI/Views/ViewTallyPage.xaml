@@ -16,6 +16,7 @@
     <ContentPage.Resources>
         <ResourceDictionary>
             <toolkit:InvertedBoolConverter x:Key="InvertedBoolConverter" />
+            <helper:BackupConverter x:Key="BackupConverter" />
         </ResourceDictionary>
     </ContentPage.Resources>
 
@@ -63,25 +64,30 @@
                                     VerticalOptions="Center" />
                                 <Image
                                     Grid.Column="1"
-                                    Margin="10,0,10,0"
+                                    IsVisible="{Binding Joined}"
                                     Source="key.png"
                                     ToolTipProperties.Text="{helper:Translate JoinedText}"
                                     WidthRequest="32" />
                                 <Image
+                                    Grid.Column="1"
+                                    IsVisible="{Binding Joined, Converter={StaticResource InvertedBoolConverter}}"
+                                    Source="redkey.png"
+                                    ToolTipProperties.Text="{helper:Translate JoinedText}"
+                                    WidthRequest="32" />
+                                <Image
                                     Grid.Column="2"
-                                    Margin="10,0,10,0"
+                                    IsVisible="{Binding Joined}"
                                     Source="{Binding HasDecryptShares, Converter={StaticResource BackupConverter}}"
                                     ToolTipProperties.Text="{helper:Translate BackupText}"
                                     WidthRequest="32" />
                                 <Image
                                     Grid.Column="3"
-                                    Margin="10,0,10,0"
+                                    IsVisible="{Binding Joined}"
                                     Source="notverify.png"
                                     ToolTipProperties.Text="{helper:Translate Verified}"
                                     WidthRequest="32" />
                                 <Image
                                     Grid.Column="3"
-                                    Margin="10,0,10,0"
                                     IsVisible="{Binding HasResponse}"
                                     Source="verify.png"
                                     WidthRequest="32" />
