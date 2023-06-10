@@ -8,10 +8,6 @@
     <Platforms>arm64;x64;x86</Platforms>
   </PropertyGroup>
 
-  <ItemGroup>
-    <ProjectReference Include="..\ElectionGuard.Encryption\ElectionGuard.Encryption.csproj" />
-  </ItemGroup>
-
   <PropertyGroup Label="Debug" Condition=" '$(Configuration)' == 'Debug' ">
     <DebugType>full</DebugType>
     <DebugSymbols>true</DebugSymbols>
@@ -26,4 +22,8 @@
     <WarningLevel>4</WarningLevel>
     <WarningsNotAsErrors>SYSLIB0004</WarningsNotAsErrors>
   </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="ElectionGuard.Encryption" Version="1.75.10" />
+  </ItemGroup>
 </Project>

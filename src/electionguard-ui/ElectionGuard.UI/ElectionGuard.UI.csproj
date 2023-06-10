@@ -163,6 +163,7 @@
 	</ItemGroup>
 
 	<ItemGroup>
+		<PackageReference Include="ElectionGuard.Encryption" />
 		<PackageReference Include="Microsoft.Extensions.Logging.Debug" />
 		<PackageReference Include="CommunityToolkit.Maui" />
 		<PackageReference Include="CommunityToolkit.Mvvm" />
@@ -171,10 +172,6 @@
 	<ItemGroup>
 	  <ProjectReference Include="..\..\..\bindings\netstandard\ElectionGuard\ElectionGuard.Decryption\ElectionGuard.Decryption.csproj" />
 	  <ProjectReference Include="..\..\..\bindings\netstandard\ElectionGuard\ElectionGuard.ElectionSetup\ElectionGuard.ElectionSetup.csproj" />
-	  <ProjectReference Include="..\..\..\bindings\netstandard\ElectionGuard\ElectionGuard.Encryption\ElectionGuard.Encryption.csproj">
-	    <CopyLocalSatelliteAssemblies>True</CopyLocalSatelliteAssemblies>
-	    <Private>True</Private>
-	  </ProjectReference>
 	  <ProjectReference Include="..\ElectionGuard.UI.Lib\ElectionGuard.UI.Lib.csproj" />
 	</ItemGroup>
 
@@ -215,6 +212,7 @@
 	  <None Remove="Resources\Images\key.svg" />
 	  <None Remove="Resources\Images\notbackup.svg" />
 	  <None Remove="Resources\Images\notverify.svg" />
+	  <None Remove="Resources\Images\redKey.svg" />
 	  <None Remove="Resources\Images\Verify.svg" />
 	  <None Remove="Services\" />
 	</ItemGroup>

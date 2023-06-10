@@ -11,6 +11,7 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="ElectionGuard.Encryption" Version="1.75.10" />
     <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.4.1" />
     <PackageReference Include="NUnit" Version="3.13.3" />
     <PackageReference Include="NUnit3TestAdapter" Version="4.3.1" />
@@ -26,7 +27,6 @@
     <ProjectReference Include="..\ElectionGuard.Decryption\ElectionGuard.Decryption.csproj" />
     <ProjectReference Include="..\ElectionGuard.ElectionSetup\ElectionGuard.ElectionSetup.csproj" />
     <ProjectReference Include="..\ElectionGuard.ElectionSetup.Tests\ElectionGuard.ElectionSetup.Tests.csproj" />
-    <ProjectReference Include="..\ElectionGuard.Encryption\ElectionGuard.Encryption.csproj" />
     <ProjectReference Include="..\ElectionGuard.Encryption.Utils\ElectionGuard.Encryption.Utils.csproj" />
   </ItemGroup>
 

@@ -37,23 +37,45 @@ public class TallyStateMachine : ITallyStateMachine
 
     public async Task Run(TallyRecord tally)
     {
-        if (Monitor.TryEnter(mutex))
+        string label = $"Electionguard.UI.TallyStateMachine-{_authenticationService.UserName}";
+
+        var mutex = new Mutex(true, label, out var owned);
+
+        if (owned)
         {
             try
             {
-                var steps = _steps[_authenticationService.IsAdmin];
-                var currentStep = steps.SingleOrDefault(s => s.State == tally.State);
-                if (currentStep is not null && await currentStep.ShouldRunStep(tally))
-                {
-                    await currentStep.RunStep(tally);
-                }
+                mutex.WaitOne();
+                Task.WaitAll(RunAsync(tally));
+            }
+            catch(AbandonedMutexException)
+            {
+                mutex.ReleaseMutex();
             }
             finally
             {
-                Monitor.Exit(mutex);
+                mutex.ReleaseMutex();
             }
         }
     }
+
+    private async Task RunAsync(TallyRecord tally)
+    {
+        try
+        {
+            var steps = _steps[_authenticationService.IsAdmin];
+            var currentStep = steps.SingleOrDefault(s => s.State == tally.State);
+            if (currentStep is not null && await currentStep.ShouldRunStep(tally))
+            {
+                await currentStep.RunStep(tally);
+            }
+        }
+        catch (Exception)
+        {
+        }
+    }
+
+
 
     #region Should Run
     private async Task<bool> ShouldAutoStartTally(TallyRecord tally)
@@ -100,7 +122,7 @@ public class TallyStateMachine : ITallyStateMachine
     #endregion
 
     #region Run Steps
-    
+
     private async Task StartTally(TallyRecord tally)
     {
         await _tallyService.UpdateStateAsync(tally.TallyId, TallyState.TallyStarted);
