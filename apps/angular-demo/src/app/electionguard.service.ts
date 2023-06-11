@@ -9,6 +9,7 @@ import {
   EncryptionMediator,
   GroupFunctions,
   InternalManifest,
+  Manifest,
   PlaintextBallot,
   initialize as egInitialize,
 } from '@infernored/electionguard-experimental';
@@ -47,8 +48,12 @@ export class ElectionguardService implements OnInit {
       this._isReady = true;
     }
 
+    this.logger.log('ElectionguardService configure');
+
     // simulate loading the election config data from the server
     const { context, manifest } = await this.fetchElectionConfigData();
+
+    this.logger.log('ElectionguardService configure: loading device');
 
     // simulate loading the device data
     const device = await EncryptionDevice.fromJson(
@@ -57,6 +62,8 @@ export class ElectionguardService implements OnInit {
 
     // create the encryption mediator
     this._mediator = await EncryptionMediator.make(manifest, context, device);
+
+    this.logger.log('ElectionguardService configure: complete');
   }
 
   // Encrypt a ballot
@@ -96,16 +103,20 @@ export class ElectionguardService implements OnInit {
   }> {
     const ciphertextElectionContext = (test_data as unknown as any).election
       .context;
-    const internalManifest = (test_data as unknown as any).election
-      .internal_manifest;
+    const manifest_data = (test_data as unknown as any).election.manifest;
+
+    // import the manifest
+    const manifest = await Manifest.fromJson(JSON.stringify(manifest_data));
 
     const context = await ElectionContext.fromJson(
       JSON.stringify(ciphertextElectionContext)
     );
-    const manifest = await InternalManifest.fromJson(
-      JSON.stringify(internalManifest)
-    );
 
-    return { context, manifest };
+    // convert the manifest to an internal manifest
+    const internalManifest = await InternalManifest.fromManifest(manifest);
+
+    this.logger.log(`electionguard fetchElectionConfigData: complete`);
+
+    return { context, manifest: internalManifest };
   }
 }

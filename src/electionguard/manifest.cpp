@@ -1255,6 +1255,7 @@ namespace electionguard
 
     bool ContestDescription::isValid() const
     {
+        auto contest_has_valid_selections = pimpl->selections.size() > 0;
         auto contest_has_valid_number_elected = pimpl->numberElected <= pimpl->selections.size();
         auto contest_has_valid_votes_allowed =
           pimpl->votesAllowed == 0 || pimpl->numberElected <= pimpl->votesAllowed;
@@ -1287,12 +1288,13 @@ namespace electionguard
         auto selections_have_valid_selection_ids = selectionIds.size() == expectedSelectionCount;
         auto selections_have_valid_sequence_ids = sequenceIds.size() == expectedSelectionCount;
 
-        auto success = contest_has_valid_number_elected && contest_has_valid_votes_allowed &&
-                       selections_have_valid_candidate_ids && selections_have_valid_selection_ids &&
-                       selections_have_valid_sequence_ids;
+        auto success = contest_has_valid_selections && contest_has_valid_number_elected &&
+                       contest_has_valid_votes_allowed && selections_have_valid_candidate_ids &&
+                       selections_have_valid_selection_ids && selections_have_valid_sequence_ids;
 
         if (!success) {
             map<string, bool> printMap{
+              {"contest_has_valid_selections", contest_has_valid_selections},
               {"contest_has_valid_number_elected", contest_has_valid_number_elected},
               {"contest_has_valid_votes_allowed", contest_has_valid_votes_allowed},
               {"selections_have_valid_candidate_ids", selections_have_valid_candidate_ids},
@@ -2017,11 +2019,15 @@ namespace electionguard
     InternalManifest::generateContestsWithPlaceholders(const Manifest &description)
     {
         vector<unique_ptr<ContestDescriptionWithPlaceholders>> contests;
+
+        //generate placeholders for each contest
         for (const auto &contest : description.getContests()) {
 
             vector<unique_ptr<SelectionDescription>> placeholders;
             placeholders.reserve(contest.get().getNumberElected());
             uint32_t maxSequenceOrder = 0;
+
+            // determine how many placeholders we need to generate
             for (const auto &selection : contest.get().getSelections()) {
                 auto sequenceOrder = selection.get().getSequenceOrder();
                 if (sequenceOrder > maxSequenceOrder) {
@@ -2031,6 +2037,7 @@ namespace electionguard
 
             maxSequenceOrder += 1;
 
+            // generate the placeholder selections
             for (uint64_t i = 0; i < contest.get().getNumberElected(); i++) {
                 auto placeholder =
                   generatePlaceholderSelectionFrom(contest.get(), maxSequenceOrder + i);
