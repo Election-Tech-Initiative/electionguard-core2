@@ -18,8 +18,8 @@ on:
       - "!src/electionguard-ui/**"
       - "test/**"
     branches: [main]
-  schedule:
-    - cron: "0 7 * * 4"
+  # schedule:
+  #   - cron: "0 7 * * 4"
 
 jobs:
   analyze:
