@@ -21,12 +21,12 @@ jobs:
       - name: Get Version Code
         id: get_version_code
         run: |
-          TAG_NAME=${GITHUB_REF/refs\/tags\//} # v1.0.0
+          TAG_NAME=$(git describe --tags `git rev-list --tags --max-count=1`) # v1.0.0
           echo "TAG_NAME=$TAG_NAME" >> $GITHUB_ENV
           BUILD_NUMBER=$(echo $TAG_NAME | grep -oP '\d+$')
           echo "BUILD_NUMBER=$BUILD_NUMBER" >> $GITHUB_ENV
           echo "build_number=$BUILD_NUMBER" >> $GITHUB_OUTPUT
-          VERSION="${TAG_NAME/v}" #-$BUILD_NUMBER
+          VERSION="${TAG_NAME/v}"
           echo "VERSION=$VERSION" >> $GITHUB_ENV
           echo "version=$VERSION" >> $GITHUB_OUTPUT
 
@@ -79,6 +79,7 @@ jobs:
     steps:
       - name: Configure Change Filter
         id: filter
+        shell: bash
         run: |
           FILTER_ANY_CHANGE="false"  # default value
           if [[ "${{ needs.changes.outputs.github }}" == "true" || "${{ needs.changes.outputs.bindings }}" == "true" || "${{ needs.changes.outputs.root }}" == "true" || "${{ needs.changes.outputs.scripts }}" == "true" || "${{ needs.changes.outputs.source }}" == "source" ]]; then
