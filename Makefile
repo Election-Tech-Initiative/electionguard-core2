@@ -138,9 +138,8 @@ endif
 	wget -O cmake/CPM.cmake https://github.com/cpm-cmake/CPM.cmake/releases/download/v0.35.5/CPM.cmake
 	make fetch-sample-data
 	dotnet tool restore
-	npm i -g appcenter-cli
 
-environment-ui: environment
+environment-ui:
 ifeq ($(OPERATING_SYSTEM),Windows)
 	dotnet workload install maui
 	dotnet workload restore ./src/electionguard-ui/ElectionGuard.UI/ElectionGuard.UI.csproj && dotnet restore ./src/electionguard-ui/ElectionGuard.UI.sln
@@ -148,6 +147,8 @@ else
 	sudo dotnet workload install maui
 	sudo dotnet workload restore ./src/electionguard-ui/ElectionGuard.UI/ElectionGuard.UI.csproj && dotnet restore ./src/electionguard-ui/ElectionGuard.UI.sln
 endif
+	dotnet tool restore
+	npm i -g appcenter-cli
 
 environment-wasm:
 	@echo 🌐 WASM INSTALL
@@ -268,7 +269,7 @@ build-cli:
 	cd ./apps/electionguard-cli && dotnet restore
 	dotnet build -c $(TARGET) $(ELECTIONGUARD_APP_CLI_DIR)/ElectionGuard.CLI.sln /p:Platform=$(PROCESSOR)
 
-build-ui: build-maccatalyst build-netstandard
+build-ui:
 	@echo 🖥️ BUILD UI $(OPERATING_SYSTEM) $(PROCESSOR) $(TARGET)
 	cd $(ELECTIONGUARD_APP_ADMIN_DIR) && dotnet restore
 	dotnet build -c $(TARGET) $(ELECTIONGUARD_APP_ADMIN_DIR)/ElectionGuard.UI.sln /p:Platform=$(PROCESSOR) /p:APPCENTER_SECRET_UWP=$(APPCENTER_SECRET_UWP) /p:APPCENTER_SECRET_MACOS=$(APPCENTER_SECRET_MACOS)
