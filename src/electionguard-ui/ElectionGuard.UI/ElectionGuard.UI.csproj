@@ -30,46 +30,48 @@
     <!--<Configurations>Release;Debug</Configurations>-->
 		<Platforms Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'maccatalyst'">arm64;x64</Platforms>
 		<Platforms Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'windows'">AnyCPU</Platforms>
+    <UserSecretsId>efb177b9-29c3-4df1-adaa-be7e64bdc8ce</UserSecretsId>
   </PropertyGroup>
 
+	<PropertyGroup>
+    <DefineConstants>$(DefineConstants);APPCENTER_SECRET_MACOS=$(APPCENTER_SECRET_MACOS);APPCENTER_SECRET_UWP=$(APPCENTER_SECRET_UWP)</DefineConstants>
+</PropertyGroup>
+
+
  <PropertyGroup Label="Debug|arm64" Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Debug|net7.0-maccatalyst|arm64'">
-	  <TreatWarningsAsErrors>True</TreatWarningsAsErrors>
 	  <CreatePackage>false</CreatePackage>
 		<RuntimeIdentifiers>maccatalyst-arm64;maccatalyst-x64</RuntimeIdentifiers>
 	</PropertyGroup>
 
 	<PropertyGroup Label="Release|arm64" Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Release|net7.0-maccatalyst|arm64'">
-	  <TreatWarningsAsErrors>True</TreatWarningsAsErrors>
-	  <CreatePackage>false</CreatePackage>
+	  <CreatePackage>true</CreatePackage>
 		<RuntimeIdentifiers>maccatalyst-arm64;maccatalyst-x64</RuntimeIdentifiers>
 	</PropertyGroup>
 
 	 <PropertyGroup Label="Debug|x64" Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Debug|net7.0-maccatalyst|x64'">
-	  <TreatWarningsAsErrors>True</TreatWarningsAsErrors>
 	  <CreatePackage>false</CreatePackage>
 		<RuntimeIdentifiers>maccatalyst-x64</RuntimeIdentifiers>
 	</PropertyGroup>
 
 	<PropertyGroup Label="Release|x64" Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Release|net7.0-maccatalyst|x64'">
-	  <TreatWarningsAsErrors>True</TreatWarningsAsErrors>
 	  <CreatePackage>false</CreatePackage>
 		<RuntimeIdentifiers>maccatalyst-x64</RuntimeIdentifiers>
 	</PropertyGroup>
 
 	<!-- <PropertyGroup Label="Debug|arm64" Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Debug|net7.0-windows10.0.19041.0|arm64'">
-	  <TreatWarningsAsErrors>True</TreatWarningsAsErrors>
+
 	</PropertyGroup>
 
 	<PropertyGroup Label="Release|arm64" Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Release|net7.0-windows10.0.19041.0|arm64'">
-	  <TreatWarningsAsErrors>True</TreatWarningsAsErrors>
+
 	</PropertyGroup> -->
 
 	<PropertyGroup Label="Debug|x64" Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Debug|net7.0-windows10.0.19041.0|x64'">
-	  <TreatWarningsAsErrors>True</TreatWarningsAsErrors>
+
 	</PropertyGroup>
 
 	<PropertyGroup Label="Release|x64" Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Release|net7.0-windows10.0.19041.0|x64'">
-	  <TreatWarningsAsErrors>True</TreatWarningsAsErrors>
+
 	</PropertyGroup>
 
 	<!-- <PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Release|net7.0-maccatalyst|AnyCPU'">
@@ -94,7 +96,6 @@
 	  <OutputPath></OutputPath>
 	  <DefineConstants></DefineConstants>
 	  <WarningLevel></WarningLevel>
-	  <TreatWarningsAsErrors></TreatWarningsAsErrors>
 	  <DocumentationFile></DocumentationFile>
 	  <ConsolePause>true</ConsolePause>
 	  <ExternalConsole>false</ExternalConsole>
@@ -122,7 +123,6 @@
 	  <OutputPath></OutputPath>
 	  <DefineConstants></DefineConstants>
 	  <WarningLevel></WarningLevel>
-	  <TreatWarningsAsErrors></TreatWarningsAsErrors>
 	  <DocumentationFile></DocumentationFile>
 	  <ConsolePause>true</ConsolePause>
 	  <ExternalConsole>false</ExternalConsole>
@@ -164,6 +164,8 @@
 
 	<ItemGroup>
 		<PackageReference Include="ElectionGuard.Encryption" />
+		<PackageReference Include="Microsoft.AppCenter.Crashes" />
+		<PackageReference Include="Microsoft.AppCenter.Distribute" />
 		<PackageReference Include="Microsoft.Extensions.Logging.Debug" />
 		<PackageReference Include="CommunityToolkit.Maui" />
 		<PackageReference Include="CommunityToolkit.Mvvm" />

@@ -2,6 +2,9 @@
 using ElectionGuard.Decryption;
 using ElectionGuard.UI.Services;
 using Microsoft.Extensions.Logging;
+using Microsoft.AppCenter;
+using Microsoft.AppCenter.Crashes;
+using Microsoft.AppCenter.Distribute;
 
 namespace ElectionGuard.UI;
 
@@ -28,6 +31,8 @@ public static class MauiProgram
             .SetupFonts()
             .SetupServices()
             .SetupLogging();
+
+        InitializeAppCenter();
 
         return builder.Build();
     }
@@ -126,5 +131,29 @@ public static class MauiProgram
         return builder;
     }
 
+    private static void InitializeAppCenter()
+    {
 
+#if !DEBUG
+#if APPCENTER_SECRET_MACOS
+        string macSecret = APPCENTER_SECRET_MACOS;
+#else
+        string macSecret = null;
+#endif
+
+#if APPCENTER_SECRET_UWP
+        string uwpSecret = APPCENTER_SECRET_UWP;
+#else
+        string uwpSecret = null;
+#endif
+        if (!string.IsNullOrWhiteSpace(macSecret) || !string.IsNullOrWhiteSpace(uwpSecret))
+        {
+            AppCenter.Start(
+                $"uwp={uwpSecret};" +
+                $"macos={macSecret};",
+                typeof(Crashes));
+        }
+#endif
+
+    }
 }

@@ -4,7 +4,7 @@ using ElectionGuard.UI.Lib.Models;
 namespace ElectionGuard.UI.Lib.Services;
 public class ZipStorageService : IStorageService
 {
-    private string _zipFile;
+    private string? _zipFile;
 
     private ZipArchiveMode ZipMode => File.Exists(_zipFile) ? ZipArchiveMode.Update : ZipArchiveMode.Create;
 
