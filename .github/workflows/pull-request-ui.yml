@@ -85,12 +85,12 @@ jobs:
             FILTER_ANY_CHANGE="true"
           fi
 
-          echo "any: $FILTER_ANY_CHANGE" >> $GITHUB_OUTPUT
-          echo "github: ${{ needs.changes.outputs.github }}" >> $GITHUB_OUTPUT
-          echo "bindings: ${{ needs.changes.outputs.bindings }}" >> $GITHUB_OUTPUT
-          echo "root: ${{ needs.changes.outputs.root }}" >> $GITHUB_OUTPUT
-          echo "scripts: ${{ needs.changes.outputs.scripts }}" >> $GITHUB_OUTPUT
-          echo "source: ${{ needs.changes.outputs.source }}" >> $GITHUB_OUTPUT
+          echo "any=$FILTER_ANY_CHANGE" >> $GITHUB_OUTPUT
+          echo "github=${{ needs.changes.outputs.github }}" >> $GITHUB_OUTPUT
+          echo "bindings=${{ needs.changes.outputs.bindings }}" >> $GITHUB_OUTPUT
+          echo "root=${{ needs.changes.outputs.root }}" >> $GITHUB_OUTPUT
+          echo "scripts=${{ needs.changes.outputs.scripts }}" >> $GITHUB_OUTPUT
+          echo "source=${{ needs.changes.outputs.source }}" >> $GITHUB_OUTPUT
 
       # Checkout
       - name: Checkout Code

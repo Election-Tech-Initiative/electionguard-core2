@@ -161,18 +161,18 @@ jobs:
             FILTER_CPP_CHANGE="true"
           fi
 
-          echo "any: $FILTER_ANY_CHANGE" >> $GITHUB_OUTPUT
-          echo "cpp: $FILTER_CPP_CHANGE" >> $GITHUB_OUTPUT
-          echo "github: ${{ needs.changes.outputs.github }}" >> $GITHUB_OUTPUT
-          echo "apps: ${{ needs.changes.outputs.apps }}" >> $GITHUB_OUTPUT
-          echo "bindings: ${{ needs.changes.outputs.bindings }}" >> $GITHUB_OUTPUT
-          echo "cmake: ${{ needs.changes.outputs.cmake }}" >> $GITHUB_OUTPUT
-          echo "include: ${{ needs.changes.outputs.include }}" >> $GITHUB_OUTPUT
-          echo "libs: ${{ needs.changes.outputs.libs }}" >> $GITHUB_OUTPUT
-          echo "root: ${{ needs.changes.outputs.root }}" >> $GITHUB_OUTPUT
-          echo "scripts: ${{ needs.changes.outputs.scripts }}" >> $GITHUB_OUTPUT
-          echo "source: ${{ needs.changes.outputs.source }}" >> $GITHUB_OUTPUT
-          echo "typescript: ${{ needs.changes.outputs.typescript }}" >> $GITHUB_OUTPUT
+          echo "any=$FILTER_ANY_CHANGE" >> $GITHUB_OUTPUT
+          echo "cpp=$FILTER_CPP_CHANGE" >> $GITHUB_OUTPUT
+          echo "github=${{ needs.changes.outputs.github }}" >> $GITHUB_OUTPUT
+          echo "apps=${{ needs.changes.outputs.apps }}" >> $GITHUB_OUTPUT
+          echo "bindings=${{ needs.changes.outputs.bindings }}" >> $GITHUB_OUTPUT
+          echo "cmake=${{ needs.changes.outputs.cmake }}" >> $GITHUB_OUTPUT
+          echo "include=${{ needs.changes.outputs.include }}" >> $GITHUB_OUTPUT
+          echo "libs=${{ needs.changes.outputs.libs }}" >> $GITHUB_OUTPUT
+          echo "root=${{ needs.changes.outputs.root }}" >> $GITHUB_OUTPUT
+          echo "scripts=${{ needs.changes.outputs.scripts }}" >> $GITHUB_OUTPUT
+          echo "source=${{ needs.changes.outputs.source }}" >> $GITHUB_OUTPUT
+          echo "typescript=${{ needs.changes.outputs.typescript }}" >> $GITHUB_OUTPUT
 
       # Checkout
       - name: Checkout Code
