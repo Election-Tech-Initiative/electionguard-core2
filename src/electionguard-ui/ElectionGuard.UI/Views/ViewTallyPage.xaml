@@ -5,6 +5,7 @@
     xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
     xmlns:controls="clr-namespace:ElectionGuard.UI.Controls"
     xmlns:helper="clr-namespace:ElectionGuard.UI.Helpers"
+    xmlns:converter="clr-namespace:ElectionGuard.UI.Converters"
     xmlns:model="clr-namespace:ElectionGuard.UI.Lib.Models;assembly=ElectionGuard.UI.Lib"
     xmlns:models="clr-namespace:ElectionGuard.UI.Models"
     xmlns:toolkit="http://schemas.microsoft.com/dotnet/2022/maui/toolkit"
@@ -16,7 +17,7 @@
     <ContentPage.Resources>
         <ResourceDictionary>
             <toolkit:InvertedBoolConverter x:Key="InvertedBoolConverter" />
-            <helper:BackupConverter x:Key="BackupConverter" />
+            <converter:BackupConverter x:Key="BackupConverter" />
         </ResourceDictionary>
     </ContentPage.Resources>
 

@@ -179,7 +179,7 @@ public partial class BallotUploadViewModel : BaseViewModel
                     BallotRecord ballotRecord = new()
                     {
                         ElectionId = ElectionId,
-                        TimeStamp = DateTime.UnixEpoch.AddSeconds(timestamp),
+                        TimeStamp = DateTime.UnixEpoch.AddSeconds(ballot.Timestamp),
                         UploadId = upload.UploadId,
                         FileName = filename,
                         BallotCode = ballot.BallotCode.ToHex(),
@@ -191,7 +191,7 @@ public partial class BallotUploadViewModel : BaseViewModel
 
                     _ = ballot.State switch
                     {
-                        BallotBoxState.Cast => Interlocked.Increment(ref totalInserted),
+                        BallotBoxState.Cast => Interlocked.Increment(ref totalImported),
                         BallotBoxState.Challenged => Interlocked.Increment(ref totalChallenged),
                         BallotBoxState.Spoiled => Interlocked.Increment(ref totalSpoiled),
                         _ => throw new NotImplementedException()
