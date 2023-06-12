@@ -10,16 +10,27 @@ const internalManifest = (test_data as unknown as any).election
 
 describe("Manifest Tests", () => {
   it("should convert from json", async () => {
-    const expected = JSON.stringify(manifest);
-    const result = await Manifest.fromJson(expected);
+    const data = JSON.stringify(manifest);
+    const result = await Manifest.fromJson(data);
     assert.isTrue(result.toJson().includes(manifest.election_scope_id));
   });
 });
 
 describe("InternalManifest Tests", () => {
   it("should convert from json", async () => {
-    const expected = JSON.stringify(internalManifest);
-    const result = await InternalManifest.fromJson(expected);
+    const data = JSON.stringify(internalManifest);
+    const result = await InternalManifest.fromJson(data);
+    assert.isTrue(result.toJson().includes(internalManifest.manifest_hash));
+  });
+  it("should convert from manifest json", async () => {
+    const data = JSON.stringify(manifest);
+    const result = await InternalManifest.fromManifestJson(data);
+    assert.isTrue(result.toJson().includes(internalManifest.manifest_hash));
+  });
+  it("should convert from manifest", async () => {
+    const data = JSON.stringify(manifest);
+    const manifest_ = await Manifest.fromJson(data);
+    const result = await InternalManifest.fromManifest(manifest_);
     assert.isTrue(result.toJson().includes(internalManifest.manifest_hash));
   });
 });

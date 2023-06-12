@@ -122,9 +122,6 @@ describe("EncryptionFunctions Tests", () => {
     const actual = reencrypted.ballotCode.toHex();
     const expected = ciphertext.ballotCode.toHex();
 
-    console.log(`actual ballotCode: ${actual}`);
-    console.log(`expected ballotCode: ${expected}`);
-
     // check that the re-encrypted ballot has the same ballot code as the original
     assert.isTrue(actual.includes(expected));
   });
