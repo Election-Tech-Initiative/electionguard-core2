@@ -21,6 +21,7 @@ jobs:
       - name: Get Version Code
         id: get_version_code
         run: |
+          git fetch --depth=100 origin +refs/tags/*:refs/tags/*
           TAG_NAME=$(git describe --tags `git rev-list --tags --max-count=1`) # v1.0.0
           echo "TAG_NAME=$TAG_NAME" >> $GITHUB_ENV
           BUILD_NUMBER=$(echo $TAG_NAME | grep -oP '\d+$')
