@@ -3,26 +3,61 @@ name: Pull Request
 on:
   workflow_dispatch:
   pull_request:
-    paths:
-      - ".github/pull-request.yml"
-      - "apps/**"
-      - "bindings/**"
-      - "cmake/**"
-      - "include/**"
-      - "libs/**"
-      - "src/**"
-      - "!src/electionguard-ui/**"
-      - "test/**"
-      - "CMakeLists.txt"
-      - "Dockerfile"
-      - "Makefile"
     branches: [main]
 
 env:
   TARGET: Release
 
 jobs:
+  changes:
+    runs-on: ubuntu-latest
+    permissions:
+      pull-requests: read
+    outputs:
+      github: ${{ steps.filter.outputs.github }}
+      apps: ${{ steps.filter.outputs.apps }}
+      bindings: ${{ steps.filter.outputs.bindings }}
+      cmake: ${{ steps.filter.outputs.cmake }}
+      include: ${{ steps.filter.outputs.include }}
+      libs: ${{ steps.filter.outputs.libs }}
+      root: ${{ steps.filter.outputs.root }}
+      scripts: ${{ steps.filter.outputs.scripts }}
+      source: ${{ steps.filter.outputs.source }}
+      typescript: ${{ steps.filter.outputs.typescript }}
+    steps:
+      # For pull requests it's not necessary to checkout the code
+      - uses: dorny/paths-filter@v2
+        id: filter
+        with:
+          filters: |
+            github:
+              - '.github/workflows/pull-request.yml'
+            apps:
+              - 'apps/**'
+            bindings:
+              - 'bindings/netstandard/**'
+              - 'src/electionguard-ui/ElectionGuard.UI.Lib/**'
+            cmake:
+              - 'cmake/**'
+            include:
+              - 'include/**'
+            libs:
+              - 'libs/**'
+            root:
+              - 'CMakeLists.txt'
+              - 'Makefile'
+            scripts:
+              - 'scripts/**'
+            source:
+              - 'src/electionguard/**'
+              - 'src/CMakeLists.txt'
+              - 'test/**'
+            typescript:
+              - 'bindings/typescript/**'
+              - 'src/electionguard/wasm/**'
+
   build_and_test:
+    needs: changes
     name: ${{ matrix.name }}
     runs-on: ${{ matrix.os }}
     strategy:
@@ -114,16 +149,44 @@ jobs:
             runTsTests: false
 
     steps:
+      - name: Configure Change Filter
+        id: filter
+        run: |
+          FILTER_ANY_CHANGE="false"  # default value
+          if [[ "${{ needs.changes.outputs.github }}" == "true" || "${{ needs.changes.outputs.apps }}" == "true" || "${{ needs.changes.outputs.bindings }}" == "true" || "${{ needs.changes.outputs.cmake }}" == "true" || "${{ needs.changes.outputs.include }}" == "true" || "${{ needs.changes.outputs.libs }}" == "true" || "${{ needs.changes.outputs.root }}" == "true" || "${{ needs.changes.outputs.scripts }}" == "true" || "${{ needs.changes.outputs.source }}" == "source" || "${{ needs.changes.outputs.typescript }}" == "true" ]]; then
+            FILTER_ANY_CHANGE="true"
+          fi
+          FILTER_CPP_CHANGE="false"  # default value
+          if [[ "${{ needs.changes.outputs.cmake }}" == "true" || "${{ needs.changes.outputs.include }}" == "true" || "${{ needs.changes.outputs.libs }}" == "true" || "${{ needs.changes.outputs.root }}" == "true" || "${{ needs.changes.outputs.source }}" == "source" ]]; then
+            FILTER_CPP_CHANGE="true"
+          fi
+
+          echo "any: $FILTER_ANY_CHANGE" >> $GITHUB_OUTPUT
+          echo "cpp: $FILTER_CPP_CHANGE" >> $GITHUB_OUTPUT
+          echo "github: ${{ needs.changes.outputs.github }}" >> $GITHUB_OUTPUT
+          echo "apps: ${{ needs.changes.outputs.apps }}" >> $GITHUB_OUTPUT
+          echo "bindings: ${{ needs.changes.outputs.bindings }}" >> $GITHUB_OUTPUT
+          echo "cmake: ${{ needs.changes.outputs.cmake }}" >> $GITHUB_OUTPUT
+          echo "include: ${{ needs.changes.outputs.include }}" >> $GITHUB_OUTPUT
+          echo "libs: ${{ needs.changes.outputs.libs }}" >> $GITHUB_OUTPUT
+          echo "root: ${{ needs.changes.outputs.root }}" >> $GITHUB_OUTPUT
+          echo "scripts: ${{ needs.changes.outputs.scripts }}" >> $GITHUB_OUTPUT
+          echo "source: ${{ needs.changes.outputs.source }}" >> $GITHUB_OUTPUT
+          echo "typescript: ${{ needs.changes.outputs.typescript }}" >> $GITHUB_OUTPUT
+
       # Checkout
       - name: Checkout Code
+        if: (steps.filter.outputs.any == 'true')
         uses: actions/checkout@v3
 
       - name: Change Directory
+        if: (steps.filter.outputs.any == 'true')
         run: cd ${{ github.workspace }}
 
       # Cache
       - name: Setup Dependency Cache
         id: dependency-cache
+        if: (steps.filter.outputs.any == 'true')
         uses: actions/cache@v3
         with:
           path: |
@@ -132,6 +195,7 @@ jobs:
 
       - name: Setup C++ Build Cache
         id: build-cache
+        if: (steps.filter.outputs.any == 'true')
         uses: actions/cache@v3
         with:
           path: |
@@ -140,7 +204,7 @@ jobs:
 
       - name: Setup Node Cache
         id: node-cache
-        if: (matrix.compiler == 'emscripten')
+        if: (matrix.compiler == 'emscripten' && steps.filter.outputs.typescript == 'true')
         uses: actions/cache@v3
         with:
           path: |
@@ -149,7 +213,7 @@ jobs:
 
       # Runner Configuration
       - name: Update Environment (Linux)
-        if: runner.os == 'Linux'
+        if: (runner.os == 'Linux' && steps.filter.outputs.any == 'true')
         run: |
           sudo apt-get update
 
@@ -168,27 +232,27 @@ jobs:
           fi
 
       - name: Update Environment (Mac)
-        if: runner.os == 'macOS'
+        if: (runner.os == 'macOS' && steps.filter.outputs.any == 'true')
         run: |
           ls -ls /Applications/
           ls -ls $ANDROID_SDK_ROOT/ndk
           sudo xcode-select -switch /Applications/Xcode_${{ matrix.version }}.app
 
       - name: Update Environment (Windows MSYS2)
-        if: (runner.os == 'Windows' && matrix.compiler == 'gcc')
+        if: (runner.os == 'Windows' && matrix.compiler == 'gcc' && steps.filter.outputs.any == 'true')
         uses: msys2/setup-msys2@v2
         with:
           update: true
           install: mingw-w64-x86_64-gcc
 
       - name: Update Environment (Windows MSVC x64)
-        if: (runner.os == 'Windows' && matrix.compiler == 'msvc' && matrix.processor == 'x64')
+        if: (runner.os == 'Windows' && matrix.compiler == 'msvc' && matrix.processor == 'x64' && steps.filter.outputs.any == 'true')
         uses: ilammy/msvc-dev-cmd@v1
         with:
           arch: ${{ matrix.processor }}
 
       - name: Update Environment (Windows MSVC x86)
-        if: (runner.os == 'Windows' && matrix.compiler == 'msvc' && matrix.processor == 'x86')
+        if: (runner.os == 'Windows' && matrix.compiler == 'msvc' && matrix.processor == 'x86' && steps.filter.outputs.any == 'true')
         uses: ilammy/msvc-dev-cmd@v1
         with:
           arch: amd64_x86
@@ -196,58 +260,60 @@ jobs:
       # Tools
       - name: Install .NET
         uses: actions/setup-dotnet@v3
+        if: (steps.filter.outputs.any == 'true')
         with:
           dotnet-version: 7.0.x
 
       # Environment
       - name: Configure Environment
+        if: (steps.filter.outputs.any == 'true')
         run: make environment
 
       # Lint
       - name: Lint
-        if: (matrix.lint)
+        if: (matrix.lint && steps.filter.outputs.any == 'true')
         run: make lint
-      
+
       # Build
       - name: Build CLI (Windows)
         env:
           PROCESSOR: ${{ matrix.processor }}
-        if: (runner.os == 'Windows' && matrix.compiler == 'msvc')
+        if: (runner.os == 'Windows' && matrix.compiler == 'msvc' && steps.filter.outputs.apps == 'true')
         run: make build-cli
 
       # Tests
       - name: Run Tests (Linux)
         env:
           PROCESSOR: ${{ matrix.processor }}
-        if: (runner.os == 'Linux')
+        if: (runner.os == 'Linux' && steps.filter.outputs.cpp == 'true')
         run: make test
 
       - name: Run Tests (MacOS)
         env:
           PROCESSOR: ${{ matrix.processor }}
-        if: runner.os == 'macOS'
+        if: (runner.os == 'macOS' && steps.filter.outputs.cpp == 'true')
         run: make test
 
       - name: Run Tests (Windows)
         env:
           PROCESSOR: ${{ matrix.processor }}
-        if: (runner.os == 'Windows' && matrix.compiler == 'msvc')
+        if: (runner.os == 'Windows' && matrix.compiler == 'msvc' && steps.filter.outputs.cpp == 'true')
         run: make test
 
       - name: Run Tests (Windows-msys2)
         env:
           PROCESSOR: ${{ matrix.processor }}
-        if: (runner.os == 'Windows' && matrix.compiler == 'gcc')
+        if: (runner.os == 'Windows' && matrix.compiler == 'gcc' && steps.filter.outputs.cpp == 'true')
         run: make test-msys2
 
       - name: Run .Net Tests
         env:
           PROCESSOR: ${{ matrix.processor }}
-        if: (matrix.runCsTests)
+        if: (matrix.runCsTests && (steps.filter.outputs.bindings == 'true' || steps.filter.outputs.cpp == 'true'))
         run: make test-netstandard
 
       - name: Run Typescript Tests (Linux)
         env:
           PROCESSOR: ${{ matrix.processor }}
-        if: (matrix.runTsTests)
+        if: (matrix.runTsTests && (steps.filter.outputs.cpp == 'true' || steps.filter.outputs.typescript == 'true'))
         run: make build-npm && make test-wasm
