@@ -1,4 +1,4 @@
-﻿namespace ElectionGuard.UI.Services;
+﻿namespace ElectionGuard.UI.Models;
 
 public class TallyCeremonyChecklist
 {
