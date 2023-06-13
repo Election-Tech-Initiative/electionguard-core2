@@ -202,6 +202,12 @@ public partial class TallyProcessViewModel : BaseViewModel
         });
     }
 
+    [RelayCommand]
+    public async Task ViewTally()
+    {
+        await NavigationService.GoToPage(typeof(ViewTallyViewModel), new() { { nameof(TallyId), TallyId } });
+    }
+
     private bool CanAbandon()
     {
         return AuthenticationService.IsAdmin &&
