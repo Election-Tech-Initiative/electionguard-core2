@@ -9,7 +9,8 @@ on:
   workflow_dispatch:
   pull_request:
     paths:
-      - ".github/codeql-analysis.yml"
+      - ".github/workflows/codeql-analysis.yml"
+      - "apps/**"
       - "bindings/**"
       - "cmake/**"
       - "include/**"
