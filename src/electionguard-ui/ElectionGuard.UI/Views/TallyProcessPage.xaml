@@ -243,7 +243,8 @@
                 <ActivityIndicator
                     Margin="10"
                     HeightRequest="100"
-                    IsRunning="{Binding Checklist.TallyStarted}"
+                    IsRunning="True"
+                    IsVisible="{Binding Checklist.TallyStarted}"
                     WidthRequest="100" />
             </HorizontalStackLayout>
             <Line Background="Black" />
@@ -258,7 +259,8 @@
                 <ActivityIndicator
                     Margin="10"
                     HeightRequest="100"
-                    IsRunning="{Binding Checklist.SubtaliesCombined}"
+                    IsRunning="True"
+                    IsVisible="{Binding Checklist.SubtaliesCombined}"
                     WidthRequest="100" />
             </HorizontalStackLayout>
             <Line Background="Black" />
@@ -273,7 +275,8 @@
                 <ActivityIndicator
                     Margin="10"
                     HeightRequest="100"
-                    IsRunning="{Binding Checklist.AllDecryptionSharesComputed}"
+                    IsRunning="True"
+                    IsVisible="{Binding Checklist.AllDecryptionSharesComputed}"
                     WidthRequest="100" />
             </HorizontalStackLayout>
             <Line Background="Black" />
@@ -288,7 +291,8 @@
                 <ActivityIndicator
                     Margin="10"
                     HeightRequest="100"
-                    IsRunning="{Binding Checklist.ChallengeCreated}"
+                    IsRunning="True"
+                    IsVisible="{Binding Checklist.ChallengeCreated}"
                     WidthRequest="100" />
             </HorizontalStackLayout>
             <Line Background="Black" />
@@ -303,7 +307,8 @@
                 <ActivityIndicator
                     Margin="10"
                     HeightRequest="100"
-                    IsRunning="{Binding Checklist.AllChallengesResponded}"
+                    IsRunning="True"
+                    IsVisible="{Binding Checklist.AllChallengesResponded}"
                     WidthRequest="100" />
             </HorizontalStackLayout>
             <Line Background="Black" />
