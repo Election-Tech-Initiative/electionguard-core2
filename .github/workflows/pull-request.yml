@@ -158,12 +158,12 @@ jobs:
             FILTER_ANY_CHANGE="true"
           fi
           FILTER_CPP_CHANGE="false"  # default value
-          if [[ "${{ needs.changes.outputs.cmake }}" == "true" || "${{ needs.changes.outputs.include }}" == "true" || "${{ needs.changes.outputs.libs }}" == "true" || "${{ needs.changes.outputs.source }}" == "source" ]]; then
+          if [[ "${{ needs.changes.outputs.cmake }}" == "true" || "${{ needs.changes.outputs.include }}" == "true" || "${{ needs.changes.outputs.libs }}" == "true" || "${{ needs.changes.outputs.source }}" == "true" ]]; then
             FILTER_CPP_CHANGE="true"
           fi
 
-          echo "any=$FILTER_ANY_CHANGE" >> $GITHUB_OUTPUT
-          echo "cpp=$FILTER_CPP_CHANGE" >> $GITHUB_OUTPUT
+          echo "any=$(FILTER_ANY_CHANGE)" >> $GITHUB_OUTPUT
+          echo "cpp=$(FILTER_CPP_CHANGE)" >> $GITHUB_OUTPUT
           echo "github=${{ needs.changes.outputs.github }}" >> $GITHUB_OUTPUT
           echo "apps=${{ needs.changes.outputs.apps }}" >> $GITHUB_OUTPUT
           echo "bindings=${{ needs.changes.outputs.bindings }}" >> $GITHUB_OUTPUT
