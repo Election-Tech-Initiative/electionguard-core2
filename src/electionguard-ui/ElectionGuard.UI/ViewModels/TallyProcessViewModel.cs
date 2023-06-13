@@ -185,7 +185,7 @@ public partial class TallyProcessViewModel : BaseViewModel
     }
 
     [RelayCommand(CanExecute = nameof(CanAbandon))]
-    public async Task AbandonTally()
+    private async Task AbandonTally()
     {
         if (Tally == null)
         {
@@ -203,7 +203,7 @@ public partial class TallyProcessViewModel : BaseViewModel
     }
 
     [RelayCommand]
-    public async Task ViewTally()
+    private async Task ViewTally()
     {
         await NavigationService.GoToPage(typeof(ViewTallyViewModel), new() { { nameof(TallyId), TallyId } });
     }
