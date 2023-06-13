@@ -319,6 +319,7 @@ endif
 
 clean-netstandard:
 	@echo 🗑️ CLEAN NETSTANDARD
+	cd $(ELECTIONGUARD_APP_CLI_DIR) && dotnet restore
 	dotnet clean -c Debug $(ELECTIONGUARD_APP_CLI_DIR)/ElectionGuard.CLI.sln
 	dotnet clean -c Release $(ELECTIONGUARD_APP_CLI_DIR)/ElectionGuard.CLI.sln
 	dotnet clean -c Debug ./bindings/netstandard/ElectionGuard/ElectionGuard.sln
@@ -326,8 +327,9 @@ clean-netstandard:
 
 clean-ui:
 	@echo 🗑️ CLEAN UI
-	dotnet clean -c Debug ./src/electionguard-ui/ElectionGuard.UI.sln
-	dotnet clean -c Release ./src/electionguard-ui/ElectionGuard.UI.sln
+	cd $(ELECTIONGUARD_APP_ADMIN_DIR) && dotnet restore
+	dotnet clean -c Debug $(ELECTIONGUARD_APP_ADMIN_DIR)/ElectionGuard.UI.sln
+	dotnet clean -c Release $(ELECTIONGUARD_APP_ADMIN_DIR)/ElectionGuard.UI.sln
 
 clean-wasm:
 	@echo 🗑️ CLEAN WASM
