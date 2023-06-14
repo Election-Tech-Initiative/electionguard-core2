@@ -1,6 +1,7 @@
 ﻿using ElectionGuard.UI.Lib.Models;
 using MongoDB.Bson;
 using MongoDB.Driver;
+using MongoDB.Driver.Core.Clusters;
 
 namespace ElectionGuard.UI.Lib.Services;
 
@@ -30,7 +31,16 @@ public class TallyService : BaseDatabaseService<TallyRecord>
             FilterBuilder.Ne(Constants.State, TallyState.Abandoned));
 
         return await GetAllByFilterAsync(filter);
+    }
 
+    /// <summary>
+    /// Gets tally state to determine if it is running
+    /// </summary>
+    /// <param name="tallyId">tally id to search for</param>
+    public async Task<bool> GetRunningByTallyIdAsync(string tallyId)
+    {
+        var tally = await GetByFieldAsync(Constants.TallyId, tallyId);
+        return tally?.State is not TallyState.Complete and not TallyState.Abandoned;
     }
 
     /// <summary>

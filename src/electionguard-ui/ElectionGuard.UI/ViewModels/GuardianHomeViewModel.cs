@@ -123,9 +123,23 @@ public partial class GuardianHomeViewModel : BaseViewModel
         var multiTallies = await _multiTallyService.GetAllAsync();
         foreach (var tally in multiTallies)
         {
+            // check if the user is part of the key ceremony used.
             if (MultiTallies.SingleOrDefault(t => t.MultiTallyId == tally.MultiTallyId) == null && keys.Contains(tally.KeyCeremonyId!))
             {
-                MultiTallies.Add(tally);
+                bool addMulti = false;
+                // check each tally in the multitally to see if any are not complete / abandoned
+                foreach (var tallyId in tally.TallyIds)
+                {
+                    if (await _tallyService.GetRunningByTallyIdAsync(tallyId))
+                    {
+                        addMulti = true;
+                        break;
+                    }
+                }
+                if (addMulti)
+                {
+                    MultiTallies.Add(tally);
+                }
             }
         }
     }
