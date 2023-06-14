@@ -19,6 +19,8 @@ internal static class Constants
 
     public readonly static string TallyId = "TallyId";
 
+    public readonly static string MultiTallyId = "MultiTallyId";
+
     public readonly static string UploadId = "UploadId";
 
     public readonly static string GuardianId = "GuardianId";

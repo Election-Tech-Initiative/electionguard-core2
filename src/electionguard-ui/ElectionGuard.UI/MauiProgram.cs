@@ -90,6 +90,7 @@ public static class MauiProgram
         builder.Services.AddTransient<LagrangeCoefficientsService>();
         builder.Services.AddTransient<TallyManager>();
         builder.Services.AddTransient<ITallyStateMachine, TallyStateMachine>();
+        builder.Services.AddTransient<MultiTallyService>();
 
         // setup view models
         builder.Services.AddTransient<LoginViewModel>();

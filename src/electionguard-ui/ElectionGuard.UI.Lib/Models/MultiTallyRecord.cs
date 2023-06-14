@@ -1,0 +1,22 @@
+﻿namespace ElectionGuard.UI.Lib.Models;
+
+public partial class MultiTallyRecord : DatabaseRecord
+{
+    [ObservableProperty]
+    private string? _name;
+
+    [ObservableProperty]
+    private string? _multiTallyId;
+
+    [ObservableProperty]
+    private string? _keyCeremonyId;
+
+    [ObservableProperty]
+    private List<string> _tallyIds = new();
+
+    public MultiTallyRecord() : base(nameof(MultiTallyRecord))
+    {
+        MultiTallyId = Guid.NewGuid().ToString();
+    }
+}
+

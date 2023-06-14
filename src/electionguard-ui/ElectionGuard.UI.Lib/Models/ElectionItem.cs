@@ -8,6 +8,9 @@ public partial class ElectionItem : ObservableObject
     private Election? _election;
 
     [ObservableProperty]
+    private string _tallyId = string.Empty;
+
+    [ObservableProperty]
     private ObservableCollection<BallotUpload> _ballotUploads = new();
 
     [ObservableProperty]

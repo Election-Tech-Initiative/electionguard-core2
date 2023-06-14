@@ -6,12 +6,17 @@ using ElectionGuard.UI.Services;
 namespace ElectionGuard.UI.ViewModels;
 
 [QueryProperty(CurrentTallyIdParam, nameof(TallyId))]
+[QueryProperty(MultiTallyIdsParam, nameof(MultiTallyIds))]
 public partial class TallyProcessViewModel : BaseViewModel
 {
-    public const string CurrentTallyIdParam = "TallyId";
+    public const string CurrentTallyIdParam = nameof(TallyId);
+    public const string MultiTallyIdsParam = nameof(MultiTallyIds);
 
     [ObservableProperty]
     private string _tallyId = string.Empty;
+
+    [ObservableProperty]
+    private List<string> _multiTallyIds = new();
 
     [ObservableProperty]
     private bool _canUserJoinTally;
