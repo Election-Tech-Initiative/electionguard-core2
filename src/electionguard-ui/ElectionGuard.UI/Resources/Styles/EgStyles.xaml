@@ -86,6 +86,13 @@
         <Setter Property="Margin" Value="10,0,10,0" />
     </Style>
 
+    <Style x:Key="MultiTallyFrame" TargetType="Frame">
+        <Setter Property="CornerRadius" Value="8" />
+        <Setter Property="BackgroundColor" Value="{StaticResource MultiColor}" />
+        <Setter Property="Padding" Value="12" />
+        <Setter Property="Margin" Value="10,0,10,0" />
+    </Style>
+
     <Style x:Key="ButtonishLabel" TargetType="Label">
         <Setter Property="HorizontalOptions" Value="Center" />
         <Setter Property="HorizontalTextAlignment" Value="Center" />

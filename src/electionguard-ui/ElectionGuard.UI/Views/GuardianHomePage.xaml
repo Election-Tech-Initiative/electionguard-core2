@@ -50,7 +50,7 @@
                             SelectionMode="Single">
                             <CollectionView.ItemTemplate>
                                 <DataTemplate x:DataType="model:MultiTallyRecord">
-                                    <Frame Style="{StaticResource ButtonishFrame}">
+                                    <Frame Style="{StaticResource MultiTallyFrame}">
                                         <Label Style="{StaticResource ButtonishLabel}" Text="{Binding Name}" />
                                     </Frame>
                                 </DataTemplate>
