@@ -3,15 +3,10 @@ using CommunityToolkit.Maui.Converters;
 
 namespace ElectionGuard.UI.Converters;
 
-internal class TallyCanBeAbandonedConverter
-    : BaseConverter<TallyState, bool>
+public class TallyCanBeAbandonedConverter
+    : TallyStateConverter
 {
-    public override bool DefaultConvertReturnValue { get; set; }
-    public override TallyState DefaultConvertBackReturnValue { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
-
-    public override TallyState ConvertBackTo(bool value, CultureInfo? culture)
+    public TallyCanBeAbandonedConverter() : base(TallyState.TallyStarted)
     {
-        throw new NotImplementedException();
     }
-    public override bool ConvertFrom(TallyState value, CultureInfo? culture) => value < TallyState.TallyStarted;
 }
