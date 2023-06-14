@@ -1,8 +1,9 @@
-﻿namespace ElectionGuard.UI.Services;
+﻿namespace ElectionGuard.UI.Models;
 
 public class TallyCeremonyChecklist
 {
     public bool QuorumReached => State > TallyState.PendingGuardiansJoin;
+    public bool TallyStarted => State == TallyState.TallyStarted;
     public bool SubtaliesCombined => QuorumReached && State >= TallyState.PendingGuardianDecryptShares;
     public bool AllDecryptionSharesComputed => SubtaliesCombined && (
         State > TallyState.PendingGuardianDecryptShares ||

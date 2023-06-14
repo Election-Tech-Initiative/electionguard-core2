@@ -264,7 +264,7 @@ build-cli:
 	cd ./apps/electionguard-cli && dotnet restore
 	dotnet build -c $(TARGET) $(ELECTIONGUARD_APP_CLI_DIR)/ElectionGuard.CLI.sln /p:Platform=$(PROCESSOR)
 
-build-ui: build-maccatalyst build-netstandard
+build-ui:
 	@echo 🖥️ BUILD UI $(OPERATING_SYSTEM) $(PROCESSOR) $(TARGET)
 	cd ./src/electionguard-ui && dotnet restore
 	dotnet build -c $(TARGET) ./src/electionguard-ui/ElectionGuard.UI.sln /p:Platform=$(PROCESSOR)
