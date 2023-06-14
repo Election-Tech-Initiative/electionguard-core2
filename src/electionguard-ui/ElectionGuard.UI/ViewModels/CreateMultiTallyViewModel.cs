@@ -240,7 +240,7 @@ public partial class CreateMultiTallyViewModel : BaseViewModel
             // create a multi-tally record for the db
             MultiTallyRecord multiTallyRecord = new()
             {
-                Name = $"MultiTally for {SelectedKeyCeremony.KeyCeremonyId}",
+                Name = $"MultiTally for {SelectedKeyCeremony.Name}",
                 KeyCeremonyId = SelectedKeyCeremony.KeyCeremonyId,
                 TallyIds = tallys
             };

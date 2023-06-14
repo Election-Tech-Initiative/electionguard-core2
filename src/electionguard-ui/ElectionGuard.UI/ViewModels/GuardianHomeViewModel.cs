@@ -123,7 +123,7 @@ public partial class GuardianHomeViewModel : BaseViewModel
         var multiTallies = await _multiTallyService.GetAllAsync();
         foreach (var tally in multiTallies)
         {
-            if (keys.Contains(tally.KeyCeremonyId!))
+            if (MultiTallies.SingleOrDefault(t => t.MultiTallyId == tally.MultiTallyId) == null && keys.Contains(tally.KeyCeremonyId!))
             {
                 MultiTallies.Add(tally);
             }
