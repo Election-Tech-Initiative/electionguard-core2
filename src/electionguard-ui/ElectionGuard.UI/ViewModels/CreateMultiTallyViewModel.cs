@@ -110,7 +110,7 @@ public partial class CreateMultiTallyViewModel : BaseViewModel
         });
     }
 
-    private async Task LoadElectionData(Election election, string tallyId = string.Empty)
+    private async Task LoadElectionData(Election election, string tallyId = "")
     {
         ElectionGuardException.ThrowIfNull(election.ElectionId, $"Election did not have an electionId {election.Id}");
 

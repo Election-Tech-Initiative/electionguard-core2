@@ -42,21 +42,37 @@
                     Style="{StaticResource H1}"
                     Text="{helper:Translate TalliesText}" />
                 <ScrollView Grid.Row="1">
-                    <CollectionView
-                        ItemsSource="{Binding Tallies}"
-                        SelectedItem="{Binding CurrentTally}"
-                        SelectionMode="Single">
-                        <CollectionView.EmptyView>
-                            <controls:NoContentView Text="{helper:Translate NoTallies}" />
-                        </CollectionView.EmptyView>
-                        <CollectionView.ItemTemplate>
-                            <DataTemplate x:DataType="model:TallyRecord">
-                                <Frame Style="{StaticResource ButtonishFrame}">
-                                    <Label Style="{StaticResource ButtonishLabel}" Text="{Binding Name}" />
-                                </Frame>
-                            </DataTemplate>
-                        </CollectionView.ItemTemplate>
-                    </CollectionView>
+                    <Grid RowDefinitions="auto, *">
+                        <CollectionView
+                            Grid.Row="0"
+                            ItemsSource="{Binding MultiTallies}"
+                            SelectedItem="{Binding CurrentMultiTally}"
+                            SelectionMode="Single">
+                            <CollectionView.ItemTemplate>
+                                <DataTemplate x:DataType="model:MultiTallyRecord">
+                                    <Frame Style="{StaticResource ButtonishFrame}">
+                                        <Label Style="{StaticResource ButtonishLabel}" Text="{Binding Name}" />
+                                    </Frame>
+                                </DataTemplate>
+                            </CollectionView.ItemTemplate>
+                        </CollectionView>
+                        <CollectionView
+                            Grid.Row="1"
+                            ItemsSource="{Binding Tallies}"
+                            SelectedItem="{Binding CurrentTally}"
+                            SelectionMode="Single">
+                            <CollectionView.EmptyView>
+                                <controls:NoContentView Text="{helper:Translate NoTallies}" />
+                            </CollectionView.EmptyView>
+                            <CollectionView.ItemTemplate>
+                                <DataTemplate x:DataType="model:TallyRecord">
+                                    <Frame Style="{StaticResource ButtonishFrame}">
+                                        <Label Style="{StaticResource ButtonishLabel}" Text="{Binding Name}" />
+                                    </Frame>
+                                </DataTemplate>
+                            </CollectionView.ItemTemplate>
+                        </CollectionView>
+                    </Grid>
                 </ScrollView>
             </Grid>
         </Grid>
