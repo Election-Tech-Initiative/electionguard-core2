@@ -579,4 +579,22 @@
   <data name="WriteinText" xml:space="preserve">
     <value>¡Escribe al candidato!</value>
   </data>
+  <data name="CreateMultiInstructionsText" xml:space="preserve">
+    <value>¡Seleccione las elecciones para hacer recuentos!</value>
+  </data>
+  <data name="CreateMultiTally" xml:space="preserve">
+    <value>¡Crea varios recuentos!</value>
+  </data>
+  <data name="CreateTallies" xml:space="preserve">
+    <value>¡Crear recuentos!</value>
+  </data>
+  <data name="JoinMultiInstructionsText" xml:space="preserve">
+    <value>¡Selecciona los recuentos para unirte!</value>
+  </data>
+  <data name="JoinTallies" xml:space="preserve">
+    <value>¡Únete a Tallies!</value>
+  </data>
+  <data name="SelectAllElectionsText" xml:space="preserve">
+    <value>¡Selecciona todas las elecciones!</value>
+  </data>
 </root>

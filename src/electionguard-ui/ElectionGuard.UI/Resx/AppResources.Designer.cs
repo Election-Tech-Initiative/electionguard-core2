@@ -1105,6 +1105,15 @@ namespace ElectionGuard.UI.Resx {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Select All Elections.
+        /// </summary>
+        internal static string SelectAllElectionsText {
+            get {
+                return ResourceManager.GetString("SelectAllElectionsText", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Selection one or more manifest files.
         /// </summary>
         internal static string SelectManifest {

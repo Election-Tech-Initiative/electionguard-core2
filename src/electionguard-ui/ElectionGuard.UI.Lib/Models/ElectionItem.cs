@@ -14,6 +14,9 @@ public partial class ElectionItem : ObservableObject
     private long _ballotAddedTotal;
 
     [ObservableProperty]
+    private long _ballotChallengedTotal;
+
+    [ObservableProperty]
     private long _ballotSpoiledTotal;
 
     [ObservableProperty]

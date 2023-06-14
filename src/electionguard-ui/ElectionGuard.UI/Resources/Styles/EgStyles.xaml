@@ -7,6 +7,11 @@
     xmlns:toolkit="http://schemas.microsoft.com/dotnet/2022/maui/toolkit">
 
     <x:Int32 x:Key="MainFontSize">16</x:Int32>
+    <x:Int32 x:Key="NarrowSize">600</x:Int32>
+    <x:Int32 x:Key="MediumSize">750</x:Int32>
+    <x:Int32 x:Key="LargeSize">850</x:Int32>
+    <Color x:Key="Gray050">#F0F0F0</Color>
+
 
     <Style x:Key="H1" TargetType="Label">
         <Setter Property="FontSize" Value="36" />
@@ -23,17 +28,36 @@
         <Setter Property="Margin" Value="0,10,0,15" />
     </Style>
 
-    <Style x:Key="NarrowCenteredPage" TargetType="VerticalStackLayout">
+    <Style x:Key="CenteredPage" TargetType="VerticalStackLayout">
         <Setter Property="HorizontalOptions" Value="Center" />
-        <Setter Property="WidthRequest" Value="600" />
         <Setter Property="Padding" Value="0,20,0,0" />
     </Style>
 
-    <Style x:Key="MediumCenteredPage" TargetType="VerticalStackLayout">
-        <Setter Property="HorizontalOptions" Value="Center" />
-        <Setter Property="WidthRequest" Value="750" />
-        <Setter Property="Padding" Value="0,20,0,0" />
+    <Style
+        x:Key="NarrowCenteredPage"
+        BasedOn="{StaticResource CenteredPage}"
+        TargetType="VerticalStackLayout">
+        <Setter Property="WidthRequest" Value="600" />
     </Style>
+
+    <Style
+        x:Key="MediumCenteredPage"
+        BasedOn="{StaticResource CenteredPage}"
+        TargetType="VerticalStackLayout">
+        <Setter Property="WidthRequest" Value="750" />
+    </Style>
+
+    <Style
+        x:Key="LargeCenteredPage"
+        BasedOn="{StaticResource CenteredPage}"
+        TargetType="VerticalStackLayout">
+        <Setter Property="WidthRequest" Value="850" />
+    </Style>
+
+    <Style
+        x:Key="FullCenteredPage"
+        BasedOn="{StaticResource CenteredPage}"
+        TargetType="VerticalStackLayout" />
 
     <Style x:Key="NarrowCenteredGrid" TargetType="Grid">
         <Setter Property="HorizontalOptions" Value="Center" />

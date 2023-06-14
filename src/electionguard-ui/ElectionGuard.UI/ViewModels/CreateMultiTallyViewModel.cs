@@ -1,6 +1,4 @@
 ﻿using CommunityToolkit.Mvvm.Input;
-using ElectionGuard.UI.Lib.Services;
-using MongoDB.Driver.Core.Clusters;
 
 namespace ElectionGuard.UI.ViewModels;
 
@@ -26,6 +24,12 @@ public partial class CreateMultiTallyViewModel : BaseViewModel
     private string? _errorMessage;
 
     [ObservableProperty]
+    private bool _selectAll;
+
+    [ObservableProperty]
+    private bool _electionsLoaded;
+
+    [ObservableProperty]
     private ObservableCollection<KeyCeremonyRecord> _keyCeremonies = new();
 
     [ObservableProperty]
@@ -33,6 +37,23 @@ public partial class CreateMultiTallyViewModel : BaseViewModel
 
     [ObservableProperty]
     private ObservableCollection<ElectionItem> _elections = new();
+
+    [ObservableProperty]
+    private ObservableCollection<object> _selectedElections = new();
+
+    partial void OnSelectAllChanged(bool value)
+    {
+        if (value)
+        {
+            foreach (var item in Elections)
+            {
+                if (!SelectedElections.Contains(item))
+                {
+                    SelectedElections.Add(item);
+                }
+            }
+        }
+    }
 
     partial void OnSelectedKeyCeremonyChanged(KeyCeremonyRecord value)
     {
@@ -43,39 +64,45 @@ public partial class CreateMultiTallyViewModel : BaseViewModel
             foreach (var item in allElections)
             {
                 var allUploads = await _ballotUploadService.GetByElectionIdAsync(item.ElectionId);
-                var ballotCountTotal = 0L;
-                var ballotAddedTotal = 0L;
-                var ballotSpoiledTotal = 0L;
-                var ballotDuplicateTotal = 0L;
-                var ballotRejectedTotal = 0L;
+                if (allUploads.Count() > 0)
+                {
+                    var ballotCountTotal = 0L;
+                    var ballotAddedTotal = 0L;
+                    var ballotChallengedTotal = 0L;
+                    var ballotSpoiledTotal = 0L;
+                    var ballotDuplicateTotal = 0L;
+                    var ballotRejectedTotal = 0L;
 
-                allUploads.ForEach((upload) =>
-                {
-                    ballotCountTotal += upload.BallotCount;
-                    ballotAddedTotal += upload.BallotImported;
-                    ballotSpoiledTotal += upload.BallotSpoiled;
-                    ballotDuplicateTotal += upload.BallotDuplicated;
-                    ballotRejectedTotal += upload.BallotRejected;
-                });
-                var election = new ElectionItem
-                {
-                    Election = item,
-                    BallotUploads = new(allUploads),
-                    BallotAddedTotal = ballotAddedTotal,
-                    BallotDuplicateTotal = ballotDuplicateTotal,
-                    BallotRejectedTotal = ballotDuplicateTotal,
-                    BallotSpoiledTotal = ballotSpoiledTotal,
-                    BallotCountTotal = ballotCountTotal
-                };
-                Elections.Add(election);
+                    allUploads.ForEach((upload) =>
+                    {
+                        ballotCountTotal += upload.BallotCount;
+                        ballotAddedTotal += upload.BallotImported;
+                        ballotChallengedTotal += upload.BallotChallenged;
+                        ballotSpoiledTotal += upload.BallotSpoiled;
+                        ballotDuplicateTotal += upload.BallotDuplicated;
+                        ballotRejectedTotal += upload.BallotRejected;
+                    });
+                    var election = new ElectionItem
+                    {
+                        Election = item,
+                        BallotUploads = new(allUploads),
+                        BallotAddedTotal = ballotAddedTotal,
+                        BallotChallengedTotal = ballotChallengedTotal,
+                        BallotDuplicateTotal = ballotDuplicateTotal,
+                        BallotRejectedTotal = ballotDuplicateTotal,
+                        BallotSpoiledTotal = ballotSpoiledTotal,
+                        BallotCountTotal = ballotCountTotal
+                    };
+                    Elections.Add(election);
+                }
             }
+            ElectionsLoaded = true;
         });
     }
 
     private async Task FillKeyCeremonies()
     {
-//        var allKeys = await _keyCeremonyService.GetAllCompleteAsync();
-        var allKeys = await _keyCeremonyService.GetAllAsync();
+        var allKeys = await _keyCeremonyService.GetAllCompleteAsync();
         foreach (var item in allKeys)
         {
             var count = await _electionService.CountByKeyCeremonyIdAsync(item.KeyCeremonyId);
@@ -86,17 +113,29 @@ public partial class CreateMultiTallyViewModel : BaseViewModel
         }
     }
 
-
     [RelayCommand]
+    private void SelectionChanged()
+    {
+        if(SelectedElections.Count != Elections.Count)
+        {
+            SelectAll = false;
+        }
+        CreateTalliesCommand.NotifyCanExecuteChanged();
+        JoinTalliesCommand.NotifyCanExecuteChanged();
+    }
+
+
+    [RelayCommand(CanExecute = nameof(TalliesSelected))]
     private void CreateTallies()
     {
-
     }
 
-    [RelayCommand]
+    [RelayCommand(CanExecute = nameof(TalliesSelected))]
     private void JoinTallies()
     {
-
     }
+
+    private bool TalliesSelected() => SelectedElections.Count > 0;
+
 }
 
