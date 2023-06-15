@@ -51,8 +51,24 @@
                     </CollectionView.ItemTemplate>
                 </CollectionView>
 
+                <Label
+                    Grid.Row="0"
+                    Style="{StaticResource H2}"
+                    Text="{helper:Translate TalliesText}" />
+                <CollectionView
+                    ItemsSource="{Binding MultiTallies}"
+                    SelectedItem="{Binding CurrentMultiTally}"
+                    SelectionMode="Single">
+                    <CollectionView.ItemTemplate>
+                        <DataTemplate x:DataType="model:MultiTallyRecord">
+                            <Frame Style="{StaticResource MultiTallyFrame}">
+                                <Label Style="{StaticResource ButtonishLabel}" Text="{Binding Name, StringFormat='[{0}]'}" />
+                            </Frame>
+                        </DataTemplate>
+                    </CollectionView.ItemTemplate>
+                </CollectionView>
+                        
                 <Label Style="{StaticResource H2}" Text="{helper:Translate ElectionsText}" />
-
                 <CollectionView
                     ItemsSource="{Binding Elections}"
                     SelectedItem="{Binding CurrentElection}"

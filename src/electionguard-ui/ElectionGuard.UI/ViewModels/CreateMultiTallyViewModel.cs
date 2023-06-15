@@ -273,14 +273,27 @@ public partial class CreateMultiTallyViewModel : BaseViewModel
     [RelayCommand(CanExecute = nameof(TalliesSelected))]
     private async Task JoinTallies()
     {
+        List<string> tallys = new();
+        foreach (var item in Elections)
+        {
+            if (SelectedElections.Contains(item))
+            {
+                // join the tally
+                await JoinTally(item.TallyId);
+                tallys.Add(item.TallyId);
+            }
+            else
+            {
+                // reject the tally
+                await JoinTally(item.TallyId, false);
+            }
+        }
+
         // do a normal tally for a single election but reject all of the others
         if (SelectedElections.Count == 1)
         {
             var election = SelectedElections.First() as ElectionItem;
             ElectionGuardException.ThrowIfNull(election, $"Could not load election selected");
-
-            // join the tally
-            await JoinTally(election.TallyId);
 
             // go to the processing page
             var pageParams = new Dictionary<string, object>
@@ -291,21 +304,6 @@ public partial class CreateMultiTallyViewModel : BaseViewModel
         }
         else
         {
-            List<string> tallys = new();
-            foreach (var item in Elections)
-            {
-                if (SelectedElections.Contains(item))
-                {
-                    // join the tally
-                    await JoinTally(item.TallyId);
-                    tallys.Add(item.TallyId);
-                }
-                else
-                {
-                    // reject the tally
-                    await JoinTally(item.TallyId, false);
-                }
-            }
             // go to the processing page
             var pageParams = new Dictionary<string, object>
             {
