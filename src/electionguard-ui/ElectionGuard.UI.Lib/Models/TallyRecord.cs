@@ -33,6 +33,9 @@ public partial class TallyRecord : DatabaseRecord
     private TallyState _state;
 
     [ObservableProperty]
+    private bool _multiTally;
+
+    [ObservableProperty]
     private bool _viewed;
 
     [ObservableProperty]

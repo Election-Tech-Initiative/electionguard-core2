@@ -173,7 +173,7 @@ public partial class CreateMultiTallyViewModel : BaseViewModel
         JoinTalliesCommand.NotifyCanExecuteChanged();
     }
 
-    private async Task<string> CreateNewTally(ElectionItem election)
+    private async Task<string> CreateNewTally(ElectionItem election, bool multi=false)
     {
         ElectionGuardException.ThrowIfNull(election, $"Could not load election selected");
         ElectionGuardException.ThrowIfNull(election.Election, $"ElectionItem does not contain an election");
@@ -201,6 +201,7 @@ public partial class CreateMultiTallyViewModel : BaseViewModel
             ChallengedBallotCount = challengedCount,
             SpoiledBallotCount = spoiledCount,
             State = TallyState.PendingGuardiansJoin,
+            MultiTally = multi,
         };
 
         _ = await _tallyService.SaveAsync(newTally);
@@ -233,7 +234,7 @@ public partial class CreateMultiTallyViewModel : BaseViewModel
             foreach (var item in SelectedElections)
             {
                 var election = item as ElectionItem;
-                var tallyId = await CreateNewTally(election);
+                var tallyId = await CreateNewTally(election, true);
                 tallys.Add(tallyId);
             }
 
