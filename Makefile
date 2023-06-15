@@ -378,10 +378,11 @@ endif
 publish-ui: 
 	@echo 🧱 PUBLISH UI
 ifeq ($(OPERATING_SYSTEM),Windows)
-	dotnet publish -f net7.0-windows10.0.19041.0 -c $(TARGET) /p:ApplicationVersion=$(BUILD_VERSION) /p:RuntimeIdentifierOverride=win10-x64 /p:APPCENTER_SECRET_UWP=$(APPCENTER_SECRET_UWP) $(ELECTIONGUARD_APP_ADMIN_DIR)/ElectionGuard.UI/ElectionGuard.UI.csproj -o ./publish
+	dotnet publish -f net7.0-windows10.0.19041.0 -c $(TARGET) /p:WindowsPackageType=None /p:ApplicationVersion=$(BUILD_NUMBER) /p:RuntimeIdentifierOverride=win10-x64 /p:APPCENTER_SECRET_UWP=$(APPCENTER_SECRET_UWP) $(ELECTIONGUARD_APP_ADMIN_DIR)/ElectionGuard.UI/ElectionGuard.UI.csproj -o ./publish/ElectionGuard.UI
+	cd ./publish && pwsh -Command "Compress-Archive ElectionGuard.UI ElectionGuard.UI.zip -Force"
 endif
 ifeq ($(OPERATING_SYSTEM),Darwin)
-	dotnet publish -f net7.0-maccatalyst -c $(TARGET) /p:CreatePackage=true /p:ApplicationVersion=$(BUILD_VERSION) /p:APPCENTER_SECRET_MACOS=$(APPCENTER_SECRET_MACOS) $(ELECTIONGUARD_APP_ADMIN_DIR)/ElectionGuard.UI/ElectionGuard.UI.csproj -o ./publish
+	dotnet publish -f net7.0-maccatalyst -c $(TARGET) /p:CreatePackage=true /p:ApplicationVersion=$(BUILD_NUMBER) /p:APPCENTER_SECRET_MACOS=$(APPCENTER_SECRET_MACOS) $(ELECTIONGUARD_APP_ADMIN_DIR)/ElectionGuard.UI/ElectionGuard.UI.csproj -o ./publish
 endif
 
 publish-ui-appcenter: 
@@ -389,7 +390,7 @@ publish-ui-appcenter:
 ifneq ($(APPCENTER_SECRET_UWP),)
 ifeq ($(OPERATING_SYSTEM),Windows)
 	@echo "Publishing UWP to AppCenter"
-	appcenter distribute release -f $(ELECTIONGUARD_PUBLISH_DIR)/*.msix -g QualityAssurance -a "InfernoRed-Technology/ElectionGuard-Admin" -n $(BUILD_NUMBER) -b $(BUILD_VERSION) --disable-telemetry --token $(APPCENTER_API_TOKEN_UWP)
+	appcenter distribute release -f $(ELECTIONGUARD_PUBLISH_DIR)/ElectionGuard.UI.zip -g QualityAssurance -a "InfernoRed-Technology/ElectionGuard-Admin-1" -n $(BUILD_NUMBER) -b $(BUILD_VERSION) --disable-telemetry --token $(APPCENTER_API_TOKEN_UWP)
 endif
 else
 	@echo "APPCENTER_SECRET_UWP not set. Skipping AppCenter publish"

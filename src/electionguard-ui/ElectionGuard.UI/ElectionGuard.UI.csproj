@@ -58,35 +58,13 @@
 		<RuntimeIdentifiers>maccatalyst-x64</RuntimeIdentifiers>
 	</PropertyGroup>
 
-	<!-- <PropertyGroup Label="Debug|arm64" Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Debug|net7.0-windows10.0.19041.0|arm64'">
-
-	</PropertyGroup>
-
-	<PropertyGroup Label="Release|arm64" Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Release|net7.0-windows10.0.19041.0|arm64'">
-
-	</PropertyGroup> -->
-
 	<PropertyGroup Label="Debug|x64" Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Debug|net7.0-windows10.0.19041.0|x64'">
-
+		<CreatePackage>false</CreatePackage>
 	</PropertyGroup>
 
 	<PropertyGroup Label="Release|x64" Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Release|net7.0-windows10.0.19041.0|x64'">
-
+		<CreatePackage>true</CreatePackage>
 	</PropertyGroup>
-
-	<!-- <PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Release|net7.0-maccatalyst|AnyCPU'">
-	  <CreatePackage>false</CreatePackage>
-	  <MtouchHttpClientHandler>NSUrlSessionHandler</MtouchHttpClientHandler>
-	</PropertyGroup>
-	<PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Debug|net7.0-maccatalyst|AnyCPU'">
-	  <CreatePackage>false</CreatePackage>
-	</PropertyGroup>
-	<PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
-	  <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
-	</PropertyGroup>
-	<PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
-	  <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
-	</PropertyGroup> -->
 
 	<PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
 	  <IntermediateOutputPath></IntermediateOutputPath>
@@ -229,17 +207,4 @@
 	    <Generator>MSBuild:Compile</Generator>
 	  </MauiXaml>
 	</ItemGroup>
-
-	<PropertyGroup Label="Library Paths">
-    <ElectionGuardLibs>..\..\..\build\libs</ElectionGuardLibs>
-  </PropertyGroup>
-  <ItemGroup Label="C++ Built Libraries">
-    <None Name="Windows (MSVC)" Visible="false" Include="$(ElectionGuardLibs)\Windows\x64\$(Configuration)\src\$(Configuration)\*.dll*" CopyToOutputDirectory="PreserveNewest" />
-    <None Name="Windows HACL (MSVC)" Visible="false" Include="$(ElectionGuardLibs)\Windows\x64\$(Configuration)\libs\hacl\$(Configuration)\*.dll*" CopyToOutputDirectory="PreserveNewest" />
-    <None Name="Windows Symbols (MSVC)" Visible="false" Include="$(ElectionGuardLibs)\Windows\x64\$(Configuration)\src\$(Configuration)\*.pdb*" CopyToOutputDirectory="PreserveNewest" />
-
-		<None Name="MacOS" Visible="false" Include="$(ElectionGuardLibs)\MacCatalyst\arm64\$(Configuration)\src\*.dylib" CopyToOutputDirectory="PreserveNewest" />
-    <None Name="MacOS HACL" Visible="false" Include="$(ElectionGuardLibs)\MacCatalyst\arm64\$(Configuration)\libs\hacl\*.dylib" CopyToOutputDirectory="PreserveNewest" />
-  </ItemGroup>
-
 </Project>
