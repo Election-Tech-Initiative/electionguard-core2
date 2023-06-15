@@ -21,23 +21,42 @@
             IsVisible="{Binding ErrorMessage, Converter={StaticResource IsNotNullConverter}}"
             Style="{StaticResource Error}"
             Text="{Binding ErrorMessage}" />
-        <Label Style="{StaticResource FormLabel}" Text="{helper:Translate KeyCeremoniesText}" />
-        <Grid WidthRequest="{StaticResource NarrowSize}">
-            <!--  This entry is due to a bug with picker in Windows.  The text gets reset to white on a mouse over  -->
-            <!--  This uses the code behind to work around.  The command still does the work for the actual process  -->
-            <Entry
-                x:Name="keyEntry"
-                InputTransparent="True"
-                IsReadOnly="True"
-                WidthRequest="{StaticResource NarrowSize}" />
-            <Picker
-                x:Name="keyPicker"
-                ItemDisplayBinding="{Binding Name}"
-                ItemsSource="{Binding KeyCeremonies}"
-                SelectedIndexChanged="Picker_SelectedIndexChanged"
-                SelectedItem="{Binding SelectedKeyCeremony}"
-                WidthRequest="{StaticResource NarrowSize}"
-                ZIndex="-1" />
+        <Grid
+            IsVisible="{Binding IsAdmin, Converter={StaticResource InvertedBoolConverter}}"
+            RowDefinitions="auto, auto"
+            WidthRequest="{StaticResource NarrowSize}">
+            <Label
+                Grid.Row="0"
+                Style="{StaticResource FormLabel}"
+                Text="{helper:Translate MultiTallyNameText}" />
+            <Label
+                Grid.Row="1"
+                Style="{StaticResource FormValue}"
+                    WidthRequest="{StaticResource NarrowSize}"
+                Text="{Binding CurrentMultiTally.Name}" />
+        </Grid>
+        <Grid IsVisible="{Binding IsAdmin}" RowDefinitions="auto, auto">
+            <Label
+                Grid.Row="0"
+                Style="{StaticResource FormLabel}"
+                Text="{helper:Translate KeyCeremoniesText}" />
+            <Grid Grid.Row="1" WidthRequest="{StaticResource NarrowSize}">
+                <!--  This entry is due to a bug with picker in Windows.  The text gets reset to white on a mouse over  -->
+                <!--  This uses the code behind to work around.  The command still does the work for the actual process  -->
+                <Entry
+                    x:Name="keyEntry"
+                    InputTransparent="True"
+                    IsReadOnly="True"
+                    WidthRequest="{StaticResource NarrowSize}" />
+                <Picker
+                    x:Name="keyPicker"
+                    ItemDisplayBinding="{Binding Name}"
+                    ItemsSource="{Binding KeyCeremonies}"
+                    SelectedIndexChanged="Picker_SelectedIndexChanged"
+                    SelectedItem="{Binding SelectedKeyCeremony}"
+                    WidthRequest="{StaticResource NarrowSize}"
+                    ZIndex="-1" />
+            </Grid>
         </Grid>
         <Grid Margin="0,20,0,10" IsVisible="{Binding IsAdmin}">
             <Label

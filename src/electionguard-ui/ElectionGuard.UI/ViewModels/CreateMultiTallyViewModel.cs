@@ -58,6 +58,9 @@ public partial class CreateMultiTallyViewModel : BaseViewModel
     private KeyCeremonyRecord _selectedKeyCeremony;
 
     [ObservableProperty]
+    private MultiTallyRecord? _currentMultiTally;
+
+    [ObservableProperty]
     private ObservableCollection<ElectionItem> _elections = new();
 
     [ObservableProperty]
@@ -65,6 +68,11 @@ public partial class CreateMultiTallyViewModel : BaseViewModel
 
     partial void OnMultiTallyIdChanged(string value)
     {
+        if (string.IsNullOrEmpty(value))
+        {
+            CurrentMultiTally = null;
+        }
+
         _ = Shell.Current.CurrentPage.Dispatcher.DispatchAsync(async () =>
         {
             // load the elections that are in the multitally
@@ -78,6 +86,7 @@ public partial class CreateMultiTallyViewModel : BaseViewModel
                     await LoadElectionData(election, tallyId);
                 }
                 ElectionsLoaded = true;
+                CurrentMultiTally = multiTally;
             }
         });
     }

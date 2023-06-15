@@ -799,6 +799,15 @@ namespace ElectionGuard.UI.Resx {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to MultiTally Name.
+        /// </summary>
+        internal static string MultiTallyNameText {
+            get {
+                return ResourceManager.GetString("MultiTallyNameText", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Names will be generated from manifest names.
         /// </summary>
         internal static string NameFromManifest {

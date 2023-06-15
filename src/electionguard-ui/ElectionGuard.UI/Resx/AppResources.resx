@@ -594,4 +594,7 @@
   <data name="SelectAllElectionsText" xml:space="preserve">
     <value>Select All Elections</value>
   </data>
+  <data name="MultiTallyNameText" xml:space="preserve">
+    <value>MultiTally Name</value>
+  </data>
 </root>
