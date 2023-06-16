@@ -143,8 +143,8 @@ public static class MauiProgram
         return;
 #endif
 
-        var uwpSecret = string.Empty;
-        var macSecret = string.Empty;
+        string uwpSecret = string.Empty;
+        string macSecret = string.Empty;
 
 #if APPCENTER_SECRET_MACOS
         macSecret = APPCENTER_SECRET_MACOS;
