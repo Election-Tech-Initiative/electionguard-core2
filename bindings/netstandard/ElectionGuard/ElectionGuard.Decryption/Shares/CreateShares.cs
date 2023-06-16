@@ -18,9 +18,22 @@ public static class CreateSharesExtensions
         CiphertextTally tally,
         List<CiphertextBallot> challengeBallots)
     {
-        var share = guardian.ComputeDecryptionShare(tally)!;
-        var shares = guardian.ComputeDecryptionShares(tally.TallyId, challengeBallots)!;
-        return new(share, shares);
+        if (challengeBallots.Count == 0)
+        {
+            return ComputeDecryptionShares(guardian, tally);
+        }
+
+        var tallyShare = guardian.ComputeDecryptionShare(tally)!;
+        var ballotShares = guardian.ComputeDecryptionShares(tally.TallyId, challengeBallots);
+
+        return new(tallyShare!, ballotShares);
+    }
+
+    public static DecryptionShare ComputeDecryptionShares(
+        this Guardian guardian,
+        CiphertextTally tally)
+    {
+        return new(guardian.ComputeDecryptionShare(tally)!);
     }
 
     /// <summary>
