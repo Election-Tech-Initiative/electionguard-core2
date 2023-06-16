@@ -5,6 +5,7 @@ ELECTIONGUARD_CACHE=$(subst \,/,$(realpath .))/.cache
 ELECTIONGUARD_APPS_DIR=$(realpath .)/apps
 ELECTIONGUARD_BINDING_DIR=$(realpath .)/bindings
 ELECTIONGUARD_DATA_DIR=$(realpath .)/data
+ELECTIONGUARD_APP_ADMIN_DIR=src/electionguard-ui
 ELECTIONGUARD_APP_CLI_DIR=$(ELECTIONGUARD_APPS_DIR)/electionguard-cli
 ELECTIONGUARD_BINDING_NETSTANDARD_DIR=$(ELECTIONGUARD_BINDING_DIR)/netstandard/ElectionGuard
 ELECTIONGUARD_BINDING_LIB_DIR=$(ELECTIONGUARD_BINDING_NETSTANDARD_DIR)/ElectionGuard.Encryption
@@ -15,6 +16,7 @@ ELECTIONGUARD_BINDING_TYPESCRIPT_DIR=$(ELECTIONGUARD_BINDING_DIR)/typescript
 ELECTIONGUARD_BUILD_DIR=$(subst \,/,$(realpath .))/build
 ELECTIONGUARD_BUILD_DIR_WIN=$(subst \c\,C:\,$(subst /,\,$(ELECTIONGUARD_BUILD_DIR)))
 ELECTIONGUARD_BUILD_LIBS_DIR=$(ELECTIONGUARD_BUILD_DIR)/libs
+ELECTIONGUARD_PUBLISH_DIR=$(subst \,/,$(realpath .))/publish
 CPM_SOURCE_CACHE=$(ELECTIONGUARD_CACHE)/CPM
 EMSCRIPTEN_VERSION?=3.1.35
 EMSDK?=$(ELECTIONGUARD_CACHE)/emscripten
@@ -62,7 +64,8 @@ else
 endif
 
 # Default build number
-BUILD:=1
+BUILD_NUMBER:=1
+BUILD_VERSION:=$(shell git describe --tags --always)
 
 # handle setting processor-specific build vars
 ifeq ($(PROCESSOR),x86)
@@ -136,7 +139,7 @@ endif
 	make fetch-sample-data
 	dotnet tool restore
 
-environment-ui: environment
+environment-ui:
 ifeq ($(OPERATING_SYSTEM),Windows)
 	dotnet workload install maui
 	dotnet workload restore ./src/electionguard-ui/ElectionGuard.UI/ElectionGuard.UI.csproj && dotnet restore ./src/electionguard-ui/ElectionGuard.UI.sln
@@ -144,6 +147,8 @@ else
 	sudo dotnet workload install maui
 	sudo dotnet workload restore ./src/electionguard-ui/ElectionGuard.UI/ElectionGuard.UI.csproj && dotnet restore ./src/electionguard-ui/ElectionGuard.UI.sln
 endif
+	dotnet tool restore
+	npm i -g appcenter-cli
 
 environment-wasm:
 	@echo 🌐 WASM INSTALL
@@ -267,7 +272,7 @@ build-cli:
 build-ui:
 	@echo 🖥️ BUILD UI $(OPERATING_SYSTEM) $(PROCESSOR) $(TARGET)
 	cd ./src/electionguard-ui && dotnet restore
-	dotnet build -c $(TARGET) ./src/electionguard-ui/ElectionGuard.UI.sln /p:Platform=$(PROCESSOR)
+	dotnet build -c $(TARGET) ./src/electionguard-ui/ElectionGuard.UI.sln /p:Platform=$(PROCESSOR) /p:APPCENTER_SECRET_UWP=$(APPCENTER_SECRET_UWP) /p:APPCENTER_SECRET_MACOS=$(APPCENTER_SECRET_MACOS)
 
 build-wasm:
 	@echo 🌐 BUILD WASM $(OPERATING_SYSTEM) $(PROCESSOR) $(TARGET)
@@ -314,12 +319,17 @@ endif
 
 clean-netstandard:
 	@echo 🗑️ CLEAN NETSTANDARD
-	dotnet clean $(ELECTIONGUARD_APP_CLI_DIR)/ElectionGuard.CLI.sln
-	dotnet clean ./bindings/netstandard/ElectionGuard/ElectionGuard.sln
+	cd $(ELECTIONGUARD_APP_CLI_DIR) && dotnet restore
+	dotnet clean -c Debug $(ELECTIONGUARD_APP_CLI_DIR)/ElectionGuard.CLI.sln
+	dotnet clean -c Release $(ELECTIONGUARD_APP_CLI_DIR)/ElectionGuard.CLI.sln
+	dotnet clean -c Debug ./bindings/netstandard/ElectionGuard/ElectionGuard.sln
+	dotnet clean -c Release ./bindings/netstandard/ElectionGuard/ElectionGuard.sln
 
 clean-ui:
 	@echo 🗑️ CLEAN UI
-	dotnet clean ./src/electionguard-ui/ElectionGuard.UI.sln
+	cd ./$(ELECTIONGUARD_APP_ADMIN_DIR) && dotnet restore
+	dotnet clean -c Debug ./$(ELECTIONGUARD_APP_ADMIN_DIR)/ElectionGuard.UI.sln
+	dotnet clean -c Release ./$(ELECTIONGUARD_APP_ADMIN_DIR)/ElectionGuard.UI.sln
 
 clean-wasm:
 	@echo 🗑️ CLEAN WASM
@@ -365,13 +375,33 @@ endif
 
 # Publish
 
-publish-ui:
+publish-ui: 
 	@echo 🧱 PUBLISH UI
 ifeq ($(OPERATING_SYSTEM),Windows)
-	dotnet publish -f net7.0-windows10.0.19041.0 -c $(TARGET) /p:ApplicationVersion=$(BUILD) /p:RuntimeIdentifierOverride=win10-x64 src/electionguard-ui/ElectionGuard.UI/ElectionGuard.UI.csproj
+	dotnet publish -f net7.0-windows10.0.19041.0 -c $(TARGET) /p:WindowsPackageType=None /p:ApplicationVersion=$(BUILD_NUMBER) /p:RuntimeIdentifierOverride=win10-x64 /p:APPCENTER_SECRET_UWP=$(APPCENTER_SECRET_UWP) ./$(ELECTIONGUARD_APP_ADMIN_DIR)/ElectionGuard.UI/ElectionGuard.UI.csproj -o ./publish/ElectionGuard.UI
+	cd ./publish && pwsh -Command "Compress-Archive ElectionGuard.UI ElectionGuard.UI.zip -Force"
 endif
 ifeq ($(OPERATING_SYSTEM),Darwin)
-	dotnet build -f net7.0-maccatalyst -c $(TARGET) /p:CreatePackage=true /p:ApplicationVersion=$(BUILD) src/electionguard-ui/ElectionGuard.UI/ElectionGuard.UI.csproj
+	dotnet publish -f net7.0-maccatalyst -c $(TARGET) /p:CreatePackage=true /p:ApplicationVersion=$(BUILD_NUMBER) /p:APPCENTER_SECRET_MACOS=$(APPCENTER_SECRET_MACOS) ./$(ELECTIONGUARD_APP_ADMIN_DIR)/ElectionGuard.UI/ElectionGuard.UI.csproj -o ./publish
+endif
+
+publish-ui-appcenter: 
+	@echo 🧱 PUBLISH UI APPCENTER
+ifneq ($(APPCENTER_SECRET_UWP),)
+ifeq ($(OPERATING_SYSTEM),Windows)
+	@echo "Publishing UWP to AppCenter"
+	appcenter distribute release -f $(ELECTIONGUARD_PUBLISH_DIR)/ElectionGuard.UI.zip -g QualityAssurance -a "InfernoRed-Technology/ElectionGuard-Admin-1" -n $(BUILD_NUMBER) -b $(BUILD_VERSION) --disable-telemetry --token $(APPCENTER_API_TOKEN_UWP)
+endif
+else
+	@echo "APPCENTER_SECRET_UWP not set. Skipping AppCenter publish"
+endif
+ifneq ($(APPCENTER_SECRET_MACOS),)
+ifeq ($(OPERATING_SYSTEM),Darwin)
+	@echo "Publishing MacCatalyst to AppCenter"
+	appcenter distribute release -f $(ELECTIONGUARD_PUBLISH_DIR)/*.pkg -g QualityAssurance -a "InfernoRed-Technology/ElectionGuard-Admin" -n $(BUILD_NUMBER) -b $(BUILD_VERSION) --disable-telemetry --token $(APPCENTER_API_TOKEN_MACOS)
+endif
+else
+	@echo "APPCENTER_SECRET_MACOS not set. Skipping AppCenter publish"
 endif
 
 publish-wasm: build-npm

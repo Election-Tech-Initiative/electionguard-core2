@@ -270,9 +270,89 @@ jobs:
           npm run prepare
           npm publish
 
+  publish_admin:
+    name: ${{ matrix.name }}
+    needs: [get_version_code, publish_nuget]
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        name: ["macOS", "windows-os"]
+        include:
+          - name: macOS
+            os: macOS-13
+            version: "14.2"
+            osFolder: "maccatalyst"
+          - name: windows-os
+            os: windows-2022
+            version: "latest"
+            osFolder: "windows"
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v3
+
+      - name: Change Directory
+        run: cd ${{ github.workspace }}/src/electionguard-ui/ElectionGuard.UI
+
+      - name: Wait For Nuget Package
+        run: |
+          for i in {1..60}
+          do
+            echo "Checking for package (attempt #$i)..."
+            if dotnet add package ElectionGuard.Encryption --version ${{needs.get_version_code.outputs.version}} --no-restore; then
+              echo "Package is available."
+              break
+            else
+              echo "Package not available yet, waiting for 10 seconds..."
+              sleep 10
+            fi
+          done
+        shell: bash
+
+      - name: Change Directory
+        run: cd ${{ github.workspace }}
+
+      - name: Install .NET
+        uses: actions/setup-dotnet@v3
+        with:
+          dotnet-version: 7.0.x
+
+      - name: Update Mac Environment
+        if: runner.os == 'macOS'
+        run: |
+          ls -ls /Applications/
+          ls -ls $ANDROID_SDK_ROOT/ndk
+          sudo xcode-select -switch /Applications/Xcode_${{ matrix.version }}.app
+
+      - name: Configure Environment
+        run: make environment-ui
+
+      - name: Publish UI
+        env:
+          BUILD_NUMBER: ${{ needs.get_version_code.outputs.build_number }}
+          BUILD_VERSION: "${{needs.get_version_code.outputs.version}}"
+          APPCENTER_SECRET_MACOS: ${{ secrets.APPCENTER_SECRET_MACOS }}
+          APPCENTER_SECRET_UWP: ${{ secrets.APPCENTER_SECRET_UWP }}
+        run: make publish-ui
+
+      - name: save build artifacts
+        uses: actions/upload-artifact@v3
+        with:
+          name: electionguard-admin
+          path: ./publish/*
+
+      - name: Publish UI (AppCenter)
+        env:
+          BUILD_NUMBER: ${{ needs.get_version_code.outputs.build_number }}
+          BUILD_VERSION: "${{needs.get_version_code.outputs.version}}"
+          APPCENTER_API_TOKEN_MACOS: ${{ secrets.APPCENTER_API_TOKEN_MACOS }}
+          APPCENTER_API_TOKEN_UWP: ${{ secrets.APPCENTER_API_TOKEN_UWP }}
+        run: make publish-ui-appcenter
+
   publish_release:
     name: Publish Release
-    needs: [get_version_code, publish_nuget, publish_npm]
+    needs: [get_version_code, publish_nuget, publish_npm, publish_admin]
     runs-on: ubuntu-22.04
     steps:
       - name: Create Github Release
@@ -282,4 +362,4 @@ jobs:
           tag_name: ${{needs.get_version_code.outputs.version}}
           draft: true
           prerelease: false
-          #TODO: changelog
+          #TODO: changelog, artifacts
