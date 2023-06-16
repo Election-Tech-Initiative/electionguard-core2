@@ -122,6 +122,11 @@ jobs:
 
       - name: Test UI
         if: (steps.filter.outputs.bindings == 'true' || steps.filter.outputs.source == 'true')
+        env:
+          BUILD_NUMBER: ${{ needs.get_version_code.outputs.build_number }}
+          BUILD_VERSION: "${{needs.get_version_code.outputs.version}}"
+          APPCENTER_SECRET_MACOS: ${{ secrets.APPCENTER_SECRET_MACOS }}
+          APPCENTER_SECRET_UWP: ${{ secrets.APPCENTER_SECRET_UWP }}
         run: make test-ui
 
       - name: Clean UI
