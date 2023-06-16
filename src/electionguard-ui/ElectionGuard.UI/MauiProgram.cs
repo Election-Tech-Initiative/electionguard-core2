@@ -153,7 +153,7 @@ public static class MauiProgram
 #if APPCENTER_SECRET_UWP
         uwpSecret = APPCENTER_SECRET_UWP;
 #endif
-        if (string.IsNullOrEmpty(macSecret) || string.IsNullOrEmpty(uwpSecret))
+        if (string.IsNullOrEmpty(macSecret) && string.IsNullOrEmpty(uwpSecret))
         {
             return;
         }
