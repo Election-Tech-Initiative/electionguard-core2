@@ -20,7 +20,7 @@ public static class CreateSharesExtensions
     {
         if (challengeBallots.Count == 0)
         {
-            return ComputeDecryptionShares(guardian, tally);
+            return guardian.ComputeDecryptionShares(tally);
         }
 
         var tallyShare = guardian.ComputeDecryptionShare(tally)!;
