@@ -194,6 +194,8 @@ public partial class BallotUploadViewModel : BaseViewModel
                         BallotBoxState.Cast => Interlocked.Increment(ref totalImported),
                         BallotBoxState.Challenged => Interlocked.Increment(ref totalChallenged),
                         BallotBoxState.Spoiled => Interlocked.Increment(ref totalSpoiled),
+                        BallotBoxState.NotSet => throw new NotImplementedException(),
+                        BallotBoxState.Unknown => throw new NotImplementedException(),
                         _ => throw new NotImplementedException()
                     };
 
@@ -210,7 +212,7 @@ public partial class BallotUploadViewModel : BaseViewModel
                 _ = Interlocked.Increment(ref totalCount);
                 UploadText = $"{AppResources.SuccessText} {totalCount} / {ballots.Length} {AppResources.Success2Text}";
             }
-            catch (Exception ex)
+            catch (Exception)
             {
                 _ = Interlocked.Increment(ref totalRejected);
             }
@@ -260,8 +262,8 @@ public partial class BallotUploadViewModel : BaseViewModel
         var customFileType = new FilePickerFileType(
                 new Dictionary<DevicePlatform, IEnumerable<string>>
                 {
-                        { DevicePlatform.WinUI, new[] { ".json" } }, // file extension
-                        { DevicePlatform.macOS, new[] { "json" } }, // UTType values
+                    { DevicePlatform.WinUI, new[] { ".json" } }, // file extension
+                    { DevicePlatform.macOS, new[] { "json" } }, // UTType values
                 });
         var options = new PickOptions() { FileTypes = customFileType, PickerTitle = AppResources.SelectManifest };
 
