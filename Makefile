@@ -271,6 +271,8 @@ build-cli:
 
 build-ui:
 	@echo 🖥️ BUILD UI $(OPERATING_SYSTEM) $(PROCESSOR) $(TARGET)
+	pwd
+	ls -alt
 	cd $(ELECTIONGUARD_APP_ADMIN_DIR) && dotnet restore
 	dotnet build -c $(TARGET) $(ELECTIONGUARD_APP_ADMIN_DIR)/ElectionGuard.UI.sln /p:Platform=$(PROCESSOR) /p:APPCENTER_SECRET_UWP=$(APPCENTER_SECRET_UWP) /p:APPCENTER_SECRET_MACOS=$(APPCENTER_SECRET_MACOS)
 
