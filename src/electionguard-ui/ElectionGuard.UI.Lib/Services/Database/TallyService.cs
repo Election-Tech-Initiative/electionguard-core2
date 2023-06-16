@@ -1,7 +1,6 @@
 ﻿using ElectionGuard.UI.Lib.Models;
 using MongoDB.Bson;
 using MongoDB.Driver;
-using MongoDB.Driver.Core.Clusters;
 
 namespace ElectionGuard.UI.Lib.Services;
 
