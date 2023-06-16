@@ -3,18 +3,66 @@ name: Pull Request UI Build
 on:
   workflow_dispatch:
   pull_request:
-    paths:
-      - ".github/pull-request-ui.yml"
-      - "src/electionguard-ui/**"
     branches: [main]
 
 env:
   TARGET: Release
 
 jobs:
+  get_version_code:
+    name: Get Version Code
+    runs-on: ubuntu-22.04
+    outputs:
+      version: ${{ steps.get_version_code.outputs.version }}
+      build_number: ${{ steps.get_version_code.outputs.build_number }}
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v3
+      - name: Get Version Code
+        id: get_version_code
+        run: |
+          git fetch --depth=100 origin +refs/tags/*:refs/tags/*
+          TAG_NAME=$(git describe --tags `git rev-list --tags --max-count=1`) # v1.0.0
+          echo "TAG_NAME=$TAG_NAME" >> $GITHUB_ENV
+          BUILD_NUMBER=$(echo $TAG_NAME | grep -oP '\d+$')
+          echo "BUILD_NUMBER=$BUILD_NUMBER" >> $GITHUB_ENV
+          echo "build_number=$BUILD_NUMBER" >> $GITHUB_OUTPUT
+          VERSION="${TAG_NAME/v}"
+          echo "VERSION=$VERSION" >> $GITHUB_ENV
+          echo "version=$VERSION" >> $GITHUB_OUTPUT
+
+  changes:
+    runs-on: ubuntu-latest
+    permissions:
+      pull-requests: read
+    outputs:
+      github: ${{ steps.filter.outputs.github }}
+      bindings: ${{ steps.filter.outputs.bindings }}
+      root: ${{ steps.filter.outputs.root }}
+      scripts: ${{ steps.filter.outputs.scripts }}
+      source: ${{ steps.filter.outputs.source }}
+    steps:
+      # For pull requests it's not necessary to checkout the code
+      - uses: dorny/paths-filter@v2
+        id: filter
+        with:
+          filters: |
+            github:
+              - '.github/workflows/pull-request-ui.yml'
+            bindings:
+              - 'bindings/netstandard/**'
+            root:
+              - 'Dockerfile'
+              - 'Makefile'
+            scripts:
+              - 'scripts/**'
+            source:
+              - 'src/electionguard-ui/**'
+
   build_and_test:
     name: ${{ matrix.name }}
     runs-on: ${{ matrix.os }}
+    needs: [get_version_code, changes]
     strategy:
       fail-fast: false
       matrix:
@@ -30,33 +78,74 @@ jobs:
             osFolder: "windows"
 
     steps:
+      - name: Configure Change Filter
+        id: filter
+        shell: bash
+        run: |
+          FILTER_ANY_CHANGE="false"  # default value
+          if [[ "${{ needs.changes.outputs.github }}" == "true" || "${{ needs.changes.outputs.bindings }}" == "true" || "${{ needs.changes.outputs.root }}" == "true" || "${{ needs.changes.outputs.scripts }}" == "true" || "${{ needs.changes.outputs.source }}" == "source" ]]; then
+            FILTER_ANY_CHANGE="true"
+          fi
+
+          echo "any=$FILTER_ANY_CHANGE" >> $GITHUB_OUTPUT
+          echo "github=${{ needs.changes.outputs.github }}" >> $GITHUB_OUTPUT
+          echo "bindings=${{ needs.changes.outputs.bindings }}" >> $GITHUB_OUTPUT
+          echo "root=${{ needs.changes.outputs.root }}" >> $GITHUB_OUTPUT
+          echo "scripts=${{ needs.changes.outputs.scripts }}" >> $GITHUB_OUTPUT
+          echo "source=${{ needs.changes.outputs.source }}" >> $GITHUB_OUTPUT
+
+      # Checkout
       - name: Checkout Code
+        if: (steps.filter.outputs.any == 'true')
         uses: actions/checkout@v3
+
       - name: Change Directory
+        if: (steps.filter.outputs.any == 'true')
         run: cd ${{ github.workspace }}
+
       - name: Install .NET
+        if: (steps.filter.outputs.any == 'true')
         uses: actions/setup-dotnet@v3
         with:
           dotnet-version: 7.0.x
+
       - name: Update Mac Environment
-        if: runner.os == 'macOS'
+        if: (runner.os == 'macOS' && steps.filter.outputs.any == 'true')
         run: |
           ls -ls /Applications/
           ls -ls $ANDROID_SDK_ROOT/ndk
           sudo xcode-select -switch /Applications/Xcode_${{ matrix.version }}.app
+
       - name: Configure Environment
+        if: (steps.filter.outputs.any == 'true')
         run: make environment-ui
+
+      - name: Test UI
+        if: (steps.filter.outputs.bindings == 'true' || steps.filter.outputs.source == 'true')
+        env:
+          BUILD_NUMBER: ${{ needs.get_version_code.outputs.build_number }}
+          BUILD_VERSION: "${{needs.get_version_code.outputs.version}}"
+          APPCENTER_SECRET_MACOS: ${{ secrets.APPCENTER_SECRET_MACOS }}
+          APPCENTER_SECRET_UWP: ${{ secrets.APPCENTER_SECRET_UWP }}
+        run: make test-ui
+
       - name: Clean UI
+        if: (steps.filter.outputs.bindings == 'true' || steps.filter.outputs.source == 'true')
         run: make clean-ui
-      - name: Build UI
-        run: make build-ui
+
       - name: Publish UI
-        run: make publish-ui BUILD=${{ github.run_number }}
+        if: (steps.filter.outputs.bindings == 'true' || steps.filter.outputs.source == 'true')
+        env:
+          BUILD_NUMBER: ${{ needs.get_version_code.outputs.build_number }}
+          BUILD_VERSION: "${{needs.get_version_code.outputs.version}}"
+          APPCENTER_SECRET_MACOS: ${{ secrets.APPCENTER_SECRET_MACOS }}
+          APPCENTER_SECRET_UWP: ${{ secrets.APPCENTER_SECRET_UWP }}
+        run: make publish-ui
+
       - name: save build artifacts
+        if: (steps.filter.outputs.bindings == 'true' || steps.filter.outputs.source == 'true')
         uses: actions/upload-artifact@v3
         with:
-          name: electionguard-ui-${{ matrix.name }}
+          name: electionguard-admin
           retention-days: 7
-          path: |
-            ${{ github.workspace}}/src/electionguard-ui/ElectionGuard.UI/bin/${{ env.TARGET }}/**/*.pkg
-            ${{ github.workspace}}/src/electionguard-ui/ElectionGuard.UI/bin/${{ env.TARGET }}/**/ElectionGuard.UI*.msix
+          path: ./publish/*
