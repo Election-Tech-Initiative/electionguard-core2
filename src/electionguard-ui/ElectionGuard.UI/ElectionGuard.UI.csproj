@@ -207,4 +207,12 @@
 	    <Generator>MSBuild:Compile</Generator>
 	  </MauiXaml>
 	</ItemGroup>
+	<PropertyGroup Label="Custom Paths">
+		<ElectionGuardData>..\..\..\data</ElectionGuardData>
+		<ElectionGuardLibs>..\..\..\build\libs</ElectionGuardLibs>
+		<ElectionGuardScripts>..\..\..\scripts</ElectionGuardScripts>
+	</PropertyGroup>
+	<Target Name="CustomAfterPublish" AfterTargets="Publish;AfterPublish">
+		<Exec Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'windows'" Command="powershell.exe -ExecutionPolicy Bypass -NoProfile -NonInteractive -File &quot;$(ElectionGuardScripts)\FixMauiPublishImages.ps1&quot; $(OutputPath) $(PublishDir)" />
+	</Target>
 </Project>
