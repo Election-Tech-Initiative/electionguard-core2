@@ -1,5 +1,4 @@
 ﻿using CommunityToolkit.Mvvm.Input;
-using ElectionGuard.UI.Lib.Services;
 
 namespace ElectionGuard.UI.ViewModels;
 
@@ -39,26 +38,24 @@ public partial class AdminHomeViewModel : BaseViewModel
             Elections = new ObservableCollection<Election>(elections);
         }
 
+        MultiTallies.Clear();
         var multiTallies = await _multiTallyService.GetAllAsync();
         foreach (var tally in multiTallies)
         {
-            // check if the user is part of the key ceremony used.
-            if (MultiTallies.SingleOrDefault(t => t.MultiTallyId == tally.MultiTallyId) == null)
+            var addMulti = false;
+            
+            // check each tally in the multitally to see if any are not complete / abandoned
+            foreach (var tallyId in tally.TallyIds)
             {
-                bool addMulti = false;
-                // check each tally in the multitally to see if any are not complete / abandoned
-                foreach (var tallyId in tally.TallyIds)
+                if (await _tallyService.GetRunningByTallyIdAsync(tallyId))
                 {
-                    if (await _tallyService.GetRunningByTallyIdAsync(tallyId))
-                    {
-                        addMulti = true;
-                        break;
-                    }
+                    addMulti = true;
+                    break;
                 }
-                if (addMulti)
-                {
-                    MultiTallies.Add(tally);
-                }
+            }
+            if (addMulti)
+            {
+                MultiTallies.Add(tally);
             }
         }
     }

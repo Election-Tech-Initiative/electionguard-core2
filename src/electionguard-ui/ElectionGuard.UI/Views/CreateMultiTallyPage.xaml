@@ -23,7 +23,7 @@
             Text="{Binding ErrorMessage}" />
         <Grid
             IsVisible="{Binding IsAdmin, Converter={StaticResource InvertedBoolConverter}}"
-            RowDefinitions="auto, auto"
+            RowDefinitions="auto, auto, auto, auto"
             WidthRequest="{StaticResource NarrowSize}">
             <Label
                 Grid.Row="0"
@@ -31,9 +31,21 @@
                 Text="{helper:Translate MultiTallyNameText}" />
             <Label
                 Grid.Row="1"
+                Margin="20,0"
                 Style="{StaticResource FormValue}"
-                    WidthRequest="{StaticResource NarrowSize}"
-                Text="{Binding CurrentMultiTally.Name}" />
+                Text="{Binding CurrentMultiTally.Name}"
+                WidthRequest="{StaticResource NarrowSize}" />
+            <Label
+                Grid.Row="2"
+                Margin="0,10,0,0"
+                Style="{StaticResource FormLabel}"
+                Text="{helper:Translate ElectionRecordPathText}" />
+            <Label
+                Grid.Row="3"
+                Margin="20,0"
+                Style="{StaticResource FormValue}"
+                Text="{Binding CurrentResultsPath}"
+                WidthRequest="{StaticResource NarrowSize}" />
         </Grid>
         <Grid IsVisible="{Binding IsAdmin}" RowDefinitions="auto, auto">
             <Label
@@ -45,28 +57,60 @@
                 <!--  This uses the code behind to work around.  The command still does the work for the actual process  -->
                 <Entry
                     x:Name="keyEntry"
+                    HeightRequest="45"
                     InputTransparent="True"
                     IsReadOnly="True"
+                    VerticalOptions="Start"
                     WidthRequest="{StaticResource NarrowSize}" />
                 <Picker
                     x:Name="keyPicker"
+                    Margin="0,5,0,0"
+                    HorizontalOptions="FillAndExpand"
                     ItemDisplayBinding="{Binding Name}"
                     ItemsSource="{Binding KeyCeremonies}"
                     SelectedIndexChanged="Picker_SelectedIndexChanged"
                     SelectedItem="{Binding SelectedKeyCeremony}"
-                    WidthRequest="{StaticResource NarrowSize}"
+                    VerticalOptions="Start"
                     ZIndex="-1" />
+
             </Grid>
         </Grid>
-        <Grid Margin="0,20,0,10" IsVisible="{Binding IsAdmin}">
+        <Grid IsVisible="{Binding IsAdmin}" RowDefinitions="auto, auto, auto">
             <Label
-                HorizontalOptions="StartAndExpand"
+                Grid.Row="0"
                 Style="{StaticResource FormLabel}"
-                Text="{helper:Translate CreateMultiInstructionsText}" />
-            <Button
-                Command="{Binding CreateTalliesCommand}"
-                HorizontalOptions="End"
-                Text="{helper:Translate CreateTallies}" />
+                Text="{helper:Translate ElectionRecordPathText}" />
+            <Grid
+                Grid.Row="1"
+                Padding="0"
+                BackgroundColor="WhiteSmoke"
+                ColumnDefinitions="auto, *">
+                <Button
+                    Grid.Column="0"
+                    BackgroundColor="{StaticResource Gray200}"
+                    Command="{Binding PickFolderCommand}"
+                    Text="{helper:Translate ChooseFolder}"
+                    TextColor="{StaticResource Gray950}" />
+                <Entry
+                    Grid.Column="1"
+                    IsReadOnly="True"
+                    Placeholder="{helper:Translate NoFolderText}"
+                    Text="{Binding CurrentResultsPath}"
+                    VerticalOptions="CenterAndExpand" />
+            </Grid>
+            <Grid
+                Grid.Row="2"
+                Margin="0,20,0,10"
+                IsVisible="{Binding IsAdmin}">
+                <Label
+                    HorizontalOptions="StartAndExpand"
+                    Style="{StaticResource FormLabel}"
+                    Text="{helper:Translate CreateMultiInstructionsText}" />
+                <Button
+                    Command="{Binding CreateTalliesCommand}"
+                    HorizontalOptions="End"
+                    Text="{helper:Translate CreateTallies}" />
+            </Grid>
         </Grid>
         <Grid Margin="0,20,0,10" IsVisible="{Binding IsAdmin, Converter={StaticResource InvertedBoolConverter}}">
             <Label

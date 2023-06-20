@@ -600,4 +600,7 @@
   <data name="MultiTallyNameText" xml:space="preserve">
     <value>Nombre MultiTally!</value>
   </data>
+  <data name="ElectionRecordPathText" xml:space="preserve">
+    <value>¡Ruta de exportación del registro de elecciones!</value>
+  </data>
 </root>

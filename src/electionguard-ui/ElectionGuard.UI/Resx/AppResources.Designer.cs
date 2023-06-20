@@ -502,6 +502,15 @@ namespace ElectionGuard.UI.Resx {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Election Record Export Path.
+        /// </summary>
+        internal static string ElectionRecordPathText {
+            get {
+                return ResourceManager.GetString("ElectionRecordPathText", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to elections created..
         /// </summary>
         internal static string ElectionsCreated {

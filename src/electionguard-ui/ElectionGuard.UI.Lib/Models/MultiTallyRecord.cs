@@ -12,6 +12,9 @@ public partial class MultiTallyRecord : DatabaseRecord
     private string? _keyCeremonyId;
 
     [ObservableProperty]
+    private string _resultsPath = string.Empty;
+
+    [ObservableProperty]
     private List<string> _tallyIds = new();
 
     public MultiTallyRecord() : base(nameof(MultiTallyRecord))

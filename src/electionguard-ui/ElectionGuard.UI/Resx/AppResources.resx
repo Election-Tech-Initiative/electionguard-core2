@@ -597,4 +597,7 @@
   <data name="MultiTallyNameText" xml:space="preserve">
     <value>MultiTally Name</value>
   </data>
+  <data name="ElectionRecordPathText" xml:space="preserve">
+    <value>Election Record Export Path</value>
+  </data>
 </root>

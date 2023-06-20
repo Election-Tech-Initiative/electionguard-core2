@@ -1,4 +1,5 @@
-﻿using CommunityToolkit.Mvvm.Input;
+﻿using CommunityToolkit.Maui.Storage;
+using CommunityToolkit.Mvvm.Input;
 
 namespace ElectionGuard.UI.ViewModels;
 
@@ -61,6 +62,11 @@ public partial class CreateMultiTallyViewModel : BaseViewModel
     private MultiTallyRecord? _currentMultiTally;
 
     [ObservableProperty]
+    [NotifyCanExecuteChangedFor(nameof(CreateTalliesCommand))]
+    [NotifyCanExecuteChangedFor(nameof(JoinTalliesCommand))]
+    private string _currentResultsPath = string.Empty;
+
+    [ObservableProperty]
     private ObservableCollection<ElectionItem> _elections = new();
 
     [ObservableProperty]
@@ -87,6 +93,7 @@ public partial class CreateMultiTallyViewModel : BaseViewModel
                 }
                 ElectionsLoaded = true;
                 CurrentMultiTally = multiTally;
+                CurrentResultsPath = CurrentMultiTally.ResultsPath;
             }
         });
     }
@@ -230,11 +237,10 @@ public partial class CreateMultiTallyViewModel : BaseViewModel
             var tallyId = await CreateNewTally(election);
 
             // go to the processing page
-            var pageParams = new Dictionary<string, object>
+            await NavigationService.GoToPage(typeof(TallyProcessViewModel), new Dictionary<string, object>
             {
                 { TallyProcessViewModel.CurrentTallyIdParam, tallyId }
-            };
-            await NavigationService.GoToPage(typeof(TallyProcessViewModel), pageParams);
+            });
         }
         else
         {
@@ -252,17 +258,17 @@ public partial class CreateMultiTallyViewModel : BaseViewModel
             {
                 Name = $"MultiTally for {SelectedKeyCeremony.Name}",
                 KeyCeremonyId = SelectedKeyCeremony.KeyCeremonyId,
-                TallyIds = tallys
+                TallyIds = tallys,
+                ResultsPath = CurrentResultsPath
             };
 
             _ = await _multiTallyService.SaveAsync(multiTallyRecord);
 
             // go to the processing page
-            var pageParams = new Dictionary<string, object>
+            await NavigationService.GoToPage(typeof(TallyProcessViewModel), new Dictionary<string, object>
             {
                 { TallyProcessViewModel.MultiTallyIdsParam, tallys }
-            };
-            await NavigationService.GoToPage(typeof(TallyProcessViewModel), pageParams);
+            });
         }
     }
 
@@ -305,24 +311,43 @@ public partial class CreateMultiTallyViewModel : BaseViewModel
             ElectionGuardException.ThrowIfNull(election, $"Could not load election selected");
 
             // go to the processing page
-            var pageParams = new Dictionary<string, object>
+            await NavigationService.GoToPage(typeof(TallyProcessViewModel), new Dictionary<string, object>
             {
                 { TallyProcessViewModel.CurrentTallyIdParam, election.TallyId }
-            };
-            await NavigationService.GoToPage(typeof(TallyProcessViewModel), pageParams);
+            });
         }
         else
         {
             // go to the processing page
-            var pageParams = new Dictionary<string, object>
+            await NavigationService.GoToPage(typeof(TallyProcessViewModel), new Dictionary<string, object>
             {
                 { TallyProcessViewModel.MultiTallyIdsParam, tallys }
-            };
-            await NavigationService.GoToPage(typeof(TallyProcessViewModel), pageParams);
+            });
         }
     }
 
-    private bool TalliesSelected() => SelectedElections.Count > 0;
+    private bool TalliesSelected() => SelectedElections.Count > 0 && !string.IsNullOrEmpty(CurrentResultsPath);
+
+    [RelayCommand]
+    private async Task PickFolder()
+    {
+        CancellationToken token = new();
+        try
+        {
+            var folder = await FolderPicker.Default.PickAsync(token);
+            CurrentResultsPath = folder.Folder?.Path;
+            //BallotFolderName = folder.Folder.Name;
+            //FolderErrorMessage = folder.Exception?.Message ?? string.Empty;
+            // verify folder
+        }
+        catch (Exception ex)
+        {
+            CurrentResultsPath = string.Empty;
+            //BallotFolderName = string.Empty;
+            //FolderErrorMessage = ex.Message;
+        }
+    }
+
 
 }
 
