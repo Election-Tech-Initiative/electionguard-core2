@@ -1,6 +1,5 @@
 ﻿using CommunityToolkit.Mvvm.Input;
 using ElectionGuard.UI.Lib.Extensions;
-using ElectionGuard.UI.Lib.Services;
 using ElectionGuard.UI.Models;
 using ElectionGuard.UI.Services;
 
@@ -296,7 +295,7 @@ public partial class TallyProcessViewModel : BaseViewModel
         // or if user is an admin and the tally is complete, move to the next
         if ((!IsAdmin && !string.IsNullOrEmpty(MultiTallyId) && Tally.State > TallyState.PendingGuardianRespondChallenge) ||
             (IsAdmin && !string.IsNullOrEmpty(MultiTallyId) && Tally.State == TallyState.Complete) ||
-            Tally.State == TallyState.Abandoned)
+            (!string.IsNullOrEmpty(MultiTallyId) && Tally.State == TallyState.Abandoned))
         {
             // move on to the next one if there are any left
             if (MultiTallyIds.Any())
