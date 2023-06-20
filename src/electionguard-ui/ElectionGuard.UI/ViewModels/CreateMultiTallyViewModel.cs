@@ -267,7 +267,7 @@ public partial class CreateMultiTallyViewModel : BaseViewModel
             // go to the processing page
             await NavigationService.GoToPage(typeof(TallyProcessViewModel), new Dictionary<string, object>
             {
-                { TallyProcessViewModel.MultiTallyIdsParam, tallys }
+                { TallyProcessViewModel.MultiTallyIdParam, multiTallyRecord.MultiTallyId }
             });
         }
     }
@@ -321,7 +321,7 @@ public partial class CreateMultiTallyViewModel : BaseViewModel
             // go to the processing page
             await NavigationService.GoToPage(typeof(TallyProcessViewModel), new Dictionary<string, object>
             {
-                { TallyProcessViewModel.MultiTallyIdsParam, tallys }
+                { TallyProcessViewModel.MultiTallyIdParam, MultiTallyId }
             });
         }
     }
