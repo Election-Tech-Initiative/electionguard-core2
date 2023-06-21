@@ -1,4 +1,5 @@
-﻿using CommunityToolkit.Mvvm.Input;
+﻿using System.Threading.Tasks;
+using CommunityToolkit.Mvvm.Input;
 using ElectionGuard.UI.Lib.Extensions;
 using ElectionGuard.UI.Models;
 using ElectionGuard.UI.Services;
@@ -31,6 +32,9 @@ public partial class TallyProcessViewModel : BaseViewModel
     private bool _canUserStartTally;
 
     [ObservableProperty]
+    public bool _isMultiTally = !string.IsNullOrEmpty(MultiTallyId);
+
+    [ObservableProperty]
     [NotifyCanExecuteChangedFor(nameof(JoinTallyCommand))]
     [NotifyCanExecuteChangedFor(nameof(StartTallyCommand))]
     [NotifyCanExecuteChangedFor(nameof(RejectTallyCommand))]
@@ -49,6 +53,8 @@ public partial class TallyProcessViewModel : BaseViewModel
 
     [ObservableProperty]
     private TallyCeremonyChecklist _checklist = new();
+
+    private List<Task> _generationTasks = new();
 
     private readonly ElectionService _electionService;
     private readonly TallyService _tallyService;
@@ -83,12 +89,15 @@ public partial class TallyProcessViewModel : BaseViewModel
 
     partial void OnMultiTallyIdChanged(string value)
     {
+        IsMultiTally = !string.IsNullOrEmpty(value);
+
         if (string.IsNullOrEmpty(value))
         {
             CurrentMultiTally = null;
+            return;
         }
 
-        _ = Shell.Current.CurrentPage.Dispatcher.DispatchAsync(async () =>
+    _ = Shell.Current.CurrentPage.Dispatcher.DispatchAsync(async () =>
         {
             // load the elections that are in the multitally
             var multiTally = await _multiTallyService.GetByMultiTallyIdAsync(value);
@@ -266,7 +275,6 @@ public partial class TallyProcessViewModel : BaseViewModel
             quorumReached;
     }
 
-
     public override async Task OnAppearing()
     {
         await base.OnAppearing();
@@ -275,14 +283,43 @@ public partial class TallyProcessViewModel : BaseViewModel
         _timer?.Start();
     }
 
+    private void MakeElectionRecord(string tally, string resultsPath)
+    {
+        ElectionGuardException.ThrowIfNull(TallyId, "Election record cannot be generated without a TallyId.");
+        ElectionGuardException.ThrowIfNull(Tally, "Election record cannot be generated without a Tally.");
+        ElectionGuardException.ThrowIfNull(CurrentMultiTally, $"Election record cannot be generated for Tally {TallyId} without path to store it in.");
+
+        if (!IsAdmin || Tally.State == TallyState.Abandoned)
+        {
+            return;
+        }
+
+        var tallyId = tally;
+        var path = resultsPath;
+
+        var makeRecord = Task.Run(async () =>
+        {
+            var tally = await _tallyService.GetByTallyIdAsync(tallyId);
+            ElectionGuardException.ThrowIfNull(tally, $"Election record cannot be generated, tally {tallyId} cannot be loaded from db.");
+
+            await ElectionRecordGenerator.GenerateElectionRecordAsync(tally, path);
+        });
+        _generationTasks.Add(makeRecord);
+    }
+
+    private void StartNextTally()
+    {
+        TallyId = MultiTallyIds.First();
+        _ = MultiTallyIds.Remove(TallyId);
+    }
+
     private void CeremonyPollingTimer_Tick(object? sender, EventArgs e)
     {
         // if we are running a multi tally and we are not running a tally yet
-        if (!string.IsNullOrEmpty(MultiTallyId) && string.IsNullOrEmpty(TallyId) && MultiTallyIds.Any())
+        if (IsMultiTally && string.IsNullOrEmpty(TallyId) && MultiTallyIds.Any())
         {
             // set the current tally id and let it load and run that one
-            TallyId = MultiTallyIds.First();
-            _ = MultiTallyIds.Remove(TallyId);
+            StartNextTally();
             return;
         }
 
@@ -293,20 +330,30 @@ public partial class TallyProcessViewModel : BaseViewModel
 
         // if user is a guardian and we are running a multitally and have finished with a tally, move to the next one
         // or if user is an admin and the tally is complete, move to the next
-        if ((!IsAdmin && !string.IsNullOrEmpty(MultiTallyId) && Tally.State > TallyState.PendingGuardianRespondChallenge) ||
-            (IsAdmin && !string.IsNullOrEmpty(MultiTallyId) && Tally.State == TallyState.Complete) ||
-            (!string.IsNullOrEmpty(MultiTallyId) && Tally.State == TallyState.Abandoned))
+        if ((!IsAdmin && IsMultiTally && Tally.State > TallyState.PendingGuardianRespondChallenge) ||
+            (IsAdmin && IsMultiTally && Tally.State == TallyState.Complete) ||
+            (IsMultiTally && Tally.State == TallyState.Abandoned))
         {
             // move on to the next one if there are any left
             if (MultiTallyIds.Any())
             {
+                // create the election record for the tally just completed
+                MakeElectionRecord(TallyId, CurrentMultiTally!.ResultsPath);
+
                 // set the current tally id and let it load and run that one
-                TallyId = MultiTallyIds.First();
-                _ = MultiTallyIds.Remove(TallyId);
+                StartNextTally();
                 return;
             }
             else
             {
+                if (IsAdmin)
+                {
+                    // create the election record for the tally just completed
+                    MakeElectionRecord(TallyId, CurrentMultiTally!.ResultsPath);
+
+                    // wait for all of the election records to be created before stopping
+                    Task.WaitAll(_generationTasks.ToArray());
+                }
                 // there are no more multi tally to run
                 _timer?.Stop();
                 return;
