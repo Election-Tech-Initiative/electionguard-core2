@@ -394,6 +394,7 @@ ifeq ($(OPERATING_SYSTEM),Windows)
 endif
 else
 	@echo "APPCENTER_SECRET_UWP not set. Skipping AppCenter publish"
+	exit 1
 endif
 ifneq ($(APPCENTER_SECRET_MACOS),)
 ifeq ($(OPERATING_SYSTEM),Darwin)
@@ -402,6 +403,7 @@ ifeq ($(OPERATING_SYSTEM),Darwin)
 endif
 else
 	@echo "APPCENTER_SECRET_MACOS not set. Skipping AppCenter publish"
+	exit 1
 endif
 
 publish-wasm: build-npm

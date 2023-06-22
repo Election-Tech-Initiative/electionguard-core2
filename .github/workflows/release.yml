@@ -348,6 +348,8 @@ jobs:
           BUILD_VERSION: "${{needs.get_version_code.outputs.version}}"
           APPCENTER_API_TOKEN_MACOS: ${{ secrets.APPCENTER_API_TOKEN_MACOS }}
           APPCENTER_API_TOKEN_UWP: ${{ secrets.APPCENTER_API_TOKEN_UWP }}
+          APPCENTER_SECRET_UWP: ${{ secrets.APPCENTER_SECRET_UWP }}
+          APPCENTER_SECRET_MACOS: ${{ secrets.APPCENTER_SECRET_MACOS }}
         run: make publish-ui-appcenter
 
   publish_release:
