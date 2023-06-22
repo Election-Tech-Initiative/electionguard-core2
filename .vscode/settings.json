@@ -129,4 +129,5 @@
         "xtree": "cpp",
         "xutility": "cpp"
     },
+    "dotnet.defaultSolution": "src\\electionguard-ui\\ElectionGuard.UI.sln",
 }

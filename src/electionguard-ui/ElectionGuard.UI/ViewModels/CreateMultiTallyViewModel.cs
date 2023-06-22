@@ -102,11 +102,11 @@ public partial class CreateMultiTallyViewModel : BaseViewModel
     {
         if (value)
         {
-            foreach (var item in Elections)
+            foreach (var election in Elections)
             {
-                if (!SelectedElections.Contains(item))
+                if (!SelectedElections.Contains(election))
                 {
-                    SelectedElections.Add(item);
+                    SelectedElections.Add(election);
                 }
             }
         }
@@ -118,9 +118,9 @@ public partial class CreateMultiTallyViewModel : BaseViewModel
         _ = Task.Run(async () =>
         {
             var allElections = await _electionService.GetAllByKeyCeremonyIdAsync(value.KeyCeremonyId);
-            foreach (var item in allElections)
+            foreach (var election in allElections)
             {
-                await LoadElectionData(item);
+                await LoadElectionData(election);
             }
             ElectionsLoaded = true;
         });
@@ -168,12 +168,12 @@ public partial class CreateMultiTallyViewModel : BaseViewModel
     private async Task FillKeyCeremonies()
     {
         var allKeys = await _keyCeremonyService.GetAllCompleteAsync();
-        foreach (var item in allKeys)
+        foreach (var keyCeremony in allKeys)
         {
-            var count = await _electionService.CountByKeyCeremonyIdAsync(item.KeyCeremonyId);
-            if(count > 1)
+            var count = await _electionService.CountByKeyCeremonyIdAsync(keyCeremony.KeyCeremonyId);
+            if (count > 1)
             {
-                KeyCeremonies.Add(item);
+                KeyCeremonies.Add(keyCeremony);
             }
         }
     }
@@ -181,36 +181,33 @@ public partial class CreateMultiTallyViewModel : BaseViewModel
     [RelayCommand]
     private void SelectionChanged()
     {
-        if(SelectedElections.Count != Elections.Count)
-        {
-            SelectAll = false;
-        }
+        SelectAll = SelectedElections.Count != Elections.Count;
         CreateTalliesCommand.NotifyCanExecuteChanged();
         JoinTalliesCommand.NotifyCanExecuteChanged();
     }
 
-    private async Task<string> CreateNewTally(ElectionItem election, bool multi=false)
+    private async Task<string> CreateNewTally(ElectionItem electionItem, bool multi=false)
     {
-        ElectionGuardException.ThrowIfNull(election, $"Could not load election selected");
-        ElectionGuardException.ThrowIfNull(election.Election, $"ElectionItem does not contain an election");
-        ElectionGuardException.ThrowIfNull(election.Election.ElectionId, $"Election does not have an election id");
-        ElectionGuardException.ThrowIfNull(election.Election.KeyCeremonyId, $"Election does not have a key ceremony id");
+        ElectionGuardException.ThrowIfNull(electionItem, $"Could not load election selected");
+        ElectionGuardException.ThrowIfNull(electionItem.Election, $"ElectionItem does not contain an election");
+        ElectionGuardException.ThrowIfNull(electionItem.Election.ElectionId, $"Election does not have an election id");
+        ElectionGuardException.ThrowIfNull(electionItem.Election.KeyCeremonyId, $"Election does not have a key ceremony id");
 
         // calculate ballot count and upload count
-        var ballotCount = await _ballotService.GetCountBallotsByElectionIdStateAsync(election.Election.ElectionId, BallotBoxState.Cast);
-        var challengedCount = await _ballotService.GetCountBallotsByElectionIdStateAsync(election.Election.ElectionId, BallotBoxState.Challenged);
-        var spoiledCount = await _ballotService.GetCountBallotsByElectionIdStateAsync(election.Election.ElectionId, BallotBoxState.Spoiled);
+        var ballotCount = await _ballotService.GetCountBallotsByElectionIdStateAsync(electionItem.Election.ElectionId, BallotBoxState.Cast);
+        var challengedCount = await _ballotService.GetCountBallotsByElectionIdStateAsync(electionItem.Election.ElectionId, BallotBoxState.Challenged);
+        var spoiledCount = await _ballotService.GetCountBallotsByElectionIdStateAsync(electionItem.Election.ElectionId, BallotBoxState.Spoiled);
 
-        var keyCeremony = await _keyCeremonyService.GetByKeyCeremonyIdAsync(election.Election.KeyCeremonyId);
-        ElectionGuardException.ThrowIfNull(keyCeremony, $"Could not load key ceremony {election.Election.KeyCeremonyId}");
+        var keyCeremony = await _keyCeremonyService.GetByKeyCeremonyIdAsync(electionItem.Election.KeyCeremonyId);
+        ElectionGuardException.ThrowIfNull(keyCeremony, $"Could not load key ceremony {electionItem.Election.KeyCeremonyId}");
 
-        var tallyName = $"{election.Election.Name} {AppResources.TallyText}";
+        var tallyName = $"{electionItem.Election.Name} {AppResources.TallyText}";
 
         TallyRecord newTally = new()
         {
             Name = tallyName,
-            ElectionId = election.Election.ElectionId,
-            KeyCeremonyId = election.Election.KeyCeremonyId,
+            ElectionId = electionItem.Election.ElectionId,
+            KeyCeremonyId = electionItem.Election.KeyCeremonyId,
             Quorum = keyCeremony.Quorum,
             NumberOfGuardians = keyCeremony.NumberOfGuardians,
             CastBallotCount = ballotCount,
@@ -237,7 +234,7 @@ public partial class CreateMultiTallyViewModel : BaseViewModel
             var tallyId = await CreateNewTally(election);
 
             // go to the processing page
-            await NavigationService.GoToPage(typeof(TallyProcessViewModel), new Dictionary<string, object>
+            await NavigationService.GoToPage(typeof(TallyProcessViewModel), new()
             {
                 { TallyProcessViewModel.CurrentTallyIdParam, tallyId }
             });
@@ -246,9 +243,9 @@ public partial class CreateMultiTallyViewModel : BaseViewModel
         {
             List<string> tallys = new();
             // create tally records for each election selected
-            foreach (var item in SelectedElections)
+            foreach (var electionItem in SelectedElections)
             {
-                var election = item as ElectionItem;
+                var election = electionItem as ElectionItem;
                 var tallyId = await CreateNewTally(election, true);
                 tallys.Add(tallyId);
             }
@@ -265,7 +262,7 @@ public partial class CreateMultiTallyViewModel : BaseViewModel
             _ = await _multiTallyService.SaveAsync(multiTallyRecord);
 
             // go to the processing page
-            await NavigationService.GoToPage(typeof(TallyProcessViewModel), new Dictionary<string, object>
+            await NavigationService.GoToPage(typeof(TallyProcessViewModel), new()
             {
                 { TallyProcessViewModel.MultiTallyIdParam, multiTallyRecord.MultiTallyId }
             });
@@ -289,18 +286,18 @@ public partial class CreateMultiTallyViewModel : BaseViewModel
     private async Task JoinTallies()
     {
         List<string> tallys = new();
-        foreach (var item in Elections)
+        foreach (var election in Elections)
         {
-            if (SelectedElections.Contains(item))
+            if (SelectedElections.Contains(election))
             {
                 // join the tally
-                await JoinTally(item.TallyId);
-                tallys.Add(item.TallyId);
+                await JoinTally(election.TallyId);
+                tallys.Add(election.TallyId);
             }
             else
             {
                 // reject the tally
-                await JoinTally(item.TallyId, false);
+                await JoinTally(election.TallyId, false);
             }
         }
 
@@ -311,7 +308,7 @@ public partial class CreateMultiTallyViewModel : BaseViewModel
             ElectionGuardException.ThrowIfNull(election, $"Could not load election selected");
 
             // go to the processing page
-            await NavigationService.GoToPage(typeof(TallyProcessViewModel), new Dictionary<string, object>
+            await NavigationService.GoToPage(typeof(TallyProcessViewModel), new()
             {
                 { TallyProcessViewModel.CurrentTallyIdParam, election.TallyId }
             });
@@ -319,7 +316,7 @@ public partial class CreateMultiTallyViewModel : BaseViewModel
         else
         {
             // go to the processing page
-            await NavigationService.GoToPage(typeof(TallyProcessViewModel), new Dictionary<string, object>
+            await NavigationService.GoToPage(typeof(TallyProcessViewModel), new()
             {
                 { TallyProcessViewModel.MultiTallyIdParam, MultiTallyId }
             });
@@ -336,15 +333,10 @@ public partial class CreateMultiTallyViewModel : BaseViewModel
         {
             var folder = await FolderPicker.Default.PickAsync(token);
             CurrentResultsPath = folder.Folder?.Path;
-            //BallotFolderName = folder.Folder.Name;
-            //FolderErrorMessage = folder.Exception?.Message ?? string.Empty;
-            // verify folder
         }
         catch (Exception ex)
         {
             CurrentResultsPath = string.Empty;
-            //BallotFolderName = string.Empty;
-            //FolderErrorMessage = ex.Message;
         }
     }
 

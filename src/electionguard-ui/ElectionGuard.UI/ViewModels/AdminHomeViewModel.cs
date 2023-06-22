@@ -40,22 +40,22 @@ public partial class AdminHomeViewModel : BaseViewModel
 
         MultiTallies.Clear();
         var multiTallies = await _multiTallyService.GetAllAsync();
-        foreach (var tally in multiTallies)
+        foreach (var multiTally in multiTallies)
         {
-            var addMulti = false;
+            var addMultiTally = false;
             
             // check each tally in the multitally to see if any are not complete / abandoned
-            foreach (var tallyId in tally.TallyIds)
+            foreach (var tallyId in multiTally.TallyIds)
             {
-                if (await _tallyService.GetRunningByTallyIdAsync(tallyId))
+                if (await _tallyService.IsRunningByTallyIdAsync(tallyId))
                 {
-                    addMulti = true;
+                    addMultiTally = true;
                     break;
                 }
             }
-            if (addMulti)
+            if (addMultiTally)
             {
-                MultiTallies.Add(tally);
+                MultiTallies.Add(multiTally);
             }
         }
     }

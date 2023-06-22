@@ -36,7 +36,7 @@ public class TallyService : BaseDatabaseService<TallyRecord>
     /// Gets tally state to determine if it is running
     /// </summary>
     /// <param name="tallyId">tally id to search for</param>
-    public async Task<bool> GetRunningByTallyIdAsync(string tallyId)
+    public async Task<bool> IsRunningByTallyIdAsync(string tallyId)
     {
         var tally = await GetByFieldAsync(Constants.TallyId, tallyId);
         return tally?.State is not TallyState.Complete and not TallyState.Abandoned;

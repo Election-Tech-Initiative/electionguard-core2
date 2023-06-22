@@ -17,6 +17,7 @@ public partial class TallyProcessViewModel : BaseViewModel
     private string _tallyId = string.Empty;
 
     [ObservableProperty]
+    [NotifyPropertyChangedFor(nameof(IsMultiTally))]
     private List<string> _multiTallyIds = new();
 
     [ObservableProperty]
@@ -31,8 +32,10 @@ public partial class TallyProcessViewModel : BaseViewModel
     [ObservableProperty]
     private bool _canUserStartTally;
 
-    [ObservableProperty]
-    public bool _isMultiTally = !string.IsNullOrEmpty(MultiTallyId);
+    public bool IsMultiTally
+    {
+        get => !string.IsNullOrEmpty(MultiTallyId);
+    }
 
     [ObservableProperty]
     [NotifyCanExecuteChangedFor(nameof(JoinTallyCommand))]
@@ -89,27 +92,25 @@ public partial class TallyProcessViewModel : BaseViewModel
 
     partial void OnMultiTallyIdChanged(string value)
     {
-        IsMultiTally = !string.IsNullOrEmpty(value);
-
         if (string.IsNullOrEmpty(value))
         {
             CurrentMultiTally = null;
             return;
         }
 
-    _ = Shell.Current.CurrentPage.Dispatcher.DispatchAsync(async () =>
-        {
-            // load the elections that are in the multitally
-            var multiTally = await _multiTallyService.GetByMultiTallyIdAsync(value);
-            if (multiTally != null)
+        _ = Shell.Current.CurrentPage.Dispatcher.DispatchAsync(async () =>
             {
-                foreach (var tallyId in multiTally.TallyIds)
+                // load the elections that are in the multitally
+                var multiTally = await _multiTallyService.GetByMultiTallyIdAsync(value);
+                if (multiTally != null)
                 {
-                    MultiTallyIds.Add(tallyId);
+                    foreach (var tallyId in multiTally.TallyIds)
+                    {
+                        MultiTallyIds.Add(tallyId);
+                    }
+                    CurrentMultiTally = multiTally;
                 }
-                CurrentMultiTally = multiTally;
-            }
-        });
+            });
     }
 
     partial void OnJoinedGuardiansChanged(ObservableCollection<GuardianTallyItem> value)
@@ -128,7 +129,7 @@ public partial class TallyProcessViewModel : BaseViewModel
 
         _ = Shell.Current.CurrentPage.Dispatcher.DispatchAsync(async () =>
         {
-            if (newValue?.State == TallyState.Abandoned && string.IsNullOrEmpty(MultiTallyId))
+            if (newValue?.State == TallyState.Abandoned && !IsMultiTally)
             {
                 await Shell.Current.CurrentPage.DisplayAlert(AppResources.AbandonTallyTitle, AppResources.AbandonTallyText, AppResources.OkText);
                 await NavigationService.GoHome();
@@ -283,7 +284,7 @@ public partial class TallyProcessViewModel : BaseViewModel
         _timer?.Start();
     }
 
-    private void MakeElectionRecord(string tally, string resultsPath)
+    private void MakeElectionRecord(string tallyId, string resultsPath)
     {
         ElectionGuardException.ThrowIfNull(TallyId, "Election record cannot be generated without a TallyId.");
         ElectionGuardException.ThrowIfNull(Tally, "Election record cannot be generated without a Tally.");
@@ -294,15 +295,12 @@ public partial class TallyProcessViewModel : BaseViewModel
             return;
         }
 
-        var tallyId = tally;
-        var path = resultsPath;
-
         var makeRecord = Task.Run(async () =>
         {
             var tally = await _tallyService.GetByTallyIdAsync(tallyId);
             ElectionGuardException.ThrowIfNull(tally, $"Election record cannot be generated, tally {tallyId} cannot be loaded from db.");
 
-            await ElectionRecordGenerator.GenerateElectionRecordAsync(tally, path);
+            await ElectionRecordGenerator.GenerateElectionRecordAsync(tally, resultsPath);
         });
         _generationTasks.Add(makeRecord);
     }
@@ -396,7 +394,7 @@ public partial class TallyProcessViewModel : BaseViewModel
                 }
                 where !JoinedGuardians.Contains(tallyItem)
                 select tallyItem;
-            
+
             JoinedGuardians.AddRange(newGuardians);
         }
         foreach (var guardian in JoinedGuardians)
