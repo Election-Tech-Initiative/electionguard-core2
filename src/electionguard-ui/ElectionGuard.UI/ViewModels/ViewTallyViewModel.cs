@@ -130,7 +130,7 @@ public partial class ViewTallyViewModel : BaseViewModel
             {
                 if (!JoinedGuardians.Any(g => g.Name == item.GuardianId))
                 {
-                    JoinedGuardians.Add(new GuardianTallyItem() { Name = item.GuardianId });
+                    JoinedGuardians.Add(new GuardianTallyItem() { Name = item.GuardianId, Joined = item.Joined });
                 }
             }
         }
@@ -191,7 +191,7 @@ public partial class ViewTallyViewModel : BaseViewModel
                 var percent = (float)selection.Tally / (contest.VotesAllowed * (ulong)Tally.CastBallotCount) * 100;
                 if (!candidate.isWritein)
                 {
-                    contestItem.Selections.Add(new() { Name = candidate.Name, Party = candidate.Party, Votes = selection.Tally, Percent = percent });
+                    contestItem.Selections.Add(new() { Name = candidate.CandidateName, Party = candidate.Party, Votes = selection.Tally, Percent = percent });
                 }
                 else
                 {

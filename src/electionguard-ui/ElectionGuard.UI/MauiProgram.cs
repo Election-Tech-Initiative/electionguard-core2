@@ -95,6 +95,7 @@ public static class MauiProgram
         builder.Services.AddTransient<LagrangeCoefficientsService>();
         builder.Services.AddTransient<TallyManager>();
         builder.Services.AddTransient<ITallyStateMachine, TallyStateMachine>();
+        builder.Services.AddTransient<MultiTallyService>();
 
         // setup view models
         builder.Services.AddTransient<LoginViewModel>();
@@ -108,6 +109,7 @@ public static class MauiProgram
         builder.Services.AddSingleton<ManifestViewModel>();
         builder.Services.AddTransient<BallotUploadViewModel>();
         builder.Services.AddTransient<CreateTallyViewModel>();
+        builder.Services.AddTransient<CreateMultiTallyViewModel>();
         builder.Services.AddTransient<TallyProcessViewModel>();
         builder.Services.AddTransient<ViewTallyViewModel>();
 
@@ -122,6 +124,7 @@ public static class MauiProgram
         builder.Services.AddTransient<ManifestPopup>();
         builder.Services.AddTransient<BallotUploadPage>();
         builder.Services.AddTransient<CreateTallyPage>();
+        builder.Services.AddTransient<CreateMultiTallyPage>();
         builder.Services.AddTransient<TallyProcessPage>();
         builder.Services.AddTransient<ViewTallyPage>();
 

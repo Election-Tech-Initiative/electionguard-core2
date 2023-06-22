@@ -3,9 +3,9 @@
 namespace ElectionGuard.UI.ViewModels;
 
 public record PartyDisplay(string Name, string Abbreviation, string PartyId);
-public record CandidateDisplay(string Name, string Party, string CandidateId, bool isWritein=false);
-public record BallotStyleDisplay(string Name, List<string> GeoPoliticalUnits);
-public record GeopoliticalUnitDisplay(string Name, string GPType, string GeopoliticalUnitId);
+public record CandidateDisplay(string CandidateName, string Party, string CandidateId, bool isWritein=false);
+public record BallotStyleDisplay(string Name, string Units);
+public record GeopoliticalUnitDisplay(string UnitName, string GPType, string GeopoliticalUnitId);
 public record ContestDisplay(string Name, string Variation, ulong NumberElected, ulong VotesAllowed, string Selections);
 
 
@@ -23,6 +23,12 @@ public partial class ManifestViewModel : BaseViewModel
 
     [ObservableProperty]
     private string _manifestName = string.Empty;
+
+    [ObservableProperty]
+    private string _Name = string.Empty;
+
+    [ObservableProperty]
+    private string _units = string.Empty;
 
     [ObservableProperty]
     private string _manifestFile = string.Empty;
@@ -97,13 +103,15 @@ public partial class ManifestViewModel : BaseViewModel
         {
             var local = value.GetBallotStyleAtIndex(i);
             var gpunits = new List<string>();
+            var units = new StringBuilder();
             var geopoliticalUnits = local.GeopoliticalUnitIds;
             for (ulong j = 0; j < local.GeopoliticalUnitIdsSize; j++)
             {
                 var unit = GeopoliticalUnits.FirstOrDefault(u => u.GeopoliticalUnitId == local.GetGeopoliticalUnitIdAtIndex(j)) ?? new(string.Empty, string.Empty, string.Empty);
-                gpunits.Add(unit.Name);
+                gpunits.Add(unit.UnitName);
+                units.AppendLine(unit.UnitName);
             }
-            BallotStyles.Add(new(local.ObjectId, gpunits));
+            BallotStyles.Add(new(local.ObjectId, units.ToString()));
         }
 
         for (ulong i = 0; i < value.ContestsSize; i++)
@@ -116,8 +124,8 @@ public partial class ManifestViewModel : BaseViewModel
                 var candidate = Candidates.FirstOrDefault(c => c.CandidateId == selection.CandidateId);
                 if (candidate != null)
                 {
-                    selections.Append($"{candidate.Name}");
-                    if (string.IsNullOrEmpty(candidate.Party))
+                    selections.Append($"{candidate.CandidateName}");
+                    if (!string.IsNullOrEmpty(candidate.Party))
                     {
                         selections.Append($" ({candidate.Party})");
                     }

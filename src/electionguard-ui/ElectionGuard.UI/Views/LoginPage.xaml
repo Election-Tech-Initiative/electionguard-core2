@@ -1,17 +1,29 @@
 ﻿<?xml version="1.0" encoding="utf-8" ?>
-<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
-             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
-             xmlns:helper="clr-namespace:ElectionGuard.UI.Helpers"
-             x:Class="ElectionGuard.UI.Views.LoginPage"
-             xmlns:viewModels="clr-namespace:ElectionGuard.UI.ViewModels"
-             x:DataType="viewModels:LoginViewModel"
-             xmlns:windows="clr-namespace:Microsoft.Maui.Controls.PlatformConfiguration.WindowsSpecific;assembly=Microsoft.Maui.Controls"
-             ControlTemplate="{StaticResource PageTemplate}">
-    <VerticalStackLayout Style="{StaticResource NarrowCenteredPage}" Margin="0,100,0,0">
-        <Label Style="{StaticResource FormLabel}"
-               Text="{helper:Translate UserID}" />
-        <Entry Placeholder="{helper:Translate LoginPlaceholder}" Text="{Binding Name}" windows:VisualElement.AccessKey="N" />
-        <Button Text="{helper:Translate LoginText}" Command="{Binding LoginCommand}" windows:VisualElement.AccessKey="L" />
-        <Label IsVisible="{Binding DbNotAvailable}" Text="{helper:Translate DatabaseUnavailable}" FontAttributes="Bold" TextColor="Red" />
+<views:ContentPageBase
+    x:Class="ElectionGuard.UI.Views.LoginPage"
+    xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+    xmlns:helper="clr-namespace:ElectionGuard.UI.Helpers"
+    xmlns:viewModels="clr-namespace:ElectionGuard.UI.ViewModels"
+    xmlns:views="using:ElectionGuard.UI.Views"
+    xmlns:windows="clr-namespace:Microsoft.Maui.Controls.PlatformConfiguration.WindowsSpecific;assembly=Microsoft.Maui.Controls"
+    x:DataType="viewModels:LoginViewModel"
+    x:TypeArguments="viewModels:LoginViewModel"
+    ControlTemplate="{StaticResource PageTemplate}">
+    <VerticalStackLayout Margin="0,100,0,0" Style="{StaticResource NarrowCenteredPage}">
+        <Label Style="{StaticResource FormLabel}" Text="{helper:Translate UserID}" />
+        <Entry
+            windows:VisualElement.AccessKey="N"
+            Placeholder="{helper:Translate LoginPlaceholder}"
+            Text="{Binding Name}" />
+        <Button
+            windows:VisualElement.AccessKey="L"
+            Command="{Binding LoginCommand}"
+            Text="{helper:Translate LoginText}" />
+        <Label
+            FontAttributes="Bold"
+            IsVisible="{Binding DbNotAvailable}"
+            Text="{helper:Translate DatabaseUnavailable}"
+            TextColor="Red" />
     </VerticalStackLayout>
-</ContentPage>
+</views:ContentPageBase>

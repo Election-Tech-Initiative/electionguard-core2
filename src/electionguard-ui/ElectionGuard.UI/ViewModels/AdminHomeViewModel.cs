@@ -6,11 +6,20 @@ public partial class AdminHomeViewModel : BaseViewModel
 {
     private readonly KeyCeremonyService _keyCeremonyService;
     private readonly ElectionService _electionService;
+    private readonly MultiTallyService _multiTallyService;
+    private readonly TallyService _tallyService;
 
-    public AdminHomeViewModel(IServiceProvider serviceProvider, KeyCeremonyService keyCeremonyService, ElectionService electionService) : base("AdminHome", serviceProvider)
+    public AdminHomeViewModel(
+        IServiceProvider serviceProvider,
+        KeyCeremonyService keyCeremonyService,
+        ElectionService electionService,
+        TallyService tallyService,
+        MultiTallyService multiTallyService) : base("AdminHome", serviceProvider)
     {
         _keyCeremonyService = keyCeremonyService;
         _electionService = electionService;
+        _tallyService = tallyService;
+        _multiTallyService = multiTallyService;
     }
 
     public override async Task OnAppearing()
@@ -28,8 +37,28 @@ public partial class AdminHomeViewModel : BaseViewModel
         {
             Elections = new ObservableCollection<Election>(elections);
         }
-    }
 
+        MultiTallies.Clear();
+        var multiTallies = await _multiTallyService.GetAllAsync();
+        foreach (var multiTally in multiTallies)
+        {
+            var addMultiTally = false;
+            
+            // check each tally in the multitally to see if any are not complete / abandoned
+            foreach (var tallyId in multiTally.TallyIds)
+            {
+                if (await _tallyService.IsRunningByTallyIdAsync(tallyId))
+                {
+                    addMultiTally = true;
+                    break;
+                }
+            }
+            if (addMultiTally)
+            {
+                MultiTallies.Add(multiTally);
+            }
+        }
+    }
 
     [ObservableProperty]
     private ObservableCollection<Election> _elections = new();
@@ -38,10 +67,31 @@ public partial class AdminHomeViewModel : BaseViewModel
     private ObservableCollection<KeyCeremonyRecord> _keyCeremonies = new();
 
     [ObservableProperty]
+    private ObservableCollection<MultiTallyRecord> _multiTallies = new();
+
+    [ObservableProperty]
     private Election? _currentElection;
 
     [ObservableProperty]
     private KeyCeremonyRecord? _currentKeyCeremony;
+
+    [ObservableProperty]
+    private MultiTallyRecord? _currentMultiTally;
+
+    partial void OnCurrentMultiTallyChanged(MultiTallyRecord? value)
+    {
+        if (value == null)
+        {
+            return;
+        }
+
+        MainThread.BeginInvokeOnMainThread(async () =>
+            await NavigationService.GoToPage(typeof(CreateMultiTallyViewModel), new Dictionary<string, object>
+            {
+                { CreateMultiTallyViewModel.MultiTallyIdParam, value.MultiTallyId! }
+            }));
+    }
+
 
     [RelayCommand(AllowConcurrentExecutions = true)]
     public async Task GoToKeyCeremony()
@@ -80,10 +130,10 @@ public partial class AdminHomeViewModel : BaseViewModel
         }
     }
 
-    [RelayCommand]
+    [RelayCommand(AllowConcurrentExecutions = true)]
     private async Task CreateMultipleTallies()
     {
-        //await NavigationService.GoToPage(typeof(CreateElectionViewModel));
+        await NavigationService.GoToPage(typeof(CreateMultiTallyViewModel));
     }
 
 }

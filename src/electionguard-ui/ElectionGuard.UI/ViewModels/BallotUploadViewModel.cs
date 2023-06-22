@@ -101,7 +101,6 @@ public partial class BallotUploadViewModel : BaseViewModel
         var deviceData = await ReadFileAsync(DeviceFile);
 
         // TODO: enhance the EncryptionDevice object to have this info coming out of the json constructor
-        EncryptionDevice device = new(deviceData);
         var deviceDocument = JsonDocument.Parse(deviceData);
         var location = string.Empty;
         long deviceId = -1;
@@ -159,14 +158,6 @@ public partial class BallotUploadViewModel : BaseViewModel
                 var ballotData = await ReadFileAsync(currentBallot, cancellationToken);
                 using var ballot = new CiphertextBallot(ballotData);
 
-                var exists = await _ballotService.BallotExistsAsync(ballot.BallotCode.ToHex());
-
-                if (ballot.ManifestHash != _manifestHash)
-                {
-                    _ = Interlocked.Increment(ref totalRejected);
-                    return;
-                }
-
                 if (ballot.Timestamp < startDate)
                 {
                     _ = Interlocked.Exchange(ref startDate, ballot.Timestamp);
@@ -176,11 +167,14 @@ public partial class BallotUploadViewModel : BaseViewModel
                     _ = Interlocked.Exchange(ref endDate, ballot.Timestamp);
                 }
 
-                if (exists)
+                if (ballot.ManifestHash != _manifestHash)
                 {
-                    _ = Interlocked.Increment(ref totalDuplicated);
+                    _ = Interlocked.Increment(ref totalRejected);
+                    return;
                 }
-                else
+
+                var exists = await _ballotService.BallotExistsAsync(ballot.BallotCode.ToHex());
+                if (!exists)
                 {
                     BallotRecord ballotRecord = new()
                     {
@@ -190,10 +184,10 @@ public partial class BallotUploadViewModel : BaseViewModel
                         FileName = filename,
                         BallotCode = ballot.BallotCode.ToHex(),
                         BallotState = ballot.State,
-                        BallotData = ballotData,
+                        BallotData = ballotData
                     };
-
                     _ = await _ballotService.SaveAsync(ballotRecord);
+
 
                     _ = ballot.State switch
                     {
@@ -210,12 +204,17 @@ public partial class BallotUploadViewModel : BaseViewModel
                         var result = ciphertextTally.Accumulate(ballot, true);
                     }
                 }
+                else
+                {
+                    _ = Interlocked.Increment(ref totalDuplicated);
+                }
 
                 _ = Interlocked.Increment(ref totalCount);
                 UploadText = $"{AppResources.SuccessText} {totalCount} / {ballots.Length} {AppResources.Success2Text}";
             }
             catch (Exception)
             {
+                _ = Interlocked.Increment(ref totalRejected);
             }
         });
 
@@ -417,7 +416,7 @@ public partial class BallotUploadViewModel : BaseViewModel
 
                     try
                     {
-                        _ = Shell.Current.CurrentPage.Dispatcher.Dispatch(() =>
+                        Shell.Current.CurrentPage.Dispatcher.Dispatch(() =>
                         {
                             BallotFolder = ballotPath;
                         });
