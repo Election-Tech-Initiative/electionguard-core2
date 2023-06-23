@@ -352,6 +352,8 @@ public partial class TallyProcessViewModel : BaseViewModel
         }
         else
         {
+            // separate formula here since the ceremony will be working on 1 of them
+            // and it will be removed from the list and not counted yet
             count = CurrentMultiTally.TallyIds.Count - MultiTallyIds.Count - 1;
         }
         MultiTallyProgress = $"{count} / {CurrentMultiTally.TallyIds.Count} {AppResources.Complete}";
