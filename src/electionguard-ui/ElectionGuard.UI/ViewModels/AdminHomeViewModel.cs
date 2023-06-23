@@ -45,7 +45,7 @@ public partial class AdminHomeViewModel : BaseViewModel
             var addMultiTally = false;
             
             // check each tally in the multitally to see if any are not complete / abandoned
-            foreach (var tallyId in multiTally.TallyIds)
+            foreach (var (tallyId, _, _) in multiTally.TallyIds)
             {
                 if (await _tallyService.IsRunningByTallyIdAsync(tallyId))
                 {
@@ -86,7 +86,7 @@ public partial class AdminHomeViewModel : BaseViewModel
         }
 
         MainThread.BeginInvokeOnMainThread(async () =>
-            await NavigationService.GoToPage(typeof(CreateMultiTallyViewModel), new Dictionary<string, object>
+            await NavigationService.GoToPage(typeof(TallyProcessViewModel), new()
             {
                 { CreateMultiTallyViewModel.MultiTallyIdParam, value.MultiTallyId! }
             }));
@@ -98,7 +98,7 @@ public partial class AdminHomeViewModel : BaseViewModel
     {
         if (CurrentKeyCeremony is null)
             return;
-        await NavigationService.GoToPage(typeof(ViewKeyCeremonyViewModel), new Dictionary<string, object>
+        await NavigationService.GoToPage(typeof(ViewKeyCeremonyViewModel), new()
         {
             { ViewKeyCeremonyViewModel.CurrentKeyCeremonyParam, CurrentKeyCeremony.KeyCeremonyId! }
         });
@@ -121,11 +121,10 @@ public partial class AdminHomeViewModel : BaseViewModel
     {
         if (CurrentElection is not null)
         {
-            var pageParams = new Dictionary<string, object>
+            await NavigationService.GoToPage(typeof(ElectionViewModel), new()
             {
                 { ElectionViewModel.CurrentElectionParam, CurrentElection }
-            };
-            await NavigationService.GoToPage(typeof(ElectionViewModel), pageParams);
+            });
             CurrentElection = null;
         }
     }
