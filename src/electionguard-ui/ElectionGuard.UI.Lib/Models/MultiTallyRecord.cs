@@ -15,7 +15,7 @@ public partial class MultiTallyRecord : DatabaseRecord
     private string _resultsPath = string.Empty;
 
     [ObservableProperty]
-    private List<(string, string, string)> _tallyIds = new();
+    private List<(string TallyId, string ElectionId, string TallyName)> _tallyIds = new();
 
     public MultiTallyRecord() : base(nameof(MultiTallyRecord))
     {
