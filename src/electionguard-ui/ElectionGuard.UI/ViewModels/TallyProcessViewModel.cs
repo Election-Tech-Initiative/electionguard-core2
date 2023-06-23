@@ -20,7 +20,7 @@ public partial class TallyProcessViewModel : BaseViewModel
     [ObservableProperty]
     [NotifyPropertyChangedFor(nameof(IsMultiTally))]
     [NotifyPropertyChangedFor(nameof(MultiTallyNames))]
-    private ObservableCollection<(string, string)> _multiTallyIds = new();
+    private ObservableCollection<(string TallyId, string Name)> _multiTallyIds = new();
 
     public ObservableCollection<string> MultiTallyNames => MultiTallyIds.Select(m => m.Name).ToObservableCollection();
 
@@ -129,13 +129,13 @@ public partial class TallyProcessViewModel : BaseViewModel
 
                     foreach (var (tallyId, electionId, name) in multiTally.TallyIds)
                     {
-                        MultiTallyIds.Add((Id: tallyId, Name: name));
+                        MultiTallyIds.Add((tallyId, name));
                     }
 
                 }
             });
     }
-
+    
     partial void OnJoinedGuardiansChanged(ObservableCollection<GuardianTallyItem> value)
     {
         CanUserJoinTally = CanJoinTally(); // needs to be aware of who joined the tally.
@@ -335,8 +335,7 @@ public partial class TallyProcessViewModel : BaseViewModel
 
     private void StartNextTally()
     {
-        var (tallyid, _, _) = MultiTallyIds.First();
-        TallyId = tallyid;
+        TallyId = MultiTallyIds.First().TallyId;
         MultiTallyIds.RemoveAt(0);
     }
 
