@@ -22,7 +22,7 @@ public partial class TallyProcessViewModel : BaseViewModel
     [NotifyPropertyChangedFor(nameof(MultiTallyNames))]
     private ObservableCollection<(string, string)> _multiTallyIds = new();
 
-    public ObservableCollection<string> MultiTallyNames => MultiTallyIds.Select(m => m.Item2).ToObservableCollection();
+    public ObservableCollection<string> MultiTallyNames => MultiTallyIds.Select(m => m.Name).ToObservableCollection();
 
     [ObservableProperty]
     [NotifyPropertyChangedFor(nameof(IsMultiTally))]
@@ -129,9 +129,9 @@ public partial class TallyProcessViewModel : BaseViewModel
 
                     foreach (var (tallyId, electionId, name) in multiTally.TallyIds)
                     {
-                        MultiTallyIds.Add((tallyId, name));
+                        MultiTallyIds.Add((Id: tallyId, Name: name));
                     }
-                    
+
                 }
             });
     }
@@ -335,7 +335,8 @@ public partial class TallyProcessViewModel : BaseViewModel
 
     private void StartNextTally()
     {
-        TallyId = MultiTallyIds.First().Item1;
+        var (tallyid, _, _) = MultiTallyIds.First();
+        TallyId = tallyid;
         MultiTallyIds.RemoveAt(0);
     }
 
