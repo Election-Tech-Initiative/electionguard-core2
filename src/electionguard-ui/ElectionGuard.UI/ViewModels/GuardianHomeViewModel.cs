@@ -130,7 +130,7 @@ public partial class GuardianHomeViewModel : BaseViewModel
 
             var addMulti = false;
             // check each tally in the multitally to see if any are not complete / abandoned
-            foreach (var tallyId in tally.TallyIds)
+            foreach (var (tallyId, _, _) in tally.TallyIds)
             {
                 if (await _tallyService.IsRunningByTallyIdAsync(tallyId))
                 {

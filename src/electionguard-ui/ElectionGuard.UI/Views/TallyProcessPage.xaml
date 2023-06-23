@@ -223,6 +223,7 @@
             Grid.Column="2"
             HorizontalOptions="End">
             <Label Style="{StaticResource H2}" Text="{helper:Translate TallyChecklist}" />
+            <Line Background="Black" />
             <HorizontalStackLayout Margin="10">
                 <Label Text="1." VerticalTextAlignment="Center" />
                 <CheckBox IsChecked="{Binding Checklist.QuorumReached}" IsEnabled="False" />
@@ -312,6 +313,38 @@
                     WidthRequest="100" />
             </HorizontalStackLayout>
             <Line Background="Black" />
+        </VerticalStackLayout>
+        <VerticalStackLayout
+            Grid.Row="0"
+            Grid.RowSpan="3"
+            Grid.Column="0"
+            HorizontalOptions="Start"
+            IsVisible="{Binding IsMultiTally}"
+            WidthRequest="250">
+            <Label
+                Margin="10,0"
+                Style="{StaticResource H2}"
+                Text="{helper:Translate TalliesText}" />
+            <Label
+                Margin="40,0,0,5"
+                FontSize="Small"
+                Text="{Binding MultiTallyProgress}" />
+            <Line Background="Black" />
+            <CollectionView ItemsSource="{Binding MultiTallyNames}" SelectionMode="None">
+                <CollectionView.ItemTemplate>
+                    <DataTemplate>
+                        <Grid RowDefinitions="auto, auto">
+                            <Label
+                                Grid.Row="0"
+                                Margin="10"
+                                LineBreakMode="TailTruncation"
+                                Text="{Binding .}"
+                                ToolTipProperties.Text="{Binding .}" />
+                            <Line Grid.Row="1" Background="{StaticResource Gray900}" />
+                        </Grid>
+                    </DataTemplate>
+                </CollectionView.ItemTemplate>
+            </CollectionView>
         </VerticalStackLayout>
 
     </Grid>

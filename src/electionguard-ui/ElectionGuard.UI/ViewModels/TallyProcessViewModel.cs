@@ -1,4 +1,5 @@
 ﻿using System.Threading.Tasks;
+using CommunityToolkit.Maui.Core.Extensions;
 using CommunityToolkit.Mvvm.Input;
 using ElectionGuard.UI.Lib.Extensions;
 using ElectionGuard.UI.Models;
@@ -18,9 +19,13 @@ public partial class TallyProcessViewModel : BaseViewModel
 
     [ObservableProperty]
     [NotifyPropertyChangedFor(nameof(IsMultiTally))]
-    private List<string> _multiTallyIds = new();
+    [NotifyPropertyChangedFor(nameof(MultiTallyNames))]
+    private ObservableCollection<(string, string)> _multiTallyIds = new();
+
+    public ObservableCollection<string> MultiTallyNames => MultiTallyIds.Select(m => m.Item2).ToObservableCollection();
 
     [ObservableProperty]
+    [NotifyPropertyChangedFor(nameof(IsMultiTally))]
     private string _multiTallyId = string.Empty;
 
     [ObservableProperty]
@@ -31,6 +36,9 @@ public partial class TallyProcessViewModel : BaseViewModel
 
     [ObservableProperty]
     private bool _canUserStartTally;
+
+    [ObservableProperty]
+    private string _multiTallyProgress;
 
     public bool IsMultiTally
     {
@@ -88,6 +96,19 @@ public partial class TallyProcessViewModel : BaseViewModel
         _decryptionShareService = decryptionShareService;
         _challengeResponseService = challengeResponseService;
         _multiTallyService = multiTallyService;
+
+        MultiTallyIds.CollectionChanged += MultiTallyIds_CollectionChanged;
+        LocalizationResourceManager.Current.PropertyChanged += Current_PropertyChanged;
+    }
+
+    private void Current_PropertyChanged(object? sender, System.ComponentModel.PropertyChangedEventArgs e)
+    {
+        UpdateProgressString();
+    }
+
+    private void MultiTallyIds_CollectionChanged(object? sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
+    {
+        OnPropertyChanged(nameof(MultiTallyNames));
     }
 
     partial void OnMultiTallyIdChanged(string value)
@@ -104,11 +125,13 @@ public partial class TallyProcessViewModel : BaseViewModel
                 var multiTally = await _multiTallyService.GetByMultiTallyIdAsync(value);
                 if (multiTally != null)
                 {
-                    foreach (var tallyId in multiTally.TallyIds)
-                    {
-                        MultiTallyIds.Add(tallyId);
-                    }
                     CurrentMultiTally = multiTally;
+
+                    foreach (var (tallyId, electionId, name) in multiTally.TallyIds)
+                    {
+                        MultiTallyIds.Add((tallyId, name));
+                    }
+                    
                 }
             });
     }
@@ -168,6 +191,10 @@ public partial class TallyProcessViewModel : BaseViewModel
         _ = Shell.Current.CurrentPage.Dispatcher.DispatchAsync(async () =>
         {
             Tally = null;
+            if (string.IsNullOrEmpty(value))
+            {
+                return;
+            }
             Tally = await _tallyService.GetByTallyIdAsync(value);
         });
     }
@@ -282,6 +309,7 @@ public partial class TallyProcessViewModel : BaseViewModel
         _timer!.Tick += CeremonyPollingTimer_Tick;
 
         _timer?.Start();
+        CeremonyPollingTimer_Tick(this, null);
     }
 
     private void MakeElectionRecord(string tallyId, string resultsPath)
@@ -307,15 +335,35 @@ public partial class TallyProcessViewModel : BaseViewModel
 
     private void StartNextTally()
     {
-        TallyId = MultiTallyIds.First();
-        _ = MultiTallyIds.Remove(TallyId);
+        TallyId = MultiTallyIds.First().Item1;
+        MultiTallyIds.RemoveAt(0);
+    }
+
+    void UpdateProgressString()
+    {
+        var count = 0;
+        if (MultiTallyIds.Count == CurrentMultiTally.TallyIds.Count)
+        {
+            count = 0;
+        }
+        else if (MultiTallyIds.Count == 0 && string.IsNullOrEmpty(TallyId))
+        {
+            count = CurrentMultiTally.TallyIds.Count;
+        }
+        else
+        {
+            count = CurrentMultiTally.TallyIds.Count - MultiTallyIds.Count - 1;
+        }
+        MultiTallyProgress = $"{count} / {CurrentMultiTally.TallyIds.Count} {AppResources.Complete}";
     }
 
     private void CeremonyPollingTimer_Tick(object? sender, EventArgs e)
     {
         // if we are running a multi tally and we are not running a tally yet
-        if (IsMultiTally && string.IsNullOrEmpty(TallyId) && MultiTallyIds.Any())
+        if (IsMultiTally && CurrentMultiTally != null && string.IsNullOrEmpty(TallyId) && MultiTallyIds.Any())
         {
+            UpdateProgressString();
+
             // set the current tally id and let it load and run that one
             StartNextTally();
             return;
@@ -338,6 +386,8 @@ public partial class TallyProcessViewModel : BaseViewModel
                 // create the election record for the tally just completed
                 MakeElectionRecord(TallyId, CurrentMultiTally!.ResultsPath);
 
+                UpdateProgressString();
+
                 // set the current tally id and let it load and run that one
                 StartNextTally();
                 return;
@@ -352,6 +402,9 @@ public partial class TallyProcessViewModel : BaseViewModel
                     // wait for all of the election records to be created before stopping
                     Task.WaitAll(_generationTasks.ToArray());
                 }
+
+                TallyId = string.Empty;
+
                 // there are no more multi tally to run
                 _timer?.Stop();
                 return;

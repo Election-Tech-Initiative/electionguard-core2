@@ -85,10 +85,9 @@ public partial class CreateMultiTallyViewModel : BaseViewModel
             var multiTally = await _multiTallyService.GetByMultiTallyIdAsync(value);
             if (multiTally != null)
             {
-                foreach (var tallyId in multiTally.TallyIds)
+                foreach (var (tallyId, electionId, name) in multiTally.TallyIds)
                 {
-                    var tally = await _tallyService.GetByTallyIdAsync(tallyId);
-                    var election = await _electionService.GetByElectionIdAsync(tally!.ElectionId!);
+                    var election = await _electionService.GetByElectionIdAsync(electionId);
                     await LoadElectionData(election, tallyId);
                 }
                 ElectionsLoaded = true;
@@ -186,7 +185,7 @@ public partial class CreateMultiTallyViewModel : BaseViewModel
         JoinTalliesCommand.NotifyCanExecuteChanged();
     }
 
-    private async Task<string> CreateNewTally(ElectionItem electionItem, bool multi=false)
+    private async Task<(string, string)> CreateNewTally(ElectionItem electionItem, bool multi=false)
     {
         ElectionGuardException.ThrowIfNull(electionItem, $"Could not load election selected");
         ElectionGuardException.ThrowIfNull(electionItem.Election, $"ElectionItem does not contain an election");
@@ -219,7 +218,7 @@ public partial class CreateMultiTallyViewModel : BaseViewModel
 
         _ = await _tallyService.SaveAsync(newTally);
 
-        return newTally.TallyId;
+        return (newTally.TallyId, newTally.Name);
     }
 
 
@@ -231,7 +230,7 @@ public partial class CreateMultiTallyViewModel : BaseViewModel
             // do a normal tally for a single election
             var election = SelectedElections.First() as ElectionItem;
 
-            var tallyId = await CreateNewTally(election);
+            var (tallyId, _) = await CreateNewTally(election);
 
             // go to the processing page
             await NavigationService.GoToPage(typeof(TallyProcessViewModel), new()
@@ -241,13 +240,13 @@ public partial class CreateMultiTallyViewModel : BaseViewModel
         }
         else
         {
-            List<string> tallys = new();
+            List<(string, string, string)> tallys = new();
             // create tally records for each election selected
             foreach (var electionItem in SelectedElections)
             {
                 var election = electionItem as ElectionItem;
-                var tallyId = await CreateNewTally(election, true);
-                tallys.Add(tallyId);
+                var (tallyId, electionName) = await CreateNewTally(election, true);
+                tallys.Add((tallyId, election!.Election!.ElectionId!, electionName));
             }
 
             // create a multi-tally record for the db
@@ -339,7 +338,5 @@ public partial class CreateMultiTallyViewModel : BaseViewModel
             CurrentResultsPath = string.Empty;
         }
     }
-
-
 }
 
