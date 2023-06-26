@@ -68,13 +68,11 @@
       <Pack>true</Pack>
       <PackageCopyToOutput>true</PackageCopyToOutput>
       <PackagePath>runtimes\win-x86\native</PackagePath>
-      <PackagePath>runtimes\win-x64\native</PackagePath>
     </Content>
     <Content Name="Windows x86 HACL" Include="$(ElectionGuardLibs)\Windows\x86\$(Configuration)\libs\hacl\$(Configuration)\*.dll*">
       <Pack>true</Pack>
       <PackageCopyToOutput>true</PackageCopyToOutput>
       <PackagePath>runtimes\win-x86\native</PackagePath>
-      <PackagePath>runtimes\win-x64\native</PackagePath>
     </Content>
     <Content Name="Windows x64" Include="$(ElectionGuardLibs)\Windows\x64\$(Configuration)\src\$(Configuration)\*.dll*">
       <Pack>true</Pack>
