@@ -5,9 +5,9 @@
     <!-- Project -->
     <RootNamespace>ElectionGuard</RootNamespace>
     <AssemblyName>ElectionGuard.Encryption</AssemblyName>
-    <Version>1.75.0</Version>
-    <AssemblyVersion>1.75.0.0</AssemblyVersion>
-    <AssemblyFileVersion>1.75.0.0</AssemblyFileVersion>
+    <Version>1.75.16</Version>
+    <AssemblyVersion>1.75.16.0</AssemblyVersion>
+    <AssemblyFileVersion>1.75.16.0</AssemblyFileVersion>
     <EnableNETAnalyzers>true</EnableNETAnalyzers>
     <EnforceCodeStyleInBuild>true</EnforceCodeStyleInBuild>
     <Platforms>arm64;x64</Platforms>
@@ -18,7 +18,7 @@
     <Title>ElectionGuard Encryption</Title>
     <Description>Open source implementation of ElectionGuard's ballot encryption.</Description>
     <Authors>Microsoft</Authors>
-    <PackageVersion>1.75.0</PackageVersion>
+    <PackageVersion>1.75.16</PackageVersion>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
     <PackageProjectUrl>https://github.com/microsoft/electionguard-core2</PackageProjectUrl>
     <RepositoryUrl>https://github.com/microsoft/electionguard-core2</RepositoryUrl>
