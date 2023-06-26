@@ -38,7 +38,7 @@ endif()
 # ---- Library Sources ----
 include(${PROJECT_SOURCE_DIR}/libs/hacl/sources.cmake)
 
-if(ELECTIONGUARD_BUILD_SHARED)
+if(BUILD_SHARED_LIBS)
     add_library(${HACL_CPP_TARGET_NAME} SHARED ${SOURCES_hacl_cpp})
 else()
     add_library(${HACL_CPP_TARGET_NAME} STATIC ${SOURCES_hacl_cpp})
@@ -72,7 +72,7 @@ else()
     )
 endif()
 
-if(ELECTIONGUARD_BUILD_SHARED)
+if(BUILD_SHARED_LIBS)
     target_link_libraries(${HACL_CPP_TARGET_NAME} PRIVATE hacl)
 else()
     target_link_libraries(${HACL_CPP_TARGET_NAME} PRIVATE hacl_static)
@@ -97,17 +97,19 @@ install(
 
 # Copy the hacl library to the same directory as the hacl_cpp library
 if(MSVC)
-    add_custom_command(
-        TARGET ${HACL_CPP_TARGET_NAME} POST_BUILD
+    add_custom_target(
+        copy_hacl_dll ALL
         COMMAND ${CMAKE_COMMAND} -E copy_directory
         ${hacl_BINARY_DIR}/${CMAKE_BUILD_TYPE}
         $<TARGET_FILE_DIR:${HACL_CPP_TARGET_NAME}>
     )
+    add_dependencies(copy_hacl_dll ${HACL_CPP_TARGET_NAME})
 else()
-    add_custom_command(
-        TARGET ${HACL_CPP_TARGET_NAME} POST_BUILD
+    add_custom_target(
+        copy_hacl_dll ALL
         COMMAND ${CMAKE_COMMAND} -E copy_directory
         ${hacl_BINARY_DIR}
         $<TARGET_FILE_DIR:${HACL_CPP_TARGET_NAME}>
     )
+    add_dependencies(copy_hacl_dll ${HACL_CPP_TARGET_NAME})
 endif()
