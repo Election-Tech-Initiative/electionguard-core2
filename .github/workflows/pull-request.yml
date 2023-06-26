@@ -154,7 +154,7 @@ jobs:
         shell: bash
         run: |
           FILTER_ANY_CHANGE="false"  # default value
-          if [[ "${{ needs.changes.outputs.github }}" == "true" || "${{ needs.changes.outputs.apps }}" == "true" || "${{ needs.changes.outputs.bindings }}" == "true" || "${{ needs.changes.outputs.cmake }}" == "true" || "${{ needs.changes.outputs.include }}" == "true" || "${{ needs.changes.outputs.libs }}" == "true" || "${{ needs.changes.outputs.root }}" == "true" || "${{ needs.changes.outputs.scripts }}" == "true" || "${{ needs.changes.outputs.source }}" == "source" || "${{ needs.changes.outputs.typescript }}" == "true" ]]; then
+          if [[ "${{ needs.changes.outputs.github }}" == "true" || "${{ needs.changes.outputs.apps }}" == "true" || "${{ needs.changes.outputs.bindings }}" == "true" || "${{ needs.changes.outputs.cmake }}" == "true" || "${{ needs.changes.outputs.include }}" == "true" || "${{ needs.changes.outputs.libs }}" == "true" || "${{ needs.changes.outputs.root }}" == "true" || "${{ needs.changes.outputs.scripts }}" == "true" || "${{ needs.changes.outputs.source }}" == "true" || "${{ needs.changes.outputs.typescript }}" == "true" ]]; then
             FILTER_ANY_CHANGE="true"
           fi
           FILTER_CPP_CHANGE="false"  # default value
