@@ -71,7 +71,7 @@ jobs:
         run: make environment
       - name: Build
         run: make build-maccatalyst
-      - name: Upload Library (x64)
+      - name: Upload Library (arm64)
         uses: actions/upload-artifact@v3
         with:
           name: maccatalyst-arm64
