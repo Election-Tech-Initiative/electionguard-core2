@@ -20,7 +20,7 @@ namespace ElectionGuard.UI.Test.ViewModels
             // ARRANGE
             var createKeyCeremonyAdminViewModel = CreateKeyCeremonyAdminViewModel();
             var ret = new KeyCeremonyRecord("test", 1, 1, "admin");
-            _keyCeremonyService.SaveAsync(Arg.Any<KeyCeremonyRecord>()).Returns(ret);
+            _ = _keyCeremonyService.SaveAsync(Arg.Any<KeyCeremonyRecord>()).Returns(ret);
 
             // ACT
             await createKeyCeremonyAdminViewModel.CreateKeyCeremonyCommand.ExecuteAsync(null);
@@ -97,13 +97,13 @@ namespace ElectionGuard.UI.Test.ViewModels
             // ARRANGE
             var createKeyCeremonyAdminViewModel = CreateKeyCeremonyAdminViewModel();
             createKeyCeremonyAdminViewModel.KeyCeremonyName = "kc1";
-            _keyCeremonyService.GetByNameAsync("kc1").Returns(new KeyCeremonyRecord("kc1", 1, 1, "admin"));
+            _ = _keyCeremonyService.GetByNameAsync("kc1").Returns(new KeyCeremonyRecord("kc1", 1, 1, "admin"));
 
             // ACT
             await createKeyCeremonyAdminViewModel.CreateKeyCeremonyCommand.ExecuteAsync(null);
 
             // ASSERT
-            createKeyCeremonyAdminViewModel.ErrorMessage.ShouldNotBeNull();
+            _ = createKeyCeremonyAdminViewModel.ErrorMessage.ShouldNotBeNull();
         }
 
         private CreateKeyCeremonyAdminViewModel CreateKeyCeremonyAdminViewModel()
