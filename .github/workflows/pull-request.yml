@@ -162,8 +162,8 @@ jobs:
             FILTER_CPP_CHANGE="true"
           fi
 
-          echo "any=$(FILTER_ANY_CHANGE)" >> $GITHUB_OUTPUT
-          echo "cpp=$(FILTER_CPP_CHANGE)" >> $GITHUB_OUTPUT
+          echo "any=$FILTER_ANY_CHANGE" >> $GITHUB_OUTPUT
+          echo "cpp=$FILTER_CPP_CHANGE" >> $GITHUB_OUTPUT
           echo "github=${{ needs.changes.outputs.github }}" >> $GITHUB_OUTPUT
           echo "apps=${{ needs.changes.outputs.apps }}" >> $GITHUB_OUTPUT
           echo "bindings=${{ needs.changes.outputs.bindings }}" >> $GITHUB_OUTPUT
