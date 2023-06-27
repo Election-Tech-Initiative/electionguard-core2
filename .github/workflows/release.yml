@@ -272,7 +272,7 @@ jobs:
 
   publish_admin:
     name: ${{ matrix.name }}
-    needs: [get_version_code, publish_nuget]
+    needs: [get_version_code, maccatalyst_build_arm64, windows_build_x64]
     runs-on: ${{ matrix.os }}
     strategy:
       fail-fast: false
@@ -293,24 +293,6 @@ jobs:
         uses: actions/checkout@v3
 
       - name: Change Directory
-        run: cd ${{ github.workspace }}/src/electionguard-ui/ElectionGuard.UI
-
-      - name: Wait For Nuget Package
-        run: |
-          for i in {1..60}
-          do
-            echo "Checking for package (attempt #$i)..."
-            if dotnet add package ElectionGuard.Encryption --version ${{needs.get_version_code.outputs.version}} --no-restore; then
-              echo "Package is available."
-              break
-            else
-              echo "Package not available yet, waiting for 10 seconds..."
-              sleep 10
-            fi
-          done
-        shell: bash
-
-      - name: Change Directory
         run: cd ${{ github.workspace }}
 
       - name: Install .NET
@@ -327,6 +309,18 @@ jobs:
 
       - name: Configure Environment
         run: make environment-ui
+
+      - name: Get MacCatalyst arm64 Artifacts
+        uses: actions/download-artifact@v3
+        with:
+          name: maccatalyst-arm64
+          path: build/libs/MacCatalyst/arm64/Release
+
+      - name: Get Windows x64 Artifacts
+        uses: actions/download-artifact@v3
+        with:
+          name: win-x64
+          path: build/libs/Windows/x64/Release
 
       - name: Publish UI
         env:

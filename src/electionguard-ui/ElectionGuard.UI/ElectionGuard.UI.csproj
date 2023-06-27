@@ -152,8 +152,8 @@
 	  <ProjectReference Include="..\..\..\bindings\netstandard\ElectionGuard\ElectionGuard.Decryption\ElectionGuard.Decryption.csproj" />
 	  <ProjectReference Include="..\..\..\bindings\netstandard\ElectionGuard\ElectionGuard.ElectionSetup\ElectionGuard.ElectionSetup.csproj" />
 		<ProjectReference Include="..\..\..\bindings\netstandard\ElectionGuard\ElectionGuard.Encryption\ElectionGuard.Encryption.csproj">
-	    <CopyLocalSatelliteAssemblies>True</CopyLocalSatelliteAssemblies>
-	    <Private>True</Private>
+	    <!-- <CopyLocalSatelliteAssemblies>True</CopyLocalSatelliteAssemblies>
+	    <Private>True</Private> -->
 	  </ProjectReference>
 	  <ProjectReference Include="..\ElectionGuard.UI.Lib\ElectionGuard.UI.Lib.csproj" />
 	</ItemGroup>
@@ -218,6 +218,38 @@
 		<ElectionGuardLibs>..\..\..\build\libs</ElectionGuardLibs>
 		<ElectionGuardScripts>..\..\..\scripts</ElectionGuardScripts>
 	</PropertyGroup>
+	<ItemGroup Label="C++ Built Libraries">
+    <None Name="Windows (MSVC)" Visible="false" Include="$(ElectionGuardLibs)\Windows\x64\$(Configuration)\src\$(Configuration)\*.dll*">
+      <CopyToOutputDirectory Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'windows'">PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Name="Windows HACL (MSVC)" Visible="false" Include="$(ElectionGuardLibs)\Windows\x64\$(Configuration)\libs\hacl\$(Configuration)\*.dll*">
+      <CopyToOutputDirectory Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'windows'">PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Name="Windows Symbols (MSVC)" Visible="false" Include="$(ElectionGuardLibs)\Windows\x64\$(Configuration)\src\$(Configuration)\*.pdb*">
+      <CopyToOutputDirectory Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'windows'">PreserveNewest</CopyToOutputDirectory>
+    </None>
+
+    <None Name="MacCatalyst" Visible="false" Include="$(ElectionGuardLibs)\MacCatalyst\arm64\$(Configuration)\src\*.dylib" >
+			<CopyToOutputDirectory Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'maccatalyst'">PreserveNewest</CopyToOutputDirectory>
+		</None>
+    <None Name="MacCatalyst HACL" Visible="false" Include="$(ElectionGuardLibs)\MacCatalyst\arm64\$(Configuration)\libs\hacl\*.dylib" >
+			<CopyToOutputDirectory Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'maccatalyst'">PreserveNewest</CopyToOutputDirectory>		
+		</None>
+	</ItemGroup>
+	<!-- <Target Name="Copy Windows x64" AfterTargets="Build">
+    <ItemGroup>
+      <NativeDlls Include="$(ElectionGuardLibs)\Windows\x64\$(Configuration)\src\$(Configuration)\*.dll*" />
+      <NativeDlls Include="$(ElectionGuardLibs)\Windows\x64\$(Configuration)\libs\hacl\$(Configuration)\*.dll*" />
+    </ItemGroup>
+    <Copy Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'windows'" SourceFiles="@(NativeDlls)" DestinationFolder="$(OutputPath)" />
+  </Target>
+	<Target Name="Copy MacCatalyst arm64" AfterTargets="Build">
+    <ItemGroup>
+      <NativeDlls Include="$(ElectionGuardLibs)\MacCatalyst\arm64\$(Configuration)\src\*.dylib" />
+      <NativeDlls Include="$(ElectionGuardLibs)\MacCatalyst\arm64\$(Configuration)\libs\hacl\*.dylib" />
+    </ItemGroup>
+    <Copy Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'maccatalyst'" SourceFiles="@(NativeDlls)" DestinationFolder="$(OutputPath)" />
+  </Target> -->
 	<Target Name="CustomAfterPublish" AfterTargets="Publish;AfterPublish">
 		<Exec Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'windows'" Command="powershell.exe -ExecutionPolicy Bypass -NoProfile -NonInteractive -File &quot;$(ElectionGuardScripts)\FixMauiPublishImages.ps1&quot; $(OutputPath) $(PublishDir)" />
 	</Target>
