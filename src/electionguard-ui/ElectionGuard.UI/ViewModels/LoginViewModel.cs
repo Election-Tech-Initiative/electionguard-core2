@@ -4,6 +4,8 @@ namespace ElectionGuard.UI.ViewModels;
 
 public partial class LoginViewModel : BaseViewModel
 {
+    private bool _hasSeenAutoSettingPage = false;
+
     public LoginViewModel(IServiceProvider serviceProvider) : base("UserLogin", serviceProvider)
     {
         SubscribeDbPing();
@@ -33,8 +35,9 @@ public partial class LoginViewModel : BaseViewModel
     /// </summary>
     private void OpenSettingsUnsetData()
     {
-        if (string.IsNullOrEmpty(DbContext.DbPassword) && string.IsNullOrEmpty(DbContext.DbConnection))
+        if (DbContext.IsValid() && !_hasSeenAutoSettingPage)
         {
+            _hasSeenAutoSettingPage = true;
             Settings();
         }
     }
@@ -79,6 +82,12 @@ public partial class LoginViewModel : BaseViewModel
 
     private void HandleDbPing(object sender, EventArgs e)
     {
+        if (!_hasSeenAutoSettingPage)
+        {
+            OpenSettingsUnsetData();
+            return;
+        }
+
         if (NameHasData)
         {
             DbNotAvailable = !DbService.Ping();

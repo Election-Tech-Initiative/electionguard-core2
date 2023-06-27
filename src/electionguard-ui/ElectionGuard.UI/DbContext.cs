@@ -27,4 +27,10 @@ public static class DbContext
         get => Preferences.Get(DbConnectionStringKey, string.Empty);
         set => Preferences.Set(DbConnectionStringKey, value.Trim());
     }
+
+    public static bool IsValid()
+    {
+        return !string.IsNullOrEmpty(DbConnection)
+            || !(string.IsNullOrEmpty(DbHost) && string.IsNullOrEmpty(DbPassword));
+    }
 }
