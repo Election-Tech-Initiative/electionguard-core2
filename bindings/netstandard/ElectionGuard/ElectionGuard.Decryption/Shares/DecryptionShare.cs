@@ -1,7 +1,6 @@
 ﻿using ElectionGuard.ElectionSetup;
 using ElectionGuard.ElectionSetup.Extensions;
 using ElectionGuard.Extensions;
-using Newtonsoft.Json;
 
 namespace ElectionGuard.Decryption.Shares;
 

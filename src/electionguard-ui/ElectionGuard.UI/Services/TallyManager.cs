@@ -6,7 +6,7 @@ using ElectionGuard.Decryption.Extensions;
 using ElectionGuard.Decryption.Shares;
 using ElectionGuard.Decryption.Tally;
 using ElectionGuard.ElectionSetup;
-using ElectionGuard.Encryption.Utils.Converters;
+using ElectionGuard.Converters;
 using ElectionGuard.Extensions;
 using ElectionGuard.Guardians;
 using MongoDB.Driver;

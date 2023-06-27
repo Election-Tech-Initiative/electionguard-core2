@@ -2,7 +2,7 @@ using System;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 
-namespace ElectionGuard.Encryption.Utils.Converters
+namespace ElectionGuard.Converters
 {
     public class ElGamalKeyPairConverter : JsonConverter<ElGamalKeyPair>
     {

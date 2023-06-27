@@ -1,10 +1,8 @@
-﻿using System.Linq;
-using ElectionGuard.Ballot;
+﻿using ElectionGuard.Ballot;
 using ElectionGuard.Decryption.Challenge;
 using ElectionGuard.Decryption.Shares;
 using ElectionGuard.ElectionSetup;
 using ElectionGuard.ElectionSetup.Extensions;
-using Newtonsoft.Json;
 
 namespace ElectionGuard.Decryption.ChallengeResponse;
 
