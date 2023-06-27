@@ -114,8 +114,8 @@ public partial class BaseViewModel : ObservableObject, IDisposable
         const string DbPasswordKey = "DbPassword";
         const string DbConnectionStringKey = "DbConnection";
 
-        var DbPassword = Preferences.Get(DbPasswordKey, string.Empty).Trim() ?? string.Empty;
-        var dbConnectionString = Preferences.Get(DbConnectionStringKey, string.Empty).Trim() ?? string.Empty;
+        var DbPassword = Preferences.Get(DbPasswordKey, string.Empty).Trim();
+        var dbConnectionString = Preferences.Get(DbConnectionStringKey, string.Empty).Trim();
 
         if (string.IsNullOrEmpty(DbPassword) && string.IsNullOrEmpty(dbConnectionString))
         {
