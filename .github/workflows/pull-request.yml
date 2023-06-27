@@ -109,7 +109,7 @@ jobs:
             version: "14.2"
             makeReleaseBuild: false
             lint: false
-            runCsTests: true
+            runCsTests: false
             runTsTests: false
           - name: macOS-13-xcode-14.2-arm64
             os: macOS-13
@@ -118,7 +118,7 @@ jobs:
             version: "14.2"
             makeReleaseBuild: false
             lint: false
-            runCsTests: false
+            runCsTests: true
             runTsTests: false
           - name: windows-2022-gcc-11
             os: windows-2022
