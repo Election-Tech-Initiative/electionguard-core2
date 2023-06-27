@@ -8,13 +8,23 @@ namespace ElectionGuard.UI;
 
 public static class DbContext
 {
-    private const string DbHostKey = "DbAddress";
-    private const string DbPasswordKey = "DbPassword";
-    private const string DbConnectionStringKey = "DbConnection";
+    public const string DbHostKey = "DbAddress";
+    public const string DbPasswordKey = "DbPassword";
+    public const string DbConnectionStringKey = "DbConnection";
 
     private const string localhost = "127.0.0.1";
 
-    public static string DbHost => Preferences.Get(DbHostKey, localhost);
-    public static string DbPassword = Preferences.Get(DbPasswordKey, string.Empty);
-    public static string DbConnection = Preferences.Get(DbConnectionStringKey, string.Empty);
+    public static string DbHost
+    { 
+        get => Preferences.Get(DbHostKey, localhost);
+        set => Preferences.Set(DbHostKey, value.Trim());
+    }
+    public static string DbPassword { 
+        get => Preferences.Get(DbPasswordKey, string.Empty);
+        set => Preferences.Set(DbPasswordKey, value.Trim());
+    }
+    public static string DbConnection {
+        get => Preferences.Get(DbConnectionStringKey, string.Empty);
+        set => Preferences.Set(DbConnectionStringKey, value.Trim());
+    }
 }

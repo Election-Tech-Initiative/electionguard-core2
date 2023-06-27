@@ -9,13 +9,13 @@ public partial class SettingsViewModel : BaseViewModel
     }
 
     [ObservableProperty]
-    private string _databaseAddress = Preferences.Get("DbAddress", "127.0.0.1");
+    private string _databaseAddress = DbContext.DbHost;
 
     [ObservableProperty]
-    private string _databasePassword = Preferences.Get("DbPassword", string.Empty);
+    private string _databasePassword = DbContext.DbPassword;
 
     [ObservableProperty]
-    private string _databaseConnectionString = Preferences.Get("DbConnection", string.Empty);
+    private string _databaseConnectionString = DbContext.DbConnection;
 
     partial void OnDatabaseConnectionStringChanged(string value)
     {
@@ -30,18 +30,17 @@ public partial class SettingsViewModel : BaseViewModel
     private void Save()
     {
         // save db settings and reset the db connection
-        Preferences.Set("DbAddress", DatabaseAddress);
-        Preferences.Set("DbPassword", DatabasePassword);
-        Preferences.Set("DbConnection", DatabaseConnectionString);
+        DbContext.DbHost = DatabaseAddress;
+        DbContext.DbPassword = DatabasePassword;
+        DbContext.DbConnection = DatabaseConnectionString;
 
         if (!string.IsNullOrEmpty(DatabaseConnectionString))
         {
             DbService.Init(DatabaseConnectionString);
+            return;
         }
-        else
-        {
-            DbService.Init(DatabaseAddress, DatabasePassword);
-        }
+
+        DbService.Init(DatabaseAddress, DatabasePassword);
     }
 
 }
