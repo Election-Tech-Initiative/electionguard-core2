@@ -2,8 +2,6 @@
 using ElectionGuard.Decryption.Decryption;
 using ElectionGuard.ElectionSetup;
 using ElectionGuard.ElectionSetup.Extensions;
-using ElectionGuard.UI.Lib.Models;
-using Newtonsoft.Json;
 
 namespace ElectionGuard.Decryption.Tally;
 

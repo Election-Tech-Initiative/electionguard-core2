@@ -24,6 +24,6 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="ElectionGuard.Encryption" Version="1.75.16" />
+    <ProjectReference Include="..\ElectionGuard.Encryption\ElectionGuard.Encryption.csproj" />
   </ItemGroup>
 </Project>

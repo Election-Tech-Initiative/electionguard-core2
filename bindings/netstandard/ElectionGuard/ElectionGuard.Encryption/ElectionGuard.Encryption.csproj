@@ -5,9 +5,9 @@
     <!-- Project -->
     <RootNamespace>ElectionGuard</RootNamespace>
     <AssemblyName>ElectionGuard.Encryption</AssemblyName>
-    <Version>1.75.16</Version>
-    <AssemblyVersion>1.75.16.0</AssemblyVersion>
-    <AssemblyFileVersion>1.75.16.0</AssemblyFileVersion>
+    <Version>1.75.17</Version>
+    <AssemblyVersion>1.75.17.0</AssemblyVersion>
+    <AssemblyFileVersion>1.75.17.0</AssemblyFileVersion>
     <EnableNETAnalyzers>true</EnableNETAnalyzers>
     <EnforceCodeStyleInBuild>true</EnforceCodeStyleInBuild>
     <Platforms>arm64;x64</Platforms>
@@ -18,7 +18,7 @@
     <Title>ElectionGuard Encryption</Title>
     <Description>Open source implementation of ElectionGuard's ballot encryption.</Description>
     <Authors>Microsoft</Authors>
-    <PackageVersion>1.75.16</PackageVersion>
+    <PackageVersion>1.75.17</PackageVersion>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
     <PackageProjectUrl>https://github.com/microsoft/electionguard-core2</PackageProjectUrl>
     <RepositoryUrl>https://github.com/microsoft/electionguard-core2</RepositoryUrl>
@@ -68,13 +68,11 @@
       <Pack>true</Pack>
       <PackageCopyToOutput>true</PackageCopyToOutput>
       <PackagePath>runtimes\win-x86\native</PackagePath>
-      <PackagePath>runtimes\win-x64\native</PackagePath>
     </Content>
     <Content Name="Windows x86 HACL" Include="$(ElectionGuardLibs)\Windows\x86\$(Configuration)\libs\hacl\$(Configuration)\*.dll*">
       <Pack>true</Pack>
       <PackageCopyToOutput>true</PackageCopyToOutput>
       <PackagePath>runtimes\win-x86\native</PackagePath>
-      <PackagePath>runtimes\win-x64\native</PackagePath>
     </Content>
     <Content Name="Windows x64" Include="$(ElectionGuardLibs)\Windows\x64\$(Configuration)\src\$(Configuration)\*.dll*">
       <Pack>true</Pack>
@@ -89,7 +87,6 @@
     <Content Name="MacOS arm64" Include="$(ElectionGuardLibs)\Darwin\arm64\$(Configuration)\src\*.dylib">
       <Pack>true</Pack>
       <PackageCopyToOutput>true</PackageCopyToOutput>
-      <!-- <Link>osx-arm64\%(Filename)%(Extension)</Link> -->
       <PackagePath>runtimes\osx-arm64\native</PackagePath>
     </Content>
     <Content Name="MacOS arm64 HACL" Include="$(ElectionGuardLibs)\Darwin\arm64\$(Configuration)\libs\hacl\*.dylib">
@@ -115,7 +112,7 @@
     <Content Name="MacCatalyst arm64 HACL" Include="$(ElectionGuardLibs)\MacCatalyst\arm64\$(Configuration)\libs\hacl\*.dylib">
       <Pack>true</Pack>
       <PackageCopyToOutput>true</PackageCopyToOutput>
-      <PackagePath>runtimes\osx-arm64\native</PackagePath>
+      <PackagePath>runtimes\maccatalyst-arm64\native</PackagePath>
     </Content>
     <Content Name="MacCatalyst x64" Include="$(ElectionGuardLibs)\MacCatalyst\x64\$(Configuration)\src\*.dylib">
       <Pack>true</Pack>
@@ -125,14 +122,24 @@
     <Content Name="MacCatalyst x64 HACL" Include="$(ElectionGuardLibs)\MacCatalyst\x64\$(Configuration)\libs\hacl\*.dylib">
       <Pack>true</Pack>
       <PackageCopyToOutput>true</PackageCopyToOutput>
-      <PackagePath>runtimes\osx-x64\native</PackagePath>
+      <PackagePath>runtimes\maccatalyst-x64\native</PackagePath>
+    </Content>
+    <Content Name="Linux arm64" Include="$(ElectionGuardLibs)\Linux\arm64\$(Configuration)\src\*.so">
+      <Pack>true</Pack>
+      <PackageCopyToOutput>true</PackageCopyToOutput>
+      <PackagePath>runtimes\linux-arm64\native</PackagePath>
+    </Content>
+    <Content Name="Linux arm64 HACL" Include="$(ElectionGuardLibs)\Linux\arm64\$(Configuration)\libs\hacl\*.so">
+      <Pack>true</Pack>
+      <PackageCopyToOutput>true</PackageCopyToOutput>
+      <PackagePath>runtimes\linux-arm64\native</PackagePath>
     </Content>
     <Content Name="Linux x64" Include="$(ElectionGuardLibs)\Linux\x64\$(Configuration)\src\*.so">
       <Pack>true</Pack>
       <PackageCopyToOutput>true</PackageCopyToOutput>
       <PackagePath>runtimes\linux-x64\native</PackagePath>
     </Content>
-    <Content Name="Linux x64 HACL" Include="$(ElectionGuardLibs)\Linux\$(PlatformTarget)\$(Configuration)\libs\hacl\*.so">
+    <Content Name="Linux x64 HACL" Include="$(ElectionGuardLibs)\Linux\x64\$(Configuration)\libs\hacl\*.so">
       <Pack>true</Pack>
       <PackageCopyToOutput>true</PackageCopyToOutput>
       <PackagePath>runtimes\linux-x64\native</PackagePath>
