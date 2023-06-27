@@ -41,8 +41,6 @@ public partial class BaseViewModel : ObservableObject, IDisposable
 
         _timer?.Start();
 
-        OpenSettingsUnsetData();
-
         await Task.Yield();
     }
 
@@ -64,7 +62,7 @@ public partial class BaseViewModel : ObservableObject, IDisposable
     private void ChangeLanguage() => LocalizationService.ToggleLanguage();
 
     [RelayCommand(CanExecute = nameof(CanChangeSettings))]
-    protected void Settings() => NavigationService.GoToModal(typeof(SettingsViewModel));
+    private void Settings() => NavigationService.GoToModal(typeof(SettingsViewModel));
 
     [RelayCommand(CanExecute = nameof(CanGoHome))]
     private async Task Home()
