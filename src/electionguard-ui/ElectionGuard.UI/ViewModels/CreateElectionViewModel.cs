@@ -34,7 +34,7 @@ public partial class CreateElectionViewModel : BaseViewModel
     {
         await base.OnAppearing();
 
-        KeyCeremonies = await _keyCeremonyService.GetAllCompleteAsync();
+        KeyCeremonies = await _keyCeremonyService.GetAllCompleteAsync() ?? new();
     }
 
     [ObservableProperty]
@@ -53,14 +53,14 @@ public partial class CreateElectionViewModel : BaseViewModel
     private KeyCeremonyRecord? _keyCeremony = null;
 
     [ObservableProperty]
-    private List<KeyCeremonyRecord> _keyCeremonies;
+    private List<KeyCeremonyRecord> _keyCeremonies = new();
 
     [ObservableProperty]
-    private string _electionUrl;
+    private string _electionUrl = string.Empty;
 
     [ObservableProperty]
     [NotifyCanExecuteChangedFor(nameof(CreateElectionCommand))]
-    private string _manifestNames;
+    private string _manifestNames = string.Empty;
 
     private List<FileResult> _manifestFiles = new();
 
