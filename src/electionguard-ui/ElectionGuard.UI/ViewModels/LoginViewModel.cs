@@ -25,6 +25,7 @@ public partial class LoginViewModel : BaseViewModel
         HomeCommand.Execute(this);
         // reset the UI name field
         Name = string.Empty;
+
     }
 
     private bool CanLogin()
@@ -37,6 +38,7 @@ public partial class LoginViewModel : BaseViewModel
     public override async Task OnAppearing()
     {
         await base.OnAppearing();
+        OpenSettingsUnsetData();
         SubscribeDbPing();
     }
 

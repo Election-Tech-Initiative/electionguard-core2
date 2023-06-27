@@ -37,10 +37,12 @@ public partial class BaseViewModel : ObservableObject, IDisposable
         UserName = AuthenticationService.UserName;
         IsAdmin = AuthenticationService.IsAdmin;
         SetPageTitle();
-
         LocalizationService.OnLanguageChanged += OnLanguageChanged;
 
         _timer?.Start();
+
+        OpenSettingsUnsetData();
+
         await Task.Yield();
     }
 
@@ -62,7 +64,7 @@ public partial class BaseViewModel : ObservableObject, IDisposable
     private void ChangeLanguage() => LocalizationService.ToggleLanguage();
 
     [RelayCommand(CanExecute = nameof(CanChangeSettings))]
-    private void Settings() => NavigationService.GoToModal(typeof(SettingsViewModel));
+    protected void Settings() => NavigationService.GoToModal(typeof(SettingsViewModel));
 
     [RelayCommand(CanExecute = nameof(CanGoHome))]
     private async Task Home()
@@ -103,6 +105,23 @@ public partial class BaseViewModel : ObservableObject, IDisposable
         if (_pageTitleLocalizationId != null)
         {
             PageTitle = LocalizationService.GetValue(_pageTitleLocalizationId);
+        }
+    }
+
+    /// <summary>
+    ///  Open settings modal if we are not using a connection string and password is unset.
+    /// </summary>
+    protected void OpenSettingsUnsetData()
+    {
+        const string DbPasswordKey = "DbPassword";
+        const string DbConnectionStringKey = "DbConnection";
+
+        var DbPassword = Preferences.Get(DbPasswordKey, string.Empty).Trim() ?? string.Empty;
+        var dbConnectionString = Preferences.Get(DbConnectionStringKey, string.Empty).Trim() ?? string.Empty;
+
+        if (string.IsNullOrEmpty(DbPassword) && string.IsNullOrEmpty(dbConnectionString))
+        {
+            Settings();
         }
     }
 
