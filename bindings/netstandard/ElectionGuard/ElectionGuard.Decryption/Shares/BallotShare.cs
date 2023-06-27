@@ -1,6 +1,5 @@
 ﻿using ElectionGuard.Decryption.Tally;
 using ElectionGuard.Guardians;
-using Newtonsoft.Json;
 
 namespace ElectionGuard.Decryption.Shares;
 

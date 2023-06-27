@@ -1,4 +1,4 @@
-﻿using ElectionGuard.Encryption.Utils.Converters;
+﻿using ElectionGuard.Converters;
 using ElectionGuard.Guardians;
 using ElectionGuard.UI.Lib.Models;
 using ElectionGuard.UI.Lib.Services;

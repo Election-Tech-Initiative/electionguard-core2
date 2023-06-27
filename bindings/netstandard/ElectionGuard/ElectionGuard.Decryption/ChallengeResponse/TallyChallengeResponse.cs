@@ -4,7 +4,6 @@ using ElectionGuard.Decryption.Shares;
 using ElectionGuard.Decryption.Tally;
 using ElectionGuard.ElectionSetup;
 using ElectionGuard.ElectionSetup.Extensions;
-using Newtonsoft.Json;
 
 namespace ElectionGuard.Decryption.ChallengeResponse;
 

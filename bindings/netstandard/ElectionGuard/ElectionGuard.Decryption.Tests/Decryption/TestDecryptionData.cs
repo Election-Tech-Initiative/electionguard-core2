@@ -3,7 +3,7 @@ using ElectionGuard.Decryption.Tally;
 using ElectionGuard.Decryption.Tests.Tally;
 using ElectionGuard.ElectionSetup.Tests.Generators;
 using ElectionGuard.Encryption.Utils.Generators;
-using ElectionGuard.Encryption.Utils.Converters;
+using ElectionGuard.Converters;
 using Newtonsoft.Json;
 using ElectionGuard.Extensions;
 

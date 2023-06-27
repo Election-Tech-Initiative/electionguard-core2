@@ -11,12 +11,8 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="ElectionGuard.Encryption" Version="1.75.14" />
-  </ItemGroup>
-
-  <ItemGroup>
     <ProjectReference Include="..\..\..\..\src\electionguard-ui\ElectionGuard.UI.Lib\ElectionGuard.UI.Lib.csproj" />
-    <ProjectReference Include="..\ElectionGuard.Encryption.Utils\ElectionGuard.Encryption.Utils.csproj" />
+    <ProjectReference Include="..\ElectionGuard.Encryption\ElectionGuard.Encryption.csproj" />
   </ItemGroup>
 
   <PropertyGroup Label="Debug" Condition=" '$(Configuration)' == 'Debug' ">

@@ -28,4 +28,7 @@
     <WarningsNotAsErrors>SYSLIB0004</WarningsNotAsErrors>
   </PropertyGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\ElectionGuard.Encryption\ElectionGuard.Encryption.csproj" />
+  </ItemGroup>
 </Project>

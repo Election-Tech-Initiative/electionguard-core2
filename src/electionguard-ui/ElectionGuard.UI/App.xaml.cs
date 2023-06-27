@@ -1,5 +1,5 @@
 ﻿using System.Globalization;
-using ElectionGuard.Encryption.Utils.Converters;
+using ElectionGuard.Converters;
 using Newtonsoft.Json;
 
 namespace ElectionGuard.UI;
