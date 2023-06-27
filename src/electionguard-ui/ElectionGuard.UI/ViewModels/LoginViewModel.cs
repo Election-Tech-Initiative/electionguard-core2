@@ -35,7 +35,7 @@ public partial class LoginViewModel : BaseViewModel
     /// </summary>
     private void OpenSettingsUnsetData()
     {
-        if (DbContext.IsValid() && !_hasSeenAutoSettingPage)
+        if (!DbContext.IsValid() && !_hasSeenAutoSettingPage)
         {
             _hasSeenAutoSettingPage = true;
             Settings();
