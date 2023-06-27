@@ -70,6 +70,9 @@ public partial class CreateElectionViewModel : BaseViewModel
     [RelayCommand(CanExecute = nameof(CanCreate))]
     private async Task CreateElection()
     {
+        ElectionGuardException.ThrowIfNull(KeyCeremony);
+        ElectionGuardException.ThrowIfNull(KeyCeremony.JointKey);
+
         var multiple = _manifestFiles.Count > 1;
         ErrorMessage = string.Empty;
 
@@ -91,13 +94,26 @@ public partial class CreateElectionViewModel : BaseViewModel
                     CreatedBy = UserName!
                 };
 
+                var extendedData = new LinkedList();
+                if (!string.IsNullOrWhiteSpace(ElectionUrl))
+                {
+                    extendedData.Append("verification_url", ElectionUrl);
+                }
+
                 // create the context
-                using var context = new CiphertextElectionContext(
-                                                            (ulong)KeyCeremony.NumberOfGuardians,
-                                                            (ulong)KeyCeremony.Quorum,
-                                                            KeyCeremony.JointKey.JointPublicKey,
-                                                            KeyCeremony.JointKey.CommitmentHash,
-                                                            manifest.CryptoHash());
+                using var context = extendedData.Count == 0 ?
+                    new CiphertextElectionContext(
+                        (ulong)KeyCeremony.NumberOfGuardians,
+                        (ulong)KeyCeremony.Quorum,
+                        KeyCeremony.JointKey.JointPublicKey,
+                        KeyCeremony.JointKey.CommitmentHash,
+                        manifest.CryptoHash()) :
+                    new CiphertextElectionContext(
+                        (ulong)KeyCeremony.NumberOfGuardians,
+                        (ulong)KeyCeremony.Quorum,
+                        KeyCeremony.JointKey.JointPublicKey,
+                        KeyCeremony.JointKey.CommitmentHash,
+                        manifest.CryptoHash(), extendedData);
 
                 var contextRecord = new ContextRecord() { ElectionId = election.ElectionId, ContextData = context.ToJson() };
 
