@@ -37,10 +37,10 @@ public partial class BaseViewModel : ObservableObject, IDisposable
         UserName = AuthenticationService.UserName;
         IsAdmin = AuthenticationService.IsAdmin;
         SetPageTitle();
-
         LocalizationService.OnLanguageChanged += OnLanguageChanged;
 
         _timer?.Start();
+
         await Task.Yield();
     }
 
@@ -62,7 +62,7 @@ public partial class BaseViewModel : ObservableObject, IDisposable
     private void ChangeLanguage() => LocalizationService.ToggleLanguage();
 
     [RelayCommand(CanExecute = nameof(CanChangeSettings))]
-    private void Settings() => NavigationService.GoToModal(typeof(SettingsViewModel));
+    protected void Settings() => NavigationService.GoToModal(typeof(SettingsViewModel));
 
     [RelayCommand(CanExecute = nameof(CanGoHome))]
     private async Task Home()

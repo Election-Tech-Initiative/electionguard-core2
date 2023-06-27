@@ -12,16 +12,14 @@ public static class MauiProgram
 {
     public static MauiApp CreateMauiApp()
     {
-        var DbHost = Preferences.Get("DbAddress", "127.0.0.1");
-        var DbPassword = Preferences.Get("DbPassword", "");
-        var DbConnection = Preferences.Get("DbConnection", "");
-        if (!string.IsNullOrEmpty(DbConnection))
+
+        if (!string.IsNullOrEmpty(DbContext.DbConnection))
         {
-            DbService.Init(DbConnection);
+            DbService.Init(DbContext.DbConnection);
         }
         else
         {
-            DbService.Init(DbHost, DbPassword);
+            DbService.Init(DbContext.DbHost, DbContext.DbPassword);
         }
 
         var builder = MauiApp.CreateBuilder();
