@@ -10,7 +10,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="ElectionGuard.Encryption" Version="1.75.16" />
+    <PackageReference Include="ElectionGuard.Encryption" Version="1.75.14" />
   </ItemGroup>
 
   <ItemGroup>

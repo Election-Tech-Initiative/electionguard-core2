@@ -8,6 +8,11 @@
     <Platforms>arm64;x64;x86</Platforms>
   </PropertyGroup>
 
+  <ItemGroup>
+    <PackageReference Include="ElectionGuard.Encryption" Version="1.75.14"/>
+    <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
+  </ItemGroup>
+
   <PropertyGroup Label="Debug" Condition=" '$(Configuration)' == 'Debug' ">
     <DebugType>full</DebugType>
     <DebugSymbols>true</DebugSymbols>
@@ -23,7 +28,4 @@
     <WarningsNotAsErrors>SYSLIB0004</WarningsNotAsErrors>
   </PropertyGroup>
 
-  <ItemGroup>
-    <PackageReference Include="ElectionGuard.Encryption" Version="1.75.16" />
-  </ItemGroup>
 </Project>
