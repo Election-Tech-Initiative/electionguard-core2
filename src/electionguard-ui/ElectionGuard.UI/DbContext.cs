@@ -30,7 +30,6 @@ public static class DbContext
 
     public static bool IsValid()
     {
-        return !string.IsNullOrEmpty(DbConnection)
-            || !(string.IsNullOrEmpty(DbHost) && string.IsNullOrEmpty(DbPassword));
+        return !string.IsNullOrEmpty(DbConnection) || !string.IsNullOrEmpty(DbPassword);
     }
 }
