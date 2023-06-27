@@ -2,9 +2,8 @@
 using System.Text;
 using ElectionGuard.ElectionSetup.Extensions;
 using System.Diagnostics;
-using Newtonsoft.Json;
 using ElectionGuard.Ballot;
-using ElectionGuard.Encryption.Utils.Converters;
+using ElectionGuard.Converters;
 
 namespace ElectionGuard.Decryption.Tally;
 

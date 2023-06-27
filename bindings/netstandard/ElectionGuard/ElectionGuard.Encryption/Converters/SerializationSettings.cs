@@ -1,7 +1,7 @@
 ﻿using Newtonsoft.Json;
 using Newtonsoft.Json.Serialization;
 
-namespace ElectionGuard.Encryption.Utils.Converters
+namespace ElectionGuard.Converters
 {
     public class SerializationSettings
     {

@@ -1,7 +1,7 @@
 ﻿using System;
 using Newtonsoft.Json;
 
-namespace ElectionGuard.Encryption.Utils.Converters
+namespace ElectionGuard.Converters
 {
     public class ElementModQConverter : JsonConverter<ElementModQ>
     {

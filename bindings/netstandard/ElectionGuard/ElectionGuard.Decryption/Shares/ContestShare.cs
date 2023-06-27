@@ -3,7 +3,6 @@ using ElectionGuard.Decryption.Tally;
 using ElectionGuard.ElectionSetup;
 using ElectionGuard.ElectionSetup.Extensions;
 using ElectionGuard.Guardians;
-using Newtonsoft.Json;
 
 namespace ElectionGuard.Decryption.Shares;
 

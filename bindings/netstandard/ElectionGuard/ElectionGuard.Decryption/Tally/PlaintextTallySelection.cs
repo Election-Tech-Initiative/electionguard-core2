@@ -1,6 +1,5 @@
 ﻿using System.Text;
 using ElectionGuard.Ballot;
-using Newtonsoft.Json;
 
 namespace ElectionGuard.Decryption.Tally;
 

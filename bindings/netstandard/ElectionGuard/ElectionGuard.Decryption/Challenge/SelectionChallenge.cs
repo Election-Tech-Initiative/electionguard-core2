@@ -2,7 +2,6 @@
 using ElectionGuard.Decryption.Accumulation;
 using ElectionGuard.ElectionSetup;
 using ElectionGuard.Guardians;
-using Newtonsoft.Json;
 
 namespace ElectionGuard.Decryption.Challenge;
 
