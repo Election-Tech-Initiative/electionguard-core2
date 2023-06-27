@@ -28,6 +28,17 @@ public partial class LoginViewModel : BaseViewModel
 
     }
 
+    /// <summary>
+    ///  Open settings modal if we are not using a connection string and password is unset.
+    /// </summary>
+    private void OpenSettingsUnsetData()
+    {
+        if (string.IsNullOrEmpty(DbContext.DbPassword) && string.IsNullOrEmpty(DbContext.DbConnection))
+        {
+            Settings();
+        }
+    }
+
     private bool CanLogin()
     {
         return NameHasData && !DbNotAvailable;
@@ -38,7 +49,7 @@ public partial class LoginViewModel : BaseViewModel
     public override async Task OnAppearing()
     {
         await base.OnAppearing();
-        OpenSettingsUnsetData();
+
         SubscribeDbPing();
     }
 
