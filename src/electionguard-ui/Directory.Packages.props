@@ -2,7 +2,6 @@
   <ItemGroup>
     <PackageVersion Include="CommunityToolkit.Maui" Version="5.1.0" />
     <PackageVersion Include="CommunityToolkit.Mvvm" Version="8.2.0" />
-    <PackageVersion Include="ElectionGuard.Encryption" Version="1.75.14" />
     <PackageVersion Include="Microsoft.AppCenter.Crashes" Version="5.0.2" />
     <PackageVersion Include="Microsoft.AppCenter.Distribute" Version="5.0.2" />
     <PackageVersion Include="Microsoft.Extensions.Logging.Debug" Version="7.0.0" />
