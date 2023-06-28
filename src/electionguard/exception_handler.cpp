@@ -27,15 +27,30 @@ namespace electionguard
     std::string ExceptionHandler::message;
     uint64_t ExceptionHandler::code;
 
-    string ExceptionHandler::getFunction() { return ExceptionHandler::function; }
-    string ExceptionHandler::getMessage() { return ExceptionHandler::message; }
-    uint64_t ExceptionHandler::getCode() { return ExceptionHandler::code; }
+    string ExceptionHandler::getFunction()
+    {
+        getInstance().task_lock.wait();
+        return ExceptionHandler::function;
+    }
+
+    string ExceptionHandler::getMessage()
+    {
+        getInstance().task_lock.wait();
+        return ExceptionHandler::message;
+    }
+
+    uint64_t ExceptionHandler::getCode()
+    {
+        getInstance().task_lock.wait();
+        return ExceptionHandler::code;
+    }
 
     void ExceptionHandler::setData(const std::string &function, uint64_t code,
                                    const std::exception &e)
     {
-        ExceptionHandler::getInstance().function = function;
-        ExceptionHandler::getInstance().message = e.what();
-        ExceptionHandler::getInstance().code = code;
+        getInstance().task_lock.wait();
+        getInstance().function = function;
+        getInstance().message = e.what();
+        getInstance().code = code;
     }
 } // namespace electionguard

@@ -7,6 +7,7 @@
 
 #include <array>
 #include <cstdint>
+#include <electionguard/async.hpp>
 #include <memory>
 #include <string>
 #include <unordered_map>
@@ -41,6 +42,7 @@ namespace electionguard
         static void setData(const std::string &function, uint64_t code, const std::exception &e);
 
       private:
+        AsyncSemaphore task_lock;
         static std::string function;
         static std::string message;
         static uint64_t code;
