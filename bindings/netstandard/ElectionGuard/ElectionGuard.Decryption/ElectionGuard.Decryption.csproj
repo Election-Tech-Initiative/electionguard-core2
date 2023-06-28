@@ -9,6 +9,7 @@
     <Platforms>arm64;x64;x86</Platforms>
   </PropertyGroup>
 
+
   <ItemGroup>
     <ProjectReference Include="..\ElectionGuard.ElectionSetup\ElectionGuard.ElectionSetup.csproj" />
     <ProjectReference Include="..\ElectionGuard.Encryption\ElectionGuard.Encryption.csproj" />
