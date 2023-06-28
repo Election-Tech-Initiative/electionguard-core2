@@ -45,10 +45,6 @@ else()
 endif()
 
 add_library(${HACL_CPP_ALIAS_NAME} ALIAS ${HACL_CPP_TARGET_NAME})
-set_target_properties(${HACL_CPP_TARGET_NAME} PROPERTIES
-    VERSION ${hacl_VERSION}
-    SOVERSION ${hacl_VERSION_MAJOR})
-
 target_compile_features(${HACL_CPP_TARGET_NAME} PUBLIC cxx_std_17)
 
 # Dependencies
