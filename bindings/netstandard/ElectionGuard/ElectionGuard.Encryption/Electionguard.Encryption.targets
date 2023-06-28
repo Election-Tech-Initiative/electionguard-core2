@@ -3,7 +3,13 @@
   <ItemGroup Condition="'$(Platform)' == 'arm64' AND '$(OS)' == 'Windows_NT'">
     <None Name="Windows MSVC arm64" Include="$(MSBuildThisFileDirectory)..\runtimes\win-arm64\native\electionguard.dll">
       <Link>electionguard.dll</Link>
+      <CopyToOutputDirectory >PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Name="Windows MSVC arm64 HACL" Include="$(MSBuildThisFileDirectory)..\runtimes\win-arm64\native\hacl.dll">
       <Link>hacl.dll</Link>
+      <CopyToOutputDirectory >PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Name="Windows MSVC arm64 HACL_CPP" Include="$(MSBuildThisFileDirectory)..\runtimes\win-arm64\native\hacl_cpp.dll">
       <Link>hacl_cpp.dll</Link>
       <CopyToOutputDirectory >PreserveNewest</CopyToOutputDirectory>
     </None>
@@ -11,7 +17,13 @@
   <ItemGroup Condition="'$(Platform)' == 'x86' AND '$(OS)' == 'Windows_NT'">
     <None Name="Windows MSVC x86" Include="$(MSBuildThisFileDirectory)..\runtimes\win-x86\native\electionguard.dll">
       <Link>electionguard.dll</Link>
+      <CopyToOutputDirectory >PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Name="Windows MSVC x86 HACL" Include="$(MSBuildThisFileDirectory)..\runtimes\win-x86\native\hacl.dll">
       <Link>hacl.dll</Link>
+      <CopyToOutputDirectory >PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Name="Windows MSVC x86 HACL_CPP" Include="$(MSBuildThisFileDirectory)..\runtimes\win-x86\native\hacl_cpp.dll">
       <Link>hacl_cpp.dll</Link>
       <CopyToOutputDirectory >PreserveNewest</CopyToOutputDirectory>
     </None>
@@ -19,7 +31,13 @@
   <ItemGroup Condition="'$(Platform)' == 'x64' AND '$(OS)' == 'Windows_NT'">
     <None Name="Windows MSVC x64" Include="$(MSBuildThisFileDirectory)..\runtimes\win-x64\native\electionguard.dll">
       <Link>electionguard.dll</Link>
+      <CopyToOutputDirectory >PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Name="Windows MSVC x64 HACL" Include="$(MSBuildThisFileDirectory)..\runtimes\win-x64\native\hacl.dll">
       <Link>hacl.dll</Link>
+      <CopyToOutputDirectory >PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Name="Windows MSVC x64 HACL_CPP" Include="$(MSBuildThisFileDirectory)..\runtimes\win-x64\native\hacl_cpp.dll">
       <Link>hacl_cpp.dll</Link>
       <CopyToOutputDirectory >PreserveNewest</CopyToOutputDirectory>
     </None>

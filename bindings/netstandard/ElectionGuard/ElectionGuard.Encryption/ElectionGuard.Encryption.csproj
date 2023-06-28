@@ -10,7 +10,7 @@
     <AssemblyFileVersion>1.75.17.0</AssemblyFileVersion>
     <EnableNETAnalyzers>true</EnableNETAnalyzers>
     <EnforceCodeStyleInBuild>true</EnforceCodeStyleInBuild>
-    <Platforms>arm64;x64</Platforms>
+    <Platforms>arm64;x64;x86</Platforms>
   </PropertyGroup>
   <PropertyGroup>
     <!-- Package -->
@@ -27,7 +27,7 @@
     <PackageIcon>icon.png</PackageIcon>
     <RestoreProjectStyle>PackageReference</RestoreProjectStyle>
     <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
-    <CopyLocalLockFileAssemblies>true</CopyLocalLockFileAssemblies>
+    <!-- <CopyLocalLockFileAssemblies>true</CopyLocalLockFileAssemblies> -->
     <!-- <PackageReleaseNotes>Changelog</PackageReleaseNotes> -->
     <Platforms>arm64;x64;x86</Platforms>
   </PropertyGroup>
