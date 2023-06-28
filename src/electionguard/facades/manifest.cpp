@@ -2,6 +2,7 @@
 
 #include "../log.hpp"
 #include "convert.hpp"
+#include "electionguard/exception_handler.hpp"
 #include "variant_cast.hpp"
 
 #include <chrono>
@@ -25,6 +26,7 @@ using electionguard::ContestDescriptionWithPlaceholders;
 using electionguard::dynamicCopy;
 using electionguard::ElectionType;
 using electionguard::ElementModQ;
+using electionguard::ExceptionHandler;
 using electionguard::GeopoliticalUnit;
 using electionguard::InternalManifest;
 using electionguard::InternationalizedText;
@@ -1994,7 +1996,8 @@ eg_electionguard_status_t eg_election_manifest_from_json(char *in_data,
         *out_handle = AS_TYPE(eg_election_manifest_t, deserialized.release());
         return ELECTIONGUARD_STATUS_SUCCESS;
     } catch (const exception &e) {
-        Log::error(":eg_election_manifest_from_json", e);
+        Log::error(__func__, e);
+        ExceptionHandler::getInstance().setData(__func__, ELECTIONGUARD_STATUS_ERROR_BAD_ALLOC, e);
         return ELECTIONGUARD_STATUS_ERROR_BAD_ALLOC;
     }
 }

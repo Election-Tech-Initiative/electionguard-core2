@@ -143,6 +143,7 @@ public partial class CreateElectionViewModel : BaseViewModel
             }
             catch (Exception)
             {
+                ExceptionHandler.GetData(out var function, out var message, out var code);
                 ErrorMessage += $"{AppResources.ErrorCreatingElection} - {file.FileName}\n";
             }
         }).ContinueWith((t) =>
@@ -211,6 +212,7 @@ public partial class CreateElectionViewModel : BaseViewModel
             }
             catch (Exception)
             {
+                ExceptionHandler.GetData(out var function, out var message, out var code);
                 ManifestErrorMessage = AppResources.ErrorLoadingManifest;
                 ElectionName = string.Empty;
             }
