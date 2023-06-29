@@ -10,8 +10,6 @@ public partial class LoginViewModel : BaseViewModel
     public LoginViewModel(IServiceProvider serviceProvider) : base("UserLogin", serviceProvider)
     {
         _serviceProvider = serviceProvider;
-        //SubscribeDbPing();
-        //HandleDbPing(this, EventArgs.Empty);
     }
 
     [ObservableProperty]
