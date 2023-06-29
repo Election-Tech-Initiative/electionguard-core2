@@ -18,7 +18,7 @@
             ReturnCommand="{Binding LoginCommand}"
             Text="{Binding Name}" />
         <Button
-            windows:VisualElement.AccessKey=""
+            windows:VisualElement.AccessKey="L"
             Command="{Binding LoginCommand}"
             Text="{helper:Translate LoginText}" />
     </VerticalStackLayout>
