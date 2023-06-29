@@ -378,12 +378,19 @@ namespace ElectionGuard.UI.Services
             var backups = await _guardianBackupService.GetByGuardianIdAsync(keyCeremony.KeyCeremonyId!, userId) ??
                 throw new ArgumentException(nameof(keyCeremony.KeyCeremonyId));
 
-            var guardian = GuardianStorageExtensions.Load(
-                userId,
-                keyCeremony,
-                publicKeys,
-                backups.ToDictionary(k => k.GuardianId!, v => v.Backup!)) ?? throw new ElectionGuardException(nameof(userId));
-            return guardian;
+            try
+            {
+                var guardian = GuardianStorageExtensions.Load(
+                    userId,
+                    keyCeremony,
+                    publicKeys,
+                    backups.ToDictionary(k => k.GuardianId!, v => v.Backup!)) ?? throw new ElectionGuardException(nameof(userId));
+                return guardian;
+            }
+            catch (Exception ex)
+            {
+                throw new ElectionGuardException(AppResources.ErrorLoadingGuardian, ex);
+            }
         }
         #endregion
     }

@@ -5,11 +5,13 @@ namespace ElectionGuard.UI.ViewModels;
 public partial class LoginViewModel : BaseViewModel
 {
     private bool _hasSeenAutoSettingPage = false;
+    private IServiceProvider _serviceProvider;
 
     public LoginViewModel(IServiceProvider serviceProvider) : base("UserLogin", serviceProvider)
     {
-        SubscribeDbPing();
-        HandleDbPing(this, EventArgs.Empty);
+        _serviceProvider = serviceProvider;
+        //SubscribeDbPing();
+        //HandleDbPing(this, EventArgs.Empty);
     }
 
     [ObservableProperty]
@@ -27,24 +29,26 @@ public partial class LoginViewModel : BaseViewModel
         HomeCommand.Execute(this);
         // reset the UI name field
         Name = string.Empty;
-
     }
 
     /// <summary>
     ///  Open settings modal if we are not using a connection string and password is unset.
     /// </summary>
-    private void OpenSettingsUnsetData()
+    public void OpenSettingsUnsetData()
     {
-        if (!DbContext.IsValid() && !_hasSeenAutoSettingPage)
+        if (!DbContext.IsValid())
         {
-            _hasSeenAutoSettingPage = true;
-            Settings();
+            _ = Shell.Current.CurrentPage.Dispatcher.DispatchAsync(async () =>
+            {
+                await NavigationService.GoToModal(typeof(SettingsViewModel));
+                _hasSeenAutoSettingPage = true;
+            });
         }
     }
 
     private bool CanLogin()
     {
-        return NameHasData && !DbNotAvailable;
+        return NameHasData && !DbNotAvailable && DbContext.IsValid();
     }
 
     private bool NameHasData => Name.Trim().Length > 0;
@@ -52,7 +56,6 @@ public partial class LoginViewModel : BaseViewModel
     public override async Task OnAppearing()
     {
         await base.OnAppearing();
-
         SubscribeDbPing();
     }
 
@@ -64,33 +67,25 @@ public partial class LoginViewModel : BaseViewModel
 
     private void SubscribeDbPing()
     {
+        _timer!.Tick += HandleDbPing;
         if (!_timer.IsRunning)
         {
-            _timer.Tick += HandleDbPing;
             _timer.Start();
         }
     }
 
     private void UnsubscribeDbPing()
     {
-        if (_timer.IsRunning)
+        if (_timer!.IsRunning)
         {
             _timer.Stop();
         }
         _timer.Tick -= HandleDbPing;
     }
 
-    private void HandleDbPing(object sender, EventArgs e)
+    private void HandleDbPing(object? sender, EventArgs e)
     {
-        if (!_hasSeenAutoSettingPage)
-        {
-            OpenSettingsUnsetData();
-            return;
-        }
-
-        if (NameHasData)
-        {
-            DbNotAvailable = !DbService.Ping();
-        }
+        DbNotAvailable = !DbService.Ping();
+        ErrorMessage = DbNotAvailable ? AppResources.DatabaseUnavailable : string.Empty;
     }
 }

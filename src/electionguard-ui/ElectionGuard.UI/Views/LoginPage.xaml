@@ -15,15 +15,11 @@
         <Entry
             windows:VisualElement.AccessKey="N"
             Placeholder="{helper:Translate LoginPlaceholder}"
+            ReturnCommand="{Binding LoginCommand}"
             Text="{Binding Name}" />
         <Button
-            windows:VisualElement.AccessKey="L"
+            windows:VisualElement.AccessKey=""
             Command="{Binding LoginCommand}"
             Text="{helper:Translate LoginText}" />
-        <Label
-            FontAttributes="Bold"
-            IsVisible="{Binding DbNotAvailable}"
-            Text="{helper:Translate DatabaseUnavailable}"
-            TextColor="Red" />
     </VerticalStackLayout>
 </views:ContentPageBase>

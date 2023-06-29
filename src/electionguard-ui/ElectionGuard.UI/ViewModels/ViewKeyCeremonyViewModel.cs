@@ -44,8 +44,9 @@ public partial class ViewKeyCeremonyViewModel : BaseViewModel
     {
         await base.OnAppearing();
 
-        _timer.Tick += CeremonyPollingTimer_Tick;
+        _timer!.Tick += CeremonyPollingTimer_Tick;
 
+        _joinPressed = await HasJoined();
         if (!_timer.IsRunning)
         {
             _timer.Start();
@@ -55,7 +56,7 @@ public partial class ViewKeyCeremonyViewModel : BaseViewModel
     public override async Task OnLeavingPage()
     {
         await base.OnLeavingPage();
-        _timer.Tick -= CeremonyPollingTimer_Tick;
+        _timer!.Tick -= CeremonyPollingTimer_Tick;
         _timer.Stop();
 
         KeyCeremony?.Dispose();
@@ -91,7 +92,7 @@ public partial class ViewKeyCeremonyViewModel : BaseViewModel
 
             if (!IsJoinVisible)
             {
-                _timer.Start();
+                _timer!.Start();
                 CeremonyPollingTimer_Tick(this, null);
             }
 
@@ -105,22 +106,33 @@ public partial class ViewKeyCeremonyViewModel : BaseViewModel
         _joinPressed = true;
         // TODO: Tell the signalR hub what user has joined
         await _mediator!.RunKeyCeremony(IsAdmin);
-        _timer.Start();
     }
 
     private void CeremonyPollingTimer_Tick(object? sender, EventArgs e)
     {
         if (KeyCeremony.State == KeyCeremonyState.Complete)
         {
-            _timer.Stop();
+            _timer!.Stop();
             return;
         }
 
         _ = Task.Run(async () =>
         {
             await UpdateGuardiansData();
-            await _mediator!.RunKeyCeremony(IsAdmin);
+            if (IsAdmin || (!IsAdmin && _joinPressed))
+            {
+                await _mediator!.RunKeyCeremony(IsAdmin);
+            }
         });
+    }
+
+    private async Task<bool> HasJoined()
+    {
+        ElectionGuardException.ThrowIfNull(UserName);
+
+        var publicKey = await _publicKeyService.GetByIdsAsync(KeyCeremonyId, UserName);
+
+        return publicKey is not null;
     }
 
     private async Task UpdateGuardiansData()

@@ -394,6 +394,15 @@ namespace ElectionGuard.UI.Resx {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Unable to login.  Please check your database settings..
+        /// </summary>
+        internal static string DatabaseLoginError {
+            get {
+                return ResourceManager.GetString("DatabaseLoginError", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Database Password.
         /// </summary>
         internal static string DatabasePassword {
@@ -543,6 +552,15 @@ namespace ElectionGuard.UI.Resx {
         internal static string ErrorCreatingElection {
             get {
                 return ResourceManager.GetString("ErrorCreatingElection", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Unable to load guardian data..
+        /// </summary>
+        internal static string ErrorLoadingGuardian {
+            get {
+                return ResourceManager.GetString("ErrorLoadingGuardian", resourceCulture);
             }
         }
         
