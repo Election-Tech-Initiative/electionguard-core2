@@ -2,5 +2,5 @@
 
 public interface ITallyStateMachine
 {
-    Task Run(TallyRecord tally);
+    Task<bool> Run(TallyRecord tally);
 }

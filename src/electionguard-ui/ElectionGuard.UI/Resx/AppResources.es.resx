@@ -603,4 +603,10 @@
   <data name="ElectionRecordPathText" xml:space="preserve">
     <value>¡Ruta de exportación del registro de elecciones!</value>
   </data>
+  <data name="DatabaseLoginError" xml:space="preserve">
+    <value>No se puede iniciar sesión.  Compruebe la configuración de su base de datos.!</value>
+  </data>
+  <data name="ErrorLoadingGuardian" xml:space="preserve">
+    <value>No se puede cargar datos.</value>
+  </data>
 </root>

@@ -35,8 +35,9 @@ public class TallyStateMachine : ITallyStateMachine
         GenerateAdminSteps();
     }
 
-    public async Task Run(TallyRecord tally)
+    public async Task<bool> Run(TallyRecord tally)
     {
+        bool ran = false;
         string label = $"Electionguard.UI.TallyStateMachine-{_authenticationService.UserName}";
 
         var mutex = new Mutex(true, label, out var owned);
@@ -47,16 +48,22 @@ public class TallyStateMachine : ITallyStateMachine
             {
                 mutex.WaitOne();
                 Task.WaitAll(RunAsync(tally));
+                ran = true;
             }
-            catch(AbandonedMutexException)
+            catch (AbandonedMutexException)
             {
                 mutex.ReleaseMutex();
+            }
+            catch
+            {
+                throw;
             }
             finally
             {
                 mutex.ReleaseMutex();
             }
         }
+        return ran;
     }
 
     private async Task RunAsync(TallyRecord tally)
@@ -72,6 +79,7 @@ public class TallyStateMachine : ITallyStateMachine
         }
         catch (Exception)
         {
+            throw;
         }
     }
 

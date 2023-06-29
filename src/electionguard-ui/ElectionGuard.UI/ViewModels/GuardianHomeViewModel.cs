@@ -140,14 +140,14 @@ public partial class GuardianHomeViewModel : BaseViewModel
             }
             if (addMulti)
             {
-                if (!MultiTallies.Contains(tally))
+                if (MultiTallies.Count(m => m.MultiTallyId == tally.MultiTallyId) == 0)
                 {
                     MultiTallies.Add(tally);
                 }
             }
             else
             {
-                if (MultiTallies.Contains(tally))
+                if (MultiTallies.Count(m => m.MultiTallyId == tally.MultiTallyId) > 0)
                 {
                     MultiTallies.Remove(tally);
                 }
