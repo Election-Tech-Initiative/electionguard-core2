@@ -1,5 +1,6 @@
 #include "log.hpp"
 
+#include "electionguard/exception_handler.hpp"
 #include "spdlog/cfg/env.h"
 #include "spdlog/sinks/stdout_sinks.h"
 #include "spdlog/spdlog.h"
@@ -142,6 +143,7 @@ namespace electionguard
     void Log::error(string msg, const std::exception &obj, const char *caller)
     {
         Impl::instance().logger->error("{}::{}: {}", caller, msg, obj.what());
+        ExceptionHandler::getInstance().setData(msg, 0, obj);
     }
 
 } // namespace electionguard

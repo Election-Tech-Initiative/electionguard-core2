@@ -3034,5 +3034,14 @@ namespace ElectionGuard
         }
         #endregion
 
+        internal static class ExceptionHandler
+        {
+            [DllImport(DllName, EntryPoint = "eg_exception_data",
+                CallingConvention = CallingConvention.Cdecl, SetLastError = true)]
+            internal static extern Status GetData(
+                out IntPtr function, out IntPtr message, out ulong size);
+        }
+
+
     }
 }
