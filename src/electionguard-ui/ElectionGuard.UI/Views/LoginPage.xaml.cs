@@ -11,6 +11,7 @@ public partial class LoginPage
     private void LoginPage_Loaded(object? sender, EventArgs e)
     {
         var vm = BindingContext as LoginViewModel;
-        vm.OpenSettingsUnsetData();
+        vm?.OpenSettingsUnsetData();
+
     }
 }
