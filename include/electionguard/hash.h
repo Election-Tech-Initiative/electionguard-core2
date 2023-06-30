@@ -15,32 +15,32 @@ typedef struct eg_crypto_hashable_type_s eg_crypto_hashable_type_t;
 /**
  * @brief Get the prefix for the hash of an election manifest
  */
-const char *eg_hash_get_prefix_00();
+EG_API const char *eg_hash_get_prefix_00();
 
 /**
  * @brief Get the prefix for the hash of a guardian key proof
  */
-const char *eg_hash_get_prefix_01();
+EG_API const char *eg_hash_get_prefix_01();
 
 /**
  * @brief Get the prefix for the hash of a guardian key share encryption proof
  */
-const char *eg_hash_get_prefix_02();
+EG_API const char *eg_hash_get_prefix_02();
 
 /**
  * @brief Get the prefix for the hash of an election extended base hash
  */
-const char *eg_hash_get_prefix_03();
+EG_API const char *eg_hash_get_prefix_03();
 
 /**
  * @brief Get the prefix for the hash of a ballot selection encryption proof
  */
-const char *eg_hash_get_prefix_04();
+EG_API const char *eg_hash_get_prefix_04();
 
 /**
  * @brief Get the prefix for the hash of a ballot contest data secret key
  */
-const char *eg_hash_get_prefix_05();
+EG_API const char *eg_hash_get_prefix_05();
 
 /**
  * @brief Get the prefix for the hash of a ballot contest data secret key
