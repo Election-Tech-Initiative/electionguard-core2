@@ -302,6 +302,7 @@ public partial class Guardian : DisposableBase, IElectionGuardian
         {
             var backup = GenerateElectionPartialKeyBackup(
                 GuardianId,
+                SequenceOrder,
                 _myElectionKeys.Polynomial,
                 guardianKey);
             BackupsToShare[guardianKey.GuardianId] = new(backup);
@@ -343,7 +344,7 @@ public partial class Guardian : DisposableBase, IElectionGuardian
 
         using var nonce = BigMath.RandQ();
         var encryptedCoordinate = HashedElgamal.Encrypt(
-            coordinate, nonce, recipientPublicKey.Key, seed);
+            coordinate, nonce, Hash.Prefix02, recipientPublicKey.Key, seed);
 
         return new(
             myGuardianId,

@@ -112,8 +112,9 @@ namespace ElectionGuard
         /// This method should not be used by consumers operating in live secret ballot elections.
         /// </Summary>
         public byte[] Decrypt(
-            //TODO: descriptionHash needs renamed
-            ElementModQ secretKey, ElementModQ descriptionHash, bool lookForPadding)
+            ElementModP publicKey,
+            ElementModQ secretKey, string hashPrefix,
+            ElementModQ encryptionSeed, bool lookForPadding)
         {
             if (Handle == null || Handle.IsInvalid)
             {
@@ -124,14 +125,14 @@ namespace ElectionGuard
             {
                 throw new ArgumentNullException(nameof(secretKey));
             }
-            if (descriptionHash == null || !descriptionHash.IsInBounds())
+            if (encryptionSeed == null || !encryptionSeed.IsInBounds())
             {
-                throw new ArgumentNullException(nameof(descriptionHash));
+                throw new ArgumentNullException(nameof(encryptionSeed));
             }
 
             var status = NativeInterface.HashedElGamalCiphertext.Decrypt(
-                Handle, secretKey.Handle, descriptionHash.Handle,
-                lookForPadding, out var data, out var size);
+                Handle, publicKey.Handle, secretKey.Handle, hashPrefix,
+                encryptionSeed.Handle, lookForPadding, out var data, out var size);
             status.ThrowIfError();
 
             var byteArray = new byte[(int)size];

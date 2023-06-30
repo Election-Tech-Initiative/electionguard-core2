@@ -86,7 +86,10 @@ public partial class Guardian
         );
 
         var decryptedCoordinate = guardianBackup.EncryptedCoordinate.Decrypt(
-            myKeyPair.KeyPair.SecretKey, encryptionSeed, false);
+            myKeyPair.KeyPair.PublicKey,
+            myKeyPair.KeyPair.SecretKey,
+            Hash.Prefix02, encryptionSeed,
+            lookForPadding: false);
 
         if (decryptedCoordinate is null)
         {
