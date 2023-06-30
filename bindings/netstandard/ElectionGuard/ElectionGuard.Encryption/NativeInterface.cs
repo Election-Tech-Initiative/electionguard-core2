@@ -562,8 +562,10 @@ namespace ElectionGuard
                 CallingConvention = CallingConvention.Cdecl, SetLastError = true)]
             internal static extern Status Decrypt(
                 HashedElGamalCiphertextHandle handle,
-                ElementModQ.ElementModQHandle secret_key,
-                ElementModQ.ElementModQHandle description_hash,
+                ElementModP.ElementModPHandle publicKey,
+                ElementModQ.ElementModQHandle secretKey,
+                [MarshalAs(UnmanagedType.LPStr)] string hashPrefix,
+                ElementModQ.ElementModQHandle encryptionSeed,
                 bool lookForPadding,
                 out IntPtr data,
                 out ulong size);
@@ -582,10 +584,26 @@ namespace ElectionGuard
                 CallingConvention = CallingConvention.Cdecl, SetLastError = true)]
             // ReSharper disable once MemberHidesStaticFromOuterClass
             internal static extern Status Encrypt(
-                byte* plaintext, ulong length,
+                byte* message, ulong length,
                 ElementModQ.ElementModQHandle nonce,
-                ElementModP.ElementModPHandle public_key,
+                [MarshalAs(UnmanagedType.LPStr)] string hashPrefix,
+                ElementModP.ElementModPHandle publicKey,
                 ElementModQ.ElementModQHandle seed,
+                uint maxLength,
+                bool allowTruncation,
+                bool usePrecompute,
+                out HashedElGamalCiphertext.HashedElGamalCiphertextHandle handle);
+
+            [DllImport(DllName, EntryPoint = "eg_hashed_elgamal_encrypt_no_pdding",
+                CallingConvention = CallingConvention.Cdecl, SetLastError = true)]
+            // ReSharper disable once MemberHidesStaticFromOuterClass
+            internal static extern Status Encrypt(
+                byte* message, ulong length,
+                ElementModQ.ElementModQHandle nonce,
+                [MarshalAs(UnmanagedType.LPStr)] string hashPrefix,
+                ElementModP.ElementModPHandle publicKey,
+                ElementModQ.ElementModQHandle seed,
+                bool usePrecompute,
                 out HashedElGamalCiphertext.HashedElGamalCiphertextHandle handle);
         }
 

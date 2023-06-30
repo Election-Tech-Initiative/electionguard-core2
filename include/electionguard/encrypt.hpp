@@ -117,14 +117,14 @@ namespace electionguard
         /// with `shouldUsePrecomputedValues` set to `true`, otherwise the function will fall back to realtime generation.
         /// </summary>
         std::unique_ptr<CiphertextBallot> encrypt(const PlaintextBallot &ballot,
-                                                  bool shouldVerifyProofs = true,
+                                                  bool verifyProofs = true,
                                                   bool usePrecomputedValues = false) const;
 
         /// <summary>
         /// Encrypt the specified ballot into its compact form using the cached election context.
         /// </summary>
-        std::unique_ptr<CompactCiphertextBallot>
-        compactEncrypt(const PlaintextBallot &ballot, bool shouldVerifyProofs = true) const;
+        std::unique_ptr<CompactCiphertextBallot> compactEncrypt(const PlaintextBallot &ballot,
+                                                                bool verifyProofs = true) const;
 
       private:
         class Impl;
@@ -143,15 +143,15 @@ namespace electionguard
     ///                          for this selection. this value can be (or derived from) the
     ///                          Contest nonce, but no relationship is required</param>
     /// <param name="isPlaceholder">specifies if this is a placeholder selection</param>
-    /// <param name="shouldVerifyProofs">specify if the proofs should be verified prior to returning (default True)</param>
+    /// <param name="verifyProofs">specify if the proofs should be verified prior to returning (default True)</param>
     /// <returns>A `CiphertextBallotSelection`</returns>
     /// </summary>
     EG_API std::unique_ptr<CiphertextBallotSelection>
     encryptSelection(const PlaintextBallotSelection &selection,
                      const SelectionDescription &description, const ElementModP &elgamalPublicKey,
                      const ElementModQ &cryptoExtendedBaseHash, const ElementModQ &nonceSeed,
-                     bool isPlaceholder = false, bool shouldVerifyProofs = true,
-                     bool shouldUsePrecomputedValues = false);
+                     bool isPlaceholder = false, bool verifyProofs = true,
+                     bool usePrecompute = false);
 
     /// <summary>
     /// Encrypt a specific `BallotContest` in the context of a specific `Ballot`
@@ -169,7 +169,7 @@ namespace electionguard
     /// <param name="nonceSeed">an `ElementModQ` used as a header to seed the `Nonce` generated
     ///                          for this contest. this value can be (or derived from) the
     ///                          Ballot nonce, but no relationship is required</param>
-    /// <param name="shouldVerifyProofs">specify if the proofs should be verified prior to returning (default True)</param>
+    /// <param name="verifyProofs">specify if the proofs should be verified prior to returning (default True)</param>
     /// <param name="shouldUsePrecomputedValues">specify if the encryption generation should use precomputed values (default False)</param>
     /// <returns>A `CiphertextBallotContest`</returns>
     /// </summary>
@@ -177,8 +177,8 @@ namespace electionguard
     encryptContest(const PlaintextBallotContest &contest, const InternalManifest &internalManifest,
                    const ContestDescriptionWithPlaceholders &description,
                    const ElementModP &elgamalPublicKey, const ElementModQ &cryptoExtendedBaseHash,
-                   const ElementModQ &nonceSeed, bool shouldVerifyProofs = true,
-                   bool shouldUsePrecomputedValues = false);
+                   const ElementModQ &nonceSeed, bool verifyProofs = true,
+                   bool usePrecompute = false);
 
     /// <summary>
     /// Encrypt the contests of a specific `Ballot` in the context of a specific `CiphertextElectionContext`
@@ -195,14 +195,14 @@ namespace electionguard
     /// <param name="internalManifest">the `InternalManifest` which defines this ballot's structure</param>
     /// <param name="context">all the cryptographic context for the election</param>
     /// <param name="nonceSeed">the random value used to seed the `Nonce` for all contests on the ballot</param>
-    /// <param name="shouldVerifyProofs">specify if the proofs should be verified prior to returning (default True)</param>
+    /// <param name="verifyProofs">specify if the proofs should be verified prior to returning (default True)</param>
     /// <param name="shouldUsePrecomputedValues">specify if the encryption generation should use precomputed values (default False)</param>
     /// <returns>A collection of `CiphertextBallotContest`</returns>
     /// </summary>
     EG_API std::vector<std::unique_ptr<CiphertextBallotContest>>
     encryptContests(const PlaintextBallot &ballot, const InternalManifest &internalManifest,
                     const CiphertextElectionContext &context, const ElementModQ &nonceSeed,
-                    bool shouldVerifyProofs = true, bool shouldUsePrecomputedValues = false);
+                    bool verifyProofs = true, bool usePrecompute = false);
 
     /// <summary>
     /// Encrypt a specific `Ballot` in the context of a specific `CiphertextElectionContext`
@@ -233,7 +233,7 @@ namespace electionguard
     /// <param name="ballotCodeSeed">Hash from previous ballot or hash from device</param>
     /// <param name="nonce">an optional value used to seed the `Nonce` generated for this ballot
     ///                     if this value is not provided, the secret generating mechanism of the OS provides its own</param>
-    /// <param name="shouldVerifyProofs">specify if the proofs should be verified prior to returning (default True)</param>
+    /// <param name="verifyProofs">specify if the proofs should be verified prior to returning (default True)</param>
     /// <param name="shouldUsePrecomputedValues">specify if precomputed values should be used (default True)</param>
     /// <returns>A `CiphertextBallot`</returns>
     /// </summary>
@@ -241,7 +241,7 @@ namespace electionguard
     encryptBallot(const PlaintextBallot &ballot, const InternalManifest &internalManifest,
                   const CiphertextElectionContext &context, const ElementModQ &ballotCodeSeed,
                   std::unique_ptr<ElementModQ> nonce = nullptr, uint64_t timestamp = 0,
-                  bool shouldVerifyProofs = true, bool shouldUsePrecomputedValues = false);
+                  bool verifyProofs = true, bool usePrecompute = false);
 
     /// <summary>
     /// Encrypt a specific `Ballot` in the context of a specific `CiphertextElectionContext`
@@ -263,7 +263,7 @@ namespace electionguard
     /// <param name="ballotCodeSeed">Hash from previous ballot or hash from device</param>
     /// <param name="nonceSeed">an optional value used to seed the `Nonce` generated for this ballot
     ///                     if this value is not provided, the secret generating mechanism of the OS provides its own</param>
-    /// <param name="shouldVerifyProofs">specify if the proofs should be verified prior to returning (default True)</param>
+    /// <param name="verifyProofs">specify if the proofs should be verified prior to returning (default True)</param>
     /// <returns>A `CiphertextBallot`</returns>
     /// </summary>
     EG_API std::unique_ptr<CompactCiphertextBallot>
@@ -271,7 +271,7 @@ namespace electionguard
                          const CiphertextElectionContext &context,
                          const ElementModQ &ballotCodeSeed,
                          std::unique_ptr<ElementModQ> nonce = nullptr, uint64_t timestamp = 0,
-                         bool shouldVerifyProofs = true);
+                         bool verifyProofs = true);
 
 } // namespace electionguard
 

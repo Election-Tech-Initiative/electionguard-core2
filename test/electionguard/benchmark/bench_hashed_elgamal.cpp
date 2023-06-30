@@ -29,7 +29,7 @@ class HashedElgamalEncryptFixture : public benchmark::Fixture
         plaintext = plain;
 
         std::unique_ptr<HashedElGamalCiphertext> HEGResult = hashedElgamalEncrypt(
-          plaintext, *nonce, *keypair->getPublicKey(), *descriptionHash, NO_PADDING, false);
+          plaintext, *nonce, "00", *keypair->getPublicKey(), *descriptionHash, false);
     }
 
     void TearDown(const ::benchmark::State &state) {}
@@ -44,8 +44,8 @@ class HashedElgamalEncryptFixture : public benchmark::Fixture
 BENCHMARK_DEFINE_F(HashedElgamalEncryptFixture, HashedElGamalEncrypt)(benchmark::State &state)
 {
     for (auto _ : state) {
-        hashedElgamalEncrypt(plaintext, *nonce, *keypair->getPublicKey(), *descriptionHash,
-                             NO_PADDING, false);
+        hashedElgamalEncrypt(plaintext, *nonce, "00", *keypair->getPublicKey(), *descriptionHash,
+                             false);
     }
 }
 
@@ -72,7 +72,7 @@ class HashedElgamalEncryptPrecomputeFixture : public benchmark::Fixture
         plaintext = plain;
 
         std::unique_ptr<HashedElGamalCiphertext> HEGResult = hashedElgamalEncrypt(
-          plaintext, *nonce, *keypair->getPublicKey(), *descriptionHash, NO_PADDING, false);
+          plaintext, *nonce, "00", *keypair->getPublicKey(), *descriptionHash, false);
 
         // cause precomputed entries that will be used by the selection
         // encryptions, that should be more than enough and on teardown
@@ -94,8 +94,8 @@ BENCHMARK_DEFINE_F(HashedElgamalEncryptPrecomputeFixture, HashedElGamalEncryptPr
 (benchmark::State &state)
 {
     for (auto _ : state) {
-        hashedElgamalEncrypt(plaintext, *nonce, *keypair->getPublicKey(), *descriptionHash,
-                             NO_PADDING, false);
+        hashedElgamalEncrypt(plaintext, *nonce, "00", *keypair->getPublicKey(), *descriptionHash,
+                             false);
     }
 }
 

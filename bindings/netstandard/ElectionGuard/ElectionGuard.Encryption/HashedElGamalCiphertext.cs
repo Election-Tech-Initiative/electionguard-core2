@@ -4,9 +4,12 @@ using System.Runtime.InteropServices;
 namespace ElectionGuard
 {
     /// <summary>
-    /// An "exponential ElGamal ciphertext" (i.e., with the plaintext in the exponent to allow for
-    /// homomorphic addition). Create one with `elgamal_encrypt`. Add them with `elgamal_add`.
-    /// Decrypt using one of the supplied instance methods.
+    /// A "Hashed ElGamal Ciphertext" as specified as the Auxiliary Encryption in
+    /// the ElectionGuard specification. The tuple g ^ r mod p concatenated with
+    /// K ^ r mod p are used to feed into a hash function to generate a main key
+    /// from which other keys derive to perform XOR encryption and to MAC the
+    /// result. Create one with `hashedElgamalEncrypt`. Decrypt using one of the
+    /// 'decrypt' methods.
     /// </summary>
     public class HashedElGamalCiphertext : DisposableBase
     {
@@ -84,17 +87,17 @@ namespace ElectionGuard
             {
                 fixed (byte* _mac = mac)
                 {
-                    var status = NativeInterface.HashedElGamalCiphertext.New(pad.Handle,
-                                                                            _data,
-                                                                            (ulong)data.Length,
-                                                                            _mac,
-                                                                            (ulong)mac.Length,
-                                                                            out Handle);
+                    var status = NativeInterface.HashedElGamalCiphertext.New(
+                        pad.Handle,
+                        _data,
+                        (ulong)data.Length,
+                        _mac,
+                        (ulong)mac.Length,
+                        out Handle);
                     status.ThrowIfError();
                 }
             }
         }
-
 
         internal HashedElGamalCiphertext(
             NativeInterface.HashedElGamalCiphertext.HashedElGamalCiphertextHandle handle)
@@ -108,7 +111,9 @@ namespace ElectionGuard
         /// This is a convenience accessor useful for some use cases.
         /// This method should not be used by consumers operating in live secret ballot elections.
         /// </Summary>
-        public byte[] Decrypt(ElementModQ secretKey, ElementModQ descriptionHash, bool lookForPadding)
+        public byte[] Decrypt(
+            //TODO: descriptionHash needs renamed
+            ElementModQ secretKey, ElementModQ descriptionHash, bool lookForPadding)
         {
             if (Handle == null || Handle.IsInvalid)
             {
