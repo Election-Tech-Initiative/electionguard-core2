@@ -82,8 +82,7 @@ public class BallotService : BaseDatabaseService<BallotRecord>
     /// <param name="ballotCode">ballotcode to find</param>
     public async Task<bool> BallotExistsAsync(string ballotCode)
     {
-        var filterBuilder = Builders<BallotRecord>.Filter;
-        var filter = filterBuilder.And(filterBuilder.Eq(Constants.BallotCode, ballotCode));
+        var filter = FilterBuilder.Eq(Constants.BallotCode, ballotCode);
 
         var ballotCount = await CountByFilterAsync(filter);
         return ballotCount > 0;
@@ -104,9 +103,26 @@ public class BallotService : BaseDatabaseService<BallotRecord>
     /// <param name="ballotCode">ballotcode to find</param>
     public async Task DeleteByBallotCodeAsync(string ballotCode)
     {
-        var filterBuilder = Builders<BallotRecord>.Filter;
-        var filter = filterBuilder.And(filterBuilder.Eq(Constants.BallotCode, ballotCode));
+        var filter = FilterBuilder.Eq(Constants.BallotCode, ballotCode);
 
         await MarkAsDeletedAsync(filter);
     }
+
+    /// <summary>
+    /// Move a ballot into a spoiled state
+    /// </summary>
+    /// <param name="ballotCode">ballot code for the ballot to convert</param>
+    public async Task ConvertToSpoiledByBallotCodeAsync(string ballotCode)
+    {
+        var filter = FilterBuilder.And(
+                        FilterBuilder.Eq(Constants.BallotCode, ballotCode),
+                        FilterBuilder.Ne(Constants.BallotState, BallotBoxState.Cast));
+        var update = Builders<BallotRecord>.Update.Set(Constants.BallotState, BallotBoxState.Spoiled);
+
+        await UpdateAsync(filter, update);
+    }
+
+
+
+
 }

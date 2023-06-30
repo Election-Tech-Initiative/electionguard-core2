@@ -205,6 +205,15 @@ namespace ElectionGuard.UI.Resx {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Enter the verification code in the search box to limit the ballots shown. Select that ballot from the list to be set to a spoiled ballot..
+        /// </summary>
+        internal static string ChallengedInstructionsText {
+            get {
+                return ResourceManager.GetString("ChallengedInstructionsText", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Challenged.
         /// </summary>
         internal static string ChallengedText {
@@ -1168,6 +1177,33 @@ namespace ElectionGuard.UI.Resx {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Move Challenged to Spoiled.
+        /// </summary>
+        internal static string SpoilBallotText {
+            get {
+                return ResourceManager.GetString("SpoilBallotText", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Spoil Ballots.
+        /// </summary>
+        internal static string SpoilChallengedText {
+            get {
+                return ResourceManager.GetString("SpoilChallengedText", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Are you sure that you would like to move this ballot into a Spoiled state?  This will remove it from the election record..
+        /// </summary>
+        internal static string SpoilConfirmationText {
+            get {
+                return ResourceManager.GetString("SpoilConfirmationText", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Spoiled.
         /// </summary>
         internal static string SpoiledText {
@@ -1452,6 +1488,15 @@ namespace ElectionGuard.UI.Resx {
         internal static string UserSetup {
             get {
                 return ResourceManager.GetString("UserSetup", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Verification Code.
+        /// </summary>
+        internal static string VerificationCodeText {
+            get {
+                return ResourceManager.GetString("VerificationCodeText", resourceCulture);
             }
         }
         

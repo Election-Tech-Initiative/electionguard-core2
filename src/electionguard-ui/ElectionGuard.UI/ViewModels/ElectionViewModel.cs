@@ -234,12 +234,15 @@ public partial class ElectionViewModel : BaseViewModel
     [RelayCommand(CanExecute = nameof(CanReview))]
     private async Task ReviewChallenged()
     {
-        // add code to go to the Challenged ballot page
+        var vm = Ioc.Default.GetService(typeof(ChallengedPopupViewModel)) as ChallengedPopupViewModel;
+        vm!.ElectionId = CurrentElection!.ElectionId!;
+
+        await NavigationService.GoToModal(typeof(ChallengedPopupViewModel));
     }
 
     private bool CanReview()
     {
-        return BallotSpoiledTotal > 0;
+        return BallotChallengedTotal > 0;
     }
 
     [RelayCommand]

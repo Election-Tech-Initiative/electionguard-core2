@@ -609,4 +609,19 @@
   <data name="ErrorLoadingGuardian" xml:space="preserve">
     <value>No se puede cargar datos.</value>
   </data>
+  <data name="SpoilBallotText" xml:space="preserve">
+    <value>¡Muévete Desafiado a Mimado!</value>
+  </data>
+  <data name="SpoilConfirmationText" xml:space="preserve">
+    <value>¿Está seguro de que le gustaría mover esta boleta a un estado estropeado?  ¡Esto lo eliminará del registro electoral!</value>
+  </data>
+  <data name="ChallengedInstructionsText" xml:space="preserve">
+    <value>Introduzca el código de verificación en el cuadro de búsqueda para limitar las papeletas mostradas. Seleccione esa boleta de la lista que se establecerá en una boleta estropeada.</value>
+  </data>
+  <data name="SpoilChallengedText" xml:space="preserve">
+    <value>¡Boletas estropeadas!</value>
+  </data>
+  <data name="VerificationCodeText" xml:space="preserve">
+    <value>Código de verificación</value>
+  </data>
 </root>
