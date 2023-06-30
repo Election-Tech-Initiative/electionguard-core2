@@ -21,6 +21,15 @@
             <converter:TallyNotStartedConverter x:Key="TallyNotStartedConverter" />
             <converter:TallyCanBeAbandonedConverter x:Key="TallyCanBeAbandonedConverter" />
             <converter:TallyCompleteConverter x:Key="TallyCompleteConverter" />
+            <converter:BackupConverter x:Key="BackupConverter" />
+            <converter:BadVerifyConverter x:Key="BadVerifyConverter" />
+            <converter:GuardianBackgroundConverter x:Key="GuardianBackgroundConverter" />
+            <Style TargetType="ActivityIndicator">
+                <Setter Property="Margin" Value="10" />
+                <Setter Property="HeightRequest" Value="30" />
+                <Setter Property="WidthRequest" Value="30" />
+                <Setter Property="IsRunning" Value="True" />
+            </Style>
         </ResourceDictionary>
     </ContentPage.Resources>
 
@@ -84,6 +93,7 @@
                         <Grid BackgroundColor="{Binding IsSelf, Converter={StaticResource GuardianBackgroundConverter}}" ColumnDefinitions="*, 50, 50,50">
                             <Label
                                 Grid.Column="0"
+                                Margin="10,5,0,5"
                                 FontSize="Medium"
                                 Text="{Binding Name}"
                                 VerticalOptions="Center" />
@@ -241,12 +251,7 @@
                     Text="{helper:Translate TallySubtalliesCombined}"
                     VerticalTextAlignment="Center"
                     WidthRequest="200" />
-                <ActivityIndicator
-                    Margin="10"
-                    HeightRequest="100"
-                    IsRunning="True"
-                    IsVisible="{Binding Checklist.TallyStarted}"
-                    WidthRequest="100" />
+                <ActivityIndicator IsVisible="{Binding Checklist.TallyStarted}" />
             </HorizontalStackLayout>
             <Line Background="Black" />
             <HorizontalStackLayout Margin="10">
@@ -257,12 +262,7 @@
                     Text="{helper:Translate TallyAllDecryptionsComputed}"
                     VerticalTextAlignment="Center"
                     WidthRequest="200" />
-                <ActivityIndicator
-                    Margin="10"
-                    HeightRequest="100"
-                    IsRunning="True"
-                    IsVisible="{Binding Checklist.SubtaliesCombined}"
-                    WidthRequest="100" />
+                <ActivityIndicator IsVisible="{Binding Checklist.SubtaliesCombined}" />
             </HorizontalStackLayout>
             <Line Background="Black" />
             <HorizontalStackLayout Margin="10">
@@ -273,12 +273,7 @@
                     Text="{helper:Translate TallyChallengeCreated}"
                     VerticalTextAlignment="Center"
                     WidthRequest="200" />
-                <ActivityIndicator
-                    Margin="10"
-                    HeightRequest="100"
-                    IsRunning="True"
-                    IsVisible="{Binding Checklist.AllDecryptionSharesComputed}"
-                    WidthRequest="100" />
+                <ActivityIndicator IsVisible="{Binding Checklist.AllDecryptionSharesComputed}" />
             </HorizontalStackLayout>
             <Line Background="Black" />
             <HorizontalStackLayout Margin="10">
@@ -289,12 +284,7 @@
                     Text="{helper:Translate TallyAllChallengesResponded}"
                     VerticalTextAlignment="Center"
                     WidthRequest="200" />
-                <ActivityIndicator
-                    Margin="10"
-                    HeightRequest="100"
-                    IsRunning="True"
-                    IsVisible="{Binding Checklist.ChallengeCreated}"
-                    WidthRequest="100" />
+                <ActivityIndicator IsVisible="{Binding Checklist.ChallengeCreated}" />
             </HorizontalStackLayout>
             <Line Background="Black" />
             <HorizontalStackLayout Margin="10">
@@ -305,12 +295,7 @@
                     Text="{helper:Translate TallyComplete}"
                     VerticalTextAlignment="Center"
                     WidthRequest="200" />
-                <ActivityIndicator
-                    Margin="10"
-                    HeightRequest="100"
-                    IsRunning="True"
-                    IsVisible="{Binding Checklist.AllChallengesResponded}"
-                    WidthRequest="100" />
+                <ActivityIndicator IsVisible="{Binding Checklist.AllChallengesResponded}" />
             </HorizontalStackLayout>
             <Line Background="Black" />
         </VerticalStackLayout>

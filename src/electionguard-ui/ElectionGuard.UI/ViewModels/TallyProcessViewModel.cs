@@ -221,12 +221,12 @@ public partial class TallyProcessViewModel : BaseViewModel
     {
         return Tally?.State == TallyState.PendingGuardiansJoin &&
             !CurrentUserJoinedAlready() &&
-            !AuthenticationService.IsAdmin;
+            !IsAdmin;
     }
 
     private bool CurrentUserJoinedAlready()
     {
-        return JoinedGuardians.SingleOrDefault(g => g.Name == UserName) is not null;
+        return JoinedGuardians.Count(g => g.Name == UserName) != 0;
     }
 
     // guardian pulls big T tally from mongo
@@ -425,7 +425,17 @@ public partial class TallyProcessViewModel : BaseViewModel
             if (Tally != null)
             {
                 await UpdateTallyData();
-                await _tallyRunner.Run(Tally);
+                try
+                {
+                    if (await _tallyRunner.Run(Tally))
+                    {
+                        ErrorMessage = string.Empty;
+                    }
+                }
+                catch (Exception ex)
+                {
+                    ErrorMessage = ex.Message;
+                }
             }
         });
     }

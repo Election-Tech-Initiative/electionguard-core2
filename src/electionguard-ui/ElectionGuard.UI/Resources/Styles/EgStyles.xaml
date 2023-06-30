@@ -236,6 +236,13 @@
                         ToolTipProperties.Text="{helpers:Translate SwitchLanguages}" />
                 </HorizontalStackLayout>
                 <Label
+                    FontAttributes="Bold"
+                    FontSize="Medium"
+                    HorizontalOptions="CenterAndExpand"
+                    LineBreakMode="TailTruncation"
+                    Text="{Binding ErrorMessage}"
+                    TextColor="Red" />
+                <Label
                     FontSize="18"
                     HorizontalOptions="End"
                     Text="{Binding AppVersion}"

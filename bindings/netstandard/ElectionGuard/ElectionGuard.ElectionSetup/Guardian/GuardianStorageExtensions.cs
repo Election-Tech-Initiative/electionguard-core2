@@ -52,9 +52,10 @@ public static class GuardianStorageExtensions
         var basePath = Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData);
         var filePath = Path.Combine(basePath, PrivateKeyFolder, keyCeremonyId, filename);
 
-        var data = storage.FromFile(filePath);
         try
         {
+            var data = storage.FromFile(filePath);
+
             var privateGuardian = JsonConvert.DeserializeObject<GuardianPrivateRecord>(
                 data, SerializationSettings.NewtonsoftSettings());
 

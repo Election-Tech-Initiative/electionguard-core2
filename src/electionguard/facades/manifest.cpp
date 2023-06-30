@@ -1994,7 +1994,7 @@ eg_electionguard_status_t eg_election_manifest_from_json(char *in_data,
         *out_handle = AS_TYPE(eg_election_manifest_t, deserialized.release());
         return ELECTIONGUARD_STATUS_SUCCESS;
     } catch (const exception &e) {
-        Log::error(":eg_election_manifest_from_json", e);
+        Log::error(__func__, e);
         return ELECTIONGUARD_STATUS_ERROR_BAD_ALLOC;
     }
 }

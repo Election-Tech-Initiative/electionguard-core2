@@ -1,10 +1,10 @@
 ﻿namespace ElectionGuard.UI.Models;
 
-public class TallyCeremonyChecklist
+public partial class TallyCeremonyChecklist : ObservableObject
 {
     public bool QuorumReached => State > TallyState.PendingGuardiansJoin;
     public bool TallyStarted => State == TallyState.TallyStarted;
-    public bool SubtaliesCombined => QuorumReached && State >= TallyState.PendingGuardianDecryptShares;
+    public bool SubtaliesCombined => State >= TallyState.PendingGuardianDecryptShares;
     public bool AllDecryptionSharesComputed => SubtaliesCombined && (
         State > TallyState.PendingGuardianDecryptShares ||
         (State == TallyState.PendingGuardianDecryptShares && _sharesComputed >= _quorum));
@@ -19,7 +19,16 @@ public class TallyCeremonyChecklist
 
     public bool IsAbandoned => State == TallyState.Abandoned;
 
-    public TallyState State { get; set; }
+    [ObservableProperty]
+    [NotifyPropertyChangedFor(nameof(QuorumReached))]
+    [NotifyPropertyChangedFor(nameof(TallyStarted))]
+    [NotifyPropertyChangedFor(nameof(SubtaliesCombined))]
+    [NotifyPropertyChangedFor(nameof(AllDecryptionSharesComputed))]
+    [NotifyPropertyChangedFor(nameof(ChallengeCreated))]
+    [NotifyPropertyChangedFor(nameof(AllChallengesResponded))]
+    [NotifyPropertyChangedFor(nameof(TallyComplete))]
+    [NotifyPropertyChangedFor(nameof(IsAbandoned))]
+    private TallyState _state;
 
     private readonly int _quorum;
     private readonly int _sharesComputed;
