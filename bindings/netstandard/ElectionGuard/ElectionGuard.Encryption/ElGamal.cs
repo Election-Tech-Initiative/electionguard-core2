@@ -146,7 +146,16 @@ namespace ElectionGuard
                 throw new ArgumentNullException(nameof(seed));
             }
 
-            // TODO: check the length
+            // TODO: HACK: ISSUE #358: the hashed elgamal process uses a 32 byte block length
+            // but reserves a few bytes for encoding. the indiator is sizeof(uint16_t)
+            // in the c/c++ constants.h file but we need to guarantee the width
+            // for now, we just make sure the maxLength is within an acceptable range
+            // and it is up to the caller to ensure the proper integer value is passed
+            // for their system. This will be fixed as part of ISSUE #358
+            if (maxLength > 512)
+            {
+                throw new ArgumentOutOfRangeException(nameof(maxLength));
+            }
 
             fixed (byte* pointer = data)
             {

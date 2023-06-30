@@ -528,9 +528,8 @@ namespace electionguard
             throw invalid_argument("HashedElGamalCiphertext::encrypt max_len is invalid");
         }
 
-        // TODO: check the modulo of the max_len matches the block length
-        // we first need to validate te pattern of jhust setting them to the 32 bit multiples
-        // and handlin the indicator size inline
+        // TODO: HACK: ISSUE #358: we need to check the modulo of the max_len matches the block length
+        // and handle the indicator size truncation inline inside this function
 
         // padding scheme is to concatenate [length of the padding][plaintext][padding bytes of 0x00]
         // padding bytes 0x00 are padded out to the first HASHED_CIPHERTEXT_BLOCK_LENGTH boundary
