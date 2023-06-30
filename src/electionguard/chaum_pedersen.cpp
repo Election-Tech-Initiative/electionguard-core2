@@ -230,7 +230,8 @@ namespace electionguard
 
         auto consistent_c =
           (*add_mod_q(c0, c1) == c) &&
-          (c == *hash_elems({&const_cast<ElementModQ &>(q), alpha, beta, a0p, b0p, a1p, b1p}));
+          (c == *hash_elems({HashPrefix::get_prefix_04(), &const_cast<ElementModQ &>(q),
+                             &const_cast<ElementModP &>(k), alpha, beta, a0p, b0p, a1p, b1p}));
 
         // 𝑔^𝑣 mod 𝑝 = 𝑎 ⋅ 𝛼^𝑐 mod 𝑝
         auto consistent_gv0 = (*g_pow_p(v0) == *mul_mod_p(a0, *pow_mod_p(*alpha, c0)));
