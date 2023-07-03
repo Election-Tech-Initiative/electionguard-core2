@@ -170,7 +170,7 @@ namespace electionguard
     ///                          for this contest. this value can be (or derived from) the
     ///                          Ballot nonce, but no relationship is required</param>
     /// <param name="verifyProofs">specify if the proofs should be verified prior to returning (default True)</param>
-    /// <param name="shouldUsePrecomputedValues">specify if the encryption generation should use precomputed values (default False)</param>
+    /// <param name="usePrecompute">specify if the encryption generation should use precomputed values (default False)</param>
     /// <returns>A `CiphertextBallotContest`</returns>
     /// </summary>
     EG_API std::unique_ptr<CiphertextBallotContest>
@@ -196,7 +196,7 @@ namespace electionguard
     /// <param name="context">all the cryptographic context for the election</param>
     /// <param name="nonceSeed">the random value used to seed the `Nonce` for all contests on the ballot</param>
     /// <param name="verifyProofs">specify if the proofs should be verified prior to returning (default True)</param>
-    /// <param name="shouldUsePrecomputedValues">specify if the encryption generation should use precomputed values (default False)</param>
+    /// <param name="usePrecompute">specify if the encryption generation should use precomputed values (default False)</param>
     /// <returns>A collection of `CiphertextBallotContest`</returns>
     /// </summary>
     EG_API std::vector<std::unique_ptr<CiphertextBallotContest>>
@@ -222,9 +222,9 @@ namespace electionguard
     /// This function can also take advantage of PrecomputeBuffers to speed up the encryption process.
     /// when using precomputed values, the application looks in the `PrecomputeBufferContext` for values
     /// and uses them for the encryptions. You must preload the `PrecomputeBufferContext` prior to calling this function
-    /// with `shouldUsePrecomputedValues` set to `true`, otherwise the function will fall back to realtime generation.
+    /// with `usePrecompute` set to `true`, otherwise the function will fall back to realtime generation.
     ///
-    /// Because PrecomputeBuffers require a random nonce, calling this function with `shouldUsePrecomputedValues`
+    /// Because PrecomputeBuffers require a random nonce, calling this function with `usePrecompute`
     /// set to `true` while also providing a nonce will result in an error.
     ///
     /// <param name="ballot">the selection in the valid input form</param>
@@ -234,7 +234,7 @@ namespace electionguard
     /// <param name="nonce">an optional value used to seed the `Nonce` generated for this ballot
     ///                     if this value is not provided, the secret generating mechanism of the OS provides its own</param>
     /// <param name="verifyProofs">specify if the proofs should be verified prior to returning (default True)</param>
-    /// <param name="shouldUsePrecomputedValues">specify if precomputed values should be used (default True)</param>
+    /// <param name="usePrecompute">specify if precomputed values should be used (default True)</param>
     /// <returns>A `CiphertextBallot`</returns>
     /// </summary>
     EG_API std::unique_ptr<CiphertextBallot>
