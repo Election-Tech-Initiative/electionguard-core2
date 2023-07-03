@@ -3,6 +3,7 @@
 #include "crypto_hashable.hpp"
 #include "export.h"
 #include "group.hpp"
+#include "precompute_buffers.hpp"
 
 #include <memory>
 #include <vector>
@@ -215,7 +216,7 @@ namespace electionguard
     /// <returns>A ciphertext tuple.</returns>
     /// </summary>
     EG_API std::unique_ptr<ElGamalCiphertext>
-    elgamalEncrypt_with_precomputed(uint64_t m, ElementModP &gToRho, ElementModP &pubkeyToRho);
+    elgamalEncrypt(uint64_t m, const TwoTriplesAndAQuadruple &precomputedValues);
 
     /// <summary>
     /// Homomorphically accumulates one or more ElGamal ciphertexts by pairwise multiplication.
@@ -231,19 +232,10 @@ namespace electionguard
     EG_API std::unique_ptr<ElGamalCiphertext> elgamalAdd(const ElGamalCiphertext &a,
                                                          const ElGamalCiphertext &b);
 
-#define HASHED_CIPHERTEXT_BLOCK_LENGTH 32U
-#define HASHED_BLOCK_LENGTH_IN_BITS 256U
-#define _PAD_INDICATOR_SIZE sizeof(uint16_t)
-
-    typedef enum padded_data_size_e {
-        NO_PADDING = 0,
-        BYTES_512 = 512 - _PAD_INDICATOR_SIZE
-    } padded_data_size_t;
-
     /// <summary>
     /// A "Hashed ElGamal Ciphertext" as specified as the Auxiliary Encryption in
-    /// the ElectionGuard specification. The tuple g ^ r mod p concatenated with
-    /// K ^ r mod p are used to feed into a hash function to generate a main key
+    /// the ElectionGuard specification. The tuple g^r mod p concatenated with
+    /// K^r mod p are used to feed into a hash function to generate a main (session) key
     /// from which other keys derive to perform XOR encryption and to MAC the
     /// result. Create one with `hashedElgamalEncrypt`. Decrypt using one of the
     /// 'decrypt' methods.
@@ -263,14 +255,14 @@ namespace electionguard
         bool operator!=(const HashedElGamalCiphertext &other);
 
         /// <Summary>
-        /// The g ^r mod p value also referred to as pad in the code and
-        /// c0 in the spec.
+        /// The g^r mod p value also referred to as pad in the code and
+        /// c0, 𝑎, or alpha in the spec.
         /// </Summary>
         ElementModP *getPad();
 
         /// <Summary>
-        /// The g ^r mod p value also referred to as pad in the code and
-        /// c0 in the spec.
+        /// The g^r mod p value also referred to as pad in the code and
+        /// c0, 𝑎, or alpha in the spec.
         /// </Summary>
         ElementModP *getPad() const;
 
@@ -305,19 +297,21 @@ namespace electionguard
         /// <summary>
         /// Decrypts ciphertext with the Auxiliary Encryption method (as specified in the
         /// ElectionGuard specification) given a random nonce, an ElGamal public key,
-        /// and a description hash. The encrypt may be called to look for padding to
+        /// and an encryption seed. The encrypt may be called to look for padding to
         /// verify and remove, in this case the plaintext will be smaller than
         /// the ciphertext, or not to look for padding in which case the
         /// plaintext will be the same size as the ciphertext.
         ///
-        /// <param name="nonce"> Randomly chosen nonce in [1,Q). </param>
-        /// <param name="secret_key"> ElGamal public key. </param>
-        /// <param name="encryptionSeed">usually the Hash of the ballot description. </param>
-        /// <param name="look_for_padding"> Indicates if padding removed. </param>
+        /// <param name="publicKey">ElGamal Public Key</param>
+        /// <param name="secretKey">ElGamal secret key or nonce</param>
+        /// <param name="hashPrefix">A prefix value for the hash used to create the session key.</param>
+        /// <param name="seed">An encruption seed used to generate the session key.</param>
+        /// <param name="expectPadding">Indicates if padding should be removed from the decrypted value.</param>
         /// <returns>A plaintext vector.</returns>
         /// </summary>
-        std::vector<uint8_t> decrypt(const ElementModQ &secret_key,
-                                     const ElementModQ &encryptionSeed, bool look_for_padding);
+        std::vector<uint8_t> decrypt(const ElementModP &publicKey, const ElementModQ &secretKey,
+                                     const std::string &hashPrefix, const ElementModQ &seed,
+                                     bool expectPadding);
 
         /// <Summary>
         /// Partially Decrypts an ElGamal ciphertext with a known ElGamal secret key.
@@ -351,39 +345,66 @@ namespace electionguard
     /// <summary>
     /// Encrypts a message with the Auxiliary Encryption method (as specified in the
     /// ElectionGuard specification) given a random nonce, an ElGamal public key,
-    /// and a description hash. The encrypt may be called to apply padding. If
+    /// and an encryption seed.
+    ///
+    /// The encrypt may be called to apply padding. If
     /// padding is to be applied then the max_len parameter may be used with
-    /// any of the padded_data_size_t enumeration values that is not NO_PADDING.
+    /// any of the HASHED_CIPHERTEXT_PADDED_DATA_SIZE enumeration values.
     /// This value indicates the maximum length of the plaintext that may be
     /// encrypted. The padding scheme applies two bytes for length of padding
-    /// plus padding bytes. If padding is not to be applied then the
-    /// max_len parameter must be NO_PADDING. and the plaintext must
-    /// be a multiple of the block length (32) and the ciphertext will be
-    /// the same size. If the max_len is set to  something other than
-    /// NO_PADDING and the allow_truncation parameter is set to
+    /// plus padding bytes.
+    ///
+    /// If allow_truncation parameter is set to
     /// true then if the message parameter data is longer than
-    /// max_len then it will be truncated to max_len. If the max_len is set to
-    /// something other than NO_PADDING and the allow_truncation parameter
+    /// max_len then it will be truncated to max_len.
+    /// If the allow_truncation parameter
     /// is set to false then if the message parameter data is longer than
     /// max_len then an exception will be thrown.
     ///
-    /// <param name="message"> Message to hashed elgamal encrypt. </param>
-    /// <param name="nonce"> Randomly chosen nonce in [1,Q). </param>
-    /// <param name="publicKey"> ElGamal public key. </param>
-    /// <param name="descriptionHash"> Hash of the ballot description. </param>
-    /// <param name="max_len"> If padding is to be applied then this indicates the
-    ///  maximum length of plaintext, must be one padded_data_size_t enumeration
-    ///  values. If padding is not to be applied then this parameter must use
-    ///  the NO_PADDING padded_data_size_t enumeration value.</param>
-    /// <param name="allow_truncation"> Truncates data to the max_len if set to
-    /// true. If max_len is set to NO_PADDING then this parameter is ignored. </param>
+    /// <param name="message">Message to hashed elgamal encrypt.</param>
+    /// <param name="nonce">Randomly chosen nonce in [1,Q).</param>
+    /// <param name="hashPrefix">A prefix value for the hash used to create the session key.</param>
+    /// <param name="publicKey">ElGamal public key.</param>
+    /// <param name="seed">Hash of the ballot description.</param>
+    /// <param name="max_len">Indicates the maximum length of plaintext,
+    ///                       must be one of the `HASHED_CIPHERTEXT_PADDED_DATA_SIZE`
+    ///                       enumeration values.
+    /// </param>
+    /// <param name="allow_truncation">Truncates data to the max_len if set to true.
+    /// </param>
+    /// <param name="shouldUsePrecomputedValues">If true, the function will attempt
+    ///                                          to use a precomputed value form the precompute buffer
+    /// </param>
     /// <returns>A ciphertext triple.</returns>
     /// </summary>
     EG_API std::unique_ptr<HashedElGamalCiphertext>
-    hashedElgamalEncrypt(std::vector<uint8_t> plaintext, const ElementModQ &nonce,
-                         const ElementModP &publicKey, const ElementModQ &descriptionHash,
-                         padded_data_size_t max_len, bool allow_truncation,
-                         bool shouldUsePrecomputedValues = false);
+    hashedElgamalEncrypt(std::vector<uint8_t> message, const ElementModQ &nonce,
+                         const std::string &hashPrefix, const ElementModP &publicKey,
+                         const ElementModQ &seed, HASHED_CIPHERTEXT_PADDED_DATA_SIZE max_len,
+                         bool allowTruncation, bool usePrecompute = false);
+
+    /// <summary>
+    /// Encrypts a message with the Auxiliary Encryption method (as specified in the
+    /// ElectionGuard specification) given a random nonce, an ElGamal public key,
+    /// and an encryption seed.
+    ///
+    /// the `message` parameter must be a multiple of the block length (32)
+    /// and the ciphertext will be the same size.
+    ///
+    /// <param name="message">Message to hashed elgamal encrypt.</param>
+    /// <param name="nonce">Randomly chosen nonce in [1,Q).</param>
+    /// <param name="hashPrefix">A prefix value for the hash used to create the session key.</param>
+    /// <param name="publicKey">ElGamal public key.</param>
+    /// <param name="seed">A seed value used to create the session key.</param>
+    /// <param name="shouldUsePrecomputedValues">If true, the function will attempt
+    ///                                          to use a precomputed value form the precompute buffer
+    /// </param>
+    /// <returns>A ciphertext triple.</returns>
+    /// </summary>
+    EG_API std::unique_ptr<HashedElGamalCiphertext>
+    hashedElgamalEncrypt(std::vector<uint8_t> message, const ElementModQ &nonce,
+                         const std::string &hashPrefix, const ElementModP &publicKey,
+                         const ElementModQ &seed, bool usePrecompute = false);
 
 } // namespace electionguard
 

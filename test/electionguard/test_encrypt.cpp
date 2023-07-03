@@ -8,6 +8,7 @@
 #include <electionguard/ballot.hpp>
 #include <electionguard/election.hpp>
 #include <electionguard/encrypt.hpp>
+#include <electionguard/hash.hpp>
 #include <electionguard/manifest.hpp>
 
 using namespace electionguard;
@@ -195,7 +196,8 @@ TEST_CASE("Encrypt PlaintextBallot overvote")
       make_unique<HashedElGamalCiphertext>(move(new_pad), heg->getData(), heg->getMac());
 
     vector<uint8_t> new_plaintext =
-      newHEG->decrypt(secret, *context->getCryptoExtendedBaseHash(), true);
+      newHEG->decrypt(*keypair->getPublicKey(), secret, HashPrefix::get_prefix_05(),
+                      *context->getCryptoExtendedBaseHash(), true);
     string new_plaintext_string((char *)&new_plaintext.front(), new_plaintext.size());
 
     CHECK(new_plaintext_string ==
@@ -288,7 +290,8 @@ TEST_CASE("Encrypt full PlaintextBallot with WriteIn and Overvote with Encryptio
       make_unique<HashedElGamalCiphertext>(move(new_pad), heg->getData(), heg->getMac());
 
     vector<uint8_t> new_plaintext =
-      newHEG->decrypt(secret, *context->getCryptoExtendedBaseHash(), true);
+      newHEG->decrypt(*keypair->getPublicKey(), secret, HashPrefix::get_prefix_05(),
+                      *context->getCryptoExtendedBaseHash(), true);
     string new_plaintext_string((char *)&new_plaintext.front(), new_plaintext.size());
     Log::debug(new_plaintext_string);
 

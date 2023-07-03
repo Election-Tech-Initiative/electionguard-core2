@@ -215,7 +215,8 @@ namespace electionguard
           {&const_cast<ElementModP &>(P()), &const_cast<ElementModQ &>(Q()),
            &const_cast<ElementModP &>(G()), numberOfGuardians, quorum, manifestHash.get()});
 
-        auto cryptoExtendedBaseHash = hash_elems({cryptoBaseHash.get(), commitmentHash.get()});
+        auto cryptoExtendedBaseHash = hash_elems({HashPrefix::get_prefix_03(), cryptoBaseHash.get(),
+                                                  elGamalPublicKey.get(), commitmentHash.get()});
 
         // ensure the elgamal public key instance is set as a fixed base
         elGamalPublicKey->setIsFixedBase(true);
@@ -234,7 +235,8 @@ namespace electionguard
           {&const_cast<ElementModP &>(P()), &const_cast<ElementModQ &>(Q()),
            &const_cast<ElementModP &>(G()), numberOfGuardians, quorum, manifestHash.get()});
 
-        auto cryptoExtendedBaseHash = hash_elems({cryptoBaseHash.get(), commitmentHash.get()});
+        auto cryptoExtendedBaseHash = hash_elems({HashPrefix::get_prefix_03(), cryptoBaseHash.get(),
+                                                  elGamalPublicKey.get(), commitmentHash.get()});
 
         // ensure the elgamal public key instance is set as a fixed base
         elGamalPublicKey->setIsFixedBase(true);
@@ -253,7 +255,8 @@ namespace electionguard
           {&const_cast<ElementModP &>(P()), &const_cast<ElementModQ &>(Q()),
            &const_cast<ElementModP &>(G()), numberOfGuardians, quorum, manifestHash.get()});
 
-        auto cryptoExtendedBaseHash = hash_elems({cryptoBaseHash.get(), commitmentHash.get()});
+        auto cryptoExtendedBaseHash = hash_elems({HashPrefix::get_prefix_03(), cryptoBaseHash.get(),
+                                                  elGamalPublicKey.get(), commitmentHash.get()});
 
         // ensure the elgamal public key instance is set as a fixed base
         elGamalPublicKey->setIsFixedBase(true);
@@ -274,7 +277,8 @@ namespace electionguard
           {&const_cast<ElementModP &>(P()), &const_cast<ElementModQ &>(Q()),
            &const_cast<ElementModP &>(G()), numberOfGuardians, quorum, manifestHash.get()});
 
-        auto cryptoExtendedBaseHash = hash_elems({cryptoBaseHash.get(), commitmentHash.get()});
+        auto cryptoExtendedBaseHash = hash_elems({HashPrefix::get_prefix_03(), cryptoBaseHash.get(),
+                                                  elGamalPublicKey.get(), commitmentHash.get()});
 
         // ensure the elgamal public key instance is set as a fixed base
         elGamalPublicKey->setIsFixedBase(true);
