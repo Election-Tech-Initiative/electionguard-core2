@@ -116,7 +116,8 @@ TEST_CASE("elgamalEncrypt simple encrypt 0 compared with elgamalEncrypt_with_pre
 
     // Act
     auto cipherText1 = elgamalEncrypt(0UL, *triple1->get_exp(), *publicKey);
-    auto cipherText2 = elgamalEncrypt(0UL, *precomputedTwoTriplesAndAQuad);
+    auto cipherText2 =
+      elgamalEncrypt(0UL, *keypair->getPublicKey(), *precomputedTwoTriplesAndAQuad);
 
     CHECK((*cipherText1->getPad() == *cipherText2->getPad()));
     CHECK((*cipherText1->getData() == *cipherText2->getData()));
@@ -153,7 +154,7 @@ TEST_CASE("elgamalEncrypt_with_precomputed simple encrypt 0 decrypts with secret
     CHECK(triple1 != nullptr);
 
     // Act
-    auto cipherText = elgamalEncrypt(0UL, *precomputedTwoTriplesAndAQuad);
+    auto cipherText = elgamalEncrypt(0UL, *keypair->getPublicKey(), *precomputedTwoTriplesAndAQuad);
 
     // Assert
     auto decrypted = cipherText->decrypt(secret);
@@ -228,7 +229,7 @@ TEST_CASE("elgamalEncrypt vwith precomputed encrypt 1, decrypts with secret")
     // it finds what it needs the the returned class will contain those values
     auto precomputedTwoTriplesAndAQuad = PrecomputeBufferContext::getTwoTriplesAndAQuadruple();
 
-    auto cipherText = elgamalEncrypt(1UL, *precomputedTwoTriplesAndAQuad);
+    auto cipherText = elgamalEncrypt(1UL, *publicKey, *precomputedTwoTriplesAndAQuad);
 
     auto decrypted = cipherText->decrypt(*secret);
     CHECK(1UL == decrypted);

@@ -267,7 +267,7 @@ namespace electionguard
         return make_unique<ElGamalCiphertext>(move(pad), move(data));
     }
 
-    unique_ptr<ElGamalCiphertext> elgamalEncrypt(uint64_t m,
+    unique_ptr<ElGamalCiphertext> elgamalEncrypt(uint64_t m, const ElementModP &publicKey,
                                                  const TwoTriplesAndAQuadruple &precomputedValues)
     {
         auto triple1 = precomputedValues.get_triple1();

@@ -367,7 +367,7 @@ namespace electionguard
                    descriptionHash.toHex());
 
         // Generate the encryption using precomputed values
-        auto ciphertext = elgamalEncrypt(vote, *precomputedValues);
+        auto ciphertext = elgamalEncrypt(vote, elgamalPublicKey, *precomputedValues);
         if (ciphertext == nullptr) {
             throw runtime_error("encryptSelection:: Error generating ciphertext");
         }
@@ -444,10 +444,15 @@ namespace electionguard
         // Configure the crypto input values
         auto descriptionHash = description.crypto_hash();
 
+        auto precomputePublicKey = PrecomputeBufferContext::getPublicKey();
+
         // check if we should use precomputed values
-        if (usePrecompute) {
-            // TODO: Issue #216 ensure that the PrecomputeBufferContext is the correct context
-            // associated with the elgamalPublicKey of this election.
+        // TODO: issue #216 ensure that the PrecomputeBufferContext is the correct context
+        // associated with the elgamalPublicKey of this election and we can remove this
+        // equality check.
+        if (usePrecompute && precomputePublicKey != nullptr &&
+            *precomputePublicKey == elgamalPublicKey) {
+            Log::trace("encryptSelection: using precomputed values");
             auto precomputedValues = PrecomputeBufferContext::popTwoTriplesAndAQuadruple();
             if (precomputedValues != nullptr && precomputedValues.has_value()) {
                 encrypted =
@@ -459,6 +464,7 @@ namespace electionguard
 
         // if we didn't use precomputed values then we need to generate values in realtime
         if (encrypted == nullptr) {
+            Log::trace("encryptSelection: generating values in realtime");
             auto nonceSequence =
               make_unique<Nonces>(*descriptionHash, &const_cast<ElementModQ &>(nonceSeed));
             auto selectionNonce = nonceSequence->get(description.getSequenceOrder());

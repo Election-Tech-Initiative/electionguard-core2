@@ -45,7 +45,8 @@ BENCHMARK_DEFINE_F(ElGamalEncryptPrecomputedFixture, ElGamalEncryptPrecomputed)
 
         // check if we found the precomputed values needed
         if (precomputedTwoTriplesAndAQuad != nullptr) {
-            elgamalEncrypt(1UL, *precomputedTwoTriplesAndAQuad);
+            elgamalEncrypt(1UL, *fixed_base_keypair->getPublicKey(),
+                           *precomputedTwoTriplesAndAQuad);
         }
     }
 }
@@ -196,7 +197,8 @@ class CiphertextBallotSelectionPrecomputedFixture : public benchmark::Fixture
         // check if we found the precomputed values needed
         if (precomputedTwoTriplesAndAQuad != nullptr) {
             // Generate the encryption using precomputed values
-            ciphertext = elgamalEncrypt(1UL, *precomputedTwoTriplesAndAQuad);
+            ciphertext =
+              elgamalEncrypt(1UL, *keypair->getPublicKey(), *precomputedTwoTriplesAndAQuad);
 
             auto encrypted = CiphertextBallotSelection::make(
               selectionId, description->getSequenceOrder(), *descriptionHash, move(ciphertext),
@@ -225,7 +227,8 @@ BENCHMARK_DEFINE_F(CiphertextBallotSelectionPrecomputedFixture,
         // check if we found the precomputed values needed
         if (precomputedTwoTriplesAndAQuad != nullptr) {
             // Generate the encryption using precomputed values
-            auto localciphertext = elgamalEncrypt(1UL, *precomputedTwoTriplesAndAQuad);
+            auto localciphertext =
+              elgamalEncrypt(1UL, *keypair->getPublicKey(), *precomputedTwoTriplesAndAQuad);
 
             auto encrypted = CiphertextBallotSelection::make(
               selectionId, description->getSequenceOrder(), *descriptionHash, move(localciphertext),

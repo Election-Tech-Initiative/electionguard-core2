@@ -655,6 +655,12 @@ namespace electionguard
         return pow_mod_p(base, *exponent.toElementModP());
     }
 
+    unique_ptr<ElementModP> pow_mod_p(const ElementModP &base, uint64_t exponent)
+    {
+        auto exp = ElementModQ::fromUint64(exponent);
+        return pow_mod_p(base, *exp);
+    }
+
     unique_ptr<ElementModP> g_pow_p(const ElementModP &exponent)
     {
         return pow_mod_p(G(), exponent);

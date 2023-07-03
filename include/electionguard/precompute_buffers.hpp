@@ -225,6 +225,9 @@ namespace electionguard
         /// </summary>
         uint32_t getCurrentQueueSize();
 
+        /// <summary>
+        /// Get the public key that the precompute buffer is initialized against.
+        /// </summary>
         ElementModP *getPublicKey();
 
         /// <summary>
@@ -380,6 +383,11 @@ namespace electionguard
         /// the number of triples in the triple_queue will be twice this.
         /// </summary>
         static uint32_t getCurrentQueueSize();
+
+        /// <summary>
+        /// Get the public key that the precompute buffer is initialized against.
+        /// </summary>
+        static ElementModP *getPublicKey();
 
         /// <summary>
         /// Get the next triple from the triple queue.

@@ -410,12 +410,26 @@ namespace electionguard
 
     uint32_t PrecomputeBufferContext::getMaxQueueSize()
     {
+        if (getInstance()._instance == nullptr) {
+            return 0;
+        }
         return getInstance()._instance->getMaxQueueSize();
     }
 
     uint32_t PrecomputeBufferContext::getCurrentQueueSize()
     {
+        if (getInstance()._instance == nullptr) {
+            return 0;
+        }
         return getInstance()._instance->getCurrentQueueSize();
+    }
+
+    ElementModP *PrecomputeBufferContext::getPublicKey()
+    {
+        if (getInstance()._instance != nullptr) {
+            return getInstance()._instance->getPublicKey();
+        }
+        return nullptr;
     }
 
     std::unique_ptr<Triple> PrecomputeBufferContext::getTriple()

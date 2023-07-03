@@ -410,7 +410,6 @@ TEST_CASE(
     // fill the precompute table
     PrecomputeBufferContext::initialize(*keypair->getPublicKey(), 100);
     PrecomputeBufferContext::start();
-    PrecomputeBufferContext::stop();
 
     // Act
     auto ciphertext = encryptBallot(*ballot, *internal, *context, codeSeed, nullptr, 0,
