@@ -68,7 +68,8 @@ public class TestCiphertextTally : DisposableBase
         Assert.That(result.Result.Failed, Has.Count.EqualTo(0));
 
         var decryptedTally = this.Benchmark(() =>
-            ciphertextTally.Decrypt(Data.KeyPair.SecretKey), "Decrypt");
+            ciphertextTally.Decrypt(
+                Data.KeyPair.SecretKey, Data.Context.ElGamalPublicKey), "Decrypt");
         Assert.That(decryptedTally.Result, Is.EqualTo(plaintextTally));
     }
 
@@ -110,7 +111,9 @@ public class TestCiphertextTally : DisposableBase
         Assert.That(result.Result.Failed, Has.Count.EqualTo(0));
 
         var decryptedTally = this.Benchmark(() =>
-            ciphertextTally.Decrypt(Data.KeyPair.SecretKey), "Decrypt");
+            ciphertextTally.Decrypt(
+                Data.KeyPair.SecretKey,
+                Data.Context.ElGamalPublicKey), "Decrypt");
         Assert.That(decryptedTally.Result, Is.EqualTo(plaintextTally));
     }
 
@@ -149,7 +152,9 @@ public class TestCiphertextTally : DisposableBase
         Assert.That(result.Result.Failed, Has.Count.EqualTo(0));
 
         var decryptedTally = this.Benchmark(() =>
-            ciphertextTally.Decrypt(Data.KeyPair.SecretKey), "Decrypt");
+            ciphertextTally.Decrypt(
+                Data.KeyPair.SecretKey,
+                Data.Context.ElGamalPublicKey), "Decrypt");
         Assert.That(decryptedTally.Result, Is.EqualTo(plaintextTally));
     }
 
@@ -232,7 +237,9 @@ public class TestCiphertextTally : DisposableBase
         Assert.That(result.Result.Failed, Has.Count.EqualTo(0));
 
         var decryptedTally = this.Benchmark(() =>
-        ciphertextTally.Decrypt(Data.KeyPair.SecretKey), "Decrypt");
+        ciphertextTally.Decrypt(
+            Data.KeyPair.SecretKey,
+            Data.Context.ElGamalPublicKey), "Decrypt");
         Assert.That(decryptedTally.Result, Is.EqualTo(plaintextTally));
     }
 
@@ -307,7 +314,9 @@ public class TestCiphertextTally : DisposableBase
         Assert.That(result.Result.Failed, Has.Count.EqualTo(0));
 
         var decryptedTally = this.Benchmark(() =>
-        ciphertextTally_1.Decrypt(Data.KeyPair.SecretKey), "Decrypt");
+        ciphertextTally_1.Decrypt(
+            Data.KeyPair.SecretKey,
+            Data.Context.ElGamalPublicKey), "Decrypt");
         Assert.That(decryptedTally.Result, Is.EqualTo(plaintextTally));
     }
 }

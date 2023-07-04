@@ -189,41 +189,45 @@ namespace electionguard
         return make_unique<ElGamalCiphertext>(move(resultPad), move(resultData));
     }
 
-    uint64_t ElGamalCiphertext::decrypt(const ElementModP &product)
+    uint64_t ElGamalCiphertext::decrypt(const ElementModP &product, const ElementModP &base)
     {
-        auto result = div_mod_p(*pimpl->data, product);
-        return DiscreteLog::getAsync(*result);
+        auto result = mul_mod_p(*pimpl->data, product);
+        return DiscreteLog::getAsync(*result, base);
     }
 
-    uint64_t ElGamalCiphertext::decrypt(const ElementModP &product) const
+    uint64_t ElGamalCiphertext::decrypt(const ElementModP &product, const ElementModP &base) const
     {
-        auto result = div_mod_p(*pimpl->data, product);
-        return DiscreteLog::getAsync(*result);
+        auto result = mul_mod_p(*pimpl->data, product);
+        return DiscreteLog::getAsync(*result, base);
     }
 
-    uint64_t ElGamalCiphertext::decrypt(const ElementModQ &secretKey)
+    uint64_t ElGamalCiphertext::decrypt(const ElementModQ &secretKey, const ElementModP &base)
     {
-        auto product = pow_mod_p(*pimpl->pad, secretKey);
-        return decrypt(*product);
+        auto difference = sub_from_q(secretKey);
+        auto product = pow_mod_p(*pimpl->pad, *difference);
+        return decrypt(*product, base);
     }
 
-    uint64_t ElGamalCiphertext::decrypt(const ElementModQ &secretKey) const
+    uint64_t ElGamalCiphertext::decrypt(const ElementModQ &secretKey, const ElementModP &base) const
     {
-        auto product = pow_mod_p(*pimpl->pad, secretKey);
-        return decrypt(*product);
+        auto difference = sub_from_q(secretKey);
+        auto product = pow_mod_p(*pimpl->pad, *difference);
+        return decrypt(*product, base);
     }
 
     uint64_t ElGamalCiphertext::decrypt(const ElementModP &publicKey, const ElementModQ &nonce)
     {
-        auto product = pow_mod_p(publicKey, nonce);
-        return decrypt(*product);
+        auto difference = sub_from_q(nonce);
+        auto product = pow_mod_p(publicKey, *difference);
+        return decrypt(*product, publicKey);
     }
 
     uint64_t ElGamalCiphertext::decrypt(const ElementModP &publicKey,
                                         const ElementModQ &nonce) const
     {
-        auto product = pow_mod_p(publicKey, nonce);
-        return decrypt(*product);
+        auto difference = sub_from_q(nonce);
+        auto product = pow_mod_p(publicKey, *difference);
+        return decrypt(*product, publicKey);
     }
 
     unique_ptr<ElementModP> ElGamalCiphertext::partialDecrypt(const ElementModQ &secretKey)
@@ -250,14 +254,19 @@ namespace electionguard
             throw invalid_argument("elgamalEncrypt encryption requires a non-zero nonce");
         }
 
-        auto pad = g_pow_p(nonce);                       // g^r
-        auto pubkey_pow_r = pow_mod_p(publicKey, nonce); // K^r
-        unique_ptr<ElementModP> data = nullptr;
-        if (m == 1) {
-            data = mul_mod_p(G(), *pubkey_pow_r);
+        // (g^R mod p, K^V ·K^R modp) = (g^R mod p, K^(V+R) mod p)
+
+        auto pad = g_pow_p(nonce); // g^r mod p
+        unique_ptr<ElementModQ> exponent = nullptr;
+        if (m == 0) {
+            exponent = nonce.clone(); // (V+0)
+        } else if (m == 1) {
+            exponent = add_mod_q(nonce, ONE_MOD_Q()); // (V+1)
         } else {
-            data = move(pubkey_pow_r);
+            exponent = add_mod_q(nonce, *ElementModQ::fromUint64(m)); // (V+r)
         }
+
+        auto data = pow_mod_p(publicKey, *exponent); // K^(V+r) mod p
 
         Log::trace("Generated Encryption");
         Log::trace("publicKey", publicKey.toHex());
@@ -270,18 +279,24 @@ namespace electionguard
     unique_ptr<ElGamalCiphertext> elgamalEncrypt(uint64_t m, const ElementModP &publicKey,
                                                  const TwoTriplesAndAQuadruple &precomputedValues)
     {
+        // (g^R mod p, K^V ·K^R modp) = (g^R mod p, K^(V+R) mod p)
+
         auto triple1 = precomputedValues.get_triple1();
 
-        auto pad = triple1->clone_g_to_exp();             // g^r
-        auto pubkey_pow_r = triple1->get_pubkey_to_exp(); // K^r
+        auto pad = triple1->clone_g_to_exp();             // g^r mod p
+        auto pubkey_pow_r = triple1->get_pubkey_to_exp(); // K^r mod p
         unique_ptr<ElementModP> data = nullptr;
         if (m == 1) {
-            data = mul_mod_p(G(), *pubkey_pow_r);
+            data = mul_mod_p(publicKey, *pubkey_pow_r); // K^1 * K^r mod p
+        } else if (m == 0) {
+            data = pubkey_pow_r->clone(); // K^0 * K^r mod p
         } else {
-            data = pubkey_pow_r->clone();
+            auto pubkey_pow_m = pow_mod_p(publicKey, m);
+            data = mul_mod_p(publicKey, *pubkey_pow_r); // K^V * K^r mod p
         }
 
         Log::trace("Generated Encryption with Precomputed Values");
+        Log::trace("publicKey", publicKey.toHex());
         Log::trace("pad", pad->toHex());
         Log::trace("data", data->toHex());
 

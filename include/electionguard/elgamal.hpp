@@ -115,17 +115,19 @@ namespace electionguard
         /// Calculates 𝑀=𝐵⁄(∏𝑀𝑖) mod 𝑝.
         ///
         /// <param name="product">The known product (blinding factor).</param>
+        /// <param name="base">The base value used to encrypt the ciphertext.</param>
         /// <returns>An exponentially encoded plaintext message.</returns
         /// </Summary>
-        uint64_t decrypt(const ElementModP &product);
+        uint64_t decrypt(const ElementModP &product, const ElementModP &base);
 
         /// <Summary>
         /// Decrypts an ElGamal ciphertext with a "known product" (the blinding factor used in the encryption).
         ///
         /// <param name="product">The known product (blinding factor).</param>
+        /// <param name="base">The base value used to encrypt the ciphertext.</param>
         /// <returns>An exponentially encoded plaintext message.</returns
         /// </Summary>
-        uint64_t decrypt(const ElementModP &product) const;
+        uint64_t decrypt(const ElementModP &product, const ElementModP &base) const;
 
         /// <Summary>
         /// Decrypt the ciphertext directly using the provided secret key.
@@ -134,9 +136,10 @@ namespace electionguard
         /// This method should not be used by consumers operating in live secret ballot elections.
         ///
         /// <param name="secretKey">The corresponding ElGamal secret key.</param>
+        /// <param name="base">The base value used to encrypt the ciphertext.</param>
         /// <returns>An exponentially encoded plaintext message.</returns
         /// </Summary>
-        uint64_t decrypt(const ElementModQ &secretKey);
+        uint64_t decrypt(const ElementModQ &secretKey, const ElementModP &base);
 
         /// <Summary>
         /// Decrypt the ciphertext directly using the provided secret key.
@@ -145,9 +148,10 @@ namespace electionguard
         /// This method should not be used by consumers operating in live secret ballot elections.
         ///
         /// <param name="secretKey">The corresponding ElGamal secret key.</param>
+        /// <param name="base">The base value used to encrypt the ciphertext.</param>
         /// <returns>An exponentially encoded plaintext message.</returns
         /// </Summary>
-        uint64_t decrypt(const ElementModQ &secretKey) const;
+        uint64_t decrypt(const ElementModQ &secretKey, const ElementModP &base) const;
 
         /// <Summary>
         /// Decrypt an ElGamal ciphertext using a known nonce and the ElGamal public key.

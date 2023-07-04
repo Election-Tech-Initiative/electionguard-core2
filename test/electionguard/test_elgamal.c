@@ -39,7 +39,7 @@ bool test_elgamal_encrypt_simple(void)
     }
 
     uint64_t plaintext = 0;
-    if (eg_elgamal_ciphertext_decrypt_with_secret(ciphertext, secret, &plaintext)) {
+    if (eg_elgamal_ciphertext_decrypt_with_secret(ciphertext, secret, public_key, &plaintext)) {
         assert(false);
     }
 

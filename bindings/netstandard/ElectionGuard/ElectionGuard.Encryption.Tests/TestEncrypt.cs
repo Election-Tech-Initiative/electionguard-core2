@@ -252,7 +252,8 @@ namespace ElectionGuard.Encryption.Tests
                 var ciphertextSelection = cipheretxtContest.Selections.First(
                     i => i.ObjectId == selection.ObjectId);
 
-                var decrypted = ciphertextSelection.Ciphertext.Decrypt(data.KeyPair.SecretKey);
+                var decrypted = ciphertextSelection.Ciphertext.Decrypt(
+                    data.KeyPair.SecretKey, data.Context.ElGamalPublicKey);
 
                 Assert.AreEqual(selection.Vote, decrypted);
             });

@@ -55,7 +55,7 @@ BENCHMARK_DEFINE_F(ElgamalEncryptFixture, ElGamalDecrypt)(benchmark::State &stat
 {
     auto two = TWO_MOD_Q();
     for (auto _ : state) {
-        ciphertext->decrypt(two);
+        ciphertext->decrypt(two, *keypair->getPublicKey());
     }
 }
 
@@ -64,7 +64,7 @@ BENCHMARK_REGISTER_F(ElgamalEncryptFixture, ElGamalDecrypt)->Unit(benchmark::kMi
 BENCHMARK_DEFINE_F(ElgamalEncryptFixture, ElGamalDecrypt_fixed_base)(benchmark::State &state)
 {
     for (auto _ : state) {
-        fixed_base_ciphertext->decrypt(*secret);
+        fixed_base_ciphertext->decrypt(*secret, *fixed_base_keypair->getPublicKey());
     }
 }
 
