@@ -228,47 +228,41 @@ namespace electionguard
         auto inBounds_v0 = v0.isInBounds();
         auto inBounds_v1 = v1.isInBounds();
 
+        // c = H(Q,K,α,β,a0,b0,a1,b1)
         auto consistent_c =
           (*add_mod_q(c0, c1) == c) &&
           (c == *hash_elems({HashPrefix::get_prefix_04(), &const_cast<ElementModQ &>(q),
                              &const_cast<ElementModP &>(k), alpha, beta, a0p, b0p, a1p, b1p}));
 
-        // 𝑔^𝑣 mod 𝑝 = 𝑎 ⋅ 𝛼^𝑐 mod 𝑝
-        auto consistent_gv0 = (*g_pow_p(v0) == *mul_mod_p(a0, *pow_mod_p(*alpha, c0)));
+        // 𝑔^𝑣0 mod 𝑝 = 𝑎0 ⋅ 𝛼^𝑐0 mod 𝑝
+        auto consistent_gv0 = (a0 == *mul_mod_p(*g_pow_p(v0), *pow_mod_p(*alpha, c0)));
 
-        // 𝑔^𝑣 mod 𝑝 = 𝑎 ⋅ 𝛼^𝑐 mod 𝑝
-        auto consistent_gv1 = (*g_pow_p(v1) == *mul_mod_p(a1, *pow_mod_p(*alpha, c1)));
+        // 𝑔^𝑣1 mod 𝑝 = 𝑎1 ⋅ 𝛼^𝑐1 mod 𝑝
+        auto consistent_gv1 = (a1 == *mul_mod_p(*g_pow_p(v1), *pow_mod_p(*alpha, c1)));
 
-        // 𝐾^𝑣 mod 𝑝 = 𝑏 ⋅ 𝛽^𝑐 mod 𝑝
-        auto consistent_kv0 = (*pow_mod_p(k, v0) == *mul_mod_p(b0, *pow_mod_p(*beta, c0)));
+        // 𝐾^𝑣0 mod 𝑝 = 𝑏0 ⋅ 𝛽^𝑐0 mod 𝑝
+        auto consistent_kv0 = (b0 == *mul_mod_p(*pow_mod_p(k, v0), *pow_mod_p(*beta, c0)));
 
-        // 𝑔^𝑐 ⋅ 𝐾^𝑣 mod 𝑝 = 𝑏 ⋅ 𝛽^𝑐 mod 𝑝
-        auto consistent_gc1kv1 =
-          (*mul_mod_p(*g_pow_p(c1), *pow_mod_p(k, v1)) == *mul_mod_p(b1, *pow_mod_p(*beta, c1)));
+        // 𝐾^w1 mod 𝑝 = 𝑏1 ⋅ 𝛽^𝑐1 mod 𝑝
+        auto w1 = sub_mod_q(v1, c1);
+        auto consistent_kw1 = (b1 == *mul_mod_p(*pow_mod_p(k, *w1), *pow_mod_p(*beta, c1)));
 
         auto success = inBounds_alpha && inBounds_beta && inBounds_a0 && inBounds_b0 &&
                        inBounds_a1 && inBounds_b1 && inBounds_c0 && inBounds_c1 && inBounds_v0 &&
                        inBounds_v1 && consistent_c && consistent_gv0 && consistent_gv1 &&
-                       consistent_kv0 && consistent_gc1kv1;
+                       consistent_kv0 && consistent_kw1;
 
         if (!success) {
 
             map<string, bool> printMap{
-              {"inBounds_alpha", inBounds_alpha},
-              {"inBounds_beta", inBounds_beta},
-              {"inBounds_a0", inBounds_a0},
-              {"inBounds_b0", inBounds_b0},
-              {"inBounds_a1", inBounds_a1},
-              {"inBounds_b1", inBounds_b1},
-              {"inBounds_c0", inBounds_c0},
-              {"inBounds_c1", inBounds_c1},
-              {"inBounds_v0", inBounds_v0},
-              {"inBounds_v1", inBounds_v1},
-              {"consistent_c", consistent_c},
-              {"consistent_gv0", consistent_gv0},
-              {"consistent_gv1", consistent_gv1},
-              {"consistent_kv0", consistent_kv0},
-              {"consistent_gc1kv1", consistent_gc1kv1},
+              {"inBounds_alpha", inBounds_alpha},  {"inBounds_beta", inBounds_beta},
+              {"inBounds_a0", inBounds_a0},        {"inBounds_b0", inBounds_b0},
+              {"inBounds_a1", inBounds_a1},        {"inBounds_b1", inBounds_b1},
+              {"inBounds_c0", inBounds_c0},        {"inBounds_c1", inBounds_c1},
+              {"inBounds_v0", inBounds_v0},        {"inBounds_v1", inBounds_v1},
+              {"consistent_c", consistent_c},      {"consistent_g^v0", consistent_gv0},
+              {"consistent_g^v1", consistent_gv1}, {"consistent_k^v0", consistent_kv0},
+              {"consistent_k^w1", consistent_kw1},
             };
 
             Log::info("found an invalid Disjunctive Chaum-Pedersen proof", printMap);
@@ -286,6 +280,7 @@ namespace electionguard
             Log::debug("c->get", c.toHex());
             Log::debug("v0->get", v0.toHex());
             Log::debug("v1->get", v1.toHex());
+            Log::debug("w1->get", w1->toHex());
 
             return false;
         }
@@ -309,32 +304,8 @@ namespace electionguard
     DisjunctiveChaumPedersenProof::make_zero(const ElGamalCiphertext &message, const ElementModQ &r,
                                              const ElementModP &k, const ElementModQ &q)
     {
-        auto *alpha = message.getPad();
-        auto *beta = message.getData();
-
-        // Pick three random numbers in Q.
-        auto u = rand_q();
-        auto v = rand_q();
-        auto w = rand_q();
-
-        // Compute the NIZKP
-        auto a0 = g_pow_p(*u);                                // 𝑔^𝑢 mod 𝑝
-        auto b0 = pow_mod_p(k, *u);                           // 𝐾^𝑢 mod 𝑝
-        auto a1 = g_pow_p(*v);                                // 𝑔^v mod 𝑝
-        auto b1 = mul_mod_p(*g_pow_p(*w), *pow_mod_p(k, *v)); // g^w⋅K^v mod p
-
-        // Compute the challenge
-        auto c = hash_elems({HashPrefix::get_prefix_04(), &const_cast<ElementModQ &>(q),
-                             &const_cast<ElementModP &>(k), alpha, beta, a0.get(), b0.get(),
-                             a1.get(), b1.get()});
-
-        //c_1 = w so we dont assign a new var for it
-        auto c0 = sub_mod_q(*c, *w);           // c_0=(c-w) mod q
-        auto v0 = a_plus_bc_mod_q(*u, *c0, r); // v_0=(u+c_0⋅R) mod q
-        auto v1 = a_plus_bc_mod_q(*v, *w, r);  // v_1=(v+c_1⋅R) mod q
-
-        return make_unique<DisjunctiveChaumPedersenProof>(
-          move(a0), move(b0), move(a1), move(b1), move(c0), move(w), move(c), move(v0), move(v1));
+        auto seed = rand_q();
+        return make_zero(message, r, k, q, *seed);
     }
 
     unique_ptr<DisjunctiveChaumPedersenProof>
@@ -342,42 +313,51 @@ namespace electionguard
                                              const ElementModP &k, const ElementModQ &q,
                                              const ElementModQ &seed)
     {
+        // NIZKP for plaintext 0
+        // (a0, b0) = (g^𝑢0 mod p, K^𝑢0 mod p)
+        // (a1, b1) = (g^𝑢1 mod p, K^(𝑢1-w) mod p)
+
         auto *alpha = message.getPad();
         auto *beta = message.getData();
 
+        Log::trace("alpha: ", alpha->toHex());
+        Log::trace("beta: ", beta->toHex());
+
         // Pick three random numbers in Q.
         auto nonces = make_unique<Nonces>(seed, "disjoint-chaum-pedersen-proof");
-        auto c1 = nonces->get(0);
-        auto v1 = nonces->get(1);
-        auto u0 = nonces->get(2);
+        auto u0 = nonces->get(0);
+        auto u1 = nonces->get(1);
+        auto w = nonces->get(2);
 
         // Compute the NIZKP
-        auto a0 = g_pow_p(*u0);      //𝑔^𝑢 mod 𝑝
-        auto b0 = pow_mod_p(k, *u0); // 𝐾^𝑢 mod 𝑝
-        auto q_min_c1 = sub_from_q(*c1);
-        auto a1 =
-          mul_mod_p(*g_pow_p(*v1), *pow_mod_p(*alpha, *q_min_c1)); // g^(v_1) α^(q-c_1) mod p
-        auto b1 =
-          mul_mod_p({pow_mod_p(k, *v1).get(), g_pow_p(*c1).get(),
-                     pow_mod_p(*beta, *q_min_c1).get()}); // K^(v_1) g^(c_1) β^(q-c_1)  mod p
+        auto a0 = g_pow_p(*u0);                      // 𝑔^𝑢0 mod 𝑝
+        auto b0 = pow_mod_p(k, *u0);                 // 𝐾^𝑢0 mod 𝑝
+        auto a1 = g_pow_p(*u1);                      // 𝑔^𝑢1 mod 𝑝
+        auto b1 = pow_mod_p(k, *sub_mod_q(*u1, *w)); // K^(𝑢1+w) mod p
 
         // Compute the challenge
         auto c = hash_elems({HashPrefix::get_prefix_04(), &const_cast<ElementModQ &>(q),
                              &const_cast<ElementModP &>(k), alpha, beta, a0.get(), b0.get(),
-                             a1.get(), b1.get()});
+                             a1.get(), b1.get()}); // H(04,Q;K,α,β,a0,b0,a1,b1)
 
-        auto c0 = sub_mod_q(*c, *c1);           // c_0=(c-c_1) mod q
-        auto v0 = a_plus_bc_mod_q(*u0, *c0, r); // v_0=(u_0+c_0⋅R) mod q
+        //c1 = w so we dont assign a new var for it
+        auto c0 = sub_mod_q(*c, *w);             // c0 = (c - w) mod q
+        auto v0 = a_minus_bc_mod_q(*u0, *c0, r); // v0 = (𝑢0 - c0 ⋅ R) mod q
+        auto v1 = a_minus_bc_mod_q(*u1, *w, r);  // v1 = (𝑢1 - c1 ⋅ R) mod q
 
         return make_unique<DisjunctiveChaumPedersenProof>(
-          move(a0), move(b0), move(a1), move(b1), move(c0), move(c1), move(c), move(v0), move(v1));
+          move(a0), move(b0), move(a1), move(b1), move(c0), move(w), move(c), move(v0), move(v1));
     }
 
-    unique_ptr<DisjunctiveChaumPedersenProof> DisjunctiveChaumPedersenProof::make_zero(
-      const ElGamalCiphertext &message,
-      const TwoTriplesAndAQuadruple &precomputedTwoTriplesAndAQuad, const ElementModP &k,
-      const ElementModQ &q)
+    unique_ptr<DisjunctiveChaumPedersenProof>
+    DisjunctiveChaumPedersenProof::make_zero(const ElGamalCiphertext &message,
+                                             const TwoTriplesAndAQuadruple &precomputedValues,
+                                             const ElementModP &k, const ElementModQ &q)
     {
+        // NIZKP for plaintext 0
+        // (a0, b0) = (g^𝑢0 mod p, K^𝑢0 mod p)
+        // (a1, b1) = (g^𝑢1 mod p, K^(𝑢1+w) mod p)
+
         auto *alpha = message.getPad();
         auto *beta = message.getData();
 
@@ -389,24 +369,28 @@ namespace electionguard
         auto r = triple1->clone_exp();
         auto triple2 = precomputedTwoTriplesAndAQuad.get_triple2();
         auto quad = precomputedTwoTriplesAndAQuad.get_quad();
-        auto u = triple2->clone_exp();
-        auto v = quad->clone_exp1();
+
+        // Pick 3 random numbers in Q.
+        auto u0 = triple2->clone_exp();
+        auto u1 = quad->clone_exp1();
         auto w = quad->clone_exp2();
 
-        auto a0 = triple2->clone_g_to_exp();                      // 𝑔^𝑢 mod 𝑝
-        auto b0 = triple2->clone_pubkey_to_exp();                 // 𝐾^𝑢 mod 𝑝
-        auto a1 = quad->clone_g_to_exp1();                        // 𝑔^v mod 𝑝
-        auto b1 = quad->clone_g_to_exp2_mult_by_pubkey_to_exp1(); // g^w⋅K^v mod p
+        // Compute the NIZKP
+        auto a0 = triple2->clone_g_to_exp();      // 𝑔^𝑢0 mod 𝑝
+        auto b0 = triple2->clone_pubkey_to_exp(); // 𝐾^𝑢0 mod 𝑝
+        auto a1 = quad->clone_g_to_exp1();        // 𝑔^𝑢1 mod 𝑝
+        auto b1 =
+          quad->clone_g_to_exp2_mult_by_pubkey_to_exp1(); // g^w⋅K^v mod p // TODO: <-- fix htis one
 
         // Compute the challenge
         auto c = hash_elems({HashPrefix::get_prefix_04(), &const_cast<ElementModQ &>(q),
                              &const_cast<ElementModP &>(k), alpha, beta, a0.get(), b0.get(),
-                             a1.get(), b1.get()});
+                             a1.get(), b1.get()}); // H(04,Q;K,α,β,a0,b0,a1,b1)
 
-        //c_1 = w so we dont assign a new var for it
-        auto c0 = sub_mod_q(*c, *w);            // c_0=(c-w) mod q
-        auto v0 = a_plus_bc_mod_q(*u, *c0, *r); // v_0=(u+c_0⋅R) mod q
-        auto v1 = a_plus_bc_mod_q(*v, *w, *r);  // v_1=(v+c_1⋅R) mod q
+        // c1 = w so we dont assign a new var for it
+        auto c0 = sub_mod_q(*c, *w);              // c0 = (c - w) mod q
+        auto v0 = a_minus_bc_mod_q(*u0, *c0, *r); // v0 = (u + c0 ⋅ R) mod q
+        auto v1 = a_minus_bc_mod_q(*u1, *w, *r);  // v1 = (v + c1 ⋅ R) mod q
 
         return make_unique<DisjunctiveChaumPedersenProof>(
           move(a0), move(b0), move(a1), move(b1), move(c0), move(w), move(c), move(v0), move(v1));
@@ -416,31 +400,8 @@ namespace electionguard
     DisjunctiveChaumPedersenProof::make_one(const ElGamalCiphertext &message, const ElementModQ &r,
                                             const ElementModP &k, const ElementModQ &q)
     {
-        auto *alpha = message.getPad();
-        auto *beta = message.getData();
-
-        // Pick three random numbers in Q.
-        auto u = rand_q();
-        auto v = rand_q();
-        auto w = rand_q();
-
-        auto a0 = g_pow_p(*v);                                // 𝑔^v mod 𝑝
-        auto b0 = mul_mod_p(*g_pow_p(*w), *pow_mod_p(k, *v)); // g^w⋅K^v  mod p
-        auto a1 = g_pow_p(*u);                                // g^u  mod p
-        auto b1 = pow_mod_p(k, *u);                           // K^u  mod p
-
-        // Compute challenge
-        auto c = hash_elems({HashPrefix::get_prefix_04(), &const_cast<ElementModQ &>(q),
-                             &const_cast<ElementModP &>(k), alpha, beta, a0.get(), b0.get(),
-                             a1.get(), b1.get()});
-
-        auto c0 = sub_mod_q(Q(), *w);          // c_0=(q-w)  mod q
-        auto c1 = add_mod_q(*c, *w);           // c_1=(c+w)  mod q
-        auto v0 = a_plus_bc_mod_q(*v, *c0, r); // v_0=(v+c_0⋅R)  mod q
-        auto v1 = a_plus_bc_mod_q(*u, *c1, r); // v_1=(u+c_1⋅R)  mod q
-
-        return make_unique<DisjunctiveChaumPedersenProof>(
-          move(a0), move(b0), move(a1), move(b1), move(c0), move(c1), move(c), move(v0), move(v1));
+        auto seed = rand_q();
+        return make_one(message, r, k, q, *seed);
     }
 
     unique_ptr<DisjunctiveChaumPedersenProof>
@@ -448,34 +409,42 @@ namespace electionguard
                                             const ElementModP &k, const ElementModQ &q,
                                             const ElementModQ &seed)
     {
+        // NIZKP for plaintext 1
+        // (a0, b0) = (g^𝑢0 mod p, K^(w+𝑢0) mod p)
+        // (a1, b1) = (g^𝑢1 mod p, K^𝑢1 mod p)
+
         auto *alpha = message.getPad();
         auto *beta = message.getData();
 
         // Pick three random numbers in Q.
         auto nonces = make_unique<Nonces>(seed, "disjoint-chaum-pedersen-proof");
-        auto c0 = nonces->get(0);
-        auto v0 = nonces->get(1);
-        auto u1 = nonces->get(2);
+        auto u0 = nonces->get(0);
+        auto u1 = nonces->get(1);
+        auto w = nonces->get(2);
 
-        auto q_min_c0 = sub_from_q(*c0);
-        auto a0 = mul_mod_p(*g_pow_p(*v0), *pow_mod_p(*alpha, *q_min_c0));
-        auto b0 = mul_mod_p(*pow_mod_p(k, *v0), *pow_mod_p(*beta, *q_min_c0));
-        auto a1 = g_pow_p(*u1);
-        auto b1 = pow_mod_p(k, *u1);
+        auto a0 = g_pow_p(*u0);                      // 𝑔^𝑢0 mod 𝑝
+        auto b0 = pow_mod_p(k, *add_mod_p(*w, *u0)); // K^(w + 𝑢0)  mod p
+        auto a1 = g_pow_p(*u1);                      // g^𝑢1  mod p
+        auto b1 = pow_mod_p(k, *u1);                 // K^𝑢1  mod p
+
+        // Compute challenge
         auto c = hash_elems({HashPrefix::get_prefix_04(), &const_cast<ElementModQ &>(q),
                              &const_cast<ElementModP &>(k), alpha, beta, a0.get(), b0.get(),
-                             a1.get(), b1.get()});
-        auto c1 = sub_mod_q(*c, *c0);
-        auto v1 = a_plus_bc_mod_q(*u1, *c1, r);
+                             a1.get(), b1.get()}); // H(04,Q;K,α,β,a0,b0,a1,b1)
+
+        // auto c0 = *w                         // c0 = w  mod q
+        auto c1 = sub_mod_q(*c, *w);             // c1 = (c - w)  mod q
+        auto v0 = a_minus_bc_mod_q(*u0, *w, r);  // v0 = (𝑢0 - c0 ⋅ R)  mod q
+        auto v1 = a_minus_bc_mod_q(*u1, *c1, r); // v1 = (𝑢1 - c1 ⋅ R)  mod q
 
         return make_unique<DisjunctiveChaumPedersenProof>(
-          move(a0), move(b0), move(a1), move(b1), move(c0), move(c1), move(c), move(v0), move(v1));
+          move(a0), move(b0), move(a1), move(b1), move(w), move(c1), move(c), move(v0), move(v1));
     }
 
-    unique_ptr<DisjunctiveChaumPedersenProof> DisjunctiveChaumPedersenProof::make_one(
-      const ElGamalCiphertext &message,
-      const TwoTriplesAndAQuadruple &precomputedTwoTriplesAndAQuad, const ElementModP &k,
-      const ElementModQ &q)
+    unique_ptr<DisjunctiveChaumPedersenProof>
+    DisjunctiveChaumPedersenProof::make_one(const ElGamalCiphertext &message,
+                                            const TwoTriplesAndAQuadruple &precomputedValues,
+                                            const ElementModP &k, const ElementModQ &q)
     {
         unique_ptr<DisjunctiveChaumPedersenProof> result;
 
