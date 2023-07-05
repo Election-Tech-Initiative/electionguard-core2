@@ -174,9 +174,8 @@ namespace electionguard
     }
 
     unique_ptr<DisjunctiveChaumPedersenProof> DisjunctiveChaumPedersenProof::make(
-      const ElGamalCiphertext &message,
-      const TwoTriplesAndAQuadruple &precomputedTwoTriplesAndAQuad, const ElementModP &k,
-      const ElementModQ &q, uint64_t plaintext)
+      const ElGamalCiphertext &message, const TwoTriplesAndAQuadruple &precomputedValues,
+      const ElementModP &k, const ElementModQ &q, uint64_t plaintext)
     {
         unique_ptr<DisjunctiveChaumPedersenProof> result;
 
@@ -186,9 +185,9 @@ namespace electionguard
         }
         Log::trace("DisjunctiveChaumPedersenProof: making proof without seed.");
         if (plaintext == 1) {
-            return make_one(message, precomputedTwoTriplesAndAQuad, k, q);
+            return make_one(message, precomputedValues, k, q);
         }
-        return make_zero(message, precomputedTwoTriplesAndAQuad, k, q);
+        return make_zero(message, precomputedValues, k, q);
 
         return result;
     }
@@ -365,32 +364,32 @@ namespace electionguard
         Log::trace("beta: ", beta->toHex());
 
         // Get our values from the precomputed values.
-        auto triple1 = precomputedTwoTriplesAndAQuad.get_triple1();
-        auto r = triple1->clone_exp();
-        auto triple2 = precomputedTwoTriplesAndAQuad.get_triple2();
-        auto quad = precomputedTwoTriplesAndAQuad.get_quad();
+        auto triple1 = precomputedValues.get_triple1();
+        auto r = triple1->get_exp();
+        auto triple2 = precomputedValues.get_triple2();
+        auto quad = precomputedValues.get_quad();
 
         // Pick 3 random numbers in Q.
-        auto u0 = triple2->clone_exp();
-        auto u1 = quad->clone_exp1();
-        auto w = quad->clone_exp2();
+        auto u0 = triple2->get_exp()->clone();
+        auto u1 = quad->get_exp1()->clone();
+        auto w = quad->get_exp2()->clone();
 
         // Compute the NIZKP
-        auto a0 = triple2->clone_g_to_exp();      // 𝑔^𝑢0 mod 𝑝
-        auto b0 = triple2->clone_pubkey_to_exp(); // 𝐾^𝑢0 mod 𝑝
-        auto a1 = quad->clone_g_to_exp1();        // 𝑔^𝑢1 mod 𝑝
-        auto b1 =
-          quad->clone_g_to_exp2_mult_by_pubkey_to_exp1(); // g^w⋅K^v mod p // TODO: <-- fix htis one
+        auto a0 = triple2->get_g_to_exp()->clone(); // 𝑔^𝑢0 mod 𝑝
+        auto b0 = triple2->get_k_to_exp()->clone(); // 𝐾^𝑢0 mod 𝑝
+        auto a1 = quad->get_g_to_exp1()->clone();   // 𝑔^𝑢1 mod 𝑝
+        auto b1 = quad->get_g_to_exp2_mult_by_pubkey_to_exp1()
+                    ->clone(); // g^w⋅K^v mod p // TODO: <-- fix htis one
 
         // Compute the challenge
         auto c = hash_elems({HashPrefix::get_prefix_04(), &const_cast<ElementModQ &>(q),
                              &const_cast<ElementModP &>(k), alpha, beta, a0.get(), b0.get(),
                              a1.get(), b1.get()}); // H(04,Q;K,α,β,a0,b0,a1,b1)
 
-        // c1 = w so we dont assign a new var for it
+        // c1 = w, so we dont assign a new var for it
         auto c0 = sub_mod_q(*c, *w);              // c0 = (c - w) mod q
-        auto v0 = a_minus_bc_mod_q(*u0, *c0, *r); // v0 = (u + c0 ⋅ R) mod q
-        auto v1 = a_minus_bc_mod_q(*u1, *w, *r);  // v1 = (v + c1 ⋅ R) mod q
+        auto v0 = a_minus_bc_mod_q(*u0, *c0, *r); // v0 = (𝑢0 - c0 ⋅ R) mod q
+        auto v1 = a_minus_bc_mod_q(*u1, *w, *r);  // v1 = (𝑢1 - c1 ⋅ R) mod q
 
         return make_unique<DisjunctiveChaumPedersenProof>(
           move(a0), move(b0), move(a1), move(b1), move(c0), move(w), move(c), move(v0), move(v1));
@@ -455,18 +454,18 @@ namespace electionguard
         Log::trace("beta: ", beta->toHex());
 
         // Get our values from the precomputed values.
-        auto triple1 = precomputedTwoTriplesAndAQuad.get_triple1();
-        auto r = triple1->clone_exp();
-        auto triple2 = precomputedTwoTriplesAndAQuad.get_triple2();
-        auto quad = precomputedTwoTriplesAndAQuad.get_quad();
-        auto u = triple2->clone_exp();
-        auto v = quad->clone_exp1();
-        auto w = quad->clone_exp2();
+        auto triple1 = precomputedValues.get_triple1();
+        auto r = triple1->get_exp();
+        auto triple2 = precomputedValues.get_triple2();
+        auto quad = precomputedValues.get_quad();
+        auto u = triple2->get_exp()->clone();
+        auto v = quad->get_exp1()->clone();
+        auto w = quad->get_exp2()->clone();
 
-        auto a0 = quad->clone_g_to_exp1();                        // 𝑔^v mod 𝑝
-        auto b0 = quad->clone_g_to_exp2_mult_by_pubkey_to_exp1(); // g^w⋅K^v mod p
-        auto a1 = triple2->clone_g_to_exp();                      // 𝑔^𝑢 mod 𝑝
-        auto b1 = triple2->clone_pubkey_to_exp();                 // 𝐾^𝑢 mod 𝑝
+        auto a0 = quad->get_g_to_exp1()->clone();                        // 𝑔^v mod 𝑝
+        auto b0 = quad->get_g_to_exp2_mult_by_pubkey_to_exp1()->clone(); // g^w⋅K^v mod p
+        auto a1 = triple2->get_g_to_exp()->clone();                      // 𝑔^𝑢 mod 𝑝
+        auto b1 = triple2->get_k_to_exp()->clone();                      // 𝐾^𝑢 mod 𝑝
 
         // Compute challenge
         auto c = hash_elems({HashPrefix::get_prefix_04(), &const_cast<ElementModQ &>(q),
@@ -571,9 +570,9 @@ namespace electionguard
             // check if the are precompute values rather than doing the exponentiations here
             auto triple = PrecomputeBufferContext::popTriple();
             if (triple != nullptr && triple.has_value()) {
-                u = triple.value()->clone_exp();
-                a = triple.value()->clone_g_to_exp();
-                b = triple.value()->clone_pubkey_to_exp();
+                u = triple.value()->get_exp()->clone();
+                a = triple.value()->get_g_to_exp()->clone();
+                b = triple.value()->get_k_to_exp()->clone();
             }
         }
         // if there are no precomputed values, do the exponentiations here

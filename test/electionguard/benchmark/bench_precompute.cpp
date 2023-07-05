@@ -41,12 +41,12 @@ BENCHMARK_DEFINE_F(ElGamalEncryptPrecomputedFixture, ElGamalEncryptPrecomputed)
 (benchmark::State &state)
 {
     while (state.KeepRunning()) {
-        auto precomputedTwoTriplesAndAQuad = PrecomputeBufferContext::getTwoTriplesAndAQuadruple();
+        auto precomputedValues = PrecomputeBufferContext::getTwoTriplesAndAQuadruple();
 
         // check if we found the precomputed values needed
-        if (precomputedTwoTriplesAndAQuad != nullptr) {
+        if (precomputedValues != nullptr) {
             elgamalEncrypt(1UL, *fixed_base_keypair->getPublicKey(),
-                           *precomputedTwoTriplesAndAQuad);
+                           *precomputedValues->get_triple1());
         }
     }
 }
@@ -62,21 +62,17 @@ class DisjunctiveChaumPedersenProofPrecomputedHarness : DisjunctiveChaumPedersen
 {
   public:
     static unique_ptr<DisjunctiveChaumPedersenProof>
-    make_zero(const ElGamalCiphertext &message,
-              const TwoTriplesAndAQuadruple &precomputedTwoTriplesAndAQuad1, const ElementModP &k,
-              const ElementModQ &q)
+    make_zero(const ElGamalCiphertext &message, const TwoTriplesAndAQuadruple &precomputedValues,
+              const ElementModP &k, const ElementModQ &q)
     {
-        return DisjunctiveChaumPedersenProof::make_zero(message, precomputedTwoTriplesAndAQuad1, k,
-                                                        q);
+        return DisjunctiveChaumPedersenProof::make_zero(message, precomputedValues, k, q);
     }
 
     static unique_ptr<DisjunctiveChaumPedersenProof>
-    make_one(const ElGamalCiphertext &message,
-             const TwoTriplesAndAQuadruple &precomputedTwoTriplesAndAQuad1, const ElementModP &k,
-             const ElementModQ &q)
+    make_one(const ElGamalCiphertext &message, const TwoTriplesAndAQuadruple &precomputedValues,
+             const ElementModP &k, const ElementModQ &q)
     {
-        return DisjunctiveChaumPedersenProof::make_one(message, precomputedTwoTriplesAndAQuad1, k,
-                                                       q);
+        return DisjunctiveChaumPedersenProof::make_one(message, precomputedValues, k, q);
     }
 };
 
@@ -96,12 +92,12 @@ class ChaumPedersenPrecomputedFixture : public benchmark::Fixture
         PrecomputeBufferContext::start();
 
         message = elgamalEncrypt(1UL, *nonce, *keypair->getPublicKey());
-        auto precomputedTwoTriplesAndAQuad = PrecomputeBufferContext::getTwoTriplesAndAQuadruple();
+        auto precomputedValues = PrecomputeBufferContext::getTwoTriplesAndAQuadruple();
 
         // check if we found the precomputed values needed
-        if (precomputedTwoTriplesAndAQuad != nullptr) {
-            disjunctive = DisjunctiveChaumPedersenProof::make(
-              *message, *precomputedTwoTriplesAndAQuad, TWO_MOD_P(), ONE_MOD_Q(), 1);
+        if (precomputedValues != nullptr) {
+            disjunctive = DisjunctiveChaumPedersenProof::make(*message, *precomputedValues,
+                                                              TWO_MOD_P(), ONE_MOD_Q(), 1);
         }
     }
 
@@ -120,12 +116,12 @@ BENCHMARK_DEFINE_F(ChaumPedersenPrecomputedFixture, disjunctiveChaumPedersenPrec
 (benchmark::State &state)
 {
     while (state.KeepRunning()) {
-        auto precomputedTwoTriplesAndAQuad = PrecomputeBufferContext::getTwoTriplesAndAQuadruple();
+        auto precomputedValues = PrecomputeBufferContext::getTwoTriplesAndAQuadruple();
 
         // check if we found the precomputed values needed
-        if (precomputedTwoTriplesAndAQuad != nullptr) {
-            DisjunctiveChaumPedersenProof::make(*message, *precomputedTwoTriplesAndAQuad,
-                                                TWO_MOD_P(), ONE_MOD_Q(), 1);
+        if (precomputedValues != nullptr) {
+            DisjunctiveChaumPedersenProof::make(*message, *precomputedValues, TWO_MOD_P(),
+                                                ONE_MOD_Q(), 1);
         }
     }
 }
@@ -137,12 +133,12 @@ BENCHMARK_DEFINE_F(ChaumPedersenPrecomputedFixture, disjunctiveChaumPedersenPrec
 (benchmark::State &state)
 {
     while (state.KeepRunning()) {
-        auto precomputedTwoTriplesAndAQuad = PrecomputeBufferContext::getTwoTriplesAndAQuadruple();
+        auto precomputedValues = PrecomputeBufferContext::getTwoTriplesAndAQuadruple();
 
         // check if we found the precomputed values needed
-        if (precomputedTwoTriplesAndAQuad != nullptr) {
+        if (precomputedValues != nullptr) {
             auto item = DisjunctiveChaumPedersenProofPrecomputedHarness::make_zero(
-              *message, *precomputedTwoTriplesAndAQuad, TWO_MOD_P(), ONE_MOD_Q());
+              *message, *precomputedValues, TWO_MOD_P(), ONE_MOD_Q());
         }
     }
 }
@@ -154,12 +150,12 @@ BENCHMARK_DEFINE_F(ChaumPedersenPrecomputedFixture, disjunctiveChaumPedersenPrec
 (benchmark::State &state)
 {
     while (state.KeepRunning()) {
-        auto precomputedTwoTriplesAndAQuad = PrecomputeBufferContext::getTwoTriplesAndAQuadruple();
+        auto precomputedValues = PrecomputeBufferContext::getTwoTriplesAndAQuadruple();
 
         // check if we found the precomputed values needed
-        if (precomputedTwoTriplesAndAQuad != nullptr) {
+        if (precomputedValues != nullptr) {
             auto item = DisjunctiveChaumPedersenProofPrecomputedHarness::make_one(
-              *message, *precomputedTwoTriplesAndAQuad, TWO_MOD_P(), ONE_MOD_Q());
+              *message, *precomputedValues, TWO_MOD_P(), ONE_MOD_Q());
         }
     }
 }
@@ -192,18 +188,17 @@ class CiphertextBallotSelectionPrecomputedFixture : public benchmark::Fixture
         PrecomputeBufferContext::initialize(*keypair->getPublicKey(), 50);
         PrecomputeBufferContext::start();
 
-        auto precomputedTwoTriplesAndAQuad = PrecomputeBufferContext::getTwoTriplesAndAQuadruple();
+        auto precomputedValues = PrecomputeBufferContext::getTwoTriplesAndAQuadruple();
 
         // check if we found the precomputed values needed
-        if (precomputedTwoTriplesAndAQuad != nullptr) {
+        if (precomputedValues != nullptr) {
             // Generate the encryption using precomputed values
             ciphertext =
-              elgamalEncrypt(1UL, *keypair->getPublicKey(), *precomputedTwoTriplesAndAQuad);
+              elgamalEncrypt(1UL, *keypair->getPublicKey(), *precomputedValues->get_triple1());
 
             auto encrypted = CiphertextBallotSelection::make(
               selectionId, description->getSequenceOrder(), *descriptionHash, move(ciphertext),
-              TWO_MOD_P(), ONE_MOD_Q(), move(precomputedTwoTriplesAndAQuad), 1UL, false, nullptr,
-              true);
+              TWO_MOD_P(), ONE_MOD_Q(), move(precomputedValues), 1UL, false, nullptr, true);
         }
     }
 
@@ -222,18 +217,17 @@ BENCHMARK_DEFINE_F(CiphertextBallotSelectionPrecomputedFixture,
     const auto *selectionId = "some-selection-object-id";
 
     while (state.KeepRunningBatch(50)) {
-        auto precomputedTwoTriplesAndAQuad = PrecomputeBufferContext::getTwoTriplesAndAQuadruple();
+        auto precomputedValues = PrecomputeBufferContext::getTwoTriplesAndAQuadruple();
 
         // check if we found the precomputed values needed
-        if (precomputedTwoTriplesAndAQuad != nullptr) {
+        if (precomputedValues != nullptr) {
             // Generate the encryption using precomputed values
             auto localciphertext =
-              elgamalEncrypt(1UL, *keypair->getPublicKey(), *precomputedTwoTriplesAndAQuad);
+              elgamalEncrypt(1UL, *keypair->getPublicKey(), *precomputedValues->get_triple1());
 
             auto encrypted = CiphertextBallotSelection::make(
               selectionId, description->getSequenceOrder(), *descriptionHash, move(localciphertext),
-              TWO_MOD_P(), ONE_MOD_Q(), move(precomputedTwoTriplesAndAQuad), 1UL, false, nullptr,
-              true);
+              TWO_MOD_P(), ONE_MOD_Q(), move(precomputedValues), 1UL, false, nullptr, true);
         }
     }
 }
@@ -318,7 +312,7 @@ BENCHMARK_DEFINE_F(PrecomputeFixture, precomputed)
         PrecomputeBufferContext::initialize(*keypair->getPublicKey(), 1);
         PrecomputeBufferContext::start();
 
-        auto precomputedTwoTriplesAndAQuad = PrecomputeBufferContext::getTwoTriplesAndAQuadruple();
+        auto precomputedValues = PrecomputeBufferContext::getTwoTriplesAndAQuadruple();
     }
     PrecomputeBufferContext::clear();
 }

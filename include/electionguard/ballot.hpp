@@ -316,10 +316,9 @@ namespace electionguard
              const ElementModQ &descriptionHash, std::unique_ptr<ElGamalCiphertext> ciphertext,
              const ElementModP &elgamalPublicKey, const ElementModQ &cryptoExtendedBaseHash,
 
-             std::unique_ptr<TwoTriplesAndAQuadruple> precomputedTwoTriplesAndAQuad,
-             uint64_t plaintext, bool isPlaceholder = false,
-             std::unique_ptr<ElementModQ> cryptoHash = nullptr, bool computeProof = true,
-             std::unique_ptr<ElGamalCiphertext> extendedData = nullptr);
+             std::unique_ptr<TwoTriplesAndAQuadruple> precomputedValues, uint64_t plaintext,
+             bool isPlaceholder = false, std::unique_ptr<ElementModQ> cryptoHash = nullptr,
+             bool computeProof = true, std::unique_ptr<ElGamalCiphertext> extendedData = nullptr);
 
         /// <sumary>
         /// Given an encrypted BallotSelection, validates the encryption state against a specific seed hash and public key.

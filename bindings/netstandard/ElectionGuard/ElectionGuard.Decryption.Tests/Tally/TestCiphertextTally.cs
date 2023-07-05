@@ -69,7 +69,8 @@ public class TestCiphertextTally : DisposableBase
 
         var decryptedTally = this.Benchmark(() =>
             ciphertextTally.Decrypt(
-                Data.KeyPair.SecretKey, Data.Context.ElGamalPublicKey), "Decrypt");
+                Data.KeyPair.SecretKey,
+                Data.Context.ElGamalPublicKey), "Decrypt");
         Assert.That(decryptedTally.Result, Is.EqualTo(plaintextTally));
     }
 

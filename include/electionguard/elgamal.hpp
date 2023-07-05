@@ -216,12 +216,11 @@ namespace electionguard
     /// However, only the first triple is used in this function.
     ///
     /// <param name="m"> Message to elgamal_encrypt; must be an integer in [0,Q). </param>
-    /// <param name="precomputedTwoTriplesAndAQuad"> Precomputed two triples and a quad. </param>
+    /// <param name="precomputedValues"> Precomputed two triples and a quad. </param>
     /// <returns>A ciphertext tuple.</returns>
     /// </summary>
     EG_API std::unique_ptr<ElGamalCiphertext>
-    elgamalEncrypt(uint64_t m, const ElementModP &publicKey,
-                   const TwoTriplesAndAQuadruple &precomputedValues);
+    elgamalEncrypt(uint64_t m, const ElementModP &publicKey, const Triple &precomputedValues);
 
     /// <summary>
     /// Homomorphically accumulates one or more ElGamal ciphertexts by pairwise multiplication.

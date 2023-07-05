@@ -18,9 +18,10 @@ namespace electionguard
 {
     /// <summary>
     /// This object holds the Triple for the entries in the precomputed triple_queue
-    /// The three items contained in this object are a random exponent (exp),
-    /// g ^ exp mod p (g_to_exp) and K ^ exp mod p (pubkey_to_exp - where K is
-    /// the public key).
+    /// The three items contained in this object are
+    /// - a random exponent (exp),
+    /// - g ^ exp mod p (g_to_exp) and
+    /// - K ^ exp mod p (pubkey_to_exp - where K is the public key).
     /// </summary>
     class EG_API Triple
     {
@@ -43,13 +44,9 @@ namespace electionguard
 
         std::unique_ptr<Triple> clone();
 
-        std::unique_ptr<ElementModQ> clone_exp() { return exp->clone(); }
-        std::unique_ptr<ElementModP> clone_g_to_exp() { return g_to_exp->clone(); }
-        std::unique_ptr<ElementModP> clone_pubkey_to_exp() { return pubkey_to_exp->clone(); }
-
         ElementModQ *get_exp() const { return exp.get(); }
         ElementModP *get_g_to_exp() const { return g_to_exp.get(); }
-        ElementModP *get_pubkey_to_exp() const { return pubkey_to_exp.get(); }
+        ElementModP *get_k_to_exp() const { return pubkey_to_exp.get(); }
 
       protected:
         void generateTriple(const ElementModP &publicKey);
@@ -57,9 +54,11 @@ namespace electionguard
 
     /// <summary>
     /// This object holds the Quadruple for the entries in the precomputed
-    /// quadruple_queue. The four items contained in this object are the
-    /// first random exponent (exp1), the second random exponent (exp2)
-    /// g ^ exp1 mod p (g_to_exp1) and (g ^ exp2 mod p) * (K ^ exp mod p)
+    /// quadruple_queue. The four items contained in this object are
+    /// - the first random exponent (exp1),
+    /// - the second random exponent (exp2)
+    /// - g ^ exp1 mod p (g_to_exp1)
+    /// - (g ^ exp2 mod p) * (K ^ exp1 mod p)
     /// (g_to_exp2 mult_by_pubkey_to_exp1 - where K is the public key).
     /// </summary>
     class EG_API Quadruple
@@ -83,14 +82,6 @@ namespace electionguard
         Quadruple &operator=(Quadruple &&);
 
         std::unique_ptr<Quadruple> clone();
-
-        std::unique_ptr<ElementModQ> clone_exp1() { return exp1->clone(); }
-        std::unique_ptr<ElementModQ> clone_exp2() { return exp2->clone(); }
-        std::unique_ptr<ElementModP> clone_g_to_exp1() { return g_to_exp1->clone(); }
-        std::unique_ptr<ElementModP> clone_g_to_exp2_mult_by_pubkey_to_exp1()
-        {
-            return g_to_exp2_mult_by_pubkey_to_exp1->clone();
-        }
 
         ElementModQ *get_exp1() const { return exp1.get(); }
         ElementModQ *get_exp2() const { return exp2.get(); }
@@ -130,10 +121,6 @@ namespace electionguard
         TwoTriplesAndAQuadruple &operator=(TwoTriplesAndAQuadruple &&);
 
         std::unique_ptr<TwoTriplesAndAQuadruple> clone();
-
-        std::unique_ptr<Triple> clone_triple1() { return triple1->clone(); }
-        std::unique_ptr<Triple> clone_triple2() { return triple2->clone(); }
-        std::unique_ptr<Quadruple> clone_quad() { return quad->clone(); }
 
         Triple *get_triple1() const { return triple1.get(); }
         Triple *get_triple2() const { return triple2.get(); }
@@ -390,23 +377,26 @@ namespace electionguard
         static ElementModP *getPublicKey();
 
         /// <summary>
-        /// Get the next triple from the triple queue.
-        /// This method is called by hashedElgamalEncrypt in order to get
-        /// the precomputed value to perform the hashed elgamal encryption.
+        /// Get the next triple from the triple queue. If there is no triple
+        /// in the queue, then one is created.
         /// </summary>
         static std::unique_ptr<Triple> getTriple();
 
         /// <summary>
-        /// Pop the next triple from the triple queue.
-        /// If no triple exists, then nullopt is returned.
+        /// Pop the next triple from the triple queue. If there is no triple
+        /// in the queue, then nullopt is returned.
+        ///
+        /// This method is called by hashedElgamalEncrypt in order to get
+        /// the precomputed value to perform the hashed elgamal encryption.
+        ///
+        /// This method is also called by ConstantChaumPedersenProof::make
+        /// in order to get the precomputed value to make the proof.
         /// </summary>
         static std::optional<std::unique_ptr<Triple>> popTriple();
 
         /// <summary>
         /// Get the next two triples and a quadruple from the queues.
-        /// This method is called by encryptSelection in order to get
-        /// the precomputed values to encrypt the selection and make a
-        /// proof for it.
+        /// If no quadruple exists, one is created.
         /// <returns>std::unique_ptr<TwoTriplesAndAQuadruple></returns>
         /// </summary>
         static std::unique_ptr<TwoTriplesAndAQuadruple> getTwoTriplesAndAQuadruple();
@@ -414,6 +404,10 @@ namespace electionguard
         /// <summary>
         /// Pop the next quadruple set from the triple queue.
         /// If no quadruple exists, then nullopt is returned.
+        ///
+        /// This method is called by encryptSelection in order to get
+        /// the precomputed values to encrypt the selection and make a
+        /// proof for it.
         /// </summary>
         static std::optional<std::unique_ptr<TwoTriplesAndAQuadruple>> popTwoTriplesAndAQuadruple();
 

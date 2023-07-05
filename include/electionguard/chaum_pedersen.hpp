@@ -126,16 +126,15 @@ namespace electionguard
         /// it does not accept a seed value and calculates
         /// proofs independent of the original encryption. (faster performance)
         /// <param name="message"> The ciphertext message</param>
-        /// <param name="precomputedTwoTriplesAndAQuad">A set of intermediate values that were generated ahead of time.</param>
+        /// <param name="precomputedValues">A set of intermediate values that were generated ahead of time.</param>
         /// <param name="k"> The public key of the election</param>
         /// <param name="q"> A value used when generating the challenge,
         ///          usually the election extended base hash (𝑄')</param>
         /// <returns>A unique pointer</returns>
         /// </Summary>
         static std::unique_ptr<DisjunctiveChaumPedersenProof>
-        make(const ElGamalCiphertext &message,
-             const TwoTriplesAndAQuadruple &precomputedTwoTriplesAndAQuad, const ElementModP &k,
-             const ElementModQ &q, uint64_t plaintext);
+        make(const ElGamalCiphertext &message, const TwoTriplesAndAQuadruple &precomputedValues,
+             const ElementModP &k, const ElementModQ &q, uint64_t plaintext);
 
         /// <Summary>
         /// Validates a "disjunctive" Chaum-Pedersen (zero or one) proof.
@@ -158,8 +157,8 @@ namespace electionguard
                   const ElementModQ &q, const ElementModQ &seed);
         static std::unique_ptr<DisjunctiveChaumPedersenProof>
         make_zero(const ElGamalCiphertext &message,
-                  const TwoTriplesAndAQuadruple &precomputedTwoTriplesAndAQuad,
-                  const ElementModP &k, const ElementModQ &q);
+                  const TwoTriplesAndAQuadruple &precomputedValues, const ElementModP &k,
+                  const ElementModQ &q);
 
         static std::unique_ptr<DisjunctiveChaumPedersenProof>
         make_one(const ElGamalCiphertext &message, const ElementModQ &r, const ElementModP &k,
@@ -168,9 +167,8 @@ namespace electionguard
         make_one(const ElGamalCiphertext &message, const ElementModQ &r, const ElementModP &k,
                  const ElementModQ &q, const ElementModQ &seed);
         static std::unique_ptr<DisjunctiveChaumPedersenProof>
-        make_one(const ElGamalCiphertext &message,
-                 const TwoTriplesAndAQuadruple &precomputedTwoTriplesAndAQuad, const ElementModP &k,
-                 const ElementModQ &q);
+        make_one(const ElGamalCiphertext &message, const TwoTriplesAndAQuadruple &precomputedValues,
+                 const ElementModP &k, const ElementModQ &q);
 
       private:
         class Impl;

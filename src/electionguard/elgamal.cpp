@@ -277,14 +277,12 @@ namespace electionguard
     }
 
     unique_ptr<ElGamalCiphertext> elgamalEncrypt(uint64_t m, const ElementModP &publicKey,
-                                                 const TwoTriplesAndAQuadruple &precomputedValues)
+                                                 const Triple &precomputedValues)
     {
         // (g^R mod p, K^V ·K^R modp) = (g^R mod p, K^(V+R) mod p)
 
-        auto triple1 = precomputedValues.get_triple1();
-
-        auto pad = triple1->clone_g_to_exp();             // g^r mod p
-        auto pubkey_pow_r = triple1->get_pubkey_to_exp(); // K^r mod p
+        auto pad = precomputedValues.get_g_to_exp()->clone(); // g^r mod p
+        auto pubkey_pow_r = precomputedValues.get_k_to_exp(); // K^r mod p
         unique_ptr<ElementModP> data = nullptr;
         if (m == 1) {
             data = mul_mod_p(publicKey, *pubkey_pow_r); // K^1 * K^r mod p
@@ -611,8 +609,8 @@ namespace electionguard
             // check if the are precompute values rather than doing the exponentiations here
             auto triple = PrecomputeBufferContext::popTriple();
             if (triple != nullptr && triple.has_value()) {
-                alpha = triple.value()->clone_g_to_exp();
-                beta = triple.value()->clone_pubkey_to_exp();
+                alpha = triple.value()->get_g_to_exp()->clone();
+                beta = triple.value()->get_k_to_exp()->clone();
             }
         }
 
