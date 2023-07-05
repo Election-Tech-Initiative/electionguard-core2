@@ -7,7 +7,7 @@ public class AlternateRowColorConverter : IValueConverter
     public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
     {
         var collectionView = parameter as CollectionView;
-        var index = collectionView.ItemsSource.Cast<object>().ToList().IndexOf(value);
+        var index = value is not null ? collectionView?.ItemsSource.Cast<object>().ToList().IndexOf(value) : 0;
 
         if (index % 2 == 0)
         {

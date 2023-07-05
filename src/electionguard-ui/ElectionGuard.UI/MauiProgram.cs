@@ -105,6 +105,7 @@ public static class MauiProgram
         builder.Services.AddTransient<ViewKeyCeremonyViewModel>();
         builder.Services.AddTransient<CreateElectionViewModel>();
         builder.Services.AddSingleton<ManifestViewModel>();
+        builder.Services.AddSingleton<ChallengedPopupViewModel>();
         builder.Services.AddTransient<BallotUploadViewModel>();
         builder.Services.AddTransient<CreateTallyViewModel>();
         builder.Services.AddTransient<CreateMultiTallyViewModel>();
@@ -120,6 +121,7 @@ public static class MauiProgram
         builder.Services.AddTransient<ViewKeyCeremonyPage>();
         builder.Services.AddTransient<CreateElectionAdminPage>();
         builder.Services.AddTransient<ManifestPopup>();
+        builder.Services.AddTransient<ChallengedPopup>();
         builder.Services.AddTransient<BallotUploadPage>();
         builder.Services.AddTransient<CreateTallyPage>();
         builder.Services.AddTransient<CreateMultiTallyPage>();

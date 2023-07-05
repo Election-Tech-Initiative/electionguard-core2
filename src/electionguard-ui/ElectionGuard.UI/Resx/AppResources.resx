@@ -606,4 +606,19 @@
   <data name="ErrorLoadingGuardian" xml:space="preserve">
     <value>Unable to load guardian data.</value>
   </data>
+  <data name="ChallengedInstructionsText" xml:space="preserve">
+    <value>Enter the verification code in the search box to limit the ballots shown. Select that ballot from the list to be set to a spoiled ballot.</value>
+  </data>
+  <data name="SpoilBallotText" xml:space="preserve">
+    <value>Move Challenged to Spoiled</value>
+  </data>
+  <data name="SpoilChallengedText" xml:space="preserve">
+    <value>Spoil Ballots</value>
+  </data>
+  <data name="SpoilConfirmationText" xml:space="preserve">
+    <value>Are you sure that you would like to move this ballot into a Spoiled state?  This will remove it from the election record.</value>
+  </data>
+  <data name="VerificationCodeText" xml:space="preserve">
+    <value>Verification Code</value>
+  </data>
 </root>

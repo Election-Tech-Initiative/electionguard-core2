@@ -27,6 +27,7 @@ public class NavigationService : INavigationService
         new PageType(typeof(CreateMultiTallyViewModel), typeof(CreateMultiTallyPage), false),
         new PageType(typeof(TallyProcessViewModel), typeof(TallyProcessPage), false),
         new PageType(typeof(ViewTallyViewModel), typeof(ViewTallyPage), false),
+        new PageType(typeof(ChallengedPopupViewModel), typeof(ChallengedPopup), false),
     };
 
     private Type _currentPage = typeof(LoginPage);
