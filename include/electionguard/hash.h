@@ -12,6 +12,41 @@ extern "C" {
 struct eg_crypto_hashable_type_s;
 typedef struct eg_crypto_hashable_type_s eg_crypto_hashable_type_t;
 
+/**
+ * @brief Get the prefix for the hash of an election manifest
+ */
+EG_API const char *eg_hash_get_prefix_00();
+
+/**
+ * @brief Get the prefix for the hash of a guardian key proof
+ */
+EG_API const char *eg_hash_get_prefix_01();
+
+/**
+ * @brief Get the prefix for the hash of a guardian key share encryption proof
+ */
+EG_API const char *eg_hash_get_prefix_02();
+
+/**
+ * @brief Get the prefix for the hash of an election extended base hash
+ */
+EG_API const char *eg_hash_get_prefix_03();
+
+/**
+ * @brief Get the prefix for the hash of a ballot selection encryption proof
+ */
+EG_API const char *eg_hash_get_prefix_04();
+
+/**
+ * @brief Get the prefix for the hash of a ballot contest data secret key
+ */
+EG_API const char *eg_hash_get_prefix_05();
+
+/**
+ * @brief Get the prefix for the hash of a ballot contest data secret key
+ */
+EG_API const char *eg_hash_get_prefix_06();
+
 // EG_API eg_electionguard_status_t eg_hash_elems(const char *prefix,
 //                                                eg_crypto_hashable_type_t *in_data[],
 //                                                uint64_t in_data_size,
@@ -28,6 +63,9 @@ EG_API eg_electionguard_status_t eg_hash_elems_int(const uint64_t a,
 
 EG_API eg_electionguard_status_t eg_hash_elems_string_int(char *a, uint64_t b,
                                                           eg_element_mod_q_t **out_handle);
+
+EG_API eg_electionguard_status_t eg_hash_elems_int_int(uint64_t a, uint64_t b,
+                                                       eg_element_mod_q_t **out_handle);
 
 EG_API eg_electionguard_status_t eg_hash_elems_string_int_modp(char *a, uint64_t b,
                                                                eg_element_mod_p_t *c,
