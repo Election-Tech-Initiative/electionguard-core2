@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
 	<PropertyGroup>
 		<TargetFrameworks Condition="$([MSBuild]::IsOSPlatform('OSX'))">net7.0-maccatalyst;net7.0</TargetFrameworks>
@@ -170,6 +170,9 @@
 	  <Compile Update="Views\CreateElectionAdminPage.xaml.cs">
 	    <DependentUpon>CreateElectionAdminPage.xaml</DependentUpon>
 	  </Compile>
+	  <Compile Update="Views\ChallengedPopup.xaml.cs">
+	    <DependentUpon>ChallengedPopup.xaml</DependentUpon>
+	  </Compile>
 	  <Compile Update="Views\TallyProcessPage.xaml.cs">
 	    <DependentUpon>TallyProcessPage.xaml</DependentUpon>
 	  </Compile>
@@ -229,10 +232,10 @@
       <CopyToOutputDirectory Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'windows'">PreserveNewest</CopyToOutputDirectory>
     </None>
 
-    <None Name="MacCatalyst" Visible="false" Include="$(ElectionGuardLibs)\MacCatalyst\arm64\$(Configuration)\src\*.dylib" >
+    <None Name="MacCatalyst" Visible="false" Include="$(ElectionGuardLibs)\MacCatalyst\arm64\$(Configuration)\src\*.dylib">
 			<CopyToOutputDirectory Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'maccatalyst'">PreserveNewest</CopyToOutputDirectory>
 		</None>
-    <None Name="MacCatalyst HACL" Visible="false" Include="$(ElectionGuardLibs)\MacCatalyst\arm64\$(Configuration)\libs\hacl\*.dylib" >
+    <None Name="MacCatalyst HACL" Visible="false" Include="$(ElectionGuardLibs)\MacCatalyst\arm64\$(Configuration)\libs\hacl\*.dylib">
 			<CopyToOutputDirectory Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'maccatalyst'">PreserveNewest</CopyToOutputDirectory>		
 		</None>
 	</ItemGroup>

@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<views:Popup
+    x:Class="ElectionGuard.UI.Views.ChallengedPopup"
+    xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+    xmlns:converter="clr-namespace:ElectionGuard.UI.Converters"
+    xmlns:helper="clr-namespace:ElectionGuard.UI.Helpers"
+    xmlns:model="clr-namespace:ElectionGuard.UI.Lib.Models;assembly=ElectionGuard.UI.Lib"
+    xmlns:views="http://schemas.microsoft.com/dotnet/2022/maui/toolkit"
+    CanBeDismissedByTappingOutsideOfPopup="true"
+    Size="600,650">
+    <Grid>
+        <Grid.Resources>
+            <ResourceDictionary>
+                <converter:AlternateRowColorConverter x:Key="AlternateRowColorConverter" />
+                <Style x:Key="DataLabel" TargetType="Label">
+                    <Setter Property="Margin" Value="10" />
+                    <Setter Property="HorizontalTextAlignment" Value="Center" />
+                </Style>
+                <Style TargetType="Label">
+                    <Setter Property="FontAttributes" Value="Bold" />
+                    <Setter Property="HorizontalTextAlignment" Value="Center" />
+                </Style>
+            </ResourceDictionary>
+        </Grid.Resources>
+        <VerticalStackLayout Style="{StaticResource PopupView}">
+            <Label Style="{StaticResource H1}" Text="{helper:Translate SpoilChallengedText}" />
+            <Label Text="{helper:Translate ChallengedInstructionsText}" />
+            <SearchBar Placeholder="{helper:Translate VerificationCodeText}" Text="{Binding SearchText}" CancelButtonColor="{StaticResource Gray950}" TextColor="{StaticResource Gray950}" />
+            <CollectionView
+                ItemsSource="{Binding FilteredBallotList}"
+                SelectedItem="{Binding CurrentBallot}"
+                SelectionChangedCommand="{Binding SpoilBallotCommand}"
+                SelectionMode="Single">
+                <CollectionView.ItemTemplate>
+                    <DataTemplate x:DataType="model:BallotRecord">
+                        <Frame
+                            Margin="0,0,0,5"
+                            BackgroundColor="{Binding ., Converter={StaticResource AlternateRowColorConverter}, ConverterParameter={x:Reference UploadCollectionView}}"
+                            BorderColor="{StaticResource Gray950}">
+                            <Grid ColumnDefinitions="3*, 2*">
+                                <Label
+                                    Grid.Column="0"
+                                    Margin="10"
+                                    Style="{StaticResource DataLabel}"
+                                    Text="{Binding BallotCode}" />
+                                <Label
+                                    Grid.Column="1"
+                                    Style="{StaticResource DataLabel}"
+                                    Text="{Binding TimeStamp}" />
+                            </Grid>
+                        </Frame>
+                    </DataTemplate>
+                </CollectionView.ItemTemplate>
+            </CollectionView>
+        </VerticalStackLayout>
+    </Grid>
+</views:Popup>
