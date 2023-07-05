@@ -360,14 +360,15 @@ namespace electionguard
     encryptSelection(const std::string objectId, uint64_t sequenceOrder, uint64_t vote,
                      const ElementModQ &descriptionHash, const ElementModP &elgamalPublicKey,
                      const ElementModQ &cryptoExtendedBaseHash,
-                     std::unique_ptr<TwoTriplesAndAQuadruple> precomputedValues, bool isPlaceholder)
+                     std::unique_ptr<PrecomputedSelection> precomputedValues, bool isPlaceholder)
     {
         // Configure the crypto input values
         Log::trace("encryptSelection: precompute for " + objectId + " hash: ",
                    descriptionHash.toHex());
 
         // Generate the encryption using precomputed values
-        auto ciphertext = elgamalEncrypt(vote, elgamalPublicKey, *precomputedValues->get_triple1());
+        auto ciphertext =
+          elgamalEncrypt(vote, elgamalPublicKey, *precomputedValues->getPartialEncryption());
         if (ciphertext == nullptr) {
             throw runtime_error("encryptSelection:: Error generating ciphertext");
         }

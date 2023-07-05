@@ -315,10 +315,10 @@ namespace electionguard
     unique_ptr<CiphertextBallotSelection> CiphertextBallotSelection::make(
       const std::string &objectId, uint64_t sequenceOrder, const ElementModQ &descriptionHash,
       unique_ptr<ElGamalCiphertext> ciphertext, const ElementModP &elgamalPublicKey,
-      const ElementModQ &cryptoExtendedBaseHash,
-      unique_ptr<TwoTriplesAndAQuadruple> precomputedValues, uint64_t plaintext,
-      bool isPlaceholder /* = false */, unique_ptr<ElementModQ> cryptoHash /* = nullptr */,
-      bool computeProof /* = true */, unique_ptr<ElGamalCiphertext> extendedData /* = nullptr */)
+      const ElementModQ &cryptoExtendedBaseHash, unique_ptr<PrecomputedSelection> precomputedValues,
+      uint64_t plaintext, bool isPlaceholder /* = false */,
+      unique_ptr<ElementModQ> cryptoHash /* = nullptr */, bool computeProof /* = true */,
+      unique_ptr<ElGamalCiphertext> extendedData /* = nullptr */)
     {
         unique_ptr<CiphertextBallotSelection> result = NULL;
 
@@ -328,7 +328,7 @@ namespace electionguard
         }
 
         // need to make sure we use the nonce used in precomputed values
-        auto nonce = precomputedValues->get_triple1()->getSecret()->clone();
+        auto nonce = precomputedValues->getPartialEncryption()->getSecret()->clone();
 
         unique_ptr<DisjunctiveChaumPedersenProof> proof = nullptr;
         if (computeProof) {

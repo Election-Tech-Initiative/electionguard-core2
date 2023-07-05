@@ -133,7 +133,7 @@ namespace electionguard
         /// <returns>A unique pointer</returns>
         /// </Summary>
         static std::unique_ptr<DisjunctiveChaumPedersenProof>
-        make(const ElGamalCiphertext &message, const TwoTriplesAndAQuadruple &precomputedValues,
+        make(const ElGamalCiphertext &message, const PrecomputedSelection &precomputedValues,
              const ElementModP &k, const ElementModQ &q, uint64_t plaintext);
 
         /// <Summary>
@@ -157,7 +157,7 @@ namespace electionguard
                   const ElementModQ &q, const ElementModQ &seed);
         static std::unique_ptr<DisjunctiveChaumPedersenProof>
         make_zero(const ElGamalCiphertext &message,
-                  const TwoTriplesAndAQuadruple &precomputedValues, const ElementModP &k,
+                  const PrecomputedSelection &precomputedValues, const ElementModP &k,
                   const ElementModQ &q);
 
         static std::unique_ptr<DisjunctiveChaumPedersenProof>
@@ -167,7 +167,7 @@ namespace electionguard
         make_one(const ElGamalCiphertext &message, const ElementModQ &r, const ElementModP &k,
                  const ElementModQ &q, const ElementModQ &seed);
         static std::unique_ptr<DisjunctiveChaumPedersenProof>
-        make_one(const ElGamalCiphertext &message, const TwoTriplesAndAQuadruple &precomputedValues,
+        make_one(const ElGamalCiphertext &message, const PrecomputedSelection &precomputedValues,
                  const ElementModP &k, const ElementModQ &q);
 
       private:

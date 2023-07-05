@@ -41,14 +41,14 @@ class DisjunctiveChaumPedersenProofHarness : DisjunctiveChaumPedersenProof
     }
 
     static unique_ptr<DisjunctiveChaumPedersenProof>
-    make_zero(const ElGamalCiphertext &message, const TwoTriplesAndAQuadruple &precomputedValues,
+    make_zero(const ElGamalCiphertext &message, const PrecomputedSelection &precomputedValues,
               const ElementModP &k, const ElementModQ &q)
     {
         return DisjunctiveChaumPedersenProof::make_zero(message, precomputedValues, k, q);
     }
 
     static unique_ptr<DisjunctiveChaumPedersenProof>
-    make_one(const ElGamalCiphertext &message, const TwoTriplesAndAQuadruple &precomputedValues,
+    make_one(const ElGamalCiphertext &message, const PrecomputedSelection &precomputedValues,
              const ElementModP &k, const ElementModQ &q)
     {
         return DisjunctiveChaumPedersenProof::make_one(message, precomputedValues, k, q);
@@ -137,7 +137,7 @@ TEST_CASE("Disjunctive CP Proof encryption of zero with precomputed values succe
     CHECK(precomputedValues != nullptr);
 
     auto message1 =
-      elgamalEncrypt(0UL, *keypair->getPublicKey(), *precomputedValues->get_triple1());
+      elgamalEncrypt(0UL, *keypair->getPublicKey(), *precomputedValues->getPartialEncryption());
 
     auto proof = DisjunctiveChaumPedersenProof::make(*message1, *precomputedValues,
                                                      *keypair->getPublicKey(), ONE_MOD_Q(), 0UL);
@@ -164,7 +164,7 @@ TEST_CASE("Disjunctive CP Proof encryption of zero with precomputed values inval
     CHECK(precomputedValues != nullptr);
 
     auto message1 =
-      elgamalEncrypt(0UL, *keypair->getPublicKey(), *precomputedValues->get_triple1());
+      elgamalEncrypt(0UL, *keypair->getPublicKey(), *precomputedValues->getPartialEncryption());
 
     auto badProof = DisjunctiveChaumPedersenProof::make(*message1, *precomputedValues,
                                                         *keypair->getPublicKey(), ONE_MOD_Q(), 1UL);
@@ -193,10 +193,10 @@ TEST_CASE("Disjunctive CP Proof encryption of one with precomputed values succee
     CHECK(precomputedValues2 != nullptr);
 
     auto message1 =
-      elgamalEncrypt(1UL, *keypair->getPublicKey(), *precomputedValues1->get_triple1());
+      elgamalEncrypt(1UL, *keypair->getPublicKey(), *precomputedValues1->getPartialEncryption());
 
     auto message2 =
-      elgamalEncrypt(1UL, *keypair->getPublicKey(), *precomputedValues2->get_triple1());
+      elgamalEncrypt(1UL, *keypair->getPublicKey(), *precomputedValues2->getPartialEncryption());
 
     auto proof = DisjunctiveChaumPedersenProof::make(*message1, *precomputedValues1,
                                                      *keypair->getPublicKey(), ONE_MOD_Q(), 1UL);

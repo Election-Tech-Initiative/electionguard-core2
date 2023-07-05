@@ -147,38 +147,52 @@ namespace electionguard
     };
 
     /// <summary>
-    /// This object holds the two Triples and a Quadruple of precomputed
-    /// values that are used to speed up encryption of a selection.
-    /// Since the values are precomputed it removes all the exponentiations
-    /// from the ElGamal encryption of the selection as well as the
-    /// computation of the Chaum Pedersen proof.
+    /// The PrecomputedSelection is a set of precomputed values that are used
+    /// to speed up encryption of a selection. It removes most the exponentiations
+    /// from the ElGamal encryption of the selection as well as the computation
+    /// of the Chaum Pedersen proof.
+    ///
+    /// This object holds a Precomputed Encryption for the selection, a Precomputed
+    /// Encryption for the proof, and a Precomputed Fake Disjunctive Commitment for
+    /// the proof.
     /// </summary>
-    class EG_API TwoTriplesAndAQuadruple // TODO: rename to PrecomputedSelection
+    class EG_API PrecomputedSelection
     {
+      public:
+        PrecomputedSelection(std::unique_ptr<PrecomputedEncryption> in_triple1,
+                             std::unique_ptr<PrecomputedEncryption> in_triple2,
+                             std::unique_ptr<PrecomputedFakeDisjuctiveCommitments> in_quad);
+        PrecomputedSelection(const PrecomputedSelection &other);
+        PrecomputedSelection(PrecomputedSelection &&);
+        ~PrecomputedSelection();
+
+        PrecomputedSelection &operator=(const PrecomputedSelection &other);
+        PrecomputedSelection &operator=(PrecomputedSelection &&);
+
+        std::unique_ptr<PrecomputedSelection> clone();
+
+        /// <summary>
+        /// Get the precomputed encryption for the selection.
+        /// </summary>
+        PrecomputedEncryption *getPartialEncryption() const { return encryption.get(); }
+
+        /// <summary>
+        /// Get the precomputed encryption for the proof.
+        /// </summary>
+        PrecomputedEncryption *getRealCommitment() const { return proof.get(); }
+
+        /// <summary>
+        /// Get the precomputed fake disjunctive commitment for the proof.
+        /// </summary>
+        PrecomputedFakeDisjuctiveCommitments *getFakeCommitment() const { return fakeProof.get(); }
+
+      private:
         std::unique_ptr<PrecomputedEncryption> encryption;
         std::unique_ptr<PrecomputedEncryption> proof;
         std::unique_ptr<PrecomputedFakeDisjuctiveCommitments> fakeProof;
-
-      public:
-        explicit TwoTriplesAndAQuadruple() {}
-        TwoTriplesAndAQuadruple(std::unique_ptr<PrecomputedEncryption> in_triple1,
-                                std::unique_ptr<PrecomputedEncryption> in_triple2,
-                                std::unique_ptr<PrecomputedFakeDisjuctiveCommitments> in_quad);
-        TwoTriplesAndAQuadruple(const TwoTriplesAndAQuadruple &other);
-        TwoTriplesAndAQuadruple(TwoTriplesAndAQuadruple &&);
-        ~TwoTriplesAndAQuadruple();
-
-        TwoTriplesAndAQuadruple &operator=(const TwoTriplesAndAQuadruple &other);
-        TwoTriplesAndAQuadruple &operator=(TwoTriplesAndAQuadruple &&);
-
-        std::unique_ptr<TwoTriplesAndAQuadruple> clone();
-
-        PrecomputedEncryption *get_triple1() const { return encryption.get(); }
-        PrecomputedEncryption *get_triple2() const { return proof.get(); }
-        PrecomputedFakeDisjuctiveCommitments *get_quad() const { return fakeProof.get(); }
     };
 
-    // TODO: range proof precompute table
+    // TODO: range proof precompute table?
 
     /// <summary>
     /// A buffer of precomputed values that are used to speed up encryption
@@ -292,7 +306,7 @@ namespace electionguard
         /// Get the next two triples and a quadruple from the queues.
         /// If no quadruple exists, one is created.
         /// </summary>
-        std::unique_ptr<TwoTriplesAndAQuadruple> getTwoTriplesAndAQuadruple();
+        std::unique_ptr<PrecomputedSelection> getTwoTriplesAndAQuadruple();
 
         /// <summary>
         /// Pop the next quadruple set from the triple queue.
@@ -302,13 +316,13 @@ namespace electionguard
         /// the precomputed values to encrypt the selection and make a
         /// proof for it.
         /// </summary>
-        std::optional<std::unique_ptr<TwoTriplesAndAQuadruple>> popTwoTriplesAndAQuadruple();
+        std::optional<std::unique_ptr<PrecomputedSelection>> popTwoTriplesAndAQuadruple();
 
       protected:
         static std::tuple<std::unique_ptr<PrecomputedEncryption>,
                           std::unique_ptr<PrecomputedEncryption>>
         createTwoTriples(const ElementModP &publicKey);
-        static std::unique_ptr<TwoTriplesAndAQuadruple>
+        static std::unique_ptr<PrecomputedSelection>
         createTwoTriplesAndAQuadruple(const ElementModP &publicKey);
 
       private:
@@ -319,7 +333,7 @@ namespace electionguard
         std::mutex quad_queue_lock;
         std::unique_ptr<ElementModP> publicKey;
         std::queue<std::unique_ptr<PrecomputedEncryption>> triple_queue;
-        std::queue<std::unique_ptr<TwoTriplesAndAQuadruple>> twoTriplesAndAQuadruple_queue;
+        std::queue<std::unique_ptr<PrecomputedSelection>> twoTriplesAndAQuadruple_queue;
     };
 
     /// <summary>
@@ -456,7 +470,7 @@ namespace electionguard
         /// If no quadruple exists, one is created.
         /// <returns>std::unique_ptr<TwoTriplesAndAQuadruple></returns>
         /// </summary>
-        static std::unique_ptr<TwoTriplesAndAQuadruple> getTwoTriplesAndAQuadruple();
+        static std::unique_ptr<PrecomputedSelection> getTwoTriplesAndAQuadruple();
 
         /// <summary>
         /// Pop the next quadruple set from the triple queue.
@@ -466,7 +480,7 @@ namespace electionguard
         /// the precomputed values to encrypt the selection and make a
         /// proof for it.
         /// </summary>
-        static std::optional<std::unique_ptr<TwoTriplesAndAQuadruple>> popTwoTriplesAndAQuadruple();
+        static std::optional<std::unique_ptr<PrecomputedSelection>> popTwoTriplesAndAQuadruple();
 
       private:
         std::mutex _mutex;

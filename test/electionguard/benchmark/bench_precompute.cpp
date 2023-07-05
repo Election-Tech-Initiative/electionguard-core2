@@ -46,7 +46,7 @@ BENCHMARK_DEFINE_F(ElGamalEncryptPrecomputedFixture, ElGamalEncryptPrecomputed)
         // check if we found the precomputed values needed
         if (precomputedValues != nullptr) {
             elgamalEncrypt(1UL, *fixed_base_keypair->getPublicKey(),
-                           *precomputedValues->get_triple1());
+                           *precomputedValues->getPartialEncryption());
         }
     }
 }
@@ -62,14 +62,14 @@ class DisjunctiveChaumPedersenProofPrecomputedHarness : DisjunctiveChaumPedersen
 {
   public:
     static unique_ptr<DisjunctiveChaumPedersenProof>
-    make_zero(const ElGamalCiphertext &message, const TwoTriplesAndAQuadruple &precomputedValues,
+    make_zero(const ElGamalCiphertext &message, const PrecomputedSelection &precomputedValues,
               const ElementModP &k, const ElementModQ &q)
     {
         return DisjunctiveChaumPedersenProof::make_zero(message, precomputedValues, k, q);
     }
 
     static unique_ptr<DisjunctiveChaumPedersenProof>
-    make_one(const ElGamalCiphertext &message, const TwoTriplesAndAQuadruple &precomputedValues,
+    make_one(const ElGamalCiphertext &message, const PrecomputedSelection &precomputedValues,
              const ElementModP &k, const ElementModQ &q)
     {
         return DisjunctiveChaumPedersenProof::make_one(message, precomputedValues, k, q);
@@ -193,8 +193,8 @@ class CiphertextBallotSelectionPrecomputedFixture : public benchmark::Fixture
         // check if we found the precomputed values needed
         if (precomputedValues != nullptr) {
             // Generate the encryption using precomputed values
-            ciphertext =
-              elgamalEncrypt(1UL, *keypair->getPublicKey(), *precomputedValues->get_triple1());
+            ciphertext = elgamalEncrypt(1UL, *keypair->getPublicKey(),
+                                        *precomputedValues->getPartialEncryption());
 
             auto encrypted = CiphertextBallotSelection::make(
               selectionId, description->getSequenceOrder(), *descriptionHash, move(ciphertext),
@@ -222,8 +222,8 @@ BENCHMARK_DEFINE_F(CiphertextBallotSelectionPrecomputedFixture,
         // check if we found the precomputed values needed
         if (precomputedValues != nullptr) {
             // Generate the encryption using precomputed values
-            auto localciphertext =
-              elgamalEncrypt(1UL, *keypair->getPublicKey(), *precomputedValues->get_triple1());
+            auto localciphertext = elgamalEncrypt(1UL, *keypair->getPublicKey(),
+                                                  *precomputedValues->getPartialEncryption());
 
             auto encrypted = CiphertextBallotSelection::make(
               selectionId, description->getSequenceOrder(), *descriptionHash, move(localciphertext),

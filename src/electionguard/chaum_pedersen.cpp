@@ -174,7 +174,7 @@ namespace electionguard
     }
 
     unique_ptr<DisjunctiveChaumPedersenProof> DisjunctiveChaumPedersenProof::make(
-      const ElGamalCiphertext &message, const TwoTriplesAndAQuadruple &precomputedValues,
+      const ElGamalCiphertext &message, const PrecomputedSelection &precomputedValues,
       const ElementModP &k, const ElementModQ &q, uint64_t plaintext)
     {
         unique_ptr<DisjunctiveChaumPedersenProof> result;
@@ -350,7 +350,7 @@ namespace electionguard
 
     unique_ptr<DisjunctiveChaumPedersenProof>
     DisjunctiveChaumPedersenProof::make_zero(const ElGamalCiphertext &message,
-                                             const TwoTriplesAndAQuadruple &precomputedValues,
+                                             const PrecomputedSelection &precomputedValues,
                                              const ElementModP &k, const ElementModQ &q)
     {
         // NIZKP for plaintext 0
@@ -364,10 +364,10 @@ namespace electionguard
         Log::trace("beta: ", beta->toHex());
 
         // Get our values from the precomputed values.
-        auto encryption = precomputedValues.get_triple1();
+        auto encryption = precomputedValues.getPartialEncryption();
         auto r = encryption->getSecret();
-        auto real = precomputedValues.get_triple2();
-        auto fake = precomputedValues.get_quad();
+        auto real = precomputedValues.getRealCommitment();
+        auto fake = precomputedValues.getFakeCommitment();
 
         // Pick 3 random numbers in Q.
         auto u0 = real->getSecret()->clone();
@@ -441,7 +441,7 @@ namespace electionguard
 
     unique_ptr<DisjunctiveChaumPedersenProof>
     DisjunctiveChaumPedersenProof::make_one(const ElGamalCiphertext &message,
-                                            const TwoTriplesAndAQuadruple &precomputedValues,
+                                            const PrecomputedSelection &precomputedValues,
                                             const ElementModP &k, const ElementModQ &q)
     {
         // NIZKP for plaintext 1
@@ -455,10 +455,10 @@ namespace electionguard
         Log::trace("beta: ", beta->toHex());
 
         // Get our values from the precomputed values.
-        auto encryption = precomputedValues.get_triple1();
+        auto encryption = precomputedValues.getPartialEncryption();
         auto r = encryption->getSecret();
-        auto real = precomputedValues.get_triple2();
-        auto fake = precomputedValues.get_quad();
+        auto real = precomputedValues.getRealCommitment();
+        auto fake = precomputedValues.getFakeCommitment();
         auto u0 = fake->getSecret1()->clone();
         auto u1 = real->getSecret()->clone();
         auto w = fake->getSecret2()->clone();

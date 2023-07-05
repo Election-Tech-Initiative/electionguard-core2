@@ -155,7 +155,7 @@ namespace electionguard
 
 #pragma region TwoTriplesAndAQuadruple
 
-    TwoTriplesAndAQuadruple::TwoTriplesAndAQuadruple(
+    PrecomputedSelection::PrecomputedSelection(
       unique_ptr<PrecomputedEncryption> triple1, unique_ptr<PrecomputedEncryption> triple2,
       unique_ptr<PrecomputedFakeDisjuctiveCommitments> quad)
     {
@@ -164,24 +164,23 @@ namespace electionguard
         this->fakeProof = move(quad);
     }
 
-    TwoTriplesAndAQuadruple::TwoTriplesAndAQuadruple(const TwoTriplesAndAQuadruple &other)
+    PrecomputedSelection::PrecomputedSelection(const PrecomputedSelection &other)
     {
         this->encryption = other.encryption->clone();
         this->proof = other.proof->clone();
         this->fakeProof = other.fakeProof->clone();
     }
 
-    TwoTriplesAndAQuadruple::TwoTriplesAndAQuadruple(TwoTriplesAndAQuadruple &&other)
+    PrecomputedSelection::PrecomputedSelection(PrecomputedSelection &&other)
     {
         this->encryption = move(other.encryption);
         this->proof = move(other.proof);
         this->fakeProof = move(other.fakeProof);
     }
 
-    TwoTriplesAndAQuadruple::~TwoTriplesAndAQuadruple() = default;
+    PrecomputedSelection::~PrecomputedSelection() = default;
 
-    TwoTriplesAndAQuadruple &
-    TwoTriplesAndAQuadruple::operator=(const TwoTriplesAndAQuadruple &other)
+    PrecomputedSelection &PrecomputedSelection::operator=(const PrecomputedSelection &other)
     {
         this->encryption = other.encryption->clone();
         this->proof = other.proof->clone();
@@ -189,7 +188,7 @@ namespace electionguard
         return *this;
     }
 
-    TwoTriplesAndAQuadruple &TwoTriplesAndAQuadruple::operator=(TwoTriplesAndAQuadruple &&other)
+    PrecomputedSelection &PrecomputedSelection::operator=(PrecomputedSelection &&other)
     {
         this->encryption = move(other.encryption);
         this->proof = move(other.proof);
@@ -197,10 +196,10 @@ namespace electionguard
         return *this;
     }
 
-    unique_ptr<TwoTriplesAndAQuadruple> TwoTriplesAndAQuadruple::clone()
+    unique_ptr<PrecomputedSelection> PrecomputedSelection::clone()
     {
-        return make_unique<TwoTriplesAndAQuadruple>(encryption->clone(), proof->clone(),
-                                                    fakeProof->clone());
+        return make_unique<PrecomputedSelection>(encryption->clone(), proof->clone(),
+                                                 fakeProof->clone());
     }
 
 #pragma endregion
@@ -316,7 +315,7 @@ namespace electionguard
         return result;
     }
 
-    std::unique_ptr<TwoTriplesAndAQuadruple> PrecomputeBuffer::getTwoTriplesAndAQuadruple()
+    std::unique_ptr<PrecomputedSelection> PrecomputeBuffer::getTwoTriplesAndAQuadruple()
     {
         if (!twoTriplesAndAQuadruple_queue.empty()) {
             return popTwoTriplesAndAQuadruple().value();
@@ -325,10 +324,10 @@ namespace electionguard
         return createTwoTriplesAndAQuadruple(*publicKey);
     }
 
-    std::optional<std::unique_ptr<TwoTriplesAndAQuadruple>>
+    std::optional<std::unique_ptr<PrecomputedSelection>>
     PrecomputeBuffer::popTwoTriplesAndAQuadruple()
     {
-        unique_ptr<TwoTriplesAndAQuadruple> result = nullptr;
+        unique_ptr<PrecomputedSelection> result = nullptr;
         std::lock_guard<std::mutex> lock(quad_queue_lock);
 
         // make sure there are enough in the queues
@@ -347,13 +346,13 @@ namespace electionguard
         auto triple2 = make_unique<PrecomputedEncryption>(publicKey);
         return std::make_tuple(move(triple1), move(triple2));
     }
-    unique_ptr<TwoTriplesAndAQuadruple>
+    unique_ptr<PrecomputedSelection>
     PrecomputeBuffer::createTwoTriplesAndAQuadruple(const ElementModP &publicKey)
     {
         auto triple1 = make_unique<PrecomputedEncryption>(publicKey);
         auto triple2 = make_unique<PrecomputedEncryption>(publicKey);
         auto quad = make_unique<PrecomputedFakeDisjuctiveCommitments>(publicKey);
-        return make_unique<TwoTriplesAndAQuadruple>(move(triple1), move(triple2), move(quad));
+        return make_unique<PrecomputedSelection>(move(triple1), move(triple2), move(quad));
     }
 
 #pragma endregion
@@ -458,7 +457,7 @@ namespace electionguard
         return std::nullopt;
     }
 
-    std::unique_ptr<TwoTriplesAndAQuadruple> PrecomputeBufferContext::getTwoTriplesAndAQuadruple()
+    std::unique_ptr<PrecomputedSelection> PrecomputeBufferContext::getTwoTriplesAndAQuadruple()
     {
         if (getInstance()._instance != nullptr) {
             return getInstance()._instance->getTwoTriplesAndAQuadruple();
@@ -466,7 +465,7 @@ namespace electionguard
         return nullptr;
     }
 
-    std::optional<std::unique_ptr<TwoTriplesAndAQuadruple>>
+    std::optional<std::unique_ptr<PrecomputedSelection>>
     PrecomputeBufferContext::popTwoTriplesAndAQuadruple()
     {
         if (getInstance()._instance != nullptr) {
