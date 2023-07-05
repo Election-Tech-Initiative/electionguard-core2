@@ -132,7 +132,7 @@ TEST_CASE("Disjunctive CP Proof encryption of zero with precomputed values succe
 
     // this function runs off to look in the precomputed values buffer and if
     // it finds what it needs the the returned class will contain those values
-    auto precomputedValues = PrecomputeBufferContext::getTwoTriplesAndAQuadruple();
+    auto precomputedValues = PrecomputeBufferContext::getPrecomputedSelection();
 
     CHECK(precomputedValues != nullptr);
 
@@ -159,7 +159,7 @@ TEST_CASE("Disjunctive CP Proof encryption of zero with precomputed values inval
 
     // this function runs off to look in the precomputed values buffer and if
     // it finds what it needs the the returned class will contain those values
-    auto precomputedValues = PrecomputeBufferContext::getTwoTriplesAndAQuadruple();
+    auto precomputedValues = PrecomputeBufferContext::getPrecomputedSelection();
 
     CHECK(precomputedValues != nullptr);
 
@@ -186,8 +186,8 @@ TEST_CASE("Disjunctive CP Proof encryption of one with precomputed values succee
 
     // this function runs off to look in the precomputed values buffer and if
     // it finds what it needs the the returned class will contain those values
-    auto precomputedValues1 = PrecomputeBufferContext::getTwoTriplesAndAQuadruple();
-    auto precomputedValues2 = PrecomputeBufferContext::getTwoTriplesAndAQuadruple();
+    auto precomputedValues1 = PrecomputeBufferContext::getPrecomputedSelection();
+    auto precomputedValues2 = PrecomputeBufferContext::getPrecomputedSelection();
 
     CHECK(precomputedValues1 != nullptr);
     CHECK(precomputedValues2 != nullptr);

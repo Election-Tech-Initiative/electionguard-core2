@@ -108,7 +108,7 @@ TEST_CASE("elgamalEncrypt simple encrypt 0 compared with elgamalEncrypt_with_pre
 
     // this function runs off to look in the precomputed values buffer and if
     // it finds what it needs the the returned class will contain those values
-    auto precomputedValues = PrecomputeBufferContext::getTwoTriplesAndAQuadruple();
+    auto precomputedValues = PrecomputeBufferContext::getPrecomputedSelection();
 
     CHECK(precomputedValues != nullptr);
 
@@ -146,7 +146,7 @@ TEST_CASE("elgamalEncrypt_with_precomputed simple encrypt 0 decrypts with secret
 
     // this function runs off to look in the precomputed values buffer and if
     // it finds what it needs the the returned class will contain those values
-    auto precomputedValues = PrecomputeBufferContext::getTwoTriplesAndAQuadruple();
+    auto precomputedValues = PrecomputeBufferContext::getPrecomputedSelection();
 
     CHECK(precomputedValues != nullptr);
 
@@ -231,7 +231,7 @@ TEST_CASE("elgamalEncrypt vwith precomputed encrypt 1, decrypts with secret")
 
     // this function runs off to look in the precomputed values buffer and if
     // it finds what it needs the the returned class will contain those values
-    auto precomputedValues = PrecomputeBufferContext::getTwoTriplesAndAQuadruple();
+    auto precomputedValues = PrecomputeBufferContext::getPrecomputedSelection();
 
     auto cipherText = elgamalEncrypt(1UL, *publicKey, *precomputedValues->getPartialEncryption());
 

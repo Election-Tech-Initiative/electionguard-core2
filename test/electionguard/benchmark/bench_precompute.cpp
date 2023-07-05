@@ -41,7 +41,7 @@ BENCHMARK_DEFINE_F(ElGamalEncryptPrecomputedFixture, ElGamalEncryptPrecomputed)
 (benchmark::State &state)
 {
     while (state.KeepRunning()) {
-        auto precomputedValues = PrecomputeBufferContext::getTwoTriplesAndAQuadruple();
+        auto precomputedValues = PrecomputeBufferContext::getPrecomputedSelection();
 
         // check if we found the precomputed values needed
         if (precomputedValues != nullptr) {
@@ -92,7 +92,7 @@ class ChaumPedersenPrecomputedFixture : public benchmark::Fixture
         PrecomputeBufferContext::start();
 
         message = elgamalEncrypt(1UL, *nonce, *keypair->getPublicKey());
-        auto precomputedValues = PrecomputeBufferContext::getTwoTriplesAndAQuadruple();
+        auto precomputedValues = PrecomputeBufferContext::getPrecomputedSelection();
 
         // check if we found the precomputed values needed
         if (precomputedValues != nullptr) {
@@ -116,7 +116,7 @@ BENCHMARK_DEFINE_F(ChaumPedersenPrecomputedFixture, disjunctiveChaumPedersenPrec
 (benchmark::State &state)
 {
     while (state.KeepRunning()) {
-        auto precomputedValues = PrecomputeBufferContext::getTwoTriplesAndAQuadruple();
+        auto precomputedValues = PrecomputeBufferContext::getPrecomputedSelection();
 
         // check if we found the precomputed values needed
         if (precomputedValues != nullptr) {
@@ -133,7 +133,7 @@ BENCHMARK_DEFINE_F(ChaumPedersenPrecomputedFixture, disjunctiveChaumPedersenPrec
 (benchmark::State &state)
 {
     while (state.KeepRunning()) {
-        auto precomputedValues = PrecomputeBufferContext::getTwoTriplesAndAQuadruple();
+        auto precomputedValues = PrecomputeBufferContext::getPrecomputedSelection();
 
         // check if we found the precomputed values needed
         if (precomputedValues != nullptr) {
@@ -150,7 +150,7 @@ BENCHMARK_DEFINE_F(ChaumPedersenPrecomputedFixture, disjunctiveChaumPedersenPrec
 (benchmark::State &state)
 {
     while (state.KeepRunning()) {
-        auto precomputedValues = PrecomputeBufferContext::getTwoTriplesAndAQuadruple();
+        auto precomputedValues = PrecomputeBufferContext::getPrecomputedSelection();
 
         // check if we found the precomputed values needed
         if (precomputedValues != nullptr) {
@@ -188,7 +188,7 @@ class CiphertextBallotSelectionPrecomputedFixture : public benchmark::Fixture
         PrecomputeBufferContext::initialize(*keypair->getPublicKey(), 50);
         PrecomputeBufferContext::start();
 
-        auto precomputedValues = PrecomputeBufferContext::getTwoTriplesAndAQuadruple();
+        auto precomputedValues = PrecomputeBufferContext::getPrecomputedSelection();
 
         // check if we found the precomputed values needed
         if (precomputedValues != nullptr) {
@@ -217,7 +217,7 @@ BENCHMARK_DEFINE_F(CiphertextBallotSelectionPrecomputedFixture,
     const auto *selectionId = "some-selection-object-id";
 
     while (state.KeepRunningBatch(50)) {
-        auto precomputedValues = PrecomputeBufferContext::getTwoTriplesAndAQuadruple();
+        auto precomputedValues = PrecomputeBufferContext::getPrecomputedSelection();
 
         // check if we found the precomputed values needed
         if (precomputedValues != nullptr) {
@@ -312,7 +312,7 @@ BENCHMARK_DEFINE_F(PrecomputeFixture, precomputed)
         PrecomputeBufferContext::initialize(*keypair->getPublicKey(), 1);
         PrecomputeBufferContext::start();
 
-        auto precomputedValues = PrecomputeBufferContext::getTwoTriplesAndAQuadruple();
+        auto precomputedValues = PrecomputeBufferContext::getPrecomputedSelection();
     }
     PrecomputeBufferContext::clear();
 }

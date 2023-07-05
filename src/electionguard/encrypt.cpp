@@ -454,7 +454,7 @@ namespace electionguard
         if (usePrecompute && precomputePublicKey != nullptr &&
             *precomputePublicKey == elgamalPublicKey) {
             Log::trace("encryptSelection: using precomputed values");
-            auto precomputedValues = PrecomputeBufferContext::popTwoTriplesAndAQuadruple();
+            auto precomputedValues = PrecomputeBufferContext::popPrecomputedSelection();
             if (precomputedValues != nullptr && precomputedValues.has_value()) {
                 encrypted =
                   encryptSelection(selection.getObjectId(), sequenceOrder, selection.getVote(),

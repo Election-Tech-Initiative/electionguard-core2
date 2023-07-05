@@ -220,16 +220,16 @@ namespace electionguard
     {
         stop();
 
-        std::lock_guard<std::mutex> lock1(triple_queue_lock);
-        uint32_t triple_size = triple_queue.size();
+        std::lock_guard<std::mutex> lock1(encryption_queue_lock);
+        uint32_t triple_size = encryption_queue.size();
         for (int i = 0; i < (int)triple_size; i++) {
-            triple_queue.pop();
+            encryption_queue.pop();
         }
 
-        std::lock_guard<std::mutex> lock2(quad_queue_lock);
-        uint32_t twoTriplesAndAQuadruple_size = twoTriplesAndAQuadruple_queue.size();
+        std::lock_guard<std::mutex> lock2(selection_queue_lock);
+        uint32_t twoTriplesAndAQuadruple_size = selection_queue.size();
         for (int i = 0; i < (int)twoTriplesAndAQuadruple_size; i++) {
-            twoTriplesAndAQuadruple_queue.pop();
+            selection_queue.pop();
         }
     }
 
@@ -250,12 +250,12 @@ namespace electionguard
         int iteration_count = 0;
         int iterationCountToGenerateTwoTriples = 3;
         do {
-            std::lock_guard<std::mutex> lock1(triple_queue_lock);
-            std::lock_guard<std::mutex> lock2(quad_queue_lock);
+            std::lock_guard<std::mutex> lock1(encryption_queue_lock);
+            std::lock_guard<std::mutex> lock2(selection_queue_lock);
 
             // generate two triples and a quadruple
-            auto quad = createTwoTriplesAndAQuadruple(*publicKey);
-            twoTriplesAndAQuadruple_queue.push(move(quad));
+            auto quad = createPrecomputedSelection(*publicKey);
+            selection_queue.push(move(quad));
 
             // This is very rudimentary. We can add a more complex algorithm in
             // the future, that would look at the queues and increase production if one
@@ -267,13 +267,13 @@ namespace electionguard
             // encryption. The generating two triples every third iteration is a guess
             // on how many precomputes we will need.
             if ((iteration_count % iterationCountToGenerateTwoTriples) == 0) {
-                auto tuple = createTwoTriples(*publicKey);
-                triple_queue.push(move(std::get<0>(tuple)));
-                triple_queue.push(move(std::get<1>(tuple)));
+                auto tuple = createTwoPrecomputedEncryptions(*publicKey);
+                encryption_queue.push(move(std::get<0>(tuple)));
+                encryption_queue.push(move(std::get<1>(tuple)));
             }
             iteration_count++;
 
-        } while (isRunning && twoTriplesAndAQuadruple_queue.size() < maxQueueSize);
+        } while (isRunning && selection_queue.size() < maxQueueSize);
     }
 
     void PrecomputeBuffer::startAsync()
@@ -286,68 +286,65 @@ namespace electionguard
 
     uint32_t PrecomputeBuffer::getMaxQueueSize() { return maxQueueSize; }
 
-    uint32_t PrecomputeBuffer::getCurrentQueueSize()
-    {
-        return twoTriplesAndAQuadruple_queue.size();
-    }
+    uint32_t PrecomputeBuffer::getCurrentQueueSize() { return selection_queue.size(); }
 
     ElementModP *PrecomputeBuffer::getPublicKey() { return publicKey.get(); }
 
-    std::unique_ptr<PrecomputedEncryption> PrecomputeBuffer::getTriple()
+    std::unique_ptr<PrecomputedEncryption> PrecomputeBuffer::getPrecomputedEncryption()
     {
-        if (!triple_queue.empty()) {
-            return popTriple().value();
+        if (!encryption_queue.empty()) {
+            return popPrecomputedEncryption().value();
         }
         return make_unique<PrecomputedEncryption>(*publicKey);
     }
 
-    std::optional<std::unique_ptr<PrecomputedEncryption>> PrecomputeBuffer::popTriple()
+    std::optional<std::unique_ptr<PrecomputedEncryption>>
+    PrecomputeBuffer::popPrecomputedEncryption()
     {
         unique_ptr<PrecomputedEncryption> result = nullptr;
-        std::lock_guard<std::mutex> lock(triple_queue_lock);
+        std::lock_guard<std::mutex> lock(encryption_queue_lock);
 
         // make sure there are enough in the queues
-        if (!triple_queue.empty()) {
-            result = std::move(triple_queue.front());
-            triple_queue.pop();
+        if (!encryption_queue.empty()) {
+            result = std::move(encryption_queue.front());
+            encryption_queue.pop();
         }
 
         return result;
     }
 
-    std::unique_ptr<PrecomputedSelection> PrecomputeBuffer::getTwoTriplesAndAQuadruple()
+    std::unique_ptr<PrecomputedSelection> PrecomputeBuffer::getPrecomputedSelection()
     {
-        if (!twoTriplesAndAQuadruple_queue.empty()) {
-            return popTwoTriplesAndAQuadruple().value();
+        if (!selection_queue.empty()) {
+            return popPrecomputedSelection().value();
         }
 
-        return createTwoTriplesAndAQuadruple(*publicKey);
+        return createPrecomputedSelection(*publicKey);
     }
 
-    std::optional<std::unique_ptr<PrecomputedSelection>>
-    PrecomputeBuffer::popTwoTriplesAndAQuadruple()
+    std::optional<std::unique_ptr<PrecomputedSelection>> PrecomputeBuffer::popPrecomputedSelection()
     {
         unique_ptr<PrecomputedSelection> result = nullptr;
-        std::lock_guard<std::mutex> lock(quad_queue_lock);
+        std::lock_guard<std::mutex> lock(selection_queue_lock);
 
         // make sure there are enough in the queues
-        if (!twoTriplesAndAQuadruple_queue.empty()) {
-            result = std::move(twoTriplesAndAQuadruple_queue.front());
-            twoTriplesAndAQuadruple_queue.pop();
+        if (!selection_queue.empty()) {
+            result = std::move(selection_queue.front());
+            selection_queue.pop();
         }
 
         return result;
     }
 
     std::tuple<std::unique_ptr<PrecomputedEncryption>, std::unique_ptr<PrecomputedEncryption>>
-    PrecomputeBuffer::createTwoTriples(const ElementModP &publicKey)
+    PrecomputeBuffer::createTwoPrecomputedEncryptions(const ElementModP &publicKey)
     {
         auto triple1 = make_unique<PrecomputedEncryption>(publicKey);
         auto triple2 = make_unique<PrecomputedEncryption>(publicKey);
         return std::make_tuple(move(triple1), move(triple2));
     }
     unique_ptr<PrecomputedSelection>
-    PrecomputeBuffer::createTwoTriplesAndAQuadruple(const ElementModP &publicKey)
+    PrecomputeBuffer::createPrecomputedSelection(const ElementModP &publicKey)
     {
         auto triple1 = make_unique<PrecomputedEncryption>(publicKey);
         auto triple2 = make_unique<PrecomputedEncryption>(publicKey);
@@ -441,35 +438,36 @@ namespace electionguard
         return nullptr;
     }
 
-    std::unique_ptr<PrecomputedEncryption> PrecomputeBufferContext::getTriple()
+    std::unique_ptr<PrecomputedEncryption> PrecomputeBufferContext::getPrecomputedEncryption()
     {
         if (getInstance()._instance != nullptr) {
-            return getInstance()._instance->getTriple();
+            return getInstance()._instance->getPrecomputedEncryption();
         }
         return nullptr;
     }
 
-    std::optional<std::unique_ptr<PrecomputedEncryption>> PrecomputeBufferContext::popTriple()
+    std::optional<std::unique_ptr<PrecomputedEncryption>>
+    PrecomputeBufferContext::popPrecomputedEncryption()
     {
         if (getInstance()._instance != nullptr) {
-            return getInstance()._instance->popTriple();
+            return getInstance()._instance->popPrecomputedEncryption();
         }
         return std::nullopt;
     }
 
-    std::unique_ptr<PrecomputedSelection> PrecomputeBufferContext::getTwoTriplesAndAQuadruple()
+    std::unique_ptr<PrecomputedSelection> PrecomputeBufferContext::getPrecomputedSelection()
     {
         if (getInstance()._instance != nullptr) {
-            return getInstance()._instance->getTwoTriplesAndAQuadruple();
+            return getInstance()._instance->getPrecomputedSelection();
         }
         return nullptr;
     }
 
     std::optional<std::unique_ptr<PrecomputedSelection>>
-    PrecomputeBufferContext::popTwoTriplesAndAQuadruple()
+    PrecomputeBufferContext::popPrecomputedSelection()
     {
         if (getInstance()._instance != nullptr) {
-            return getInstance()._instance->popTwoTriplesAndAQuadruple();
+            return getInstance()._instance->popPrecomputedSelection();
         }
         return std::nullopt;
     }

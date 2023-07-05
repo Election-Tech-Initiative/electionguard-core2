@@ -288,7 +288,7 @@ namespace electionguard
         /// Get the next triple from the triple queue.
         /// If no triple exists, one is created.
         /// </summary>
-        std::unique_ptr<PrecomputedEncryption> getTriple();
+        std::unique_ptr<PrecomputedEncryption> getPrecomputedEncryption();
 
         /// <summary>
         /// Pop the next triple from the triple queue. If there is no triple
@@ -300,13 +300,13 @@ namespace electionguard
         /// This method is also called by ConstantChaumPedersenProof::make
         /// in order to get the precomputed value to make the proof.
         /// </summary>
-        std::optional<std::unique_ptr<PrecomputedEncryption>> popTriple();
+        std::optional<std::unique_ptr<PrecomputedEncryption>> popPrecomputedEncryption();
 
         /// <summary>
         /// Get the next two triples and a quadruple from the queues.
         /// If no quadruple exists, one is created.
         /// </summary>
-        std::unique_ptr<PrecomputedSelection> getTwoTriplesAndAQuadruple();
+        std::unique_ptr<PrecomputedSelection> getPrecomputedSelection();
 
         /// <summary>
         /// Pop the next quadruple set from the triple queue.
@@ -316,24 +316,24 @@ namespace electionguard
         /// the precomputed values to encrypt the selection and make a
         /// proof for it.
         /// </summary>
-        std::optional<std::unique_ptr<PrecomputedSelection>> popTwoTriplesAndAQuadruple();
+        std::optional<std::unique_ptr<PrecomputedSelection>> popPrecomputedSelection();
 
       protected:
         static std::tuple<std::unique_ptr<PrecomputedEncryption>,
                           std::unique_ptr<PrecomputedEncryption>>
-        createTwoTriples(const ElementModP &publicKey);
+        createTwoPrecomputedEncryptions(const ElementModP &publicKey);
         static std::unique_ptr<PrecomputedSelection>
-        createTwoTriplesAndAQuadruple(const ElementModP &publicKey);
+        createPrecomputedSelection(const ElementModP &publicKey);
 
       private:
         uint32_t maxQueueSize = DEFAULT_PRECOMPUTE_SIZE;
         bool isRunning = false;
         bool shouldAutoPopulate = false;
-        std::mutex triple_queue_lock;
-        std::mutex quad_queue_lock;
+        std::mutex encryption_queue_lock;
+        std::mutex selection_queue_lock;
         std::unique_ptr<ElementModP> publicKey;
-        std::queue<std::unique_ptr<PrecomputedEncryption>> triple_queue;
-        std::queue<std::unique_ptr<PrecomputedSelection>> twoTriplesAndAQuadruple_queue;
+        std::queue<std::unique_ptr<PrecomputedEncryption>> encryption_queue;
+        std::queue<std::unique_ptr<PrecomputedSelection>> selection_queue;
     };
 
     /// <summary>
@@ -451,7 +451,7 @@ namespace electionguard
         /// Get the next triple from the triple queue. If there is no triple
         /// in the queue, then one is created.
         /// </summary>
-        static std::unique_ptr<PrecomputedEncryption> getTriple();
+        static std::unique_ptr<PrecomputedEncryption> getPrecomputedEncryption();
 
         /// <summary>
         /// Pop the next triple from the triple queue. If there is no triple
@@ -463,14 +463,14 @@ namespace electionguard
         /// This method is also called by ConstantChaumPedersenProof::make
         /// in order to get the precomputed value to make the proof.
         /// </summary>
-        static std::optional<std::unique_ptr<PrecomputedEncryption>> popTriple();
+        static std::optional<std::unique_ptr<PrecomputedEncryption>> popPrecomputedEncryption();
 
         /// <summary>
         /// Get the next two triples and a quadruple from the queues.
         /// If no quadruple exists, one is created.
         /// <returns>std::unique_ptr<TwoTriplesAndAQuadruple></returns>
         /// </summary>
-        static std::unique_ptr<PrecomputedSelection> getTwoTriplesAndAQuadruple();
+        static std::unique_ptr<PrecomputedSelection> getPrecomputedSelection();
 
         /// <summary>
         /// Pop the next quadruple set from the triple queue.
@@ -480,7 +480,7 @@ namespace electionguard
         /// the precomputed values to encrypt the selection and make a
         /// proof for it.
         /// </summary>
-        static std::optional<std::unique_ptr<PrecomputedSelection>> popTwoTriplesAndAQuadruple();
+        static std::optional<std::unique_ptr<PrecomputedSelection>> popPrecomputedSelection();
 
       private:
         std::mutex _mutex;

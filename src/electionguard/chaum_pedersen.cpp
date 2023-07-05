@@ -569,7 +569,7 @@ namespace electionguard
             Log::debug("ConstantChaumPedersenProof:: using precomputed values. Your seed value is "
                        "ignored and is no longer deterministic.");
             // check if the are precompute values rather than doing the exponentiations here
-            auto triple = PrecomputeBufferContext::popTriple();
+            auto triple = PrecomputeBufferContext::popPrecomputedEncryption();
             if (triple != nullptr && triple.has_value()) {
                 u = triple.value()->getSecret()->clone();
                 a = triple.value()->getPad()->clone();

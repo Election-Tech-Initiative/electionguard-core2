@@ -607,7 +607,7 @@ namespace electionguard
 
         if (usePrecompute) {
             // check if the are precompute values rather than doing the exponentiations here
-            auto triple = PrecomputeBufferContext::popTriple();
+            auto triple = PrecomputeBufferContext::popPrecomputedEncryption();
             if (triple != nullptr && triple.has_value()) {
                 alpha = triple.value()->getPad()->clone();
                 beta = triple.value()->getBlindingFactor()->clone();
