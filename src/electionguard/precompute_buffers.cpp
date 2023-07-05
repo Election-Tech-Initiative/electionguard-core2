@@ -78,76 +78,86 @@ namespace electionguard
 
 #pragma endregion
 
-#pragma region Quadruple
+#pragma region PrecomputedFakeDisjuctiveCommitments
 
-    Quadruple::Quadruple(unique_ptr<ElementModQ> exp1, unique_ptr<ElementModQ> exp2,
-                         unique_ptr<ElementModP> g_to_exp1,
-                         unique_ptr<ElementModP> g_to_exp2_mult_by_pubkey_to_exp1)
+    PrecomputedFakeDisjuctiveCommitments::PrecomputedFakeDisjuctiveCommitments(
+      unique_ptr<ElementModQ> exp1, unique_ptr<ElementModQ> exp2, unique_ptr<ElementModP> g_to_exp1,
+      unique_ptr<ElementModP> dataZero, unique_ptr<ElementModP> dataOne)
     {
         this->secret1 = move(exp1);
         this->secret2 = move(exp2);
         this->pad = move(g_to_exp1);
-        this->dataZero = move(g_to_exp2_mult_by_pubkey_to_exp1);
+        this->dataZero = move(dataZero);
+        this->dataOne = move(dataOne);
     }
 
-    Quadruple::Quadruple(const Quadruple &quadruple)
+    PrecomputedFakeDisjuctiveCommitments::PrecomputedFakeDisjuctiveCommitments(
+      const PrecomputedFakeDisjuctiveCommitments &other)
     {
-        this->secret1 = quadruple.secret1->clone();
-        this->secret2 = quadruple.secret2->clone();
-        this->pad = quadruple.pad->clone();
-        this->dataZero = quadruple.dataZero->clone();
+        this->secret1 = other.secret1->clone();
+        this->secret2 = other.secret2->clone();
+        this->pad = other.pad->clone();
+        this->dataZero = other.dataZero->clone();
+        this->dataOne = other.dataOne->clone();
     }
 
-    Quadruple::Quadruple(Quadruple &&quadruple)
+    PrecomputedFakeDisjuctiveCommitments::PrecomputedFakeDisjuctiveCommitments(
+      PrecomputedFakeDisjuctiveCommitments &&other)
     {
-        this->secret1 = move(quadruple.secret1);
-        this->secret2 = move(quadruple.secret2);
-        this->pad = move(quadruple.pad);
-        this->dataZero = move(quadruple.dataZero);
+        this->secret1 = move(other.secret1);
+        this->secret2 = move(other.secret2);
+        this->pad = move(other.pad);
+        this->dataZero = move(other.dataZero);
+        this->dataOne = move(other.dataOne);
     }
 
-    Quadruple::~Quadruple() = default;
+    PrecomputedFakeDisjuctiveCommitments::~PrecomputedFakeDisjuctiveCommitments() = default;
 
-    Quadruple &Quadruple::operator=(const Quadruple &quadruple)
+    PrecomputedFakeDisjuctiveCommitments &PrecomputedFakeDisjuctiveCommitments::operator=(
+      const PrecomputedFakeDisjuctiveCommitments &other)
     {
-        this->secret1 = quadruple.secret1->clone();
-        this->secret2 = quadruple.secret2->clone();
-        this->pad = quadruple.pad->clone();
-        this->dataZero = quadruple.dataZero->clone();
+        this->secret1 = other.secret1->clone();
+        this->secret2 = other.secret2->clone();
+        this->pad = other.pad->clone();
+        this->dataZero = other.dataZero->clone();
+        this->dataOne = other.dataOne->clone();
         return *this;
     }
 
-    Quadruple &Quadruple::operator=(Quadruple &&quadruple)
+    PrecomputedFakeDisjuctiveCommitments &
+    PrecomputedFakeDisjuctiveCommitments::operator=(PrecomputedFakeDisjuctiveCommitments &&other)
     {
-        this->secret1 = move(quadruple.secret1);
-        this->secret2 = move(quadruple.secret2);
-        this->pad = move(quadruple.pad);
-        this->dataZero = move(quadruple.dataZero);
+        this->secret1 = move(other.secret1);
+        this->secret2 = move(other.secret2);
+        this->pad = move(other.pad);
+        this->dataZero = move(other.dataZero);
+        this->dataOne = move(other.dataOne);
         return *this;
     }
 
-    void Quadruple::generateQuadruple(const ElementModP &publicKey)
+    void PrecomputedFakeDisjuctiveCommitments::generate(const ElementModP &publicKey)
     {
         // generate a random sigma and rho
         secret1 = rand_q();
         secret2 = rand_q();
         pad = g_pow_p(*secret1);
-        dataZero = mul_mod_p(*g_pow_p(*secret2), *pow_mod_p(publicKey, *secret1));
+        dataZero = pow_mod_p(publicKey, *sub_mod_q(*secret1, *secret2)); // K^(𝑢1-w) mod p
+        dataOne = pow_mod_p(publicKey, *add_mod_q(*secret1, *secret2));  // K^(w+𝑢0) mod p
     }
 
-    unique_ptr<Quadruple> Quadruple::clone()
+    unique_ptr<PrecomputedFakeDisjuctiveCommitments> PrecomputedFakeDisjuctiveCommitments::clone()
     {
-        return make_unique<Quadruple>(secret1->clone(), secret2->clone(), pad->clone(),
-                                      dataZero->clone());
+        return make_unique<PrecomputedFakeDisjuctiveCommitments>(
+          secret1->clone(), secret2->clone(), pad->clone(), dataZero->clone(), dataOne->clone());
     }
 
 #pragma endregion
 
 #pragma region TwoTriplesAndAQuadruple
 
-    TwoTriplesAndAQuadruple::TwoTriplesAndAQuadruple(unique_ptr<PrecomputedEncryption> triple1,
-                                                     unique_ptr<PrecomputedEncryption> triple2,
-                                                     unique_ptr<Quadruple> quad)
+    TwoTriplesAndAQuadruple::TwoTriplesAndAQuadruple(
+      unique_ptr<PrecomputedEncryption> triple1, unique_ptr<PrecomputedEncryption> triple2,
+      unique_ptr<PrecomputedFakeDisjuctiveCommitments> quad)
     {
         this->encryption = move(triple1);
         this->proof = move(triple2);
@@ -342,7 +352,7 @@ namespace electionguard
     {
         auto triple1 = make_unique<PrecomputedEncryption>(publicKey);
         auto triple2 = make_unique<PrecomputedEncryption>(publicKey);
-        auto quad = make_unique<Quadruple>(publicKey);
+        auto quad = make_unique<PrecomputedFakeDisjuctiveCommitments>(publicKey);
         return make_unique<TwoTriplesAndAQuadruple>(move(triple1), move(triple2), move(quad));
     }
 

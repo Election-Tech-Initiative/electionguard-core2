@@ -314,7 +314,7 @@ namespace electionguard
     {
         // NIZKP for plaintext 0
         // (a0, b0) = (g^𝑢0 mod p, K^𝑢0 mod p)
-        // (a1, b1) = (g^𝑢1 mod p, K^(𝑢1-w) mod p)
+        // (a1, b1) = (g^𝑢1 mod p, K^(𝑢1-w) mod p) <-- fake proof
 
         auto *alpha = message.getPad();
         auto *beta = message.getData();
@@ -355,7 +355,7 @@ namespace electionguard
     {
         // NIZKP for plaintext 0
         // (a0, b0) = (g^𝑢0 mod p, K^𝑢0 mod p)
-        // (a1, b1) = (g^𝑢1 mod p, K^(𝑢1-w) mod p)
+        // (a1, b1) = (g^𝑢1 mod p, K^(𝑢1-w) mod p) <-- fake proof
 
         auto *alpha = message.getPad();
         auto *beta = message.getData();
@@ -364,22 +364,21 @@ namespace electionguard
         Log::trace("beta: ", beta->toHex());
 
         // Get our values from the precomputed values.
-        auto triple1 = precomputedValues.get_triple1();
-        auto r = triple1->getSecret();
-        auto triple2 = precomputedValues.get_triple2();
-        auto quad = precomputedValues.get_quad();
+        auto encryption = precomputedValues.get_triple1();
+        auto r = encryption->getSecret();
+        auto real = precomputedValues.get_triple2();
+        auto fake = precomputedValues.get_quad();
 
         // Pick 3 random numbers in Q.
-        auto u0 = triple2->getSecret()->clone();
-        auto u1 = quad->get_exp1()->clone();
-        auto w = quad->get_exp2()->clone();
+        auto u0 = real->getSecret()->clone();
+        auto u1 = fake->getSecret1()->clone();
+        auto w = fake->getSecret2()->clone();
 
         // Compute the NIZKP
-        auto a0 = triple2->getPad()->clone();            // 𝑔^𝑢0 mod 𝑝
-        auto b0 = triple2->getBlindingFactor()->clone(); // 𝐾^𝑢0 mod 𝑝
-        auto a1 = quad->get_g_to_exp1()->clone();        // 𝑔^𝑢1 mod 𝑝
-        auto b1 = quad->get_g_to_exp2_mult_by_pubkey_to_exp1()
-                    ->clone(); // g^w⋅K^v mod p // TODO: <-- fix htis one
+        auto a0 = real->getPad()->clone();            // 𝑔^𝑢0 mod 𝑝
+        auto b0 = real->getBlindingFactor()->clone(); // 𝐾^𝑢0 mod 𝑝
+        auto a1 = fake->getPad()->clone();            // 𝑔^𝑢1 mod 𝑝
+        auto b1 = fake->getDataZero()->clone();       // K^(𝑢1-w) mod p
 
         // Compute the challenge
         auto c = hash_elems({HashPrefix::get_prefix_04(), &const_cast<ElementModQ &>(q),
@@ -409,7 +408,7 @@ namespace electionguard
                                             const ElementModQ &seed)
     {
         // NIZKP for plaintext 1
-        // (a0, b0) = (g^𝑢0 mod p, K^(w+𝑢0) mod p)
+        // (a0, b0) = (g^𝑢0 mod p, K^(w+𝑢0) mod p) <-- fake proof
         // (a1, b1) = (g^𝑢1 mod p, K^𝑢1 mod p)
 
         auto *alpha = message.getPad();
@@ -446,7 +445,7 @@ namespace electionguard
                                             const ElementModP &k, const ElementModQ &q)
     {
         // NIZKP for plaintext 1
-        // (a0, b0) = (g^𝑢0 mod p, K^(w+𝑢0) mod p)
+        // (a0, b0) = (g^𝑢0 mod p, K^(w+𝑢0) mod p) <-- fake proof
         // (a1, b1) = (g^𝑢1 mod p, K^𝑢1 mod p)
 
         auto *alpha = message.getPad();
@@ -456,31 +455,31 @@ namespace electionguard
         Log::trace("beta: ", beta->toHex());
 
         // Get our values from the precomputed values.
-        auto triple1 = precomputedValues.get_triple1();
-        auto r = triple1->getSecret();
-        auto triple2 = precomputedValues.get_triple2();
-        auto quad = precomputedValues.get_quad();
-        auto u = triple2->getSecret()->clone();
-        auto v = quad->get_exp1()->clone();
-        auto w = quad->get_exp2()->clone();
+        auto encryption = precomputedValues.get_triple1();
+        auto r = encryption->getSecret();
+        auto real = precomputedValues.get_triple2();
+        auto fake = precomputedValues.get_quad();
+        auto u0 = fake->getSecret1()->clone();
+        auto u1 = real->getSecret()->clone();
+        auto w = fake->getSecret2()->clone();
 
-        auto a0 = quad->get_g_to_exp1()->clone();                        // 𝑔^𝑢0 mod 𝑝
-        auto b0 = quad->get_g_to_exp2_mult_by_pubkey_to_exp1()->clone(); // g^w⋅K^𝑢0 mod p
-        auto a1 = triple2->getPad()->clone();                            // 𝑔^𝑢1 mod 𝑝
-        auto b1 = triple2->getBlindingFactor()->clone();                 // 𝐾^𝑢1 mod 𝑝
+        auto a0 = fake->getPad()->clone();            // 𝑔^𝑢0 mod 𝑝
+        auto b0 = fake->getDataOne()->clone();        // K^(w+𝑢0) mod p
+        auto a1 = real->getPad()->clone();            // 𝑔^𝑢1 mod 𝑝
+        auto b1 = real->getBlindingFactor()->clone(); // 𝐾^𝑢1 mod 𝑝
 
         // Compute challenge
         auto c = hash_elems({HashPrefix::get_prefix_04(), &const_cast<ElementModQ &>(q),
                              &const_cast<ElementModP &>(k), alpha, beta, a0.get(), b0.get(),
                              a1.get(), b1.get()});
 
-        auto c0 = sub_mod_q(Q(), *w);           // c_0=(q-w)  mod q
-        auto c1 = add_mod_q(*c, *w);            // c_1=(c+w)  mod q
-        auto v0 = a_plus_bc_mod_q(*v, *c0, *r); // v_0=(v+c_0⋅R)  mod q
-        auto v1 = a_plus_bc_mod_q(*u, *c1, *r); // v_1=(u+c_1⋅R)  mod q
+        // auto c0 = *w                          // c0 = w  mod q
+        auto c1 = sub_mod_q(*c, *w);              // c1 = (c - w)  mod q
+        auto v0 = a_minus_bc_mod_q(*u0, *w, *r);  // v0 = (𝑢0 - c0 ⋅ R)  mod q
+        auto v1 = a_minus_bc_mod_q(*u1, *c1, *r); // v1 = (𝑢1 - c1 ⋅ R)  mod q
 
         return make_unique<DisjunctiveChaumPedersenProof>(
-          move(a0), move(b0), move(a1), move(b1), move(c0), move(c1), move(c), move(v0), move(v1));
+          move(a0), move(b0), move(a1), move(b1), move(w), move(c1), move(c), move(v0), move(v1));
     }
 
 #pragma endregion

@@ -20,7 +20,7 @@ namespace electionguard
     /// A PrecomputedEncryption is a triplet-set of precomputed values
     /// that are used to speed up encryption.
     ///
-    /// it is used when encrypting a selection as an intermediate value
+    /// It is used when encrypting a selection as an intermediate value
     /// and it is used when generating a proof for a selection.
     ///
     /// The three items contained in this object are
@@ -69,44 +69,81 @@ namespace electionguard
     };
 
     /// <summary>
-    /// This object holds the Quadruple for the entries in the precomputed
-    /// quadruple_queue. The four items contained in this object are
+    /// PrecomputedFakeDisjuctiveCommitments is a quintuplet-set of precomputed values
+    /// that are used to speed up encryption. It works by pregenerating the fake proof
+    /// values for an encryption of zero or one. Both fake proofs are made as part of
+    /// this precompute object, but only one of them is used. It is up to the caller
+    /// to determine which one to use.
+    ///
+    /// It is used when generating a fake proof as part of proving an encryption
+    /// is an encryption of zero or one.
+    ///
+    /// The five items contained in this object are
     /// - the first random exponent (exp1),
     /// - the second random exponent (exp2)
     /// - g ^ exp1 mod p (g_to_exp1)
     /// - (g ^ exp2 mod p) * (K ^ exp1 mod p)
     /// (g_to_exp2 mult_by_pubkey_to_exp1 - where K is the public key).
     /// </summary>
-    class EG_API Quadruple // TODO: rename to PrecomputedFakeProof
+    class EG_API PrecomputedFakeDisjuctiveCommitments
     {
+      public:
+        explicit PrecomputedFakeDisjuctiveCommitments(const ElementModP &publicKey)
+        {
+            generate(publicKey);
+        }
+        PrecomputedFakeDisjuctiveCommitments(std::unique_ptr<ElementModQ> secret1,
+                                             std::unique_ptr<ElementModQ> secret2,
+                                             std::unique_ptr<ElementModP> pad,
+                                             std::unique_ptr<ElementModP> dataZero,
+                                             std::unique_ptr<ElementModP> dataOne);
+        PrecomputedFakeDisjuctiveCommitments(const PrecomputedFakeDisjuctiveCommitments &other);
+        PrecomputedFakeDisjuctiveCommitments(PrecomputedFakeDisjuctiveCommitments &&other);
+        ~PrecomputedFakeDisjuctiveCommitments();
+
+        PrecomputedFakeDisjuctiveCommitments &
+        operator=(const PrecomputedFakeDisjuctiveCommitments &other);
+        PrecomputedFakeDisjuctiveCommitments &
+        operator=(PrecomputedFakeDisjuctiveCommitments &&other);
+
+        std::unique_ptr<PrecomputedFakeDisjuctiveCommitments> clone();
+
+        /// <summary>
+        /// The first secret value (either 𝑢0 or 𝑢1 in the spec)
+        /// </summary>
+        ElementModQ *getSecret1() const { return secret1.get(); }
+
+        /// <summary>
+        /// The second secret value (w in the spec)
+        /// </summary>
+        ElementModQ *getSecret2() const { return secret2.get(); }
+
+        /// <summary>
+        /// The pad applied to the ciphertext message (either a0 or a1 in the spec)
+        /// </summary>
+        ElementModP *getPad() const { return pad.get(); }
+
+        /// <summary>
+        /// The fake data proving an encryption of zero (b1 in the spec)
+        /// Use this value when proving an encryption of zero.
+        /// </summary>
+        ElementModP *getDataZero() const { return dataZero.get(); }
+
+        /// <summary>
+        /// The pad applied to the ciphertext message (b0 in the spec)
+        /// Use this value when proving an encryption of one.
+        /// </summary>
+        ElementModP *getDataOne() const { return dataOne.get(); }
+
+      protected:
+        void generate(const ElementModP &publicKey);
+
+      private:
         std::unique_ptr<ElementModQ> secret1;
         std::unique_ptr<ElementModQ> secret2;
         std::unique_ptr<ElementModP> pad;
         std::unique_ptr<ElementModP> dataZero;
         std::unique_ptr<ElementModP> dataOne;
-
-      public:
-        explicit Quadruple(const ElementModP &publicKey) { generateQuadruple(publicKey); }
-        Quadruple(){};
-        Quadruple(std::unique_ptr<ElementModQ> exp1, std::unique_ptr<ElementModQ> exp2,
-                  std::unique_ptr<ElementModP> g_to_exp1,
-                  std::unique_ptr<ElementModP> g_to_exp2_mult_by_pubkey_to_exp1);
-        Quadruple(const Quadruple &quadruple);
-        Quadruple(Quadruple &&);
-        ~Quadruple();
-
-        Quadruple &operator=(const Quadruple &quadruple);
-        Quadruple &operator=(Quadruple &&);
-
-        std::unique_ptr<Quadruple> clone();
-
-        ElementModQ *get_exp1() const { return secret1.get(); }
-        ElementModQ *get_exp2() const { return secret2.get(); }
-        ElementModP *get_g_to_exp1() const { return pad.get(); }
-        ElementModP *get_g_to_exp2_mult_by_pubkey_to_exp1() const { return dataZero.get(); }
-
-      protected:
-        void generateQuadruple(const ElementModP &publicKey);
     };
 
     /// <summary>
@@ -120,13 +157,13 @@ namespace electionguard
     {
         std::unique_ptr<PrecomputedEncryption> encryption;
         std::unique_ptr<PrecomputedEncryption> proof;
-        std::unique_ptr<Quadruple> fakeProof;
+        std::unique_ptr<PrecomputedFakeDisjuctiveCommitments> fakeProof;
 
       public:
         explicit TwoTriplesAndAQuadruple() {}
         TwoTriplesAndAQuadruple(std::unique_ptr<PrecomputedEncryption> in_triple1,
                                 std::unique_ptr<PrecomputedEncryption> in_triple2,
-                                std::unique_ptr<Quadruple> in_quad);
+                                std::unique_ptr<PrecomputedFakeDisjuctiveCommitments> in_quad);
         TwoTriplesAndAQuadruple(const TwoTriplesAndAQuadruple &other);
         TwoTriplesAndAQuadruple(TwoTriplesAndAQuadruple &&);
         ~TwoTriplesAndAQuadruple();
@@ -138,7 +175,7 @@ namespace electionguard
 
         PrecomputedEncryption *get_triple1() const { return encryption.get(); }
         PrecomputedEncryption *get_triple2() const { return proof.get(); }
-        Quadruple *get_quad() const { return fakeProof.get(); }
+        PrecomputedFakeDisjuctiveCommitments *get_quad() const { return fakeProof.get(); }
     };
 
     // TODO: range proof precompute table
