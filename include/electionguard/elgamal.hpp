@@ -220,7 +220,8 @@ namespace electionguard
     /// <returns>A ciphertext tuple.</returns>
     /// </summary>
     EG_API std::unique_ptr<ElGamalCiphertext>
-    elgamalEncrypt(uint64_t m, const ElementModP &publicKey, const Triple &precomputedValues);
+    elgamalEncrypt(uint64_t m, const ElementModP &publicKey,
+                   const PrecomputedEncryption &precomputedValues);
 
     /// <summary>
     /// Homomorphically accumulates one or more ElGamal ciphertexts by pairwise multiplication.

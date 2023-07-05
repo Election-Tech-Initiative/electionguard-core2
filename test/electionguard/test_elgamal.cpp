@@ -115,7 +115,7 @@ TEST_CASE("elgamalEncrypt simple encrypt 0 compared with elgamalEncrypt_with_pre
     auto triple1 = precomputedValues->get_triple1();
 
     // Act
-    auto cipherText1 = elgamalEncrypt(0UL, *triple1->get_exp(), *publicKey);
+    auto cipherText1 = elgamalEncrypt(0UL, *triple1->getSecret(), *publicKey);
     auto cipherText2 =
       elgamalEncrypt(0UL, *keypair->getPublicKey(), *precomputedValues->get_triple1());
 

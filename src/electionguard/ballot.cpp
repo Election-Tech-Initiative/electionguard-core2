@@ -328,7 +328,7 @@ namespace electionguard
         }
 
         // need to make sure we use the nonce used in precomputed values
-        auto nonce = precomputedValues->get_triple1()->get_exp()->clone();
+        auto nonce = precomputedValues->get_triple1()->getSecret()->clone();
 
         unique_ptr<DisjunctiveChaumPedersenProof> proof = nullptr;
         if (computeProof) {

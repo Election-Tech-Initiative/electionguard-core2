@@ -17,39 +17,55 @@
 namespace electionguard
 {
     /// <summary>
-    /// This object holds the Triple for the entries in the precomputed triple_queue
+    /// A PrecomputedEncryption is a triplet-set of precomputed values
+    /// that are used to speed up encryption.
+    ///
+    /// it is used when encrypting a selection as an intermediate value
+    /// and it is used when generating a proof for a selection.
+    ///
     /// The three items contained in this object are
-    /// - a random exponent (exp),
-    /// - g ^ exp mod p (g_to_exp) and
-    /// - K ^ exp mod p (pubkey_to_exp - where K is the public key).
+    /// - a random secret exponent r (secret - where r is [0,Q) and Q is the small prime modulus),
+    /// - g^r mod p (pad - where g is the generator and p is the large prime modulus)
+    /// - K^r mod p (blindingFactor - where K is the public key).
     /// </summary>
-    class EG_API Triple
+    class EG_API PrecomputedEncryption
     {
-        std::unique_ptr<ElementModQ> exp;
-        std::unique_ptr<ElementModP> g_to_exp;
-        std::unique_ptr<ElementModP> pubkey_to_exp;
-
       public:
-        explicit Triple(const ElementModP &publicKey) { generateTriple(publicKey); }
-        Triple() {}
-        Triple(std::unique_ptr<ElementModQ> exp, std::unique_ptr<ElementModP> g_to_exp,
-               std::unique_ptr<ElementModP> pubkey_to_exp);
+        explicit PrecomputedEncryption(const ElementModP &publicKey) { generate(publicKey); }
+        PrecomputedEncryption(std::unique_ptr<ElementModQ> secret, std::unique_ptr<ElementModP> pad,
+                              std::unique_ptr<ElementModP> blindingFactor);
 
-        Triple(const Triple &triple);
-        Triple(Triple &&);
-        ~Triple();
+        PrecomputedEncryption(const PrecomputedEncryption &other);
+        PrecomputedEncryption(PrecomputedEncryption &&);
+        ~PrecomputedEncryption();
 
-        Triple &operator=(const Triple &triple);
-        Triple &operator=(Triple &&);
+        PrecomputedEncryption &operator=(const PrecomputedEncryption &other);
+        PrecomputedEncryption &operator=(PrecomputedEncryption &&other);
 
-        std::unique_ptr<Triple> clone();
+        std::unique_ptr<PrecomputedEncryption> clone();
 
-        ElementModQ *get_exp() const { return exp.get(); }
-        ElementModP *get_g_to_exp() const { return g_to_exp.get(); }
-        ElementModP *get_k_to_exp() const { return pubkey_to_exp.get(); }
+        /// <summary>
+        /// the secret value (the expontent usually r, s, u, v, or w in the spec)
+        /// </summary>
+        ElementModQ *getSecret() const { return secret.get(); }
+
+        /// <summary>
+        /// the pad applied to the ciphertext message (g^r)
+        /// </summary>
+        ElementModP *getPad() const { return pad.get(); }
+
+        /// <summary>
+        /// the blinding factor applied to the message during encryption ( K^r)
+        /// </summary>
+        ElementModP *getBlindingFactor() const { return blindingFactor.get(); }
 
       protected:
-        void generateTriple(const ElementModP &publicKey);
+        void generate(const ElementModP &publicKey);
+
+      private:
+        std::unique_ptr<ElementModQ> secret;
+        std::unique_ptr<ElementModP> pad;
+        std::unique_ptr<ElementModP> blindingFactor;
     };
 
     /// <summary>
@@ -61,12 +77,13 @@ namespace electionguard
     /// - (g ^ exp2 mod p) * (K ^ exp1 mod p)
     /// (g_to_exp2 mult_by_pubkey_to_exp1 - where K is the public key).
     /// </summary>
-    class EG_API Quadruple
+    class EG_API Quadruple // TODO: rename to PrecomputedFakeProof
     {
-        std::unique_ptr<ElementModQ> exp1;
-        std::unique_ptr<ElementModQ> exp2;
-        std::unique_ptr<ElementModP> g_to_exp1;
-        std::unique_ptr<ElementModP> g_to_exp2_mult_by_pubkey_to_exp1;
+        std::unique_ptr<ElementModQ> secret1;
+        std::unique_ptr<ElementModQ> secret2;
+        std::unique_ptr<ElementModP> pad;
+        std::unique_ptr<ElementModP> dataZero;
+        std::unique_ptr<ElementModP> dataOne;
 
       public:
         explicit Quadruple(const ElementModP &publicKey) { generateQuadruple(publicKey); }
@@ -83,13 +100,10 @@ namespace electionguard
 
         std::unique_ptr<Quadruple> clone();
 
-        ElementModQ *get_exp1() const { return exp1.get(); }
-        ElementModQ *get_exp2() const { return exp2.get(); }
-        ElementModP *get_g_to_exp1() const { return g_to_exp1.get(); }
-        ElementModP *get_g_to_exp2_mult_by_pubkey_to_exp1() const
-        {
-            return g_to_exp2_mult_by_pubkey_to_exp1.get();
-        }
+        ElementModQ *get_exp1() const { return secret1.get(); }
+        ElementModQ *get_exp2() const { return secret2.get(); }
+        ElementModP *get_g_to_exp1() const { return pad.get(); }
+        ElementModP *get_g_to_exp2_mult_by_pubkey_to_exp1() const { return dataZero.get(); }
 
       protected:
         void generateQuadruple(const ElementModP &publicKey);
@@ -102,16 +116,16 @@ namespace electionguard
     /// from the ElGamal encryption of the selection as well as the
     /// computation of the Chaum Pedersen proof.
     /// </summary>
-    class EG_API TwoTriplesAndAQuadruple
+    class EG_API TwoTriplesAndAQuadruple // TODO: rename to PrecomputedSelection
     {
-        std::unique_ptr<Triple> triple1;
-        std::unique_ptr<Triple> triple2;
-        std::unique_ptr<Quadruple> quad;
+        std::unique_ptr<PrecomputedEncryption> encryption;
+        std::unique_ptr<PrecomputedEncryption> proof;
+        std::unique_ptr<Quadruple> fakeProof;
 
       public:
         explicit TwoTriplesAndAQuadruple() {}
-        TwoTriplesAndAQuadruple(std::unique_ptr<Triple> in_triple1,
-                                std::unique_ptr<Triple> in_triple2,
+        TwoTriplesAndAQuadruple(std::unique_ptr<PrecomputedEncryption> in_triple1,
+                                std::unique_ptr<PrecomputedEncryption> in_triple2,
                                 std::unique_ptr<Quadruple> in_quad);
         TwoTriplesAndAQuadruple(const TwoTriplesAndAQuadruple &other);
         TwoTriplesAndAQuadruple(TwoTriplesAndAQuadruple &&);
@@ -122,10 +136,12 @@ namespace electionguard
 
         std::unique_ptr<TwoTriplesAndAQuadruple> clone();
 
-        Triple *get_triple1() const { return triple1.get(); }
-        Triple *get_triple2() const { return triple2.get(); }
-        Quadruple *get_quad() const { return quad.get(); }
+        PrecomputedEncryption *get_triple1() const { return encryption.get(); }
+        PrecomputedEncryption *get_triple2() const { return proof.get(); }
+        Quadruple *get_quad() const { return fakeProof.get(); }
     };
+
+    // TODO: range proof precompute table
 
     /// <summary>
     /// A buffer of precomputed values that are used to speed up encryption
@@ -220,36 +236,40 @@ namespace electionguard
         /// <summary>
         /// Get the next triple from the triple queue.
         /// If no triple exists, one is created.
+        /// </summary>
+        std::unique_ptr<PrecomputedEncryption> getTriple();
+
+        /// <summary>
+        /// Pop the next triple from the triple queue. If there is no triple
+        /// in the queue, then nullopt is returned.
         ///
         /// This method is called by hashedElgamalEncrypt in order to get
         /// the precomputed value to perform the hashed elgamal encryption.
+        ///
+        /// This method is also called by ConstantChaumPedersenProof::make
+        /// in order to get the precomputed value to make the proof.
         /// </summary>
-        std::unique_ptr<Triple> getTriple();
-
-        /// <summary>
-        /// Pop the next triple from the triple queue.
-        /// If no triple exists, then nullopt is returned.
-        /// </summary>
-        std::optional<std::unique_ptr<Triple>> popTriple();
+        std::optional<std::unique_ptr<PrecomputedEncryption>> popTriple();
 
         /// <summary>
         /// Get the next two triples and a quadruple from the queues.
         /// If no quadruple exists, one is created.
-        ///
-        /// This method is called by encryptSelection in order to get
-        /// the precomputed values to encrypt the selection and make a
-        /// proof for it.
         /// </summary>
         std::unique_ptr<TwoTriplesAndAQuadruple> getTwoTriplesAndAQuadruple();
 
         /// <summary>
         /// Pop the next quadruple set from the triple queue.
         /// If no quadruple exists, then nullopt is returned.
+        ///
+        /// This method is called by encryptSelection in order to get
+        /// the precomputed values to encrypt the selection and make a
+        /// proof for it.
         /// </summary>
         std::optional<std::unique_ptr<TwoTriplesAndAQuadruple>> popTwoTriplesAndAQuadruple();
 
       protected:
-        static std::tuple<std::unique_ptr<Triple>, std::unique_ptr<Triple>>
+        static std::tuple<std::unique_ptr<PrecomputedEncryption>,
+                          std::unique_ptr<PrecomputedEncryption>>
         createTwoTriples(const ElementModP &publicKey);
         static std::unique_ptr<TwoTriplesAndAQuadruple>
         createTwoTriplesAndAQuadruple(const ElementModP &publicKey);
@@ -261,7 +281,7 @@ namespace electionguard
         std::mutex triple_queue_lock;
         std::mutex quad_queue_lock;
         std::unique_ptr<ElementModP> publicKey;
-        std::queue<std::unique_ptr<Triple>> triple_queue;
+        std::queue<std::unique_ptr<PrecomputedEncryption>> triple_queue;
         std::queue<std::unique_ptr<TwoTriplesAndAQuadruple>> twoTriplesAndAQuadruple_queue;
     };
 
@@ -380,7 +400,7 @@ namespace electionguard
         /// Get the next triple from the triple queue. If there is no triple
         /// in the queue, then one is created.
         /// </summary>
-        static std::unique_ptr<Triple> getTriple();
+        static std::unique_ptr<PrecomputedEncryption> getTriple();
 
         /// <summary>
         /// Pop the next triple from the triple queue. If there is no triple
@@ -392,7 +412,7 @@ namespace electionguard
         /// This method is also called by ConstantChaumPedersenProof::make
         /// in order to get the precomputed value to make the proof.
         /// </summary>
-        static std::optional<std::unique_ptr<Triple>> popTriple();
+        static std::optional<std::unique_ptr<PrecomputedEncryption>> popTriple();
 
         /// <summary>
         /// Get the next two triples and a quadruple from the queues.

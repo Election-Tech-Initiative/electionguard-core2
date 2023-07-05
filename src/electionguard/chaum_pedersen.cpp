@@ -332,7 +332,7 @@ namespace electionguard
         auto a0 = g_pow_p(*u0);                      // 𝑔^𝑢0 mod 𝑝
         auto b0 = pow_mod_p(k, *u0);                 // 𝐾^𝑢0 mod 𝑝
         auto a1 = g_pow_p(*u1);                      // 𝑔^𝑢1 mod 𝑝
-        auto b1 = pow_mod_p(k, *sub_mod_q(*u1, *w)); // K^(𝑢1+w) mod p
+        auto b1 = pow_mod_p(k, *sub_mod_q(*u1, *w)); // K^(𝑢1-w) mod p
 
         // Compute the challenge
         auto c = hash_elems({HashPrefix::get_prefix_04(), &const_cast<ElementModQ &>(q),
@@ -355,7 +355,7 @@ namespace electionguard
     {
         // NIZKP for plaintext 0
         // (a0, b0) = (g^𝑢0 mod p, K^𝑢0 mod p)
-        // (a1, b1) = (g^𝑢1 mod p, K^(𝑢1+w) mod p)
+        // (a1, b1) = (g^𝑢1 mod p, K^(𝑢1-w) mod p)
 
         auto *alpha = message.getPad();
         auto *beta = message.getData();
@@ -365,19 +365,19 @@ namespace electionguard
 
         // Get our values from the precomputed values.
         auto triple1 = precomputedValues.get_triple1();
-        auto r = triple1->get_exp();
+        auto r = triple1->getSecret();
         auto triple2 = precomputedValues.get_triple2();
         auto quad = precomputedValues.get_quad();
 
         // Pick 3 random numbers in Q.
-        auto u0 = triple2->get_exp()->clone();
+        auto u0 = triple2->getSecret()->clone();
         auto u1 = quad->get_exp1()->clone();
         auto w = quad->get_exp2()->clone();
 
         // Compute the NIZKP
-        auto a0 = triple2->get_g_to_exp()->clone(); // 𝑔^𝑢0 mod 𝑝
-        auto b0 = triple2->get_k_to_exp()->clone(); // 𝐾^𝑢0 mod 𝑝
-        auto a1 = quad->get_g_to_exp1()->clone();   // 𝑔^𝑢1 mod 𝑝
+        auto a0 = triple2->getPad()->clone();            // 𝑔^𝑢0 mod 𝑝
+        auto b0 = triple2->getBlindingFactor()->clone(); // 𝐾^𝑢0 mod 𝑝
+        auto a1 = quad->get_g_to_exp1()->clone();        // 𝑔^𝑢1 mod 𝑝
         auto b1 = quad->get_g_to_exp2_mult_by_pubkey_to_exp1()
                     ->clone(); // g^w⋅K^v mod p // TODO: <-- fix htis one
 
@@ -422,7 +422,7 @@ namespace electionguard
         auto w = nonces->get(2);
 
         auto a0 = g_pow_p(*u0);                      // 𝑔^𝑢0 mod 𝑝
-        auto b0 = pow_mod_p(k, *add_mod_p(*w, *u0)); // K^(w + 𝑢0)  mod p
+        auto b0 = pow_mod_p(k, *add_mod_p(*w, *u0)); // K^(w+𝑢0)  mod p
         auto a1 = g_pow_p(*u1);                      // g^𝑢1  mod p
         auto b1 = pow_mod_p(k, *u1);                 // K^𝑢1  mod p
 
@@ -431,7 +431,7 @@ namespace electionguard
                              &const_cast<ElementModP &>(k), alpha, beta, a0.get(), b0.get(),
                              a1.get(), b1.get()}); // H(04,Q;K,α,β,a0,b0,a1,b1)
 
-        // auto c0 = *w                         // c0 = w  mod q
+        // auto c0 = *w                          // c0 = w  mod q
         auto c1 = sub_mod_q(*c, *w);             // c1 = (c - w)  mod q
         auto v0 = a_minus_bc_mod_q(*u0, *w, r);  // v0 = (𝑢0 - c0 ⋅ R)  mod q
         auto v1 = a_minus_bc_mod_q(*u1, *c1, r); // v1 = (𝑢1 - c1 ⋅ R)  mod q
@@ -445,7 +445,9 @@ namespace electionguard
                                             const TwoTriplesAndAQuadruple &precomputedValues,
                                             const ElementModP &k, const ElementModQ &q)
     {
-        unique_ptr<DisjunctiveChaumPedersenProof> result;
+        // NIZKP for plaintext 1
+        // (a0, b0) = (g^𝑢0 mod p, K^(w+𝑢0) mod p)
+        // (a1, b1) = (g^𝑢1 mod p, K^𝑢1 mod p)
 
         auto *alpha = message.getPad();
         auto *beta = message.getData();
@@ -455,17 +457,17 @@ namespace electionguard
 
         // Get our values from the precomputed values.
         auto triple1 = precomputedValues.get_triple1();
-        auto r = triple1->get_exp();
+        auto r = triple1->getSecret();
         auto triple2 = precomputedValues.get_triple2();
         auto quad = precomputedValues.get_quad();
-        auto u = triple2->get_exp()->clone();
+        auto u = triple2->getSecret()->clone();
         auto v = quad->get_exp1()->clone();
         auto w = quad->get_exp2()->clone();
 
-        auto a0 = quad->get_g_to_exp1()->clone();                        // 𝑔^v mod 𝑝
-        auto b0 = quad->get_g_to_exp2_mult_by_pubkey_to_exp1()->clone(); // g^w⋅K^v mod p
-        auto a1 = triple2->get_g_to_exp()->clone();                      // 𝑔^𝑢 mod 𝑝
-        auto b1 = triple2->get_k_to_exp()->clone();                      // 𝐾^𝑢 mod 𝑝
+        auto a0 = quad->get_g_to_exp1()->clone();                        // 𝑔^𝑢0 mod 𝑝
+        auto b0 = quad->get_g_to_exp2_mult_by_pubkey_to_exp1()->clone(); // g^w⋅K^𝑢0 mod p
+        auto a1 = triple2->getPad()->clone();                            // 𝑔^𝑢1 mod 𝑝
+        auto b1 = triple2->getBlindingFactor()->clone();                 // 𝐾^𝑢1 mod 𝑝
 
         // Compute challenge
         auto c = hash_elems({HashPrefix::get_prefix_04(), &const_cast<ElementModQ &>(q),
@@ -570,9 +572,9 @@ namespace electionguard
             // check if the are precompute values rather than doing the exponentiations here
             auto triple = PrecomputeBufferContext::popTriple();
             if (triple != nullptr && triple.has_value()) {
-                u = triple.value()->get_exp()->clone();
-                a = triple.value()->get_g_to_exp()->clone();
-                b = triple.value()->get_k_to_exp()->clone();
+                u = triple.value()->getSecret()->clone();
+                a = triple.value()->getPad()->clone();
+                b = triple.value()->getBlindingFactor()->clone();
             }
         }
         // if there are no precomputed values, do the exponentiations here
