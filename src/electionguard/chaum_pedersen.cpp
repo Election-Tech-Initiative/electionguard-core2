@@ -248,16 +248,16 @@ namespace electionguard
           (c == *hash_elems({HashPrefix::get_prefix_04(), &const_cast<ElementModQ &>(q),
                              &const_cast<ElementModP &>(k), alpha, beta, a0p, b0p, a1p, b1p}));
 
-        // 𝑔^𝑣0 mod 𝑝 = 𝑎0 ⋅ 𝛼^𝑐0 mod 𝑝
+        // 𝑎0 = 𝑔^𝑣0 mod 𝑝 ⋅ 𝛼^𝑐0 mod 𝑝
         auto consistent_gv0 = (a0 == *mul_mod_p(*g_pow_p(v0), *pow_mod_p(*alpha, c0)));
 
-        // 𝑔^𝑣1 mod 𝑝 = 𝑎1 ⋅ 𝛼^𝑐1 mod 𝑝
+        // 𝑎1 = 𝑔^𝑣1 mod 𝑝 ⋅ 𝛼^𝑐1 mod 𝑝
         auto consistent_gv1 = (a1 == *mul_mod_p(*g_pow_p(v1), *pow_mod_p(*alpha, c1)));
 
-        // 𝐾^𝑣0 mod 𝑝 = 𝑏0 ⋅ 𝛽^𝑐0 mod 𝑝
+        // 𝑏0 = 𝐾^𝑣0 mod 𝑝 ⋅ 𝛽^𝑐0 mod 𝑝
         auto consistent_kv0 = (b0 == *mul_mod_p(*pow_mod_p(k, v0), *pow_mod_p(*beta, c0)));
 
-        // 𝐾^w1 mod 𝑝 = 𝑏1 ⋅ 𝛽^𝑐1 mod 𝑝
+        // 𝑏1 = 𝐾^w1 mod 𝑝 ⋅ 𝛽^𝑐1 mod 𝑝
         auto w1 = sub_mod_q(v1, c1);
         auto consistent_kw1 = (b1 == *mul_mod_p(*pow_mod_p(k, *w1), *pow_mod_p(*beta, c1)));
 
