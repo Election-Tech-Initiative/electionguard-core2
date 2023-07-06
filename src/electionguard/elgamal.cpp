@@ -230,6 +230,34 @@ namespace electionguard
         return decrypt(*product, publicKey);
     }
 
+    uint64_t ElGamalCiphertext::decrypt(const ElementModP &publicKey, const ElementModQ &nonce,
+                                        const ElementModP &base)
+    {
+        // E.G. 2.0 Base-K Decrypt
+        if (publicKey == base) {
+            return decrypt(publicKey, nonce);
+        }
+
+        // E.G. 1.0 Compatible Decrypt
+        auto product = pow_mod_p(publicKey, nonce);
+        auto result = div_mod_p(*pimpl->data, *product);
+        return DiscreteLog::getAsync(*result, base);
+    }
+
+    uint64_t ElGamalCiphertext::decrypt(const ElementModP &publicKey, const ElementModQ &nonce,
+                                        const ElementModP &base) const
+    {
+        // E.G. 2.0 Base-K Decrypt
+        if (publicKey == base) {
+            return decrypt(publicKey, nonce);
+        }
+
+        // E.G. 1.0 Compatible Decrypt
+        auto product = pow_mod_p(publicKey, nonce);
+        auto result = div_mod_p(*pimpl->data, *product);
+        return DiscreteLog::getAsync(*result, base);
+    }
+
     unique_ptr<ElementModP> ElGamalCiphertext::partialDecrypt(const ElementModQ &secretKey)
     {
         return pow_mod_p(*pimpl->pad, secretKey);
@@ -247,28 +275,40 @@ namespace electionguard
 
 #pragma endregion
 
-    unique_ptr<ElGamalCiphertext> elgamalEncrypt(uint64_t m, const ElementModQ &nonce,
-                                                 const ElementModP &publicKey)
+    /// <summary>
+    /// elgamal encrypt using the provided pad and blinding factor against a specific base
+    /// this method supports the case where the encryption base is different than the public key
+    /// which was the case in EG 1.0.
+    ///
+    /// this method is used both for encrypting against G for 1.0 elections
+    /// and for encrypting against K for 2.0 elections using precomputed values.
+    ///
+    /// ecryptionBase (B) is usually either the generator (G()) or the public key of the election (K)
+    /// <param name="m">the message to encrypt (m or V in the spec)</param>
+    /// <param name="pad">the pad to use for the encryption (g^R mod p)</param>
+    /// <param name="blindingFactor">the blinding factor to use for the encryption (K^R mod p)</param>
+    /// <param name="publicKey">the public key to use for the encryption (K in the spec)</param>
+    /// <param name="encryptionBase">the base to use for the encryption (g or K in the spec)</param>
+    /// </summary>
+    unique_ptr<ElGamalCiphertext> elgamalEncrypt(uint64_t m, unique_ptr<ElementModP> pad,
+                                                 const ElementModP blindingFactor,
+                                                 const ElementModP &publicKey,
+                                                 const ElementModP &encryptionBase)
     {
-        if ((const_cast<ElementModQ &>(nonce) == ZERO_MOD_Q())) {
-            throw invalid_argument("elgamalEncrypt encryption requires a non-zero nonce");
-        }
+        // E.G. 1.0 Compatible ElGamal Encrypt.
+        // (g^R mod p, B^V ·K^R mod p)
 
-        // (g^R mod p, K^V ·K^R mod p) = (g^R mod p, K^(V+R) mod p)
-
-        auto pad = g_pow_p(nonce); // g^r mod p
-        unique_ptr<ElementModQ> exponent = nullptr;
-        if (m == 0) {
-            exponent = nonce.clone(); // (V+0)
-        } else if (m == 1) {
-            exponent = add_mod_q(nonce, ONE_MOD_Q()); // (V+1)
+        unique_ptr<ElementModP> data = nullptr;
+        if (m == 1) {
+            data = mul_mod_p(encryptionBase, blindingFactor); // B^1 * K^R mod p
+        } else if (m == 0) {
+            data = blindingFactor.clone(); // B^0 * K^R mod p
         } else {
-            exponent = add_mod_q(nonce, *ElementModQ::fromUint64(m)); // (V+r)
+            auto message = pow_mod_p(encryptionBase, m);
+            data = mul_mod_p(*message, blindingFactor); // B^V * K^R mod p
         }
 
-        auto data = pow_mod_p(publicKey, *exponent); // K^(V+r) mod p
-
-        Log::trace("Generated Encryption");
+        Log::trace("Compatible Base Generated Encryption");
         Log::trace("publicKey", publicKey.toHex());
         Log::trace("pad", pad->toHex());
         Log::trace("data", data->toHex());
@@ -276,29 +316,61 @@ namespace electionguard
         return make_unique<ElGamalCiphertext>(move(pad), move(data));
     }
 
-    unique_ptr<ElGamalCiphertext> elgamalEncrypt(uint64_t m, const ElementModP &publicKey,
-                                                 const PrecomputedEncryption &precomputedValues)
+    unique_ptr<ElGamalCiphertext> elgamalEncrypt(uint64_t m, const ElementModQ &nonce,
+                                                 const ElementModP &publicKey)
     {
-        // (g^R mod p, K^V ·K^R mod p) = (g^R mod p, K^(V+R) mod p)
-
-        auto pad = precomputedValues.getPad()->clone();            // g^r mod p
-        auto pubkey_pow_r = precomputedValues.getBlindingFactor(); // K^r mod p
-        unique_ptr<ElementModP> data = nullptr;
-        if (m == 1) {
-            data = mul_mod_p(publicKey, *pubkey_pow_r); // K^1 * K^r mod p
-        } else if (m == 0) {
-            data = pubkey_pow_r->clone(); // K^0 * K^r mod p
-        } else {
-            auto pubkey_pow_m = pow_mod_p(publicKey, m);
-            data = mul_mod_p(publicKey, *pubkey_pow_r); // K^V * K^r mod p
+        if ((const_cast<ElementModQ &>(nonce) == ZERO_MOD_Q())) {
+            throw invalid_argument("elgamalEncrypt encryption requires a non-zero nonce");
         }
 
-        Log::trace("Generated Encryption with Precomputed Values");
+        // E.G. 2.0 Base-K ElGamal Encrypt in realtime.
+        // (g^R mod p, K^V ·K^R mod p) = (g^R mod p, K^(V+R) mod p)
+
+        auto pad = g_pow_p(nonce); // g^R mod p
+        unique_ptr<ElementModQ> exponent = nullptr;
+        if (m == 0) {
+            exponent = nonce.clone(); // (V+0)
+        } else if (m == 1) {
+            exponent = add_mod_q(nonce, ONE_MOD_Q()); // (V+1)
+        } else {
+            exponent = add_mod_q(nonce, *ElementModQ::fromUint64(m)); // (V+R)
+        }
+
+        auto data = pow_mod_p(publicKey, *exponent); // K^(V+R) mod p
+
+        Log::trace("Base-K Generated Encryption");
         Log::trace("publicKey", publicKey.toHex());
         Log::trace("pad", pad->toHex());
         Log::trace("data", data->toHex());
 
         return make_unique<ElGamalCiphertext>(move(pad), move(data));
+    }
+
+    unique_ptr<ElGamalCiphertext> elgamalEncrypt(uint64_t m, const ElementModQ &nonce,
+                                                 const ElementModP &publicKey,
+                                                 const ElementModP &encryptionBase)
+    {
+        // E.G. 1.0 Compatible ElGamal Encrypt.
+        // (g^R mod p, B^V ·K^R mod p)
+
+        if (publicKey == encryptionBase) {
+            return elgamalEncrypt(m, nonce, publicKey);
+        }
+
+        auto pad = g_pow_p(nonce);                         // g^R
+        auto blindingFactor = pow_mod_p(publicKey, nonce); // K^R
+        return elgamalEncrypt(m, move(pad), *blindingFactor, publicKey, encryptionBase);
+    }
+
+    unique_ptr<ElGamalCiphertext> elgamalEncrypt(uint64_t m, const ElementModP &publicKey,
+                                                 const PrecomputedEncryption &precomputedValues)
+    {
+        // E.G 2.0 Encrypt using precomputed values.
+        // (g^R mod p, K^V ·K^R mod p) = (g^R mod p, K^(V+R) mod p)
+
+        auto pad = precomputedValues.getPad()->clone();              // g^R mod p
+        auto blindingFactor = precomputedValues.getBlindingFactor(); // K^R mod p
+        return elgamalEncrypt(m, move(pad), *blindingFactor, publicKey, publicKey);
     }
 
     unique_ptr<ElGamalCiphertext>

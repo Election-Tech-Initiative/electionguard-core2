@@ -156,6 +156,8 @@ namespace electionguard
         /// <Summary>
         /// Decrypt an ElGamal ciphertext using a known nonce and the ElGamal public key.
         ///
+        /// This method is used primarily for decrypting against K for 2.0 elections
+        ///
         /// <param name="publicKey">The corresponding ElGamal Public Key</param>
         /// <param name="nonce">The secret nonce used to create the ciphertext.</param>
         /// <returns>An exponentially encoded plaintext message.</returns
@@ -165,11 +167,37 @@ namespace electionguard
         /// <Summary>
         /// Decrypt an ElGamal ciphertext using a known nonce and the ElGamal public key.
         ///
+        /// This method is used primarily for decrypting against K for 2.0 elections
+        ///
         /// <param name="publicKey">The corresponding ElGamal Public Key</param>
         /// <param name="nonce">The secret nonce used to create the ciphertext.</param>
         /// <returns>An exponentially encoded plaintext message.</returns
         /// </Summary>
         uint64_t decrypt(const ElementModP &publicKey, const ElementModQ &nonce) const;
+
+        /// <Summary>
+        /// Decrypt an ElGamal ciphertext using a known nonce and the ElGamal public key.
+        ///
+        /// This method is used primarily for decrypting against G for 1.0 elections
+        ///
+        /// <param name="publicKey">The corresponding ElGamal Public Key</param>
+        /// <param name="nonce">The secret nonce used to create the ciphertext.</param>
+        /// <returns>An exponentially encoded plaintext message.</returns
+        /// </Summary>
+        uint64_t decrypt(const ElementModP &publicKey, const ElementModQ &nonce,
+                         const ElementModP &base);
+
+        /// <Summary>
+        /// Decrypt an ElGamal ciphertext using a known nonce and the ElGamal public key.
+        ///
+        /// This method is used primarily for decrypting against G for 1.0 elections
+        ///
+        /// <param name="publicKey">The corresponding ElGamal Public Key</param>
+        /// <param name="nonce">The secret nonce used to create the ciphertext.</param>
+        /// <returns>An exponentially encoded plaintext message.</returns
+        /// </Summary>
+        uint64_t decrypt(const ElementModP &publicKey, const ElementModQ &nonce,
+                         const ElementModP &base) const;
 
         /// <Summary>
         /// Partially Decrypts an ElGamal ciphertext with a known ElGamal secret key.
@@ -203,7 +231,7 @@ namespace electionguard
     /// <summary>
     /// Encrypts a message with a given random nonce and an ElGamal public key.
     ///
-    /// <param name="m"> Message to elgamal_encrypt; must be an integer in [0,Q). </param>
+    /// <param name="m">Message to elgamal_encrypt; must be an integer in [0,Q). Sometimes V or m, in the spec.</param>
     /// <param name="nonce"> Randomly chosen nonce in [1,Q). </param>
     /// <param name="publicKey"> ElGamal public key. </param>
     /// <returns>A ciphertext tuple.</returns>
@@ -212,11 +240,28 @@ namespace electionguard
     elgamalEncrypt(const uint64_t m, const ElementModQ &nonce, const ElementModP &publicKey);
 
     /// <summary>
+    /// Encrypts a message with a given random nonce and an ElGamal public key.
+    ///
+    /// This method is used primarily for encrypting against G for 1.0 elections
+    /// but can be used for encrypting against K for 2.0 elections, however it is
+    /// more efficient to call the other overload of this method without the encryptionBase
+    /// parameter for E.G. 2.0 elections.
+    ///
+    /// <param name="m">Message to elgamal_encrypt; must be an integer in [0,Q). Sometimes V or m, in the spec.</param>
+    /// <param name="nonce">Randomly chosen nonce in [1,Q). (R, r, or s in the spec)</param>
+    /// <param name="publicKey">ElGamal public key. (K in the spec)</param>
+    /// <param name="encryptionBase"> The encryption base used to encrypt the ciphertext. (g or K in the spec)</param>
+    EG_API std::unique_ptr<ElGamalCiphertext> elgamalEncrypt(const uint64_t m,
+                                                             const ElementModQ &nonce,
+                                                             const ElementModP &publicKey,
+                                                             const ElementModP &encryptionBase);
+
+    /// <summary>
     /// Encrypts a message with given precomputed values (two triples and a quadruple).
     /// However, only the first triple is used in this function.
     ///
-    /// <param name="m"> Message to elgamal_encrypt; must be an integer in [0,Q). </param>
-    /// <param name="precomputedValues"> Precomputed two triples and a quad. </param>
+    /// <param name="m">Message to elgamal_encrypt; must be an integer in [0,Q). Sometimes V or m, in the spec.</param>
+    /// <param name="precomputedValues">Precomputed encryption values. See Precompute Buffers.</param>
     /// <returns>A ciphertext tuple.</returns>
     /// </summary>
     EG_API std::unique_ptr<ElGamalCiphertext>

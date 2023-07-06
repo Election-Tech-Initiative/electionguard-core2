@@ -215,6 +215,22 @@ TEST_CASE("elgamalEncrypt encrypt 1 decrypts with nonce")
     CHECK(1UL == decrypted);
 }
 
+TEST_CASE("elgamalEncrypt encrypt 1 decrypts with nonce for E.G. 1.0 Compatible Elections (Base G)")
+{
+    auto nonce = ElementModQ::fromHex(a_fixed_nonce);
+    auto secret = ElementModQ::fromHex(a_fixed_secret);
+    auto keypair = ElGamalKeyPair::fromSecret(*secret);
+    auto *publicKey = keypair->getPublicKey();
+    auto encryptionBase = G(); // *publicKey;
+
+    CHECK((*publicKey < P()));
+
+    auto cipherText = elgamalEncrypt(1UL, *nonce, *publicKey, encryptionBase);
+    auto cipherText2 = elgamalEncrypt(1UL, *nonce, *publicKey, encryptionBase);
+    auto decrypted = cipherText->decrypt(*publicKey, *nonce, encryptionBase);
+    CHECK(1UL == decrypted);
+}
+
 TEST_CASE("elgamalEncrypt vwith precomputed encrypt 1, decrypts with secret")
 {
     //auto nonce = ElementModQ::fromHex(a_fixed_nonce);
