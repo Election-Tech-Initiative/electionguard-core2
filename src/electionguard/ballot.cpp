@@ -1233,13 +1233,23 @@ namespace electionguard
     SubmittedBallot::SubmittedBallot(const CiphertextBallot &other, BallotBoxState state)
         : CiphertextBallot(other)
     {
-        if (state != BallotBoxState::spoiled && state != BallotBoxState::cast) {
+        if (state != BallotBoxState::spoiled && state != BallotBoxState::challenged &&
+            state != BallotBoxState::cast) {
             throw invalid_argument("invalid state for SubmittedBallot");
         }
-        if (state == BallotBoxState::spoiled) {
-            this->spoil();
-        } else {
-            this->cast();
+
+        switch (state) {
+            case BallotBoxState::cast:
+                this->cast();
+                break;
+            case BallotBoxState::spoiled:
+                this->spoil();
+                break;
+            case BallotBoxState::challenged:
+                this->challenge();
+                break;
+            default:
+                break;
         }
     }
 

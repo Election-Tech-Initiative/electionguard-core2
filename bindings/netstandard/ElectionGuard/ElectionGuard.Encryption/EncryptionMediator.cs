@@ -38,7 +38,16 @@
         /// Encrypt the specified ballot using the cached election context.
         /// </summary>
         public CiphertextBallot Encrypt(
-            PlaintextBallot plaintext, bool verifyProofs = false, bool usePrecomputedValues = false)
+            PlaintextBallot plaintext, bool verifyProofs = false)
+        {
+            return Encrypt(plaintext, false, verifyProofs);
+        }
+
+        /// <summary>
+        /// Encrypt the specified ballot using the cached election context.
+        /// </summary>
+        public CiphertextBallot Encrypt(
+            PlaintextBallot plaintext, bool usePrecomputedValues, bool verifyProofs = false)
         {
             if (verifyProofs)
             {
