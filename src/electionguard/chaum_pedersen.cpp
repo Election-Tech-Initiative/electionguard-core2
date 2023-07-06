@@ -77,6 +77,12 @@ namespace electionguard
     }
 
     DisjunctiveChaumPedersenProof::DisjunctiveChaumPedersenProof(
+      DisjunctiveChaumPedersenProof &&other)
+        : pimpl(move(other.pimpl))
+    {
+    }
+
+    DisjunctiveChaumPedersenProof::DisjunctiveChaumPedersenProof(
       unique_ptr<ElementModP> proof_zero_pad, unique_ptr<ElementModP> proof_zero_data,
       unique_ptr<ElementModP> proof_one_pad, unique_ptr<ElementModP> proof_one_data,
       unique_ptr<ElementModQ> proof_zero_challenge, unique_ptr<ElementModQ> proof_one_challenge,
@@ -177,6 +183,16 @@ namespace electionguard
       const ElGamalCiphertext &message, const PrecomputedSelection &precomputedValues,
       const ElementModP &k, const ElementModQ &q, uint64_t plaintext)
     {
+        return make(message, *precomputedValues.getPartialEncryption()->getSecret(),
+                    precomputedValues.getRealCommitment()->clone(),
+                    precomputedValues.getFakeCommitment()->clone(), k, q, plaintext);
+    }
+
+    unique_ptr<DisjunctiveChaumPedersenProof> DisjunctiveChaumPedersenProof::make(
+      const ElGamalCiphertext &message, const ElementModQ &r,
+      unique_ptr<PrecomputedEncryption> real, unique_ptr<PrecomputedFakeDisjuctiveCommitments> fake,
+      const ElementModP &k, const ElementModQ &q, uint64_t plaintext)
+    {
         unique_ptr<DisjunctiveChaumPedersenProof> result;
 
         if (plaintext > 1) {
@@ -185,15 +201,14 @@ namespace electionguard
         }
         Log::trace("DisjunctiveChaumPedersenProof: making proof without seed.");
         if (plaintext == 1) {
-            return make_one(message, precomputedValues, k, q);
+            return make_one(message, r, move(real), move(fake), k, q);
         }
-        return make_zero(message, precomputedValues, k, q);
-
-        return result;
+        return make_zero(message, r, move(real), move(fake), k, q);
     }
 
     // Public Methods
 
+    // TODO: return a result struct with a bool and a string
     bool DisjunctiveChaumPedersenProof::isValid(const ElGamalCiphertext &message,
                                                 const ElementModP &k, const ElementModQ &q)
     {
@@ -353,6 +368,17 @@ namespace electionguard
                                              const PrecomputedSelection &precomputedValues,
                                              const ElementModP &k, const ElementModQ &q)
     {
+        auto nonce = precomputedValues.getPartialEncryption()->getSecret();
+        return make_zero(message, *nonce, precomputedValues.getRealCommitment()->clone(),
+                         precomputedValues.getFakeCommitment()->clone(), k, q);
+    }
+
+    unique_ptr<DisjunctiveChaumPedersenProof> DisjunctiveChaumPedersenProof::make_zero(
+      const ElGamalCiphertext &message, const ElementModQ &r,
+      const unique_ptr<PrecomputedEncryption> real,
+      const unique_ptr<PrecomputedFakeDisjuctiveCommitments> fake, const ElementModP &k,
+      const ElementModQ &q)
+    {
         // NIZKP for plaintext 0
         // (a0, b0) = (g^𝑢0 mod p, K^𝑢0 mod p)
         // (a1, b1) = (g^𝑢1 mod p, K^(𝑢1-w) mod p) <-- fake proof
@@ -363,16 +389,10 @@ namespace electionguard
         Log::trace("alpha: ", alpha->toHex());
         Log::trace("beta: ", beta->toHex());
 
-        // Get our values from the precomputed values.
-        auto encryption = precomputedValues.getPartialEncryption();
-        auto r = encryption->getSecret();
-        auto real = precomputedValues.getRealCommitment();
-        auto fake = precomputedValues.getFakeCommitment();
-
         // Pick 3 random numbers in Q.
-        auto u0 = real->getSecret()->clone();
-        auto u1 = fake->getSecret1()->clone();
-        auto w = fake->getSecret2()->clone();
+        auto u0 = real->getSecret();
+        auto u1 = fake->getSecret1();
+        auto w = fake->getSecret2();
 
         // Compute the NIZKP
         auto a0 = real->getPad()->clone();            // 𝑔^𝑢0 mod 𝑝
@@ -385,13 +405,13 @@ namespace electionguard
                              &const_cast<ElementModP &>(k), alpha, beta, a0.get(), b0.get(),
                              a1.get(), b1.get()}); // H(04,Q;K,α,β,a0,b0,a1,b1)
 
-        // c1 = w, so we dont assign a new var for it
-        auto c0 = sub_mod_q(*c, *w);              // c0 = (c - w) mod q
-        auto v0 = a_minus_bc_mod_q(*u0, *c0, *r); // v0 = (𝑢0 - c0 ⋅ R) mod q
-        auto v1 = a_minus_bc_mod_q(*u1, *w, *r);  // v1 = (𝑢1 - c1 ⋅ R) mod q
+        auto c0 = sub_mod_q(*c, *w);             // c0 = (c - w) mod q
+        auto v0 = a_minus_bc_mod_q(*u0, *c0, r); // v0 = (𝑢0 - c0 ⋅ R) mod q
+        auto c1 = w->clone();                    // c1 = w
+        auto v1 = a_minus_bc_mod_q(*u1, *w, r);  // v1 = (𝑢1 - c1 ⋅ R) mod q
 
         return make_unique<DisjunctiveChaumPedersenProof>(
-          move(a0), move(b0), move(a1), move(b1), move(c0), move(w), move(c), move(v0), move(v1));
+          move(a0), move(b0), move(a1), move(b1), move(c0), move(c1), move(c), move(v0), move(v1));
     }
 
     unique_ptr<DisjunctiveChaumPedersenProof>
@@ -444,6 +464,17 @@ namespace electionguard
                                             const PrecomputedSelection &precomputedValues,
                                             const ElementModP &k, const ElementModQ &q)
     {
+        auto nonce = precomputedValues.getPartialEncryption()->getSecret();
+        return make_one(message, *nonce, precomputedValues.getRealCommitment()->clone(),
+                        precomputedValues.getFakeCommitment()->clone(), k, q);
+    }
+
+    unique_ptr<DisjunctiveChaumPedersenProof> DisjunctiveChaumPedersenProof::make_one(
+      const ElGamalCiphertext &message, const ElementModQ &r,
+      const unique_ptr<PrecomputedEncryption> real,
+      const unique_ptr<PrecomputedFakeDisjuctiveCommitments> fake, const ElementModP &k,
+      const ElementModQ &q)
+    {
         // NIZKP for plaintext 1
         // (a0, b0) = (g^𝑢0 mod p, K^(w+𝑢0) mod p) <-- fake proof
         // (a1, b1) = (g^𝑢1 mod p, K^𝑢1 mod p)
@@ -454,14 +485,10 @@ namespace electionguard
         Log::trace("alpha: ", alpha->toHex());
         Log::trace("beta: ", beta->toHex());
 
-        // Get our values from the precomputed values.
-        auto encryption = precomputedValues.getPartialEncryption();
-        auto r = encryption->getSecret();
-        auto real = precomputedValues.getRealCommitment();
-        auto fake = precomputedValues.getFakeCommitment();
-        auto u0 = fake->getSecret1()->clone();
-        auto u1 = real->getSecret()->clone();
-        auto w = fake->getSecret2()->clone();
+        // Pick three random numbers in Q.
+        auto u0 = fake->getSecret1();
+        auto u1 = real->getSecret();
+        auto w = fake->getSecret2();
 
         auto a0 = fake->getPad()->clone();            // 𝑔^𝑢0 mod 𝑝
         auto b0 = fake->getDataOne()->clone();        // K^(w+𝑢0) mod p
@@ -473,13 +500,13 @@ namespace electionguard
                              &const_cast<ElementModP &>(k), alpha, beta, a0.get(), b0.get(),
                              a1.get(), b1.get()});
 
-        // auto c0 = *w                          // c0 = w  mod q
-        auto c1 = sub_mod_q(*c, *w);              // c1 = (c - w)  mod q
-        auto v0 = a_minus_bc_mod_q(*u0, *w, *r);  // v0 = (𝑢0 - c0 ⋅ R)  mod q
-        auto v1 = a_minus_bc_mod_q(*u1, *c1, *r); // v1 = (𝑢1 - c1 ⋅ R)  mod q
+        auto c0 = w->clone();                    // c0 = w  mod q
+        auto c1 = sub_mod_q(*c, *w);             // c1 = (c - w)  mod q
+        auto v0 = a_minus_bc_mod_q(*u0, *w, r);  // v0 = (𝑢0 - c0 ⋅ R)  mod q
+        auto v1 = a_minus_bc_mod_q(*u1, *c1, r); // v1 = (𝑢1 - c1 ⋅ R)  mod q
 
         return make_unique<DisjunctiveChaumPedersenProof>(
-          move(a0), move(b0), move(a1), move(b1), move(w), move(c1), move(c), move(v0), move(v1));
+          move(a0), move(b0), move(a1), move(b1), move(c0), move(c1), move(c), move(v0), move(v1));
     }
 
 #pragma endregion

@@ -367,8 +367,8 @@ namespace electionguard
                    descriptionHash.toHex());
 
         // Generate the encryption using precomputed values
-        auto ciphertext =
-          elgamalEncrypt(vote, elgamalPublicKey, *precomputedValues->getPartialEncryption());
+        auto partialEncryption = *precomputedValues->getPartialEncryption();
+        auto ciphertext = elgamalEncrypt(vote, elgamalPublicKey, partialEncryption);
         if (ciphertext == nullptr) {
             throw runtime_error("encryptSelection:: Error generating ciphertext");
         }

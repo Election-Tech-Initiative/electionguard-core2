@@ -333,8 +333,12 @@ namespace electionguard
         unique_ptr<DisjunctiveChaumPedersenProof> proof = nullptr;
         if (computeProof) {
             // always make a proof using the faster, non-deterministic method
-            proof = DisjunctiveChaumPedersenProof::make(
-              *ciphertext, *precomputedValues, elgamalPublicKey, cryptoExtendedBaseHash, plaintext);
+            auto real = precomputedValues->getRealCommitment()->clone();
+            auto fake = precomputedValues->getFakeCommitment()->clone();
+
+            proof = DisjunctiveChaumPedersenProof::make(*ciphertext, *nonce, move(real), move(fake),
+                                                        elgamalPublicKey, cryptoExtendedBaseHash,
+                                                        plaintext);
         }
 
         return make_unique<CiphertextBallotSelection>(

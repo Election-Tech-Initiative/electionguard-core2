@@ -36,7 +36,7 @@ namespace electionguard
                               std::unique_ptr<ElementModP> blindingFactor);
 
         PrecomputedEncryption(const PrecomputedEncryption &other);
-        PrecomputedEncryption(PrecomputedEncryption &&);
+        PrecomputedEncryption(PrecomputedEncryption &&other);
         ~PrecomputedEncryption();
 
         PrecomputedEncryption &operator=(const PrecomputedEncryption &other);
@@ -163,7 +163,7 @@ namespace electionguard
                              std::unique_ptr<PrecomputedEncryption> in_triple2,
                              std::unique_ptr<PrecomputedFakeDisjuctiveCommitments> in_quad);
         PrecomputedSelection(const PrecomputedSelection &other);
-        PrecomputedSelection(PrecomputedSelection &&);
+        PrecomputedSelection(PrecomputedSelection &&other);
         ~PrecomputedSelection();
 
         PrecomputedSelection &operator=(const PrecomputedSelection &other);
