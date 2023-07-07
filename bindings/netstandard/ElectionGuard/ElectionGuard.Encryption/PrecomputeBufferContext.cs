@@ -182,8 +182,6 @@ namespace ElectionGuard
         /// <summary>
         /// Starts the precompute process by creating a new thread to run the process
         /// </summary>
-        /// <param name="publicKey">The max exponentiation to be calculated</param>
-        /// <param name="buffers">The maximum number of buffers to precompute</param>
         public void StartPrecomputeAsync()
         {
             _currentStatus.CurrentState = PrecomputeState.Running;
@@ -204,7 +202,6 @@ namespace ElectionGuard
         /// Starts the precompute process by creating a new thread to run the process
         /// </summary>
         /// <param name="publicKey">The max exponentiation to be calculated</param>
-        /// <param name="buffers">The maximum number of buffers to precompute</param>
         public void StartPrecomputeAsync(ElementModP publicKey)
         {
             _currentStatus.CurrentState = PrecomputeState.Running;
