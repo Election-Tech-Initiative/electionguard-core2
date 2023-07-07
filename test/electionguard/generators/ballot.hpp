@@ -68,10 +68,12 @@ namespace electionguard::tools::generators
             for (const auto &description : contest.getSelections()) {
                 if (choices < maxChoices) {
                     ++choices;
-                    Log::debug(" " + description.get().getObjectId() + " Adding Selection: TRUE");
+                    Log::trace(" " + description.get().getObjectId() +
+                               " Adding Selection: placeholder: TRUE");
                     selections.push_back(selectionFrom(description.get(), true));
                 } else {
-                    Log::trace(" " + description.get().getObjectId() + " Adding Selection: FALSE");
+                    Log::trace(" " + description.get().getObjectId() +
+                               " Adding Selection: placeholder: FALSE");
                     selections.push_back(selectionFrom(description.get(), false));
                 }
             }

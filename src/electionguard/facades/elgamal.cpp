@@ -202,13 +202,14 @@ eg_electionguard_status_t eg_elgamal_ciphertext_add(eg_elgamal_ciphertext_t *han
     }
 }
 
-eg_electionguard_status_t
-eg_elgamal_ciphertext_decrypt_known_product(eg_elgamal_ciphertext_t *handle,
-                                            eg_element_mod_p_t *in_product, uint64_t *out_plaintext)
+eg_electionguard_status_t eg_elgamal_ciphertext_decrypt_known_product(
+  eg_elgamal_ciphertext_t *handle, eg_element_mod_p_t *in_product,
+  eg_element_mod_p_t *in_encryption_base, uint64_t *out_plaintext)
 {
     try {
         auto *product = AS_TYPE(ElementModP, in_product);
-        *out_plaintext = AS_TYPE(ElGamalCiphertext, handle)->decrypt(*product);
+        auto *base = AS_TYPE(ElementModP, in_encryption_base);
+        *out_plaintext = AS_TYPE(ElGamalCiphertext, handle)->decrypt(*product, *base);
         return ELECTIONGUARD_STATUS_SUCCESS;
     } catch (const exception &e) {
         Log::error(__func__, e);
@@ -217,11 +218,13 @@ eg_elgamal_ciphertext_decrypt_known_product(eg_elgamal_ciphertext_t *handle,
 }
 
 eg_electionguard_status_t eg_elgamal_ciphertext_decrypt_with_secret(
-  eg_elgamal_ciphertext_t *handle, eg_element_mod_q_t *in_secret_key, uint64_t *out_plaintext)
+  eg_elgamal_ciphertext_t *handle, eg_element_mod_q_t *in_secret_key,
+  eg_element_mod_p_t *in_encryption_base, uint64_t *out_plaintext)
 {
     try {
         auto *secretKey = AS_TYPE(ElementModQ, in_secret_key);
-        *out_plaintext = AS_TYPE(ElGamalCiphertext, handle)->decrypt(*secretKey);
+        auto *base = AS_TYPE(ElementModP, in_encryption_base);
+        *out_plaintext = AS_TYPE(ElGamalCiphertext, handle)->decrypt(*secretKey, *base);
         return ELECTIONGUARD_STATUS_SUCCESS;
     } catch (const exception &e) {
         Log::error(__func__, e);
