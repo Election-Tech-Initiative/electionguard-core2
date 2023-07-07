@@ -1,10 +1,12 @@
-﻿using System.Threading;
+﻿using System;
+using System.Threading;
 
 namespace ElectionGuard
 {
     /// <summary>
     /// Class that controls the precompute process
     /// </summary>
+    [Obsolete]
     public class Precompute
     {
         static readonly int DummyBufferSize = 100;   // set a buffer size that will be > 0 and < the default of 5000 for initialization
