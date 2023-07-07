@@ -99,7 +99,6 @@ namespace ElectionGuard
         /// Hash together the values
         /// </summary>
         /// <param name="first">first value for the hash</param>
-        /// <param name="sequence">second value for the hash</param>
         public static ElementModQ HashElems(string first)
         {
             var status = External.HashElems(first,
@@ -111,8 +110,7 @@ namespace ElectionGuard
         /// <summary>
         /// Hash together the values
         /// </summary>
-        /// <param name="id">first value for the hash</param>
-        /// <param name="first">second value for the hash</param>
+        /// <param name="first">first value for the hash</param>
         public static ElementModQ HashElems(ulong first)
         {
             var status = External.HashElems(first,

@@ -8,6 +8,9 @@ namespace ElectionGuard
     /// </summary>
     public class DisposableBase : IDisposable
     {
+        /// <summary>
+        /// Property to use to tell if the object is already disposed
+        /// </summary>
         [JsonIgnore]
         public bool IsDisposed { get; private set; }
 

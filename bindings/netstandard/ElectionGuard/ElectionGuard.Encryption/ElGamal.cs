@@ -108,18 +108,19 @@ namespace ElectionGuard
         /// is set to false then if the message parameter data is longer than
         /// max_len then an exception will be thrown.
         ///
-        /// <param name="message">Message to hashed elgamal encrypt.</param>
+        /// <param name="data">Message to hashed elgamal encrypt.</param>
+        /// <param name="length">Length of the data to encrypt.</param>
         /// <param name="nonce">Randomly chosen nonce in [1,Q).</param>
         /// <param name="hashPrefix">A prefix value for the hash used to create the session key.</param>
         /// <param name="publicKey">ElGamal public key.</param>
         /// <param name="seed">Hash of the ballot description.</param>
-        /// <param name="max_len">Indicates the maximum length of plaintext,
+        /// <param name="maxLength">Indicates the maximum length of plaintext,
         ///                       must be one of the `HASHED_CIPHERTEXT_PADDED_DATA_SIZE`
         ///                       enumeration values.
         /// </param>
-        /// <param name="allow_truncation">Truncates data to the max_len if set to true.
+        /// <param name="allowTruncation">Truncates data to the max_len if set to true.
         /// </param>
-        /// <param name="shouldUsePrecomputedValues">If true, the function will attempt
+        /// <param name="usePrecompute">If true, the function will attempt
         ///                                          to use a precomputed value form the precompute buffer
         /// </param>
         /// <returns>A ciphertext triple.</returns>
@@ -178,12 +179,13 @@ namespace ElectionGuard
         /// the `message` parameter must be a multiple of the block length (32)
         /// and the ciphertext will be the same size.
         ///
-        /// <param name="message">Message to hashed elgamal encrypt.</param>
+        /// <param name="data">Message to hashed elgamal encrypt.</param>
+        /// <param name="length">Length of the data to encrypt</param>
         /// <param name="nonce">Randomly chosen nonce in [1,Q).</param>
         /// <param name="hashPrefix">A prefix value for the hash used to create the session key.</param>
         /// <param name="publicKey">ElGamal public key.</param>
         /// <param name="seed">A seed value used to create the session key.</param>
-        /// <param name="shouldUsePrecomputedValues">If true, the function will attempt
+        /// <param name="usePrecompute">If true, the function will attempt
         ///                                          to use a precomputed value form the precompute buffer
         /// </param>
         /// <returns>A ciphertext triple.</returns>

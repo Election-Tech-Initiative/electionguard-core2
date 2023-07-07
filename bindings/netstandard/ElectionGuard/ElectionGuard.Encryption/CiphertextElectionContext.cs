@@ -183,8 +183,7 @@ namespace ElectionGuard
         ///
         /// <param name="numberOfGuardians"> The number of guardians necessary to generate the public key </param>
         /// <param name="quorum"> The quorum of guardians necessary to decrypt an election.  Must be less than `number_of_guardians` </param>
-        /// <param name="publicKey"> the public key of the election </param>
-        /// <param name="commitmentHash"> the hash of the commitments the guardians make to each other </param>
+        /// <param name="jointKey"> the hash of the commitments the guardians make to each other </param>
         /// <param name="manifestHash"> the hash of the election metadata </param>
         /// </summary>
         public CiphertextElectionContext(

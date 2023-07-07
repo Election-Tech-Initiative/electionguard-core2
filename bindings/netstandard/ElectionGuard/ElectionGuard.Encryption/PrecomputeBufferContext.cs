@@ -9,10 +9,6 @@ namespace ElectionGuard
     {
         static readonly int DummyBufferSize = 100;   // set a buffer size that will be > 0 and < the default of 5000 for initialization
 
-        readonly int _initCount = -1;            // initializer for count to make sure we are getting a value back from the C++
-        readonly int _initQueueSize = -2;       // initializer for the queue size to make sure that its different than the count and being set
-
-        AutoResetEvent _waitHandle;
         PrecomputeBufferContext _context;
 
         /// <summary>
@@ -145,6 +141,11 @@ namespace ElectionGuard
             CurrentState = PrecomputeState.NotStarted
         };
 
+        /// <summary>
+        /// Parameterized constructor
+        /// </summary>
+        /// <param name="publicKey">Key to use</param>
+        /// <param name="maxQueueSize">Size of the queue</param>
         public PrecomputeBufferContext(
             ElementModP publicKey, int maxQueueSize = 5000)
         {
