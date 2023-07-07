@@ -51,7 +51,7 @@ TEST_CASE("elgamalEncrypt simple encrypt 0, with nonce 1 then publickey is g_pow
     CHECK((*decryptedData == *calculatedData));
     CHECK((*cipherText->getData() == *calculatedData));
 
-    auto decrypted = cipherText->decrypt(secret);
+    auto decrypted = cipherText->decrypt(secret, *publicKey);
     CHECK((0UL == decrypted));
 }
 
@@ -69,7 +69,7 @@ TEST_CASE("elgamalEncrypt simple encrypt 0, with real nonce decrypts with secret
     auto cipherText = elgamalEncrypt(0UL, *nonce, *publicKey);
 
     // Assert
-    auto decrypted = cipherText->decrypt(secret);
+    auto decrypted = cipherText->decrypt(secret, *publicKey);
     CHECK((0UL == decrypted));
 }
 
@@ -108,23 +108,24 @@ TEST_CASE("elgamalEncrypt simple encrypt 0 compared with elgamalEncrypt_with_pre
 
     // this function runs off to look in the precomputed values buffer and if
     // it finds what it needs the the returned class will contain those values
-    auto precomputedTwoTriplesAndAQuad = PrecomputeBufferContext::getTwoTriplesAndAQuadruple();
+    auto precomputedValues = PrecomputeBufferContext::getPrecomputedSelection();
 
-    CHECK(precomputedTwoTriplesAndAQuad != nullptr);
+    CHECK(precomputedValues != nullptr);
 
-    auto triple1 = precomputedTwoTriplesAndAQuad->get_triple1();
+    auto triple1 = precomputedValues->getPartialEncryption();
 
     // Act
-    auto cipherText1 = elgamalEncrypt(0UL, *triple1->get_exp(), *publicKey);
-    auto cipherText2 = elgamalEncrypt(0UL, *precomputedTwoTriplesAndAQuad);
+    auto cipherText1 = elgamalEncrypt(0UL, *triple1->getSecret(), *publicKey);
+    auto cipherText2 =
+      elgamalEncrypt(0UL, *keypair->getPublicKey(), *precomputedValues->getPartialEncryption());
 
     CHECK((*cipherText1->getPad() == *cipherText2->getPad()));
     CHECK((*cipherText1->getData() == *cipherText2->getData()));
 
     // Assert
-    auto decrypted1 = cipherText1->decrypt(secret);
+    auto decrypted1 = cipherText1->decrypt(secret, *publicKey);
     CHECK((0UL == decrypted1));
-    auto decrypted2 = cipherText2->decrypt(secret);
+    auto decrypted2 = cipherText2->decrypt(secret, *publicKey);
     CHECK((0UL == decrypted2));
     PrecomputeBufferContext::clear();
 }
@@ -145,18 +146,19 @@ TEST_CASE("elgamalEncrypt_with_precomputed simple encrypt 0 decrypts with secret
 
     // this function runs off to look in the precomputed values buffer and if
     // it finds what it needs the the returned class will contain those values
-    auto precomputedTwoTriplesAndAQuad = PrecomputeBufferContext::getTwoTriplesAndAQuadruple();
+    auto precomputedValues = PrecomputeBufferContext::getPrecomputedSelection();
 
-    CHECK(precomputedTwoTriplesAndAQuad != nullptr);
+    CHECK(precomputedValues != nullptr);
 
-    auto triple1 = precomputedTwoTriplesAndAQuad->get_triple1();
+    auto triple1 = precomputedValues->getPartialEncryption();
     CHECK(triple1 != nullptr);
 
     // Act
-    auto cipherText = elgamalEncrypt(0UL, *precomputedTwoTriplesAndAQuad);
+    auto cipherText =
+      elgamalEncrypt(0UL, *keypair->getPublicKey(), *precomputedValues->getPartialEncryption());
 
     // Assert
-    auto decrypted = cipherText->decrypt(secret);
+    auto decrypted = cipherText->decrypt(secret, *keypair->getPublicKey());
     CHECK((0UL == decrypted));
     PrecomputeBufferContext::clear();
 }
@@ -170,14 +172,17 @@ TEST_CASE("elgamalEncrypt simple encrypt 1 decrypts with secret")
 
     CHECK((*publicKey < P()));
 
-    auto elem = g_pow_p(ONE_MOD_P());
+    auto elem = g_pow_p(nonce);
     CHECK((*elem == G())); // g^1 = g
 
     auto cipherText = elgamalEncrypt(1UL, nonce, *publicKey);
-    CHECK((const_cast<ElementModP &>(G()) == *cipherText->getPad()));
+    CHECK(*elem == *cipherText->getPad());
 
-    auto decrypted = cipherText->decrypt(secret);
-    CHECK(1UL == decrypted);
+    auto nonceDecrypted = cipherText->decrypt(*publicKey, nonce);
+    CHECK(1UL == nonceDecrypted);
+
+    auto secretDecrypted = cipherText->decrypt(secret, *publicKey);
+    CHECK(1UL == secretDecrypted);
 }
 
 TEST_CASE("elgamalEncrypt encrypt 1 decrypts with secret")
@@ -191,7 +196,7 @@ TEST_CASE("elgamalEncrypt encrypt 1 decrypts with secret")
 
     auto cipherText = elgamalEncrypt(1UL, *nonce, *publicKey);
     auto cipherText2 = elgamalEncrypt(1UL, *nonce, *publicKey);
-    auto decrypted = cipherText->decrypt(*secret);
+    auto decrypted = cipherText->decrypt(*secret, *publicKey);
     CHECK(1UL == decrypted);
 }
 
@@ -207,6 +212,22 @@ TEST_CASE("elgamalEncrypt encrypt 1 decrypts with nonce")
     auto cipherText = elgamalEncrypt(1UL, *nonce, *publicKey);
     auto cipherText2 = elgamalEncrypt(1UL, *nonce, *publicKey);
     auto decrypted = cipherText->decrypt(*publicKey, *nonce);
+    CHECK(1UL == decrypted);
+}
+
+TEST_CASE("elgamalEncrypt encrypt 1 decrypts with nonce for E.G. 1.0 Compatible Elections (Base G)")
+{
+    auto nonce = ElementModQ::fromHex(a_fixed_nonce);
+    auto secret = ElementModQ::fromHex(a_fixed_secret);
+    auto keypair = ElGamalKeyPair::fromSecret(*secret);
+    auto *publicKey = keypair->getPublicKey();
+    auto encryptionBase = G(); // *publicKey;
+
+    CHECK((*publicKey < P()));
+
+    auto cipherText = elgamalEncrypt(1UL, *nonce, *publicKey, encryptionBase);
+    auto cipherText2 = elgamalEncrypt(1UL, *nonce, *publicKey, encryptionBase);
+    auto decrypted = cipherText->decrypt(*publicKey, *nonce, encryptionBase);
     CHECK(1UL == decrypted);
 }
 
@@ -226,11 +247,11 @@ TEST_CASE("elgamalEncrypt vwith precomputed encrypt 1, decrypts with secret")
 
     // this function runs off to look in the precomputed values buffer and if
     // it finds what it needs the the returned class will contain those values
-    auto precomputedTwoTriplesAndAQuad = PrecomputeBufferContext::getTwoTriplesAndAQuadruple();
+    auto precomputedValues = PrecomputeBufferContext::getPrecomputedSelection();
 
-    auto cipherText = elgamalEncrypt(1UL, *precomputedTwoTriplesAndAQuad);
+    auto cipherText = elgamalEncrypt(1UL, *publicKey, *precomputedValues->getPartialEncryption());
 
-    auto decrypted = cipherText->decrypt(*secret);
+    auto decrypted = cipherText->decrypt(*secret, *publicKey);
     CHECK(1UL == decrypted);
     PrecomputeBufferContext::clear();
 }
@@ -249,7 +270,7 @@ TEST_CASE("elgamalAdd simple decrypts with secret")
                                                                       *secondCiphertext};
     auto result = elgamalAdd(ciphertexts);
 
-    auto decrypted = result->decrypt(secret);
+    auto decrypted = result->decrypt(secret, *publicKey);
     CHECK(2UL == decrypted);
 }
 
