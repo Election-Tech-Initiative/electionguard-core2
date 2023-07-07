@@ -58,6 +58,10 @@ namespace ElectionGuard.Ballot
             return sb.ToString();
         }
     }
+
+    /// <summary>
+    /// extension class for ballot validation
+    /// </summary>
     public static class BallotValidationExtensions
     {
         /// <summary>
@@ -80,6 +84,11 @@ namespace ElectionGuard.Ballot
                 : new BallotValidationResult(true);
         }
 
+        /// <summary>
+        /// Check to see if the contest is valid based on the contest description to use
+        /// </summary>
+        /// <param name="contest">Contest to check</param>
+        /// <param name="description">Description to compare with</param>
         public static BallotValidationResult IsValid(
             this CiphertextBallotContest contest,
             ContestDescriptionWithPlaceholders description)
