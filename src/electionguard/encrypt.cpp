@@ -12,7 +12,6 @@
 #include "serialize.hpp"
 #include "utils.hpp"
 
-#include <algorithm>
 #include <future>
 #include <iostream>
 #include <nlohmann/json.hpp>

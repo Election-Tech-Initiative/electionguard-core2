@@ -1,3 +1,4 @@
+#include "../../src/electionguard/convert.hpp"
 #include "../../src/electionguard/log.hpp"
 
 #include <doctest/doctest.h>
@@ -193,6 +194,32 @@ TEST_CASE("Disjunctive CP Proof encryption of one with precomputed values invali
 
     CHECK(badProof->isValid(*message1, *keypair->getPublicKey(), ONE_MOD_Q()) == false);
     PrecomputeBufferContext::clear();
+}
+
+TEST_CASE("Ranged CP Proof encryption of one")
+{
+    auto keypair = ElGamalKeyPair::fromSecret(TWO_MOD_Q(), false);
+    const auto &nonce = ONE_MOD_Q();
+    const auto &seed = TWO_MOD_Q();
+    const auto selected = 3UL; // we chose 3 selections on the ballot
+    const auto limit = 4UL;    // can choose up to 4 selections out of 5
+    const auto count = 5UL;    // 5 selections on the ballot
+
+    // encrypt selections representing a contest on ballot
+    vector<unique_ptr<ElGamalCiphertext>> messages;
+    for (size_t i = 0; i < count; i++) {
+        auto choice = i < selected ? 1UL : 0UL;
+        auto message = elgamalEncrypt(choice, nonce, *keypair->getPublicKey());
+        messages.push_back(move(message));
+    }
+
+    auto accumulation = elgamalAdd(referenceWrap(messages));
+    auto aggregateNonce = mul_mod_q(nonce, *ElementModQ::fromUint64(count));
+
+    auto proof = RangedChaumPedersenProof::make(*accumulation, *aggregateNonce, selected, limit,
+                                                *keypair->getPublicKey(), ONE_MOD_Q(), seed);
+    auto result = proof->isValid(*accumulation, *keypair->getPublicKey(), ONE_MOD_Q());
+    CHECK(result.isValid == true);
 }
 
 TEST_CASE("Constant CP Proof encryption of zero" * doctest::may_fail())

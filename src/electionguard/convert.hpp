@@ -290,6 +290,62 @@ namespace electionguard
     std::chrono::system_clock::time_point timePointFromIsoString(const string &time,
                                                                  const string &format);
 
+    template <typename T>
+    std::vector<std::reference_wrapper<T>>
+    referenceWrap(const std::vector<std::unique_ptr<T>> &input)
+    {
+        std::vector<std::reference_wrapper<T>> result;
+        result.reserve(input.size());
+
+        for (const auto &item : input) {
+            result.emplace_back(*item);
+        }
+
+        return result;
+    }
+
+    template <typename T>
+    std::vector<std::reference_wrapper<T>>
+    referenceWrap(const std::map<uint64_t, std::unique_ptr<T>> &input)
+    {
+        std::vector<std::reference_wrapper<T>> result;
+        result.reserve(input.size());
+
+        for (const auto &item : input) {
+            result.emplace_back(*item.second);
+        }
+
+        return result;
+    }
+
+    template <typename T, typename U>
+    std::vector<std::reference_wrapper<T>>
+    referenceWrap(const std::vector<std::reference_wrapper<U>> &input)
+    {
+        std::vector<std::reference_wrapper<T>> result;
+        result.reserve(input.size());
+
+        for (const auto &item : input) {
+            result.emplace_back(static_cast<T &>(*item));
+        }
+
+        return result;
+    }
+
+    template <typename T, typename U>
+    std::vector<std::reference_wrapper<T>>
+    referenceWrap(const std::map<uint64_t, std::unique_ptr<U>> &input)
+    {
+        std::vector<std::reference_wrapper<T>> result;
+        result.reserve(input.size());
+
+        for (const auto &item : input) {
+            result.emplace_back(static_cast<T &>(*item.second));
+        }
+
+        return result;
+    }
+
 } // namespace electionguard
 
 #endif /* __ELECTIONGUARD_CPP_CONVERT_HPP_INCLUDED__ */
