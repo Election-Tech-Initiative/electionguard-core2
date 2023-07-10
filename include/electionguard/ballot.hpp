@@ -437,7 +437,7 @@ namespace electionguard
                                 std::unique_ptr<ElementModQ> nonce,
                                 std::unique_ptr<ElGamalCiphertext> ciphertextAccumulation,
                                 std::unique_ptr<ElementModQ> cryptoHash,
-                                std::unique_ptr<ConstantChaumPedersenProof> proof,
+                                std::unique_ptr<RangedChaumPedersenProof> proof,
                                 std::unique_ptr<HashedElGamalCiphertext> hashedElGamal);
         ~CiphertextBallotContest();
 
@@ -484,7 +484,7 @@ namespace electionguard
         /// The proof demonstrates the sum of the selections does not exceed the maximum
         /// available selections for the contest, and that the proof was generated with the nonce
         /// </summary>
-        ConstantChaumPedersenProof *getProof() const;
+        RangedChaumPedersenProof *getProof() const;
 
         /// <summary>
         /// The hashed elgamal ciphertext is the encrypted extended data (overvote information
@@ -516,10 +516,10 @@ namespace electionguard
              const ElementModQ &descriptionHash,
              std::vector<std::unique_ptr<CiphertextBallotSelection>> selections,
              const ElementModP &elgamalPublicKey, const ElementModQ &cryptoExtendedBaseHash,
-             const ElementModQ &proofSeed, const uint64_t numberElected,
-             std::unique_ptr<ElementModQ> nonce = nullptr,
+             const ElementModQ &proofSeed, const uint64_t numberSelected,
+             const uint64_t numberElected, std::unique_ptr<ElementModQ> nonce = nullptr,
              std::unique_ptr<ElementModQ> cryptoHash = nullptr,
-             std::unique_ptr<ConstantChaumPedersenProof> proof = nullptr,
+             std::unique_ptr<RangedChaumPedersenProof> proof = nullptr,
              std::unique_ptr<HashedElGamalCiphertext> hashedElGamal = nullptr,
              bool shouldUsePrecomputedValues = false);
 
@@ -542,7 +542,7 @@ namespace electionguard
         /// Calling this function expects that the object is in a well-formed encrypted state
         /// with the `ballot_selections` populated with valid encrypted ballot selections,
         /// the ElementModQ `description_hash`, the ElementModQ `crypto_hash`,
-        /// and the ConstantChaumPedersenProof all populated.
+        /// and the RangedChaumPedersenProof all populated.
         /// Specifically, the seed hash in this context is the hash of the ContestDescription,
         /// or whatever `ElementModQ` was used to populate the `description_hash` field.
         /// </summary>

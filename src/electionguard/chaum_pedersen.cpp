@@ -561,7 +561,7 @@ namespace electionguard
         // validate a specific proof at position j against the message
         static ValidationResult isValid(const ElGamalCiphertext &message,
                                         const ZeroKnowledgeProof &proof, uint64_t j,
-                                        const ElementModP &k, const ElementModQ &q)
+                                        const ElementModP &k)
         {
             auto *alpha = message.getPad();
             auto *beta = message.getData();
@@ -581,26 +581,27 @@ namespace electionguard
             auto consistent_kv = (bj == *mul_mod_p(*pow_mod_p(k, *w), *pow_mod_p(*beta, cj)));
 
             if (!consistent_gv || !consistent_kv) {
-                Log::debug("RangedChaumPedersenProof::isValid: invalid integer proof" +
-                           to_string(j));
-                return ValidationResult{false,
-                                        {
-                                          "consistent_gv: " + to_string(consistent_gv),
-                                          "consistent_kv: " + to_string(consistent_kv),
-                                        }};
+                auto jstring = to_string(j);
+                Log::debug("RangedChaumPedersenProof::Impl::isValid: invalid integer proof " +
+                           jstring);
+                return ValidationResult{
+                  false,
+                  {
+                    "j: " + jstring + " consistent_gv: " + to_string(consistent_gv),
+                    "j: " + jstring + " consistent_kv: " + to_string(consistent_kv),
+                  }};
             }
             return ValidationResult{true, {}};
         }
 
         // validate the integer proofs against the message
-        ValidationResult isValid(const ElGamalCiphertext &message, const ElementModP &k,
-                                 const ElementModQ &q)
+        ValidationResult isValid(const ElGamalCiphertext &message, const ElementModP &k)
         {
             bool proofsAreValid = true;
             std::vector<std::string> messages;
             for (uint64_t i = 0; i < this->rangeLimit; i++) {
                 auto proof = *this->integerProofs[i];
-                auto validationResult = isValid(message, proof, i, k, q);
+                auto validationResult = isValid(message, proof, i, k);
 
                 // if the proof is invalid cache the error messages
                 // TODO: move not copy
@@ -652,6 +653,12 @@ namespace electionguard
     ZeroKnowledgeProof *RangedChaumPedersenProof::getProofAtIndex(uint64_t index) const
     {
         return pimpl->integerProofs.at(index).get();
+    }
+
+    std::vector<std::reference_wrapper<ZeroKnowledgeProof>>
+    RangedChaumPedersenProof::getProofs() const
+    {
+        return referenceWrap(pimpl->integerProofs);
     }
 
     // Public Static Methods
@@ -762,13 +769,13 @@ namespace electionguard
 
         if (!consistent_c) {
             validationResult.isValid = false;
-            validationResult.messages.push_back(
-              "RangedChaumPedersenProof: invalid computed challenge");
+            validationResult.messages.push_back("invalid computed challenge");
         }
 
         // print out the error messages if the proof is invalid
         if (!validationResult.isValid) {
-            Log::info("found an invalid Range-Bound Chaum-Pedersen proof");
+            Log::info("RangedChaumPedersenProof::isValid: found an invalid Range-Bound "
+                      "Chaum-Pedersen proof");
             for (const auto &message : validationResult.messages) {
                 Log::debug(message);
             }

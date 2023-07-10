@@ -475,12 +475,12 @@ namespace electionguard
                                     bool supportOvervotes /* = true */) const
     {
         if (pimpl->object_id != expectedObjectId) {
-            Log::info(": invalid objectId");
+            Log::warn("PlaintextBallotContest::isValid: invalid objectId for contest");
             return INVALID_OBJECT_ID_ERROR;
         }
 
         if (pimpl->selections.size() > expectedNumberSelections) {
-            Log::info(": too many selections");
+            Log::warn("PlaintextBallotContest::isValid: too many selections for contest");
             return TOO_MANY_SELECTIONS_ERROR;
         }
 
@@ -530,14 +530,14 @@ namespace electionguard
         unique_ptr<ElementModQ> nonce;
         unique_ptr<ElGamalCiphertext> ciphertextAccumulation;
         unique_ptr<ElementModQ> cryptoHash;
-        unique_ptr<ConstantChaumPedersenProof> proof;
+        unique_ptr<RangedChaumPedersenProof> proof;
         unique_ptr<HashedElGamalCiphertext> hashedElGamal;
 
         Impl(const string &objectId, uint64_t sequenceOrder,
              unique_ptr<ElementModQ> descriptionHash,
              vector<unique_ptr<CiphertextBallotSelection>> selections,
              unique_ptr<ElementModQ> nonce, unique_ptr<ElGamalCiphertext> ciphertextAccumulation,
-             unique_ptr<ElementModQ> cryptoHash, unique_ptr<ConstantChaumPedersenProof> proof,
+             unique_ptr<ElementModQ> cryptoHash, unique_ptr<RangedChaumPedersenProof> proof,
              unique_ptr<HashedElGamalCiphertext> hashedElGamal)
             : sequenceOrder(sequenceOrder), descriptionHash(move(descriptionHash)),
               selections(move(selections)), nonce(move(nonce)),
@@ -559,7 +559,7 @@ namespace electionguard
             auto _nonce = make_unique<ElementModQ>(*nonce);
             auto _accumulation = make_unique<ElGamalCiphertext>(*ciphertextAccumulation);
             auto _cryptoHash = make_unique<ElementModQ>(*cryptoHash);
-            auto _proof = make_unique<ConstantChaumPedersenProof>(*proof);
+            auto _proof = make_unique<RangedChaumPedersenProof>(*proof);
             auto _hashedElGamal = make_unique<HashedElGamalCiphertext>(*hashedElGamal);
 
             return make_unique<CiphertextBallotContest::Impl>(
@@ -579,8 +579,7 @@ namespace electionguard
       const string &objectId, uint64_t sequenceOrder, const ElementModQ &descriptionHash,
       vector<unique_ptr<CiphertextBallotSelection>> selections, unique_ptr<ElementModQ> nonce,
       unique_ptr<ElGamalCiphertext> ciphertextAccumulation, unique_ptr<ElementModQ> cryptoHash,
-      unique_ptr<ConstantChaumPedersenProof> proof,
-      unique_ptr<HashedElGamalCiphertext> hashedElGamal)
+      unique_ptr<RangedChaumPedersenProof> proof, unique_ptr<HashedElGamalCiphertext> hashedElGamal)
         : pimpl(new Impl(objectId, sequenceOrder, make_unique<ElementModQ>(descriptionHash),
                          move(selections), move(nonce), move(ciphertextAccumulation),
                          move(cryptoHash), move(proof), move(hashedElGamal)))
@@ -631,7 +630,7 @@ namespace electionguard
 
     ElementModQ *CiphertextBallotContest::getCryptoHash() const { return pimpl->cryptoHash.get(); }
 
-    ConstantChaumPedersenProof *CiphertextBallotContest::getProof() const
+    RangedChaumPedersenProof *CiphertextBallotContest::getProof() const
     {
         return pimpl->proof.get();
     }
@@ -655,9 +654,10 @@ namespace electionguard
       const string &objectId, uint64_t sequenceOrder, const ElementModQ &descriptionHash,
       vector<unique_ptr<CiphertextBallotSelection>> selections, const ElementModP &elgamalPublicKey,
       const ElementModQ &cryptoExtendedBaseHash, const ElementModQ &proofSeed,
-      uint64_t numberElected, unique_ptr<ElementModQ> nonce /* = nullptr */,
+      uint64_t numberSelected, uint64_t numberElected,
+      unique_ptr<ElementModQ> nonce /* = nullptr */,
       unique_ptr<ElementModQ> cryptoHash /* = nullptr */,
-      unique_ptr<ConstantChaumPedersenProof> proof /* = nullptr */,
+      unique_ptr<RangedChaumPedersenProof> proof /* = nullptr */,
       unique_ptr<HashedElGamalCiphertext> hashedElGamal /*nullptr */,
       bool shouldUsePrecomputedValues /* = false */)
     {
@@ -667,6 +667,7 @@ namespace electionguard
             selectionReferences.push_back(ref(*selection));
         }
 
+        // ensure the selections are sorted in the same order as the description
         sort(selectionReferences.begin(), selectionReferences.end(),
              [](const reference_wrapper<CiphertextBallotSelection> left,
                 const reference_wrapper<CiphertextBallotSelection> right) {
@@ -682,9 +683,9 @@ namespace electionguard
         auto accumulation = elgamalAccumulate(selectionReferences);
         if (proof == nullptr) {
             auto aggregate = aggregateNonce(selectionReferences);
-            auto owned_proof = ConstantChaumPedersenProof::make(
-              *accumulation, *aggregate, elgamalPublicKey, proofSeed, cryptoExtendedBaseHash,
-              numberElected, shouldUsePrecomputedValues);
+            auto owned_proof = RangedChaumPedersenProof::make(
+              *accumulation, *aggregate, numberSelected, numberElected, elgamalPublicKey,
+              cryptoExtendedBaseHash, proofSeed);
             proof = move(owned_proof);
         }
 
@@ -747,18 +748,20 @@ namespace electionguard
             consistent_accumulation = false;
         }
 
-        bool valid_proof =
+        auto valid_proof =
           pimpl->proof->isValid(*computedAccumulation, elgamalPublicKey, cryptoExtendedBaseHash);
 
         bool success = consistent_encryption_seed && consistent_crypto_hash && proof_exists &&
-                       consistent_accumulation && valid_proof;
+                       consistent_accumulation && valid_proof.isValid;
+
+        // TODO #365 Use ValidationResult
 
         if (!success) {
             map<string, bool> printMap{{"consistent_encryption_seed", consistent_encryption_seed},
                                        {"consistent_crypto_hash", consistent_crypto_hash},
                                        {"proof_exists", proof_exists},
                                        {"consistent_accumulation", consistent_accumulation},
-                                       {"valid_proof", valid_proof}};
+                                       {"valid_proof", valid_proof.isValid}};
 
             Log::info("CiphertextBallotContest::isValidEncryption failed!", printMap);
         }

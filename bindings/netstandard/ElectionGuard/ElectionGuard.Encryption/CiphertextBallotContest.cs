@@ -114,7 +114,7 @@ namespace ElectionGuard
         /// Calling this function expects that the object is in a well-formed encrypted state
         /// with the `ballot_selections` populated with valid encrypted ballot selections,
         /// the ElementModQ `description_hash`, the ElementModQ `crypto_hash`,
-        /// and the ConstantChaumPedersenProof all populated.
+        /// and the RangedChaumPedersenProof all populated.
         /// Specifically, the seed hash in this context is the hash of the ContestDescription,
         /// or whatever `ElementModQ` was used to populate the `description_hash` field.
         /// </summary>
