@@ -520,8 +520,7 @@ namespace electionguard
              const uint64_t numberElected, std::unique_ptr<ElementModQ> nonce = nullptr,
              std::unique_ptr<ElementModQ> cryptoHash = nullptr,
              std::unique_ptr<RangedChaumPedersenProof> proof = nullptr,
-             std::unique_ptr<HashedElGamalCiphertext> hashedElGamal = nullptr,
-             bool shouldUsePrecomputedValues = false);
+             std::unique_ptr<HashedElGamalCiphertext> hashedElGamal = nullptr);
 
         /// <summary>
         /// An aggregate nonce for the contest composed of the nonces of the selections.

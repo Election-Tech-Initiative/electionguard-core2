@@ -178,7 +178,7 @@ namespace electionguard
                    const ContestDescriptionWithPlaceholders &description,
                    const ElementModP &elgamalPublicKey, const ElementModQ &cryptoExtendedBaseHash,
                    const ElementModQ &nonceSeed, bool verifyProofs = true,
-                   bool usePrecompute = false);
+                   bool usePrecompute = false, bool allowOvervotes = true);
 
     /// <summary>
     /// Encrypt the contests of a specific `Ballot` in the context of a specific `CiphertextElectionContext`
@@ -202,7 +202,8 @@ namespace electionguard
     EG_API std::vector<std::unique_ptr<CiphertextBallotContest>>
     encryptContests(const PlaintextBallot &ballot, const InternalManifest &internalManifest,
                     const CiphertextElectionContext &context, const ElementModQ &nonceSeed,
-                    bool verifyProofs = true, bool usePrecompute = false);
+                    bool verifyProofs = true, bool usePrecompute = false,
+                    bool allowOvervotes = true);
 
     /// <summary>
     /// Encrypt a specific `Ballot` in the context of a specific `CiphertextElectionContext`
@@ -241,7 +242,7 @@ namespace electionguard
     encryptBallot(const PlaintextBallot &ballot, const InternalManifest &internalManifest,
                   const CiphertextElectionContext &context, const ElementModQ &ballotCodeSeed,
                   std::unique_ptr<ElementModQ> nonce = nullptr, uint64_t timestamp = 0,
-                  bool verifyProofs = true, bool usePrecompute = false);
+                  bool verifyProofs = true, bool usePrecompute = false, bool allowOvervotes = true);
 
     /// <summary>
     /// Encrypt a specific `Ballot` in the context of a specific `CiphertextElectionContext`

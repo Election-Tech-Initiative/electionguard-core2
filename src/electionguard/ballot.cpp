@@ -495,10 +495,12 @@ namespace electionguard
         }
 
         if (numberElected > expectedNumberElected) {
-            Log::info(": too many elections");
             if (supportOvervotes) {
+                Log::info("PlaintextBallotContest::isValid: too many elections (allow overvote)");
                 return OVERVOTE;
             } else {
+                Log::warn(
+                  "PlaintextBallotContest::isValid: too many elections (disallow overvote)");
                 return OVERVOTE_ERROR;
             }
         }
@@ -508,10 +510,11 @@ namespace electionguard
         }
 
         if (votes > votesAllowd) {
-            Log::info(": too many votes");
             if (supportOvervotes) {
+                Log::info("PlaintextBallotContest::isValid: too many votes (allow overvote)");
                 return OVERVOTE;
             } else {
+                Log::warn("PlaintextBallotContest::isValid: too many votes (disallow overvote)");
                 return OVERVOTE_ERROR;
             }
         }
@@ -658,8 +661,7 @@ namespace electionguard
       unique_ptr<ElementModQ> nonce /* = nullptr */,
       unique_ptr<ElementModQ> cryptoHash /* = nullptr */,
       unique_ptr<RangedChaumPedersenProof> proof /* = nullptr */,
-      unique_ptr<HashedElGamalCiphertext> hashedElGamal /*nullptr */,
-      bool shouldUsePrecomputedValues /* = false */)
+      unique_ptr<HashedElGamalCiphertext> hashedElGamal /*nullptr */)
     {
         vector<reference_wrapper<CiphertextBallotSelection>> selectionReferences;
         selectionReferences.reserve(selections.size());

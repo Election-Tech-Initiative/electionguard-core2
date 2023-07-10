@@ -216,9 +216,9 @@ namespace electionguard
     /// <param name="is_overvote">indicates if an overvote was detected</param>
     /// <returns>string holding the json with the write ins</returns>
     /// </summary>
-    string getOvervoteAndWriteIns(const PlaintextBallotContest &contest,
-                                  const InternalManifest &manifest,
-                                  eg_contest_is_valid_result_t is_overvote)
+    string encodeExtendedData(const PlaintextBallotContest &contest,
+                              const InternalManifest &manifest,
+                              eg_contest_is_valid_result_t is_overvote)
     {
         // TODO: refactor overvote and writein so that we do not need the internal manifest
         json overvoteAndWriteIns;
@@ -282,6 +282,17 @@ namespace electionguard
         }
 
         return overvoteAndWriteIns_string;
+    }
+
+    unique_ptr<PlaintextBallotContest> emplaceAllZeroes(const ContestDescription &description)
+    {
+        vector<unique_ptr<PlaintextBallotSelection>> selections;
+        // loop through the selections for the contest
+        for (const auto &selectionDescription : description.getSelections()) {
+            selections.push_back(selectionFrom(selectionDescription));
+        }
+
+        return make_unique<PlaintextBallotContest>(description.getObjectId(), move(selections));
     }
 
     unique_ptr<PlaintextBallotContest> emplaceMissingValues(const PlaintextBallotContest &contest,
@@ -492,15 +503,15 @@ namespace electionguard
                    const ContestDescriptionWithPlaceholders &description,
                    const ElementModP &elgamalPublicKey, const ElementModQ &cryptoExtendedBaseHash,
                    const ElementModQ &nonceSeed, bool verifyProofs /* = true */,
-                   bool usePrecompute /* = true */)
+                   bool usePrecompute /* = true */, bool allowOvervotes /* = true */)
 
     {
         // Validate Input
-        bool supportOvervotes = true;
-        eg_contest_is_valid_result_t is_valid_contest = contest.isValid(
+        auto validationResult = contest.isValid(
           description.getObjectId(), description.getSelections().size(),
-          description.getNumberElected(), description.getVotesAllowed(), supportOvervotes);
-        if ((is_valid_contest != SUCCESS) && (is_valid_contest != OVERVOTE)) {
+          description.getNumberElected(), description.getVotesAllowed(), allowOvervotes);
+
+        if ((validationResult != SUCCESS) && (validationResult != OVERVOTE)) {
             throw invalid_argument("encryptedContest:: the plaintext contest was invalid");
         }
 
@@ -513,26 +524,25 @@ namespace electionguard
         auto nonceSequence =
           make_unique<Nonces>(*descriptionHash, &const_cast<ElementModQ &>(nonceSeed));
         auto contestNonce = nonceSequence->get(description.getSequenceOrder());
-        auto chaumPedersenNonce = nonceSequence->next();
+        auto proofNonce = nonceSequence->next();
         std::shared_ptr<ElementModQ> sharedNonce(move(contestNonce));
 
-        vector<unique_ptr<CiphertextBallotSelection>> encryptedSelections;
+        // normalize contest selections
+        unique_ptr<PlaintextBallotContest> normalizedContest;
+        if (validationResult == OVERVOTE) {
+            // if the is an overvote then we need to make all the selection votes 0
+            normalizedContest = emplaceAllZeroes(description);
+        } else {
+            // iterate over the actual selections for each contest description
+            // and apply the selected value if it exists.  If it does not, an explicit
+            // false is entered instead and the selection_count is not incremented
+            // this allows consumers to only pass in the relevant selections made by a voter
+            normalizedContest = emplaceMissingValues(contest, description);
+        }
 
-        // get the writein data if there is any
-        auto extendedData = getOvervoteAndWriteIns(contest, internalManifest, is_valid_contest);
-
-        // TODO: ISSUE #36: this code could be inefficient if we had a contest
-        // with a lot of choices, although the O(n^2) iteration here is small
-        // compared to the huge cost of doing the cryptography.
+        // encrypt selections
         uint64_t selectionCount = 0;
-
-        unique_ptr<PlaintextBallotSelection> duplicate_selection;
-
-        // iterate over the actual selections for each contest description
-        // and apply the selected value if it exists.  If it does not, an explicit
-        // false is entered instead and the selection_count is not incremented
-        // this allows consumers to only pass in the relevant selections made by a voter
-        auto normalizedContest = emplaceMissingValues(contest, description);
+        vector<unique_ptr<CiphertextBallotSelection>> encryptedSelections;
         auto normalizedSelections = normalizedContest->getSelections();
         for (const auto &selectionDescription : description.getSelections()) {
             auto description_id = selectionDescription.get().getObjectId();
@@ -543,20 +553,11 @@ namespace electionguard
                                });
                 selection != normalizedSelections.end()) {
 
+                // always false for E.G. 2.0 encryptions
                 auto isPlaceholder = false;
 
-                // track the selection count so we can append the
-                // appropriate number of true placeholder votes
+                // track the selection count for the range proof
                 auto selection_ptr = &selection->get();
-
-                // if the is an overvote then we need to make all the selection votes 0
-                if (is_valid_contest == OVERVOTE) {
-                    auto markOvervoteZero = 0;
-                    duplicate_selection = make_unique<PlaintextBallotSelection>(
-                      selection_ptr->getObjectId(), markOvervoteZero, isPlaceholder);
-                    selection_ptr = duplicate_selection.get();
-                }
-
                 selectionCount += selection_ptr->getVote();
 
                 // explicitly do not verify proofs when creating the encrypted selections
@@ -567,39 +568,16 @@ namespace electionguard
                                    *sharedNonce.get(), isPlaceholder, verifyProofs, usePrecompute));
             } else {
                 // Should never happen since the contest is normalized by emplaceMissingValues
-                throw runtime_error("Error constructing encrypted selection");
+                throw runtime_error("Error constructing encrypted selection. Missing selection.");
             }
         }
 
-        // Handle Placeholder selections
-        // After we loop through all of the real selections on the ballot,
-        // we loop through each placeholder value and determine if it should be filled in
-        for (const auto &placeholder : description.getPlaceholders()) {
-            bool selectPlaceholder = false;
-            // if the is an overvote then we don't count any of the selections
-            if (is_valid_contest == OVERVOTE) {
-                selectPlaceholder = true;
-            } else {
-                // for undervotes, select the placeholder value as true for each available seat
-                // note this pattern is used since DisjunctiveChaumPedersen expects a 0 or 1
-                // so each seat can only have a maximum value of 1 in the current implementation
-                if (selectionCount < description.getNumberElected()) {
-                    selectPlaceholder = true;
-                    selectionCount += 1;
-                }
-            }
-
-            auto isPlaceholder = true;
-            auto placeholderSelection = selectionFrom(placeholder, true, selectPlaceholder);
-            encryptedSelections.push_back(
-              encryptSelection(*placeholderSelection, placeholder, *elgamalPublicKey_ptr,
-                               *cryptoExtendedBaseHash_ptr, *sharedNonce.get(), isPlaceholder,
-                               verifyProofs, usePrecompute));
-        }
+        // Encrypt ExtendedData
+        auto extendedData = encodeExtendedData(contest, internalManifest, validationResult);
 
         // Derive the extendedDataNonce from the selection nonce and a constant
         auto noncesForExtendedData =
-          make_unique<Nonces>(*sharedNonce->clone(), "constant-extended-data");
+          make_unique<Nonces>(*sharedNonce->clone(), "contest-extended-data");
         auto extendedDataNonce = noncesForExtendedData->get(0);
 
         vector<uint8_t> extendedData_plaintext(extendedData.begin(), extendedData.end());
@@ -609,18 +587,11 @@ namespace electionguard
           extendedData_plaintext, *extendedDataNonce, HashPrefix::get_prefix_05(), elgamalPublicKey,
           cryptoExtendedBaseHash, BYTES_512, true, usePrecompute);
 
-        // TODO: ISSUE #33: support other cases such as cumulative voting
-        // (individual selections being an encryption of > 1)
-        if (selectionCount < description.getVotesAllowed()) {
-            Log::warn("encryptedContest:: mismatching selection count: only n-of-m style elections "
-                      "are currently supported");
-        }
-
-        // Create the return object
+        // Create the CiphertextBallotContest return object
         auto encryptedContest = CiphertextBallotContest::make(
           contest.getObjectId(), description.getSequenceOrder(), *descriptionHash,
-          move(encryptedSelections), elgamalPublicKey, cryptoExtendedBaseHash, *chaumPedersenNonce,
-          description.getNumberElected(), sharedNonce->clone(), nullptr, nullptr,
+          move(encryptedSelections), elgamalPublicKey, cryptoExtendedBaseHash, *proofNonce,
+          selectionCount, description.getNumberElected(), sharedNonce->clone(), nullptr, nullptr,
           move(hashedElGamal));
 
         if (encryptedContest == nullptr || encryptedContest->getProof() == nullptr) {
@@ -644,13 +615,14 @@ namespace electionguard
     vector<unique_ptr<CiphertextBallotContest>>
     encryptContests(const PlaintextBallot &ballot, const InternalManifest &internalManifest,
                     const CiphertextElectionContext &context, const ElementModQ &nonceSeed,
-                    bool verifyProofs /* = true */, bool usePrecompute /* = true */)
+                    bool verifyProofs /* = true */, bool usePrecompute /* = true */,
+                    bool allowOvervotes /* = true */)
     {
         auto *style = internalManifest.getBallotStyle(ballot.getStyleId());
         vector<unique_ptr<CiphertextBallotContest>> encryptedContests;
         auto normalizedBallot = emplaceMissingValues(ballot, internalManifest);
 
-        // TODO: Issue #217: implement this
+        // TODO: Issue #217: implement async multithreading
 
         // only iterate on contests for this specific ballot style
         for (const auto &description : internalManifest.getContestsFor(style->getObjectId())) {
@@ -661,7 +633,7 @@ namespace electionguard
                     auto encrypted = encryptContest(
                       contest.get(), internalManifest, description.get(),
                       *context.getElGamalPublicKey(), *context.getCryptoExtendedBaseHash(),
-                      nonceSeed, verifyProofs, usePrecompute);
+                      nonceSeed, verifyProofs, usePrecompute, allowOvervotes);
 
                     encryptedContests.push_back(move(encrypted));
                     break;
@@ -680,7 +652,8 @@ namespace electionguard
     encryptBallot(const PlaintextBallot &ballot, const InternalManifest &manifest,
                   const CiphertextElectionContext &context, const ElementModQ &encryptionSeed,
                   unique_ptr<ElementModQ> nonce /* = nullptr */, uint64_t timestamp /* = 0 */,
-                  bool verifyProofs /* = true */, bool usePrecompute /* = false */)
+                  bool verifyProofs /* = true */, bool usePrecompute /* = false */,
+                  bool allowOvervotes /* = true */)
     {
         Log::trace("encryptBallot:: encrypting");
         auto *style = manifest.getBallotStyle(ballot.getStyleId());
@@ -712,8 +685,8 @@ namespace electionguard
         Log::trace("timestamp       :", to_string(timestamp));
 
         // encrypt contests
-        auto encryptedContests =
-          encryptContests(ballot, manifest, context, *nonceSeed, verifyProofs, usePrecompute);
+        auto encryptedContests = encryptContests(ballot, manifest, context, *nonceSeed,
+                                                 verifyProofs, usePrecompute, allowOvervotes);
 
         // Get the system time
         if (timestamp == 0) {

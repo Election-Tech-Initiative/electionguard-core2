@@ -110,11 +110,8 @@ TEST_CASE("Encrypt simple selection malformed data fails")
 }
 
 TEST_CASE("Encrypt PlaintextBallot with EncryptionMediator against constructed "
-          "InternalManifest succeeds" *
-          doctest::skip())
+          "InternalManifest succeeds")
 {
-    Log::info("Skip due to invalid Constant Chaum Pedersen proof");
-
     // Arrange
     auto secret = ElementModQ::fromHex(a_fixed_secret);
     auto keypair = ElGamalKeyPair::fromSecret(*secret);
@@ -137,10 +134,8 @@ TEST_CASE("Encrypt PlaintextBallot with EncryptionMediator against constructed "
     CHECK(ciphertext->getContests().front().get().getHashedElGamalCiphertext().get() != nullptr);
 }
 
-TEST_CASE("Encrypt PlaintextBallot undervote succeeds" * doctest::skip())
+TEST_CASE("Encrypt PlaintextBallot undervote succeeds")
 {
-    Log::info("Skip due to invalid Constant Chaum Pedersen proof");
-
     // Arrange
     auto secret = ElementModQ::fromHex(a_fixed_secret);
     auto keypair = ElGamalKeyPair::fromSecret(*secret);
@@ -161,10 +156,8 @@ TEST_CASE("Encrypt PlaintextBallot undervote succeeds" * doctest::skip())
                                         *context->getCryptoExtendedBaseHash()) == true);
 }
 
-TEST_CASE("Encrypt PlaintextBallot overvote" * doctest::skip())
+TEST_CASE("Encrypt PlaintextBallot overvote")
 {
-    Log::info("Skip due to invalid Constant Chaum Pedersen proof");
-
     // Arrange
     const auto &secret = TWO_MOD_Q();
     auto keypair = ElGamalKeyPair::fromSecret(secret, false);
@@ -214,10 +207,8 @@ TEST_CASE("Encrypt PlaintextBallot overvote" * doctest::skip())
                  ",\"john-adams-selection\"]}"));
 }
 
-TEST_CASE("Encrypt simple PlaintextBallot with EncryptionMediator succeeds" * doctest::skip())
+TEST_CASE("Encrypt simple PlaintextBallot with EncryptionMediator succeeds")
 {
-    Log::info("Skip due to invalid Constant Chaum Pedersen proof");
-
     // Arrange
     auto secret = ElementModQ::fromHex(a_fixed_secret);
     auto keypair = ElGamalKeyPair::fromSecret(*secret);
@@ -253,11 +244,8 @@ TEST_CASE("Encrypt simple PlaintextBallot with EncryptionMediator succeeds" * do
     CHECK(fromBson->getNonce()->toHex() == ZERO_MOD_Q().toHex());
 }
 
-TEST_CASE(
-  "Encrypt full PlaintextBallot with WriteIn and Overvote with EncryptionMediator succeeds" *
-  doctest::skip())
+TEST_CASE("Encrypt full PlaintextBallot with WriteIn and Overvote with EncryptionMediator succeeds")
 {
-    Log::info("Skip due to invalid Constant Chaum Pedersen proof");
     const auto &secret = TWO_MOD_Q();
     auto keypair = ElGamalKeyPair::fromSecret(secret, false);
     auto manifest = ManifestGenerator::getManifestFromFile(TEST_SPEC_VERSION, TEST_USE_FULL_SAMPLE);
@@ -316,10 +304,8 @@ TEST_CASE(
                  ":{\"write-in-selection\":\"Susan B. Anthony\"}}"));
 }
 
-TEST_CASE("Encrypt simple CompactPlaintextBallot with EncryptionMediator succeeds" *
-          doctest::skip())
+TEST_CASE("Encrypt simple CompactPlaintextBallot with EncryptionMediator succeeds")
 {
-    Log::info("Skip due to invalid Constant Chaum Pedersen proof");
     // Arrange
     auto secret = ElementModQ::fromHex(a_fixed_secret);
     auto keypair = ElGamalKeyPair::fromSecret(*secret);
@@ -337,10 +323,8 @@ TEST_CASE("Encrypt simple CompactPlaintextBallot with EncryptionMediator succeed
     CHECK(compactCiphertext->getObjectId() == plaintext->getObjectId());
 }
 
-TEST_CASE("Encrypt simple ballot from file with mediator succeeds" * doctest::skip())
+TEST_CASE("Encrypt simple ballot from file with mediator succeeds")
 {
-    Log::info("Skip due to invalid Constant Chaum Pedersen proof");
-
     // Arrange
     auto secret = ElementModQ::fromHex(a_fixed_secret);
     auto keypair = ElGamalKeyPair::fromSecret(*secret);
@@ -360,10 +344,8 @@ TEST_CASE("Encrypt simple ballot from file with mediator succeeds" * doctest::sk
                                         *context->getCryptoExtendedBaseHash()) == true);
 }
 
-TEST_CASE("Encrypt simple ballot from file succeeds" * doctest::skip())
+TEST_CASE("Encrypt simple ballot from file succeeds")
 {
-    Log::info("Skip due to invalid Constant Chaum Pedersen proof");
-
     // Arrange
     auto secret = ElementModQ::fromHex(a_fixed_secret);
     auto keypair = ElGamalKeyPair::fromSecret(*secret);
@@ -386,9 +368,8 @@ TEST_CASE("Encrypt simple ballot from file succeeds" * doctest::skip())
                                         *context->getCryptoExtendedBaseHash()) == true);
 }
 
-TEST_CASE("Encrypt simple ballot from file re-encrypt creates same ballot" * doctest::skip())
+TEST_CASE("Encrypt simple ballot from file re-encrypt creates same ballot")
 {
-    Log::info("Skip due to invalid Constant Chaum Pedersen proof");
     // Arrange
     auto secret = ElementModQ::fromHex(a_fixed_secret);
     auto keypair = ElGamalKeyPair::fromSecret(*secret);
@@ -414,11 +395,8 @@ TEST_CASE("Encrypt simple ballot from file re-encrypt creates same ballot" * doc
 }
 
 TEST_CASE(
-  "Encrypt simple ballot from file using precompute tables re-encrypt creates a different ballot" *
-  doctest::skip())
+  "Encrypt simple ballot from file using precompute tables re-encrypt creates a different ballot")
 {
-    Log::info("Skip due to invalid Constant Chaum Pedersen proof");
-
     // Arrange
     auto secret = ElementModQ::fromHex(a_fixed_secret);
     auto keypair = ElGamalKeyPair::fromSecret(*secret);
@@ -449,10 +427,8 @@ TEST_CASE(
     CHECK(ciphertext->getBallotCode()->toHex() != reencrypted->getBallotCode()->toHex());
 }
 
-TEST_CASE("Encrypt simple ballot from file cast is valid" * doctest::skip())
+TEST_CASE("Encrypt simple ballot from file cast is valid")
 {
-    Log::info("Skip due to invalid Constant Chaum Pedersen proof");
-
     // Arrange
     auto secret = ElementModQ::fromHex(a_fixed_secret);
     auto keypair = ElGamalKeyPair::fromSecret(*secret);
@@ -471,10 +447,8 @@ TEST_CASE("Encrypt simple ballot from file cast is valid" * doctest::skip())
     CHECK(ciphertext->getNonce() == nullptr);
 }
 
-TEST_CASE("Encrypt simple ballot from file submitted is valid" * doctest::skip())
+TEST_CASE("Encrypt simple ballot from file submitted is valid")
 {
-    Log::info("Skip due to invalid Constant Chaum Pedersen proof");
-
     // Arrange
     auto secret = ElementModQ::fromHex(a_fixed_secret);
     auto keypair = ElGamalKeyPair::fromSecret(*secret);
@@ -502,9 +476,8 @@ TEST_CASE("Encrypt simple ballot from file submitted is valid" * doctest::skip()
                                           *context->getCryptoExtendedBaseHash()) == true);
 }
 
-TEST_CASE("Submit multiple ballots" * doctest::skip())
+TEST_CASE("Submit multiple ballots")
 {
-    Log::info("Skip due to invalid Constant Chaum Pedersen proof");
     auto ballotData =
       "{\"object_id\": \"ballot-434ab8e7-22f7-11ed-8bad-04d9f5218a21\", \"style_id\": "
       "\"e3505391-aca6-4666-aadf-4fb31357170b\", \"contests\": [{\"object_id\": "
@@ -1418,10 +1391,8 @@ TEST_CASE("Submit multiple ballots" * doctest::skip())
                                           *context->getCryptoExtendedBaseHash()) == true);
 }
 
-TEST_CASE("Encrypt simple ballot from file succeeds with precomputed values" * doctest::skip())
+TEST_CASE("Encrypt simple ballot from file succeeds with precomputed values")
 {
-    Log::info("Skip due to invalid Constant Chaum Pedersen proof");
-
     // Arrange
     auto secret = ElementModQ::fromHex(a_fixed_secret);
     auto keypair = ElGamalKeyPair::fromSecret(*secret);
@@ -1490,9 +1461,9 @@ TEST_CASE("Create EncryptionMediator with different manifest hash")
     }
 }
 
-TEST_CASE("Verify placeholder flag" * doctest::skip())
+TEST_CASE("Verify placeholder flag")
 {
-    Log::info("Skip due to invalid Constant Chaum Pedersen proof");
+    // placeholders are no longer used in E.G. 2.0
 
     // Arrange
     auto secret = ElementModQ::fromHex(a_fixed_secret);
@@ -1512,5 +1483,5 @@ TEST_CASE("Verify placeholder flag" * doctest::skip())
       ciphertext->getContests().front().get().getSelections().front().get().getIsPlaceholder() ==
       false);
     CHECK(ciphertext->getContests().front().get().getSelections().back().get().getIsPlaceholder() ==
-          true);
+          false);
 }
