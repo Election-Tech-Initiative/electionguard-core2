@@ -539,7 +539,7 @@ namespace electionguard
                     serialized.push_back({"contact_information", contactInformation});
                 }
 
-                serialized.push_back({"spec_version", "1.0"});
+                serialized.push_back({"spec_version", "1.90"});
 
                 return serialized;
             }
