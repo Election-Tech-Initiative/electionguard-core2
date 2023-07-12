@@ -1,0 +1,149 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<views:ContentPageBase
+    x:Class="ElectionGuard.UI.Views.CreateMultiTallyPage"
+    xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+    xmlns:controls="clr-namespace:ElectionGuard.UI.Controls"
+    xmlns:helper="clr-namespace:ElectionGuard.UI.Helpers"
+    xmlns:model="clr-namespace:ElectionGuard.UI.Lib.Models;assembly=ElectionGuard.UI.Lib"
+    xmlns:toolkit="http://schemas.microsoft.com/dotnet/2022/maui/toolkit"
+    xmlns:viewModels="clr-namespace:ElectionGuard.UI.ViewModels"
+    xmlns:views="using:ElectionGuard.UI.Views"
+    x:DataType="viewModels:CreateMultiTallyViewModel"
+    x:TypeArguments="viewModels:CreateMultiTallyViewModel"
+    ControlTemplate="{StaticResource PageTemplate}">
+    <ContentPage.Resources>
+        <toolkit:InvertedBoolConverter x:Key="InvertedBoolConverter" />
+        <toolkit:IsNotNullConverter x:Key="IsNotNullConverter" />
+    </ContentPage.Resources>
+    <VerticalStackLayout Style="{StaticResource LargeCenteredPage}">
+        <Label
+            IsVisible="{Binding ErrorMessage, Converter={StaticResource IsNotNullConverter}}"
+            Style="{StaticResource Error}"
+            Text="{Binding ErrorMessage}" />
+        <Grid
+            IsVisible="{Binding IsAdmin, Converter={StaticResource InvertedBoolConverter}}"
+            RowDefinitions="auto, auto, auto, auto"
+            WidthRequest="{StaticResource NarrowSize}">
+            <Label
+                Grid.Row="0"
+                Style="{StaticResource FormLabel}"
+                Text="{helper:Translate MultiTallyNameText}" />
+            <Label
+                Grid.Row="1"
+                Margin="20,0"
+                Style="{StaticResource FormValue}"
+                Text="{Binding CurrentMultiTally.Name}"
+                WidthRequest="{StaticResource NarrowSize}" />
+        </Grid>
+        <Grid IsVisible="{Binding IsAdmin}" RowDefinitions="auto, auto">
+            <Label
+                Grid.Row="0"
+                Style="{StaticResource FormLabel}"
+                Text="{helper:Translate KeyCeremoniesText}" />
+            <Grid Grid.Row="1" WidthRequest="{StaticResource NarrowSize}">
+                <!--  This entry is due to a bug with picker in Windows.  The text gets reset to white on a mouse over  -->
+                <!--  This uses the code behind to work around.  The command still does the work for the actual process  -->
+                <Entry
+                    x:Name="keyEntry"
+                    HeightRequest="45"
+                    InputTransparent="True"
+                    IsReadOnly="True"
+                    VerticalOptions="Start"
+                    WidthRequest="{StaticResource NarrowSize}" />
+                <Picker
+                    x:Name="keyPicker"
+                    Margin="0,5,0,0"
+                    HorizontalOptions="FillAndExpand"
+                    ItemDisplayBinding="{Binding Name}"
+                    ItemsSource="{Binding KeyCeremonies}"
+                    SelectedIndexChanged="Picker_SelectedIndexChanged"
+                    SelectedItem="{Binding SelectedKeyCeremony}"
+                    VerticalOptions="Start"
+                    ZIndex="-1" />
+
+            </Grid>
+        </Grid>
+        <Grid IsVisible="{Binding IsAdmin}" RowDefinitions="auto, auto, auto">
+            <Label
+                Grid.Row="0"
+                Style="{StaticResource FormLabel}"
+                Text="{helper:Translate ElectionRecordPathText}" />
+            <Grid
+                Grid.Row="1"
+                Padding="0"
+                BackgroundColor="WhiteSmoke"
+                ColumnDefinitions="auto, *">
+                <Button
+                    Grid.Column="0"
+                    BackgroundColor="{StaticResource Gray200}"
+                    Command="{Binding PickFolderCommand}"
+                    Text="{helper:Translate ChooseFolder}"
+                    TextColor="{StaticResource Gray950}" />
+                <Entry
+                    Grid.Column="1"
+                    IsReadOnly="True"
+                    Placeholder="{helper:Translate NoFolderText}"
+                    Text="{Binding CurrentResultsPath}"
+                    VerticalOptions="CenterAndExpand" />
+            </Grid>
+            <Grid
+                Grid.Row="2"
+                Margin="0,20,0,10"
+                IsVisible="{Binding IsAdmin}">
+                <Label
+                    HorizontalOptions="StartAndExpand"
+                    Style="{StaticResource FormLabel}"
+                    Text="{helper:Translate CreateMultiInstructionsText}" />
+                <Button
+                    Command="{Binding CreateTalliesCommand}"
+                    HorizontalOptions="End"
+                    Text="{helper:Translate CreateTallies}" />
+            </Grid>
+        </Grid>
+        <Grid Margin="0,20,0,10" IsVisible="{Binding IsAdmin, Converter={StaticResource InvertedBoolConverter}}">
+            <Label
+                HorizontalOptions="StartAndExpand"
+                Style="{StaticResource FormLabel}"
+                Text="{helper:Translate JoinMultiInstructionsText}" />
+            <Button
+                Command="{Binding JoinTalliesCommand}"
+                HorizontalOptions="End"
+                Text="{helper:Translate JoinTallies}" />
+        </Grid>
+        <HorizontalStackLayout Margin="5,10,0,10" IsEnabled="{Binding ElectionsLoaded}">
+            <CheckBox IsChecked="{Binding SelectAll}" VerticalOptions="Start" />
+            <Label
+                Style="{StaticResource H3}"
+                Text="{helper:Translate SelectAllElectionsText}"
+                VerticalOptions="Start" />
+        </HorizontalStackLayout>
+        <CollectionView
+            x:Name="electionList"
+            ItemsSource="{Binding Elections}"
+            SelectedItems="{Binding SelectedElections}"
+            SelectionChangedCommand="{Binding SelectionChangedCommand}"
+            SelectionMode="Multiple" 
+            WidthRequest="{StaticResource LargeSize}">
+            <CollectionView.ItemTemplate>
+                <DataTemplate x:DataType="model:ElectionItem">
+                    <Frame
+                        Margin="25,0,0,10"
+                        BackgroundColor="{StaticResource Gray050}"
+                        HasShadow="True">
+                        <Grid RowDefinitions="auto, *">
+                            <Label
+                                Grid.Row="0"
+                                Margin="10,0,0,10"
+                                Style="{StaticResource H2}"
+                                Text="{Binding Election.Name}" />
+                            <controls:UploadsControl Grid.Row="1" BindingContext="{Binding .}" />
+                        </Grid>
+                    </Frame>
+                </DataTemplate>
+            </CollectionView.ItemTemplate>
+
+        </CollectionView>
+
+    </VerticalStackLayout>
+</views:ContentPageBase>

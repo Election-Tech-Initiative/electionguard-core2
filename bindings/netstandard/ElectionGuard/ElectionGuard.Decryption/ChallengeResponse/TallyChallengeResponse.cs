@@ -1,4 +1,4 @@
-using ElectionGuard.Ballot;
+﻿using ElectionGuard.Ballot;
 using ElectionGuard.Decryption.Challenge;
 using ElectionGuard.Decryption.Shares;
 using ElectionGuard.Decryption.Tally;
@@ -31,6 +31,24 @@ public record TallyChallengeResponse
     public ElementModQ Coefficient { get; init; }
 
     public Dictionary<string, ContestChallengeResponse> Contests { get; init; } = default!;
+
+    [JsonConstructor]
+    public TallyChallengeResponse(
+        string tallyId,
+        string guardianId,
+        ulong sequenceOrder,
+        ElementModQ coefficient,
+        Dictionary<string, ContestChallengeResponse> contests)
+    {
+        TallyId = tallyId;
+        GuardianId = guardianId;
+        SequenceOrder = sequenceOrder;
+        Coefficient = new(coefficient);
+        Contests = contests
+            .ToDictionary(
+                kvp => kvp.Key,
+                kvp => new ContestChallengeResponse(kvp.Value));
+    }
 
     public TallyChallengeResponse(
         TallyChallenge challenge)

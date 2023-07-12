@@ -14,7 +14,7 @@ class HashedElgamalEncryptFixture : public benchmark::Fixture
   public:
     void SetUp(const ::benchmark::State &state)
     {
-
+        hashPrefix = "00";
         nonce = rand_q();
         secret = ElementModQ::fromHex(a_fixed_secret);
         keypair = ElGamalKeyPair::fromSecret(TWO_MOD_Q(), false);
@@ -29,7 +29,7 @@ class HashedElgamalEncryptFixture : public benchmark::Fixture
         plaintext = plain;
 
         std::unique_ptr<HashedElGamalCiphertext> HEGResult = hashedElgamalEncrypt(
-          plaintext, *nonce, *keypair->getPublicKey(), *descriptionHash, NO_PADDING, false);
+          plaintext, *nonce, hashPrefix, *keypair->getPublicKey(), *descriptionHash, false);
     }
 
     void TearDown(const ::benchmark::State &state) {}
@@ -39,13 +39,14 @@ class HashedElgamalEncryptFixture : public benchmark::Fixture
     unique_ptr<ElGamalKeyPair> keypair;
     unique_ptr<ElementModQ> descriptionHash;
     vector<uint8_t> plaintext;
+    string hashPrefix;
 };
 
 BENCHMARK_DEFINE_F(HashedElgamalEncryptFixture, HashedElGamalEncrypt)(benchmark::State &state)
 {
     for (auto _ : state) {
-        hashedElgamalEncrypt(plaintext, *nonce, *keypair->getPublicKey(), *descriptionHash,
-                             NO_PADDING, false);
+        hashedElgamalEncrypt(plaintext, *nonce, hashPrefix, *keypair->getPublicKey(),
+                             *descriptionHash, false);
     }
 }
 
@@ -57,7 +58,7 @@ class HashedElgamalEncryptPrecomputeFixture : public benchmark::Fixture
   public:
     void SetUp(const ::benchmark::State &state)
     {
-
+        hashPrefix = "00";
         nonce = rand_q();
         secret = ElementModQ::fromHex(a_fixed_secret);
         keypair = ElGamalKeyPair::fromSecret(TWO_MOD_Q(), false);
@@ -72,7 +73,7 @@ class HashedElgamalEncryptPrecomputeFixture : public benchmark::Fixture
         plaintext = plain;
 
         std::unique_ptr<HashedElGamalCiphertext> HEGResult = hashedElgamalEncrypt(
-          plaintext, *nonce, *keypair->getPublicKey(), *descriptionHash, NO_PADDING, false);
+          plaintext, *nonce, "00", *keypair->getPublicKey(), *descriptionHash, false);
 
         // cause precomputed entries that will be used by the selection
         // encryptions, that should be more than enough and on teardown
@@ -88,14 +89,15 @@ class HashedElgamalEncryptPrecomputeFixture : public benchmark::Fixture
     unique_ptr<ElGamalKeyPair> keypair;
     unique_ptr<ElementModQ> descriptionHash;
     vector<uint8_t> plaintext;
+    string hashPrefix;
 };
 
 BENCHMARK_DEFINE_F(HashedElgamalEncryptPrecomputeFixture, HashedElGamalEncryptPrecompute)
 (benchmark::State &state)
 {
     for (auto _ : state) {
-        hashedElgamalEncrypt(plaintext, *nonce, *keypair->getPublicKey(), *descriptionHash,
-                             NO_PADDING, false);
+        hashedElgamalEncrypt(plaintext, *nonce, hashPrefix, *keypair->getPublicKey(),
+                             *descriptionHash, false);
     }
 }
 

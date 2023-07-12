@@ -17,7 +17,7 @@ namespace ElectionGuard.Encryption.Utils.Generators
             return GetManifestFromPath(path);
         }
 
-        private static Manifest GetManifestFromPath(string filepath)
+        public static Manifest GetManifestFromPath(string filepath)
         {
             var path = Path.Combine(AppContext.BaseDirectory, "data", filepath);
             var text = File.ReadAllText(path);
@@ -146,6 +146,7 @@ namespace ElectionGuard.Encryption.Utils.Generators
 
             return new Manifest(
                 "jefferson-county-open-primary",
+                "1.0",
                 ElectionType.Primary,
                 startDate: start,
                 endDate: start.AddDays(1),

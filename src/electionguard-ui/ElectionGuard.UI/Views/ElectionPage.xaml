@@ -4,6 +4,7 @@
     xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
     xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
     xmlns:controls="clr-namespace:ElectionGuard.UI.Controls"
+    xmlns:converter="clr-namespace:ElectionGuard.UI.Converters"
     xmlns:helper="clr-namespace:ElectionGuard.UI.Helpers"
     xmlns:model="clr-namespace:ElectionGuard.UI.Lib.Models;assembly=ElectionGuard.UI.Lib"
     xmlns:toolkit="http://schemas.microsoft.com/dotnet/2022/maui/toolkit"
@@ -14,7 +15,7 @@
     ControlTemplate="{StaticResource PageTemplate}">
     <ContentPage.Resources>
         <ResourceDictionary>
-            <helper:AlternateRowColorConverter x:Key="AlternateRowColorConverter" />
+            <converter:AlternateRowColorConverter x:Key="AlternateRowColorConverter" />
         </ResourceDictionary>
     </ContentPage.Resources>
     <Grid
@@ -113,114 +114,7 @@
                 </HorizontalStackLayout>
             </Grid>
             <ScrollView>
-                <CollectionView x:Name="UploadCollectionView" ItemsSource="{Binding BallotUploads}">
-                    <CollectionView.Header>
-                        <Grid>
-                            <Grid ColumnDefinitions="1.5*, 2*, *, *, *, *, *">
-                                <Label
-                                    Grid.Column="0"
-                                    FontAttributes="Bold"
-                                    Text="{helper:Translate UploadedText}" />
-                                <Label
-                                    Grid.Column="1"
-                                    FontAttributes="Bold"
-                                    Text="{helper:Translate LocationText}" />
-                                <Label
-                                    Grid.Column="2"
-                                    FontAttributes="Bold"
-                                    Text="{helper:Translate AddedText}" />
-                                <Label
-                                    Grid.Column="3"
-                                    FontAttributes="Bold"
-                                    Text="{helper:Translate SpoiledText}" />
-                                <Label
-                                    Grid.Column="4"
-                                    FontAttributes="Bold"
-                                    Text="{helper:Translate DuplicatedText}" />
-                                <Label
-                                    Grid.Column="5"
-                                    FontAttributes="Bold"
-                                    Text="{helper:Translate RejectedText}" />
-                                <Label
-                                    Grid.Column="6"
-                                    FontAttributes="Bold"
-                                    Text="{helper:Translate BallotCountText}" />
-                            </Grid>
-                            <Line
-                                BackgroundColor="{StaticResource Gray950}"
-                                StrokeThickness="2"
-                                VerticalOptions="End" />
-                        </Grid>
-                    </CollectionView.Header>
-                    <CollectionView.ItemTemplate>
-                        <DataTemplate x:DataType="model:BallotUpload">
-                            <Grid BackgroundColor="{Binding ., Converter={StaticResource AlternateRowColorConverter}, ConverterParameter={x:Reference UploadCollectionView}}}" ColumnDefinitions="1.5*, 2*, *, *, *, *, *">
-                                <Label
-                                    Grid.Column="0"
-                                    Margin="10"
-                                    Text="{Binding CreatedAt}" />
-                                <Label
-                                    Grid.Column="1"
-                                    Margin="10"
-                                    Text="{Binding Location}" />
-                                <Label
-                                    Grid.Column="2"
-                                    Margin="10"
-                                    Text="{Binding BallotImported}" />
-                                <Label
-                                    Grid.Column="3"
-                                    Margin="10"
-                                    Text="{Binding BallotSpoiled}" />
-                                <Label
-                                    Grid.Column="4"
-                                    Margin="10"
-                                    Text="{Binding BallotDuplicated}" />
-                                <Label
-                                    Grid.Column="5"
-                                    Margin="10"
-                                    Text="{Binding BallotRejected}" />
-                                <Label
-                                    Grid.Column="6"
-                                    Margin="10"
-                                    Text="{Binding BallotCount}" />
-                            </Grid>
-                        </DataTemplate>
-                    </CollectionView.ItemTemplate>
-                    <CollectionView.Footer>
-                        <Grid BackgroundColor="{StaticResource Gray400}" ColumnDefinitions="3.5*, *, *, *, *, *">
-                            <Label
-                                Grid.Column="0"
-                                Margin="10"
-                                FontAttributes="Bold,Italic"
-                                Text="{helper:Translate TotalText}" />
-                            <Label
-                                Grid.Column="1"
-                                Margin="10"
-                                FontAttributes="Bold"
-                                Text="{Binding BallotAddedTotal}" />
-                            <Label
-                                Grid.Column="2"
-                                Margin="10"
-                                FontAttributes="Bold"
-                                Text="{Binding BallotSpoiledTotal}" />
-                            <Label
-                                Grid.Column="3"
-                                Margin="10"
-                                FontAttributes="Bold"
-                                Text="{Binding BallotDuplicateTotal}" />
-                            <Label
-                                Grid.Column="4"
-                                Margin="10"
-                                FontAttributes="Bold"
-                                Text="{Binding BallotRejectedTotal}" />
-                            <Label
-                                Grid.Column="5"
-                                Margin="10"
-                                FontAttributes="Bold"
-                                Text="{Binding BallotCountTotal}" />
-                        </Grid>
-                    </CollectionView.Footer>
-                </CollectionView>
+                <controls:UploadsControl BindingContext="{Binding .}" />
             </ScrollView>
         </VerticalStackLayout>
 
@@ -238,14 +132,31 @@
                     Style="{StaticResource H2}"
                     Text="{helper:Translate TalliesText}" />
             </Grid>
+            <Grid>
+                <Grid ColumnDefinitions="1.5*, 3*, 50">
+                    <Label
+                        Grid.Column="0"
+                        FontAttributes="Bold"
+                        Text="{helper:Translate CreatedText}" />
+                    <Label
+                        Grid.Column="1"
+                        FontAttributes="Bold"
+                        Text="{helper:Translate NameText}" />
+                </Grid>
+                <Line
+                    BackgroundColor="{StaticResource Gray950}"
+                    StrokeThickness="2"
+                    VerticalOptions="End" />
+            </Grid>
             <CollectionView
                 x:Name="TallyCollectionView"
                 ItemsSource="{Binding Tallies}"
                 SelectedItem="{Binding CurrentTally}"
                 SelectionMode="Single">
+                <!-- section commented out to want to maui to fix
                 <CollectionView.Header>
                     <Grid>
-                        <Grid ColumnDefinitions="*, 3*">
+                        <Grid ColumnDefinitions="1.5*, 3*, 50">
                             <Label
                                 Grid.Column="0"
                                 FontAttributes="Bold"
@@ -260,10 +171,10 @@
                             StrokeThickness="2"
                             VerticalOptions="End" />
                     </Grid>
-                </CollectionView.Header>
+                </CollectionView.Header>-->
                 <CollectionView.ItemTemplate>
                     <DataTemplate x:DataType="model:TallyRecord">
-                        <Grid BackgroundColor="{Binding ., Converter={StaticResource AlternateRowColorConverter}, ConverterParameter={x:Reference TallyCollectionView}}}" ColumnDefinitions="*, 3*">
+                        <Grid BackgroundColor="{Binding ., Converter={StaticResource AlternateRowColorConverter}, ConverterParameter={x:Reference TallyCollectionView}}" ColumnDefinitions="1.5*, 3*, 50">
                             <Label
                                 Grid.Column="0"
                                 Margin="10"
@@ -275,6 +186,7 @@
                         </Grid>
                     </DataTemplate>
                 </CollectionView.ItemTemplate>
+                <!-- section commented out to want to maui to fix
                 <CollectionView.Footer>
                     <Grid BackgroundColor="{StaticResource Gray400}">
                         <Label
@@ -283,8 +195,15 @@
                             FontAttributes="Bold,Italic"
                             Text=" " />
                     </Grid>
-                </CollectionView.Footer>
+                </CollectionView.Footer>-->
             </CollectionView>
+            <Grid BackgroundColor="{StaticResource Gray400}">
+                <Label
+                    Grid.Column="0"
+                    Margin="10"
+                    FontAttributes="Bold,Italic"
+                    Text=" " />
+            </Grid>
         </VerticalStackLayout>
 
         <VerticalStackLayout Grid.RowSpan="2" Grid.Column="2">

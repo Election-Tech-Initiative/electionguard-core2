@@ -34,7 +34,7 @@ public partial class CreateElectionViewModel : BaseViewModel
     {
         await base.OnAppearing();
 
-        KeyCeremonies = await _keyCeremonyService.GetAllCompleteAsync();
+        KeyCeremonies = await _keyCeremonyService.GetAllCompleteAsync() ?? new();
     }
 
     [ObservableProperty]
@@ -53,14 +53,14 @@ public partial class CreateElectionViewModel : BaseViewModel
     private KeyCeremonyRecord? _keyCeremony = null;
 
     [ObservableProperty]
-    private List<KeyCeremonyRecord> _keyCeremonies;
+    private List<KeyCeremonyRecord> _keyCeremonies = new();
 
     [ObservableProperty]
-    private string _electionUrl;
+    private string _electionUrl = string.Empty;
 
     [ObservableProperty]
     [NotifyCanExecuteChangedFor(nameof(CreateElectionCommand))]
-    private string _manifestNames;
+    private string _manifestNames = string.Empty;
 
     private List<FileResult> _manifestFiles = new();
 
@@ -70,6 +70,9 @@ public partial class CreateElectionViewModel : BaseViewModel
     [RelayCommand(CanExecute = nameof(CanCreate))]
     private async Task CreateElection()
     {
+        ElectionGuardException.ThrowIfNull(KeyCeremony);
+        ElectionGuardException.ThrowIfNull(KeyCeremony.JointKey);
+
         var multiple = _manifestFiles.Count > 1;
         ErrorMessage = string.Empty;
 
@@ -91,13 +94,26 @@ public partial class CreateElectionViewModel : BaseViewModel
                     CreatedBy = UserName!
                 };
 
+                var extendedData = new LinkedList();
+                if (!string.IsNullOrWhiteSpace(ElectionUrl))
+                {
+                    extendedData.Append("verification_url", ElectionUrl);
+                }
+
                 // create the context
-                using var context = new CiphertextElectionContext(
-                                                            (ulong)KeyCeremony.NumberOfGuardians,
-                                                            (ulong)KeyCeremony.Quorum,
-                                                            KeyCeremony.JointKey.JointPublicKey,
-                                                            KeyCeremony.JointKey.CommitmentHash,
-                                                            manifest.CryptoHash());
+                using var context = extendedData.Count == 0 ?
+                    new CiphertextElectionContext(
+                        (ulong)KeyCeremony.NumberOfGuardians,
+                        (ulong)KeyCeremony.Quorum,
+                        KeyCeremony.JointKey.JointPublicKey,
+                        KeyCeremony.JointKey.CommitmentHash,
+                        manifest.CryptoHash()) :
+                    new CiphertextElectionContext(
+                        (ulong)KeyCeremony.NumberOfGuardians,
+                        (ulong)KeyCeremony.Quorum,
+                        KeyCeremony.JointKey.JointPublicKey,
+                        KeyCeremony.JointKey.CommitmentHash,
+                        manifest.CryptoHash(), extendedData);
 
                 var contextRecord = new ContextRecord() { ElectionId = election.ElectionId, ContextData = context.ToJson() };
 
@@ -143,6 +159,7 @@ public partial class CreateElectionViewModel : BaseViewModel
             }
             catch (Exception)
             {
+                ExceptionHandler.GetData(out var function, out var message, out var code);
                 ErrorMessage += $"{AppResources.ErrorCreatingElection} - {file.FileName}\n";
             }
         }).ContinueWith((t) =>
@@ -211,6 +228,7 @@ public partial class CreateElectionViewModel : BaseViewModel
             }
             catch (Exception)
             {
+                ExceptionHandler.GetData(out var function, out var message, out var code);
                 ManifestErrorMessage = AppResources.ErrorLoadingManifest;
                 ElectionName = string.Empty;
             }
@@ -257,13 +275,14 @@ public partial class CreateElectionViewModel : BaseViewModel
             ManifestErrorMessage = $"{AppResources.ErrorManifest}: {message}\n{AppResources.RemovingList}";
         }
 
-        if (_manifestFiles.Count == 1)
-        {
-            var vm = (ManifestViewModel)Ioc.Default.GetService(typeof(ManifestViewModel));
-            vm.ManifestFile = _manifestFiles.First().FullPath;
+        // commenting out the display of the manifest until we can get it not throwing an exception
+        //if (_manifestFiles.Count == 1)
+        //{
+        //    var vm = (ManifestViewModel)Ioc.Default.GetService(typeof(ManifestViewModel));
+        //    vm.ManifestFile = _manifestFiles.First().FullPath;
 
-            await NavigationService.GoToModal(typeof(ManifestViewModel));
-        }
+        //    await NavigationService.GoToModal(typeof(ManifestViewModel));
+        //}
     }
 
 }

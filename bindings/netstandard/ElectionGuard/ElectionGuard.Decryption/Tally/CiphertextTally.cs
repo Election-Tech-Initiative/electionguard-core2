@@ -2,8 +2,8 @@
 using System.Text;
 using ElectionGuard.ElectionSetup.Extensions;
 using System.Diagnostics;
-using Newtonsoft.Json;
 using ElectionGuard.Ballot;
+using ElectionGuard.Converters;
 
 namespace ElectionGuard.Decryption.Tally;
 
@@ -16,7 +16,7 @@ public record CiphertextTally : DisposableRecordBase, IEquatable<CiphertextTally
     /// <summary>
     /// The unique identifier for the tally.
     /// </summary>
-    public string TallyId { get; init; } = Guid.NewGuid().ToString();
+    public string TallyId { get; init; }
 
     /// <summary>
     /// The name of the tally.
@@ -54,12 +54,12 @@ public record CiphertextTally : DisposableRecordBase, IEquatable<CiphertextTally
     public CiphertextTally(
         string name,
         CiphertextElectionContext context,
-        InternalManifest manifest)
+        InternalManifest manifest) : this(
+            tallyId: Guid.NewGuid().ToString(),
+            name: name,
+            context: context,
+            manifest: manifest)
     {
-        Name = name;
-        Context = new(context);
-        Manifest = new(manifest);
-        Contests = manifest.ToCiphertextTallyContestDictionary();
     }
 
     public CiphertextTally(
@@ -100,6 +100,7 @@ public record CiphertextTally : DisposableRecordBase, IEquatable<CiphertextTally
                     entry => entry.Key,
                     entry => entry.Value);
     }
+
 
     public CiphertextTally(CiphertextTally other) : base(other)
     {
@@ -453,14 +454,20 @@ public static partial class CyphertextTallyExtensions
     /// </summary>
     public static string ToJson(this CiphertextTally tally)
     {
-        return JsonConvert.SerializeObject(tally);
+        return JsonConvert.SerializeObject(tally, SerializationSettings.NewtonsoftSettings());
     }
 
     /// <summary>
     /// Converts json string back to a CiphertextTally
     /// </summary>
-    public static CiphertextTally? ToCiphertextTally(this string jsonData)
+    /// <param name="jsonData">data to be deserialized</param>
+    /// <exception cref="ArgumentException">When the data is unable to be deserialized into <see cref="CiphertextTally"/></exception>
+    public static CiphertextTally ToCiphertextTally(this string jsonData)
     {
-        return JsonConvert.DeserializeObject<CiphertextTally>(jsonData);
+        ArgumentException.ThrowIfNullOrEmpty(jsonData, nameof(jsonData));
+
+        var tally = JsonConvert.DeserializeObject<CiphertextTally>(jsonData, SerializationSettings.NewtonsoftSettings());
+
+        return tally ?? throw new ArgumentException(nameof(jsonData));
     }
 }

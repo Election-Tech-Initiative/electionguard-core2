@@ -312,12 +312,12 @@ namespace electionguard
           move(cryptoHash), move(proof), move(extendedData));
     }
 
-    unique_ptr<CiphertextBallotSelection> CiphertextBallotSelection::make_with_precomputed(
+    unique_ptr<CiphertextBallotSelection> CiphertextBallotSelection::make(
       const std::string &objectId, uint64_t sequenceOrder, const ElementModQ &descriptionHash,
-      unique_ptr<ElGamalCiphertext> ciphertext, const ElementModQ &cryptoExtendedBaseHash,
-      uint64_t plaintext, unique_ptr<TwoTriplesAndAQuadruple> precomputedTwoTriplesAndAQuad,
-      bool isPlaceholder /* = false */, bool computeProof /* = true */,
-      unique_ptr<ElementModQ> cryptoHash /* = nullptr */,
+      unique_ptr<ElGamalCiphertext> ciphertext, const ElementModP &elgamalPublicKey,
+      const ElementModQ &cryptoExtendedBaseHash, unique_ptr<PrecomputedSelection> precomputedValues,
+      uint64_t plaintext, bool isPlaceholder /* = false */,
+      unique_ptr<ElementModQ> cryptoHash /* = nullptr */, bool computeProof /* = true */,
       unique_ptr<ElGamalCiphertext> extendedData /* = nullptr */)
     {
         unique_ptr<CiphertextBallotSelection> result = NULL;
@@ -328,13 +328,17 @@ namespace electionguard
         }
 
         // need to make sure we use the nonce used in precomputed values
-        auto nonce = precomputedTwoTriplesAndAQuad->get_triple1()->get_exp();
+        auto nonce = precomputedValues->getPartialEncryption()->getSecret()->clone();
 
         unique_ptr<DisjunctiveChaumPedersenProof> proof = nullptr;
         if (computeProof) {
             // always make a proof using the faster, non-deterministic method
-            proof = DisjunctiveChaumPedersenProof::make_with_precomputed(
-              *ciphertext, move(precomputedTwoTriplesAndAQuad), cryptoExtendedBaseHash, plaintext);
+            auto real = precomputedValues->getRealCommitment()->clone();
+            auto fake = precomputedValues->getFakeCommitment()->clone();
+
+            proof = DisjunctiveChaumPedersenProof::make(*ciphertext, *nonce, move(real), move(fake),
+                                                        elgamalPublicKey, cryptoExtendedBaseHash,
+                                                        plaintext);
         }
 
         return make_unique<CiphertextBallotSelection>(
@@ -1232,13 +1236,23 @@ namespace electionguard
     SubmittedBallot::SubmittedBallot(const CiphertextBallot &other, BallotBoxState state)
         : CiphertextBallot(other)
     {
-        if (state != BallotBoxState::spoiled && state != BallotBoxState::cast) {
+        if (state != BallotBoxState::spoiled && state != BallotBoxState::challenged &&
+            state != BallotBoxState::cast) {
             throw invalid_argument("invalid state for SubmittedBallot");
         }
-        if (state == BallotBoxState::spoiled) {
-            this->spoil();
-        } else {
-            this->cast();
+
+        switch (state) {
+            case BallotBoxState::cast:
+                this->cast();
+                break;
+            case BallotBoxState::spoiled:
+                this->spoil();
+                break;
+            case BallotBoxState::challenged:
+                this->challenge();
+                break;
+            default:
+                break;
         }
     }
 

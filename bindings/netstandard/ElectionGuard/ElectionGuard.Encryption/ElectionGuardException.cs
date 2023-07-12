@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Diagnostics.CodeAnalysis;
 // ReSharper disable UnusedAutoPropertyAccessor.Global
 
 namespace ElectionGuard
@@ -43,6 +44,22 @@ namespace ElectionGuard
         /// <param name="inner">exception to wrap inside the ElectionGuardException</param>
         /// <returns>New ElectionGuardException object</returns>
         public ElectionGuardException(string message, Exception inner) : base(message, inner) { }
+
+
+        /// <summary>
+        /// Throws an <see cref="ElectionGuardException"/> if <paramref name="argument"/> is null containing <paramref name="message"/>
+        /// </summary>
+#if NETSTANDARD2_0
+        public static void ThrowIfNull(object argument, string message = null)
+#else
+        public static void ThrowIfNull([NotNull] object argument, string message = null)
+#endif
+        {
+            if (argument == null)
+            {
+                throw new ElectionGuardException(message ?? "Data is null");
+            }
+        }
     }
 
 }

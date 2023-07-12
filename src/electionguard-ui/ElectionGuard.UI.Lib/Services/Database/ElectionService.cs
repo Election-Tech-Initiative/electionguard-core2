@@ -52,4 +52,27 @@ public class ElectionService : BaseDatabaseService<Election>
 
         await UpdateAsync(filter, update);
     }
+
+    /// <summary>
+    /// Gets count of elections that use a key ceremony
+    /// </summary>
+    /// <param name="keyCeremonyId">key ceremony id to search for</param>
+    public async Task<long> CountByKeyCeremonyIdAsync(string keyCeremonyId)
+    {
+        var filterBuilder = Builders<Election>.Filter;
+        var filter = filterBuilder.Eq(Constants.KeyCeremonyId, keyCeremonyId);
+        return await CountByFilterAsync(filter);
+    }
+
+    /// <summary>
+    /// Gets all elections that use a key ceremony
+    /// </summary>
+    /// <param name="keyCeremonyId">key ceremony id to search for</param>
+    public async Task<List<Election>> GetAllByKeyCeremonyIdAsync(string keyCeremonyId)
+    {
+        var filterBuilder = Builders<Election>.Filter;
+        var filter = filterBuilder.Eq(Constants.KeyCeremonyId, keyCeremonyId);
+        return await GetAllByFilterAsync(filter);
+    }
+
 }

@@ -1,4 +1,4 @@
-using ElectionGuard.Ballot;
+﻿using ElectionGuard.Ballot;
 using ElectionGuard.Decryption.Accumulation;
 using ElectionGuard.ElectionSetup;
 using ElectionGuard.Guardians;
@@ -34,8 +34,6 @@ public record SelectionChallenge : DisposableRecordBase
     /// 𝑐𝑖 = (𝑐 • ω𝑖) mod q in the spec. Equation (61)
     /// </summary>
     public ElementModQ Challenge { get; init; }
-
-    public const string HASH_PREFIX = "06";
 
     public SelectionChallenge(
         IElectionGuardian guardian,
@@ -112,6 +110,7 @@ public record SelectionChallenge : DisposableRecordBase
         Challenge = BigMath.MultModQ(challenge, coefficient);
     }
 
+    [JsonConstructor]
     public SelectionChallenge(
         string selectionId,
         string guardianId,
@@ -202,7 +201,7 @@ public record SelectionChallenge : DisposableRecordBase
         ElementModP mBar)
     {
         return Hash.HashElems(
-                    HASH_PREFIX,
+                    Hash.Prefix06,
                     extendedHash,
                     elGamalPublicKey,
                     ciphertext.Pad,

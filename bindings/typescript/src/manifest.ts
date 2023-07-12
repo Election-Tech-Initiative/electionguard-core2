@@ -52,10 +52,30 @@ export class InternalManifest {
   }
 
   /**
-   * @brief Creates an Internal Manifest object from a [RFC-8259](https://www.rfc-editor.org/rfc/rfc8259.html#section-8.1) UTF-8 encoded JSON string
+   * @brief Creates an Internal Manifest object from a [RFC-8259](https://www.rfc-editor.org/rfc/rfc8259.html#section-8.1) UTF-8 encoded JSON string representation of an Internal Manifest object
    */
   static async fromJson(json: string): Promise<InternalManifest> {
     var result = (await getInstance()).InternalManifest.fromJson(json);
+    return new InternalManifest(result);
+  }
+
+  /**
+   * @brief Creates an Internal Manifest object from a Manifest object
+   */
+  static async fromManifest(manifest: Manifest): Promise<InternalManifest> {
+    var result = (
+      await getInstance()
+    ).ManifestFunctions.InternalManifestFromElectionManifest(manifest._handle);
+    return new InternalManifest(result);
+  }
+
+  /**
+   * @brief Creates an Internal Manifest object from a [RFC-8259](https://www.rfc-editor.org/rfc/rfc8259.html#section-8.1) UTF-8 encoded JSON string representation of a Manifest object
+   */
+  static async fromManifestJson(json: string): Promise<InternalManifest> {
+    var result = (
+      await getInstance()
+    ).ManifestFunctions.InternalManifestFromElectionManifestJson(json);
     return new InternalManifest(result);
   }
 }

@@ -15,7 +15,7 @@ public partial class CiphertextTallyRecord : DatabaseRecord
     private bool _isExportable = false;
 
     [ObservableProperty]
-    private string? _ciphertextTallyData;
+    private string _ciphertextTallyData = string.Empty;
 
     public CiphertextTallyRecord() : base(nameof(CiphertextTallyRecord))
     {

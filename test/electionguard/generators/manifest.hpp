@@ -88,9 +88,16 @@ namespace electionguard::tools::generators
             selections.push_back(
               make_unique<SelectionDescription>("write-in-selection", "write-in", 2UL));
 
-            return make_unique<ContestDescription>(objectId, electoralDistrictId, sequenceOrder,
-                                                   VoteVariationType::one_of_m, numberElected, name,
-                                                   move(selections));
+            // simulate a contest with a title an no subtitle
+            vector<unique_ptr<Language>> languages = {};
+            languages.push_back(make_unique<Language>(name, "en"));
+            auto title = make_unique<InternationalizedText>(move(languages));
+
+            auto votesAllowed = numberElected;
+
+            return make_unique<ContestDescription>(
+              objectId, electoralDistrictId, sequenceOrder, VoteVariationType::one_of_m,
+              numberElected, votesAllowed, name, move(title), nullptr, move(selections));
         }
         // TODO: rename these
         static unique_ptr<Manifest> getJeffersonCountyManifest_Minimal()
@@ -119,7 +126,7 @@ namespace electionguard::tools::generators
               make_unique<BallotStyle>("jefferson-county-ballot-style", gpunitIds));
 
             return make_unique<Manifest>(
-              "jefferson-county-open-primary", ElectionType::primary,
+              "jefferson-county-open-primary", "1.0", ElectionType::primary,
               std::chrono::system_clock::now(), std::chrono::system_clock::now(), move(gpUnits),
               move(parties), move(candidates), move(contests), move(ballotStyles));
         }
@@ -162,7 +169,7 @@ namespace electionguard::tools::generators
               make_unique<BallotStyle>("jefferson-county-school-district-1", schoolGPUnitIds));
 
             return make_unique<Manifest>(
-              "jefferson-county-open-primary", ElectionType::primary,
+              "jefferson-county-open-primary", "1.0", ElectionType::primary,
               std::chrono::system_clock::now(), std::chrono::system_clock::now(), move(gpUnits),
               move(parties), move(candidates), move(contests), move(ballotStyles));
         }

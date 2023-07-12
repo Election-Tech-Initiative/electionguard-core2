@@ -20,12 +20,26 @@ public class TallyService : BaseDatabaseService<TallyRecord>
     public TallyService() : base(_collection, nameof(TallyRecord)) { }
 
     /// <summary>
-    /// Gets tallies for an election
+    /// Gets tallies for an election, including completed tallies.
     /// </summary>
     /// <param name="electionId">election id to search for</param>
-    public async Task<List<TallyRecord>> GetByElectionIdAsync(string electionId)
+    public async Task<List<TallyRecord>> GetAllActiveByElectionIdAsync(string electionId)
     {
-        return await GetAllByFieldAsync(Constants.ElectionId, electionId);
+        var filter = FilterBuilder.And(
+            FilterBuilder.Eq(Constants.ElectionId, electionId),
+            FilterBuilder.Ne(Constants.State, TallyState.Abandoned));
+
+        return await GetAllByFilterAsync(filter);
+    }
+
+    /// <summary>
+    /// Gets tally state to determine if it is running
+    /// </summary>
+    /// <param name="tallyId">tally id to search for</param>
+    public async Task<bool> IsRunningByTallyIdAsync(string tallyId)
+    {
+        var tally = await GetByFieldAsync(Constants.TallyId, tallyId);
+        return tally?.State is not TallyState.Complete and not TallyState.Abandoned;
     }
 
     /// <summary>
@@ -55,8 +69,7 @@ public class TallyService : BaseDatabaseService<TallyRecord>
     /// <param name="keyCeremonyId">key ceremony id to update</param>
     virtual public async Task UpdateCompleteAsync(string tallyId)
     {
-        var filterBuilder = Builders<TallyRecord>.Filter;
-        var filter = filterBuilder.And(filterBuilder.Eq(Constants.TallyId, tallyId));
+        var filter = FilterBuilder.And(FilterBuilder.Eq(Constants.TallyId, tallyId));
 
         var updateBuilder = Builders<TallyRecord>.Update;
         var update = updateBuilder.Set(Constants.State, TallyState.Complete)
@@ -65,4 +78,20 @@ public class TallyService : BaseDatabaseService<TallyRecord>
 
         await UpdateAsync(filter, update);
     }
+
+    /// <summary>
+    /// Update the state of the TallyRecord
+    /// </summary>
+    /// <param name="tallyId">tally id to use</param>
+    /// <param name="state">new state to put the tally into</param>
+    public virtual async Task UpdateStateAsync(string tallyId, TallyState state)
+    {
+        var filter = FilterBuilder.And(FilterBuilder.Eq(Constants.TallyId, tallyId));
+
+        var updateBuilder = Builders<TallyRecord>.Update;
+        var update = updateBuilder.Set(Constants.State, state);
+
+        await UpdateAsync(filter, update);
+    }
+
 }

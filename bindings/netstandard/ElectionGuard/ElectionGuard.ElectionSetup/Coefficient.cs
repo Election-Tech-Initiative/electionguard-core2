@@ -1,5 +1,4 @@
 ﻿using ElectionGuard.Proofs;
-using Newtonsoft.Json;
 
 namespace ElectionGuard.ElectionSetup;
 

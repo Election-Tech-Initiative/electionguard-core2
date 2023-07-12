@@ -1,6 +1,10 @@
 ﻿using CommunityToolkit.Maui;
+using ElectionGuard.Decryption;
 using ElectionGuard.UI.Services;
 using Microsoft.Extensions.Logging;
+using Microsoft.AppCenter;
+using Microsoft.AppCenter.Crashes;
+using Microsoft.AppCenter.Analytics;
 
 namespace ElectionGuard.UI;
 
@@ -8,16 +12,14 @@ public static class MauiProgram
 {
     public static MauiApp CreateMauiApp()
     {
-        var DbHost = Preferences.Get("DbAddress", "127.0.0.1");
-        var DbPassword = Preferences.Get("DbPassword", "");
-        var DbConnection = Preferences.Get("DbConnection", "");
-        if (!string.IsNullOrEmpty(DbConnection))
+
+        if (!string.IsNullOrEmpty(DbContext.DbConnection))
         {
-            DbService.Init(DbConnection);
+            DbService.Init(DbContext.DbConnection);
         }
         else
         {
-            DbService.Init(DbHost, DbPassword);
+            DbService.Init(DbContext.DbHost, DbContext.DbPassword);
         }
 
         var builder = MauiApp.CreateBuilder();
@@ -26,7 +28,13 @@ public static class MauiProgram
             .UseMauiCommunityToolkit()
             .SetupFonts()
             .SetupServices()
-            .SetupLogging();
+            .SetupLogging()
+            .ConfigureEssentials(essentials =>
+            {
+                essentials.UseVersionTracking();
+            });
+
+        AddAppCenterAnalytics();
 
         return builder.Build();
     }
@@ -79,7 +87,17 @@ public static class MauiProgram
         builder.Services.AddTransient<ConstantsService>();
         builder.Services.AddTransient<BallotUploadService>();
         builder.Services.AddTransient<BallotService>();
+        builder.Services.AddTransient<ChallengedBallotService>();
         builder.Services.AddTransient<CiphertextTallyService>();
+        builder.Services.AddTransient<TallyMediator>();
+        builder.Services.AddTransient<DecryptionShareService>();
+        builder.Services.AddTransient<ChallengeService>();
+        builder.Services.AddTransient<ChallengeResponseService>();
+        builder.Services.AddTransient<PlaintextTallyService>();
+        builder.Services.AddTransient<LagrangeCoefficientsService>();
+        builder.Services.AddTransient<TallyManager>();
+        builder.Services.AddTransient<ITallyStateMachine, TallyStateMachine>();
+        builder.Services.AddTransient<MultiTallyService>();
 
         // setup view models
         builder.Services.AddTransient<LoginViewModel>();
@@ -91,9 +109,12 @@ public static class MauiProgram
         builder.Services.AddTransient<ViewKeyCeremonyViewModel>();
         builder.Services.AddTransient<CreateElectionViewModel>();
         builder.Services.AddSingleton<ManifestViewModel>();
+        builder.Services.AddSingleton<ChallengedPopupViewModel>();
         builder.Services.AddTransient<BallotUploadViewModel>();
         builder.Services.AddTransient<CreateTallyViewModel>();
+        builder.Services.AddTransient<CreateMultiTallyViewModel>();
         builder.Services.AddTransient<TallyProcessViewModel>();
+        builder.Services.AddTransient<ViewTallyViewModel>();
 
         // setup views
         builder.Services.AddTransient<LoginPage>();
@@ -104,9 +125,12 @@ public static class MauiProgram
         builder.Services.AddTransient<ViewKeyCeremonyPage>();
         builder.Services.AddTransient<CreateElectionAdminPage>();
         builder.Services.AddTransient<ManifestPopup>();
+        builder.Services.AddTransient<ChallengedPopup>();
         builder.Services.AddTransient<BallotUploadPage>();
         builder.Services.AddTransient<CreateTallyPage>();
+        builder.Services.AddTransient<CreateMultiTallyPage>();
         builder.Services.AddTransient<TallyProcessPage>();
+        builder.Services.AddTransient<ViewTallyPage>();
 
         // popup pages
         builder.Services.AddTransient<SettingsPage>();
@@ -115,4 +139,35 @@ public static class MauiProgram
     }
 
 
+    /// <summary>
+    /// Include crash analytics via appcenter.
+    /// This requires both APPCENTER_SECRET_MACOS and APPCENTER_SECRET_UWP to be set.
+    /// TODO: https://github.com/dotnet/maui/issues/4408 for user secret support.
+    /// </summary>
+    private static void AddAppCenterAnalytics()
+    {
+#if DEBUG
+        return;
+#endif
+
+        string uwpSecret = string.Empty;
+        string macSecret = string.Empty;
+
+#if APPCENTER_SECRET_MACOS
+        macSecret = APPCENTER_SECRET_MACOS;
+#endif
+
+#if APPCENTER_SECRET_UWP
+        uwpSecret = APPCENTER_SECRET_UWP;
+#endif
+        if (string.IsNullOrEmpty(macSecret) && string.IsNullOrEmpty(uwpSecret))
+        {
+            return;
+        }
+
+        AppCenter.Start(
+            $"uwp={uwpSecret};macos={macSecret};",
+            typeof(Analytics), typeof(Crashes));
+
+    }
 }

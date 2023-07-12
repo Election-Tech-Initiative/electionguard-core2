@@ -1,5 +1,4 @@
 using ElectionGuard.Ballot;
-using ElectionGuard.Decryption.Accumulation;
 using ElectionGuard.Decryption.Decryption;
 using ElectionGuard.Decryption.Shares;
 using ElectionGuard.Decryption.Tally;

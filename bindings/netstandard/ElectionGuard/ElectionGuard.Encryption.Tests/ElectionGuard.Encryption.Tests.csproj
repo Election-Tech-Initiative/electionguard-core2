@@ -35,8 +35,9 @@
     <WarningLevel>4</WarningLevel>
     <WarningsNotAsErrors>SYSLIB0004</WarningsNotAsErrors>
   </PropertyGroup>
-   
-  <PropertyGroup Label="Library Paths">
+
+  <!-- Library paths -->
+  <PropertyGroup>
     <ElectionGuardData>..\..\..\..\data</ElectionGuardData>
     <ElectionGuardLibs>..\..\..\..\build\libs</ElectionGuardLibs>
   </PropertyGroup>

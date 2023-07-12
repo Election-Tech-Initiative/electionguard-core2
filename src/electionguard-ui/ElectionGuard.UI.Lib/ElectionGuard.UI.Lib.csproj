@@ -12,8 +12,8 @@
 		<PackageReference Include="CommunityToolkit.Mvvm" />
 		<PackageReference Include="MongoDB.Driver" />
 	</ItemGroup>
-  
-	<ItemGroup>
+
+  <ItemGroup>
 	  <ProjectReference Include="..\..\..\bindings\netstandard\ElectionGuard\ElectionGuard.Encryption\ElectionGuard.Encryption.csproj" />
 	</ItemGroup>
 

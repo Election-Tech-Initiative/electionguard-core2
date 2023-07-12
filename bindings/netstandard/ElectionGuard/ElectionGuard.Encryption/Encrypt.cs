@@ -58,6 +58,7 @@
         ///                          for this contest. this value can be (or derived from) the
         ///                          Ballot nonce, but no relationship is required</param>
         /// <param name="shouldVerifyProofs">specify if the proofs should be verified prior to returning (default True)</param>
+        /// <param name="usePrecomputedValues">specify if the precompute values should be used</param>
         /// <returns>A `CiphertextBallotContest`</returns>
         public static CiphertextBallotContest Contest(
             PlaintextBallotContest plaintext,
@@ -107,8 +108,9 @@
         /// <param name="ballotCodeSeed">Hash from previous ballot or hash from device</param>
         /// <param name="nonce">an optional value used to seed the `Nonce` generated for this ballot
         ///                     if this value is not provided, the secret generating mechanism of the OS provides its own</param>
+        /// <param name="timestamp">timestamp to use</param>
         /// <param name="shouldVerifyProofs">specify if the proofs should be verified prior to returning (default True)</param>
-        /// <param name="shouldUsePrecomputedValues">specify if precomputed values should be used (default True)</param>
+        /// <param name="usePrecomputedValues">specify if precomputed values should be used (default True)</param>
         /// <returns>A `CiphertextBallot`</returns>
         public static CiphertextBallot Ballot(
             PlaintextBallot ballot,
@@ -169,6 +171,7 @@
         /// <param name="ballotCodeSeed">Hash from previous ballot or hash from device</param>
         /// <param name="nonce">an optional value used to seed the `Nonce` generated for this ballot
         ///                     if this value is not provided, the secret generating mechanism of the OS provides its own</param>
+        /// <param name="timestamp">timestamp to use</param>
         /// <param name="shouldVerifyProofs">specify if the proofs should be verified prior to returning (default True)</param>
         /// <returns>A `CiphertextBallot`</returns>
         public static CompactCiphertextBallot CompactBallot(

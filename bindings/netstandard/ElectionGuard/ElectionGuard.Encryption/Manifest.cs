@@ -106,6 +106,7 @@ namespace ElectionGuard
         /// Creates a `Manifest` object
         /// </summary>
         /// <param name="electionScopeId"></param>
+        /// <param name="specVersion">election type</param>
         /// <param name="electionType">election type</param>
         /// <param name="startDate">start date for election</param>
         /// <param name="endDate">end data for the election</param>
@@ -115,41 +116,41 @@ namespace ElectionGuard
         /// <param name="contests">array of the `ContestDescription` for election</param>
         /// <param name="ballotStyles">array of the `BallotStyle` for election</param>
         public Manifest(
-            string electionScopeId, ElectionType electionType,
+            string electionScopeId, string specVersion, ElectionType electionType,
             DateTime startDate, DateTime endDate,
             GeopoliticalUnit[] gpUnits, Party[] parties,
             Candidate[] candidates, ContestDescription[] contests,
             BallotStyle[] ballotStyles)
         {
-            IntPtr[] gpUnitPointers = new IntPtr[gpUnits.Length];
+            var gpUnitPointers = new IntPtr[gpUnits.Length];
             for (var i = 0; i < gpUnits.Length; i++)
             {
                 gpUnitPointers[i] = gpUnits[i].Handle.Ptr;
                 gpUnits[i].Dispose();
             }
 
-            IntPtr[] partyPointers = new IntPtr[parties.Length];
+            var partyPointers = new IntPtr[parties.Length];
             for (var i = 0; i < parties.Length; i++)
             {
                 partyPointers[i] = parties[i].Handle.Ptr;
                 parties[i].Dispose();
             }
 
-            IntPtr[] candidatePointers = new IntPtr[candidates.Length];
+            var candidatePointers = new IntPtr[candidates.Length];
             for (var i = 0; i < candidates.Length; i++)
             {
                 candidatePointers[i] = candidates[i].Handle.Ptr;
                 candidates[i].Dispose();
             }
 
-            IntPtr[] contestPointers = new IntPtr[contests.Length];
+            var contestPointers = new IntPtr[contests.Length];
             for (var i = 0; i < contests.Length; i++)
             {
                 contestPointers[i] = contests[i].Handle.Ptr;
                 contests[i].Dispose();
             }
 
-            IntPtr[] ballotStylePointers = new IntPtr[ballotStyles.Length];
+            var ballotStylePointers = new IntPtr[ballotStyles.Length];
             for (var i = 0; i < ballotStyles.Length; i++)
             {
                 ballotStylePointers[i] = ballotStyles[i].Handle.Ptr;
@@ -157,7 +158,7 @@ namespace ElectionGuard
             }
 
             var status = NativeInterface.Manifest.New(
-                electionScopeId, electionType,
+                electionScopeId, specVersion, electionType,
                 (ulong)new DateTimeOffset(startDate).ToUnixTimeMilliseconds(),
                 (ulong)new DateTimeOffset(endDate).ToUnixTimeMilliseconds(),
                 gpUnitPointers, (ulong)gpUnitPointers.LongLength,
@@ -176,6 +177,7 @@ namespace ElectionGuard
         /// Creates a `Manifest` object
         /// </summary>
         /// <param name="electionScopeId"></param>
+        /// <param name="specVersion">election type</param>
         /// <param name="electionType">election type</param>
         /// <param name="startDate">start date for election</param>
         /// <param name="endDate">end data for the election</param>
@@ -187,41 +189,41 @@ namespace ElectionGuard
         /// <param name="name">name of the election</param>
         /// <param name="contact">contact information for the election</param>
         public Manifest(
-             string electionScopeId, ElectionType electionType,
+             string electionScopeId, string specVersion, ElectionType electionType,
              DateTime startDate, DateTime endDate,
              GeopoliticalUnit[] gpUnits, Party[] parties,
              Candidate[] candidates, ContestDescription[] contests,
              BallotStyle[] ballotStyles, InternationalizedText name, ContactInformation contact)
         {
-            IntPtr[] gpUnitPointers = new IntPtr[gpUnits.Length];
+            var gpUnitPointers = new IntPtr[gpUnits.Length];
             for (var i = 0; i < gpUnits.Length; i++)
             {
                 gpUnitPointers[i] = gpUnits[i].Handle.Ptr;
                 gpUnits[i].Dispose();
             }
 
-            IntPtr[] partyPointers = new IntPtr[parties.Length];
+            var partyPointers = new IntPtr[parties.Length];
             for (var i = 0; i < parties.Length; i++)
             {
                 partyPointers[i] = parties[i].Handle.Ptr;
                 parties[i].Dispose();
             }
 
-            IntPtr[] candidatePointers = new IntPtr[candidates.Length];
+            var candidatePointers = new IntPtr[candidates.Length];
             for (var i = 0; i < candidates.Length; i++)
             {
                 candidatePointers[i] = candidates[i].Handle.Ptr;
                 candidates[i].Dispose();
             }
 
-            IntPtr[] contestPointers = new IntPtr[contests.Length];
+            var contestPointers = new IntPtr[contests.Length];
             for (var i = 0; i < contests.Length; i++)
             {
                 contestPointers[i] = contests[i].Handle.Ptr;
                 contests[i].Dispose();
             }
 
-            IntPtr[] ballotStylePointers = new IntPtr[ballotStyles.Length];
+            var ballotStylePointers = new IntPtr[ballotStyles.Length];
             for (var i = 0; i < ballotStyles.Length; i++)
             {
                 ballotStylePointers[i] = ballotStyles[i].Handle.Ptr;
@@ -229,7 +231,7 @@ namespace ElectionGuard
             }
 
             var status = NativeInterface.Manifest.New(
-                electionScopeId, electionType,
+                electionScopeId, specVersion, electionType,
                 (ulong)new DateTimeOffset(startDate).ToUnixTimeMilliseconds(),
                 (ulong)new DateTimeOffset(endDate).ToUnixTimeMilliseconds(),
                 gpUnitPointers, (ulong)gpUnitPointers.LongLength,
@@ -252,12 +254,10 @@ namespace ElectionGuard
         public GeopoliticalUnit GetGeopoliticalUnitAtIndex(ulong index)
         {
             var status = NativeInterface.Manifest.GetGeopoliticalUnitAtIndex(
-                Handle, index, out NativeGeopoliticalUnit value);
-            if (status != Status.ELECTIONGUARD_STATUS_SUCCESS)
-            {
-                throw new ElectionGuardException($"Manifest Error GetGeopoliticalUnitAtIndex: {status}");
-            }
-            return new GeopoliticalUnit(value);
+                Handle, index, out var value);
+            return status != Status.ELECTIONGUARD_STATUS_SUCCESS
+                ? throw new ElectionGuardException($"Manifest Error GetGeopoliticalUnitAtIndex: {status}")
+                : new GeopoliticalUnit(value);
         }
 
         /// <Summary>
@@ -266,12 +266,10 @@ namespace ElectionGuard
         public Party GetPartyAtIndex(ulong index)
         {
             var status = NativeInterface.Manifest.GetPartyAtIndex(
-                Handle, index, out NativeParty value);
-            if (status != Status.ELECTIONGUARD_STATUS_SUCCESS)
-            {
-                throw new ElectionGuardException($"Manifest Error GetPartyAtIndex: {status}");
-            }
-            return new Party(value);
+                Handle, index, out var value);
+            return status != Status.ELECTIONGUARD_STATUS_SUCCESS
+                ? throw new ElectionGuardException($"Manifest Error GetPartyAtIndex: {status}")
+                : new Party(value);
         }
 
         /// <Summary>
@@ -280,12 +278,10 @@ namespace ElectionGuard
         public Candidate GetCandidateAtIndex(ulong index)
         {
             var status = NativeInterface.Manifest.GetCandidateAtIndex(
-                Handle, index, out NativeCandidate value);
-            if (status != Status.ELECTIONGUARD_STATUS_SUCCESS)
-            {
-                throw new ElectionGuardException($"Manifest Error GetCandidateAtIndex: {status}");
-            }
-            return new Candidate(value);
+                Handle, index, out var value);
+            return status != Status.ELECTIONGUARD_STATUS_SUCCESS
+                ? throw new ElectionGuardException($"Manifest Error GetCandidateAtIndex: {status}")
+                : new Candidate(value);
         }
 
         /// <Summary>
@@ -294,12 +290,10 @@ namespace ElectionGuard
         public ContestDescription GetContestAtIndex(ulong index)
         {
             var status = NativeInterface.Manifest.GetContestAtIndex(
-                Handle, index, out NativeContestDescription value);
-            if (status != Status.ELECTIONGUARD_STATUS_SUCCESS)
-            {
-                throw new ElectionGuardException($"Manifest Error GetContestAtIndex: {status}");
-            }
-            return new ContestDescription(value);
+                Handle, index, out var value);
+            return status != Status.ELECTIONGUARD_STATUS_SUCCESS
+                ? throw new ElectionGuardException($"Manifest Error GetContestAtIndex: {status}")
+                : new ContestDescription(value);
         }
 
         /// <Summary>
@@ -308,12 +302,10 @@ namespace ElectionGuard
         public BallotStyle GetBallotStyleAtIndex(ulong index)
         {
             var status = NativeInterface.Manifest.GetBallotStyleAtIndex(
-                Handle, index, out NativeBallotStyle value);
-            if (status != Status.ELECTIONGUARD_STATUS_SUCCESS)
-            {
-                throw new ElectionGuardException($"Manifest Error GetContestAtIndex: {status}");
-            }
-            return new BallotStyle(value);
+                Handle, index, out var value);
+            return status != Status.ELECTIONGUARD_STATUS_SUCCESS
+                ? throw new ElectionGuardException($"Manifest Error GetContestAtIndex: {status}")
+                : new BallotStyle(value);
         }
 
         /// <Summary>
@@ -322,12 +314,10 @@ namespace ElectionGuard
         public ElementModQ CryptoHash()
         {
             var status = NativeInterface.Manifest.CryptoHash(
-                    Handle, out NativeElementModQ value);
-            if (status != Status.ELECTIONGUARD_STATUS_SUCCESS)
-            {
-                throw new ElectionGuardException($"CryptoHash Error Status: {status}");
-            }
-            return new ElementModQ(value);
+                    Handle, out var value);
+            return status != Status.ELECTIONGUARD_STATUS_SUCCESS
+                ? throw new ElectionGuardException($"CryptoHash Error Status: {status}")
+                : new ElementModQ(value);
         }
 
         /// <Summary>
@@ -345,13 +335,13 @@ namespace ElectionGuard
         public string ToJson()
         {
             var status = NativeInterface.Manifest.ToJson(
-                Handle, out IntPtr pointer, out _);
+                Handle, out var pointer, out _);
             if (status != Status.ELECTIONGUARD_STATUS_SUCCESS)
             {
                 throw new ElectionGuardException($"ToJson Error Status: {status}");
             }
             var json = pointer.PtrToStringUTF8();
-            NativeInterface.Memory.FreeIntPtr(pointer);
+            _ = NativeInterface.Memory.FreeIntPtr(pointer);
             return json;
         }
 
@@ -362,7 +352,7 @@ namespace ElectionGuard
         {
 
             var status = NativeInterface.Manifest.ToBson(
-                Handle, out IntPtr data, out ulong size);
+                Handle, out var data, out var size);
 
             if (status != Status.ELECTIONGUARD_STATUS_SUCCESS)
             {
@@ -376,7 +366,7 @@ namespace ElectionGuard
 
             var byteArray = new byte[(int)size];
             Marshal.Copy(data, byteArray, 0, (int)size);
-            NativeInterface.Memory.DeleteIntPtr(data);
+            _ = NativeInterface.Memory.DeleteIntPtr(data);
             return byteArray;
         }
 
@@ -387,7 +377,7 @@ namespace ElectionGuard
         {
 
             var status = NativeInterface.Manifest.ToMsgPack(
-                Handle, out IntPtr data, out ulong size);
+                Handle, out var data, out var size);
 
             if (status != Status.ELECTIONGUARD_STATUS_SUCCESS)
             {
@@ -401,7 +391,7 @@ namespace ElectionGuard
 
             var byteArray = new byte[(int)size];
             Marshal.Copy(data, byteArray, 0, (int)size);
-            NativeInterface.Memory.DeleteIntPtr(data);
+            _ = NativeInterface.Memory.DeleteIntPtr(data);
             return byteArray;
         }
     }

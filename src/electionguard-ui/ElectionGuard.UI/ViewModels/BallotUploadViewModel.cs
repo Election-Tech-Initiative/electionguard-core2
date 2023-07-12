@@ -47,7 +47,6 @@ public partial class BallotUploadViewModel : BaseViewModel
 
     private InternalManifest? _internalManifest;
 
-    
     private CiphertextElectionContext? _context;
 
     partial void OnElectionIdChanged(string value)
@@ -55,7 +54,7 @@ public partial class BallotUploadViewModel : BaseViewModel
         _ = Task.Run(async () =>
         {
             var record = await _manifestService.GetByElectionIdAsync(value);
-            using var manifest = new Manifest(record.ManifestData);
+            using var manifest = new Manifest(record?.ManifestData);
             _manifestHash = new(manifest.CryptoHash());
             _internalManifest = new InternalManifest(manifest);
 
@@ -81,20 +80,33 @@ public partial class BallotUploadViewModel : BaseViewModel
     [RelayCommand]
     private async Task Cancel()
     {
-        await NavigationService.GoToPage(typeof(ElectionViewModel));
+        await NavigationService.GoToPage(typeof(ElectionViewModel), new() { { ElectionViewModel.ElectionIdParam, ElectionId } });
+    }
+
+    private async Task<string> ReadFileAsync(string path, CancellationToken cancellationToken = new())
+    {
+        if (!File.Exists(path))
+        {
+            return string.Empty;
+        }
+
+        using var stream = new StreamReader(path, Encoding.UTF8);
+        return await stream.ReadToEndAsync(cancellationToken);
     }
 
     [RelayCommand(CanExecute = nameof(CanUpload))]
     private async Task Upload()
     {
         // create the device file
-        var deviceData = File.ReadAllText(DeviceFile, System.Text.Encoding.UTF8);
-        EncryptionDevice device = new(deviceData);
+        var deviceData = await ReadFileAsync(DeviceFile);
+
+        // TODO: enhance the EncryptionDevice object to have this info coming out of the json constructor
         var deviceDocument = JsonDocument.Parse(deviceData);
         var location = string.Empty;
         long deviceId = -1;
         long sessionId = -1;
         long launchCode = -1;
+
         using (var jsonDoc = JsonDocument.Parse(deviceData))
         {
             location = jsonDoc.RootElement.GetProperty("location").GetString();
@@ -102,6 +114,7 @@ public partial class BallotUploadViewModel : BaseViewModel
             sessionId = jsonDoc.RootElement.GetProperty("session_id").GetInt64();
             launchCode = jsonDoc.RootElement.GetProperty("launch_code").GetInt64();
         }
+
         // save the ballot upload
         var ballots = Directory.GetFiles(BallotFolder);
         BallotUpload upload = new()
@@ -114,37 +127,45 @@ public partial class BallotUploadViewModel : BaseViewModel
             SessionId = sessionId,
             LaunchCode = launchCode,
             BallotCount = ballots.LongLength,
-            BallotImported = 0,
-            BallotSpoiled = 0,
-            BallotDuplicated = 0,
-            BallotRejected = 0,
             SerialNumber = _serialNumber,
-            CreatedBy = UserName
+            CreatedBy = UserName,
         };
 
-        long totalCount = 0;
-        long totalInserted = 0;
-        long totalDuplicated = 0;
-        long totalRejected = 0;
-        long totalSpoiled = 0;
-        ulong startDate = ulong.MaxValue;
-        ulong endDate = ulong.MinValue;
+        var totalCount = 0L;
+        var totalImported = 0L;
+        var totalDuplicated = 0L;
+        var totalRejected = 0L;
+        var totalChallenged = 0L;
+        var totalSpoiled = 0L;
+        var startDate = ulong.MaxValue;
+        var endDate = ulong.MinValue;
         object tallyLock = new();
 
         var mediator = new TallyMediator();
-        var ciphertextTally = mediator.CreateTally(Guid.NewGuid().ToString(), 
+        var ciphertextTally = mediator.CreateTally(Guid.NewGuid().ToString(),
             "subtally",
             _context!,
             _internalManifest!);
 
+        UploadText = $"{AppResources.Uploading} {ballots.Length} {AppResources.Success2Text}";
 
-        await Parallel.ForEachAsync(ballots, async (currentBallot, cancel) =>
+
+        await Parallel.ForEachAsync(ballots, async (currentBallot, cancellationToken) =>
         {
             try
             {
                 var filename = Path.GetFileName(currentBallot);
-                var ballotData = File.ReadAllText(currentBallot);
+                var ballotData = await ReadFileAsync(currentBallot, cancellationToken);
                 using var ballot = new CiphertextBallot(ballotData);
+
+                if (ballot.Timestamp < startDate)
+                {
+                    _ = Interlocked.Exchange(ref startDate, ballot.Timestamp);
+                }
+                if (ballot.Timestamp > endDate)
+                {
+                    _ = Interlocked.Exchange(ref endDate, ballot.Timestamp);
+                }
 
                 if (ballot.ManifestHash != _manifestHash)
                 {
@@ -155,19 +176,10 @@ public partial class BallotUploadViewModel : BaseViewModel
                 var exists = await _ballotService.BallotExistsAsync(ballot.BallotCode.ToHex());
                 if (!exists)
                 {
-                    var timestamp = ballot.Timestamp;
-                    if (timestamp < startDate)
-                    {
-                        _ = Interlocked.Exchange(ref startDate, timestamp);
-                    }
-                    if (timestamp > endDate)
-                    {
-                        _ = Interlocked.Exchange(ref endDate, timestamp);
-                    }
                     BallotRecord ballotRecord = new()
                     {
                         ElectionId = ElectionId,
-                        TimeStamp = DateTime.UnixEpoch.AddSeconds(timestamp),
+                        TimeStamp = DateTime.UnixEpoch.AddSeconds(ballot.Timestamp),
                         UploadId = upload.UploadId,
                         FileName = filename,
                         BallotCode = ballot.BallotCode.ToHex(),
@@ -176,37 +188,44 @@ public partial class BallotUploadViewModel : BaseViewModel
                     };
                     _ = await _ballotService.SaveAsync(ballotRecord);
 
-                    if (ballot.State == BallotBoxState.Spoiled)
+
+                    _ = ballot.State switch
                     {
-                        _ = Interlocked.Increment(ref totalSpoiled);
-                    }
-                    else
-                    {
-                        _ = Interlocked.Increment(ref totalInserted);
-                    }
+                        BallotBoxState.Cast => Interlocked.Increment(ref totalImported),
+                        BallotBoxState.Challenged => Interlocked.Increment(ref totalChallenged),
+                        BallotBoxState.Spoiled => Interlocked.Increment(ref totalSpoiled),
+                        BallotBoxState.NotSet => throw new NotImplementedException(),
+                        BallotBoxState.Unknown => throw new NotImplementedException(),
+                        _ => throw new NotImplementedException()
+                    };
+
                     lock (tallyLock)
                     {
-                        var result = ciphertextTally.Accumulate(ballot, false);
+                        var result = ciphertextTally.Accumulate(ballot, true);
                     }
                 }
                 else
                 {
                     _ = Interlocked.Increment(ref totalDuplicated);
                 }
+
                 _ = Interlocked.Increment(ref totalCount);
                 UploadText = $"{AppResources.SuccessText} {totalCount} / {ballots.Length} {AppResources.Success2Text}";
             }
             catch (Exception)
             {
+                _ = Interlocked.Increment(ref totalRejected);
             }
         });
 
         // update totals before saving
         upload.BallotCount = totalCount;
-        upload.BallotImported = totalInserted;
+        upload.BallotImported = totalImported;
         upload.BallotDuplicated = totalDuplicated;
         upload.BallotRejected = totalRejected;
         upload.BallotSpoiled = totalSpoiled;
+        upload.BallotChallenged = totalChallenged;
+
         upload.BallotsStart = DateTime.UnixEpoch.AddSeconds(startDate);
         upload.BallotsEnd = DateTime.UnixEpoch.AddSeconds(endDate);
 
@@ -239,6 +258,7 @@ public partial class BallotUploadViewModel : BaseViewModel
     [RelayCommand]
     private async Task PickDeviceFile()
     {
+        FileErrorMessage = string.Empty;
         var customFileType = new FilePickerFileType(
                 new Dictionary<DevicePlatform, IEnumerable<string>>
                 {
@@ -246,7 +266,7 @@ public partial class BallotUploadViewModel : BaseViewModel
                     { DevicePlatform.macOS, new[] { "json" } }, // UTType values
                 });
         var options = new PickOptions() { FileTypes = customFileType, PickerTitle = AppResources.SelectManifest };
-        FileErrorMessage = string.Empty;
+
         var file = await FilePicker.PickAsync(options);
         if (file == null)
         {
@@ -254,10 +274,10 @@ public partial class BallotUploadViewModel : BaseViewModel
             // if the picking was canceled then do not change anything
             return;
         }
-        // check if it is a device file
+        // check if it is a device file. If it's not, this will throw an exception.
         try
         {
-            var data = File.ReadAllText(file.FullPath, Encoding.UTF8);
+            var data = await ReadFileAsync(file.FullPath);
             EncryptionDevice device = new(data);
             DeviceFile = file.FullPath;
         }
@@ -274,9 +294,9 @@ public partial class BallotUploadViewModel : BaseViewModel
         try
         {
             var folder = await FolderPicker.Default.PickAsync(token);
-            BallotFolder = folder.Folder.Path;
+            BallotFolder = folder.Folder!.Path;
             BallotFolderName = folder.Folder.Name;
-            FolderErrorMessage = string.Empty;
+            FolderErrorMessage = folder.Exception?.Message ?? string.Empty;
             // verify folder
         }
         catch (Exception ex)
@@ -375,7 +395,7 @@ public partial class BallotUploadViewModel : BaseViewModel
                     {
                         try
                         {
-                            var data = File.ReadAllText(device, System.Text.Encoding.UTF8);
+                            var data = await ReadFileAsync(device);
                             EncryptionDevice dev = new(data);
                             DeviceFile = device;
                             break;

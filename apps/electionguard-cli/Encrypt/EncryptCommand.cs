@@ -2,12 +2,12 @@
 {
     internal class EncryptCommand
     {
-        public static Task Encrypt(EncryptOptions encryptOptions)
+        public static Task Execute(EncryptOptions options)
         {
             try
             {
-                var encryptCommand = new EncryptCommand();
-                return encryptCommand.EncryptInternal(encryptOptions);
+                var command = new EncryptCommand();
+                return command.ExecuteInternal(options);
             }
             catch (Exception ex)
             {
@@ -16,28 +16,28 @@
             }
         }
 
-        private async Task EncryptInternal(EncryptOptions encryptOptions)
+        private async Task ExecuteInternal(EncryptOptions options)
         {
-            encryptOptions.Validate();
-            if (string.IsNullOrEmpty(encryptOptions.Context))
-                throw new ArgumentNullException(nameof(encryptOptions.Context));
-            if (string.IsNullOrEmpty(encryptOptions.Manifest))
-                throw new ArgumentNullException(nameof(encryptOptions.Manifest));
-            if (string.IsNullOrEmpty(encryptOptions.BallotsDir))
-                throw new ArgumentNullException(nameof(encryptOptions.BallotsDir));
+            options.Validate();
+            if (string.IsNullOrEmpty(options.Context))
+                throw new ArgumentNullException(nameof(options.Context));
+            if (string.IsNullOrEmpty(options.Manifest))
+                throw new ArgumentNullException(nameof(options.Manifest));
+            if (string.IsNullOrEmpty(options.BallotsDir))
+                throw new ArgumentNullException(nameof(options.BallotsDir));
 
             var encryptionMediator = await GetEncryptionMediator(
-                encryptOptions.Context, encryptOptions.Manifest);
-            var ballotFiles = GetBallotFiles(encryptOptions.BallotsDir);
+                options.Context, options.Manifest);
+            var ballotFiles = GetBallotFiles(options.BallotsDir);
 
             foreach (var ballotFile in ballotFiles)
             {
                 Console.WriteLine($"Parsing: {ballotFile}");
                 var plaintextBallot = await GetPlaintextBallot(ballotFile);
-                var spoiledDeviceIds = encryptOptions.SpoiledDeviceIds.ToList();
+                var spoiledDeviceIds = options.SpoiledDeviceIds.ToList();
                 var submittedBallot = EncryptAndSubmit(
                     encryptionMediator, plaintextBallot, spoiledDeviceIds, ballotFile);
-                await WriteSubmittedBallot(encryptOptions, ballotFile, submittedBallot);
+                await WriteSubmittedBallot(options, ballotFile, submittedBallot);
             }
             Console.WriteLine("Parsing Complete");
         }

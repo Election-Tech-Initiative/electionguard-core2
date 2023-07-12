@@ -1,4 +1,4 @@
-using ElectionGuard.Decryption.Tally;
+﻿using ElectionGuard.Decryption.Tally;
 using ElectionGuard.ElectionSetup;
 using ElectionGuard.ElectionSetup.Extensions;
 using ElectionGuard.Guardians;
@@ -16,6 +16,7 @@ public record TallyShare : DisposableRecordBase, IEquatable<TallyShare>
 
     public Dictionary<string, ContestShare> Contests { get; init; } = default!;
 
+    [JsonConstructor]
     public TallyShare(
         string guardianId,
         string tallyId,

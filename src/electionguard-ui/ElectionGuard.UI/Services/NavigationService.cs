@@ -1,6 +1,5 @@
 ﻿using CommunityToolkit.Maui.Views;
 using CommunityToolkit.Mvvm.DependencyInjection;
-using ElectionGuard.UI.Lib.Services;
 
 namespace ElectionGuard.UI.Services;
 
@@ -25,7 +24,10 @@ public class NavigationService : INavigationService
         new PageType(typeof(ManifestViewModel), typeof(ManifestPopup), false),
         new PageType(typeof(BallotUploadViewModel), typeof(BallotUploadPage), false),
         new PageType(typeof(CreateTallyViewModel), typeof(CreateTallyPage), false),
+        new PageType(typeof(CreateMultiTallyViewModel), typeof(CreateMultiTallyPage), false),
         new PageType(typeof(TallyProcessViewModel), typeof(TallyProcessPage), false),
+        new PageType(typeof(ViewTallyViewModel), typeof(ViewTallyPage), false),
+        new PageType(typeof(ChallengedPopupViewModel), typeof(ChallengedPopup), false),
     };
 
     private Type _currentPage = typeof(LoginPage);

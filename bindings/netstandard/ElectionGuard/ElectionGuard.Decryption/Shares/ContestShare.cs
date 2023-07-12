@@ -1,4 +1,4 @@
-using ElectionGuard.Ballot;
+﻿using ElectionGuard.Ballot;
 using ElectionGuard.Decryption.Tally;
 using ElectionGuard.ElectionSetup;
 using ElectionGuard.ElectionSetup.Extensions;
@@ -57,6 +57,38 @@ public record ContestShare
         ObjectId = contest.ObjectId;
         SequenceOrder = contest.SequenceOrder;
         DescriptionHash = new(contest.DescriptionHash);
+        ExtendedData = new(extendedData);
+        Selections = selections.Select(
+            x => new SelectionShare(x.Value))
+            .ToDictionary(x => x.ObjectId);
+    }
+
+    [JsonConstructor]
+    public ContestShare(
+        string objectId,
+        ulong sequenceOrder,
+        ElementModQ descriptionHash,
+        ElementModP extendedData,
+        Dictionary<string, SelectionShare> selections)
+    {
+        ObjectId = objectId;
+        SequenceOrder = sequenceOrder;
+        DescriptionHash = new(descriptionHash);
+        ExtendedData = extendedData != null ? new(extendedData) : null;
+        Selections = selections.Select(
+            x => new SelectionShare(x.Value))
+            .ToDictionary(x => x.ObjectId);
+    }
+
+    public ContestShare(
+        IElectionContest contest,
+        ElementModQ descriptionHash,
+        ElementModP extendedData,
+        Dictionary<string, SelectionShare> selections)
+    {
+        ObjectId = contest.ObjectId;
+        SequenceOrder = contest.SequenceOrder;
+        DescriptionHash = new(descriptionHash);
         ExtendedData = new(extendedData);
         Selections = selections.Select(
             x => new SelectionShare(x.Value))

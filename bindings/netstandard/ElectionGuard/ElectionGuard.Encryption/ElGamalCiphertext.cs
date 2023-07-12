@@ -102,11 +102,11 @@ namespace ElectionGuard
         /// This is a convenience accessor useful for some use cases.
         /// This method should not be used by consumers operating in live secret ballot elections.
         /// </Summary>
-        public ulong? Decrypt(ElementModP knownProduct)
+        public ulong? Decrypt(ElementModP knownProduct, ElementModP encryptionBase)
         {
             ulong plaintext = 0;
             var status = NativeInterface.ElGamalCiphertext.DecryptKnownProduct(
-                Handle, knownProduct.Handle, ref plaintext);
+                Handle, knownProduct.Handle, encryptionBase.Handle, ref plaintext);
             status.ThrowIfError();
             return plaintext;
         }
@@ -117,11 +117,11 @@ namespace ElectionGuard
         /// This is a convenience accessor useful for some use cases.
         /// This method should not be used by consumers operating in live secret ballot elections.
         /// </Summary>
-        public ulong? Decrypt(ElementModQ secretKey)
+        public ulong? Decrypt(ElementModQ secretKey, ElementModP encryptionBase)
         {
             ulong plaintext = 0;
             var status = NativeInterface.ElGamalCiphertext.DecryptWithSecret(
-                Handle, secretKey.Handle, ref plaintext);
+                Handle, secretKey.Handle, encryptionBase.Handle, ref plaintext);
             status.ThrowIfError();
             return plaintext;
         }

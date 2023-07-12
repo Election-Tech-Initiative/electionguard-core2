@@ -1,6 +1,5 @@
-
+﻿
 using ElectionGuard.Encryption.Utils.Generators;
-using ElectionGuard.ElectionSetup.Tests.Generators;
 using ElectionGuard.Decryption.Decryption;
 using ElectionGuard.Decryption.Shares;
 using ElectionGuard.Decryption.ChallengeResponse;
@@ -8,6 +7,7 @@ using ElectionGuard.Decryption.Extensions;
 using ElectionGuard.Decryption.Accumulation;
 using ElectionGuard.Decryption.Challenge;
 using ElectionGuard.Decryption.Tests.Decryption;
+using ElectionGuard.ElectionSetup.Tests.Generators;
 
 namespace ElectionGuard.Decryption.Tests.Challenge;
 
@@ -137,7 +137,7 @@ public class TestChallenge : DisposableBase
         accumulation.AddProof(proof);
 
         // decrypt
-        var decrypted = selection.Decrypt(accumulation);
+        var decrypted = selection.Decrypt(accumulation, context.ElGamalPublicKey);
 
         // TODO: verify the proof
 

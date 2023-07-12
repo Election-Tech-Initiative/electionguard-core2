@@ -1,4 +1,4 @@
-using ElectionGuard.Ballot;
+﻿using ElectionGuard.Ballot;
 using ElectionGuard.Base;
 using ElectionGuard.ElectionSetup;
 using ElectionGuard.ElectionSetup.Extensions;
@@ -40,6 +40,7 @@ public record ContestChallenge
         SequenceOrder = contest.SequenceOrder;
     }
 
+    [JsonConstructor]
     public ContestChallenge(
         string objectId,
         ulong sequenceOrder,

@@ -19,6 +19,8 @@ internal static class Constants
 
     public readonly static string TallyId = "TallyId";
 
+    public readonly static string MultiTallyId = "MultiTallyId";
+
     public readonly static string UploadId = "UploadId";
 
     public readonly static string GuardianId = "GuardianId";
@@ -55,6 +57,10 @@ internal static class Constants
 
     public readonly static string IsExportable = "IsExportable";
 
+    public readonly static string BallotState = "BallotState";
+
+    public readonly static string ObjectId = "ObjectId";
+
 }
 
 
@@ -67,13 +73,14 @@ internal static class Constants
 public interface IDatabaseService<T>
 {
     Task<long> CountByFilterAsync(FilterDefinition<T> filter, string? table = null);
+    Task<bool> ExistsByFilterAsync(FilterDefinition<T> filter, string? table = null);
     Task<List<T>> GetAllAsync(string? table = null);
     Task<List<T>> GetAllByFilterAsync(FilterDefinition<T> filter, string? table = null);
     Task<List<T>> GetAllByFieldAsync(string fieldName, object fieldValue, string? table = null);
     Task<T?> GetByIdAsync(string id, string? table = null);
     Task<T?> GetByNameAsync(string name, string? table = null);
     Task<T?> GetByFieldAsync(string fieldName, object fieldValue, string? table = null);
-    Task<T> SaveAsync(T data, string? table = null);
+    Task<T> SaveAsync(T data, FilterDefinition<T>? customFilter = null, string? table = null);
     Task UpdateAsync(FilterDefinition<T> filter, UpdateDefinition<T> update, string? table = null);
     FilterDefinition<T> UpdateFilter(FilterDefinition<T> filter, bool getDeleted = false);
 }

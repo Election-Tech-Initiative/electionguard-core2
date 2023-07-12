@@ -1,4 +1,4 @@
-using ElectionGuard.Decryption.Challenge;
+﻿using ElectionGuard.Decryption.Challenge;
 using ElectionGuard.Decryption.Shares;
 using ElectionGuard.Decryption.Tally;
 using ElectionGuard.ElectionSetup;
@@ -30,6 +30,22 @@ public record GuardianChallengeResponse : DisposableRecordBase
     public TallyChallengeResponse Tally { get; init; }
 
     public List<BallotChallengeResponse> Ballots { get; init; }
+
+    [JsonConstructor]
+    public GuardianChallengeResponse(
+        string guardianId,
+        ulong sequenceOrder,
+        ElementModP commitmentOffset,
+        TallyChallengeResponse tally,
+        List<BallotChallengeResponse>? ballots)
+    {
+        GuardianId = guardianId;
+        SequenceOrder = sequenceOrder;
+        CommitmentOffset = new(commitmentOffset);
+        Tally = new(tally);
+        Ballots = ballots != null
+            ? ballots.Select(x => new BallotChallengeResponse(x)).ToList() : new();
+    }
 
     public GuardianChallengeResponse(
         IElectionGuardian guardian,

@@ -61,6 +61,24 @@ namespace ElectionGuard.UI.Resx {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Tally has been canceled by election administrator. See administrator for addional details..
+        /// </summary>
+        internal static string AbandonTallyText {
+            get {
+                return ResourceManager.GetString("AbandonTallyText", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Tally Canceled.
+        /// </summary>
+        internal static string AbandonTallyTitle {
+            get {
+                return ResourceManager.GetString("AbandonTallyTitle", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Add Ballots.
         /// </summary>
         internal static string AddBallots {
@@ -124,7 +142,7 @@ namespace ElectionGuard.UI.Resx {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Ballot Count.
+        ///   Looks up a localized string similar to Count.
         /// </summary>
         internal static string BallotCountText {
             get {
@@ -183,6 +201,33 @@ namespace ElectionGuard.UI.Resx {
         internal static string CandidatesText {
             get {
                 return ResourceManager.GetString("CandidatesText", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Enter the verification code in the search box to limit the ballots shown. Select that ballot from the list to be set to a spoiled ballot..
+        /// </summary>
+        internal static string ChallengedInstructionsText {
+            get {
+                return ResourceManager.GetString("ChallengedInstructionsText", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Challenged.
+        /// </summary>
+        internal static string ChallengedText {
+            get {
+                return ResourceManager.GetString("ChallengedText", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Choice.
+        /// </summary>
+        internal static string ChoiceText {
+            get {
+                return ResourceManager.GetString("ChoiceText", resourceCulture);
             }
         }
         
@@ -295,11 +340,38 @@ namespace ElectionGuard.UI.Resx {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Select the elections to make tallies.
+        /// </summary>
+        internal static string CreateMultiInstructionsText {
+            get {
+                return ResourceManager.GetString("CreateMultiInstructionsText", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Create Multiple Tallies.
         /// </summary>
         internal static string CreateMultipleTalliesText {
             get {
                 return ResourceManager.GetString("CreateMultipleTalliesText", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Create Multiple Tallies.
+        /// </summary>
+        internal static string CreateMultiTally {
+            get {
+                return ResourceManager.GetString("CreateMultiTally", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Create Tallies.
+        /// </summary>
+        internal static string CreateTallies {
+            get {
+                return ResourceManager.GetString("CreateTallies", resourceCulture);
             }
         }
         
@@ -327,6 +399,15 @@ namespace ElectionGuard.UI.Resx {
         internal static string DatabaseAddress {
             get {
                 return ResourceManager.GetString("DatabaseAddress", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Unable to login.  Please check your database settings..
+        /// </summary>
+        internal static string DatabaseLoginError {
+            get {
+                return ResourceManager.GetString("DatabaseLoginError", resourceCulture);
             }
         }
         
@@ -430,6 +511,24 @@ namespace ElectionGuard.UI.Resx {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Election Name.
+        /// </summary>
+        internal static string ElectionNameText {
+            get {
+                return ResourceManager.GetString("ElectionNameText", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Election Record Export Path.
+        /// </summary>
+        internal static string ElectionRecordPathText {
+            get {
+                return ResourceManager.GetString("ElectionRecordPathText", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to elections created..
         /// </summary>
         internal static string ElectionsCreated {
@@ -462,6 +561,15 @@ namespace ElectionGuard.UI.Resx {
         internal static string ErrorCreatingElection {
             get {
                 return ResourceManager.GetString("ErrorCreatingElection", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Unable to load guardian data..
+        /// </summary>
+        internal static string ErrorLoadingGuardian {
+            get {
+                return ResourceManager.GetString("ErrorLoadingGuardian", resourceCulture);
             }
         }
         
@@ -507,6 +615,15 @@ namespace ElectionGuard.UI.Resx {
         internal static string ExportEncryptionText {
             get {
                 return ResourceManager.GetString("ExportEncryptionText", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Export Election Record.
+        /// </summary>
+        internal static string ExportTally {
+            get {
+                return ResourceManager.GetString("ExportTally", resourceCulture);
             }
         }
         
@@ -601,11 +718,38 @@ namespace ElectionGuard.UI.Resx {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Joined Guardians.
+        /// </summary>
+        internal static string JoinedGuardians {
+            get {
+                return ResourceManager.GetString("JoinedGuardians", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Joined.
         /// </summary>
         internal static string JoinedText {
             get {
                 return ResourceManager.GetString("JoinedText", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Select the tallies to join.
+        /// </summary>
+        internal static string JoinMultiInstructionsText {
+            get {
+                return ResourceManager.GetString("JoinMultiInstructionsText", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Join Tallies.
+        /// </summary>
+        internal static string JoinTallies {
+            get {
+                return ResourceManager.GetString("JoinTallies", resourceCulture);
             }
         }
         
@@ -687,6 +831,15 @@ namespace ElectionGuard.UI.Resx {
         internal static string ManuelUploadText {
             get {
                 return ResourceManager.GetString("ManuelUploadText", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to MultiTally Name.
+        /// </summary>
+        internal static string MultiTallyNameText {
+            get {
+                return ResourceManager.GetString("MultiTallyNameText", resourceCulture);
             }
         }
         
@@ -799,11 +952,29 @@ namespace ElectionGuard.UI.Resx {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Ok.
+        /// </summary>
+        internal static string OkText {
+            get {
+                return ResourceManager.GetString("OkText", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Parties.
         /// </summary>
         internal static string PartiesText {
             get {
                 return ResourceManager.GetString("PartiesText", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Party.
+        /// </summary>
+        internal static string PartyText {
+            get {
+                return ResourceManager.GetString("PartyText", resourceCulture);
             }
         }
         
@@ -871,6 +1042,24 @@ namespace ElectionGuard.UI.Resx {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to %.
+        /// </summary>
+        internal static string PercentText {
+            get {
+                return ResourceManager.GetString("PercentText", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Cancel Tally.
+        /// </summary>
+        internal static string ProcessTallyAbandon {
+            get {
+                return ResourceManager.GetString("ProcessTallyAbandon", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to No, Do not Join Tally.
         /// </summary>
         internal static string ProcessTallyJoinNo {
@@ -885,6 +1074,15 @@ namespace ElectionGuard.UI.Resx {
         internal static string ProcessTallyJoinYes {
             get {
                 return ResourceManager.GetString("ProcessTallyJoinYes", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Start Tally.
+        /// </summary>
+        internal static string ProcessTallyStartTally {
+            get {
+                return ResourceManager.GetString("ProcessTallyStartTally", resourceCulture);
             }
         }
         
@@ -925,6 +1123,15 @@ namespace ElectionGuard.UI.Resx {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Results.
+        /// </summary>
+        internal static string ResultsText {
+            get {
+                return ResourceManager.GetString("ResultsText", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Review Challenge.
         /// </summary>
         internal static string ReviewSpoiledText {
@@ -939,6 +1146,15 @@ namespace ElectionGuard.UI.Resx {
         internal static string Save {
             get {
                 return ResourceManager.GetString("Save", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Select All Elections.
+        /// </summary>
+        internal static string SelectAllElectionsText {
+            get {
+                return ResourceManager.GetString("SelectAllElectionsText", resourceCulture);
             }
         }
         
@@ -961,6 +1177,33 @@ namespace ElectionGuard.UI.Resx {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Move Challenged to Spoiled.
+        /// </summary>
+        internal static string SpoilBallotText {
+            get {
+                return ResourceManager.GetString("SpoilBallotText", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Spoil Ballots.
+        /// </summary>
+        internal static string SpoilChallengedText {
+            get {
+                return ResourceManager.GetString("SpoilChallengedText", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Are you sure that you would like to move this ballot into a Spoiled state?  This will remove it from the election record..
+        /// </summary>
+        internal static string SpoilConfirmationText {
+            get {
+                return ResourceManager.GetString("SpoilConfirmationText", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Spoiled.
         /// </summary>
         internal static string SpoiledText {
@@ -975,6 +1218,15 @@ namespace ElectionGuard.UI.Resx {
         internal static string StartCeremony {
             get {
                 return ResourceManager.GetString("StartCeremony", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Status.
+        /// </summary>
+        internal static string Status {
+            get {
+                return ResourceManager.GetString("Status", resourceCulture);
             }
         }
         
@@ -1060,6 +1312,51 @@ namespace ElectionGuard.UI.Resx {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to All Guardians responded to Challenge.
+        /// </summary>
+        internal static string TallyAllChallengesResponded {
+            get {
+                return ResourceManager.GetString("TallyAllChallengesResponded", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to All Guardian Shares Calculated.
+        /// </summary>
+        internal static string TallyAllDecryptionsComputed {
+            get {
+                return ResourceManager.GetString("TallyAllDecryptionsComputed", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Challenge Created.
+        /// </summary>
+        internal static string TallyChallengeCreated {
+            get {
+                return ResourceManager.GetString("TallyChallengeCreated", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Tally Process.
+        /// </summary>
+        internal static string TallyChecklist {
+            get {
+                return ResourceManager.GetString("TallyChecklist", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Tally Verified and results computed.
+        /// </summary>
+        internal static string TallyComplete {
+            get {
+                return ResourceManager.GetString("TallyComplete", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Tally Name.
         /// </summary>
         internal static string TallyNameText {
@@ -1074,6 +1371,24 @@ namespace ElectionGuard.UI.Resx {
         internal static string TallyProcess {
             get {
                 return ResourceManager.GetString("TallyProcess", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Quorum has been reached.
+        /// </summary>
+        internal static string TallyQuorumReachedText {
+            get {
+                return ResourceManager.GetString("TallyQuorumReachedText", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Ballots have been tallied.
+        /// </summary>
+        internal static string TallySubtalliesCombined {
+            get {
+                return ResourceManager.GetString("TallySubtalliesCombined", resourceCulture);
             }
         }
         
@@ -1101,6 +1416,15 @@ namespace ElectionGuard.UI.Resx {
         internal static string UploadedText {
             get {
                 return ResourceManager.GetString("UploadedText", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Uploading.
+        /// </summary>
+        internal static string Uploading {
+            get {
+                return ResourceManager.GetString("Uploading", resourceCulture);
             }
         }
         
@@ -1168,6 +1492,15 @@ namespace ElectionGuard.UI.Resx {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Verification Code.
+        /// </summary>
+        internal static string VerificationCodeText {
+            get {
+                return ResourceManager.GetString("VerificationCodeText", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Verified.
         /// </summary>
         internal static string Verified {
@@ -1195,11 +1528,38 @@ namespace ElectionGuard.UI.Resx {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to View Tally.
+        /// </summary>
+        internal static string ViewTally {
+            get {
+                return ResourceManager.GetString("ViewTally", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Votes.
+        /// </summary>
+        internal static string VotesText {
+            get {
+                return ResourceManager.GetString("VotesText", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to ElectionGuard Election Manager.
         /// </summary>
         internal static string WindowTitle {
             get {
                 return ResourceManager.GetString("WindowTitle", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Writein Candidate.
+        /// </summary>
+        internal static string WriteinText {
+            get {
+                return ResourceManager.GetString("WriteinText", resourceCulture);
             }
         }
         

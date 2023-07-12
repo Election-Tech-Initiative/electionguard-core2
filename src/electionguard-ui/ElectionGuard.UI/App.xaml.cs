@@ -1,4 +1,6 @@
-using System.Globalization;
+﻿using System.Globalization;
+using ElectionGuard.Converters;
+using Newtonsoft.Json;
 
 namespace ElectionGuard.UI;
 
@@ -8,6 +10,8 @@ public partial class App
 
     public App()
     {
+        JsonConvert.DefaultSettings = SerializationSettings.NewtonsoftSettings;
+
         InitializeComponent();
         UserAppTheme = AppTheme.Light;
 
@@ -21,7 +25,7 @@ public partial class App
         LocalizationResourceManager.Current.PropertyChanged += CurrentLanguage_Changed;
         LocalizationResourceManager.Current.Init(AppResources.ResourceManager, CultureInfo.CurrentCulture);
 
-        string? currentLanguage = Preferences.Get("CurrentLanguage", null);
+        var currentLanguage = Preferences.Get("CurrentLanguage", null);
         LocalizationResourceManager.Current.CurrentCulture = currentLanguage is null ? CultureInfo.CurrentCulture : new CultureInfo(currentLanguage);
     }
 
@@ -31,7 +35,9 @@ public partial class App
 
         // change the first windows title to the new language
         if (Windows.Count > 0)
+        {
             Windows[0].Title = GetWindowTitle();
+        }
     }
 
     protected override Window CreateWindow(IActivationState? activationState)
@@ -46,5 +52,8 @@ public partial class App
         return window;
     }
 
-    private static string GetWindowTitle() => AppResources.WindowTitle;
+    private static string GetWindowTitle()
+    {
+        return AppResources.WindowTitle;
+    }
 }

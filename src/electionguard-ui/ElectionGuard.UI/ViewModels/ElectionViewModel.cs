@@ -5,8 +5,12 @@ using ElectionGuard.UI.Models;
 namespace ElectionGuard.UI.ViewModels;
 
 [QueryProperty(CurrentElectionParam, nameof(CurrentElection))]
+[QueryProperty(ElectionIdParam, nameof(ElectionId))]
 public partial class ElectionViewModel : BaseViewModel
 {
+    public const string CurrentElectionParam = "CurrentElection";
+    public const string ElectionIdParam = "ElectionId";
+
     private readonly IStorageService _storageService;
     private readonly IStorageService _driveService;
     private readonly KeyCeremonyService _keyCeremonyService;
@@ -45,6 +49,9 @@ public partial class ElectionViewModel : BaseViewModel
     private Election? _currentElection;
 
     [ObservableProperty]
+    private string _electionId;
+
+    [ObservableProperty]
     private Manifest? _manifest;
 
     [ObservableProperty]
@@ -67,6 +74,11 @@ public partial class ElectionViewModel : BaseViewModel
     [NotifyCanExecuteChangedFor(nameof(CreateTallyCommand))]
     [NotifyCanExecuteChangedFor(nameof(ReviewChallengedCommand))]
     private long _ballotSpoiledTotal = 0;
+
+    [ObservableProperty]
+    [NotifyCanExecuteChangedFor(nameof(CreateTallyCommand))]
+    [NotifyCanExecuteChangedFor(nameof(ReviewChallengedCommand))]
+    private long _ballotChallengedTotal = 0;
 
     [ObservableProperty]
     private long _ballotDuplicateTotal = 0;
@@ -101,7 +113,6 @@ public partial class ElectionViewModel : BaseViewModel
     [ObservableProperty]
     private TallyRecord? _currentTally;
 
-
     partial void OnBallotsUploadedDateTimeChanged(DateTime value)
     {
         Step2Complete = true;
@@ -109,13 +120,28 @@ public partial class ElectionViewModel : BaseViewModel
 
     partial void OnCurrentTallyChanged(TallyRecord? value)
     {
-        MainThread.BeginInvokeOnMainThread(async () =>
+        if (value is null)
+        {
+            return;
+        }
+
+        if (value.State == TallyState.Complete)
+        {
+            MainThread.BeginInvokeOnMainThread(async () =>
+                await NavigationService.GoToPage(typeof(ViewTallyViewModel), new Dictionary<string, object>
+                {
+                    { "TallyId", value.TallyId! }
+                }));
+        }
+        else if (value.State != TallyState.Abandoned)
+        {
+            MainThread.BeginInvokeOnMainThread(async () =>
             await NavigationService.GoToPage(typeof(TallyProcessViewModel), new Dictionary<string, object>
             {
                 { "TallyId", value.TallyId! }
             }));
+        }
     }
-
 
     partial void OnCurrentElectionChanged(Election? value)
     {
@@ -131,6 +157,7 @@ public partial class ElectionViewModel : BaseViewModel
                 BallotCountTotal = 0;
                 BallotAddedTotal = 0;
                 BallotSpoiledTotal = 0;
+                BallotChallengedTotal = 0;
                 BallotDuplicateTotal = 0;
                 BallotRejectedTotal = 0;
                 uploads.ForEach((upload) =>
@@ -138,13 +165,14 @@ public partial class ElectionViewModel : BaseViewModel
                     BallotUploads.Add(upload);
                     BallotCountTotal += upload.BallotCount;
                     BallotAddedTotal += upload.BallotImported;
+                    BallotChallengedTotal += upload.BallotChallenged;
                     BallotSpoiledTotal += upload.BallotSpoiled;
                     BallotDuplicateTotal += upload.BallotDuplicated;
                     BallotRejectedTotal += upload.BallotRejected;
                 });
 
                 Tallies.Clear();
-                var tallies = await _tallyService.GetByElectionIdAsync(value?.ElectionId);
+                var tallies = await _tallyService.GetAllActiveByElectionIdAsync(value?.ElectionId);
                 foreach (var item in tallies)
                 {
                     Tallies.Add(item);
@@ -159,6 +187,16 @@ public partial class ElectionViewModel : BaseViewModel
             {
             }
         });
+    }
+
+    partial void OnElectionIdChanged(string value)
+    {
+        if (string.IsNullOrEmpty(value))
+        {
+            return;
+        }
+
+        _ = Shell.Current.CurrentPage.Dispatcher.DispatchAsync(async () => CurrentElection = await _electionService.GetByElectionIdAsync(value));
     }
 
     [RelayCommand(CanExecute = nameof(CanCreateTally))]
@@ -196,12 +234,15 @@ public partial class ElectionViewModel : BaseViewModel
     [RelayCommand(CanExecute = nameof(CanReview))]
     private async Task ReviewChallenged()
     {
-        // add code to go to the Challenged ballot page
+        var vm = Ioc.Default.GetService(typeof(ChallengedPopupViewModel)) as ChallengedPopupViewModel;
+        vm!.ElectionId = CurrentElection!.ElectionId!;
+
+        await NavigationService.GoToModal(typeof(ChallengedPopupViewModel));
     }
 
     private bool CanReview()
     {
-        return BallotSpoiledTotal > 0;
+        return BallotChallengedTotal > 0;
     }
 
     [RelayCommand]
@@ -279,8 +320,6 @@ public partial class ElectionViewModel : BaseViewModel
         Manifest = new Manifest(value.ManifestData);
         ManifestName = Manifest.Name.GetTextAt(0).Value;
     }
-
-    public const string CurrentElectionParam = "CurrentElection";
 
     public override void Dispose()
     {

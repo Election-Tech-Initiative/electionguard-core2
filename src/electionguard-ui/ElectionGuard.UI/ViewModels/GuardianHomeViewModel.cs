@@ -6,29 +6,37 @@ public partial class GuardianHomeViewModel : BaseViewModel
     private readonly GuardianPublicKeyService _guardianService;
     private readonly TallyService _tallyService;
     private readonly TallyJoinedService _tallyJoinedService;
+    private readonly MultiTallyService _multiTallyService;
 
     public GuardianHomeViewModel(IServiceProvider serviceProvider, 
         KeyCeremonyService keyCeremonyService,
         GuardianPublicKeyService guardianService,
         TallyService tallyService,
-        TallyJoinedService tallyJoinedService) : base("GuardianHome", serviceProvider)
+        TallyJoinedService tallyJoinedService,
+        MultiTallyService multiTallyService) : base("GuardianHome", serviceProvider)
     {
         _keyCeremonyService = keyCeremonyService;
         _guardianService = guardianService;
         _tallyService = tallyService;
         _tallyJoinedService = tallyJoinedService;
+        _multiTallyService = multiTallyService;
     }
 
     public override async Task OnAppearing()
     {
         await base.OnAppearing();
 
+        _timer.Tick += PollingTimer_Tick;
         _timer.Start();
+
         PollingTimer_Tick(this, null);
     }
 
     [ObservableProperty]
     private ObservableCollection<KeyCeremonyRecord> _keyCeremonies = new();
+
+    [ObservableProperty]
+    private ObservableCollection<MultiTallyRecord> _multiTallies = new();
 
     [ObservableProperty]
     private ObservableCollection<TallyRecord> _tallies = new();
@@ -38,6 +46,9 @@ public partial class GuardianHomeViewModel : BaseViewModel
 
     [ObservableProperty]
     private TallyRecord? _currentTally;
+
+    [ObservableProperty]
+    private MultiTallyRecord? _currentMultiTally;
 
 
     public override async Task OnLeavingPage()
@@ -74,6 +85,20 @@ public partial class GuardianHomeViewModel : BaseViewModel
             }));
     }
 
+    partial void OnCurrentMultiTallyChanged(MultiTallyRecord? value)
+    {
+        if (value == null)
+        {
+            return;
+        }
+
+        MainThread.BeginInvokeOnMainThread(async () =>
+            await NavigationService.GoToPage(typeof(CreateMultiTallyViewModel), new Dictionary<string, object>
+            {
+                { CreateMultiTallyViewModel.MultiTallyIdParam, value.MultiTallyId! }
+            }));
+    }
+
     private async void PollingTimer_Tick(object? sender, EventArgs e)
     {
         var keyCeremonies = await _keyCeremonyService.GetAllNotCompleteAsync();
@@ -83,14 +108,49 @@ public partial class GuardianHomeViewModel : BaseViewModel
             KeyCeremonies.Add(item);
         }
 
-        var tallies = await _tallyService.GetAllByKeyCeremoniesAsync(await _guardianService.GetKeyCeremonyIdsAsync(UserName!));
+        var keys = await _guardianService.GetKeyCeremonyIdsAsync(UserName!);
+        var tallies = await _tallyService.GetAllByKeyCeremoniesAsync(keys);
         var rejected = await _tallyJoinedService.GetGuardianRejectedIdsAsync(UserName!);
         Tallies.Clear();
         foreach (var item in tallies)
         {
-            if (!rejected.Contains(item.TallyId))
+            if (!rejected.Contains(item.TallyId) && item.State < TallyState.Complete)
             {
                 Tallies.Add(item);
+            }
+        }
+
+        var multiTallies = await _multiTallyService.GetAllAsync();
+        foreach (var tally in multiTallies)
+        {
+            if (!keys.Contains(tally.KeyCeremonyId!))
+            {
+                continue;
+            }
+
+            var addMulti = false;
+            // check each tally in the multitally to see if any are not complete / abandoned
+            foreach (var (tallyId, _, _) in tally.TallyIds)
+            {
+                if (await _tallyService.IsRunningByTallyIdAsync(tallyId))
+                {
+                    addMulti = true;
+                    break;
+                }
+            }
+            if (addMulti)
+            {
+                if (MultiTallies.Count(m => m.MultiTallyId == tally.MultiTallyId) == 0)
+                {
+                    MultiTallies.Add(tally);
+                }
+            }
+            else
+            {
+                if (MultiTallies.Count(m => m.MultiTallyId == tally.MultiTallyId) > 0)
+                {
+                    MultiTallies.Remove(tally);
+                }
             }
         }
     }

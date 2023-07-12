@@ -107,7 +107,7 @@ public class ElectionKeyPair : DisposableBase, IElectionGuardian
     /// Construct an Election Key Pair using the provided key pair and polynomial.
     /// This override is used when the guardain generates the polynomial and keypair externally.
     /// </summary>
-    [Newtonsoft.Json.JsonConstructor]
+    [JsonConstructor]
     public ElectionKeyPair(
         string ownerId,
         ulong sequenceOrder,

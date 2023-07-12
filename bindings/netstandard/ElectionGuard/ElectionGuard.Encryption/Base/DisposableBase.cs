@@ -1,4 +1,6 @@
 ﻿using System;
+using Newtonsoft.Json;
+
 namespace ElectionGuard
 {
     /// <summary>
@@ -6,6 +8,10 @@ namespace ElectionGuard
     /// </summary>
     public class DisposableBase : IDisposable
     {
+        /// <summary>
+        /// Property to use to tell if the object is already disposed
+        /// </summary>
+        [JsonIgnore]
         public bool IsDisposed { get; private set; }
 
         /// <summary>

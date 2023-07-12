@@ -1,4 +1,4 @@
-using ElectionGuard.Decryption.Accumulation;
+﻿using ElectionGuard.Decryption.Accumulation;
 using ElectionGuard.Decryption.Challenge;
 using ElectionGuard.Decryption.ChallengeResponse;
 using ElectionGuard.Decryption.Extensions;
@@ -275,6 +275,17 @@ public record class CiphertextDecryptionTally : DisposableRecordBase
     #endregion
 
     #region Challenge
+
+    public void LoadChallenge(string guardianId, GuardianChallenge challenge)
+    {
+        _challenges.Add(guardianId, challenge);
+        if(_challenges.Count == _guardians.Count)
+        {
+            // state transition
+            DecryptionState = DecryptionState.PendingGuardianChallengeResponses;
+        }
+    }
+
 
     /// <summary>
     /// Create a challenge for each available guardian that includes the tally and ballot challenges
@@ -614,7 +625,7 @@ public record class CiphertextDecryptionTally : DisposableRecordBase
     {
         if (!_challengedBallots.ContainsKey(ballot.ObjectId))
         {
-            _challengedBallots.Add(ballot.ObjectId, new(ballot));
+            _challengedBallots.Add(ballot.ObjectId, ballot);
         }
     }
 

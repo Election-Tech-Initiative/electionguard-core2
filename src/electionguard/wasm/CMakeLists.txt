@@ -20,18 +20,23 @@ if(EMSCRIPTEN)
             "-s ALLOW_MEMORY_GROWTH=1"
             "-s MODULARIZE=1"
             "-s DEMANGLE_SUPPORT=1"
+
+            # "-s ENVIRONMENT='web,node'"
             "-s EXPORT_NAME=Electionguard"
 
-            # "-s SINGLE_FILE=1"
+            # TODO: remove single file
+            "-s SINGLE_FILE=1"
             "-s WASM_BIGINT=1"
             "-s ERROR_ON_UNDEFINED_SYMBOLS=0"
             "-s WARN_ON_UNDEFINED_SYMBOLS=1"
             "-s DISABLE_EXCEPTION_CATCHING=0"
             "-s STRICT=1"
+            "-s WASM=1"
 
             # "-s EXPORT_ES6=1"
             # "-s FILESYSTEM=0"
-            "-pthread"
+            # TODO: re-enable pthread
+            # "-pthread"
             "--no-entry"
             "-lembind"
         )
@@ -43,12 +48,17 @@ if(EMSCRIPTEN)
             "-g0"
             "-s ALLOW_MEMORY_GROWTH=1"
             "-s MODULARIZE=1"
+
+            # "-s ENVIRONMENT='web,node'"
             "-s EXPORT_NAME=Electionguard"
+            "-s SINGLE_FILE=1"
             "-s WASM_BIGINT=1"
             "-s ERROR_ON_UNDEFINED_SYMBOLS=0"
             "-s WARN_ON_UNDEFINED_SYMBOLS=1"
             "-s STRICT=1"
-            "-pthread"
+            "-s WASM=1"
+
+            # "-pthread"
             "--no-entry"
             "-lembind"
         )

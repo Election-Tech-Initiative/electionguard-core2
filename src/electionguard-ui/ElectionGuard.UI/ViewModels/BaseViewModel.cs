@@ -18,6 +18,9 @@ public partial class BaseViewModel : ObservableObject, IDisposable
     private bool _isLoading;
 
     [ObservableProperty]
+    private string _errorMessage;
+
+    [ObservableProperty]
     private string _pageTitle = "";
 
     protected IDispatcherTimer? _timer;
@@ -37,10 +40,10 @@ public partial class BaseViewModel : ObservableObject, IDisposable
         UserName = AuthenticationService.UserName;
         IsAdmin = AuthenticationService.IsAdmin;
         SetPageTitle();
-
         LocalizationService.OnLanguageChanged += OnLanguageChanged;
 
         _timer?.Start();
+
         await Task.Yield();
     }
 
@@ -61,8 +64,11 @@ public partial class BaseViewModel : ObservableObject, IDisposable
     [RelayCommand]
     private void ChangeLanguage() => LocalizationService.ToggleLanguage();
 
-    [RelayCommand(CanExecute = nameof(CanChangeSettings))]
-    private void Settings() => NavigationService.GoToModal(typeof(SettingsViewModel));
+    [RelayCommand(CanExecute = nameof(CanChangeSettings), AllowConcurrentExecutions = true)]
+    protected async Task Settings()
+    {
+        await NavigationService.GoToModal(typeof(SettingsViewModel));
+    }
 
     [RelayCommand(CanExecute = nameof(CanGoHome))]
     private async Task Home()

@@ -202,13 +202,14 @@ eg_electionguard_status_t eg_elgamal_ciphertext_add(eg_elgamal_ciphertext_t *han
     }
 }
 
-eg_electionguard_status_t
-eg_elgamal_ciphertext_decrypt_known_product(eg_elgamal_ciphertext_t *handle,
-                                            eg_element_mod_p_t *in_product, uint64_t *out_plaintext)
+eg_electionguard_status_t eg_elgamal_ciphertext_decrypt_known_product(
+  eg_elgamal_ciphertext_t *handle, eg_element_mod_p_t *in_product,
+  eg_element_mod_p_t *in_encryption_base, uint64_t *out_plaintext)
 {
     try {
         auto *product = AS_TYPE(ElementModP, in_product);
-        *out_plaintext = AS_TYPE(ElGamalCiphertext, handle)->decrypt(*product);
+        auto *base = AS_TYPE(ElementModP, in_encryption_base);
+        *out_plaintext = AS_TYPE(ElGamalCiphertext, handle)->decrypt(*product, *base);
         return ELECTIONGUARD_STATUS_SUCCESS;
     } catch (const exception &e) {
         Log::error(__func__, e);
@@ -217,11 +218,13 @@ eg_elgamal_ciphertext_decrypt_known_product(eg_elgamal_ciphertext_t *handle,
 }
 
 eg_electionguard_status_t eg_elgamal_ciphertext_decrypt_with_secret(
-  eg_elgamal_ciphertext_t *handle, eg_element_mod_q_t *in_secret_key, uint64_t *out_plaintext)
+  eg_elgamal_ciphertext_t *handle, eg_element_mod_q_t *in_secret_key,
+  eg_element_mod_p_t *in_encryption_base, uint64_t *out_plaintext)
 {
     try {
         auto *secretKey = AS_TYPE(ElementModQ, in_secret_key);
-        *out_plaintext = AS_TYPE(ElGamalCiphertext, handle)->decrypt(*secretKey);
+        auto *base = AS_TYPE(ElementModP, in_encryption_base);
+        *out_plaintext = AS_TYPE(ElGamalCiphertext, handle)->decrypt(*secretKey, *base);
         return ELECTIONGUARD_STATUS_SUCCESS;
     } catch (const exception &e) {
         Log::error(__func__, e);
@@ -408,15 +411,17 @@ eg_hashed_elgamal_ciphertext_crypto_hash(eg_hashed_elgamal_ciphertext_t *handle,
 }
 
 eg_electionguard_status_t eg_hashed_elgamal_ciphertext_decrypt_with_secret(
-  eg_hashed_elgamal_ciphertext_t *handle, eg_element_mod_q_t *in_secret_key,
-  eg_element_mod_q_t *in_description_hash, bool in_look_for_padding, uint8_t **out_data,
-  uint64_t *out_size)
+  eg_hashed_elgamal_ciphertext_t *handle, eg_element_mod_p_t *in_public_key,
+  eg_element_mod_q_t *in_secret_key, char *in_hash_prefix, eg_element_mod_q_t *in_encryption_seed,
+  bool in_look_for_padding, uint8_t **out_data, uint64_t *out_size)
 {
     try {
+        auto publicKey = AS_TYPE(ElementModP, in_public_key);
         auto *secretKey = AS_TYPE(ElementModQ, in_secret_key);
-        auto *descriptionHash = AS_TYPE(ElementModQ, in_description_hash);
+        auto hashPrefix = string(in_hash_prefix);
+        auto *seed = AS_TYPE(ElementModQ, in_encryption_seed);
         auto result = AS_TYPE(HashedElGamalCiphertext, handle)
-                        ->decrypt(*secretKey, *descriptionHash, in_look_for_padding);
+                        ->decrypt(*publicKey, *secretKey, hashPrefix, *seed, in_look_for_padding);
 
         size_t size = 0;
         *out_data = dynamicCopy(result, &size);
@@ -450,20 +455,42 @@ eg_hashed_elgamal_ciphertext_partial_decrypt(eg_hashed_elgamal_ciphertext_t *han
 
 #pragma region HashedElgamalEncrypt
 
-eg_electionguard_status_t eg_hashed_elgamal_encrypt(uint8_t *in_plaintext, uint64_t in_length,
-                                                    eg_element_mod_q_t *in_nonce,
-                                                    eg_element_mod_p_t *in_public_key,
-                                                    eg_element_mod_q_t *in_seed,
-                                                    eg_hashed_elgamal_ciphertext_t **out_ciphertext)
+eg_electionguard_status_t eg_hashed_elgamal_encrypt(
+  uint8_t *in_message, uint64_t in_length, eg_element_mod_q_t *in_nonce, char *in_hash_prefix,
+  eg_element_mod_p_t *in_public_key, eg_element_mod_q_t *in_seed,
+  enum HASHED_CIPHERTEXT_PADDED_DATA_SIZE in_max_len, bool in_allow_truncation,
+  bool in_should_use_precomputed_values, eg_hashed_elgamal_ciphertext_t **out_ciphertext)
 {
     try {
-        auto data_bytes = vector<uint8_t>(in_plaintext, in_plaintext + in_length);
+        auto data_bytes = vector<uint8_t>(in_message, in_message + in_length);
         auto *nonce = AS_TYPE(ElementModQ, in_nonce);
+        auto hashPrefix = string(in_hash_prefix);
         auto *publicKey = AS_TYPE(ElementModP, in_public_key);
         auto *seed = AS_TYPE(ElementModQ, in_seed);
         auto ciphertext =
-          hashedElgamalEncrypt(data_bytes, *nonce, *publicKey, *seed,
-                               electionguard::padded_data_size_t::NO_PADDING, false);
+          hashedElgamalEncrypt(data_bytes, *nonce, hashPrefix, *publicKey, *seed, in_max_len,
+                               in_allow_truncation, in_should_use_precomputed_values);
+        *out_ciphertext = AS_TYPE(eg_hashed_elgamal_ciphertext_t, ciphertext.release());
+        return ELECTIONGUARD_STATUS_SUCCESS;
+    } catch (const exception &e) {
+        Log::error(__func__, e);
+        return ELECTIONGUARD_STATUS_ERROR_RUNTIME_ERROR;
+    }
+}
+
+eg_electionguard_status_t eg_hashed_elgamal_encrypt_no_pdding(
+  uint8_t *in_message, uint64_t in_length, eg_element_mod_q_t *in_nonce, char *in_hash_prefix,
+  eg_element_mod_p_t *in_public_key, eg_element_mod_q_t *in_seed,
+  bool in_should_use_precomputed_values, eg_hashed_elgamal_ciphertext_t **out_ciphertext)
+{
+    try {
+        auto data_bytes = vector<uint8_t>(in_message, in_message + in_length);
+        auto *nonce = AS_TYPE(ElementModQ, in_nonce);
+        auto hashPrefix = string(in_hash_prefix);
+        auto *publicKey = AS_TYPE(ElementModP, in_public_key);
+        auto *seed = AS_TYPE(ElementModQ, in_seed);
+        auto ciphertext = hashedElgamalEncrypt(data_bytes, *nonce, hashPrefix, *publicKey, *seed,
+                                               in_should_use_precomputed_values);
         *out_ciphertext = AS_TYPE(eg_hashed_elgamal_ciphertext_t, ciphertext.release());
         return ELECTIONGUARD_STATUS_SUCCESS;
     } catch (const exception &e) {

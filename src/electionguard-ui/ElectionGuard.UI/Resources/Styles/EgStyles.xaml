@@ -7,6 +7,11 @@
     xmlns:toolkit="http://schemas.microsoft.com/dotnet/2022/maui/toolkit">
 
     <x:Int32 x:Key="MainFontSize">16</x:Int32>
+    <x:Int32 x:Key="NarrowSize">600</x:Int32>
+    <x:Int32 x:Key="MediumSize">750</x:Int32>
+    <x:Int32 x:Key="LargeSize">850</x:Int32>
+    <Color x:Key="Gray050">#F0F0F0</Color>
+
 
     <Style x:Key="H1" TargetType="Label">
         <Setter Property="FontSize" Value="36" />
@@ -23,11 +28,36 @@
         <Setter Property="Margin" Value="0,10,0,15" />
     </Style>
 
-    <Style x:Key="NarrowCenteredPage" TargetType="VerticalStackLayout">
+    <Style x:Key="CenteredPage" TargetType="VerticalStackLayout">
         <Setter Property="HorizontalOptions" Value="Center" />
-        <Setter Property="WidthRequest" Value="600" />
         <Setter Property="Padding" Value="0,20,0,0" />
     </Style>
+
+    <Style
+        x:Key="NarrowCenteredPage"
+        BasedOn="{StaticResource CenteredPage}"
+        TargetType="VerticalStackLayout">
+        <Setter Property="WidthRequest" Value="600" />
+    </Style>
+
+    <Style
+        x:Key="MediumCenteredPage"
+        BasedOn="{StaticResource CenteredPage}"
+        TargetType="VerticalStackLayout">
+        <Setter Property="WidthRequest" Value="750" />
+    </Style>
+
+    <Style
+        x:Key="LargeCenteredPage"
+        BasedOn="{StaticResource CenteredPage}"
+        TargetType="VerticalStackLayout">
+        <Setter Property="WidthRequest" Value="850" />
+    </Style>
+
+    <Style
+        x:Key="FullCenteredPage"
+        BasedOn="{StaticResource CenteredPage}"
+        TargetType="VerticalStackLayout" />
 
     <Style x:Key="NarrowCenteredGrid" TargetType="Grid">
         <Setter Property="HorizontalOptions" Value="Center" />
@@ -53,6 +83,14 @@
         <Setter Property="CornerRadius" Value="8" />
         <Setter Property="BackgroundColor" Value="{StaticResource HeaderColor}" />
         <Setter Property="Padding" Value="12" />
+        <Setter Property="Margin" Value="10,0,10,0" />
+    </Style>
+
+    <Style x:Key="MultiTallyFrame" TargetType="Frame">
+        <Setter Property="CornerRadius" Value="8" />
+        <Setter Property="BackgroundColor" Value="{StaticResource MultiColor}" />
+        <Setter Property="Padding" Value="12" />
+        <Setter Property="Margin" Value="10,0,10,0" />
     </Style>
 
     <Style x:Key="ButtonishLabel" TargetType="Label">
@@ -107,6 +145,22 @@
     <Style TargetType="toolkit:UniformItemsLayout">
         <Setter Property="HorizontalOptions" Value="FillAndExpand" />
     </Style>
+
+    <Style x:Key="Title" TargetType="Grid">
+        <Setter Property="Margin" Value="5" />
+        <Setter Property="BackgroundColor" Value="{StaticResource Primary}" />
+        <Setter Property="HeightRequest" Value="60" />
+    </Style>
+
+    <Style
+        x:Key="H2W"
+        BasedOn="{StaticResource H2}"
+        TargetType="Label">
+        <Setter Property="Margin" Value="5,0" />
+        <Setter Property="VerticalTextAlignment" Value="Center" />
+        <Setter Property="TextColor" Value="{StaticResource White}" />
+    </Style>
+
 
     <ControlTemplate x:Key="PageTemplate">
         <Grid BindingContext="{Binding BindingContext, Source={RelativeSource TemplatedParent}}" RowDefinitions="auto, *, auto">
@@ -181,6 +235,13 @@
                         Source="world.png"
                         ToolTipProperties.Text="{helpers:Translate SwitchLanguages}" />
                 </HorizontalStackLayout>
+                <Label
+                    FontAttributes="Bold"
+                    FontSize="Medium"
+                    HorizontalOptions="CenterAndExpand"
+                    LineBreakMode="TailTruncation"
+                    Text="{Binding ErrorMessage}"
+                    TextColor="Red" />
                 <Label
                     FontSize="18"
                     HorizontalOptions="End"

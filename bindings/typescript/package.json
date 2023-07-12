@@ -1,6 +1,6 @@
 {
     "name": "@infernored/electionguard-experimental",
-    "version": "1.75.6",
+    "version": "1.75.9",
     "description": "Library for encrypting ballots for the ElectionGuard voting system",
     "author": "Microsoft <electionguard@microsoft.com>",
     "license": "MIT",
@@ -23,11 +23,13 @@
     "main": "dist/index.js",
     "types": "dist/index.d.ts",
     "scripts": {
-        "build": "tsc",
+        "build": "tsc && copyfiles -u 1 src/**/*.wasm dist",
         "build:wasm": "cd ../.. && make build-wasm",
         "clean": "rm -rf dist",
+        "clean:all": "rm -rf dist && rm -r src/wasm/electionguard.wasm.*",
         "pack": "webpack",
         "prepare": "npm run clean && npm run build",
+        "restore": "rm -r node_modules && npm install",
         "test": "mocha --require ts-node/register **/*.test.ts"
     },
     "devDependencies": {
@@ -36,6 +38,7 @@
         "@types/mocha": "^10.0.1",
         "@types/node": "^18.15.12",
         "chai": "^4.3.7",
+        "copyfiles": "^2.4.1",
         "file-loader": "^6.2.0",
         "mocha": "^10.2.0",
         "prettier": "^2.8.7",
@@ -47,6 +50,7 @@
         "webpack-cli": "^5.0.1"
     },
     "peerDependencies": {
+        "@types/emscripten": "^1.39.6",
         "typescript": "^4.0.0"
     },
     "files": [

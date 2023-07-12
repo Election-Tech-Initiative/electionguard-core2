@@ -16,6 +16,22 @@ namespace electionguard::tools::generators
     class ElectionGenerator
     {
       public:
+        static unique_ptr<CiphertextElectionContext> getContextFromFile(const string &filePath)
+        {
+
+            ifstream file;
+            file.open("data/" + filePath);
+            if (!file) {
+                //Log::debug(filePath);
+                throw invalid_argument("could not find file");
+            }
+
+            stringstream stream;
+            stream << file.rdbuf();
+            file.close();
+
+            return CiphertextElectionContext::fromJson(stream.str());
+        }
         static unique_ptr<CiphertextElectionContext>
         getFakeContext(const InternalManifest &manifest, const ElementModP &publicKey)
         {

@@ -1,9 +1,27 @@
-# AngularDemo
+# Angular Demo
+
+This application is an example of running the EelectionGuard SDK in an Angular application.
+
+## Using ElectionGuard in Your Application
 
 In order to use the electionguard package in angluar, you need to tell angular to use a custom webpack build. [Digital Ocean has some nice instructions](https://www.digitalocean.com/community/tutorials/angular-custom-webpack-config) but the process is simple:
+
 1. load `@angular-builders/custom-webpack:browser`
 2. modify your angular.json file builder to use the custom config
 3. modify your angular.json file server to serve the custom config in dev mode.
+
+### Support for Pthread
+
+The ElectionGuard library relies on `SharedArrayBuffer` to handle background processing. Your app needs to include the appropriate headers for the browser to enable this feature.
+
+[Here is an explanation on web.dev](https://web.dev/coop-coep/)
+
+
+## Running the Demo
+
+Launch Angluar as you normally would (instructions below).  The demo will be available at `http://localhost:4200/`.
+
+Open the developer console in your browser and inspect the console log messages.
 
 ## Angular
 

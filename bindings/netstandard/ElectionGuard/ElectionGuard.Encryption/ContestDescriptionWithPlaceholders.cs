@@ -2,6 +2,8 @@
 using System.Collections.Generic;
 using System.Runtime.InteropServices;
 using ElectionGuard.Ballot;
+using ElectionGuard.Extensions;
+using Newtonsoft.Json;
 
 namespace ElectionGuard
 {
@@ -260,6 +262,55 @@ namespace ElectionGuard
         /// <param name="ballotSubtitle">international string for the ballot title</param>
         /// <param name="selections">array of `SelectionDescription`</param>
         /// <param name="placeholders">array of `SelectionDescription` to use as placeholders</param>
+        [JsonConstructor]
+        public ContestDescriptionWithPlaceholders(
+            string objectId, string electoralDistrictId, ulong sequenceOrder,
+            VoteVariationType voteVariation, ulong numberElected, ulong votesAllowed,
+            string name, InternationalizedText ballotTitle, InternationalizedText ballotSubtitle,
+            Dictionary<string, SelectionDescription> selections, Dictionary<string, SelectionDescription> placeholders)
+        {
+            var selectionPointers = new IntPtr[selections.Values.Count];
+            foreach (var (selection, index) in selections.Values.WithIndex())
+            {
+                selectionPointers[index] = selection.Handle.Ptr;
+                selection.Dispose();
+            }
+
+            var placeholderPointers = new IntPtr[placeholders.Values.Count];
+            foreach (var (placeholder, index) in placeholders.Values.WithIndex())
+            {
+                placeholderPointers[index] = placeholder.Handle.Ptr;
+                placeholder.Dispose();
+            }
+
+            var status = NativeInterface.ContestDescriptionWithPlaceholders.New(
+                objectId, electoralDistrictId, sequenceOrder,
+                voteVariation, numberElected, votesAllowed,
+                name, ballotTitle.Handle, ballotSubtitle.Handle,
+                selectionPointers, (ulong)selectionPointers.LongLength,
+                placeholderPointers, (ulong)placeholderPointers.LongLength,
+                out Handle);
+            if (status != Status.ELECTIONGUARD_STATUS_SUCCESS)
+            {
+                throw new ElectionGuardException($"ContestDescriptionWithPlaceholders Error Status: {status}");
+            }
+        }
+
+
+        /// <summary>
+        /// Create a `ContestDescriptionWithPlaceholders` object
+        /// </summary>
+        /// <param name="objectId">string identifying object</param>
+        /// <param name="electoralDistrictId">string identifying electoral district</param>
+        /// <param name="sequenceOrder">the sequence order to show this in</param>
+        /// <param name="voteVariation">vote variation type</param>
+        /// <param name="numberElected">the number of elected</param>
+        /// <param name="votesAllowed">number of votes allowed</param>
+        /// <param name="name">string for name of the contest</param>
+        /// <param name="ballotTitle">international string for the ballot title</param>
+        /// <param name="ballotSubtitle">international string for the ballot title</param>
+        /// <param name="selections">array of `SelectionDescription`</param>
+        /// <param name="placeholders">array of `SelectionDescription` to use as placeholders</param>
         public ContestDescriptionWithPlaceholders(
             string objectId, string electoralDistrictId, ulong sequenceOrder,
             VoteVariationType voteVariation, ulong numberElected, ulong votesAllowed,
@@ -292,6 +343,7 @@ namespace ElectionGuard
                 throw new ElectionGuardException($"ContestDescriptionWithPlaceholders Error Status: {status}");
             }
         }
+
 
         /// <summary>
         /// Create a `ContestDescriptionWithPlaceholders` object

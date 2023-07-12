@@ -1,6 +1,7 @@
-using ElectionGuard.ElectionSetup.Concurrency;
+﻿using ElectionGuard.ElectionSetup.Concurrency;
 using ElectionGuard.UI.Lib.Models;
 using ElectionGuard.UI.Lib.Services;
+using MongoDB.Driver;
 
 namespace ElectionGuard.ElectionSetup.Tests.Mocks;
 
@@ -35,7 +36,7 @@ public class MockGuardianBackupService : MockBaseDatabaseServiceBase<GuardianBac
     }
 
     public override async Task<GuardianBackups> SaveAsync(
-        GuardianBackups data, string? table = null)
+        GuardianBackups data, FilterDefinition<GuardianBackups>? customFilter = null, string? table = null)
     {
         using (await _lock.LockAsync())
         {

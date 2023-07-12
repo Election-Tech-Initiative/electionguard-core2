@@ -48,6 +48,11 @@ namespace ElectionGuard.Extensions
             return source;
         }
 
+        public static bool IsNullOrEmpty<T>(this IList<T> source)
+        {
+            return source is null || source.Count == 0;
+        }
+
         public static IEnumerable<(T item, ulong index)> WithIndex<T>(this IEnumerable<T> source)
         {
             return source.Select((item, index) => (item, (ulong)index));
@@ -64,6 +69,12 @@ namespace ElectionGuard.Extensions
             {
                 item.Dispose();
             }
+        }
+
+        public static void Dispose(this IDictionary<string, IDisposable> source)
+        {
+            source.Values.Dispose();
+            source.Clear();
         }
     }
 }

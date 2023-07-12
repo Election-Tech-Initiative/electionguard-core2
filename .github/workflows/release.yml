@@ -71,10 +71,10 @@ jobs:
         run: make environment
       - name: Build
         run: make build-maccatalyst
-      - name: Upload Library (x64)
+      - name: Upload Library (arm64)
         uses: actions/upload-artifact@v3
         with:
-          name: osx-arm64
+          name: maccatalyst-arm64
           path: |
             build/libs/MacCatalyst/arm64/Release/src/*.dylib
             build/libs/MacCatalyst/arm64/Release/libs/hacl/*.a
@@ -97,7 +97,7 @@ jobs:
       - name: Upload Library (x64)
         uses: actions/upload-artifact@v3
         with:
-          name: maccatalyst-arm64
+          name: osx-arm64
           path: |
             build/libs/Darwin/arm64/Release/src/*.dylib
             build/libs/Darwin/arm64/Release/libs/hacl/*.a
@@ -270,9 +270,85 @@ jobs:
           npm run prepare
           npm publish
 
+  publish_admin:
+    name: ${{ matrix.name }}
+    needs: [get_version_code, maccatalyst_build_arm64, windows_build_x64]
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        name: ["macOS", "windows-os"]
+        include:
+          - name: macOS
+            os: macOS-13
+            version: "14.2"
+            osFolder: "maccatalyst"
+          - name: windows-os
+            os: windows-2022
+            version: "latest"
+            osFolder: "windows"
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v3
+
+      - name: Change Directory
+        run: cd ${{ github.workspace }}
+
+      - name: Install .NET
+        uses: actions/setup-dotnet@v3
+        with:
+          dotnet-version: 7.0.x
+
+      - name: Update Mac Environment
+        if: runner.os == 'macOS'
+        run: |
+          ls -ls /Applications/
+          ls -ls $ANDROID_SDK_ROOT/ndk
+          sudo xcode-select -switch /Applications/Xcode_${{ matrix.version }}.app
+
+      - name: Configure Environment
+        run: make environment-ui
+
+      - name: Get MacCatalyst arm64 Artifacts
+        uses: actions/download-artifact@v3
+        with:
+          name: maccatalyst-arm64
+          path: build/libs/MacCatalyst/arm64/Release
+
+      - name: Get Windows x64 Artifacts
+        uses: actions/download-artifact@v3
+        with:
+          name: win-x64
+          path: build/libs/Windows/x64/Release
+
+      - name: Publish UI
+        env:
+          BUILD_NUMBER: ${{ needs.get_version_code.outputs.build_number }}
+          BUILD_VERSION: "${{needs.get_version_code.outputs.version}}"
+          APPCENTER_SECRET_MACOS: ${{ secrets.APPCENTER_SECRET_MACOS }}
+          APPCENTER_SECRET_UWP: ${{ secrets.APPCENTER_SECRET_UWP }}
+        run: make publish-ui
+
+      - name: save build artifacts
+        uses: actions/upload-artifact@v3
+        with:
+          name: electionguard-admin
+          path: ./publish/*
+
+      - name: Publish UI (AppCenter)
+        env:
+          BUILD_NUMBER: ${{ needs.get_version_code.outputs.build_number }}
+          BUILD_VERSION: "${{needs.get_version_code.outputs.version}}"
+          APPCENTER_API_TOKEN_MACOS: ${{ secrets.APPCENTER_API_TOKEN_MACOS }}
+          APPCENTER_API_TOKEN_UWP: ${{ secrets.APPCENTER_API_TOKEN_UWP }}
+          APPCENTER_SECRET_UWP: ${{ secrets.APPCENTER_SECRET_UWP }}
+          APPCENTER_SECRET_MACOS: ${{ secrets.APPCENTER_SECRET_MACOS }}
+        run: make publish-ui-appcenter
+
   publish_release:
     name: Publish Release
-    needs: [get_version_code, publish_nuget, publish_npm]
+    needs: [get_version_code, publish_nuget, publish_npm, publish_admin]
     runs-on: ubuntu-22.04
     steps:
       - name: Create Github Release
@@ -282,4 +358,4 @@ jobs:
           tag_name: ${{needs.get_version_code.outputs.version}}
           draft: true
           prerelease: false
-          #TODO: changelog
+          #TODO: changelog, artifacts

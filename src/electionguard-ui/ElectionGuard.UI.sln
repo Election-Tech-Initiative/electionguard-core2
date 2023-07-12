@@ -23,6 +23,10 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ElectionGuard.UI.Test", "El
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ElectionGuard.Decryption.Tests", "..\..\bindings\netstandard\ElectionGuard\ElectionGuard.Decryption.Tests\ElectionGuard.Decryption.Tests.csproj", "{72F8C1CA-FDD7-4B7B-A08A-C16589EEA187}"
 EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ElectionGuard.ElectionSetup.Tests", "..\..\bindings\netstandard\ElectionGuard\ElectionGuard.ElectionSetup.Tests\ElectionGuard.ElectionSetup.Tests.csproj", "{123DF2EF-5EB9-4974-B834-F996D777CFAB}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Tests", "Tests", "{42BB40E3-87DD-44E6-A2B8-AE36B2B98AA1}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|arm64 = Debug|arm64
@@ -134,9 +138,26 @@ Global
 		{72F8C1CA-FDD7-4B7B-A08A-C16589EEA187}.Release|x64.Build.0 = Release|x64
 		{72F8C1CA-FDD7-4B7B-A08A-C16589EEA187}.Release|x86.ActiveCfg = Release|x86
 		{72F8C1CA-FDD7-4B7B-A08A-C16589EEA187}.Release|x86.Build.0 = Release|x86
+		{123DF2EF-5EB9-4974-B834-F996D777CFAB}.Debug|arm64.ActiveCfg = Debug|arm64
+		{123DF2EF-5EB9-4974-B834-F996D777CFAB}.Debug|arm64.Build.0 = Debug|arm64
+		{123DF2EF-5EB9-4974-B834-F996D777CFAB}.Debug|x64.ActiveCfg = Debug|x64
+		{123DF2EF-5EB9-4974-B834-F996D777CFAB}.Debug|x64.Build.0 = Debug|x64
+		{123DF2EF-5EB9-4974-B834-F996D777CFAB}.Debug|x86.ActiveCfg = Debug|x86
+		{123DF2EF-5EB9-4974-B834-F996D777CFAB}.Debug|x86.Build.0 = Debug|x86
+		{123DF2EF-5EB9-4974-B834-F996D777CFAB}.Release|arm64.ActiveCfg = Release|arm64
+		{123DF2EF-5EB9-4974-B834-F996D777CFAB}.Release|arm64.Build.0 = Release|arm64
+		{123DF2EF-5EB9-4974-B834-F996D777CFAB}.Release|x64.ActiveCfg = Release|x64
+		{123DF2EF-5EB9-4974-B834-F996D777CFAB}.Release|x64.Build.0 = Release|x64
+		{123DF2EF-5EB9-4974-B834-F996D777CFAB}.Release|x86.ActiveCfg = Release|x86
+		{123DF2EF-5EB9-4974-B834-F996D777CFAB}.Release|x86.Build.0 = Release|x86
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{108ACA29-BCC3-421E-9DF5-B87182CF5710} = {42BB40E3-87DD-44E6-A2B8-AE36B2B98AA1}
+		{72F8C1CA-FDD7-4B7B-A08A-C16589EEA187} = {42BB40E3-87DD-44E6-A2B8-AE36B2B98AA1}
+		{123DF2EF-5EB9-4974-B834-F996D777CFAB} = {42BB40E3-87DD-44E6-A2B8-AE36B2B98AA1}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {61F7FB11-1E47-470C-91E2-47F8143E1572}
