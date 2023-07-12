@@ -421,13 +421,17 @@ public partial class TallyProcessViewModel : BaseViewModel
 
         _ = Task.Run(async () =>
         {
-            Tally = await _tallyService.GetByTallyIdAsync(TallyId);
-            if (Tally != null)
+            var localTally = await _tallyService.GetByTallyIdAsync(TallyId);
+            if (localTally != null)
             {
-                await UpdateTallyData();
                 try
                 {
-                    if (await _tallyRunner.Run(Tally))
+                    _ = Shell.Current.CurrentPage.Dispatcher.DispatchAsync(async () =>
+                    {
+                        Tally = localTally;
+                    });
+                    await UpdateTallyData();
+                    if (await _tallyRunner.Run(localTally))
                     {
                         ErrorMessage = string.Empty;
                     }
