@@ -17,182 +17,119 @@
 namespace electionguard
 {
     /// <summary>
-    /// A PrecomputedEncryption is a triplet-set of precomputed values
-    /// that are used to speed up encryption.
-    ///
-    /// It is used when encrypting a selection as an intermediate value
-    /// and it is used when generating a proof for a selection.
-    ///
-    /// The three items contained in this object are
-    /// - a random secret exponent r (secret - where r is [0,Q) and Q is the small prime modulus),
-    /// - g^r mod p (pad - where g is the generator and p is the large prime modulus)
-    /// - K^r mod p (blindingFactor - where K is the public key).
+    /// This object holds the Triple for the entries in the precomputed triple_queue
+    /// The three items contained in this object are a random exponent (exp),
+    /// g ^ exp mod p (g_to_exp) and K ^ exp mod p (pubkey_to_exp - where K is
+    /// the public key).
     /// </summary>
-    class EG_API PrecomputedEncryption
+    class EG_API Triple
     {
+        std::unique_ptr<ElementModQ> exp;
+        std::unique_ptr<ElementModP> g_to_exp;
+        std::unique_ptr<ElementModP> pubkey_to_exp;
+
       public:
-        explicit PrecomputedEncryption(const ElementModP &publicKey) { generate(publicKey); }
-        PrecomputedEncryption(std::unique_ptr<ElementModQ> secret, std::unique_ptr<ElementModP> pad,
-                              std::unique_ptr<ElementModP> blindingFactor);
+        explicit Triple(const ElementModP &publicKey) { generateTriple(publicKey); }
+        Triple() {}
+        Triple(std::unique_ptr<ElementModQ> exp, std::unique_ptr<ElementModP> g_to_exp,
+               std::unique_ptr<ElementModP> pubkey_to_exp);
 
-        PrecomputedEncryption(const PrecomputedEncryption &other);
-        PrecomputedEncryption(PrecomputedEncryption &&other);
-        ~PrecomputedEncryption();
+        Triple(const Triple &triple);
+        Triple(Triple &&);
+        ~Triple();
 
-        PrecomputedEncryption &operator=(const PrecomputedEncryption &other);
-        PrecomputedEncryption &operator=(PrecomputedEncryption &&other);
+        Triple &operator=(const Triple &triple);
+        Triple &operator=(Triple &&);
 
-        std::unique_ptr<PrecomputedEncryption> clone();
+        std::unique_ptr<ElementModQ> get_exp() { return exp->clone(); }
 
-        /// <summary>
-        /// the secret value (the expontent usually r, s, u, v, or w in the spec)
-        /// </summary>
-        ElementModQ *getSecret() const { return secret.get(); }
+        std::unique_ptr<ElementModP> get_g_to_exp() { return g_to_exp->clone(); }
 
-        /// <summary>
-        /// the pad applied to the ciphertext message (g^r)
-        /// </summary>
-        ElementModP *getPad() const { return pad.get(); }
+        std::unique_ptr<ElementModP> get_pubkey_to_exp() { return pubkey_to_exp->clone(); }
 
-        /// <summary>
-        /// the blinding factor applied to the message during encryption ( K^r)
-        /// </summary>
-        ElementModP *getBlindingFactor() const { return blindingFactor.get(); }
+        std::unique_ptr<Triple> clone();
 
       protected:
-        void generate(const ElementModP &publicKey);
-
-      private:
-        std::unique_ptr<ElementModQ> secret;
-        std::unique_ptr<ElementModP> pad;
-        std::unique_ptr<ElementModP> blindingFactor;
+        void generateTriple(const ElementModP &publicKey);
     };
 
     /// <summary>
-    /// PrecomputedFakeDisjuctiveCommitments is a quintuplet-set of precomputed values
-    /// that are used to speed up encryption. It works by pregenerating the fake proof
-    /// values for an encryption of zero or one. Both fake proofs are made as part of
-    /// this precompute object, but only one of them is used. It is up to the caller
-    /// to determine which one to use.
-    ///
-    /// It is used when generating a fake proof as part of proving an encryption
-    /// is an encryption of zero or one.
-    ///
-    /// The five items contained in this object are
-    /// - the first random exponent (exp1),
-    /// - the second random exponent (exp2)
-    /// - g ^ exp1 mod p (g_to_exp1)
-    /// - (g ^ exp2 mod p) * (K ^ exp1 mod p)
+    /// This object holds the Quadruple for the entries in the precomputed
+    /// quadruple_queue. The four items contained in this object are the
+    /// first random exponent (exp1), the second random exponent (exp2)
+    /// g ^ exp1 mod p (g_to_exp1) and (g ^ exp2 mod p) * (K ^ exp mod p)
     /// (g_to_exp2 mult_by_pubkey_to_exp1 - where K is the public key).
     /// </summary>
-    class EG_API PrecomputedFakeDisjuctiveCommitments
+    class EG_API Quadruple
     {
+        std::unique_ptr<ElementModQ> exp1;
+        std::unique_ptr<ElementModQ> exp2;
+        std::unique_ptr<ElementModP> g_to_exp1;
+        std::unique_ptr<ElementModP> g_to_exp2_mult_by_pubkey_to_exp1;
+
       public:
-        explicit PrecomputedFakeDisjuctiveCommitments(const ElementModP &publicKey)
+        explicit Quadruple(const ElementModP &publicKey) { generateQuadruple(publicKey); }
+        Quadruple(){};
+        Quadruple(std::unique_ptr<ElementModQ> exp1, std::unique_ptr<ElementModQ> exp2,
+                  std::unique_ptr<ElementModP> g_to_exp1,
+                  std::unique_ptr<ElementModP> g_to_exp2_mult_by_pubkey_to_exp1);
+        Quadruple(const Quadruple &quadruple);
+        Quadruple(Quadruple &&);
+        ~Quadruple();
+
+        Quadruple &operator=(const Quadruple &quadruple);
+        Quadruple &operator=(Quadruple &&);
+
+        std::unique_ptr<ElementModQ> get_exp1() { return exp1->clone(); }
+
+        std::unique_ptr<ElementModQ> get_exp2() { return exp2->clone(); }
+
+        std::unique_ptr<ElementModP> get_g_to_exp1() { return g_to_exp1->clone(); }
+
+        std::unique_ptr<ElementModP> get_g_to_exp2_mult_by_pubkey_to_exp1()
         {
-            generate(publicKey);
+            return g_to_exp2_mult_by_pubkey_to_exp1->clone();
         }
-        PrecomputedFakeDisjuctiveCommitments(std::unique_ptr<ElementModQ> secret1,
-                                             std::unique_ptr<ElementModQ> secret2,
-                                             std::unique_ptr<ElementModP> pad,
-                                             std::unique_ptr<ElementModP> dataZero,
-                                             std::unique_ptr<ElementModP> dataOne);
-        PrecomputedFakeDisjuctiveCommitments(const PrecomputedFakeDisjuctiveCommitments &other);
-        PrecomputedFakeDisjuctiveCommitments(PrecomputedFakeDisjuctiveCommitments &&other);
-        ~PrecomputedFakeDisjuctiveCommitments();
 
-        PrecomputedFakeDisjuctiveCommitments &
-        operator=(const PrecomputedFakeDisjuctiveCommitments &other);
-        PrecomputedFakeDisjuctiveCommitments &
-        operator=(PrecomputedFakeDisjuctiveCommitments &&other);
-
-        std::unique_ptr<PrecomputedFakeDisjuctiveCommitments> clone();
-
-        /// <summary>
-        /// The first secret value (either 𝑢0 or 𝑢1 in the spec)
-        /// </summary>
-        ElementModQ *getSecret1() const { return secret1.get(); }
-
-        /// <summary>
-        /// The second secret value (w in the spec)
-        /// </summary>
-        ElementModQ *getSecret2() const { return secret2.get(); }
-
-        /// <summary>
-        /// The pad applied to the ciphertext message (either a0 or a1 in the spec)
-        /// </summary>
-        ElementModP *getPad() const { return pad.get(); }
-
-        /// <summary>
-        /// The fake data proving an encryption of zero (b1 in the spec)
-        /// Use this value when proving an encryption of zero.
-        /// </summary>
-        ElementModP *getDataZero() const { return dataZero.get(); }
-
-        /// <summary>
-        /// The pad applied to the ciphertext message (b0 in the spec)
-        /// Use this value when proving an encryption of one.
-        /// </summary>
-        ElementModP *getDataOne() const { return dataOne.get(); }
+        std::unique_ptr<Quadruple> clone();
 
       protected:
-        void generate(const ElementModP &publicKey);
-
-      private:
-        std::unique_ptr<ElementModQ> secret1;
-        std::unique_ptr<ElementModQ> secret2;
-        std::unique_ptr<ElementModP> pad;
-        std::unique_ptr<ElementModP> dataZero;
-        std::unique_ptr<ElementModP> dataOne;
+        void generateQuadruple(const ElementModP &publicKey);
     };
 
     /// <summary>
-    /// The PrecomputedSelection is a set of precomputed values that are used
-    /// to speed up encryption of a selection. It removes most the exponentiations
-    /// from the ElGamal encryption of the selection as well as the computation
-    /// of the Chaum Pedersen proof.
-    ///
-    /// This object holds a Precomputed Encryption for the selection, a Precomputed
-    /// Encryption for the proof, and a Precomputed Fake Disjunctive Commitment for
-    /// the proof.
+    /// This object holds the two Triples and a Quadruple of precomputed
+    /// values that are used to speed up encryption of a selection.
+    /// Since the values are precomputed it removes all the exponentiations
+    /// from the ElGamal encryption of the selection as well as the
+    /// computation of the Chaum Pedersen proof.
     /// </summary>
-    class EG_API PrecomputedSelection
+    class EG_API TwoTriplesAndAQuadruple
     {
+        std::unique_ptr<Triple> triple1;
+        std::unique_ptr<Triple> triple2;
+        std::unique_ptr<Quadruple> quad;
+
       public:
-        PrecomputedSelection(std::unique_ptr<PrecomputedEncryption> in_triple1,
-                             std::unique_ptr<PrecomputedEncryption> in_triple2,
-                             std::unique_ptr<PrecomputedFakeDisjuctiveCommitments> in_quad);
-        PrecomputedSelection(const PrecomputedSelection &other);
-        PrecomputedSelection(PrecomputedSelection &&other);
-        ~PrecomputedSelection();
+        explicit TwoTriplesAndAQuadruple() {}
+        TwoTriplesAndAQuadruple(std::unique_ptr<Triple> in_triple1,
+                                std::unique_ptr<Triple> in_triple2,
+                                std::unique_ptr<Quadruple> in_quad);
+        TwoTriplesAndAQuadruple(const TwoTriplesAndAQuadruple &other);
+        TwoTriplesAndAQuadruple(TwoTriplesAndAQuadruple &&);
+        ~TwoTriplesAndAQuadruple();
 
-        PrecomputedSelection &operator=(const PrecomputedSelection &other);
-        PrecomputedSelection &operator=(PrecomputedSelection &&);
+        TwoTriplesAndAQuadruple &operator=(const TwoTriplesAndAQuadruple &other);
+        TwoTriplesAndAQuadruple &operator=(TwoTriplesAndAQuadruple &&);
 
-        std::unique_ptr<PrecomputedSelection> clone();
+        std::unique_ptr<Triple> get_triple1() { return triple1->clone(); }
 
-        /// <summary>
-        /// Get the precomputed encryption for the selection.
-        /// </summary>
-        PrecomputedEncryption *getPartialEncryption() const { return encryption.get(); }
+        std::unique_ptr<Triple> get_triple2() { return triple2->clone(); }
 
-        /// <summary>
-        /// Get the precomputed encryption for the proof.
-        /// </summary>
-        PrecomputedEncryption *getRealCommitment() const { return proof.get(); }
+        std::unique_ptr<Quadruple> get_quad() { return quad->clone(); }
 
-        /// <summary>
-        /// Get the precomputed fake disjunctive commitment for the proof.
-        /// </summary>
-        PrecomputedFakeDisjuctiveCommitments *getFakeCommitment() const { return fakeProof.get(); }
-
-      private:
-        std::unique_ptr<PrecomputedEncryption> encryption;
-        std::unique_ptr<PrecomputedEncryption> proof;
-        std::unique_ptr<PrecomputedFakeDisjuctiveCommitments> fakeProof;
+        std::unique_ptr<TwoTriplesAndAQuadruple> clone();
     };
-
-    // TODO: range proof precompute table?
 
     /// <summary>
     /// A buffer of precomputed values that are used to speed up encryption
@@ -279,61 +216,54 @@ namespace electionguard
         /// </summary>
         uint32_t getCurrentQueueSize();
 
-        /// <summary>
-        /// Get the public key that the precompute buffer is initialized against.
-        /// </summary>
         ElementModP *getPublicKey();
 
         /// <summary>
         /// Get the next triple from the triple queue.
         /// If no triple exists, one is created.
-        /// </summary>
-        std::unique_ptr<PrecomputedEncryption> getPrecomputedEncryption();
-
-        /// <summary>
-        /// Pop the next triple from the triple queue. If there is no triple
-        /// in the queue, then nullopt is returned.
         ///
         /// This method is called by hashedElgamalEncrypt in order to get
         /// the precomputed value to perform the hashed elgamal encryption.
-        ///
-        /// This method is also called by ConstantChaumPedersenProof::make
-        /// in order to get the precomputed value to make the proof.
         /// </summary>
-        std::optional<std::unique_ptr<PrecomputedEncryption>> popPrecomputedEncryption();
+        std::unique_ptr<Triple> getTriple();
+
+        /// <summary>
+        /// Pop the next triple from the triple queue.
+        /// If no triple exists, then nullopt is returned.
+        /// </summary>
+        std::optional<std::unique_ptr<Triple>> popTriple();
 
         /// <summary>
         /// Get the next two triples and a quadruple from the queues.
         /// If no quadruple exists, one is created.
-        /// </summary>
-        std::unique_ptr<PrecomputedSelection> getPrecomputedSelection();
-
-        /// <summary>
-        /// Pop the next quadruple set from the triple queue.
-        /// If no quadruple exists, then nullopt is returned.
         ///
         /// This method is called by encryptSelection in order to get
         /// the precomputed values to encrypt the selection and make a
         /// proof for it.
         /// </summary>
-        std::optional<std::unique_ptr<PrecomputedSelection>> popPrecomputedSelection();
+        std::unique_ptr<TwoTriplesAndAQuadruple> getTwoTriplesAndAQuadruple();
+
+        /// <summary>
+        /// Pop the next quadruple set from the triple queue.
+        /// If no quadruple exists, then nullopt is returned.
+        /// </summary>
+        std::optional<std::unique_ptr<TwoTriplesAndAQuadruple>> popTwoTriplesAndAQuadruple();
 
       protected:
-        static std::tuple<std::unique_ptr<PrecomputedEncryption>,
-                          std::unique_ptr<PrecomputedEncryption>>
-        createTwoPrecomputedEncryptions(const ElementModP &publicKey);
-        static std::unique_ptr<PrecomputedSelection>
-        createPrecomputedSelection(const ElementModP &publicKey);
+        static std::tuple<std::unique_ptr<Triple>, std::unique_ptr<Triple>>
+        createTwoTriples(const ElementModP &publicKey);
+        static std::unique_ptr<TwoTriplesAndAQuadruple>
+        createTwoTriplesAndAQuadruple(const ElementModP &publicKey);
 
       private:
         uint32_t maxQueueSize = DEFAULT_PRECOMPUTE_SIZE;
         bool isRunning = false;
         bool shouldAutoPopulate = false;
-        std::mutex encryption_queue_lock;
-        std::mutex selection_queue_lock;
+        std::mutex triple_queue_lock;
+        std::mutex quad_queue_lock;
         std::unique_ptr<ElementModP> publicKey;
-        std::queue<std::unique_ptr<PrecomputedEncryption>> encryption_queue;
-        std::queue<std::unique_ptr<PrecomputedSelection>> selection_queue;
+        std::queue<std::unique_ptr<Triple>> triple_queue;
+        std::queue<std::unique_ptr<TwoTriplesAndAQuadruple>> twoTriplesAndAQuadruple_queue;
     };
 
     /// <summary>
@@ -443,44 +373,32 @@ namespace electionguard
         static uint32_t getCurrentQueueSize();
 
         /// <summary>
-        /// Get the public key that the precompute buffer is initialized against.
-        /// </summary>
-        static ElementModP *getPublicKey();
-
-        /// <summary>
-        /// Get the next triple from the triple queue. If there is no triple
-        /// in the queue, then one is created.
-        /// </summary>
-        static std::unique_ptr<PrecomputedEncryption> getPrecomputedEncryption();
-
-        /// <summary>
-        /// Pop the next triple from the triple queue. If there is no triple
-        /// in the queue, then nullopt is returned.
-        ///
+        /// Get the next triple from the triple queue.
         /// This method is called by hashedElgamalEncrypt in order to get
         /// the precomputed value to perform the hashed elgamal encryption.
-        ///
-        /// This method is also called by ConstantChaumPedersenProof::make
-        /// in order to get the precomputed value to make the proof.
         /// </summary>
-        static std::optional<std::unique_ptr<PrecomputedEncryption>> popPrecomputedEncryption();
+        static std::unique_ptr<Triple> getTriple();
+
+        /// <summary>
+        /// Pop the next triple from the triple queue.
+        /// If no triple exists, then nullopt is returned.
+        /// </summary>
+        static std::optional<std::unique_ptr<Triple>> popTriple();
 
         /// <summary>
         /// Get the next two triples and a quadruple from the queues.
-        /// If no quadruple exists, one is created.
+        /// This method is called by encryptSelection in order to get
+        /// the precomputed values to encrypt the selection and make a
+        /// proof for it.
         /// <returns>std::unique_ptr<TwoTriplesAndAQuadruple></returns>
         /// </summary>
-        static std::unique_ptr<PrecomputedSelection> getPrecomputedSelection();
+        static std::unique_ptr<TwoTriplesAndAQuadruple> getTwoTriplesAndAQuadruple();
 
         /// <summary>
         /// Pop the next quadruple set from the triple queue.
         /// If no quadruple exists, then nullopt is returned.
-        ///
-        /// This method is called by encryptSelection in order to get
-        /// the precomputed values to encrypt the selection and make a
-        /// proof for it.
         /// </summary>
-        static std::optional<std::unique_ptr<PrecomputedSelection>> popPrecomputedSelection();
+        static std::optional<std::unique_ptr<TwoTriplesAndAQuadruple>> popTwoTriplesAndAQuadruple();
 
       private:
         std::mutex _mutex;

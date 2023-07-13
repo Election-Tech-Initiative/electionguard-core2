@@ -302,7 +302,6 @@ public partial class Guardian : DisposableBase, IElectionGuardian
         {
             var backup = GenerateElectionPartialKeyBackup(
                 GuardianId,
-                SequenceOrder,
                 _myElectionKeys.Polynomial,
                 guardianKey);
             BackupsToShare[guardianKey.GuardianId] = new(backup);
@@ -325,7 +324,6 @@ public partial class Guardian : DisposableBase, IElectionGuardian
 
     private static ElectionPartialKeyBackup GenerateElectionPartialKeyBackup(
         string myGuardianId,
-        ulong mySequenceOrder,
         ElectionPolynomial myPolynomial,
         ElectionPublicKey recipientPublicKey)
     {
@@ -338,36 +336,24 @@ public partial class Guardian : DisposableBase, IElectionGuardian
 
         var coordinate = myPolynomial.ComputeCoordinate(
             recipientPublicKey.SequenceOrder);
-        var seed = CreateBackupSeed(
-                mySequenceOrder,
+        var seed = GetBackupSeed(
+                recipientPublicKey.GuardianId,
                 recipientPublicKey.SequenceOrder);
 
         using var nonce = BigMath.RandQ();
         var encryptedCoordinate = HashedElgamal.Encrypt(
-            coordinate, nonce, Hash.Prefix02, recipientPublicKey.Key, seed);
+            coordinate, nonce, recipientPublicKey.Key, seed);
 
         return new(
             myGuardianId,
-            mySequenceOrder,
             recipientPublicKey.GuardianId,
             recipientPublicKey.SequenceOrder,
             encryptedCoordinate
         );
     }
 
-    /// <summary>
-    /// hashes together the guardian sequence orders to create an encryption seed
-    /// </summary>
-    private static ElementModQ CreateBackupSeed(ulong mySequenceOrder, ulong theirSequenceOrder)
+    private static ElementModQ GetBackupSeed(string ownerId, ulong sequenceOrder)
     {
-        return Hash.HashElems(mySequenceOrder, theirSequenceOrder);
-    }
-
-    /// <summary>
-    /// hashes together the guardian sequence orders to re-create an encryption seed
-    /// </summary>
-    private static ElementModQ GetBackupSeed(ulong mySequenceOrder, ulong theirSequenceOrder)
-    {
-        return Hash.HashElems(theirSequenceOrder, mySequenceOrder);
+        return Hash.HashElems(ownerId, sequenceOrder);
     }
 }

@@ -20,186 +20,177 @@ using std::unique_ptr;
 
 namespace electionguard
 {
-#pragma region PrecomputedEncryption
-    PrecomputedEncryption::PrecomputedEncryption(unique_ptr<ElementModQ> exp,
-                                                 unique_ptr<ElementModP> g_to_exp,
-                                                 unique_ptr<ElementModP> pubkey_to_exp)
+#pragma region Triple
+    Triple::Triple(unique_ptr<ElementModQ> exp, unique_ptr<ElementModP> g_to_exp,
+                   unique_ptr<ElementModP> pubkey_to_exp)
     {
-        this->secret = move(exp);
-        this->pad = move(g_to_exp);
-        this->blindingFactor = move(pubkey_to_exp);
+        this->exp = move(exp);
+        this->g_to_exp = move(g_to_exp);
+        this->pubkey_to_exp = move(pubkey_to_exp);
     }
 
-    PrecomputedEncryption::PrecomputedEncryption(const PrecomputedEncryption &other)
+    Triple::Triple(const Triple &triple)
     {
-        this->secret = other.secret->clone();
-        this->pad = other.pad->clone();
-        this->blindingFactor = other.blindingFactor->clone();
+        this->exp = triple.exp->clone();
+        this->g_to_exp = triple.g_to_exp->clone();
+        this->pubkey_to_exp = triple.pubkey_to_exp->clone();
     }
 
-    PrecomputedEncryption::PrecomputedEncryption(PrecomputedEncryption &&other)
+    Triple::Triple(Triple &&triple)
     {
-        this->secret = move(other.secret);
-        this->pad = move(other.pad);
-        this->blindingFactor = move(other.blindingFactor);
+        this->exp = move(triple.exp);
+        this->g_to_exp = move(triple.g_to_exp);
+        this->pubkey_to_exp = move(triple.pubkey_to_exp);
     }
 
-    PrecomputedEncryption::~PrecomputedEncryption() = default;
+    Triple::~Triple() = default;
 
-    PrecomputedEncryption &PrecomputedEncryption::operator=(const PrecomputedEncryption &triple)
+    Triple &Triple::operator=(const Triple &triple)
     {
-        this->secret = triple.secret->clone();
-        this->pad = triple.pad->clone();
-        this->blindingFactor = triple.blindingFactor->clone();
+        this->exp = triple.exp->clone();
+        this->g_to_exp = triple.g_to_exp->clone();
+        this->pubkey_to_exp = triple.pubkey_to_exp->clone();
         return *this;
     }
 
-    PrecomputedEncryption &PrecomputedEncryption::operator=(PrecomputedEncryption &&triple)
+    Triple &Triple::operator=(Triple &&triple)
     {
-        this->secret = move(triple.secret);
-        this->pad = move(triple.pad);
-        this->blindingFactor = move(triple.blindingFactor);
+        this->exp = move(triple.exp);
+        this->g_to_exp = move(triple.g_to_exp);
+        this->pubkey_to_exp = move(triple.pubkey_to_exp);
         return *this;
     }
 
-    void PrecomputedEncryption::generate(const ElementModP &publicKey)
+    void Triple::generateTriple(const ElementModP &publicKey)
     {
         // generate a random rho
-        secret = rand_q();
-        pad = g_pow_p(*secret);                         // g ^ r
-        blindingFactor = pow_mod_p(publicKey, *secret); // K ^ r
+        exp = rand_q();
+        g_to_exp = g_pow_p(*exp);
+        pubkey_to_exp = pow_mod_p(publicKey, *exp);
     }
 
-    unique_ptr<PrecomputedEncryption> PrecomputedEncryption::clone()
+    unique_ptr<Triple> Triple::clone()
     {
-        return make_unique<PrecomputedEncryption>(secret->clone(), pad->clone(),
-                                                  blindingFactor->clone());
+        return make_unique<Triple>(exp->clone(), g_to_exp->clone(), pubkey_to_exp->clone());
     }
 
 #pragma endregion
 
-#pragma region PrecomputedFakeDisjuctiveCommitments
+#pragma region Quadruple
 
-    PrecomputedFakeDisjuctiveCommitments::PrecomputedFakeDisjuctiveCommitments(
-      unique_ptr<ElementModQ> exp1, unique_ptr<ElementModQ> exp2, unique_ptr<ElementModP> g_to_exp1,
-      unique_ptr<ElementModP> dataZero, unique_ptr<ElementModP> dataOne)
+    Quadruple::Quadruple(unique_ptr<ElementModQ> exp1, unique_ptr<ElementModQ> exp2,
+                         unique_ptr<ElementModP> g_to_exp1,
+                         unique_ptr<ElementModP> g_to_exp2_mult_by_pubkey_to_exp1)
     {
-        this->secret1 = move(exp1);
-        this->secret2 = move(exp2);
-        this->pad = move(g_to_exp1);
-        this->dataZero = move(dataZero);
-        this->dataOne = move(dataOne);
+        this->exp1 = move(exp1);
+        this->exp2 = move(exp2);
+        this->g_to_exp1 = move(g_to_exp1);
+        this->g_to_exp2_mult_by_pubkey_to_exp1 = move(g_to_exp2_mult_by_pubkey_to_exp1);
     }
 
-    PrecomputedFakeDisjuctiveCommitments::PrecomputedFakeDisjuctiveCommitments(
-      const PrecomputedFakeDisjuctiveCommitments &other)
+    Quadruple::Quadruple(const Quadruple &quadruple)
     {
-        this->secret1 = other.secret1->clone();
-        this->secret2 = other.secret2->clone();
-        this->pad = other.pad->clone();
-        this->dataZero = other.dataZero->clone();
-        this->dataOne = other.dataOne->clone();
+        this->exp1 = quadruple.exp1->clone();
+        this->exp2 = quadruple.exp2->clone();
+        this->g_to_exp1 = quadruple.g_to_exp1->clone();
+        this->g_to_exp2_mult_by_pubkey_to_exp1 =
+          quadruple.g_to_exp2_mult_by_pubkey_to_exp1->clone();
     }
 
-    PrecomputedFakeDisjuctiveCommitments::PrecomputedFakeDisjuctiveCommitments(
-      PrecomputedFakeDisjuctiveCommitments &&other)
+    Quadruple::Quadruple(Quadruple &&quadruple)
     {
-        this->secret1 = move(other.secret1);
-        this->secret2 = move(other.secret2);
-        this->pad = move(other.pad);
-        this->dataZero = move(other.dataZero);
-        this->dataOne = move(other.dataOne);
+        this->exp1 = move(quadruple.exp1);
+        this->exp2 = move(quadruple.exp2);
+        this->g_to_exp1 = move(quadruple.g_to_exp1);
+        this->g_to_exp2_mult_by_pubkey_to_exp1 = move(quadruple.g_to_exp2_mult_by_pubkey_to_exp1);
     }
 
-    PrecomputedFakeDisjuctiveCommitments::~PrecomputedFakeDisjuctiveCommitments() = default;
+    Quadruple::~Quadruple() = default;
 
-    PrecomputedFakeDisjuctiveCommitments &PrecomputedFakeDisjuctiveCommitments::operator=(
-      const PrecomputedFakeDisjuctiveCommitments &other)
+    Quadruple &Quadruple::operator=(const Quadruple &quadruple)
     {
-        this->secret1 = other.secret1->clone();
-        this->secret2 = other.secret2->clone();
-        this->pad = other.pad->clone();
-        this->dataZero = other.dataZero->clone();
-        this->dataOne = other.dataOne->clone();
+        this->exp1 = quadruple.exp1->clone();
+        this->exp2 = quadruple.exp2->clone();
+        this->g_to_exp1 = quadruple.g_to_exp1->clone();
+        this->g_to_exp2_mult_by_pubkey_to_exp1 =
+          quadruple.g_to_exp2_mult_by_pubkey_to_exp1->clone();
         return *this;
     }
 
-    PrecomputedFakeDisjuctiveCommitments &
-    PrecomputedFakeDisjuctiveCommitments::operator=(PrecomputedFakeDisjuctiveCommitments &&other)
+    Quadruple &Quadruple::operator=(Quadruple &&quadruple)
     {
-        this->secret1 = move(other.secret1);
-        this->secret2 = move(other.secret2);
-        this->pad = move(other.pad);
-        this->dataZero = move(other.dataZero);
-        this->dataOne = move(other.dataOne);
+        this->exp1 = move(quadruple.exp1);
+        this->exp2 = move(quadruple.exp2);
+        this->g_to_exp1 = move(quadruple.g_to_exp1);
+        this->g_to_exp2_mult_by_pubkey_to_exp1 = move(quadruple.g_to_exp2_mult_by_pubkey_to_exp1);
         return *this;
     }
 
-    void PrecomputedFakeDisjuctiveCommitments::generate(const ElementModP &publicKey)
+    void Quadruple::generateQuadruple(const ElementModP &publicKey)
     {
         // generate a random sigma and rho
-        secret1 = rand_q();
-        secret2 = rand_q();
-        pad = g_pow_p(*secret1);
-        dataZero = pow_mod_p(publicKey, *sub_mod_q(*secret1, *secret2)); // K^(𝑢1-w) mod p
-        dataOne = pow_mod_p(publicKey, *add_mod_q(*secret1, *secret2));  // K^(w+𝑢0) mod p
+        exp1 = rand_q();
+        exp2 = rand_q();
+        g_to_exp1 = g_pow_p(*exp1);
+        g_to_exp2_mult_by_pubkey_to_exp1 = mul_mod_p(*g_pow_p(*exp2), *pow_mod_p(publicKey, *exp1));
     }
 
-    unique_ptr<PrecomputedFakeDisjuctiveCommitments> PrecomputedFakeDisjuctiveCommitments::clone()
+    unique_ptr<Quadruple> Quadruple::clone()
     {
-        return make_unique<PrecomputedFakeDisjuctiveCommitments>(
-          secret1->clone(), secret2->clone(), pad->clone(), dataZero->clone(), dataOne->clone());
+        return make_unique<Quadruple>(exp1->clone(), exp2->clone(), g_to_exp1->clone(),
+                                      g_to_exp2_mult_by_pubkey_to_exp1->clone());
     }
 
 #pragma endregion
 
 #pragma region TwoTriplesAndAQuadruple
 
-    PrecomputedSelection::PrecomputedSelection(
-      unique_ptr<PrecomputedEncryption> triple1, unique_ptr<PrecomputedEncryption> triple2,
-      unique_ptr<PrecomputedFakeDisjuctiveCommitments> quad)
+    TwoTriplesAndAQuadruple::TwoTriplesAndAQuadruple(unique_ptr<Triple> triple1,
+                                                     unique_ptr<Triple> triple2,
+                                                     unique_ptr<Quadruple> quad)
     {
-        this->encryption = move(triple1);
-        this->proof = move(triple2);
-        this->fakeProof = move(quad);
+        this->triple1 = move(triple1);
+        this->triple2 = move(triple2);
+        this->quad = move(quad);
     }
 
-    PrecomputedSelection::PrecomputedSelection(const PrecomputedSelection &other)
+    TwoTriplesAndAQuadruple::TwoTriplesAndAQuadruple(const TwoTriplesAndAQuadruple &other)
     {
-        this->encryption = other.encryption->clone();
-        this->proof = other.proof->clone();
-        this->fakeProof = other.fakeProof->clone();
+        this->triple1 = other.triple1->clone();
+        this->triple2 = other.triple2->clone();
+        this->quad = other.quad->clone();
     }
 
-    PrecomputedSelection::PrecomputedSelection(PrecomputedSelection &&other)
+    TwoTriplesAndAQuadruple::TwoTriplesAndAQuadruple(TwoTriplesAndAQuadruple &&other)
     {
-        this->encryption = move(other.encryption);
-        this->proof = move(other.proof);
-        this->fakeProof = move(other.fakeProof);
+        this->triple1 = move(other.triple1);
+        this->triple2 = move(other.triple2);
+        this->quad = move(other.quad);
     }
 
-    PrecomputedSelection::~PrecomputedSelection() = default;
+    TwoTriplesAndAQuadruple::~TwoTriplesAndAQuadruple() = default;
 
-    PrecomputedSelection &PrecomputedSelection::operator=(const PrecomputedSelection &other)
+    TwoTriplesAndAQuadruple &
+    TwoTriplesAndAQuadruple::operator=(const TwoTriplesAndAQuadruple &other)
     {
-        this->encryption = other.encryption->clone();
-        this->proof = other.proof->clone();
-        this->fakeProof = other.fakeProof->clone();
+        this->triple1 = other.triple1->clone();
+        this->triple2 = other.triple2->clone();
+        this->quad = other.quad->clone();
         return *this;
     }
 
-    PrecomputedSelection &PrecomputedSelection::operator=(PrecomputedSelection &&other)
+    TwoTriplesAndAQuadruple &TwoTriplesAndAQuadruple::operator=(TwoTriplesAndAQuadruple &&other)
     {
-        this->encryption = move(other.encryption);
-        this->proof = move(other.proof);
-        this->fakeProof = move(other.fakeProof);
+        this->triple1 = move(other.triple1);
+        this->triple2 = move(other.triple2);
+        this->quad = move(other.quad);
         return *this;
     }
 
-    unique_ptr<PrecomputedSelection> PrecomputedSelection::clone()
+    unique_ptr<TwoTriplesAndAQuadruple> TwoTriplesAndAQuadruple::clone()
     {
-        return make_unique<PrecomputedSelection>(encryption->clone(), proof->clone(),
-                                                 fakeProof->clone());
+        return make_unique<TwoTriplesAndAQuadruple>(triple1->clone(), triple2->clone(),
+                                                    quad->clone());
     }
 
 #pragma endregion
@@ -220,16 +211,16 @@ namespace electionguard
     {
         stop();
 
-        std::lock_guard<std::mutex> lock1(encryption_queue_lock);
-        uint32_t triple_size = encryption_queue.size();
+        std::lock_guard<std::mutex> lock1(triple_queue_lock);
+        uint32_t triple_size = triple_queue.size();
         for (int i = 0; i < (int)triple_size; i++) {
-            encryption_queue.pop();
+            triple_queue.pop();
         }
 
-        std::lock_guard<std::mutex> lock2(selection_queue_lock);
-        uint32_t twoTriplesAndAQuadruple_size = selection_queue.size();
+        std::lock_guard<std::mutex> lock2(quad_queue_lock);
+        uint32_t twoTriplesAndAQuadruple_size = twoTriplesAndAQuadruple_queue.size();
         for (int i = 0; i < (int)twoTriplesAndAQuadruple_size; i++) {
-            selection_queue.pop();
+            twoTriplesAndAQuadruple_queue.pop();
         }
     }
 
@@ -250,12 +241,12 @@ namespace electionguard
         int iteration_count = 0;
         int iterationCountToGenerateTwoTriples = 3;
         do {
-            std::lock_guard<std::mutex> lock1(encryption_queue_lock);
-            std::lock_guard<std::mutex> lock2(selection_queue_lock);
+            std::lock_guard<std::mutex> lock1(triple_queue_lock);
+            std::lock_guard<std::mutex> lock2(quad_queue_lock);
 
             // generate two triples and a quadruple
-            auto quad = createPrecomputedSelection(*publicKey);
-            selection_queue.push(move(quad));
+            auto quad = createTwoTriplesAndAQuadruple(*publicKey);
+            twoTriplesAndAQuadruple_queue.push(move(quad));
 
             // This is very rudimentary. We can add a more complex algorithm in
             // the future, that would look at the queues and increase production if one
@@ -267,13 +258,13 @@ namespace electionguard
             // encryption. The generating two triples every third iteration is a guess
             // on how many precomputes we will need.
             if ((iteration_count % iterationCountToGenerateTwoTriples) == 0) {
-                auto tuple = createTwoPrecomputedEncryptions(*publicKey);
-                encryption_queue.push(move(std::get<0>(tuple)));
-                encryption_queue.push(move(std::get<1>(tuple)));
+                auto tuple = createTwoTriples(*publicKey);
+                triple_queue.push(move(std::get<0>(tuple)));
+                triple_queue.push(move(std::get<1>(tuple)));
             }
             iteration_count++;
 
-        } while (isRunning && selection_queue.size() < maxQueueSize);
+        } while (isRunning && twoTriplesAndAQuadruple_queue.size() < maxQueueSize);
     }
 
     void PrecomputeBuffer::startAsync()
@@ -286,70 +277,73 @@ namespace electionguard
 
     uint32_t PrecomputeBuffer::getMaxQueueSize() { return maxQueueSize; }
 
-    uint32_t PrecomputeBuffer::getCurrentQueueSize() { return selection_queue.size(); }
+    uint32_t PrecomputeBuffer::getCurrentQueueSize()
+    {
+        return twoTriplesAndAQuadruple_queue.size();
+    }
 
     ElementModP *PrecomputeBuffer::getPublicKey() { return publicKey.get(); }
 
-    std::unique_ptr<PrecomputedEncryption> PrecomputeBuffer::getPrecomputedEncryption()
+    std::unique_ptr<Triple> PrecomputeBuffer::getTriple()
     {
-        if (!encryption_queue.empty()) {
-            return popPrecomputedEncryption().value();
+        if (!triple_queue.empty()) {
+            return popTriple().value();
         }
-        return make_unique<PrecomputedEncryption>(*publicKey);
+        return make_unique<Triple>(*publicKey);
     }
 
-    std::optional<std::unique_ptr<PrecomputedEncryption>>
-    PrecomputeBuffer::popPrecomputedEncryption()
+    std::optional<std::unique_ptr<Triple>> PrecomputeBuffer::popTriple()
     {
-        unique_ptr<PrecomputedEncryption> result = nullptr;
-        std::lock_guard<std::mutex> lock(encryption_queue_lock);
+        unique_ptr<Triple> result = nullptr;
+        std::lock_guard<std::mutex> lock(triple_queue_lock);
 
         // make sure there are enough in the queues
-        if (!encryption_queue.empty()) {
-            result = std::move(encryption_queue.front());
-            encryption_queue.pop();
+        if (!triple_queue.empty()) {
+            result = std::move(triple_queue.front());
+            triple_queue.pop();
         }
 
         return result;
     }
 
-    std::unique_ptr<PrecomputedSelection> PrecomputeBuffer::getPrecomputedSelection()
+    std::unique_ptr<TwoTriplesAndAQuadruple> PrecomputeBuffer::getTwoTriplesAndAQuadruple()
     {
-        if (!selection_queue.empty()) {
-            return popPrecomputedSelection().value();
+        if (!twoTriplesAndAQuadruple_queue.empty()) {
+            return popTwoTriplesAndAQuadruple().value();
         }
 
-        return createPrecomputedSelection(*publicKey);
+        return createTwoTriplesAndAQuadruple(*publicKey);
     }
 
-    std::optional<std::unique_ptr<PrecomputedSelection>> PrecomputeBuffer::popPrecomputedSelection()
+    std::optional<std::unique_ptr<TwoTriplesAndAQuadruple>>
+    PrecomputeBuffer::popTwoTriplesAndAQuadruple()
     {
-        unique_ptr<PrecomputedSelection> result = nullptr;
-        std::lock_guard<std::mutex> lock(selection_queue_lock);
+        unique_ptr<TwoTriplesAndAQuadruple> result = nullptr;
+        std::lock_guard<std::mutex> lock(quad_queue_lock);
 
         // make sure there are enough in the queues
-        if (!selection_queue.empty()) {
-            result = std::move(selection_queue.front());
-            selection_queue.pop();
+        if (!twoTriplesAndAQuadruple_queue.empty()) {
+            result = std::move(twoTriplesAndAQuadruple_queue.front());
+            twoTriplesAndAQuadruple_queue.pop();
         }
 
         return result;
     }
 
-    std::tuple<std::unique_ptr<PrecomputedEncryption>, std::unique_ptr<PrecomputedEncryption>>
-    PrecomputeBuffer::createTwoPrecomputedEncryptions(const ElementModP &publicKey)
+    std::tuple<std::unique_ptr<Triple>, std::unique_ptr<Triple>>
+    PrecomputeBuffer::createTwoTriples(const ElementModP &publicKey)
     {
-        auto triple1 = make_unique<PrecomputedEncryption>(publicKey);
-        auto triple2 = make_unique<PrecomputedEncryption>(publicKey);
+        auto triple1 = make_unique<Triple>(publicKey);
+        auto triple2 = make_unique<Triple>(publicKey);
         return std::make_tuple(move(triple1), move(triple2));
     }
-    unique_ptr<PrecomputedSelection>
-    PrecomputeBuffer::createPrecomputedSelection(const ElementModP &publicKey)
+    unique_ptr<TwoTriplesAndAQuadruple>
+    PrecomputeBuffer::createTwoTriplesAndAQuadruple(const ElementModP &publicKey)
     {
-        auto triple1 = make_unique<PrecomputedEncryption>(publicKey);
-        auto triple2 = make_unique<PrecomputedEncryption>(publicKey);
-        auto quad = make_unique<PrecomputedFakeDisjuctiveCommitments>(publicKey);
-        return make_unique<PrecomputedSelection>(move(triple1), move(triple2), move(quad));
+        auto triple1 = make_unique<Triple>(publicKey);
+        auto triple2 = make_unique<Triple>(publicKey);
+        auto quad = make_unique<Quadruple>(publicKey);
+        return make_unique<TwoTriplesAndAQuadruple>(move(triple1), move(triple2), move(quad));
     }
 
 #pragma endregion
@@ -416,58 +410,43 @@ namespace electionguard
 
     uint32_t PrecomputeBufferContext::getMaxQueueSize()
     {
-        if (getInstance()._instance == nullptr) {
-            return 0;
-        }
         return getInstance()._instance->getMaxQueueSize();
     }
 
     uint32_t PrecomputeBufferContext::getCurrentQueueSize()
     {
-        if (getInstance()._instance == nullptr) {
-            return 0;
-        }
         return getInstance()._instance->getCurrentQueueSize();
     }
 
-    ElementModP *PrecomputeBufferContext::getPublicKey()
+    std::unique_ptr<Triple> PrecomputeBufferContext::getTriple()
     {
         if (getInstance()._instance != nullptr) {
-            return getInstance()._instance->getPublicKey();
+            return getInstance()._instance->getTriple();
         }
         return nullptr;
     }
 
-    std::unique_ptr<PrecomputedEncryption> PrecomputeBufferContext::getPrecomputedEncryption()
+    std::optional<std::unique_ptr<Triple>> PrecomputeBufferContext::popTriple()
     {
         if (getInstance()._instance != nullptr) {
-            return getInstance()._instance->getPrecomputedEncryption();
-        }
-        return nullptr;
-    }
-
-    std::optional<std::unique_ptr<PrecomputedEncryption>>
-    PrecomputeBufferContext::popPrecomputedEncryption()
-    {
-        if (getInstance()._instance != nullptr) {
-            return getInstance()._instance->popPrecomputedEncryption();
+            return getInstance()._instance->popTriple();
         }
         return std::nullopt;
     }
 
-    std::unique_ptr<PrecomputedSelection> PrecomputeBufferContext::getPrecomputedSelection()
+    std::unique_ptr<TwoTriplesAndAQuadruple> PrecomputeBufferContext::getTwoTriplesAndAQuadruple()
     {
         if (getInstance()._instance != nullptr) {
-            return getInstance()._instance->getPrecomputedSelection();
+            return getInstance()._instance->getTwoTriplesAndAQuadruple();
         }
         return nullptr;
     }
 
-    std::optional<std::unique_ptr<PrecomputedSelection>>
-    PrecomputeBufferContext::popPrecomputedSelection()
+    std::optional<std::unique_ptr<TwoTriplesAndAQuadruple>>
+    PrecomputeBufferContext::popTwoTriplesAndAQuadruple()
     {
         if (getInstance()._instance != nullptr) {
-            return getInstance()._instance->popPrecomputedSelection();
+            return getInstance()._instance->popTwoTriplesAndAQuadruple();
         }
         return std::nullopt;
     }

@@ -57,7 +57,7 @@ public class TestCiphertextTallySelection
         _ = subject.AccumulateCiphertexts(ciphertexts);
 
         // Assert
-        var plaintext = subject.Ciphertext.Decrypt(keyPair.SecretKey, publicKey);
+        var plaintext = subject.Ciphertext.Decrypt(keyPair.SecretKey);
         Assert.That(plaintext, Is.EqualTo(vote * count));
 
         // Cleanup

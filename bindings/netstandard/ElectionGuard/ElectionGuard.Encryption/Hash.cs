@@ -11,92 +11,9 @@ namespace ElectionGuard
     /// </summary>
     public static class Hash
     {
-        /// <Summary>
-        /// Get the prefix for the hash of an election manifest
-        /// </Summary>
-        public static string Prefix00
-        {
-            get
-            {
-                var ptr = External.GetPrefix00();
-                return Marshal.PtrToStringAnsi(ptr);
-            }
-        }
-
-        /// <Summary>
-        /// Get the prefix for the hash of a guardian key proof
-        /// </Summary>
-        public static string Prefix01
-        {
-            get
-            {
-                var ptr = External.GetPrefix01();
-                return Marshal.PtrToStringAnsi(ptr);
-            }
-        }
-
-        /// <Summary>
-        /// Get the prefix for the hash of a guardian key share encryption proof
-        /// </Summary>
-        public static string Prefix02
-        {
-            get
-            {
-                var ptr = External.GetPrefix02();
-                return Marshal.PtrToStringAnsi(ptr);
-            }
-        }
-
-        /// <Summary>
-        /// Get the prefix for the hash of an election extended base hash
-        /// </Summary>
-        public static string Prefix03
-        {
-            get
-            {
-                var ptr = External.GetPrefix03();
-                return Marshal.PtrToStringAnsi(ptr);
-            }
-        }
-
-        /// <Summary>
-        /// Get the prefix for the hash of a ballot selection encryption proof
-        /// </Summary>
-        public static string Prefix04
-        {
-            get
-            {
-                var ptr = External.GetPrefix04();
-                return Marshal.PtrToStringAnsi(ptr);
-            }
-        }
-
-        /// <Summary>
-        /// Get the prefix for the hash of a ballot contest data secret key
-        /// </Summary>
-        public static string tPrefix05
-        {
-            get
-            {
-                var ptr = External.GetPrefix05();
-                return Marshal.PtrToStringAnsi(ptr);
-            }
-        }
-
-        /// <Summary>
-        /// Get the prefix for the hash of a ballot selection decryption proof
-        /// </Summary>
-        public static string Prefix06
-        {
-            get
-            {
-                var ptr = External.GetPrefix06();
-                return Marshal.PtrToStringAnsi(ptr);
-            }
-        }
 
         /// <summary>
-        /// Hash together the values
+        /// Hash together the ElementModP values
         /// </summary>
         /// <param name="first">first value for the hash</param>
         public static ElementModQ HashElems(string first)
@@ -108,7 +25,7 @@ namespace ElectionGuard
         }
 
         /// <summary>
-        /// Hash together the values
+        /// Hash together the ElementModP values
         /// </summary>
         /// <param name="first">first value for the hash</param>
         public static ElementModQ HashElems(ulong first)
@@ -120,24 +37,11 @@ namespace ElectionGuard
         }
 
         /// <summary>
-        /// Hash together the values
+        /// Hash together the ElementModP values
         /// </summary>
         /// <param name="first">first value for the hash</param>
         /// <param name="second">second value for the hash</param>
         public static ElementModQ HashElems(string first, ulong second)
-        {
-            var status = External.HashElems(first, second,
-                out var value);
-            status.ThrowIfError();
-            return value.IsInvalid ? null : new ElementModQ(value);
-        }
-
-        /// <summary>
-        /// Hash together the values
-        /// </summary>
-        /// <param name="first">first value for the hash</param>
-        /// <param name="second">second value for the hash</param>
-        public static ElementModQ HashElems(ulong first, ulong second)
         {
             var status = External.HashElems(first, second,
                 out var value);
@@ -283,60 +187,8 @@ namespace ElectionGuard
             return hashed;
         }
 
-
-
         internal static class External
         {
-            [DllImport(
-                NativeInterface.DllName,
-                EntryPoint = "eg_hash_get_prefix_00",
-                CallingConvention = CallingConvention.Cdecl,
-                SetLastError = true, CharSet = CharSet.Unicode)]
-            public static extern IntPtr GetPrefix00();
-
-            [DllImport(
-                NativeInterface.DllName,
-                EntryPoint = "eg_hash_get_prefix_01",
-                CallingConvention = CallingConvention.Cdecl,
-                SetLastError = true, CharSet = CharSet.Unicode)]
-            public static extern IntPtr GetPrefix01();
-
-            [DllImport(
-                NativeInterface.DllName,
-                EntryPoint = "eg_hash_get_prefix_02",
-                CallingConvention = CallingConvention.Cdecl,
-                SetLastError = true, CharSet = CharSet.Unicode)]
-            public static extern IntPtr GetPrefix02();
-
-            [DllImport(
-                NativeInterface.DllName,
-                EntryPoint = "eg_hash_get_prefix_03",
-                CallingConvention = CallingConvention.Cdecl,
-                SetLastError = true, CharSet = CharSet.Unicode)]
-
-            public static extern IntPtr GetPrefix03();
-
-            [DllImport(
-                NativeInterface.DllName,
-                EntryPoint = "eg_hash_get_prefix_04",
-                CallingConvention = CallingConvention.Cdecl,
-                SetLastError = true, CharSet = CharSet.Unicode)]
-            public static extern IntPtr GetPrefix04();
-
-            [DllImport(
-                NativeInterface.DllName,
-                EntryPoint = "eg_hash_get_prefix_05",
-                CallingConvention = CallingConvention.Cdecl,
-                SetLastError = true, CharSet = CharSet.Unicode)]
-            public static extern IntPtr GetPrefix05();
-
-            [DllImport(
-                NativeInterface.DllName,
-                EntryPoint = "eg_hash_get_prefix_06",
-                CallingConvention = CallingConvention.Cdecl,
-                SetLastError = true, CharSet = CharSet.Unicode)]
-            public static extern IntPtr GetPrefix06();
-
             [DllImport(
                 NativeInterface.DllName,
                 EntryPoint = "eg_hash_elems_string",
@@ -375,17 +227,6 @@ namespace ElectionGuard
                 SetLastError = true)]
             internal static extern Status HashElems(
                 [MarshalAs(UnmanagedType.LPStr)] string a,
-                ulong b,
-                out NativeInterface.ElementModQ.ElementModQHandle handle
-                );
-
-            [DllImport(
-                NativeInterface.DllName,
-                EntryPoint = "eg_hash_elems_int_int",
-                CallingConvention = CallingConvention.Cdecl,
-                SetLastError = true)]
-            internal static extern Status HashElems(
-                ulong a,
                 ulong b,
                 out NativeInterface.ElementModQ.ElementModQHandle handle
                 );
