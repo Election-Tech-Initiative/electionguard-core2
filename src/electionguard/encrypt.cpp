@@ -360,15 +360,14 @@ namespace electionguard
     encryptSelection(const std::string objectId, uint64_t sequenceOrder, uint64_t vote,
                      const ElementModQ &descriptionHash, const ElementModP &elgamalPublicKey,
                      const ElementModQ &cryptoExtendedBaseHash,
-                     std::unique_ptr<PrecomputedSelection> precomputedValues, bool isPlaceholder)
+                     std::unique_ptr<TwoTriplesAndAQuadruple> precomputedValues, bool isPlaceholder)
     {
         // Configure the crypto input values
         Log::trace("encryptSelection: precompute for " + objectId + " hash: ",
                    descriptionHash.toHex());
 
         // Generate the encryption using precomputed values
-        auto partialEncryption = *precomputedValues->getPartialEncryption();
-        auto ciphertext = elgamalEncrypt(vote, elgamalPublicKey, partialEncryption);
+        auto ciphertext = elgamalEncrypt(vote, *precomputedValues);
         if (ciphertext == nullptr) {
             throw runtime_error("encryptSelection:: Error generating ciphertext");
         }
@@ -445,16 +444,11 @@ namespace electionguard
         // Configure the crypto input values
         auto descriptionHash = description.crypto_hash();
 
-        auto precomputePublicKey = PrecomputeBufferContext::getPublicKey();
-
         // check if we should use precomputed values
-        // TODO: issue #216 ensure that the PrecomputeBufferContext is the correct context
-        // associated with the elgamalPublicKey of this election and we can remove this
-        // equality check.
-        if (usePrecompute && precomputePublicKey != nullptr &&
-            *precomputePublicKey == elgamalPublicKey) {
-            Log::trace("encryptSelection: using precomputed values");
-            auto precomputedValues = PrecomputeBufferContext::popPrecomputedSelection();
+        if (usePrecompute) {
+            // TODO: Issue #216 ensure that the PrecomputeBufferContext is the correct context
+            // associated with the elgamalPublicKey of this election.
+            auto precomputedValues = PrecomputeBufferContext::popTwoTriplesAndAQuadruple();
             if (precomputedValues != nullptr && precomputedValues.has_value()) {
                 encrypted =
                   encryptSelection(selection.getObjectId(), sequenceOrder, selection.getVote(),
@@ -465,7 +459,6 @@ namespace electionguard
 
         // if we didn't use precomputed values then we need to generate values in realtime
         if (encrypted == nullptr) {
-            Log::trace("encryptSelection: generating values in realtime");
             auto nonceSequence =
               make_unique<Nonces>(*descriptionHash, &const_cast<ElementModQ &>(nonceSeed));
             auto selectionNonce = nonceSequence->get(description.getSequenceOrder());

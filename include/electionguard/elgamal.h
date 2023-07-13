@@ -91,13 +91,11 @@ eg_elgamal_ciphertext_add(eg_elgamal_ciphertext_t *handle, eg_elgamal_ciphertext
  * 
  * @param[in] handle The handle to the ElGamal ciphertext.
  * @param[in] in_product The known product (blinding factor).
- * @param[in] in_encryption_base The base value used in the encryption.
  * @param[out] out_plaintext An exponentially encoded plaintext message.
  * @return EG_API 
  */
 EG_API eg_electionguard_status_t eg_elgamal_ciphertext_decrypt_known_product(
-  eg_elgamal_ciphertext_t *handle, eg_element_mod_p_t *in_product,
-  eg_element_mod_p_t *in_encryption_base, uint64_t *out_plaintext);
+  eg_elgamal_ciphertext_t *handle, eg_element_mod_p_t *in_product, uint64_t *out_plaintext);
 
 /**
  * @brief Decrypt an ElGamal ciphertext using a known ElGamal secret key.
@@ -108,8 +106,7 @@ EG_API eg_electionguard_status_t eg_elgamal_ciphertext_decrypt_known_product(
  * @return EG_API 
  */
 EG_API eg_electionguard_status_t eg_elgamal_ciphertext_decrypt_with_secret(
-  eg_elgamal_ciphertext_t *handle, eg_element_mod_q_t *in_secret_key,
-  eg_element_mod_p_t *in_encryption_base, uint64_t *out_plaintext);
+  eg_elgamal_ciphertext_t *handle, eg_element_mod_q_t *in_secret_key, uint64_t *out_plaintext);
 
 /**
  * @brief Decrypt an ElGamal ciphertext using a known nonce and the ElGamal public key.
