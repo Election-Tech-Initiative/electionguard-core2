@@ -273,10 +273,7 @@ namespace ElectionGuard.UI.Services
             var challengeBallots = (await GetBallotsByState(tally.ElectionId, BallotBoxState.Challenged)).ToList();
             using var decryptionShares = guardian.ComputeDecryptionShares(mediator.Tallies[tally.TallyId], challengeBallots);
 
-            if (challengeBallots.Count > 0)
-            {
-                mediator.SubmitShares(decryptionShares, challengeBallots);
-            }
+            mediator.SubmitShares(decryptionShares, challengeBallots);
 
             await SaveShare(guardianId, tally, decryptionShares);
         }

@@ -431,9 +431,21 @@ public partial class TallyProcessViewModel : BaseViewModel
                         Tally = localTally;
                     });
                     await UpdateTallyData();
+#if DEBUG
+                    ErrorMessage = Tally.State.ToString();
+#endif
                     if (await _tallyRunner.Run(localTally))
                     {
                         ErrorMessage = string.Empty;
+#if DEBUG
+                        ErrorMessage = $"{Tally.State.ToString()} ran";
+#endif
+                    }
+                    else
+                    {
+#if DEBUG
+                        ErrorMessage = $"{Tally.State.ToString()} waiting";
+#endif
                     }
                 }
                 catch (Exception ex)

@@ -8,7 +8,6 @@ namespace ElectionGuard.UI.Services;
 public class TallyStateMachine : ITallyStateMachine
 {
     private Dictionary<bool, List<StateMachineStep<TallyState, TallyRecord>>> _steps = new();
-    private object mutex = new();
 
     private IAuthenticationService _authenticationService;
     private readonly ChallengeResponseService _challengeResponseService;
@@ -40,15 +39,16 @@ public class TallyStateMachine : ITallyStateMachine
         bool ran = false;
         string label = $"Electionguard.UI.TallyStateMachine-{_authenticationService.UserName}";
 
-        var mutex = new Mutex(true, label, out var owned);
-
+        using var mutex = new Mutex(true, label, out var owned);
         if (owned)
         {
             try
             {
-                mutex.WaitOne();
-                Task.WaitAll(RunAsync(tally));
-                ran = true;
+                if (mutex.WaitOne(10))
+                {
+                    Task.WaitAll(RunAsync(tally));
+                    ran = true;
+                }
             }
             catch (AbandonedMutexException)
             {
