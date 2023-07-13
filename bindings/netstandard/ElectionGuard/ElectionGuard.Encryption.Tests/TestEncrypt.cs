@@ -69,7 +69,6 @@ namespace ElectionGuard.Encryption.Tests
         }
 
         [Test]
-        [Ignore("Skip due to invalid Constant Chaum Pedersen proof")]
         public void Test_Encrypt_Ballot_Simple_Reencrypt_Creates_Same_Ballot()
         {
             // Arrange
@@ -184,7 +183,6 @@ namespace ElectionGuard.Encryption.Tests
         }
 
         [Test]
-        [Ignore("Skip due to invalid Constant Chaum Pedersen proof")]
         public void Test_Encrypt_Ballot_Undervote_Succeeds()
         {
             // Arrange
@@ -209,7 +207,6 @@ namespace ElectionGuard.Encryption.Tests
         }
 
         [Test]
-        [Ignore("Skip due to invalid Constant Chaum Pedersen proof")]
         public void Test_Encrypt_Ballot_Overvote_Succeeds()
         {
             // Arrange
@@ -255,8 +252,7 @@ namespace ElectionGuard.Encryption.Tests
                 var ciphertextSelection = cipheretxtContest.Selections.First(
                     i => i.ObjectId == selection.ObjectId);
 
-                var decrypted = ciphertextSelection.Ciphertext.Decrypt(
-                    data.KeyPair.SecretKey, data.Context.ElGamalPublicKey);
+                var decrypted = ciphertextSelection.Ciphertext.Decrypt(data.KeyPair.SecretKey);
 
                 Assert.AreEqual(selection.Vote, decrypted);
             });

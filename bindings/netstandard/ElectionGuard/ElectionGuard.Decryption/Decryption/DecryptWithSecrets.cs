@@ -13,7 +13,7 @@ public static class DecryptWithSecretsExtensions
     /// </summary>
     public static PlaintextTally Decrypt(
         this CiphertextTally self,
-        ElementModQ secretKey, ElementModP publicKey)
+        ElementModQ secretKey)
     {
         var plaintextTally = new PlaintextTally(
             self.TallyId, self.Name, self.Manifest);
@@ -28,7 +28,7 @@ public static class DecryptWithSecretsExtensions
                 var plaintextSelection = plaintextContest.Selections.First(
                     x => x.Key == selection.Key).Value;
 
-                var value = ciphertext.Decrypt(secretKey, publicKey);
+                var value = ciphertext.Decrypt(secretKey);
                 plaintextSelection.Tally += value ?? 0;
             }
         }
@@ -42,7 +42,7 @@ public static class DecryptWithSecretsExtensions
     public static PlaintextTallyBallot Decrypt(
         this CiphertextBallot self,
         InternalManifest manifest,
-        ElementModQ secretKey, ElementModP publicKey)
+        ElementModQ secretKey)
     {
         var plaintextBallot = new PlaintextTallyBallot(
             self.ObjectId, self.ObjectId, self.StyleId, manifest);
@@ -57,7 +57,7 @@ public static class DecryptWithSecretsExtensions
                 var plaintextSelection = plaintextContest.Selections.First(
                     x => x.Key == selection.ObjectId).Value;
 
-                var value = ciphertext.Decrypt(secretKey, publicKey);
+                var value = ciphertext.Decrypt(secretKey);
                 plaintextSelection.Tally += value ?? 0;
 
             }

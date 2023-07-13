@@ -221,10 +221,6 @@ namespace electionguard
     /// </summary>
     EG_API std::unique_ptr<ElementModP> add_mod_p(const ElementModP &lhs, const ElementModP &rhs);
 
-    EG_API std::unique_ptr<ElementModP> add_mod_p(const ElementModP &lhs, const ElementModQ &rhs);
-
-    EG_API std::unique_ptr<ElementModP> add_mod_p(const ElementModQ &lhs, const ElementModQ &rhs);
-
     /// <summary>
     /// Multplies together the left hand side and right hand side and returns the product mod P
     /// </summary>
@@ -262,11 +258,6 @@ namespace electionguard
                                                   const ElementModQ &exponent);
 
     /// <summary>
-    /// Computes b^e mod p.
-    /// </summary>
-    EG_API std::unique_ptr<ElementModP> pow_mod_p(const ElementModP &base, uint64_t exponent);
-
-    /// <summary>
     /// Computes g^e mod p.
     /// </summary>
     EG_API std::unique_ptr<ElementModP> g_pow_p(const ElementModP &exponent);
@@ -288,7 +279,7 @@ namespace electionguard
     add_mod_q(const std::vector<std::reference_wrapper<ElementModQ>> &elements);
 
     /// <summary>
-    /// Computes (a - b) mod q.
+    /// Computes (a-b) mod q.
     /// </summary>
     EG_API std::unique_ptr<ElementModQ> sub_mod_q(const ElementModQ &a, const ElementModQ &b);
 
@@ -325,12 +316,6 @@ namespace electionguard
     /// </summary>
     EG_API std::unique_ptr<ElementModQ> a_plus_bc_mod_q(const ElementModQ &a, const ElementModQ &b,
                                                         const ElementModQ &c);
-
-    /// <summary>
-    /// Computes (a - b * c) mod q.
-    /// </summary>
-    EG_API std::unique_ptr<ElementModQ> a_minus_bc_mod_q(const ElementModQ &a, const ElementModQ &b,
-                                                         const ElementModQ &c);
 
     /// <summary>
     /// Generate random number between 0 and P
