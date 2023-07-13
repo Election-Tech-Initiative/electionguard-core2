@@ -75,28 +75,25 @@ public partial class Guardian
     /// Decrypts a compensated partial decryption of an elgamal encryption on behalf of a missing guardian
     /// </summary>
     /// <param name="guardianBackup">Missing guardian's backup</param>
-    /// <param name="myKeyPair">The present guardian's key pair that will be used to decrypt the backup</param>
+    /// <param name="keyPair">The present guardian's key pair that will be used to decrypt the backup</param>
     /// <returns>coordinatedata of the decryption and its proof</returns>
     private static ElementModQ? DecryptBackup(
-        ElectionPartialKeyBackup guardianBackup, ElectionKeyPair myKeyPair)
+        ElectionPartialKeyBackup guardianBackup, ElectionKeyPair keyPair)
     {
         var encryptionSeed = GetBackupSeed(
-            myKeyPair.SequenceOrder,
-            guardianBackup.OwnerSequenceOrder
+            keyPair.GuardianId,
+            keyPair.SequenceOrder
         );
 
-        var decryptedCoordinate = guardianBackup.EncryptedCoordinate.Decrypt(
-            myKeyPair.KeyPair.PublicKey,
-            myKeyPair.KeyPair.SecretKey,
-            Hash.Prefix02, encryptionSeed,
-            lookForPadding: false);
+        var bytesOptional = guardianBackup.EncryptedCoordinate.Decrypt(
+            keyPair.KeyPair.SecretKey, encryptionSeed, false);
 
-        if (decryptedCoordinate is null)
+        if (bytesOptional is null)
         {
             return null;
         }
 
-        var coordinateData = new ElementModQ(decryptedCoordinate);
+        var coordinateData = new ElementModQ(bytesOptional);
         return coordinateData;
     }
 }

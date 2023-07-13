@@ -41,15 +41,13 @@ namespace electionguard
         Triple &operator=(const Triple &triple);
         Triple &operator=(Triple &&);
 
+        std::unique_ptr<ElementModQ> get_exp() { return exp->clone(); }
+
+        std::unique_ptr<ElementModP> get_g_to_exp() { return g_to_exp->clone(); }
+
+        std::unique_ptr<ElementModP> get_pubkey_to_exp() { return pubkey_to_exp->clone(); }
+
         std::unique_ptr<Triple> clone();
-
-        std::unique_ptr<ElementModQ> clone_exp() { return exp->clone(); }
-        std::unique_ptr<ElementModP> clone_g_to_exp() { return g_to_exp->clone(); }
-        std::unique_ptr<ElementModP> clone_pubkey_to_exp() { return pubkey_to_exp->clone(); }
-
-        ElementModQ *get_exp() const { return exp.get(); }
-        ElementModP *get_g_to_exp() const { return g_to_exp.get(); }
-        ElementModP *get_pubkey_to_exp() const { return pubkey_to_exp.get(); }
 
       protected:
         void generateTriple(const ElementModP &publicKey);
@@ -82,23 +80,18 @@ namespace electionguard
         Quadruple &operator=(const Quadruple &quadruple);
         Quadruple &operator=(Quadruple &&);
 
-        std::unique_ptr<Quadruple> clone();
+        std::unique_ptr<ElementModQ> get_exp1() { return exp1->clone(); }
 
-        std::unique_ptr<ElementModQ> clone_exp1() { return exp1->clone(); }
-        std::unique_ptr<ElementModQ> clone_exp2() { return exp2->clone(); }
-        std::unique_ptr<ElementModP> clone_g_to_exp1() { return g_to_exp1->clone(); }
-        std::unique_ptr<ElementModP> clone_g_to_exp2_mult_by_pubkey_to_exp1()
+        std::unique_ptr<ElementModQ> get_exp2() { return exp2->clone(); }
+
+        std::unique_ptr<ElementModP> get_g_to_exp1() { return g_to_exp1->clone(); }
+
+        std::unique_ptr<ElementModP> get_g_to_exp2_mult_by_pubkey_to_exp1()
         {
             return g_to_exp2_mult_by_pubkey_to_exp1->clone();
         }
 
-        ElementModQ *get_exp1() const { return exp1.get(); }
-        ElementModQ *get_exp2() const { return exp2.get(); }
-        ElementModP *get_g_to_exp1() const { return g_to_exp1.get(); }
-        ElementModP *get_g_to_exp2_mult_by_pubkey_to_exp1() const
-        {
-            return g_to_exp2_mult_by_pubkey_to_exp1.get();
-        }
+        std::unique_ptr<Quadruple> clone();
 
       protected:
         void generateQuadruple(const ElementModP &publicKey);
@@ -129,15 +122,13 @@ namespace electionguard
         TwoTriplesAndAQuadruple &operator=(const TwoTriplesAndAQuadruple &other);
         TwoTriplesAndAQuadruple &operator=(TwoTriplesAndAQuadruple &&);
 
+        std::unique_ptr<Triple> get_triple1() { return triple1->clone(); }
+
+        std::unique_ptr<Triple> get_triple2() { return triple2->clone(); }
+
+        std::unique_ptr<Quadruple> get_quad() { return quad->clone(); }
+
         std::unique_ptr<TwoTriplesAndAQuadruple> clone();
-
-        std::unique_ptr<Triple> clone_triple1() { return triple1->clone(); }
-        std::unique_ptr<Triple> clone_triple2() { return triple2->clone(); }
-        std::unique_ptr<Quadruple> clone_quad() { return quad->clone(); }
-
-        Triple *get_triple1() const { return triple1.get(); }
-        Triple *get_triple2() const { return triple2.get(); }
-        Quadruple *get_quad() const { return quad.get(); }
     };
 
     /// <summary>

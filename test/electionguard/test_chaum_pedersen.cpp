@@ -41,21 +41,21 @@ class DisjunctiveChaumPedersenProofHarness : DisjunctiveChaumPedersenProof
     }
 
     static unique_ptr<DisjunctiveChaumPedersenProof>
-    make_zero(const ElGamalCiphertext &message,
-              const TwoTriplesAndAQuadruple &precomputedTwoTriplesAndAQuad1, const ElementModP &k,
-              const ElementModQ &q)
+    make_zero_with_precomputed(const ElGamalCiphertext &message,
+                               unique_ptr<TwoTriplesAndAQuadruple> precomputedTwoTriplesAndAQuad1,
+                               const ElementModQ &q)
     {
-        return DisjunctiveChaumPedersenProof::make_zero(message, precomputedTwoTriplesAndAQuad1, k,
-                                                        q);
+        return DisjunctiveChaumPedersenProof::make_zero_with_precomputed(
+          message, move(precomputedTwoTriplesAndAQuad1), q);
     }
 
     static unique_ptr<DisjunctiveChaumPedersenProof>
-    make_one(const ElGamalCiphertext &message,
-             const TwoTriplesAndAQuadruple &precomputedTwoTriplesAndAQuad1, const ElementModP &k,
-             const ElementModQ &q)
+    make_one_with_precomputed(const ElGamalCiphertext &message,
+                              unique_ptr<TwoTriplesAndAQuadruple> precomputedTwoTriplesAndAQuad1,
+                              const ElementModQ &q)
     {
-        return DisjunctiveChaumPedersenProof::make_one(message, precomputedTwoTriplesAndAQuad1, k,
-                                                       q);
+        return DisjunctiveChaumPedersenProof::make_one_with_precomputed(
+          message, move(precomputedTwoTriplesAndAQuad1), q);
     }
 };
 
@@ -150,25 +150,34 @@ TEST_CASE("Disjunctive CP Proof simple valid inputs generate valid proofs")
     CHECK(precomputedTwoTriplesAndAQuad3 != nullptr);
     CHECK(precomputedTwoTriplesAndAQuad4 != nullptr);
 
-    auto firstMessage = elgamalEncrypt(0UL, *precomputedTwoTriplesAndAQuad1);
+    auto triple1_1 = precomputedTwoTriplesAndAQuad1->get_triple1();
+    auto triple1_2 = precomputedTwoTriplesAndAQuad2->get_triple1();
+    auto triple1_3 = precomputedTwoTriplesAndAQuad3->get_triple1();
+    auto triple1_4 = precomputedTwoTriplesAndAQuad4->get_triple1();
 
-    auto secondMessage = elgamalEncrypt(0UL, *precomputedTwoTriplesAndAQuad2);
+    auto firstMessage = elgamalEncrypt_with_precomputed(0UL, *triple1_1->get_g_to_exp(),
+                                                        *triple1_1->get_pubkey_to_exp());
 
-    auto thirdMessage = elgamalEncrypt(1UL, *precomputedTwoTriplesAndAQuad3);
+    auto secondMessage = elgamalEncrypt_with_precomputed(0UL, *triple1_2->get_g_to_exp(),
+                                                         *triple1_2->get_pubkey_to_exp());
 
-    auto fourthMessage = elgamalEncrypt(1UL, *precomputedTwoTriplesAndAQuad4);
+    auto thirdMessage = elgamalEncrypt_with_precomputed(1UL, *triple1_3->get_g_to_exp(),
+                                                        *triple1_3->get_pubkey_to_exp());
+
+    auto fourthMessage = elgamalEncrypt_with_precomputed(1UL, *triple1_4->get_g_to_exp(),
+                                                         *triple1_4->get_pubkey_to_exp());
 
     // Act
-    auto firstMessageZeroProof = DisjunctiveChaumPedersenProofHarness::make_zero(
-      *firstMessage, *precomputedTwoTriplesAndAQuad1, *keypair->getPublicKey(), ONE_MOD_Q());
-    auto secondMessageOneProof = DisjunctiveChaumPedersenProofHarness::make_one(
-      *secondMessage, *precomputedTwoTriplesAndAQuad2, *keypair->getPublicKey(), ONE_MOD_Q());
+    auto firstMessageZeroProof = DisjunctiveChaumPedersenProofHarness::make_zero_with_precomputed(
+      *firstMessage, move(precomputedTwoTriplesAndAQuad1), ONE_MOD_Q());
+    auto secondMessageOneProof = DisjunctiveChaumPedersenProofHarness::make_one_with_precomputed(
+      *secondMessage, move(precomputedTwoTriplesAndAQuad2), ONE_MOD_Q());
 
-    auto thirdMessageZeroProof = DisjunctiveChaumPedersenProofHarness::make_zero(
-      *thirdMessage, *precomputedTwoTriplesAndAQuad3, *keypair->getPublicKey(), ONE_MOD_Q());
+    auto thirdMessageZeroProof = DisjunctiveChaumPedersenProofHarness::make_zero_with_precomputed(
+      *thirdMessage, move(precomputedTwoTriplesAndAQuad3), ONE_MOD_Q());
 
-    auto fourthMessageOneProof = DisjunctiveChaumPedersenProofHarness::make_one(
-      *fourthMessage, *precomputedTwoTriplesAndAQuad4, *keypair->getPublicKey(), ONE_MOD_Q());
+    auto fourthMessageOneProof = DisjunctiveChaumPedersenProofHarness::make_one_with_precomputed(
+      *fourthMessage, move(precomputedTwoTriplesAndAQuad4), ONE_MOD_Q());
 
     // Assert
     CHECK(firstMessageZeroProof->isValid(*firstMessage, *keypair->getPublicKey(), ONE_MOD_Q()) ==
@@ -203,14 +212,19 @@ TEST_CASE("Disjunctive CP Proof encryption of zero with precomputed values")
     CHECK(precomputedTwoTriplesAndAQuad1 != nullptr);
     CHECK(precomputedTwoTriplesAndAQuad2 != nullptr);
 
-    auto message1 = elgamalEncrypt(0UL, *precomputedTwoTriplesAndAQuad1);
+    auto triple1_1 = precomputedTwoTriplesAndAQuad1->get_triple1();
+    auto triple1_2 = precomputedTwoTriplesAndAQuad2->get_triple1();
 
-    auto message2 = elgamalEncrypt(0UL, *precomputedTwoTriplesAndAQuad2);
+    auto message1 = elgamalEncrypt_with_precomputed(0UL, *triple1_1->get_g_to_exp(),
+                                                    *triple1_1->get_pubkey_to_exp());
 
-    auto proof = DisjunctiveChaumPedersenProof::make(*message1, *precomputedTwoTriplesAndAQuad1,
-                                                     *keypair->getPublicKey(), ONE_MOD_Q(), 0UL);
-    auto badProof = DisjunctiveChaumPedersenProof::make(*message2, *precomputedTwoTriplesAndAQuad2,
-                                                        *keypair->getPublicKey(), ONE_MOD_Q(), 1UL);
+    auto message2 = elgamalEncrypt_with_precomputed(0UL, *triple1_2->get_g_to_exp(),
+                                                    *triple1_2->get_pubkey_to_exp());
+
+    auto proof = DisjunctiveChaumPedersenProof::make_with_precomputed(
+      *message1, move(precomputedTwoTriplesAndAQuad1), ONE_MOD_Q(), 0UL);
+    auto badProof = DisjunctiveChaumPedersenProof::make_with_precomputed(
+      *message2, move(precomputedTwoTriplesAndAQuad2), ONE_MOD_Q(), 1UL);
 
     CHECK(proof->isValid(*message1, *keypair->getPublicKey(), ONE_MOD_Q()) == true);
     CHECK(badProof->isValid(*message2, *keypair->getPublicKey(), ONE_MOD_Q()) == false);
@@ -236,14 +250,19 @@ TEST_CASE("Disjunctive CP Proof encryption of one with precomputed values")
     CHECK(precomputedTwoTriplesAndAQuad1 != nullptr);
     CHECK(precomputedTwoTriplesAndAQuad2 != nullptr);
 
-    auto message1 = elgamalEncrypt(1UL, *precomputedTwoTriplesAndAQuad1);
+    auto triple1_1 = precomputedTwoTriplesAndAQuad1->get_triple1();
+    auto triple1_2 = precomputedTwoTriplesAndAQuad2->get_triple1();
 
-    auto message2 = elgamalEncrypt(1UL, *precomputedTwoTriplesAndAQuad2);
+    auto message1 = elgamalEncrypt_with_precomputed(1UL, *triple1_1->get_g_to_exp(),
+                                                    *triple1_1->get_pubkey_to_exp());
 
-    auto proof = DisjunctiveChaumPedersenProof::make(*message1, *precomputedTwoTriplesAndAQuad1,
-                                                     *keypair->getPublicKey(), ONE_MOD_Q(), 1UL);
-    auto badProof = DisjunctiveChaumPedersenProof::make(*message2, *precomputedTwoTriplesAndAQuad2,
-                                                        *keypair->getPublicKey(), ONE_MOD_Q(), 0UL);
+    auto message2 = elgamalEncrypt_with_precomputed(1UL, *triple1_2->get_g_to_exp(),
+                                                    *triple1_2->get_pubkey_to_exp());
+
+    auto proof = DisjunctiveChaumPedersenProof::make_with_precomputed(
+      *message1, move(precomputedTwoTriplesAndAQuad1), ONE_MOD_Q(), 1UL);
+    auto badProof = DisjunctiveChaumPedersenProof::make_with_precomputed(
+      *message2, move(precomputedTwoTriplesAndAQuad2), ONE_MOD_Q(), 0UL);
 
     CHECK(proof->isValid(*message1, *keypair->getPublicKey(), ONE_MOD_Q()) == true);
     CHECK(badProof->isValid(*message2, *keypair->getPublicKey(), ONE_MOD_Q()) == false);

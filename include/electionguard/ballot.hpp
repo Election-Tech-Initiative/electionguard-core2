@@ -311,15 +311,14 @@ namespace electionguard
         /// given nonce isn't `None`. Likewise, if a crypto_hash is not provided, it will be derived from
         /// the other fields.
         ///</summary>
-        static std::unique_ptr<CiphertextBallotSelection>
-        make(const std::string &objectId, uint64_t sequenceOrder,
-             const ElementModQ &descriptionHash, std::unique_ptr<ElGamalCiphertext> ciphertext,
-             const ElementModP &elgamalPublicKey, const ElementModQ &cryptoExtendedBaseHash,
-
-             std::unique_ptr<TwoTriplesAndAQuadruple> precomputedTwoTriplesAndAQuad,
-             uint64_t plaintext, bool isPlaceholder = false,
-             std::unique_ptr<ElementModQ> cryptoHash = nullptr, bool computeProof = true,
-             std::unique_ptr<ElGamalCiphertext> extendedData = nullptr);
+        static std::unique_ptr<CiphertextBallotSelection> make_with_precomputed(
+          const std::string &objectId, uint64_t sequenceOrder, const ElementModQ &descriptionHash,
+          std::unique_ptr<ElGamalCiphertext> ciphertext, const ElementModQ &cryptoExtendedBaseHash,
+          uint64_t plaintext,
+          std::unique_ptr<TwoTriplesAndAQuadruple> precomputedTwoTriplesAndAQuad,
+          bool isPlaceholder = false, bool computeProof = true,
+          std::unique_ptr<ElementModQ> cryptoHash = nullptr,
+          std::unique_ptr<ElGamalCiphertext> extendedData = nullptr);
 
         /// <sumary>
         /// Given an encrypted BallotSelection, validates the encryption state against a specific seed hash and public key.

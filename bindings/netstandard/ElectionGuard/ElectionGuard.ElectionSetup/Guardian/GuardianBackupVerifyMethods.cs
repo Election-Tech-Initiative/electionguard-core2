@@ -63,21 +63,18 @@ public partial class Guardian
         string receiverGuardianId,
         ElectionPartialKeyBackup senderGuardianBackup,
         ElectionPublicKey senderGuardianPublicKey,
-        ElectionKeyPair myKeyPair, string keyCeremonyId)
+        ElectionKeyPair electionKeys, string keyCeremonyId)
     {
-        using var coordinateData = DecryptBackup(senderGuardianBackup, myKeyPair);
-        if (coordinateData is null)
-        {
-            Debug.WriteLine($"VerifyElectionPartialKeyBackup: {receiverGuardianId} -> {senderGuardianBackup.OwnerId} {senderGuardianBackup.DesignatedSequenceOrder} failed to decrypt");
-            return new()
-            {
-                KeyCeremonyId = keyCeremonyId,
-                OwnerId = senderGuardianBackup.OwnerId,
-                DesignatedId = senderGuardianBackup.DesignatedId,
-                VerifierId = receiverGuardianId,
-                Verified = false
-            };
-        }
+        using var encryptionSeed = GetBackupSeed(
+                receiverGuardianId,
+                senderGuardianBackup.DesignatedSequenceOrder
+            );
+
+        var secretKey = electionKeys.KeyPair.SecretKey;
+        var data = senderGuardianBackup.EncryptedCoordinate.Decrypt(
+                secretKey, encryptionSeed, false);
+
+        using var coordinateData = new ElementModQ(data);
 
         var verified = ElectionPolynomial.VerifyCoordinate(
                 senderGuardianBackup.DesignatedSequenceOrder,
