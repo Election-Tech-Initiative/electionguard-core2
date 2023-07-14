@@ -10,6 +10,10 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ElectionGuard.CLI", "ElectionGuard.CLI.csproj", "{0771316F-7C71-4795-90DF-705EC63442ED}"
 EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ElectionGuard.Encryption.Utils", "..\..\bindings\netstandard\ElectionGuard\ElectionGuard.Encryption.Utils\ElectionGuard.Encryption.Utils.csproj", "{9CF2608E-9B97-4E21-B5B7-C59E2435B110}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ElectionGuard.Encryption", "..\..\bindings\netstandard\ElectionGuard\ElectionGuard.Encryption\ElectionGuard.Encryption.csproj", "{DC80E980-829A-4AFF-BB29-AAA594A4118B}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|arm64 = Debug|arm64
@@ -32,6 +36,30 @@ Global
 		{0771316F-7C71-4795-90DF-705EC63442ED}.Release|x64.Build.0 = Release|x64
 		{0771316F-7C71-4795-90DF-705EC63442ED}.Release|x86.ActiveCfg = Release|x86
 		{0771316F-7C71-4795-90DF-705EC63442ED}.Release|x86.Build.0 = Release|x86
+		{9CF2608E-9B97-4E21-B5B7-C59E2435B110}.Debug|arm64.ActiveCfg = Debug|arm64
+		{9CF2608E-9B97-4E21-B5B7-C59E2435B110}.Debug|arm64.Build.0 = Debug|arm64
+		{9CF2608E-9B97-4E21-B5B7-C59E2435B110}.Debug|x64.ActiveCfg = Debug|x64
+		{9CF2608E-9B97-4E21-B5B7-C59E2435B110}.Debug|x64.Build.0 = Debug|x64
+		{9CF2608E-9B97-4E21-B5B7-C59E2435B110}.Debug|x86.ActiveCfg = Debug|x86
+		{9CF2608E-9B97-4E21-B5B7-C59E2435B110}.Debug|x86.Build.0 = Debug|x86
+		{9CF2608E-9B97-4E21-B5B7-C59E2435B110}.Release|arm64.ActiveCfg = Release|arm64
+		{9CF2608E-9B97-4E21-B5B7-C59E2435B110}.Release|arm64.Build.0 = Release|arm64
+		{9CF2608E-9B97-4E21-B5B7-C59E2435B110}.Release|x64.ActiveCfg = Release|x64
+		{9CF2608E-9B97-4E21-B5B7-C59E2435B110}.Release|x64.Build.0 = Release|x64
+		{9CF2608E-9B97-4E21-B5B7-C59E2435B110}.Release|x86.ActiveCfg = Release|x86
+		{9CF2608E-9B97-4E21-B5B7-C59E2435B110}.Release|x86.Build.0 = Release|x86
+		{DC80E980-829A-4AFF-BB29-AAA594A4118B}.Debug|arm64.ActiveCfg = Debug|arm64
+		{DC80E980-829A-4AFF-BB29-AAA594A4118B}.Debug|arm64.Build.0 = Debug|arm64
+		{DC80E980-829A-4AFF-BB29-AAA594A4118B}.Debug|x64.ActiveCfg = Debug|x64
+		{DC80E980-829A-4AFF-BB29-AAA594A4118B}.Debug|x64.Build.0 = Debug|x64
+		{DC80E980-829A-4AFF-BB29-AAA594A4118B}.Debug|x86.ActiveCfg = Debug|x86
+		{DC80E980-829A-4AFF-BB29-AAA594A4118B}.Debug|x86.Build.0 = Debug|x86
+		{DC80E980-829A-4AFF-BB29-AAA594A4118B}.Release|arm64.ActiveCfg = Release|arm64
+		{DC80E980-829A-4AFF-BB29-AAA594A4118B}.Release|arm64.Build.0 = Release|arm64
+		{DC80E980-829A-4AFF-BB29-AAA594A4118B}.Release|x64.ActiveCfg = Release|x64
+		{DC80E980-829A-4AFF-BB29-AAA594A4118B}.Release|x64.Build.0 = Release|x64
+		{DC80E980-829A-4AFF-BB29-AAA594A4118B}.Release|x86.ActiveCfg = Release|x86
+		{DC80E980-829A-4AFF-BB29-AAA594A4118B}.Release|x86.Build.0 = Release|x86
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
