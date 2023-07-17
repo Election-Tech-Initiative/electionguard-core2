@@ -621,4 +621,7 @@
   <data name="VerificationCodeText" xml:space="preserve">
     <value>Verification Code</value>
   </data>
+  <data name="CreateMultiTallyError" xml:space="preserve">
+    <value>There are no Key Ceremonies that are used for multi-tallies</value>
+  </data>
 </root>

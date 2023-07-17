@@ -367,6 +367,15 @@ namespace ElectionGuard.UI.Resx {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to There are no Key Ceremonies that are used for multi-tallies.
+        /// </summary>
+        internal static string CreateMultiTallyError {
+            get {
+                return ResourceManager.GetString("CreateMultiTallyError", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Create Tallies.
         /// </summary>
         internal static string CreateTallies {
