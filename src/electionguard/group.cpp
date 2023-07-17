@@ -524,6 +524,16 @@ namespace electionguard
 
 #pragma region ElementModP Global Functions
 
+    unique_ptr<ElementModP> add_mod_p(const ElementModP &lhs, const ElementModQ &rhs)
+    {
+        return add_mod_p(lhs, *rhs.toElementModP());
+    }
+
+    unique_ptr<ElementModP> add_mod_p(const ElementModQ &lhs, const ElementModQ &rhs)
+    {
+        return add_mod_p(*lhs.toElementModP(), *rhs.toElementModP());
+    }
+
     unique_ptr<ElementModP> add_mod_p(const ElementModP &lhs, const ElementModP &rhs)
     {
         const auto &p = P();
@@ -653,6 +663,12 @@ namespace electionguard
         }
         // if none exists, execute the modular exponentiation directly
         return pow_mod_p(base, *exponent.toElementModP());
+    }
+
+    unique_ptr<ElementModP> pow_mod_p(const ElementModP &base, uint64_t exponent)
+    {
+        auto exp = ElementModQ::fromUint64(exponent);
+        return pow_mod_p(base, *exp);
     }
 
     unique_ptr<ElementModP> g_pow_p(const ElementModP &exponent)
@@ -865,6 +881,13 @@ namespace electionguard
         }
 
         return make_unique<ElementModQ>(res, true);
+    }
+
+    unique_ptr<ElementModQ> a_minus_bc_mod_q(const ElementModQ &a, const ElementModQ &b,
+                                             const ElementModQ &c)
+    {
+        auto bc_mod_q = mul_mod_q(b, c);
+        return sub_mod_q(a, *bc_mod_q);
     }
 
     unique_ptr<ElementModP> rand_p()

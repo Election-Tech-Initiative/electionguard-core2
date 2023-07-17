@@ -18,7 +18,7 @@ namespace ElectionGuard.Encryption.Tests
 
             // Act
             var ciphertext = ElGamal.Encrypt(vote, nonce, publicKey);
-            var plaintext = ciphertext.Decrypt(keyPair.SecretKey);
+            var plaintext = ciphertext.Decrypt(keyPair.SecretKey, publicKey);
 
             // Assert
             Assert.That(plaintext == vote);
@@ -41,7 +41,7 @@ namespace ElectionGuard.Encryption.Tests
             var firstCiphertext = ElGamal.Encrypt(vote, nonce, publicKey);
             var secondCiphertext = ElGamal.Encrypt(vote, nonce, publicKey);
             var result = ElGamal.Add(new List<ElGamalCiphertext> { firstCiphertext, secondCiphertext });
-            var plaintext = result.Decrypt(keyPair.SecretKey);
+            var plaintext = result.Decrypt(keyPair.SecretKey, publicKey);
 
             // Assert
             Assert.That(plaintext == vote + vote);
