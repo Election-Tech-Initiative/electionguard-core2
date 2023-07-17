@@ -167,13 +167,20 @@ public partial class CreateMultiTallyViewModel : BaseViewModel
     private async Task FillKeyCeremonies()
     {
         var allKeys = await _keyCeremonyService.GetAllCompleteAsync();
-        foreach (var keyCeremony in allKeys)
+        if (allKeys is not null)
         {
-            var count = await _electionService.CountByKeyCeremonyIdAsync(keyCeremony.KeyCeremonyId);
-            if (count > 1)
+            foreach (var keyCeremony in allKeys)
             {
-                KeyCeremonies.Add(keyCeremony);
+                var count = await _electionService.CountByKeyCeremonyIdAsync(keyCeremony.KeyCeremonyId);
+                if (count > 1)
+                {
+                    KeyCeremonies.Add(keyCeremony);
+                }
             }
+        }
+        else
+        {
+            await Shell.Current.CurrentPage.DisplayAlert(AppResources.CreateMultiTally, AppResources.CreateMultiTallyError, AppResources.OkText);
         }
     }
 

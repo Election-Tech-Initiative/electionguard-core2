@@ -1,6 +1,6 @@
 ﻿using CommandLine;
 using ElectionGuard.CLI.Encrypt;
-using System;
+using ElectionGuard.CLI.Generate;
 using System.Reflection;
 
 namespace ElectionGuard.CLI;
@@ -10,7 +10,7 @@ class Program
     static async Task Main(string[] args)
     {
         var verbs = LoadVerbs();
-        await Parser.Default.ParseArguments(args, verbs)
+        _ = await Parser.Default.ParseArguments(args, verbs)
             .WithParsedAsync(Run);
     }
 
@@ -26,10 +26,13 @@ class Program
         switch (obj)
         {
             case CreateElectionOptions c:
-                CreateElectionCommand.Execute(c);
+                await CreateElectionCommand.Execute(c);
                 break;
             case EncryptOptions o:
-                EncryptCommand.Execute(o);
+                await EncryptCommand.Execute(o);
+                break;
+            case GenerateOptions g:
+                await GenerateCommand.Execute(g);
                 break;
         }
     }
