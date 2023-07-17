@@ -71,22 +71,25 @@ public partial class CreateTallyViewModel : BaseViewModel
     {
         _ = Task.Run(async () =>
         {
-            CurrentElection = await _electionService.GetByElectionIdAsync(value);
+            var currentElection = await _electionService.GetByElectionIdAsync(value);
             var record = await _manifestService.GetByElectionIdAsync(value);
-            CurrentManifest = new(record?.ManifestData);
-            CurrentKeyCeremony = await _keyCeremonyService.GetByKeyCeremonyIdAsync(CurrentElection.KeyCeremonyId);
-            TallyName = $"{CurrentElection.Name} {AppResources.TallyText}";
-
             var uploads = await _ballotUploadService.GetByElectionIdAsync(value);
-            BallotUploads = uploads.DistinctBy(u => u.DeviceId).ToList();
             var startDate = uploads.Min(u => u.BallotsStart);
             var endDate = uploads.Max(u => u.BallotsEnd);
-            DateList.Clear();
-            for (DateTime currentDate = startDate; currentDate <= endDate; currentDate = currentDate.AddDays(1))
-            {
-                DateList.Add(currentDate.ToShortDateString());
-            }
 
+            _ = Shell.Current.CurrentPage.Dispatcher.Dispatch(async () =>
+            {
+                CurrentElection = currentElection!;
+                BallotUploads = uploads.DistinctBy(u => u.DeviceId).ToList();
+                CurrentManifest = new(record?.ManifestData);
+                CurrentKeyCeremony = await _keyCeremonyService.GetByKeyCeremonyIdAsync(CurrentElection.KeyCeremonyId!);
+                TallyName = $"{CurrentElection.Name} {AppResources.TallyText}";
+                DateList.Clear();
+                for (DateTime currentDate = startDate; currentDate <= endDate; currentDate = currentDate.AddDays(1))
+                {
+                    DateList.Add(currentDate.ToShortDateString());
+                }
+            });
         });
     }
 
