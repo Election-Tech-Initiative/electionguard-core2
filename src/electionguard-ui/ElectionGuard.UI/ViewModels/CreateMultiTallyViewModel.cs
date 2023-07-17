@@ -180,8 +180,9 @@ public partial class CreateMultiTallyViewModel : BaseViewModel
         }
         else
         {
-            await Shell.Current.CurrentPage.DisplayAlert(AppResources.CreateMultiTally, AppResources.CreateMultiTallyError, AppResources.OkText); ;
+            await Shell.Current.CurrentPage.DisplayAlert(AppResources.CreateMultiTally, AppResources.CreateMultiTallyError, AppResources.OkText);
         }
+    }
 
     [RelayCommand]
     private void SelectionChanged()
