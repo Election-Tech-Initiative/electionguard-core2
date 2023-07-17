@@ -2,8 +2,8 @@
 
 public partial class TallyCeremonyChecklist : ObservableObject
 {
-    public bool QuorumReached => State > TallyState.PendingGuardiansJoin;
-    public bool TallyStarted => State == TallyState.TallyStarted;
+    public bool QuorumReached => _guardiansJoined >= _quorum;
+    public bool TallyStarted => State >= TallyState.TallyStarted;
     public bool SubtaliesCombined => State >= TallyState.PendingGuardianDecryptShares;
     public bool AllDecryptionSharesComputed => SubtaliesCombined && (
         State > TallyState.PendingGuardianDecryptShares ||
@@ -30,16 +30,22 @@ public partial class TallyCeremonyChecklist : ObservableObject
     [NotifyPropertyChangedFor(nameof(IsAbandoned))]
     private TallyState _state;
 
+    private readonly int _guardiansJoined;
     private readonly int _quorum;
     private readonly int _sharesComputed;
     private readonly int _challengesResponded;
 
     public TallyCeremonyChecklist() { }
 
-    public TallyCeremonyChecklist(TallyRecord tally, int sharesComputed, int challengesResponded)
+    public TallyCeremonyChecklist(
+        TallyRecord tally,
+        int guardiansJoined,
+        int sharesComputed,
+        int challengesResponded)
     {
         State = tally.State;
         _quorum = tally.Quorum;
+        _guardiansJoined = guardiansJoined;
         _sharesComputed = sharesComputed;
         _challengesResponded = challengesResponded;
     }

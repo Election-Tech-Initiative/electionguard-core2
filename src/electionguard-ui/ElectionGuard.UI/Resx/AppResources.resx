@@ -624,6 +624,12 @@
   <data name="CreateMultiTallyError" xml:space="preserve">
     <value>There are no Key Ceremonies that are used for multi-tallies</value>
   </data>
+  <data name="DecryptionComplete" xml:space="preserve">
+    <value>Partial Decryption Complete</value>
+  </data>
+  <data name="ResponseComplete" xml:space="preserve">
+    <value>Guardian has responded to Admin Challenge</value>
+  </data>
   <data name="CloseText" xml:space="preserve">
     <value>Close</value>
   </data>
