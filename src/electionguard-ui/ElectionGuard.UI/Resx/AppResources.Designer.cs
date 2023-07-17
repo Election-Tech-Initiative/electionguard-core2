@@ -259,6 +259,15 @@ namespace ElectionGuard.UI.Resx {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Close.
+        /// </summary>
+        internal static string CloseText {
+            get {
+                return ResourceManager.GetString("CloseText", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Complete.
         /// </summary>
         internal static string Complete {
