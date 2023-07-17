@@ -448,6 +448,15 @@ namespace ElectionGuard.UI.Resx {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Partial Decryption Complete.
+        /// </summary>
+        internal static string DecryptionComplete {
+            get {
+                return ResourceManager.GetString("DecryptionComplete", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Device File.
         /// </summary>
         internal static string DeviceFileText {
@@ -1128,6 +1137,15 @@ namespace ElectionGuard.UI.Resx {
         internal static string RemovingList {
             get {
                 return ResourceManager.GetString("RemovingList", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Guardian has responded to Admin Challenge.
+        /// </summary>
+        internal static string ResponseComplete {
+            get {
+                return ResourceManager.GetString("ResponseComplete", resourceCulture);
             }
         }
         
