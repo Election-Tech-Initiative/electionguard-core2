@@ -18,6 +18,16 @@ using electionguard::uint64_to_size;
 using electionguard::variant_cast;
 using std::vector;
 
+#pragma region HashPrefix
+
+const char *eg_hash_get_prefix_00() { return electionguard::HashPrefix::get_prefix_00().c_str(); }
+const char *eg_hash_get_prefix_01() { return electionguard::HashPrefix::get_prefix_01().c_str(); }
+const char *eg_hash_get_prefix_02() { return electionguard::HashPrefix::get_prefix_02().c_str(); }
+const char *eg_hash_get_prefix_03() { return electionguard::HashPrefix::get_prefix_03().c_str(); }
+const char *eg_hash_get_prefix_04() { return electionguard::HashPrefix::get_prefix_04().c_str(); }
+const char *eg_hash_get_prefix_05() { return electionguard::HashPrefix::get_prefix_05().c_str(); }
+const char *eg_hash_get_prefix_06() { return electionguard::HashPrefix::get_prefix_06().c_str(); }
+
 eg_electionguard_status_t eg_hash_elems_string(const char *a, eg_element_mod_q_t **out_handle)
 {
     try {
@@ -62,6 +72,20 @@ eg_electionguard_status_t eg_hash_elems_string_int(char *in_first, uint64_t in_s
     try {
         auto first = string(in_first);
         auto result = hash_elems({first, in_second});
+
+        *out_handle = AS_TYPE(eg_element_mod_q_t, result.release());
+        return ELECTIONGUARD_STATUS_SUCCESS;
+    } catch (const exception &e) {
+        Log::error(__func__, e);
+        return ELECTIONGUARD_STATUS_ERROR_BAD_ALLOC;
+    }
+}
+
+eg_electionguard_status_t eg_hash_elems_int_int(uint64_t in_first, uint64_t in_second,
+                                                eg_element_mod_q_t **out_handle)
+{
+    try {
+        auto result = hash_elems({in_first, in_second});
 
         *out_handle = AS_TYPE(eg_element_mod_q_t, result.release());
         return ELECTIONGUARD_STATUS_SUCCESS;

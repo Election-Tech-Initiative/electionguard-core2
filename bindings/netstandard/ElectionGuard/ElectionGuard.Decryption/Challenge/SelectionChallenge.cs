@@ -35,8 +35,6 @@ public record SelectionChallenge : DisposableRecordBase
     /// </summary>
     public ElementModQ Challenge { get; init; }
 
-    public const string HASH_PREFIX = "06";
-
     public SelectionChallenge(
         IElectionGuardian guardian,
         ElementModQ coefficient,
@@ -203,7 +201,7 @@ public record SelectionChallenge : DisposableRecordBase
         ElementModP mBar)
     {
         return Hash.HashElems(
-                    HASH_PREFIX,
+                    Hash.Prefix06,
                     extendedHash,
                     elGamalPublicKey,
                     ciphertext.Pad,

@@ -6,6 +6,7 @@
 #include <electionguard/convert.hpp>
 #include <electionguard/elgamal.hpp>
 #include <electionguard/group.hpp>
+#include <electionguard/hash.hpp>
 #include <electionguard/nonces.hpp>
 #include <electionguard/precompute_buffers.hpp>
 #include <stdexcept>
@@ -115,8 +116,7 @@ TEST_CASE("elgamalEncrypt simple encrypt 0 compared with elgamalEncrypt_with_pre
 
     // Act
     auto cipherText1 = elgamalEncrypt(0UL, *triple1->get_exp(), *publicKey);
-    auto cipherText2 =
-      elgamalEncrypt_with_precomputed(0UL, *triple1->get_g_to_exp(), *triple1->get_pubkey_to_exp());
+    auto cipherText2 = elgamalEncrypt(0UL, *precomputedTwoTriplesAndAQuad);
 
     CHECK((*cipherText1->getPad() == *cipherText2->getPad()));
     CHECK((*cipherText1->getData() == *cipherText2->getData()));
@@ -153,8 +153,7 @@ TEST_CASE("elgamalEncrypt_with_precomputed simple encrypt 0 decrypts with secret
     CHECK(triple1 != nullptr);
 
     // Act
-    auto cipherText =
-      elgamalEncrypt_with_precomputed(0UL, *triple1->get_g_to_exp(), *triple1->get_pubkey_to_exp());
+    auto cipherText = elgamalEncrypt(0UL, *precomputedTwoTriplesAndAQuad);
 
     // Assert
     auto decrypted = cipherText->decrypt(secret);
@@ -211,6 +210,31 @@ TEST_CASE("elgamalEncrypt encrypt 1 decrypts with nonce")
     CHECK(1UL == decrypted);
 }
 
+TEST_CASE("elgamalEncrypt vwith precomputed encrypt 1, decrypts with secret")
+{
+    //auto nonce = ElementModQ::fromHex(a_fixed_nonce);
+    auto secret = ElementModQ::fromHex(a_fixed_secret);
+    auto keypair = ElGamalKeyPair::fromSecret(*secret);
+    auto *publicKey = keypair->getPublicKey();
+
+    CHECK((*publicKey < P()));
+
+    // cause a two triples and a quad to be populated
+    PrecomputeBufferContext::initialize(*keypair->getPublicKey(), 1);
+    PrecomputeBufferContext::start();
+    PrecomputeBufferContext::stop();
+
+    // this function runs off to look in the precomputed values buffer and if
+    // it finds what it needs the the returned class will contain those values
+    auto precomputedTwoTriplesAndAQuad = PrecomputeBufferContext::getTwoTriplesAndAQuadruple();
+
+    auto cipherText = elgamalEncrypt(1UL, *precomputedTwoTriplesAndAQuad);
+
+    auto decrypted = cipherText->decrypt(*secret);
+    CHECK(1UL == decrypted);
+    PrecomputeBufferContext::clear();
+}
+
 TEST_CASE("elgamalAdd simple decrypts with secret")
 {
     const auto &nonce = ONE_MOD_Q();
@@ -246,7 +270,7 @@ TEST_CASE("HashedElGamalCiphertext encrypt and decrypt data")
     vector<uint8_t> plaintext(bytes_to_use, bytes_to_use + sizeof(bytes_to_use));
 
     std::unique_ptr<HashedElGamalCiphertext> HEGResult = hashedElgamalEncrypt(
-      plaintext, *nonce, *publicKey, *cryptoExtendedBaseHash, NO_PADDING, false);
+      plaintext, *nonce, HashPrefix::get_prefix_05(), *publicKey, *cryptoExtendedBaseHash, false);
 
     unique_ptr<ElementModQ> hash_of_HEG = HEGResult->crypto_hash();
 
@@ -257,7 +281,8 @@ TEST_CASE("HashedElGamalCiphertext encrypt and decrypt data")
     unique_ptr<HashedElGamalCiphertext> newHEG =
       make_unique<HashedElGamalCiphertext>(move(pad), HEGResult->getData(), HEGResult->getMac());
 
-    vector<uint8_t> new_plaintext = newHEG->decrypt(secret, *cryptoExtendedBaseHash, false);
+    vector<uint8_t> new_plaintext = newHEG->decrypt(*publicKey, secret, HashPrefix::get_prefix_05(),
+                                                    *cryptoExtendedBaseHash, false);
 
     CHECK(plaintext == new_plaintext);
 }
@@ -267,7 +292,7 @@ TEST_CASE("HashedElGamalCiphertext encrypt and decrypt data with padding but on 
     uint64_t qwords_to_use[4] = {0x0102030405060708, 0x090a0b0c0d0e0f10, 0x1112131415161718,
                                  0x191a1b1c1d1e1f20};
 
-    uint8_t bytes_to_use[BYTES_512] = {0x09};
+    uint8_t bytes_to_use[HASHED_CIPHERTEXT_PADDED_DATA_SIZE::BYTES_512] = {0x09};
 
     const auto nonce = make_unique<ElementModQ>(qwords_to_use);
     const auto cryptoExtendedBaseHash = make_unique<ElementModQ>(qwords_to_use);
@@ -276,8 +301,9 @@ TEST_CASE("HashedElGamalCiphertext encrypt and decrypt data with padding but on 
     auto *publicKey = keypair->getPublicKey();
     vector<uint8_t> plaintext(bytes_to_use, bytes_to_use + sizeof(bytes_to_use));
 
-    std::unique_ptr<HashedElGamalCiphertext> HEGResult =
-      hashedElgamalEncrypt(plaintext, *nonce, *publicKey, *cryptoExtendedBaseHash, BYTES_512, true);
+    std::unique_ptr<HashedElGamalCiphertext> HEGResult = hashedElgamalEncrypt(
+      plaintext, *nonce, HashPrefix::get_prefix_05(), *publicKey, *cryptoExtendedBaseHash,
+      HASHED_CIPHERTEXT_PADDED_DATA_SIZE::BYTES_512, false, true);
 
     unique_ptr<ElementModQ> hash_of_HEG = HEGResult->crypto_hash();
 
@@ -287,8 +313,9 @@ TEST_CASE("HashedElGamalCiphertext encrypt and decrypt data with padding but on 
     unique_ptr<HashedElGamalCiphertext> newHEG =
       make_unique<HashedElGamalCiphertext>(move(pad), ciphertext, mac);
 
-    CHECK(ciphertext.size() == (BYTES_512 + sizeof(uint16_t)));
-    vector<uint8_t> new_plaintext = newHEG->decrypt(secret, *cryptoExtendedBaseHash, true);
+    CHECK(ciphertext.size() == (HASHED_CIPHERTEXT_PADDED_DATA_SIZE::BYTES_512 + sizeof(uint16_t)));
+    vector<uint8_t> new_plaintext = newHEG->decrypt(*publicKey, secret, HashPrefix::get_prefix_05(),
+                                                    *cryptoExtendedBaseHash, true);
 
     CHECK(plaintext == new_plaintext);
 }
@@ -298,7 +325,7 @@ TEST_CASE("HashedElGamalCiphertext encrypt and decrypt string data with padding"
     uint64_t qwords_to_use[4] = {0x0102030405060708, 0x090a0b0c0d0e0f10, 0x1112131415161718,
                                  0x191a1b1c1d1e1f20};
 
-    uint8_t bytes_to_use[BYTES_512] = {0x09};
+    uint8_t bytes_to_use[HASHED_CIPHERTEXT_PADDED_DATA_SIZE::BYTES_512] = {0x09};
     const auto nonce = make_unique<ElementModQ>(qwords_to_use);
     const auto cryptoExtendedBaseHash = make_unique<ElementModQ>(qwords_to_use);
     const auto &secret = TWO_MOD_Q();
@@ -310,8 +337,9 @@ TEST_CASE("HashedElGamalCiphertext encrypt and decrypt string data with padding"
                               +(uint8_t *)&plaintext_string.front() +
                                 (plaintext_string.size() * 2));
 
-    auto HEGResult =
-      hashedElgamalEncrypt(plaintext, *nonce, *publicKey, *cryptoExtendedBaseHash, BYTES_512, true);
+    auto HEGResult = hashedElgamalEncrypt(
+      plaintext, *nonce, HashPrefix::get_prefix_05(), *publicKey, *cryptoExtendedBaseHash,
+      HASHED_CIPHERTEXT_PADDED_DATA_SIZE::BYTES_512, false, true);
 
     unique_ptr<ElementModQ> hash_of_HEG = HEGResult->crypto_hash();
 
@@ -320,13 +348,14 @@ TEST_CASE("HashedElGamalCiphertext encrypt and decrypt string data with padding"
     auto ciphertext = HEGResult->getData();
     auto mac = HEGResult->getMac();
 
-    CHECK(ciphertext.size() == (BYTES_512 + sizeof(uint16_t)));
+    CHECK(ciphertext.size() == (HASHED_CIPHERTEXT_PADDED_DATA_SIZE::BYTES_512 + sizeof(uint16_t)));
 
     // now lets decrypt
     unique_ptr<HashedElGamalCiphertext> newHEG =
       make_unique<HashedElGamalCiphertext>(move(p_pad), HEGResult->getData(), HEGResult->getMac());
 
-    vector<uint8_t> new_plaintext = newHEG->decrypt(secret, *cryptoExtendedBaseHash, true);
+    vector<uint8_t> new_plaintext = newHEG->decrypt(*publicKey, secret, HashPrefix::get_prefix_05(),
+                                                    *cryptoExtendedBaseHash, true);
 
     CHECK(plaintext == new_plaintext);
 }
@@ -336,8 +365,8 @@ TEST_CASE("HashedElGamalCiphertext encrypt and decrypt string data with padding 
     uint64_t qwords_to_use[4] = {0x0102030405060708, 0x090a0b0c0d0e0f10, 0x1112131415161718,
                                  0x191a1b1c1d1e1f20};
 
-    uint8_t bytes_to_use[BYTES_512 + 20] = {0x1a};
-    uint8_t truncated_bytes[BYTES_512] = {0x1a};
+    uint8_t bytes_to_use[HASHED_CIPHERTEXT_PADDED_DATA_SIZE::BYTES_512 + 20] = {0x1a};
+    uint8_t truncated_bytes[HASHED_CIPHERTEXT_PADDED_DATA_SIZE::BYTES_512] = {0x1a};
 
     const auto nonce = make_unique<ElementModQ>(qwords_to_use);
     const auto cryptoExtendedBaseHash = make_unique<ElementModQ>(qwords_to_use);
@@ -347,8 +376,9 @@ TEST_CASE("HashedElGamalCiphertext encrypt and decrypt string data with padding 
 
     vector<uint8_t> plaintext(bytes_to_use, bytes_to_use + sizeof(bytes_to_use));
 
-    auto HEGResult =
-      hashedElgamalEncrypt(plaintext, *nonce, *publicKey, *cryptoExtendedBaseHash, BYTES_512, true);
+    auto HEGResult = hashedElgamalEncrypt(
+      plaintext, *nonce, HashPrefix::get_prefix_05(), *publicKey, *cryptoExtendedBaseHash,
+      HASHED_CIPHERTEXT_PADDED_DATA_SIZE::BYTES_512, true, true);
 
     unique_ptr<ElementModQ> hash_of_HEG = HEGResult->crypto_hash();
 
@@ -357,13 +387,14 @@ TEST_CASE("HashedElGamalCiphertext encrypt and decrypt string data with padding 
     auto ciphertext = HEGResult->getData();
     auto mac = HEGResult->getMac();
 
-    CHECK(ciphertext.size() == (BYTES_512 + sizeof(uint16_t)));
+    CHECK(ciphertext.size() == (HASHED_CIPHERTEXT_PADDED_DATA_SIZE::BYTES_512 + sizeof(uint16_t)));
 
     // now lets decrypt
     unique_ptr<HashedElGamalCiphertext> newHEG =
       make_unique<HashedElGamalCiphertext>(move(p_pad), HEGResult->getData(), HEGResult->getMac());
 
-    vector<uint8_t> new_plaintext = newHEG->decrypt(secret, *cryptoExtendedBaseHash, true);
+    vector<uint8_t> new_plaintext = newHEG->decrypt(*publicKey, secret, HashPrefix::get_prefix_05(),
+                                                    *cryptoExtendedBaseHash, true);
 
     vector<uint8_t> plaintext_truncated(truncated_bytes, truncated_bytes + sizeof(truncated_bytes));
 
@@ -384,8 +415,9 @@ TEST_CASE("HashedElGamalCiphertext encrypt and decrypt no data")
     vector<uint8_t> plaintext; // no data in plaintext
     CHECK(plaintext.size() == 0);
 
-    auto HEGResult =
-      hashedElgamalEncrypt(plaintext, *nonce, *publicKey, *cryptoExtendedBaseHash, BYTES_512, true);
+    auto HEGResult = hashedElgamalEncrypt(
+      plaintext, *nonce, HashPrefix::get_prefix_05(), *publicKey, *cryptoExtendedBaseHash,
+      HASHED_CIPHERTEXT_PADDED_DATA_SIZE::BYTES_512, false, true);
 
     unique_ptr<ElementModQ> hash_of_HEG = HEGResult->crypto_hash();
 
@@ -393,14 +425,15 @@ TEST_CASE("HashedElGamalCiphertext encrypt and decrypt no data")
     unique_ptr<ElementModP> p_pad = make_unique<ElementModP>(*pad);
     auto ciphertext = HEGResult->getData();
     auto mac = HEGResult->getMac();
-    CHECK(ciphertext.size() ==
-          (BYTES_512 + sizeof(uint16_t))); // two more bytes than max_len input to encrypt
+    CHECK(ciphertext.size() == (HASHED_CIPHERTEXT_PADDED_DATA_SIZE::BYTES_512 +
+                                sizeof(uint16_t))); // two more bytes than max_len input to encrypt
 
     // now lets decrypt
     unique_ptr<HashedElGamalCiphertext> newHEG =
       make_unique<HashedElGamalCiphertext>(move(p_pad), HEGResult->getData(), HEGResult->getMac());
 
-    vector<uint8_t> new_plaintext = newHEG->decrypt(secret, *cryptoExtendedBaseHash, true);
+    vector<uint8_t> new_plaintext = newHEG->decrypt(*publicKey, secret, HashPrefix::get_prefix_05(),
+                                                    *cryptoExtendedBaseHash, true);
     CHECK(new_plaintext.size() == 0);
 
     CHECK(plaintext == new_plaintext);
@@ -427,7 +460,7 @@ TEST_CASE("HashedElGamalCiphertext encrypt and decrypt data failure different no
     bool decrypt_failed = false;
 
     std::unique_ptr<HashedElGamalCiphertext> HEGResult = hashedElgamalEncrypt(
-      plaintext, *nonce, *publicKey, *cryptoExtendedBaseHash, NO_PADDING, false);
+      plaintext, *nonce, HashPrefix::get_prefix_05(), *publicKey, *cryptoExtendedBaseHash, false);
 
     unique_ptr<ElementModP> pad = make_unique<ElementModP>(*HEGResult->getPad());
     vector<uint8_t> ciphertext = HEGResult->getData();
@@ -438,7 +471,8 @@ TEST_CASE("HashedElGamalCiphertext encrypt and decrypt data failure different no
 
     try {
         vector<uint8_t> new_plaintext =
-          newHEG->decrypt(*different_secret, *cryptoExtendedBaseHash, false);
+          newHEG->decrypt(*publicKey, *different_secret, HashPrefix::get_prefix_05(),
+                          *cryptoExtendedBaseHash, false);
     } catch (std::runtime_error &e) {
         decrypt_failed = true;
     }
@@ -463,7 +497,7 @@ TEST_CASE("HashedElGamalCiphertext encrypt and decrypt data failure - tampered w
     bool decrypt_failed = false;
 
     std::unique_ptr<HashedElGamalCiphertext> HEGResult = hashedElgamalEncrypt(
-      plaintext, *nonce, *publicKey, *cryptoExtendedBaseHash, NO_PADDING, false);
+      plaintext, *nonce, HashPrefix::get_prefix_05(), *publicKey, *cryptoExtendedBaseHash, false);
 
     unique_ptr<ElementModP> pad = make_unique<ElementModP>(*HEGResult->getPad());
     vector<uint8_t> ciphertext = HEGResult->getData();
@@ -480,7 +514,8 @@ TEST_CASE("HashedElGamalCiphertext encrypt and decrypt data failure - tampered w
       make_unique<HashedElGamalCiphertext>(move(pad), ciphertext, HEGResult->getMac());
 
     try {
-        vector<uint8_t> new_plaintext = newHEG->decrypt(secret, *cryptoExtendedBaseHash, false);
+        vector<uint8_t> new_plaintext = newHEG->decrypt(
+          *publicKey, secret, HashPrefix::get_prefix_05(), *cryptoExtendedBaseHash, false);
     } catch (std::runtime_error &e) {
         decrypt_failed = true;
     }
@@ -509,15 +544,17 @@ TEST_CASE("HashedElGamalCiphertext encrypt failure length cases")
 
     try {
         std::unique_ptr<HashedElGamalCiphertext> HEGResult = hashedElgamalEncrypt(
-          longer_plaintext, *nonce, *publicKey, *cryptoExtendedBaseHash, BYTES_512, false);
+          longer_plaintext, *nonce, HashPrefix::get_prefix_05(), *publicKey,
+          *cryptoExtendedBaseHash, HASHED_CIPHERTEXT_PADDED_DATA_SIZE::BYTES_512, false, false);
     } catch (std::invalid_argument &e) {
         encrypt_longer_plaintext_failed = true;
     }
     CHECK(encrypt_longer_plaintext_failed);
 
     try {
-        std::unique_ptr<HashedElGamalCiphertext> HEGResult = hashedElgamalEncrypt(
-          longer_plaintext, *nonce, *publicKey, *cryptoExtendedBaseHash, NO_PADDING, false);
+        std::unique_ptr<HashedElGamalCiphertext> HEGResult =
+          hashedElgamalEncrypt(longer_plaintext, *nonce, HashPrefix::get_prefix_05(), *publicKey,
+                               *cryptoExtendedBaseHash, false);
     } catch (std::invalid_argument &e) {
         encrypt_no_pad_not_block_length_failed = true;
     }
@@ -551,50 +588,25 @@ TEST_CASE("HashedElGamalCiphertext encrypt and decrypt string data with padding 
     PrecomputeBufferContext::start();
     PrecomputeBufferContext::stop();
 
-    auto HEGResult =
-      hashedElgamalEncrypt(plaintext, *nonce, *publicKey, *cryptoExtendedBaseHash, BYTES_512, true);
+    auto HEGResult = hashedElgamalEncrypt(
+      plaintext, *nonce, HashPrefix::get_prefix_05(), *publicKey, *cryptoExtendedBaseHash,
+      HASHED_CIPHERTEXT_PADDED_DATA_SIZE::BYTES_512, true, true);
 
     auto pad = HEGResult->getPad();
     unique_ptr<ElementModP> p_pad = make_unique<ElementModP>(*pad);
     auto ciphertext = HEGResult->getData();
     auto mac = HEGResult->getMac();
 
-    CHECK(ciphertext.size() == (BYTES_512 + sizeof(uint16_t)));
+    CHECK(ciphertext.size() == (HASHED_CIPHERTEXT_PADDED_DATA_SIZE::BYTES_512 + sizeof(uint16_t)));
 
     // now lets decrypt
     unique_ptr<HashedElGamalCiphertext> newHEG =
       make_unique<HashedElGamalCiphertext>(move(p_pad), HEGResult->getData(), HEGResult->getMac());
 
-    vector<uint8_t> new_plaintext = newHEG->decrypt(secret, *cryptoExtendedBaseHash, true);
+    vector<uint8_t> new_plaintext = newHEG->decrypt(*publicKey, secret, HashPrefix::get_prefix_05(),
+                                                    *cryptoExtendedBaseHash, true);
 
     CHECK(plaintext == new_plaintext);
-    PrecomputeBufferContext::clear();
-}
-
-TEST_CASE("elgamalEncrypt_with_precomputed encrypt 1, decrypts with secret")
-{
-    //auto nonce = ElementModQ::fromHex(a_fixed_nonce);
-    auto secret = ElementModQ::fromHex(a_fixed_secret);
-    auto keypair = ElGamalKeyPair::fromSecret(*secret);
-    auto *publicKey = keypair->getPublicKey();
-
-    CHECK((*publicKey < P()));
-
-    // cause a two triples and a quad to be populated
-    PrecomputeBufferContext::initialize(*keypair->getPublicKey(), 1);
-    PrecomputeBufferContext::start();
-    PrecomputeBufferContext::stop();
-
-    // this function runs off to look in the precomputed values buffer and if
-    // it finds what it needs the the returned class will contain those values
-    auto precomputedTwoTriplesAndAQuad = PrecomputeBufferContext::getTwoTriplesAndAQuadruple();
-    auto triple1 = precomputedTwoTriplesAndAQuad->get_triple1();
-
-    auto cipherText =
-      elgamalEncrypt_with_precomputed(1UL, *triple1->get_g_to_exp(), *triple1->get_pubkey_to_exp());
-
-    auto decrypted = cipherText->decrypt(*secret);
-    CHECK(1UL == decrypted);
     PrecomputeBufferContext::clear();
 }
 
@@ -616,7 +628,8 @@ TEST_CASE("HashedElGamalCiphertext encrypt and decrypt with hard coded data for 
       ElementModQ::fromHex("6E418518C6C244CA58399C0F47A9C761BAE7B876F8F5360D8D15FCFF26A42BAA");
 
     std::unique_ptr<HashedElGamalCiphertext> HEGResult = hashedElgamalEncrypt(
-      plaintext, *nonce, *publicKey, *cryptoExtendedBaseHash, BYTES_512, false);
+      plaintext, *nonce, HashPrefix::get_prefix_05(), *publicKey, *cryptoExtendedBaseHash,
+      HASHED_CIPHERTEXT_PADDED_DATA_SIZE::BYTES_512, true, false);
 
     unique_ptr<ElementModQ> hash_of_HEG = HEGResult->crypto_hash();
 
@@ -641,29 +654,29 @@ TEST_CASE("HashedElGamalCiphertext encrypt and decrypt with hard coded data for 
     CHECK(pad->toHex() == hard_coded_pad_string);
 
     string hard_coded_data_string(
-      "F8E994D157A065A1DB2DA5E38645C283F7CCB339E13F0DE29B83A4EFA"
-      "2F4366C626FC8E318AF81DCB2E6083A598F8916A5FEEC3C1A1B8EBEB4081F3CB92FA86E000B4994B77E"
-      "E173072D796D21EE771F4D8F50E7DC50A7945E35059F893DD0A67C53DF5A3439A89E990C5B7568912CD"
-      "2655B39E943511E1B0DF8A8E1FEF4EAC3923A5B5DDF1A658335E97AA6EB12E4EEE1394D91548F3E8446"
-      "E9BBF4207D873F54298B446A7D689FF60A6F60B3FC6B8319EC17FA424F0461949CD49B764C6360AC0D4"
-      "92696E43EE83A6A7CE7AEA4DDBA206F365AA81E918F63709DE796F0338CCD311360D97CDC821506D3ED"
-      "B434922264966B8AF7E304A403E18384DDCF53AEF1FFC19A66FBCD9C2D04EFC8F2D456BE52DB9C460E3"
-      "CA10AC4ABFE0B726E19A715546F1CD9CA89C57ED52DA9D78C30BEFE5FE99A8BDEA33B7C06EDFD4E92D5"
-      "14661CD55B99B54E5C468118E16F4827F78FB381845B093F202111E3B84CFCF8DAEE7948BA57698475F"
-      "3EBC3729559835BF63AAB0F5659019965A2F0CF55E953B1CD37BCBED8EA0D5F161D461E03031BA7D0B0"
-      "42B978F7F6776DDFBCAA7145DE30BA24C29BDFA05C7CCF54D7DD58E75143A16F8619053FCF4DE7BDCCA"
-      "031F0873A65ACCC56FE78F32B8FC192D2106CF1A1E5339A5C5657E6703D7F30F908CEEF05A84C67C426"
-      "B187CBC1599FB334307146EAECB16774C5CB7630F4CB093E840086");
+      "A3C7CDFAEB85EE51ECC8A832AD02F72035A24A3B1514DC5AD68A636122AE22016E6377923191496999EBF1CAA13A"
+      "8CBAD60FBE8B44C59E9DFDBD47241933864C7A25FB9ED522B367CEBA765C3FD15D127D3D16199AAC20048FFD4180"
+      "6B112F5B288A68B3659AE48AF1F6D2DC164AA94F6CCD1223427194530B950280B6D5666A812A476A9C484B02FF88"
+      "2182014D5DF3683BF805A92CA0A574040BEF1649C4100428AD8B49F191E2808343A5E2D3DA8B23BFFA9808D4A33E"
+      "F4DD501F0E31B73C2334DD90A56881355CEEF5A5CB8E5CAF710C94B070CB33E77564181587EAD374C74421F32DF4"
+      "12C1D90E4A07E12ABE096FDBAE0981716505B014C6A3E9C1C8F6C88C34389FB6C2F042AF4BA394C47560B8179AFB"
+      "C655628AD7E7D0DF24E7591DEA47DF86762029BD4E046384B48863D5A5E98FCCA0123CDD4439E2A37C9CE8218184"
+      "D1EB4C88B90DB1A9C54A8F0568B87926AD6437C1196622B5E85E7A6F826A1CE9D53F82C3BA89B0B64D4C035DAB5F"
+      "F442A656F3E3EC5817B9ACE0B5C0A9896FB0B6F9BF62C78080E022DE152C7EB24D78DA2C4B88D07DC6D3C35FA984"
+      "03B52962530370D7A99B93C159265A55A9E27D0321B2B6377F6DB8F2F391AF2B27850CB2C2D694F87C796E9D9857"
+      "DA0F11882C45D3A661EEAA765E94C12BDC90A83A7CAE3D3109A29CDE251EC02C96562CC985EBFB2AA0BC868B1A6F"
+      "8B1CBB57ABFD");
     CHECK(bytes_to_hex(data) == hard_coded_data_string);
 
-    string hard_coded_mac_string("BBCDE57B7E92BB8607696E09FE629A2B9665D809649B751333023983C0"
-                                 "01C191");
+    string hard_coded_mac_string(
+      "74C8D7660225A4146D05F6CDB3751B5A2502240CD6B0978A52A6344D61A20219");
     CHECK(bytes_to_hex(mac) == hard_coded_mac_string);
 
     unique_ptr<HashedElGamalCiphertext> newHEG =
       make_unique<HashedElGamalCiphertext>(move(pad), HEGResult->getData(), HEGResult->getMac());
 
-    vector<uint8_t> new_plaintext = newHEG->decrypt(*secret, *cryptoExtendedBaseHash, true);
+    vector<uint8_t> new_plaintext = newHEG->decrypt(
+      *publicKey, *secret, HashPrefix::get_prefix_05(), *cryptoExtendedBaseHash, true);
 
     CHECK(plaintext == new_plaintext);
 }
