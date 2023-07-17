@@ -630,4 +630,7 @@
   <data name="ResponseComplete" xml:space="preserve">
     <value>Guardian has responded to Admin Challenge</value>
   </data>
+  <data name="CloseText" xml:space="preserve">
+    <value>Close</value>
+  </data>
 </root>

@@ -633,4 +633,7 @@
   <data name="ResponseComplete" xml:space="preserve">
     <value>¡El tutor ha respondido al desafío del administrador!</value>
   </data>
+  <data name="CloseText" xml:space="preserve">
+    <value>¡Cerca!</value>
+  </data>
 </root>
