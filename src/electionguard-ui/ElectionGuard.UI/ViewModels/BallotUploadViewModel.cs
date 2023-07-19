@@ -5,6 +5,7 @@ using CommunityToolkit.Mvvm.Input;
 using ElectionGuard.Ballot;
 using ElectionGuard.Decryption;
 using ElectionGuard.Decryption.Tally;
+using Microsoft.Extensions.Logging;
 
 namespace ElectionGuard.UI.ViewModels;
 
@@ -213,9 +214,10 @@ public partial class BallotUploadViewModel : BaseViewModel
                 _ = Interlocked.Increment(ref totalCount);
                 UploadText = $"{AppResources.SuccessText} {totalCount} / {ballots.Length} {AppResources.Success2Text}";
             }
-            catch (Exception)
+            catch (Exception ex)
             {
                 _ = Interlocked.Increment(ref totalRejected);
+                _logger.LogWarning(ex, "Ballot being rejected {currentBallot}", currentBallot);
             }
         });
 
@@ -325,14 +327,17 @@ public partial class BallotUploadViewModel : BaseViewModel
     private readonly CiphertextTallyService _ciphertextTallyService;
     private bool _importing;
     private long _lastDrive = -1;
+    private ILogger<BallotUploadViewModel> _logger;
 
     public BallotUploadViewModel(IServiceProvider serviceProvider,
         BallotUploadService uploadService,
         BallotService ballotService,
         ManifestService manifestService,
         ContextService contextService,
-        CiphertextTallyService ciphertextTallyService) : base("BallotUploadText", serviceProvider)
+        CiphertextTallyService ciphertextTallyService,
+        ILogger<BallotUploadViewModel> logger) : base("BallotUploadText", serviceProvider)
     {
+        _logger = logger;
         _uploadService = uploadService;
         _ballotService = ballotService;
         _manifestService = manifestService;
