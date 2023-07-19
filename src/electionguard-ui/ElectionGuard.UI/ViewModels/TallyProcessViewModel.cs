@@ -421,15 +421,31 @@ public partial class TallyProcessViewModel : BaseViewModel
 
         _ = Task.Run(async () =>
         {
-            Tally = await _tallyService.GetByTallyIdAsync(TallyId);
-            if (Tally != null)
+            var localTally = await _tallyService.GetByTallyIdAsync(TallyId);
+            if (localTally != null)
             {
-                await UpdateTallyData();
                 try
                 {
-                    if (await _tallyRunner.Run(Tally))
+                    _ = Shell.Current.CurrentPage.Dispatcher.DispatchAsync(async () =>
+                    {
+                        Tally = localTally;
+                    });
+                    await UpdateTallyData();
+#if DEBUG
+                    ErrorMessage = Tally.State.ToString();
+#endif
+                    if (await _tallyRunner.Run(localTally))
                     {
                         ErrorMessage = string.Empty;
+#if DEBUG
+                        ErrorMessage = $"{Tally.State.ToString()} ran";
+#endif
+                    }
+                    else
+                    {
+#if DEBUG
+                        ErrorMessage = $"{Tally.State.ToString()} waiting";
+#endif
                     }
                 }
                 catch (Exception ex)
@@ -471,9 +487,14 @@ public partial class TallyProcessViewModel : BaseViewModel
 
         var sharesComputed = JoinedGuardians.Count(g => g.HasDecryptShares);
         var challengesResponded = JoinedGuardians.Count(g => g.HasResponse);
+        var consentingGuardians = JoinedGuardians.Count(g => g.Joined);
+
+        CanUserStartTally = Tally.State == TallyState.PendingGuardiansJoin
+            && consentingGuardians >= Tally.Quorum && IsAdmin;
 
         Checklist = new TallyCeremonyChecklist(
             Tally!,
+            consentingGuardians,
             sharesComputed,
             challengesResponded
             );

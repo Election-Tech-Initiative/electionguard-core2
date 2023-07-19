@@ -11,7 +11,6 @@ public partial class CreateElectionViewModel : BaseViewModel
     private readonly ManifestService _manifestService;
     private readonly ContextService _contextService;
     private readonly ConstantsService _constantsService;
-    private readonly IStorageService _storageService;
     private const string PageName = "CreateElection";
 
     public CreateElectionViewModel(IServiceProvider serviceProvider,
@@ -19,15 +18,13 @@ public partial class CreateElectionViewModel : BaseViewModel
                                    ElectionService electionService,
                                    ManifestService manifestService,
                                    ContextService contextService,
-                                   ConstantsService constantsService,
-                                   ZipStorageService storageService) : base(PageName, serviceProvider)
+                                   ConstantsService constantsService) : base(PageName, serviceProvider)
     {
         _keyCeremonyService = keyCeremonyService;
         _electionService = electionService;
         _manifestService = manifestService;
         _contextService = contextService;
         _constantsService = constantsService;
-        _storageService = storageService;
     }
 
     public override async Task OnAppearing()
@@ -81,6 +78,8 @@ public partial class CreateElectionViewModel : BaseViewModel
             // create an election for each file
             try
             {
+                ZipStorageService storageService = new();
+
                 // create the manifest
                 using var manifest = new Manifest(File.ReadAllText(file.FullPath));
                 var electionName = multiple ? manifest.Name.GetTextAt(0).Value : ElectionName;
@@ -139,10 +138,9 @@ public partial class CreateElectionViewModel : BaseViewModel
                     // need to add the path from the manifest
                     var zipPath = file.FullPath.ToLower().Replace(".json", ".zip");
                     var encryptionPackage = new EncryptionPackage(contextRecord, constantsRecord, manifestRecord);
-                    _storageService.UpdatePath(zipPath);
-                    _storageService.ToFiles(encryptionPackage);
+                    storageService.UpdatePath(zipPath);
+                    storageService.ToFiles(encryptionPackage);
                 }
-
 
                 if (!multiple)
                 {
@@ -169,7 +167,10 @@ public partial class CreateElectionViewModel : BaseViewModel
                 // goto the email page or go to the home page
                 if (multiple)
                 {
-                    HomeCommand.Execute(null);
+                    _ = Shell.Current.CurrentPage.Dispatcher.DispatchAsync(() =>
+                    {
+                        HomeCommand.Execute(null);
+                    });
                 }
             }
         });
