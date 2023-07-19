@@ -491,9 +491,14 @@ public partial class TallyProcessViewModel : BaseViewModel
 
         var sharesComputed = JoinedGuardians.Count(g => g.HasDecryptShares);
         var challengesResponded = JoinedGuardians.Count(g => g.HasResponse);
+        var consentingGuardians = JoinedGuardians.Count(g => g.Joined);
+
+        CanUserStartTally = Tally.State == TallyState.PendingGuardiansJoin
+            && consentingGuardians >= Tally.Quorum && IsAdmin;
 
         Checklist = new TallyCeremonyChecklist(
             Tally!,
+            consentingGuardians,
             sharesComputed,
             challengesResponded
             );

@@ -630,4 +630,13 @@
   <data name="ErrorLogs" xml:space="preserve">
     <value>Ver registros de errores</value>
   </data>
+  <data name="DecryptionComplete" xml:space="preserve">
+    <value>¡Descifrado parcial completo!</value>
+  </data>
+  <data name="ResponseComplete" xml:space="preserve">
+    <value>¡El tutor ha respondido al desafío del administrador!</value>
+  </data>
+  <data name="CloseText" xml:space="preserve">
+    <value>¡Cerca!</value>
+  </data>
 </root>

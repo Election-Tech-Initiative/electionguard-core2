@@ -627,4 +627,13 @@
   <data name="ErrorLogs" xml:space="preserve">
     <value>View Error Logs</value>
   </data>
+  <data name="DecryptionComplete" xml:space="preserve">
+    <value>Partial Decryption Complete</value>
+  </data>
+  <data name="ResponseComplete" xml:space="preserve">
+    <value>Guardian has responded to Admin Challenge</value>
+  </data>
+  <data name="CloseText" xml:space="preserve">
+    <value>Close</value>
+  </data>
 </root>

@@ -259,6 +259,15 @@ namespace ElectionGuard.UI.Resx {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Close.
+        /// </summary>
+        internal static string CloseText {
+            get {
+                return ResourceManager.GetString("CloseText", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Complete.
         /// </summary>
         internal static string Complete {
@@ -444,6 +453,15 @@ namespace ElectionGuard.UI.Resx {
         internal static string DatesText {
             get {
                 return ResourceManager.GetString("DatesText", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Partial Decryption Complete.
+        /// </summary>
+        internal static string DecryptionComplete {
+            get {
+                return ResourceManager.GetString("DecryptionComplete", resourceCulture);
             }
         }
         
@@ -1137,6 +1155,15 @@ namespace ElectionGuard.UI.Resx {
         internal static string RemovingList {
             get {
                 return ResourceManager.GetString("RemovingList", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Guardian has responded to Admin Challenge.
+        /// </summary>
+        internal static string ResponseComplete {
+            get {
+                return ResourceManager.GetString("ResponseComplete", resourceCulture);
             }
         }
         

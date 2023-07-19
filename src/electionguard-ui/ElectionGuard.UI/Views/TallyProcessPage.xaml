@@ -24,6 +24,11 @@
             <converter:BackupConverter x:Key="BackupConverter" />
             <converter:BadVerifyConverter x:Key="BadVerifyConverter" />
             <converter:GuardianBackgroundConverter x:Key="GuardianBackgroundConverter" />
+            <converter:TallyAccumulatingConverter x:Key="TallyAccumulatingConverter" />
+            <converter:TallyPendingDecryptionsConverter x:Key="TallyPendingDecryptionsConverter" />
+            <converter:TallyCreatingChallengeConverter x:Key="TallyCreatingChallengeConverter" />
+            <converter:TallyPendingChallengeResponseConverter x:Key="TallyPendingChallengeResponseConverter" />
+            <converter:TallyVerifyConverter x:Key="TallyVerifyConverter" />
             <Style TargetType="ActivityIndicator">
                 <Setter Property="Margin" Value="10" />
                 <Setter Property="HeightRequest" Value="30" />
@@ -111,7 +116,7 @@
                                 WidthRequest="32" />
                             <Image
                                 Grid.Column="2"
-                                IsVisible="{Binding Joined}"
+                                IsVisible="{Binding HasDecryptShares}"
                                 Source="{Binding HasDecryptShares, Converter={StaticResource BackupConverter}}"
                                 ToolTipProperties.Text="{helper:Translate DecryptionComplete}"
                                 WidthRequest="32" />
@@ -120,11 +125,6 @@
                                 IsVisible="{Binding HasResponse}"
                                 Source="notverify.png"
                                 ToolTipProperties.Text="{helper:Translate ResponseComplete}"
-                                WidthRequest="32" />
-                            <Image
-                                Grid.Column="3"
-                                IsVisible="{Binding HasResponse}"
-                                Source="{Binding HasResponse, Converter={StaticResource BadVerifyConverter}}"
                                 WidthRequest="32" />
                         </Grid>
                     </DataTemplate>
@@ -251,7 +251,7 @@
                     Text="{helper:Translate TallySubtalliesCombined}"
                     VerticalTextAlignment="Center"
                     WidthRequest="200" />
-                <ActivityIndicator IsVisible="{Binding Checklist.TallyStarted}" />
+                <ActivityIndicator IsVisible="{Binding Tally.State, Converter={StaticResource TallyAccumulatingConverter}}" />
             </HorizontalStackLayout>
             <Line Background="Black" />
             <HorizontalStackLayout Margin="10">
@@ -262,7 +262,7 @@
                     Text="{helper:Translate TallyAllDecryptionsComputed}"
                     VerticalTextAlignment="Center"
                     WidthRequest="200" />
-                <ActivityIndicator IsVisible="{Binding Checklist.SubtaliesCombined}" />
+                <ActivityIndicator IsVisible="{Binding Tally.State, Converter={StaticResource TallyPendingDecryptionsConverter}}" />
             </HorizontalStackLayout>
             <Line Background="Black" />
             <HorizontalStackLayout Margin="10">
@@ -273,7 +273,7 @@
                     Text="{helper:Translate TallyChallengeCreated}"
                     VerticalTextAlignment="Center"
                     WidthRequest="200" />
-                <ActivityIndicator IsVisible="{Binding Checklist.AllDecryptionSharesComputed}" />
+                <ActivityIndicator IsVisible="{Binding Tally.State, Converter={StaticResource TallyCreatingChallengeConverter}}" />
             </HorizontalStackLayout>
             <Line Background="Black" />
             <HorizontalStackLayout Margin="10">
@@ -284,7 +284,7 @@
                     Text="{helper:Translate TallyAllChallengesResponded}"
                     VerticalTextAlignment="Center"
                     WidthRequest="200" />
-                <ActivityIndicator IsVisible="{Binding Checklist.ChallengeCreated}" />
+                <ActivityIndicator IsVisible="{Binding Tally.State, Converter={StaticResource TallyPendingChallengeResponseConverter}}" />
             </HorizontalStackLayout>
             <Line Background="Black" />
             <HorizontalStackLayout Margin="10">
@@ -295,7 +295,7 @@
                     Text="{helper:Translate TallyComplete}"
                     VerticalTextAlignment="Center"
                     WidthRequest="200" />
-                <ActivityIndicator IsVisible="{Binding Checklist.AllChallengesResponded}" />
+                <ActivityIndicator IsVisible="{Binding Tally.State, Converter={StaticResource TallyVerifyConverter}}" />
             </HorizontalStackLayout>
             <Line Background="Black" />
         </VerticalStackLayout>
