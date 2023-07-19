@@ -4,7 +4,7 @@ using ElectionGuard.UI.Services;
 using Microsoft.Extensions.Logging;
 using Microsoft.AppCenter;
 using Microsoft.AppCenter.Crashes;
-using Microsoft.AppCenter.Distribute;
+using Microsoft.AppCenter.Analytics;
 
 namespace ElectionGuard.UI;
 
@@ -28,7 +28,11 @@ public static class MauiProgram
             .UseMauiCommunityToolkit()
             .SetupFonts()
             .SetupServices()
-            .SetupLogging();
+            .SetupLogging()
+            .ConfigureEssentials(essentials =>
+            {
+                essentials.UseVersionTracking();
+            });
 
         AddAppCenterAnalytics();
 
@@ -163,7 +167,7 @@ public static class MauiProgram
 
         AppCenter.Start(
             $"uwp={uwpSecret};macos={macSecret};",
-            typeof(Crashes));
+            typeof(Analytics), typeof(Crashes));
 
     }
 }
