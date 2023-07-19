@@ -55,22 +55,33 @@
             </Grid>
 
         </VerticalStackLayout>
-        <Button
+        <Grid
             Margin="10"
-            Clicked="Button_Clicked"
-            Command="{Binding SaveCommand}"
-            HorizontalOptions="Start"
-            Text="{helper:Translate Save}"
-            VerticalOptions="End" />
-        <ImageButton
-            Margin="10"
-            BackgroundColor="Transparent"
-            BorderWidth="0"
-            Command="{Binding ChangeLanguageCommand}"
-            HeightRequest="40"
-            HorizontalOptions="End"
-            Source="world.png"
-            ToolTipProperties.Text="{helper:Translate SwitchLanguages}"
-            VerticalOptions="End" />
+            ColumnDefinitions="*, auto, auto"
+            VerticalOptions="End">
+            <Button
+                Grid.Column="0"
+                Clicked="Button_Clicked"
+                Command="{Binding SaveCommand}"
+                HorizontalOptions="Start"
+                Text="{helper:Translate Save}" />
+            <ImageButton
+                Grid.Column="2"
+                BackgroundColor="Transparent"
+                BorderWidth="0"
+                Command="{Binding ChangeLanguageCommand}"
+                HeightRequest="40"
+                Source="world.png"
+                ToolTipProperties.Text="{helper:Translate SwitchLanguages}" />
+            <ImageButton
+                Grid.Column="1"
+                Margin="10,10,30,10"
+                BackgroundColor="Transparent"
+                BorderWidth="0"
+                Command="{Binding LogsCommand}"
+                HeightRequest="40"
+                Source="documenterror.png"
+                ToolTipProperties.Text="{helper:Translate ErrorLogs}" />
+        </Grid>
     </Grid>
 </views:Popup>

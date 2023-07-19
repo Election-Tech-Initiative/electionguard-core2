@@ -627,4 +627,7 @@
   <data name="CreateMultiTallyError" xml:space="preserve">
     <value>¡No hay ceremonias clave que se utilicen para multitallies!</value>
   </data>
+  <data name="ErrorLogs" xml:space="preserve">
+    <value>Ver registros de errores</value>
+  </data>
 </root>

@@ -592,6 +592,15 @@ namespace ElectionGuard.UI.Resx {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to View Error Logs.
+        /// </summary>
+        internal static string ErrorLogs {
+            get {
+                return ResourceManager.GetString("ErrorLogs", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Error in manifest files.
         /// </summary>
         internal static string ErrorManifest {

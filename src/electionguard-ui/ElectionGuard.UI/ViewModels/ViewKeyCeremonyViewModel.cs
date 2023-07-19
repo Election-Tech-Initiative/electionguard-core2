@@ -1,6 +1,7 @@
 ﻿using CommunityToolkit.Mvvm.Input;
 using ElectionGuard.ElectionSetup;
 using ElectionGuard.UI.Models;
+using Microsoft.Extensions.Logging;
 
 namespace ElectionGuard.UI.ViewModels;
 
@@ -12,14 +13,17 @@ public partial class ViewKeyCeremonyViewModel : BaseViewModel
     private KeyCeremonyMediator? _mediator;
 
     private bool _joinPressed;
+    private ILogger<ViewKeyCeremonyViewModel> _logger;
 
     public ViewKeyCeremonyViewModel(IServiceProvider serviceProvider,
                                     KeyCeremonyService keyCeremonyService,
                                     GuardianPublicKeyService guardianService,
                                     GuardianBackupService backupService,
-                                    VerificationService verificationService) :
+                                    VerificationService verificationService,
+                                    ILogger<ViewKeyCeremonyViewModel> logger) :
         base("ViewKeyCeremony", serviceProvider)
     {
+        _logger = logger;
         _keyCeremonyService = keyCeremonyService;
         _publicKeyService = guardianService;
         _backupService = backupService;
@@ -118,10 +122,19 @@ public partial class ViewKeyCeremonyViewModel : BaseViewModel
 
         _ = Task.Run(async () =>
         {
-            await UpdateGuardiansData();
-            if (IsAdmin || (!IsAdmin && _joinPressed))
+            try
             {
-                await _mediator!.RunKeyCeremony(IsAdmin);
+                await UpdateGuardiansData();
+                if (IsAdmin || (!IsAdmin && _joinPressed))
+                {
+                    await _mediator!.RunKeyCeremony(IsAdmin);
+                    ErrorMessage = string.Empty;
+                }
+            }
+            catch (Exception ex)
+            {
+                ErrorMessage = ex.Message;
+                _logger.LogError(ex, "Exception in Key Ceremony at {KeyCeremony.State}", KeyCeremony.State);
             }
         });
     }
