@@ -34,13 +34,13 @@ public class ZipStorageService : IStorageService
     public void ToFiles(List<FileContents> fileContents)
     {
         using var zipArchive = ZipFile.Open(_zipFile, ZipMode);
-        _ = Parallel.ForEach(fileContents, fileContent =>
+        foreach (var fileContent in fileContents)
         {
             var entry = zipArchive.CreateEntry(fileContent.FileName);
             using var stream = entry.Open();
             using var writer = new StreamWriter(stream);
             writer.Write(fileContent.Contents);
-        });
+        }
     }
 
     public string FromFile(string fileName)

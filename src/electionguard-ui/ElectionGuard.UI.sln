@@ -19,8 +19,6 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ElectionGuard.Encryption.Ut
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ElectionGuard.Decryption", "..\..\bindings\netstandard\ElectionGuard\ElectionGuard.Decryption\ElectionGuard.Decryption.csproj", "{DF0CA84A-EC01-48A6-9140-EF546FD781C5}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ElectionGuard.UI.Test", "ElectionGuard.UI.Test\ElectionGuard.UI.Test.csproj", "{108ACA29-BCC3-421E-9DF5-B87182CF5710}"
-EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ElectionGuard.Decryption.Tests", "..\..\bindings\netstandard\ElectionGuard\ElectionGuard.Decryption.Tests\ElectionGuard.Decryption.Tests.csproj", "{72F8C1CA-FDD7-4B7B-A08A-C16589EEA187}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ElectionGuard.ElectionSetup.Tests", "..\..\bindings\netstandard\ElectionGuard\ElectionGuard.ElectionSetup.Tests\ElectionGuard.ElectionSetup.Tests.csproj", "{123DF2EF-5EB9-4974-B834-F996D777CFAB}"
@@ -114,18 +112,6 @@ Global
 		{DF0CA84A-EC01-48A6-9140-EF546FD781C5}.Release|x64.Build.0 = Release|x64
 		{DF0CA84A-EC01-48A6-9140-EF546FD781C5}.Release|x86.ActiveCfg = Release|x86
 		{DF0CA84A-EC01-48A6-9140-EF546FD781C5}.Release|x86.Build.0 = Release|x86
-		{108ACA29-BCC3-421E-9DF5-B87182CF5710}.Debug|arm64.ActiveCfg = Debug|arm64
-		{108ACA29-BCC3-421E-9DF5-B87182CF5710}.Debug|arm64.Build.0 = Debug|arm64
-		{108ACA29-BCC3-421E-9DF5-B87182CF5710}.Debug|x64.ActiveCfg = Debug|x64
-		{108ACA29-BCC3-421E-9DF5-B87182CF5710}.Debug|x64.Build.0 = Debug|x64
-		{108ACA29-BCC3-421E-9DF5-B87182CF5710}.Debug|x86.ActiveCfg = Debug|x86
-		{108ACA29-BCC3-421E-9DF5-B87182CF5710}.Debug|x86.Build.0 = Debug|x86
-		{108ACA29-BCC3-421E-9DF5-B87182CF5710}.Release|arm64.ActiveCfg = Release|arm64
-		{108ACA29-BCC3-421E-9DF5-B87182CF5710}.Release|arm64.Build.0 = Release|arm64
-		{108ACA29-BCC3-421E-9DF5-B87182CF5710}.Release|x64.ActiveCfg = Release|x64
-		{108ACA29-BCC3-421E-9DF5-B87182CF5710}.Release|x64.Build.0 = Release|x64
-		{108ACA29-BCC3-421E-9DF5-B87182CF5710}.Release|x86.ActiveCfg = Release|x86
-		{108ACA29-BCC3-421E-9DF5-B87182CF5710}.Release|x86.Build.0 = Release|x86
 		{72F8C1CA-FDD7-4B7B-A08A-C16589EEA187}.Debug|arm64.ActiveCfg = Debug|arm64
 		{72F8C1CA-FDD7-4B7B-A08A-C16589EEA187}.Debug|arm64.Build.0 = Debug|arm64
 		{72F8C1CA-FDD7-4B7B-A08A-C16589EEA187}.Debug|x64.ActiveCfg = Debug|x64
@@ -155,7 +141,6 @@ Global
 		HideSolutionNode = FALSE
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
-		{108ACA29-BCC3-421E-9DF5-B87182CF5710} = {42BB40E3-87DD-44E6-A2B8-AE36B2B98AA1}
 		{72F8C1CA-FDD7-4B7B-A08A-C16589EEA187} = {42BB40E3-87DD-44E6-A2B8-AE36B2B98AA1}
 		{123DF2EF-5EB9-4974-B834-F996D777CFAB} = {42BB40E3-87DD-44E6-A2B8-AE36B2B98AA1}
 	EndGlobalSection

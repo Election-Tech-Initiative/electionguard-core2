@@ -1,4 +1,5 @@
-﻿using CommunityToolkit.Mvvm.Input;
+﻿using CommunityToolkit.Maui.Core.Extensions;
+using CommunityToolkit.Mvvm.Input;
 
 namespace ElectionGuard.UI.ViewModels;
 
@@ -59,34 +60,37 @@ public partial class CreateTallyViewModel : BaseViewModel
     private Manifest _currentManifest;
 
     [ObservableProperty]
-    private List<string> _deviceList = new();
+    private ObservableCollection<string> _deviceList = new();
 
     [ObservableProperty]
-    private List<string> _dateList = new();
+    private ObservableCollection<string> _dateList = new();
 
     [ObservableProperty]
-    private List<BallotUpload> _ballotUploads = new();
+    private ObservableCollection<BallotUpload> _ballotUploads = new();
 
     partial void OnElectionIdChanged(string value)
     {
         _ = Task.Run(async () =>
         {
-            CurrentElection = await _electionService.GetByElectionIdAsync(value);
+            var currentElection = await _electionService.GetByElectionIdAsync(value);
             var record = await _manifestService.GetByElectionIdAsync(value);
-            CurrentManifest = new(record?.ManifestData);
-            CurrentKeyCeremony = await _keyCeremonyService.GetByKeyCeremonyIdAsync(CurrentElection.KeyCeremonyId);
-            TallyName = $"{CurrentElection.Name} {AppResources.TallyText}";
-
             var uploads = await _ballotUploadService.GetByElectionIdAsync(value);
-            BallotUploads = uploads.DistinctBy(u => u.DeviceId).ToList();
             var startDate = uploads.Min(u => u.BallotsStart);
             var endDate = uploads.Max(u => u.BallotsEnd);
-            DateList.Clear();
-            for (DateTime currentDate = startDate; currentDate <= endDate; currentDate = currentDate.AddDays(1))
-            {
-                DateList.Add(currentDate.ToShortDateString());
-            }
 
+            _ = Shell.Current.CurrentPage.Dispatcher.Dispatch(async () =>
+            {
+                CurrentElection = currentElection!;
+                BallotUploads = uploads.DistinctBy(u => u.DeviceId).ToObservableCollection();
+                CurrentManifest = new(record?.ManifestData);
+                CurrentKeyCeremony = await _keyCeremonyService.GetByKeyCeremonyIdAsync(CurrentElection.KeyCeremonyId!);
+                TallyName = $"{CurrentElection.Name} {AppResources.TallyText}";
+                DateList.Clear();
+                for (DateTime currentDate = startDate; currentDate <= endDate; currentDate = currentDate.AddDays(1))
+                {
+                    DateList.Add(currentDate.ToShortDateString());
+                }
+            });
         });
     }
 

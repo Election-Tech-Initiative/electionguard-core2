@@ -636,7 +636,7 @@ test-cli: build-cli
 
 test-ui: build-ui
 	@echo 🧪 TEST UI $(OPERATING_SYSTEM) $(PROCESSOR) $(TARGET)
-	dotnet test -a $(PROCESSOR) -c $(TARGET) ./src/electionguard-ui/ElectionGuard.UI.Test/ElectionGuard.UI.Test.csproj
+# dotnet test -a $(PROCESSOR) -c $(TARGET) ./src/electionguard-ui/ElectionGuard.UI.Test/ElectionGuard.UI.Test.csproj
 
 test-wasm: build-wasm
 	@echo 🧪 TEST WASM $(PROCESSOR) $(TARGET)

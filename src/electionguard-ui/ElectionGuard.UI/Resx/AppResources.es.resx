@@ -624,4 +624,16 @@
   <data name="VerificationCodeText" xml:space="preserve">
     <value>Código de verificación</value>
   </data>
+  <data name="CreateMultiTallyError" xml:space="preserve">
+    <value>¡No hay ceremonias clave que se utilicen para multitallies!</value>
+  </data>
+  <data name="DecryptionComplete" xml:space="preserve">
+    <value>¡Descifrado parcial completo!</value>
+  </data>
+  <data name="ResponseComplete" xml:space="preserve">
+    <value>¡El tutor ha respondido al desafío del administrador!</value>
+  </data>
+  <data name="CloseText" xml:space="preserve">
+    <value>¡Cerca!</value>
+  </data>
 </root>
