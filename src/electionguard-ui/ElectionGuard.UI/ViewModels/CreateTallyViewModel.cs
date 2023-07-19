@@ -1,4 +1,5 @@
-﻿using CommunityToolkit.Mvvm.Input;
+﻿using CommunityToolkit.Maui.Core.Extensions;
+using CommunityToolkit.Mvvm.Input;
 
 namespace ElectionGuard.UI.ViewModels;
 
@@ -59,13 +60,13 @@ public partial class CreateTallyViewModel : BaseViewModel
     private Manifest _currentManifest;
 
     [ObservableProperty]
-    private List<string> _deviceList = new();
+    private ObservableCollection<string> _deviceList = new();
 
     [ObservableProperty]
-    private List<string> _dateList = new();
+    private ObservableCollection<string> _dateList = new();
 
     [ObservableProperty]
-    private List<BallotUpload> _ballotUploads = new();
+    private ObservableCollection<BallotUpload> _ballotUploads = new();
 
     partial void OnElectionIdChanged(string value)
     {
@@ -80,7 +81,7 @@ public partial class CreateTallyViewModel : BaseViewModel
             _ = Shell.Current.CurrentPage.Dispatcher.Dispatch(async () =>
             {
                 CurrentElection = currentElection!;
-                BallotUploads = uploads.DistinctBy(u => u.DeviceId).ToList();
+                BallotUploads = uploads.DistinctBy(u => u.DeviceId).ToObservableCollection();
                 CurrentManifest = new(record?.ManifestData);
                 CurrentKeyCeremony = await _keyCeremonyService.GetByKeyCeremonyIdAsync(CurrentElection.KeyCeremonyId!);
                 TallyName = $"{CurrentElection.Name} {AppResources.TallyText}";
