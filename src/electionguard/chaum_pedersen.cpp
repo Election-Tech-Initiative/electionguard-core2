@@ -541,11 +541,21 @@ namespace electionguard
                                                                move(_proofs));
         }
 
-        vector<reference_wrapper<CryptoHashable>> getHashableCommitments() const
+        // get hashable commitments for the integer proofs
+        // if the commitment is not present, recompute it using the public values
+        vector<reference_wrapper<CryptoHashable>>
+        getHashableCommitments(const ElGamalCiphertext &message, const ElementModP &k) const
         {
             vector<reference_wrapper<CryptoHashable>> commitments;
             for (auto &proof : integerProofs) {
-                commitments.emplace_back(static_cast<CryptoHashable &>(*proof.second->commitment));
+                if (!proof.second->commitment.has_value()) {
+                    // recompute using the publically known values
+                    auto recomputedCommitment = recomputeCommitment(
+                      message, *proof.second->challenge, *proof.second->response, proof.first, k);
+                    proof.second->commitment = move(recomputedCommitment);
+                }
+                commitments.emplace_back(
+                  static_cast<CryptoHashable &>(*proof.second->commitment.value()));
             }
             return commitments;
         }
@@ -559,27 +569,54 @@ namespace electionguard
             return challengeValues;
         }
 
-        // validate a specific proof at position j against the message
-        static ValidationResult isValid(const ElGamalCiphertext &message,
-                                        const ZeroKnowledgeProof &proof, uint64_t j,
-                                        const ElementModP &k)
+        static std::unique_ptr<ElGamalCiphertext>
+        recomputeCommitment(const ElGamalCiphertext &message, const ElementModQ &cj,
+                            const ElementModQ &vj, uint64_t j, const ElementModP &k)
         {
             auto *alpha = message.getPad();
             auto *beta = message.getData();
 
-            auto aj = *proof.commitment->getPad();
-            auto bj = *proof.commitment->getData();
-            auto cj = *proof.challenge;
-            auto vj = *proof.response;
-
-            // 𝑔^𝑉 = 𝑎 ⋅ 𝐴^𝐶 mod 𝑝
-            auto consistent_gv = (aj == *mul_mod_p(*g_pow_p(vj), *pow_mod_p(*alpha, cj)));
+            // 𝑎 = 𝑔^𝑉 ⋅ 𝐴^𝐶 mod 𝑝
+            auto aj = mul_mod_p(*g_pow_p(vj), *pow_mod_p(*alpha, cj));
 
             // w = v - jc
             auto w = sub_mod_q(vj, *mul_mod_q(*ElementModQ::fromUint64(j), cj));
 
             // 𝑏  = 𝐾^w ⋅ 𝐵^𝐶 mod 𝑝
-            auto consistent_kv = (bj == *mul_mod_p(*pow_mod_p(k, *w), *pow_mod_p(*beta, cj)));
+            auto bj = mul_mod_p(*pow_mod_p(k, *w), *pow_mod_p(*beta, cj));
+
+            return make_unique<ElGamalCiphertext>(move(aj), move(bj));
+        }
+
+        // validate a specific proof at position j against the message
+        static ValidationResult isValid(const ElGamalCiphertext &message,
+                                        const ZeroKnowledgeProof &proof, uint64_t j,
+                                        const ElementModP &k)
+        {
+            // if we don't have a commitment, we can't validate
+            // so we explicitly return false, but this is expected behavior
+            // when trying to validate against a proof that has been deserialized
+            // from an election record that does not include the commitment values
+            if (!proof.commitment.has_value()) {
+                Log::debug("RangedChaumPedersenProof::Impl::isValid: inconclusive integer proof " +
+                           to_string(j));
+                return ValidationResult{false, {"j: " + to_string(j) + " inconclusive commitment"}};
+            }
+
+            // recompute the commitment using the publically known values
+            auto recomputedCommitment =
+              recomputeCommitment(message, *proof.challenge, *proof.response, j, k);
+
+            auto aj = *proof.commitment.value()->getPad();
+            auto bj = *proof.commitment.value()->getData();
+            auto cj = *proof.challenge;
+            auto vj = *proof.response;
+
+            // 𝑎 = 𝑔^𝑉 ⋅ 𝐴^𝐶 mod 𝑝
+            auto consistent_gv = (aj == *recomputedCommitment->getPad());
+
+            // 𝑏  = 𝐾^w ⋅ 𝐵^𝐶 mod 𝑝
+            auto consistent_kv = (bj == *recomputedCommitment->getData());
 
             if (!consistent_gv || !consistent_kv) {
                 auto jstring = to_string(j);
@@ -602,13 +639,26 @@ namespace electionguard
             std::vector<std::string> messages;
             for (uint64_t i = 0; i < this->rangeLimit; i++) {
                 auto proof = *this->integerProofs[i];
+                auto isInclonclusive = !proof.commitment.has_value();
                 auto validationResult = isValid(message, proof, i, k);
 
-                // if the proof is invalid cache the error messages
-                // TODO: move not copy
-                if (!validationResult.isValid) {
+                // if the proof is conclusively invalid, meanining it has a commitment
+                // and the commitment does not match the recomputed commitment
+                // then we can return false immediately.
+                // this happens when we are validating a proof that was constructed
+                // from an election record that does include the commitment values
+                // or when we are validating a proof that was constructed from a
+                // direct encryption operation as part of the encryption process.
+                if (!validationResult.isValid & !isInclonclusive) {
                     proofsAreValid = false;
                     messages.push_back("proof for selection " + std::to_string(i) + " is invalid");
+                }
+
+                // but if it is inconclusive, we just log the message
+                // and allow the loop to continue.
+                // this happens when we are validating a proof that was constructed
+                // from an election record that does not include the commitment values
+                if (!validationResult.isValid) {
                     for (const auto &message : validationResult.messages) {
                         messages.push_back(message);
                     }
@@ -752,15 +802,13 @@ namespace electionguard
     ValidationResult RangedChaumPedersenProof::isValid(const ElGamalCiphertext &message,
                                                        const ElementModP &k, const ElementModQ &q)
     {
-        Log::trace("RangedChaumPedersenProof::isValid: checking validity");
-
         auto *alpha = message.getPad();
         auto *beta = message.getData();
 
         // validate the integer proofs against the message
         auto validationResult = pimpl->isValid(message, k);
 
-        auto commitments = pimpl->getHashableCommitments();
+        auto commitments = pimpl->getHashableCommitments(message, k);
 
         // Compute the challenge
         auto computedChallenge =

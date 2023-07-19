@@ -31,9 +31,19 @@ namespace electionguard
         ElementModQ *getSecretKey();
 
         /// <Summary>
+        /// The ElGamal Secret Key.
+        /// </Summary>
+        ElementModQ *getSecretKey() const;
+
+        /// <Summary>
         /// The ElGamal Public Key.
         /// </Summary>
         ElementModP *getPublicKey();
+
+        /// <Summary>
+        /// The ElGamal Public Key.
+        /// </Summary>
+        ElementModP *getPublicKey() const;
 
         /// <Summary>
         /// Make an elgamal keypair from a secret.

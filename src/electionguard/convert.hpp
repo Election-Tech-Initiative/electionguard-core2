@@ -237,6 +237,20 @@ namespace electionguard
         return converterX.to_bytes(wstr);
     }
 
+    template <typename T> inline string concat(const std::vector<T> &vec, std::size_t maxLength)
+    {
+        std::stringstream ss;
+        for (const auto &element : vec) {
+            ss << element;
+            if (ss.tellp() > static_cast<std::streampos>(maxLength)) {
+                std::string result = ss.str();
+                result.resize(maxLength); // cut the string to the maximum length
+                return result;
+            }
+        }
+        return ss.str();
+    }
+
     /// Copy the string to a heap-allocated null-termianted array
     inline char *dynamicCopy(const string &data, size_t *out_size)
     {

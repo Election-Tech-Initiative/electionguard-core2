@@ -10,9 +10,11 @@
 
 #include <cstdlib>
 #include <ctime>
+#include <stdexcept>
 #include <string>
 #include <unordered_map>
 
+using std::domain_error;
 using std::invalid_argument;
 using std::make_unique;
 using std::map;
@@ -306,6 +308,11 @@ namespace electionguard
         if (proof == nullptr && nonce != nullptr) {
             proof = DisjunctiveChaumPedersenProof::make(
               *ciphertext, *nonce, elgamalPublicKey, cryptoExtendedBaseHash, proofSeed, plaintext);
+        } else if (proof != nullptr) {
+            // validate the proof because the caller can provide an invalid one
+            if (!proof->isValid(*ciphertext, elgamalPublicKey, cryptoExtendedBaseHash)) {
+                throw domain_error("proof is not valid");
+            }
         }
         return make_unique<CiphertextBallotSelection>(
           objectId, sequenceOrder, descriptionHash, move(ciphertext), isPlaceholder, move(nonce),
@@ -689,6 +696,18 @@ namespace electionguard
               *accumulation, *aggregate, numberSelected, numberElected, elgamalPublicKey,
               cryptoExtendedBaseHash, proofSeed);
             proof = move(owned_proof);
+        }
+
+        // always check that the proof is valid when the constructor is called
+        // because it is both possible for a caller to create an invalid proof and also
+        // there is no other guarantee the proof will be validated downstream
+        // such as when serializing from an election record so it must be validated
+        // at the time of construction.
+        auto validationResult =
+          proof->isValid(*accumulation, elgamalPublicKey, cryptoExtendedBaseHash);
+        if (!validationResult.isValid) {
+            validationResult.messages.insert(validationResult.messages.begin(), "invalid proof");
+            throw domain_error(concat(validationResult.messages, 64));
         }
 
         return make_unique<CiphertextBallotContest>(

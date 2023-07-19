@@ -34,6 +34,9 @@ using std::vector;
 
 namespace electionguard
 {
+
+#pragma region Manifest Helpers
+
     // TODO: input sanitization and safety
 
     static json annotatedStringToJson(const AnnotatedString &serializable)
@@ -497,6 +500,8 @@ namespace electionguard
         }
         return elements;
     }
+
+#pragma endregion
 
     class Serialize
     {
@@ -1108,20 +1113,32 @@ namespace electionguard
                         selections.push_back(selection_props);
                     }
 
+                    // CiphertextBallotContest
+
                     json ciphertext = {
                       {"pad", contest.get().getCiphertextAccumulation()->getPad()->toHex()},
                       {"data", contest.get().getCiphertextAccumulation()->getData()->toHex()}};
 
+                    // RangedChaumPedersenProof
                     auto *p = contest.get().getProof();
                     json integer_proofs;
                     uint64_t i = 0;
                     for (const auto &proof : p->getProofs()) {
-                        json proof_json = {
-                          {"pad", proof.get().commitment->getPad()->toHex()},
-                          {"data", proof.get().commitment->getData()->toHex()},
-                          {"challenge", proof.get().challenge->toHex()},
-                          {"response", proof.get().response->toHex()},
-                        };
+                        json proof_json;
+                        if (proof.get().commitment.has_value()) {
+                            proof_json = {
+                              {"pad", proof.get().commitment.value()->getPad()->toHex()},
+                              {"data", proof.get().commitment.value()->getData()->toHex()},
+                              {"challenge", proof.get().challenge->toHex()},
+                              {"response", proof.get().response->toHex()},
+                            };
+                        } else {
+                            proof_json = {
+                              {"challenge", proof.get().challenge->toHex()},
+                              {"response", proof.get().response->toHex()},
+                            };
+                        }
+
                         integer_proofs.push_back({i, proof_json});
                         i++;
                     }
@@ -1225,15 +1242,23 @@ namespace electionguard
 
                     for (auto &proof : proof["proofs"]) {
                         auto proof_index = proof[0].get<uint64_t>();
-                        auto proof_pad = proof[1]["pad"].get<string>();
-                        auto proof_data = proof[1]["data"].get<string>();
+
                         auto proof_challenge = proof[1]["challenge"].get<string>();
                         auto proof_response = proof[1]["response"].get<string>();
 
-                        integer_proofs[proof_index] = make_unique<ZeroKnowledgeProof>(
-                          ElementModP::fromHex(proof_pad), ElementModP::fromHex(proof_data),
-                          ElementModQ::fromHex(proof_challenge),
-                          ElementModQ::fromHex(proof_response));
+                        if (proof[1].contains("pad")) {
+                            auto proof_pad = proof[1]["pad"].get<string>();
+                            auto proof_data = proof[1]["data"].get<string>();
+
+                            integer_proofs[proof_index] = make_unique<ZeroKnowledgeProof>(
+                              ElementModP::fromHex(proof_pad), ElementModP::fromHex(proof_data),
+                              ElementModQ::fromHex(proof_challenge),
+                              ElementModQ::fromHex(proof_response));
+                        } else {
+                            integer_proofs[proof_index] =
+                              make_unique<ZeroKnowledgeProof>(ElementModQ::fromHex(proof_challenge),
+                                                              ElementModQ::fromHex(proof_response));
+                        }
                     }
 
                     // TODO: handle deserialization

@@ -62,7 +62,11 @@ namespace electionguard
 
     ElementModQ *ElGamalKeyPair::getSecretKey() { return pimpl->secretKey.get(); }
 
+    ElementModQ *ElGamalKeyPair::getSecretKey() const { return pimpl->secretKey.get(); }
+
     ElementModP *ElGamalKeyPair::getPublicKey() { return pimpl->publicKey.get(); }
+
+    ElementModP *ElGamalKeyPair::getPublicKey() const { return pimpl->publicKey.get(); }
 
     // Public Members
 

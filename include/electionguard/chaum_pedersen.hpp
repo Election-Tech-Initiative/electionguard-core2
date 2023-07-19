@@ -24,7 +24,7 @@ namespace electionguard
     /// any of the individual proofs used for ballot correctness in electionguard
     /// </summary>
     struct ZeroKnowledgeProof {
-        std::unique_ptr<ElGamalCiphertext> commitment;
+        std::optional<std::unique_ptr<ElGamalCiphertext>> commitment;
         std::unique_ptr<ElementModQ> challenge;
         std::unique_ptr<ElementModQ> response;
 
@@ -33,6 +33,12 @@ namespace electionguard
                            std::unique_ptr<ElementModQ> response)
             : commitment(std::move(commitment)), challenge(std::move(challenge)),
               response(std::move(response))
+        {
+        }
+
+        ZeroKnowledgeProof(std::unique_ptr<ElementModQ> challenge,
+                           std::unique_ptr<ElementModQ> response)
+            : challenge(std::move(challenge)), response(std::move(response))
         {
         }
 
@@ -45,15 +51,19 @@ namespace electionguard
         }
 
         ZeroKnowledgeProof(const ZeroKnowledgeProof &other)
-            : commitment(other.commitment->clone()), challenge(other.challenge->clone()),
-              response(other.response->clone())
+            : challenge(other.challenge->clone()), response(other.response->clone())
         {
+            if (other.commitment.has_value()) {
+                commitment = other.commitment.value()->clone();
+            }
         }
 
         ZeroKnowledgeProof(ZeroKnowledgeProof &&other)
-            : commitment(std::move(other.commitment)), challenge(std::move(other.challenge)),
-              response(std::move(other.response))
+            : challenge(std::move(other.challenge)), response(std::move(other.response))
         {
+            if (other.commitment.has_value()) {
+                commitment = std::move(other.commitment.value());
+            }
         }
 
         ~ZeroKnowledgeProof() = default;
@@ -68,8 +78,12 @@ namespace electionguard
 
         std::unique_ptr<ZeroKnowledgeProof> clone() const
         {
-            return std::make_unique<ZeroKnowledgeProof>(commitment->clone(), challenge->clone(),
-                                                        response->clone());
+            if (commitment.has_value()) {
+                return std::make_unique<ZeroKnowledgeProof>(commitment.value()->clone(),
+                                                            challenge->clone(), response->clone());
+            } else {
+                return std::make_unique<ZeroKnowledgeProof>(challenge->clone(), response->clone());
+            }
         }
 
         bool operator==(const ZeroKnowledgeProof &other) const
