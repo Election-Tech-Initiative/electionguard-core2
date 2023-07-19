@@ -276,13 +276,17 @@ namespace electionguard
     };
 
     /// <Summary>
-    /// The Constant Chaum PedersenProof is a Non-Interactive Zero-Knowledge Proof
+    /// The Ranged Chaum PedersenProof is a Non-Interactive Zero-Knowledge Proof
     /// that represents the proof of satisfying the selection limit (that the voter has not over voted).
     /// The proof demonstrates that the elgamal accumulation of the encrypted selections
     /// on the ballot forms an aggregate contest encryption matches the combination of random nonces (R)
     /// used to encrypt the selections and that the encrypted values do not exceed the selection limit L.
     ///
-    /// This object should not be made directly.  Use ConstantChaumPedersenProof::make
+    /// This proof is a composite proof similar to the disjunctive whereby it provides a real proof
+    /// for the selections made and then fake proofs for each possible value in the range.
+    /// It replaces the ConstantChaumPedersenProof from previous versions of the spec.
+    ///
+    /// This object should not be made directly.  Use RangedChaumPedersenProof::make
     ///
     /// see: https://www.electionguard.vote/spec/0.95.0/5_Ballot_encryption/#proof-of-satisfying-the-selection-limit
     /// </Summary>
@@ -327,7 +331,7 @@ namespace electionguard
              const ElementModQ &seed);
 
         /// <Summary>
-        /// Validates a `ConstantChaumPedersenProof`
+        /// Validates a `RangedChaumPedersenProof`
         ///
         /// <param name="message"> The ciphertext message</param>
         /// <param name="k"> The public key of the election</param>
@@ -353,6 +357,8 @@ namespace electionguard
     /// The proof demonstrates that the elgamal accumulation of the encrypted selections
     /// on the ballot forms an aggregate contest encryption matches the combination of random nonces (R)
     /// used to encrypt the selections and that the encrypted values do not exceed the selection limit L.
+    ///
+    /// This proof is deprecated in favor of the RangedChaumPedersenProof.
     ///
     /// This object should not be made directly.  Use ConstantChaumPedersenProof::make
     ///

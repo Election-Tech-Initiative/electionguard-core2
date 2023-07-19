@@ -43,7 +43,7 @@ namespace electionguard
     /// <Summary>
     /// Hash constant used to prefix the hash of election artifacts
     /// </Summary>
-    class HashPrefix
+    class EG_API HashPrefix
     {
       public:
         /// <Summary>

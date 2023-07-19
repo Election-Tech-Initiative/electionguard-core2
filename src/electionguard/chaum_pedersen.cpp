@@ -30,6 +30,7 @@ namespace electionguard
 
     struct DisjunctiveChaumPedersenProof::Impl {
 
+        // TODO: #362 reaplce internal structure with the generic ZKP
         unique_ptr<ElementModP> proof_zero_pad;
         unique_ptr<ElementModP> proof_zero_data;
         unique_ptr<ElementModP> proof_one_pad;
@@ -411,10 +412,10 @@ namespace electionguard
                              &const_cast<ElementModP &>(k), alpha, beta, a0.get(), b0.get(),
                              a1.get(), b1.get()}); // H(04,Q;K,α,β,a0,b0,a1,b1)
 
-        auto c0 = sub_mod_q(*c, *w);               // c0 = (c - w) mod q
-        auto v0 = a_minus_bc_mod_q(*u0, *c0, r);   // v0 = (𝑢0 - c0 ⋅ R) mod q
-        auto c1 = w->clone();                      // c1 = w
-        auto v1 = a_minus_bc_mod_q(*u1, *w, r);    // v1 = (𝑢1 - c1 ⋅ R) mod q
+        auto c0 = sub_mod_q(*c, *w);             // c0 = (c - w) mod q
+        auto v0 = a_minus_bc_mod_q(*u0, *c0, r); // v0 = (𝑢0 - c0 ⋅ R) mod q
+        auto c1 = w->clone();                    // c1 = w
+        auto v1 = a_minus_bc_mod_q(*u1, *w, r);  // v1 = (𝑢1 - c1 ⋅ R) mod q
 
         return make_unique<DisjunctiveChaumPedersenProof>(
           move(a0), move(b0), move(a1), move(b1), move(c0), move(c1), move(c), move(v0), move(v1));
