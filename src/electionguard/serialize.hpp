@@ -1125,7 +1125,14 @@ namespace electionguard
                     uint64_t i = 0;
                     for (const auto &proof : p->getProofs()) {
                         json proof_json;
-                        if (proof.get().commitment.has_value()) {
+
+                        // HACK: disable serializing out commitments
+                        // as a means of enforcing that commitments are not
+                        // included in the election record.
+                        // TODO: allow a caller to specify this behavior
+                        auto expliclyDisableSerializingCommimtnets = true;
+                        if (proof.get().commitment.has_value() &&
+                            !expliclyDisableSerializingCommimtnets) {
                             proof_json = {
                               {"pad", proof.get().commitment.value()->getPad()->toHex()},
                               {"data", proof.get().commitment.value()->getData()->toHex()},
