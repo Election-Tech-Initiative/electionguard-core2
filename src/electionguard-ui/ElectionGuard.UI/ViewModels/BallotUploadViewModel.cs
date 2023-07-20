@@ -327,7 +327,6 @@ public partial class BallotUploadViewModel : BaseViewModel
     private readonly CiphertextTallyService _ciphertextTallyService;
     private bool _importing;
     private long _lastDrive = -1;
-    private ILogger<BallotUploadViewModel> _logger;
 
     public BallotUploadViewModel(IServiceProvider serviceProvider,
         BallotUploadService uploadService,

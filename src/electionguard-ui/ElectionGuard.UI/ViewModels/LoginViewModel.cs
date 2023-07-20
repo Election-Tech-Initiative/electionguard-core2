@@ -85,5 +85,15 @@ public partial class LoginViewModel : BaseViewModel
     {
         DbNotAvailable = !DbService.Ping();
         ErrorMessage = DbNotAvailable ? AppResources.DatabaseUnavailable : string.Empty;
+
+        if (ErrorLog.AppPreviousCrashed())
+        {
+            ErrorLog.DeleteCrashedFile();
+            _ = Shell.Current.CurrentPage.Dispatcher.DispatchAsync(async () =>
+            {
+                await Shell.Current.CurrentPage.DisplayAlert(AppResources.PreviousCrash, AppResources.ViewLogsText, AppResources.OkText);
+            });
+        }
+
     }
 }

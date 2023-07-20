@@ -7,7 +7,7 @@ namespace ElectionGuard.UI;
 public partial class App
 {
     public static User CurrentUser { get; set; } = new();
-    private ILogger<App> _logger;
+    private readonly ILogger _logger;
 
     public App(ILogger<App> logger)
     {
@@ -25,7 +25,8 @@ public partial class App
 
     private void Current_UnhandledException(object sender, Microsoft.UI.Xaml.UnhandledExceptionEventArgs e)
     {
-        _logger.LogError(e.Exception, "Unhandled Exception");
+        _logger.LogCritical(e.Exception, "Unhandled Exception");
+        ErrorLog.CreateCrashedFile();
     }
 
     private void SetupLanguageSupport()

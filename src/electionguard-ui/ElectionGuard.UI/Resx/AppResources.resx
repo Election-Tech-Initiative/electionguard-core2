@@ -636,4 +636,10 @@
   <data name="CloseText" xml:space="preserve">
     <value>Close</value>
   </data>
+  <data name="PreviousCrash" xml:space="preserve">
+    <value>Application Crash Detected</value>
+  </data>
+  <data name="ViewLogsText" xml:space="preserve">
+    <value>It appears that the application has crashed the last time that it was used.  Please look at the log files in the Settings page to be able to determine the issue.</value>
+  </data>
 </root>

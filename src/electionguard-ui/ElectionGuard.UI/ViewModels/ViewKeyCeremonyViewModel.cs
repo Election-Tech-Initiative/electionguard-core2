@@ -1,7 +1,6 @@
 ﻿using CommunityToolkit.Mvvm.Input;
 using ElectionGuard.ElectionSetup;
 using ElectionGuard.UI.Models;
-using Microsoft.Extensions.Logging;
 
 namespace ElectionGuard.UI.ViewModels;
 
@@ -13,7 +12,6 @@ public partial class ViewKeyCeremonyViewModel : BaseViewModel
     private KeyCeremonyMediator? _mediator;
 
     private bool _joinPressed;
-    private ILogger<ViewKeyCeremonyViewModel> _logger;
 
     public ViewKeyCeremonyViewModel(IServiceProvider serviceProvider,
                                     KeyCeremonyService keyCeremonyService,

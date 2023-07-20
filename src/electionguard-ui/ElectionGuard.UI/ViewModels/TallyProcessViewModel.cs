@@ -75,7 +75,6 @@ public partial class TallyProcessViewModel : BaseViewModel
     private readonly DecryptionShareService _decryptionShareService;
     private readonly ChallengeResponseService _challengeResponseService;
     private readonly MultiTallyService _multiTallyService;
-    private ILogger<TallyProcessViewModel> _logger;
 
     public TallyProcessViewModel(
         IServiceProvider serviceProvider,

@@ -1087,6 +1087,15 @@ namespace ElectionGuard.UI.Resx {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Application Crash Detected.
+        /// </summary>
+        internal static string PreviousCrash {
+            get {
+                return ResourceManager.GetString("PreviousCrash", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Cancel Tally.
         /// </summary>
         internal static string ProcessTallyAbandon {
@@ -1560,6 +1569,15 @@ namespace ElectionGuard.UI.Resx {
         internal static string ViewKeyCeremony {
             get {
                 return ResourceManager.GetString("ViewKeyCeremony", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to It appears that the application has crashed the last time that it was used.  Please look at the log files in the Settings page to be able to determine the issue..
+        /// </summary>
+        internal static string ViewLogsText {
+            get {
+                return ResourceManager.GetString("ViewLogsText", resourceCulture);
             }
         }
         
