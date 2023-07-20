@@ -2,10 +2,8 @@
 using System.Text.Json;
 using CommunityToolkit.Maui.Storage;
 using CommunityToolkit.Mvvm.Input;
-using ElectionGuard.Ballot;
 using ElectionGuard.Decryption;
 using ElectionGuard.Decryption.Tally;
-using Microsoft.Extensions.Logging;
 
 namespace ElectionGuard.UI.ViewModels;
 
