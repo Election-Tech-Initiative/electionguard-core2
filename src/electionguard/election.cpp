@@ -211,12 +211,26 @@ namespace electionguard
       uint64_t numberOfGuardians, uint64_t quorum, unique_ptr<ElementModP> elGamalPublicKey,
       unique_ptr<ElementModQ> commitmentHash, unique_ptr<ElementModQ> manifestHash)
     {
-        auto cryptoBaseHash = hash_elems(
-          {&const_cast<ElementModP &>(P()), &const_cast<ElementModQ &>(Q()),
-           &const_cast<ElementModP &>(G()), numberOfGuardians, quorum, manifestHash.get()});
+        // TODO: configurable version code
 
-        auto cryptoExtendedBaseHash = hash_elems({HashPrefix::get_prefix_03(), cryptoBaseHash.get(),
-                                                  elGamalPublicKey.get(), commitmentHash.get()});
+        // HP = H(HV ;00,p,q,g). Parameter Hash 3.1.2
+        auto versionCode = string_to_fixed_width_bytes<32>("v2.0");
+        auto parameterHash = hash_elems(
+          {versionCode, HashPrefix::get_prefix_parameter_hash(), &const_cast<ElementModP &>(P()),
+           &const_cast<ElementModQ &>(Q()), &const_cast<ElementModP &>(G())});
+
+        // HM = H(HP;01,manifest). Manifest Hash 3.1.4
+        auto manifestDigest = hash_elems(
+          {parameterHash.get(), HashPrefix::get_prefix_manifest_hash(), manifestHash.get()});
+
+        // HB =(HP;02,n,k,date,info,HM). Election Base Hash 3.1.5
+        auto cryptoBaseHash = hash_elems({parameterHash.get(), HashPrefix::get_prefix_base_hash(),
+                                          manifestDigest.get(), numberOfGuardians, quorum});
+
+        // HE = H(HB;12,K,K1,0,K1,1,...,K1,k−1,K2,0,...,Kn,k−2,Kn,k−1). // Extended Base Hash 3.2.3
+        auto cryptoExtendedBaseHash =
+          hash_elems({cryptoBaseHash.get(), HashPrefix::get_prefix_extended_hash(),
+                      elGamalPublicKey.get(), commitmentHash.get()});
 
         // ensure the elgamal public key instance is set as a fixed base
         elGamalPublicKey->setIsFixedBase(true);
@@ -231,12 +245,27 @@ namespace electionguard
       unique_ptr<ElementModQ> commitmentHash, unique_ptr<ElementModQ> manifestHash,
       unique_ptr<ContextConfiguration> config)
     {
-        auto cryptoBaseHash = hash_elems(
-          {&const_cast<ElementModP &>(P()), &const_cast<ElementModQ &>(Q()),
-           &const_cast<ElementModP &>(G()), numberOfGuardians, quorum, manifestHash.get()});
+        // TODO: configurable version code
 
-        auto cryptoExtendedBaseHash = hash_elems({HashPrefix::get_prefix_03(), cryptoBaseHash.get(),
-                                                  elGamalPublicKey.get(), commitmentHash.get()});
+        // HP = H(HV ;00,p,q,g). Parameter Hash 3.1.2
+        auto versionCode = string_to_fixed_width_bytes<32>("v2.0");
+        auto parameterHash = hash_elems(
+          {versionCode, HashPrefix::get_prefix_parameter_hash(), &const_cast<ElementModP &>(P()),
+           &const_cast<ElementModQ &>(Q()), &const_cast<ElementModP &>(G())});
+
+        // HM = H(HP;01,manifest). Manifest Hash 3.1.4
+        auto manifestDigest = hash_elems(
+          {parameterHash.get(), HashPrefix::get_prefix_manifest_hash(), manifestHash.get()});
+
+        // TODO: complete according to spec
+        // HB =(HP;02,n,k,date,info,HM). Election Base Hash 3.1.5
+        auto cryptoBaseHash = hash_elems({parameterHash.get(), HashPrefix::get_prefix_base_hash(),
+                                          numberOfGuardians, quorum, manifestDigest.get()});
+
+        // HE = H(HB;12,K,K1,0,K1,1,...,K1,k−1,K2,0,...,Kn,k−2,Kn,k−1). // Extended Base Hash 3.2.3
+        auto cryptoExtendedBaseHash =
+          hash_elems({cryptoBaseHash.get(), HashPrefix::get_prefix_extended_hash(),
+                      elGamalPublicKey.get(), commitmentHash.get()});
 
         // ensure the elgamal public key instance is set as a fixed base
         elGamalPublicKey->setIsFixedBase(true);
@@ -251,12 +280,27 @@ namespace electionguard
       unique_ptr<ElementModQ> commitmentHash, unique_ptr<ElementModQ> manifestHash,
       std::unordered_map<std::string, std::string> extendedData)
     {
-        auto cryptoBaseHash = hash_elems(
-          {&const_cast<ElementModP &>(P()), &const_cast<ElementModQ &>(Q()),
-           &const_cast<ElementModP &>(G()), numberOfGuardians, quorum, manifestHash.get()});
+        // TODO: configurable version code
 
-        auto cryptoExtendedBaseHash = hash_elems({HashPrefix::get_prefix_03(), cryptoBaseHash.get(),
-                                                  elGamalPublicKey.get(), commitmentHash.get()});
+        // HP = H(HV ;00,p,q,g). Parameter Hash 3.1.2
+        auto versionCode = string_to_fixed_width_bytes<32>("v2.0");
+        auto parameterHash = hash_elems(
+          {versionCode, HashPrefix::get_prefix_parameter_hash(), &const_cast<ElementModP &>(P()),
+           &const_cast<ElementModQ &>(Q()), &const_cast<ElementModP &>(G())});
+
+        // HM = H(HP;01,manifest). Manifest Hash 3.1.4
+        auto manifestDigest = hash_elems(
+          {parameterHash.get(), HashPrefix::get_prefix_manifest_hash(), manifestHash.get()});
+
+        // TODO: complete according to spec
+        // HB =(HP;02,n,k,date,info,HM). Election Base Hash 3.1.5
+        auto cryptoBaseHash = hash_elems({parameterHash.get(), HashPrefix::get_prefix_base_hash(),
+                                          numberOfGuardians, quorum, manifestDigest.get()});
+
+        // HE = H(HB;12,K,K1,0,K1,1,...,K1,k−1,K2,0,...,Kn,k−2,Kn,k−1). // Extended Base Hash 3.2.3
+        auto cryptoExtendedBaseHash =
+          hash_elems({cryptoBaseHash.get(), HashPrefix::get_prefix_extended_hash(),
+                      elGamalPublicKey.get(), commitmentHash.get()});
 
         // ensure the elgamal public key instance is set as a fixed base
         elGamalPublicKey->setIsFixedBase(true);
@@ -273,12 +317,27 @@ namespace electionguard
       unique_ptr<ContextConfiguration> config,
       std::unordered_map<std::string, std::string> extendedData)
     {
-        auto cryptoBaseHash = hash_elems(
-          {&const_cast<ElementModP &>(P()), &const_cast<ElementModQ &>(Q()),
-           &const_cast<ElementModP &>(G()), numberOfGuardians, quorum, manifestHash.get()});
+        // TODO: configurable version code
 
-        auto cryptoExtendedBaseHash = hash_elems({HashPrefix::get_prefix_03(), cryptoBaseHash.get(),
-                                                  elGamalPublicKey.get(), commitmentHash.get()});
+        // HP = H(HV ;00,p,q,g). Parameter Hash 3.1.2
+        auto versionCode = string_to_fixed_width_bytes<32>("v2.0");
+        auto parameterHash = hash_elems(
+          {versionCode, HashPrefix::get_prefix_parameter_hash(), &const_cast<ElementModP &>(P()),
+           &const_cast<ElementModQ &>(Q()), &const_cast<ElementModP &>(G())});
+
+        // HM = H(HP;01,manifest). Manifest Hash 3.1.4
+        auto manifestDigest = hash_elems(
+          {parameterHash.get(), HashPrefix::get_prefix_manifest_hash(), manifestHash.get()});
+
+        // TODO: complete according to spec
+        // HB =(HP;02,n,k,date,info,HM). Election Base Hash 3.1.5
+        auto cryptoBaseHash = hash_elems({parameterHash.get(), HashPrefix::get_prefix_base_hash(),
+                                          numberOfGuardians, quorum, manifestDigest.get()});
+
+        // HE = H(HB;12,K,K1,0,K1,1,...,K1,k−1,K2,0,...,Kn,k−2,Kn,k−1). // Extended Base Hash 3.2.3
+        auto cryptoExtendedBaseHash =
+          hash_elems({cryptoBaseHash.get(), HashPrefix::get_prefix_extended_hash(),
+                      elGamalPublicKey.get(), commitmentHash.get()});
 
         // ensure the elgamal public key instance is set as a fixed base
         elGamalPublicKey->setIsFixedBase(true);

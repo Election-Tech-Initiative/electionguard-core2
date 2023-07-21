@@ -20,13 +20,34 @@ using std::vector;
 
 #pragma region HashPrefix
 
-const char *eg_hash_get_prefix_00() { return electionguard::HashPrefix::get_prefix_00().c_str(); }
-const char *eg_hash_get_prefix_01() { return electionguard::HashPrefix::get_prefix_01().c_str(); }
-const char *eg_hash_get_prefix_02() { return electionguard::HashPrefix::get_prefix_02().c_str(); }
-const char *eg_hash_get_prefix_03() { return electionguard::HashPrefix::get_prefix_03().c_str(); }
-const char *eg_hash_get_prefix_04() { return electionguard::HashPrefix::get_prefix_04().c_str(); }
-const char *eg_hash_get_prefix_05() { return electionguard::HashPrefix::get_prefix_05().c_str(); }
-const char *eg_hash_get_prefix_06() { return electionguard::HashPrefix::get_prefix_06().c_str(); }
+const char *eg_hash_get_prefix_parameter_hash()
+{
+    return electionguard::HashPrefix::get_prefix_parameter_hash().c_str();
+}
+const char *eg_hash_get_prefix_manifest_hash()
+{
+    return electionguard::HashPrefix::get_prefix_manifest_hash().c_str();
+}
+const char *eg_hash_get_prefix_base_hash()
+{
+    return electionguard::HashPrefix::get_prefix_base_hash().c_str();
+}
+const char *eg_hash_get_prefix_guardian_share_challenge()
+{
+    return electionguard::HashPrefix::get_prefix_guardian_share_challenge().c_str();
+}
+const char *eg_hash_get_prefix_guardian_share_secret()
+{
+    return electionguard::HashPrefix::get_prefix_guardian_share_secret().c_str();
+}
+const char *eg_hash_get_prefix_extended_hash()
+{
+    return electionguard::HashPrefix::get_prefix_extended_hash().c_str();
+}
+const char *eg_hash_get_prefix_selection_nonce()
+{
+    return electionguard::HashPrefix::get_prefix_selection_nonce().c_str();
+}
 
 eg_electionguard_status_t eg_hash_elems_string(const char *a, eg_element_mod_q_t **out_handle)
 {

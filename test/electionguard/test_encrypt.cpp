@@ -25,10 +25,11 @@ TEST_CASE("Encrypt simple selection succeeds")
     auto metadata = make_unique<SelectionDescription>(selectionId, candidateId, 1UL);
     auto hashContext = metadata->crypto_hash();
     auto plaintext = BallotGenerator::selectionFrom(*metadata);
+    auto context = CiphertextElectionContext::make(3, 2, keypair->getPublicKey()->clone(),
+                                                   ONE_MOD_Q().clone(), ONE_MOD_Q().clone());
 
     // Act
-    auto result = encryptSelection(*plaintext, *metadata, *keypair->getPublicKey(), ONE_MOD_Q(),
-                                   *nonce, false, true);
+    auto result = encryptSelection(*plaintext, *metadata, *context, *nonce, false, true);
 
     // Assert
     CHECK(result != nullptr);
@@ -48,6 +49,8 @@ TEST_CASE("Encrypt simple selection using precomputed values succeeds")
     auto metadata = make_unique<SelectionDescription>(selectionId, candidateId, 1UL);
     auto hashContext = metadata->crypto_hash();
     auto plaintext = BallotGenerator::selectionFrom(*metadata);
+    auto context = CiphertextElectionContext::make(3, 2, keypair->getPublicKey()->clone(),
+                                                   ONE_MOD_Q().clone(), ONE_MOD_Q().clone());
 
     // cause a two triples and a quad to be populated
     PrecomputeBufferContext::initialize(*keypair->getPublicKey(), 1);
@@ -61,8 +64,7 @@ TEST_CASE("Encrypt simple selection using precomputed values succeeds")
     CHECK(1 == current_precomputed_queue_size);
 
     // and this ecryptSelection will use the precomputed values
-    auto result = encryptSelection(*plaintext, *metadata, *keypair->getPublicKey(), ONE_MOD_Q(),
-                                   *nonce, false, true);
+    auto result = encryptSelection(*plaintext, *metadata, *context, *nonce, false, true);
 
     // Assert
     CHECK(result != nullptr);
@@ -84,10 +86,11 @@ TEST_CASE("Encrypt simple selection malformed data fails")
     auto metadata = make_unique<SelectionDescription>(selectionId, candidateId, 1UL);
     auto hashContext = metadata->crypto_hash();
     auto plaintext = BallotGenerator::selectionFrom(*metadata);
+    auto context = CiphertextElectionContext::make(3, 2, keypair->getPublicKey()->clone(),
+                                                   ONE_MOD_Q().clone(), ONE_MOD_Q().clone());
 
     // Act
-    auto result = encryptSelection(*plaintext, *metadata, *keypair->getPublicKey(), ONE_MOD_Q(),
-                                   *nonce, false, true);
+    auto result = encryptSelection(*plaintext, *metadata, *context, *nonce, false, true);
 
     // tamper with the description_hash
     auto malformedDescriptionHash = make_unique<CiphertextBallotSelection>(
@@ -197,9 +200,9 @@ TEST_CASE("Encrypt PlaintextBallot overvote")
     unique_ptr<HashedElGamalCiphertext> newHEG =
       make_unique<HashedElGamalCiphertext>(move(new_pad), heg->getData(), heg->getMac());
 
-    vector<uint8_t> new_plaintext =
-      newHEG->decrypt(*keypair->getPublicKey(), secret, HashPrefix::get_prefix_05(),
-                      *context->getCryptoExtendedBaseHash(), true);
+    vector<uint8_t> new_plaintext = newHEG->decrypt(*keypair->getPublicKey(), secret,
+                                                    HashPrefix::get_prefix_contest_data_secret(),
+                                                    *context->getCryptoExtendedBaseHash(), true);
     string new_plaintext_string((char *)&new_plaintext.front(), new_plaintext.size());
 
     CHECK(new_plaintext_string ==
@@ -292,9 +295,9 @@ TEST_CASE("Encrypt full PlaintextBallot with WriteIn and Overvote with Encryptio
     unique_ptr<HashedElGamalCiphertext> newHEG =
       make_unique<HashedElGamalCiphertext>(move(new_pad), heg->getData(), heg->getMac());
 
-    vector<uint8_t> new_plaintext =
-      newHEG->decrypt(*keypair->getPublicKey(), secret, HashPrefix::get_prefix_05(),
-                      *context->getCryptoExtendedBaseHash(), true);
+    vector<uint8_t> new_plaintext = newHEG->decrypt(*keypair->getPublicKey(), secret,
+                                                    HashPrefix::get_prefix_contest_data_secret(),
+                                                    *context->getCryptoExtendedBaseHash(), true);
     string new_plaintext_string((char *)&new_plaintext.front(), new_plaintext.size());
     Log::debug(new_plaintext_string);
 

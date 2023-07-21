@@ -236,22 +236,23 @@ eg_electionguard_status_t eg_encryption_mediator_encrypt_ballot_verify_proofs(
 
 #pragma region EncryptSelection
 
-eg_electionguard_status_t eg_encrypt_selection(
-  eg_plaintext_ballot_selection_t *in_plaintext, eg_selection_description_t *in_description,
-  eg_element_mod_p_t *in_public_key, eg_element_mod_q_t *in_crypto_extended_base_hash,
-  eg_element_mod_q_t *in_nonce_seed, bool in_is_placeholder, bool in_should_verify_proofs,
-  bool in_use_precomputed_values, eg_ciphertext_ballot_selection_t **out_handle)
+eg_electionguard_status_t eg_encrypt_selection(eg_plaintext_ballot_selection_t *in_plaintext,
+                                               eg_selection_description_t *in_description,
+                                               eg_ciphertext_election_context_t *in_context,
+                                               eg_element_mod_q_t *in_nonce_seed,
+                                               bool in_is_placeholder, bool in_should_verify_proofs,
+                                               bool in_use_precomputed_values,
+                                               eg_ciphertext_ballot_selection_t **out_handle)
 {
     try {
         auto *plaintext = AS_TYPE(PlaintextBallotSelection, in_plaintext);
         auto *description = AS_TYPE(SelectionDescription, in_description);
-        auto *public_key = AS_TYPE(ElementModP, in_public_key);
-        auto *crypto_extended_base_hash = AS_TYPE(ElementModQ, in_crypto_extended_base_hash);
+        auto *context = AS_TYPE(CiphertextElectionContext, in_context);
         auto *nonce_seed_ = AS_TYPE(ElementModQ, in_nonce_seed);
 
-        auto ciphertext = encryptSelection(
-          *plaintext, *description, *public_key, *crypto_extended_base_hash, *nonce_seed_,
-          in_is_placeholder, in_should_verify_proofs, in_use_precomputed_values);
+        auto ciphertext =
+          encryptSelection(*plaintext, *description, *context, *nonce_seed_, in_is_placeholder,
+                           in_should_verify_proofs, in_use_precomputed_values);
 
         *out_handle = AS_TYPE(eg_ciphertext_ballot_selection_t, ciphertext.release());
         return ELECTIONGUARD_STATUS_SUCCESS;
@@ -274,22 +275,20 @@ eg_electionguard_status_t eg_encrypt_selection(
 eg_electionguard_status_t
 eg_encrypt_contest(eg_plaintext_ballot_contest_t *in_plaintext, eg_internal_manifest_t *in_manifest,
                    eg_contest_description_with_placeholders_t *in_description,
-                   eg_element_mod_p_t *in_public_key,
-                   eg_element_mod_q_t *in_crypto_extended_base_hash,
-                   eg_element_mod_q_t *in_nonce_seed, bool in_should_verify_proofs,
-                   bool in_use_precomputed_values, eg_ciphertext_ballot_contest_t **out_handle)
+                   eg_ciphertext_election_context_t *in_context, eg_element_mod_q_t *in_nonce_seed,
+                   bool in_should_verify_proofs, bool in_use_precomputed_values,
+                   eg_ciphertext_ballot_contest_t **out_handle)
 {
     try {
         auto *plaintext = AS_TYPE(PlaintextBallotContest, in_plaintext);
         auto *internalManifest = AS_TYPE(InternalManifest, in_manifest);
         auto *description = AS_TYPE(ContestDescriptionWithPlaceholders, in_description);
-        auto *public_key = AS_TYPE(ElementModP, in_public_key);
-        auto *crypto_extended_base_hash = AS_TYPE(ElementModQ, in_crypto_extended_base_hash);
+        auto *context = AS_TYPE(CiphertextElectionContext, in_context);
         auto *nonce_seed_ = AS_TYPE(ElementModQ, in_nonce_seed);
 
-        auto ciphertext = encryptContest(*plaintext, *internalManifest, *description, *public_key,
-                                         *crypto_extended_base_hash, *nonce_seed_,
-                                         in_should_verify_proofs, in_use_precomputed_values);
+        auto ciphertext =
+          encryptContest(*plaintext, *internalManifest, *description, *context, *nonce_seed_,
+                         in_should_verify_proofs, in_use_precomputed_values);
 
         *out_handle = AS_TYPE(eg_ciphertext_ballot_contest_t, ciphertext.release());
         return ELECTIONGUARD_STATUS_SUCCESS;

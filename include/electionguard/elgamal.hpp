@@ -241,9 +241,12 @@ namespace electionguard
     /// <summary>
     /// Encrypts a message with a given random nonce and an ElGamal public key.
     ///
-    /// <param name="m">Message to elgamal_encrypt; must be an integer in [0,Q). Sometimes V or m, in the spec.</param>
-    /// <param name="nonce"> Randomly chosen nonce in [1,Q). </param>
-    /// <param name="publicKey"> ElGamal public key. </param>
+    /// This method is the "base-K" encruption method used primarily
+    /// for encrypting against K for 2.0 elections.
+    ///
+    /// <param name="m">Message to elgamal_encrypt; must be an integer in [0,Q). Sometimes V or m or σ, in the spec.</param>
+    /// <param name="nonce"> Randomly chosen nonce in [1,Q). (R, r or s or ξ in the spec)</param>
+    /// <param name="publicKey"> ElGamal public key.</param>
     /// <returns>A ciphertext tuple.</returns>
     /// </summary>
     EG_API std::unique_ptr<ElGamalCiphertext>
@@ -258,7 +261,7 @@ namespace electionguard
     /// parameter for E.G. 2.0 elections.
     ///
     /// <param name="m">Message to elgamal_encrypt; must be an integer in [0,Q). Sometimes V or m, in the spec.</param>
-    /// <param name="nonce">Randomly chosen nonce in [1,Q). (R, r, or s in the spec)</param>
+    /// <param name="nonce">Randomly chosen nonce in [1,Q). (R, r, or s or ξ in the spec)</param>
     /// <param name="publicKey">ElGamal public key. (K in the spec)</param>
     /// <param name="encryptionBase"> The encryption base used to encrypt the ciphertext. (g or K in the spec)</param>
     EG_API std::unique_ptr<ElGamalCiphertext> elgamalEncrypt(const uint64_t m,
@@ -270,7 +273,7 @@ namespace electionguard
     /// Encrypts a message with given precomputed values (two triples and a quadruple).
     /// However, only the first triple is used in this function.
     ///
-    /// <param name="m">Message to elgamal_encrypt; must be an integer in [0,Q). Sometimes V or m, in the spec.</param>
+    /// <param name="m">Message to elgamal_encrypt; must be an integer in [0,Q). Sometimes V or m or σ, in the spec.</param>
     /// <param name="precomputedValues">Precomputed encryption values. See Precompute Buffers.</param>
     /// <returns>A ciphertext tuple.</returns>
     /// </summary>

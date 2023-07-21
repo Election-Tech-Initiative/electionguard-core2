@@ -249,11 +249,12 @@ namespace electionguard
         auto inBounds_v0 = v0.isInBounds();
         auto inBounds_v1 = v1.isInBounds();
 
-        // c = H(Q,K,α,β,a0,b0,a1,b1)
+        // c = H(HE;21,K,α,β,a0,b0,a1,b1). Ballot Selection Encryption Proof (selected/unselected) 3.3.5
         auto consistent_c =
           (*add_mod_q(c0, c1) == c) &&
-          (c == *hash_elems({HashPrefix::get_prefix_04(), &const_cast<ElementModQ &>(q),
-                             &const_cast<ElementModP &>(k), alpha, beta, a0p, b0p, a1p, b1p}));
+          (c ==
+           *hash_elems({HashPrefix::get_prefix_selection_proof(), &const_cast<ElementModQ &>(q),
+                        &const_cast<ElementModP &>(k), alpha, beta, a0p, b0p, a1p, b1p}));
 
         // 𝑎0 = 𝑔^𝑣0 mod 𝑝 ⋅ 𝛼^𝑐0 mod 𝑝
         auto consistent_gv0 = (a0 == *mul_mod_p(*g_pow_p(v0), *pow_mod_p(*alpha, c0)));
@@ -357,9 +358,11 @@ namespace electionguard
         auto b1 = pow_mod_p(k, *sub_mod_q(*u1, *w)); // K^(𝑢1-w) mod p
 
         // Compute the challenge
-        auto c = hash_elems({HashPrefix::get_prefix_04(), &const_cast<ElementModQ &>(q),
-                             &const_cast<ElementModP &>(k), alpha, beta, a0.get(), b0.get(),
-                             a1.get(), b1.get()}); // H(04,Q;K,α,β,a0,b0,a1,b1)
+        // c = H(HE;21,K,α,β,a0,b0,a1,b1). Ballot Selection Encryption Proof (selected/unselected) 3.3.5
+        auto c =
+          hash_elems({HashPrefix::get_prefix_selection_proof(), &const_cast<ElementModQ &>(q),
+                      &const_cast<ElementModP &>(k), alpha, beta, a0.get(), b0.get(), a1.get(),
+                      b1.get()}); // H(04,Q;K,α,β,a0,b0,a1,b1)
 
         //c1 = w so we dont assign a new var for it
         auto c0 = sub_mod_q(*c, *w);             // c0 = (c - w) mod q
@@ -408,9 +411,11 @@ namespace electionguard
         auto b1 = fake->getDataZero()->clone();       // K^(𝑢1-w) mod p
 
         // Compute the challenge
-        auto c = hash_elems({HashPrefix::get_prefix_04(), &const_cast<ElementModQ &>(q),
-                             &const_cast<ElementModP &>(k), alpha, beta, a0.get(), b0.get(),
-                             a1.get(), b1.get()}); // H(04,Q;K,α,β,a0,b0,a1,b1)
+        // c = H(HE;21,K,α,β,a0,b0,a1,b1). Ballot Selection Encryption Proof (selected/unselected) 3.3.5
+        auto c =
+          hash_elems({HashPrefix::get_prefix_selection_proof(), &const_cast<ElementModQ &>(q),
+                      &const_cast<ElementModP &>(k), alpha, beta, a0.get(), b0.get(), a1.get(),
+                      b1.get()}); // H(04,Q;K,α,β,a0,b0,a1,b1)
 
         auto c0 = sub_mod_q(*c, *w);             // c0 = (c - w) mod q
         auto v0 = a_minus_bc_mod_q(*u0, *c0, r); // v0 = (𝑢0 - c0 ⋅ R) mod q
@@ -453,9 +458,11 @@ namespace electionguard
         auto b1 = pow_mod_p(k, *u1);                 // K^𝑢1  mod p
 
         // Compute challenge
-        auto c = hash_elems({HashPrefix::get_prefix_04(), &const_cast<ElementModQ &>(q),
-                             &const_cast<ElementModP &>(k), alpha, beta, a0.get(), b0.get(),
-                             a1.get(), b1.get()}); // H(04,Q;K,α,β,a0,b0,a1,b1)
+        // c = H(HE;21,K,α,β,a0,b0,a1,b1). Ballot Selection Encryption Proof (selected/unselected) 3.3.5
+        auto c =
+          hash_elems({HashPrefix::get_prefix_selection_proof(), &const_cast<ElementModQ &>(q),
+                      &const_cast<ElementModP &>(k), alpha, beta, a0.get(), b0.get(), a1.get(),
+                      b1.get()}); // H(04,Q;K,α,β,a0,b0,a1,b1)
 
         // auto c0 = *w                          // c0 = w  mod q
         auto c1 = sub_mod_q(*c, *w);             // c1 = (c - w)  mod q
@@ -503,9 +510,10 @@ namespace electionguard
         auto b1 = real->getBlindingFactor()->clone(); // 𝐾^𝑢1 mod 𝑝
 
         // Compute challenge
-        auto c = hash_elems({HashPrefix::get_prefix_04(), &const_cast<ElementModQ &>(q),
-                             &const_cast<ElementModP &>(k), alpha, beta, a0.get(), b0.get(),
-                             a1.get(), b1.get()});
+        // c = H(HE;21,K,α,β,a0,b0,a1,b1). Ballot Selection Encryption Proof (selected/unselected) 3.3.5
+        auto c = hash_elems({HashPrefix::get_prefix_selection_proof(),
+                             &const_cast<ElementModQ &>(q), &const_cast<ElementModP &>(k), alpha,
+                             beta, a0.get(), b0.get(), a1.get(), b1.get()});
 
         auto c0 = w->clone();                    // c0 = w  mod q
         auto c1 = sub_mod_q(*c, *w);             // c1 = (c - w)  mod q
@@ -717,11 +725,11 @@ namespace electionguard
     std::unique_ptr<RangedChaumPedersenProof>
     RangedChaumPedersenProof::make(const ElGamalCiphertext &message, const ElementModQ &r,
                                    uint64_t selected, uint64_t maxLimit, const ElementModP &k,
-                                   const ElementModQ &q)
+                                   const ElementModQ &q, const string &hashPrefix)
 
     {
         auto seed = rand_q();
-        return make(message, r, selected, maxLimit, k, q, *seed);
+        return make(message, r, selected, maxLimit, k, q, hashPrefix, *seed);
     }
 
     /// <summary>
@@ -730,10 +738,9 @@ namespace electionguard
     /// made for each integer proof so that we can compare them during verification
     /// which allows us to know which one failed.
     /// </summary>
-    unique_ptr<RangedChaumPedersenProof>
-    RangedChaumPedersenProof::make(const ElGamalCiphertext &message, const ElementModQ &r,
-                                   uint64_t selected, uint64_t maxLimit, const ElementModP &k,
-                                   const ElementModQ &q, const ElementModQ &seed)
+    unique_ptr<RangedChaumPedersenProof> RangedChaumPedersenProof::make(
+      const ElGamalCiphertext &message, const ElementModQ &r, uint64_t selected, uint64_t maxLimit,
+      const ElementModP &k, const ElementModQ &q, const string &hashPrefix, const ElementModQ &seed)
     {
         Log::trace("RangedChaumPedersenProof:: making proof");
 
@@ -774,9 +781,9 @@ namespace electionguard
 
         // compute the joint challenge
 
-        // H(04,Q;K,α,β,a0,b0,a1,b1)
+        // c = H(HE;21,K,α ̄,β ̄,a0,b0,a1,b1,...,aL,bL). Ballot Contest Limit Encryption Proof 3.3.8
         auto commitmentReferences = referenceWrap<CryptoHashable>(commitments);
-        auto c = hash_elems({HashPrefix::get_prefix_04(), &const_cast<ElementModQ &>(q),
+        auto c = hash_elems({&const_cast<ElementModQ &>(q), hashPrefix,
                              &const_cast<ElementModP &>(k), alpha, beta, commitmentReferences});
 
         // Compute the challenge for the selected value
@@ -800,7 +807,8 @@ namespace electionguard
     // Public Methods
 
     ValidationResult RangedChaumPedersenProof::isValid(const ElGamalCiphertext &message,
-                                                       const ElementModP &k, const ElementModQ &q)
+                                                       const ElementModP &k, const ElementModQ &q,
+                                                       const std::string &hashPrefix)
     {
         auto *alpha = message.getPad();
         auto *beta = message.getData();
@@ -811,9 +819,11 @@ namespace electionguard
         auto commitments = pimpl->getHashableCommitments(message, k);
 
         // Compute the challenge
+        // TODO: change the HashPrefix to an input param since it can also be
+        // use for selection proofs
         auto computedChallenge =
-          hash_elems({HashPrefix::get_prefix_04(), &const_cast<ElementModQ &>(q),
-                      &const_cast<ElementModP &>(k), alpha, beta, commitments});
+          hash_elems({&const_cast<ElementModQ &>(q), hashPrefix, &const_cast<ElementModP &>(k),
+                      alpha, beta, commitments});
         auto consistent_c = (*pimpl->challenge == *computedChallenge);
 
         if (!consistent_c) {

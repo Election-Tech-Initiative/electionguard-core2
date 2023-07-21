@@ -217,6 +217,14 @@ namespace electionguard
         return result;
     }
 
+    template <std::size_t Width = 32>
+    inline std::vector<uint8_t> string_to_fixed_width_bytes(const std::string &str)
+    {
+        std::vector<uint8_t> byteVector(Width, 0); // Initialize with zeros
+        std::copy_n(str.begin(), std::min(str.size(), byteVector.size()), byteVector.begin());
+        return byteVector;
+    }
+
     string hacl_to_hex_256(uint64_t *data);
 
     string hacl_to_hex_4096(uint64_t *data);

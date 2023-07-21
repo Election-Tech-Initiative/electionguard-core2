@@ -241,7 +241,7 @@ makeAFakeRangedProof(const ElGamalKeyPair &keypair, uint64_t selected, uint64_t 
     auto aggregateNonce = mul_mod_q(nonce, *ElementModQ::fromUint64(count));
 
     auto proof = RangedChaumPedersenProof::make(*accumulation, *aggregateNonce, selected, limit,
-                                                *keypair.getPublicKey(), ONE_MOD_Q(), seed);
+                                                *keypair.getPublicKey(), ONE_MOD_Q(), "test");
     return make_pair(move(accumulation), move(proof));
 }
 
@@ -253,7 +253,7 @@ TEST_CASE("Ranged CP Proof encryption of zero generates valid proof")
     const auto count = 5UL;    // 5 selections on the ballot
 
     auto [accumulation, proof] = makeAFakeRangedProof(*keypair, selected, limit, count);
-    auto result = proof->isValid(*accumulation, *keypair->getPublicKey(), ONE_MOD_Q());
+    auto result = proof->isValid(*accumulation, *keypair->getPublicKey(), ONE_MOD_Q(), "test");
 
     CHECK(result.isValid == true);
 }
@@ -266,7 +266,7 @@ TEST_CASE("Ranged CP Proof encryption of some generates valid proof")
     const auto count = 5UL;    // 5 selections on the ballot
 
     auto [accumulation, proof] = makeAFakeRangedProof(*keypair, selected, limit, count);
-    auto result = proof->isValid(*accumulation, *keypair->getPublicKey(), ONE_MOD_Q());
+    auto result = proof->isValid(*accumulation, *keypair->getPublicKey(), ONE_MOD_Q(), "test");
 
     CHECK(result.isValid == true);
 }
@@ -288,7 +288,7 @@ TEST_CASE("Ranged CP Proof encryption of some with missing commitments generates
         }
     }
 
-    auto result = proof->isValid(*accumulation, *keypair->getPublicKey(), ONE_MOD_Q());
+    auto result = proof->isValid(*accumulation, *keypair->getPublicKey(), ONE_MOD_Q(), "test");
 
     CHECK(result.isValid == true);
 }
@@ -301,7 +301,7 @@ TEST_CASE("Ranged CP Proof encryption of all generates valid proof")
     const auto count = 5UL;    // 5 selections on the ballot
 
     auto [accumulation, proof] = makeAFakeRangedProof(*keypair, selected, limit, count);
-    auto result = proof->isValid(*accumulation, *keypair->getPublicKey(), ONE_MOD_Q());
+    auto result = proof->isValid(*accumulation, *keypair->getPublicKey(), ONE_MOD_Q(), "Test");
     CHECK(result.isValid == true);
 }
 

@@ -25,14 +25,15 @@ class EncryptSelectionFixture : public benchmark::Fixture
         const auto *selectionId = "some-selection-object-id";
         auto secret = ElementModQ::fromHex(a_fixed_secret);
         keypair = ElGamalKeyPair::fromSecret(*secret);
+        const auto context = CiphertextElectionContext::make(
+          3, 2, keypair->getPublicKey()->clone(), ONE_MOD_Q().clone(), ONE_MOD_Q().clone());
 
         metadata = make_unique<SelectionDescription>(selectionId, candidateId, 1UL);
         hashContext = metadata->crypto_hash();
         plaintext = BallotGenerator::selectionFrom(*metadata);
 
         auto nonce = ElementModQ::fromHex(a_fixed_nonce);
-        ciphertext = encryptSelection(*plaintext, *metadata, *keypair->getPublicKey(), ONE_MOD_Q(),
-                                      *nonce, false, false);
+        ciphertext = encryptSelection(*plaintext, *metadata, *context, *nonce, false, false);
     }
 
     void TearDown(const ::benchmark::State &state) {}
@@ -48,8 +49,10 @@ BENCHMARK_DEFINE_F(EncryptSelectionFixture, encryptSelection)(benchmark::State &
 {
     for (auto _ : state) {
         auto nonce = rand_q();
-        encryptSelection(*plaintext, *metadata, *keypair->getPublicKey(), ONE_MOD_Q(), *nonce,
-                         false, false);
+        const auto context = CiphertextElectionContext::make(
+          3, 2, keypair->getPublicKey()->clone(), ONE_MOD_Q().clone(), ONE_MOD_Q().clone());
+
+        encryptSelection(*plaintext, *metadata, *context, *nonce, false, false);
     }
 }
 

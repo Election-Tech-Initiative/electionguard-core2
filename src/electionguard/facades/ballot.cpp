@@ -329,7 +329,7 @@ eg_ciphertext_ballot_selection_crypto_hash_with(eg_ciphertext_ballot_selection_t
 {
     try {
         auto *encryptionSeed = AS_TYPE(ElementModQ, in_encryption_seed);
-        auto result = AS_TYPE(CiphertextBallotSelection, handle)->crypto_hash_with(*encryptionSeed);
+        auto result = AS_TYPE(CiphertextBallotSelection, handle)->crypto_hash();
         *out_crypto_hash = AS_TYPE(eg_element_mod_q_t, result.release());
         return ELECTIONGUARD_STATUS_SUCCESS;
     } catch (const exception &e) {
@@ -609,7 +609,7 @@ eg_ciphertext_ballot_contest_crypto_hash_with(eg_ciphertext_ballot_contest_t *ha
 {
     try {
         auto *encryptionSeed = AS_TYPE(ElementModQ, in_encryption_seed);
-        auto result = AS_TYPE(CiphertextBallotContest, handle)->crypto_hash_with(*encryptionSeed);
+        auto result = AS_TYPE(CiphertextBallotContest, handle)->crypto_hash();
         *out_crypto_hash = AS_TYPE(eg_element_mod_q_t, result.release());
         return ELECTIONGUARD_STATUS_SUCCESS;
     } catch (const exception &e) {
@@ -1017,7 +1017,7 @@ eg_ciphertext_ballot_crypto_hash_with(eg_ciphertext_ballot_t *handle,
 {
     try {
         auto *manifestHash = AS_TYPE(ElementModQ, in_manifest_hash);
-        auto result = AS_TYPE(CiphertextBallot, handle)->crypto_hash_with(*manifestHash);
+        auto result = AS_TYPE(CiphertextBallot, handle)->crypto_hash();
         *out_hash_ref = AS_TYPE(eg_element_mod_q_t, result.release());
         return ELECTIONGUARD_STATUS_SUCCESS;
     } catch (const exception &e) {
