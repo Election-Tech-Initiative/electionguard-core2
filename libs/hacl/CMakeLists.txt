@@ -30,7 +30,7 @@ set(HACL_CPP_EXPORT_NAME "hacl")
 set(HACL_CPP_ALIAS_NAME "hacl::hacl")
 set(HACL_CPP_TARGET_NAME "hacl_cpp")
 
-if(MSVC OR MSYS OR MINGW)
+if(WIN32)
     message("++ Exporting all Symbols")
     set(CMAKE_WINDOWS_EXPORT_ALL_SYMBOLS TRUE)
 endif()
