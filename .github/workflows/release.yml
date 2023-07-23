@@ -152,7 +152,36 @@ jobs:
             build/libs/wasm/Release/src/electionguard/wasm/*.js
             build/libs/wasm/Release/src/electionguard/wasm/*.wasm
 
-  # TODO: win x86
+  windows_build_x86:
+    name: Windows Build (x86)
+    runs-on: windows-2022
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v3
+      - name: Update Environment (Windows MSYS2)
+        uses: msys2/setup-msys2@v2
+        with:
+          update: true
+          install: mingw-w64-x86_64-gcc
+      - name: Install .NET
+        uses: actions/setup-dotnet@v3
+        with:
+          dotnet-version: 7.0.x
+      - name: Setup Environment
+        run: make environment
+      - name: Build
+        run: make build-msys2-x86
+      - name: Upload Library (x86)
+        uses: actions/upload-artifact@v3
+        with:
+          name: win-x86
+          path: |
+            build/libs/x86/Release/src/*.dll
+            build/libs/x86/Release/src/*.exp
+            build/libs/x86/Release/src/*.lib
+            build/libs/x86/Release/libs/hacl/*.dll
+            build/libs/x86/Release/libs/hacl/*.exp
+            build/libs/x86/Release/libs/hacl/*.lib
 
   windows_build_x64:
     name: Windows Build (x64)
@@ -190,6 +219,7 @@ jobs:
         macos_build_arm64,
         macos_build_x64,
         windows_build_x64,
+        windows_build_x86
       ]
     runs-on: ubuntu-22.04
     steps:
@@ -221,6 +251,12 @@ jobs:
         with:
           name: osx-x64
           path: build/libs/Darwin/x64/Release
+
+      - name: Get Windows x86 Artifacts
+        uses: actions/download-artifact@v3
+        with:
+          name: win-x86
+          path: build/libs/x86/Release
 
       - name: Get Windows x64 Artifacts
         uses: actions/download-artifact@v3

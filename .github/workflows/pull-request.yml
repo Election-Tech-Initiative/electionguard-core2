@@ -71,8 +71,8 @@ jobs:
             "macos-13-xcode-14.2",
             "macos-13-xcode-14.2-arm64",
             "windows-2022-gcc-11",
+            "windows-2022-gcc-11-x86",
             "windows-2022-msvc-latest-x64",
-            "windows-2022-msvc-latest-x86",
             "ubuntu-22.04-linter",
           ]
         include:
@@ -130,20 +130,20 @@ jobs:
             lint: false
             runCsTests: false
             runTsTests: false
+          - name: windows-2022-gcc-11-x86
+            os: windows-2022
+            processor: x86
+            compiler: gcc
+            version: "11"
+            makeReleaseBuild: false
+            lint: false
+            runCsTests: true
+            runTsTests: false
           - name: windows-2022-msvc-latest-x64
             os: windows-2022
             processor: x64
             compiler: msvc
             version: "latest"
-            makeReleaseBuild: false
-            lint: false
-            runCsTests: true
-            runTsTests: false
-          - name: windows-2022-msvc-latest-x86
-            os: windows-2022
-            processor: x86
-            compiler: msvc
-            version: latest
             makeReleaseBuild: false
             lint: false
             runCsTests: true
