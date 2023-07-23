@@ -34,9 +34,10 @@ TEST_CASE("Encrypt simple selection succeeds")
     // Assert
     CHECK(result != nullptr);
     CHECK(result->getCiphertext() != nullptr);
-    CHECK(result->isValidEncryption(*hashContext, *keypair->getPublicKey(), ONE_MOD_Q()) == true);
+    CHECK(result->isValidEncryption(*hashContext, *keypair->getPublicKey(),
+                                    *context->getCryptoExtendedBaseHash()) == true);
     CHECK(result->getProof()->isValid(*result->getCiphertext(), *keypair->getPublicKey(),
-                                      ONE_MOD_Q()) == true);
+                                      *context->getCryptoExtendedBaseHash()) == true);
 }
 
 TEST_CASE("Encrypt simple selection using precomputed values succeeds")
@@ -69,9 +70,10 @@ TEST_CASE("Encrypt simple selection using precomputed values succeeds")
     // Assert
     CHECK(result != nullptr);
     CHECK(result->getCiphertext() != nullptr);
-    CHECK(result->isValidEncryption(*hashContext, *keypair->getPublicKey(), ONE_MOD_Q()) == true);
+    CHECK(result->isValidEncryption(*hashContext, *keypair->getPublicKey(),
+                                    *context->getCryptoExtendedBaseHash()) == true);
     CHECK(result->getProof()->isValid(*result->getCiphertext(), *keypair->getPublicKey(),
-                                      ONE_MOD_Q()) == true);
+                                      *context->getCryptoExtendedBaseHash()) == true);
     // need to empty the queues because future tests don't use the same keys
     PrecomputeBufferContext::clear();
 }
@@ -105,11 +107,13 @@ TEST_CASE("Encrypt simple selection malformed data fails")
       result->getCryptoHash()->clone(), nullptr);
 
     // Assert
-    CHECK(result->isValidEncryption(*hashContext, *keypair->getPublicKey(), ONE_MOD_Q()) == true);
+    CHECK(result->isValidEncryption(*hashContext, *keypair->getPublicKey(),
+                                    *context->getCryptoExtendedBaseHash()) == true);
     CHECK(malformedDescriptionHash->isValidEncryption(*hashContext, *keypair->getPublicKey(),
-                                                      ONE_MOD_Q()) == false);
-    CHECK(missingProof->isValidEncryption(*hashContext, *keypair->getPublicKey(), ONE_MOD_Q()) ==
+                                                      *context->getCryptoExtendedBaseHash()) ==
           false);
+    CHECK(missingProof->isValidEncryption(*hashContext, *keypair->getPublicKey(),
+                                          *context->getCryptoExtendedBaseHash()) == false);
 }
 
 TEST_CASE("Encrypt PlaintextBallot with EncryptionMediator against constructed "
@@ -126,9 +130,9 @@ TEST_CASE("Encrypt PlaintextBallot with EncryptionMediator against constructed "
 
     auto mediator = make_unique<EncryptionMediator>(*internal, *context, *device);
 
-    // Act
+    // // Act
     auto plaintext = BallotGenerator::getFakeBallot(*internal);
-    // Log::debug(plaintext->toJson());
+    Log::trace(plaintext->toJson());
     auto ciphertext = mediator->encrypt(*plaintext);
 
     // Assert
@@ -151,7 +155,7 @@ TEST_CASE("Encrypt PlaintextBallot undervote succeeds")
 
     // Act
     auto plaintext = BallotGenerator::getFakeBallot(*internal, 0UL);
-    // Log::debug(plaintext->toJson());
+    Log::trace(plaintext->toJson());
     auto ciphertext = mediator->encrypt(*plaintext);
 
     // Assert

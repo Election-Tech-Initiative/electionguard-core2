@@ -280,7 +280,7 @@ TEST_CASE("Ranged CP Proof encryption of some with missing commitments generates
 
     auto [accumulation, proof] = makeAFakeRangedProof(*keypair, selected, limit, count);
     auto integerProofs = proof->getProofs();
-    Log::debug("proofs size: " + to_string(integerProofs.size()));
+    Log::trace("proofs size: " + to_string(integerProofs.size()));
     for (size_t i = 0; i < limit; i++) {
         // just arbitrarily remove some but not all of the commitments
         if (i != selected - 1) {
@@ -301,7 +301,7 @@ TEST_CASE("Ranged CP Proof encryption of all generates valid proof")
     const auto count = 5UL;    // 5 selections on the ballot
 
     auto [accumulation, proof] = makeAFakeRangedProof(*keypair, selected, limit, count);
-    auto result = proof->isValid(*accumulation, *keypair->getPublicKey(), ONE_MOD_Q(), "Test");
+    auto result = proof->isValid(*accumulation, *keypair->getPublicKey(), ONE_MOD_Q(), "test");
     CHECK(result.isValid == true);
 }
 
@@ -310,8 +310,6 @@ TEST_CASE("Ranged CP Proof encryption of all generates valid proof")
 // for E.G. 2.0 Base-K ElGamal Encrypt use RangedChaumPedersenProof
 TEST_CASE("Constant CP Proof encryption of zero")
 {
-    Log::info("Skipping Constant CP Proof Check because the proof is invalid when using the "
-              "base-k elgamal encryption method");
     const auto &nonce = ONE_MOD_Q();
     const auto &seed = TWO_MOD_Q();
     auto keypair = ElGamalKeyPair::fromSecret(TWO_MOD_Q(), false);
@@ -329,8 +327,6 @@ TEST_CASE("Constant CP Proof encryption of zero")
 
 TEST_CASE("Constant CP Proof encryption of one")
 {
-    Log::info("Skipping Constant CP Proof Check because the proof is invalid when using the "
-              "base-k elgamal encryption method");
     auto keypair = ElGamalKeyPair::fromSecret(TWO_MOD_Q(), false);
     const auto &nonce = ONE_MOD_Q();
     const auto &seed = TWO_MOD_Q();

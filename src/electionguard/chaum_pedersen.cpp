@@ -606,7 +606,7 @@ namespace electionguard
             // when trying to validate against a proof that has been deserialized
             // from an election record that does not include the commitment values
             if (!proof.commitment.has_value()) {
-                Log::debug("RangedChaumPedersenProof::Impl::isValid: inconclusive integer proof " +
+                Log::trace("RangedChaumPedersenProof::Impl::isValid: inconclusive integer proof " +
                            to_string(j));
                 return ValidationResult{false, {"j: " + to_string(j) + " inconclusive commitment"}};
             }

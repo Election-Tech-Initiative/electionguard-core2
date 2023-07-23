@@ -794,8 +794,8 @@ namespace electionguard
       const CiphertextElectionContext &context, uint64_t sequenceOrder,
       const vector<reference_wrapper<CiphertextBallotSelection>> &selections)
     {
-        makeCryptoHash(*context.getElGamalPublicKey(), *context.getCryptoExtendedBaseHash(),
-                       sequenceOrder, selections);
+        return makeCryptoHash(*context.getElGamalPublicKey(), *context.getCryptoExtendedBaseHash(),
+                              sequenceOrder, selections);
     }
 
     unique_ptr<ElementModQ> CiphertextBallotContest::makeCryptoHash(
