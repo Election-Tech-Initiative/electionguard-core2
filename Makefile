@@ -135,9 +135,15 @@ ifeq ($(OPERATING_SYSTEM),Windows)
 	choco upgrade ninja -y
 	choco upgrade vswhere -y
 endif
-	wget -O cmake/CPM.cmake https://github.com/cpm-cmake/CPM.cmake/releases/download/v0.35.5/CPM.cmake
+	wget -O cmake/CPM.cmake https://github.com/cpm-cmake/CPM.cmake/releases/download/v0.38.2/CPM.cmake
 	make fetch-sample-data
 	dotnet tool restore
+
+environment-msys2:
+ifeq ($(OPERATING_SYSTEM),Windows)
+	@echo 🏁 MSYS2 INSTALL
+	pacman -S mingw-w64-x86_64-gcc mingw-w64-clang-x86_64-toolchain mingw-w64-x86_64-cmake make git
+endif
 
 environment-ui:
 ifeq ($(OPERATING_SYSTEM),Windows)
@@ -169,6 +175,7 @@ ifeq ($(OPERATING_SYSTEM),Windows)
 		-DBUILD_SHARED_LIBS=ON \
 		-DDISABLE_VALE=$(TEMP_DISABLE_VALE) \
 		-DUSE_MSVC=ON \
+		-DUSE_32BIT_MATH=$(USE_32BIT_MATH) \
 		-DANDROID_NDK_PATH=$(ANDROID_NDK_PATH) \
 		-DCPM_SOURCE_CACHE=$(CPM_SOURCE_CACHE) \
 		-DCMAKE_TOOLCHAIN_FILE=cmake/toolchains/$(PROCESSOR)-$(OPERATING_SYSTEM).cmake
@@ -211,10 +218,18 @@ ifeq ($(OPERATING_SYSTEM),Windows)
 	cmake -S . -B $(ELECTIONGUARD_BUILD_LIBS_DIR)/$(OPERATING_SYSTEM)/$(PROCESSOR)/$(TARGET) -G "MSYS Makefiles" \
 		-DCMAKE_BUILD_TYPE=$(TARGET) \
 		-DBUILD_SHARED_LIBS=ON \
-		-DCAN_USE_VECTOR_INTRINSICS=ON \
+		-DDISABLE_VALE=$(TEMP_DISABLE_VALE) \
+		-DUSE_32BIT_MATH=$(USE_32BIT_MATH) \
 		-DCPM_SOURCE_CACHE=$(CPM_SOURCE_CACHE) \
 		-DCMAKE_TOOLCHAIN_FILE=cmake/toolchains/$(PROCESSOR)-$(OPERATING_SYSTEM)-msys2.cmake
 	cmake --build $(ELECTIONGUARD_BUILD_LIBS_DIR)/$(OPERATING_SYSTEM)/$(PROCESSOR)/$(TARGET)
+else
+	echo "MSYS2 builds are only supported on Windows"
+endif
+
+build-msys2-x86:
+ifeq ($(OPERATING_SYSTEM),Windows)
+	PROCESSOR=x86 USE_32BIT_MATH=ON && make build-msys2
 else
 	echo "MSYS2 builds are only supported on Windows"
 endif
@@ -569,10 +584,19 @@ ifeq ($(OPERATING_SYSTEM),Windows)
 	cmake -S . -B $(ELECTIONGUARD_BUILD_LIBS_DIR)/$(PROCESSOR)/$(TARGET) -G "MSYS Makefiles" \
 		-DCMAKE_BUILD_TYPE=$(TARGET) \
 		-DCPM_SOURCE_CACHE=$(CPM_SOURCE_CACHE) \
-		-DCMAKE_TOOLCHAIN_FILE=cmake/toolchains/test.cmake
+		-DDISABLE_VALE=$(TEMP_DISABLE_VALE) \
+		-DUSE_32BIT_MATH=$(USE_32BIT_MATH) \
+		-DCMAKE_TOOLCHAIN_FILE=cmake/toolchains/test-msys2.cmake
 	cmake --build $(ELECTIONGUARD_BUILD_LIBS_DIR)/$(PROCESSOR)/$(TARGET)
 	$(ELECTIONGUARD_BUILD_LIBS_DIR)/$(PROCESSOR)/$(TARGET)/test/ElectionGuardTests
 	$(ELECTIONGUARD_BUILD_LIBS_DIR)/$(PROCESSOR)/$(TARGET)/test/ElectionGuardCTests
+endif
+
+test-msys2-x86:
+ifeq ($(OPERATING_SYSTEM),Windows)
+	PROCESSOR=x86 USE_32BIT_MATH=ON && make test-msys2
+else
+	echo "MSYS2 tests are only supported on Windows"
 endif
 
 test-netstandard: build-netstandard

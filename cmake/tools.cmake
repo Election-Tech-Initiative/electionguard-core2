@@ -25,7 +25,7 @@ include(cmake/CPM.cmake)
 CPMAddPackage(
     NAME StableCoder-cmake-scripts
     GITHUB_REPOSITORY StableCoder/cmake-scripts
-    GIT_TAG 22.01
+    GIT_TAG 23.06
 )
 
 CPMAddPackage(

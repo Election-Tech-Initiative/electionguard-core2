@@ -177,6 +177,7 @@ endif()
 
 if(CMAKE_CXX_COMPILER_ID MATCHES "Clang|GNU")
     message("++ Configuring compile options for Clang|GNU")
+    target_compile_options(${META_PROJECT_TARGET} PUBLIC -Wno-unqualified-std-cast-call)
 endif()
 
 if(CMAKE_CXX_COMPILER_ID MATCHES "Clang")
