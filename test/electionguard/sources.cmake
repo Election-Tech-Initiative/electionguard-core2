@@ -26,6 +26,7 @@ set(SOURCES_electionguard_test_benchmark
     ${CMAKE_CURRENT_SOURCE_DIR}/electionguard/benchmark/bench_hashed_elgamal.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/electionguard/benchmark/bench_nonces.cpp
 
+    # TODO: reenable
     # ${CMAKE_CURRENT_SOURCE_DIR}/electionguard/benchmark/bench_precompute.cpp
 )
 
