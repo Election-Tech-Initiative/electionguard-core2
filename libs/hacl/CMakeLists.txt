@@ -30,10 +30,11 @@ set(HACL_CPP_EXPORT_NAME "hacl")
 set(HACL_CPP_ALIAS_NAME "hacl::hacl")
 set(HACL_CPP_TARGET_NAME "hacl_cpp")
 
-if(WIN32)
-    message("++ Exporting all Symbols")
-    set(CMAKE_WINDOWS_EXPORT_ALL_SYMBOLS TRUE)
-endif()
+# if(WIN32)
+message("++ Exporting all Symbols")
+set(CMAKE_WINDOWS_EXPORT_ALL_SYMBOLS TRUE)
+
+# endif()
 
 # ---- Library Sources ----
 include(${PROJECT_SOURCE_DIR}/libs/hacl/sources.cmake)
