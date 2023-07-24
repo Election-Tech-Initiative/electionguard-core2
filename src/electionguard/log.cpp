@@ -139,6 +139,7 @@ namespace electionguard
     void Log::error(string msg, DomainLoggableType obj, const char *caller)
     {
         Impl::instance().logger->error("{}::{}: {}", caller, msg, format(obj));
+        ExceptionHandler::getInstance().setData(msg, 0, format(obj));
     }
     void Log::error(string msg, const std::exception &obj, const char *caller)
     {
