@@ -181,89 +181,26 @@ typedef struct eg_ranged_chaum_pedersen_proof_s eg_ranged_chaum_pedersen_proof_t
 
 // No constructor provided.  Use `eg_disjunctive_chaum_pedersen_proof_make`
 
-EG_API eg_electionguard_status_t
-eg_ranged_chaum_pedersen_proof_free(eg_ranged_chaum_pedersen_proof_t *handle);
+/**
+ * @brief get the proof's range limit
+ * 
+ * @param handle A handle to a `eg_ranged_chaum_pedersen_proof_t` opaque instance
+ * @param out_element_ref range limit
+ **/
+EG_API eg_electionguard_status_t eg_ranged_chaum_pedersen_proof_get_range_limit(
+  eg_ranged_chaum_pedersen_proof_t *handle, uint64_t *out_element_ref);
 
 /**
- * a0 in the spec
+ * @brief get the proof's challenge
  * 
- * @param[out] out_element_ref An opaque pointer to the ElementModP zero pad.  
- *                           The value is a reference and is not owned by the caller
- */
-EG_API eg_electionguard_status_t eg_ranged_chaum_pedersen_proof_get_zero_pad(
-  eg_ranged_chaum_pedersen_proof_t *handle, eg_element_mod_p_t **out_element_ref);
-
-/**
- * b0 in the spec
- * 
- * @param[out] out_element_ref An opaque pointer to the ElementModP zero data.  
- *                           The value is a reference and is not owned by the caller
- */
-EG_API eg_electionguard_status_t eg_ranged_chaum_pedersen_proof_get_zero_data(
-  eg_ranged_chaum_pedersen_proof_t *handle, eg_element_mod_p_t **out_element_ref);
-
-/**
- * a1 in the spec
- * 
- * @param[out] out_element_ref An opaque pointer to the ElementModP one pad.  
- *                           The value is a reference and is not owned by the caller
- */
-EG_API eg_electionguard_status_t eg_ranged_chaum_pedersen_proof_get_one_pad(
-  eg_ranged_chaum_pedersen_proof_t *handle, eg_element_mod_p_t **out_element_ref);
-
-/**
- * b1 in the spec
- * 
- * @param[out] out_element_ref An opaque pointer to the ElementModP one data.  
- *                           The value is a reference and is not owned by the caller
- */
-EG_API eg_electionguard_status_t eg_ranged_chaum_pedersen_proof_get_one_data(
-  eg_ranged_chaum_pedersen_proof_t *handle, eg_element_mod_p_t **out_element_ref);
-
-/**
- * c0 in the spec
- * 
- * @param[out] out_element_ref An opaque pointer to the ElementModQ zero challenge.  
- *                           The value is a reference and is not owned by the caller
- */
-EG_API eg_electionguard_status_t eg_ranged_chaum_pedersen_proof_get_zero_challenge(
-  eg_ranged_chaum_pedersen_proof_t *handle, eg_element_mod_q_t **out_element_ref);
-
-/**
- * c1 in the spec
- * 
- * @param[out] out_element_ref An opaque pointer to the ElementModQ one challenge.  
- *                           The value is a reference and is not owned by the caller
- */
-EG_API eg_electionguard_status_t eg_disjunctive_chaum_pedersen_proof_get_one_challenge(
-  eg_disjunctive_chaum_pedersen_proof_t *handle, eg_element_mod_q_t **out_element_ref);
-
-/**
- * c in the spec
- * 
- * @param[out] out_element_ref An opaque pointer to the ElementModQ challenge.  
- *                           The value is a reference and is not owned by the caller
+ * @param handle A handle to a `eg_ranged_chaum_pedersen_proof_t` opaque instance
+ * @param out_element_ref challenge
  */
 EG_API eg_electionguard_status_t eg_ranged_chaum_pedersen_proof_get_challenge(
   eg_ranged_chaum_pedersen_proof_t *handle, eg_element_mod_q_t **out_element_ref);
 
-/**
- * v0 in the spec
- * 
- * @param[out] out_element_ref An opaque pointer to the ElementModQ zero response.  
- *                           The value is a reference and is not owned by the caller
- */
-EG_API eg_electionguard_status_t eg_ranged_chaum_pedersen_proof_get_zero_response(
-  eg_ranged_chaum_pedersen_proof_t *handle, eg_element_mod_q_t **out_element_ref);
-
-/**
- * v1 in the spec
- * 
- * @param[out] out_element_ref An opaque pointer to the ElementModQ one response.  
- *                           The value is a reference and is not owned by the caller
- */
-EG_API eg_electionguard_status_t eg_ranged_chaum_pedersen_proof_get_one_response(
-  eg_ranged_chaum_pedersen_proof_t *handle, eg_element_mod_q_t **out_element_ref);
+EG_API eg_electionguard_status_t
+eg_ranged_chaum_pedersen_proof_free(eg_ranged_chaum_pedersen_proof_t *handle);
 
 /**
  * make function for a `RangedChaumPedersenProof`
@@ -272,16 +209,18 @@ EG_API eg_electionguard_status_t eg_ranged_chaum_pedersen_proof_get_one_response
  * proofs independent of the original encryption. (faster performance)
  * @param[in] in_message The ciphertext message
  * @param[in] in_r The nonce used creating the ElGamal ciphertext
+ * @param[in] in_selected index of the selection
+ * @param[in] in_maxLimit number of commitments in the proof
  * @param[in] in_k The public key of the election
  * @param[in] in_q A value used when generating the challenge,
  *                 usually the election extended base hash (𝑄')
- * @param[in] in_plaintext Zero or one
  * @param[out] out_handle A handle to an `eg_ranged_chaum_pedersen_proof_t`. 
  *                        Caller is responsible for lifecycle.
  */
 EG_API eg_electionguard_status_t eg_ranged_chaum_pedersen_proof_make(
-  eg_elgamal_ciphertext_t *in_message, eg_element_mod_q_t *in_r, eg_element_mod_p_t *in_k,
-  eg_element_mod_q_t *in_q, uint64_t in_plaintext, eg_ranged_chaum_pedersen_proof_t **out_handle);
+  eg_elgamal_ciphertext_t *in_message, eg_element_mod_q_t *in_r, uint64_t in_selected,
+  uint64_t in_maxLimit, eg_element_mod_p_t *in_k, eg_element_mod_q_t *in_q,
+  eg_ranged_chaum_pedersen_proof_t **out_handle);
 
 /**
  * make function for a `RangedChaumPedersenProof`
@@ -290,6 +229,8 @@ EG_API eg_electionguard_status_t eg_ranged_chaum_pedersen_proof_make(
  * proofs deterministically based on the seed. (slower, but reproduceable proofs)
  * @param[in] in_message The ciphertext message
  * @param[in] in_r The nonce used creating the ElGamal ciphertext
+ * @param[in] in_selected index of the selection
+ * @param[in] in_maxLimit number of commitments in the proof
  * @param[in] in_k The public key of the election
  * @param[in] in_q A value used when generating the challenge,
  *                 usually the election extended base hash (𝑄')
@@ -299,19 +240,19 @@ EG_API eg_electionguard_status_t eg_ranged_chaum_pedersen_proof_make(
  *                        Caller is responsible for lifecycle.
  */
 EG_API eg_electionguard_status_t eg_ranged_chaum_pedersen_proof_make_deterministic(
-  eg_elgamal_ciphertext_t *in_message, eg_element_mod_q_t *in_r, eg_element_mod_p_t *in_k,
-  eg_element_mod_q_t *in_q, eg_element_mod_q_t *in_seed, uint64_t in_plaintext,
-  eg_ranged_chaum_pedersen_proof_t **out_handle);
+  eg_elgamal_ciphertext_t *in_message, eg_element_mod_q_t *in_r, uint64_t in_selected,
+  uint64_t in_maxLimit, eg_element_mod_p_t *in_k, eg_element_mod_q_t *in_q,
+  eg_element_mod_q_t *in_seed, eg_ranged_chaum_pedersen_proof_t **out_handle);
 
 /**
  * Validates a "ranged" Chaum-Pedersen [0...n] proof.
  *
- * @param[in] in_message The ciphertext message
+ * @param[in] in_ciphertext The ciphertext message
  * @param[in] in_k The public key of the election
  * @param[in] in_q The extended base hash of the election
  */
 EG_API bool eg_ranged_chaum_pedersen_proof_is_valid(eg_ranged_chaum_pedersen_proof_t *handle,
-                                                    eg_elgamal_ciphertext_t *in_message,
+                                                    eg_elgamal_ciphertext_t *in_ciphertext,
                                                     eg_element_mod_p_t *in_k,
                                                     eg_element_mod_q_t *in_q);
 
