@@ -15,6 +15,7 @@ using electionguard::ElementModP;
 using electionguard::ElementModQ;
 using electionguard::ElGamalCiphertext;
 using electionguard::Log;
+using electionguard::RangedChaumPedersenProof;
 
 using std::make_unique;
 using std::move;
@@ -181,6 +182,129 @@ bool eg_disjunctive_chaum_pedersen_proof_is_valid(eg_disjunctive_chaum_pedersen_
 
 #pragma endregion
 
+#pragma region RangedChaumPedersenProof
+
+eg_electionguard_status_t
+eg_ranged_chaum_pedersen_proof_free(eg_ranged_chaum_pedersen_proof_t *handle)
+{
+    if (handle == nullptr) {
+        return ELECTIONGUARD_STATUS_ERROR_INVALID_ARGUMENT;
+    }
+
+    delete AS_TYPE(RangedChaumPedersenProof,
+                   handle); // NOLINT(cppcoreguidelines-owning-memory)
+    handle = nullptr;
+    return ELECTIONGUARD_STATUS_SUCCESS;
+}
+
+eg_electionguard_status_t
+eg_ranged_chaum_pedersen_proof_make(eg_elgamal_ciphertext_t *in_message, eg_element_mod_q_t *in_r,
+                                    uint64_t in_selected, uint64_t in_maxLimit,
+                                    eg_element_mod_p_t *in_k, eg_element_mod_q_t *in_q,
+                                    eg_ranged_chaum_pedersen_proof_t **out_handle)
+{
+    // TODO: Add validation to selected and maxLimit.
+    if (in_message == nullptr || in_r == nullptr || in_k == nullptr || in_q == nullptr) {
+        return ELECTIONGUARD_STATUS_ERROR_INVALID_ARGUMENT;
+    }
+
+    auto *message = AS_TYPE(ElGamalCiphertext, in_message);
+    auto *r = AS_TYPE(ElementModQ, in_r);
+    auto *k = AS_TYPE(ElementModP, in_k);
+    auto *q = AS_TYPE(ElementModQ, in_q);
+
+    try {
+        auto proof = RangedChaumPedersenProof::make(*message, *r, in_selected, in_maxLimit, *k, *q);
+        *out_handle = AS_TYPE(eg_ranged_chaum_pedersen_proof_t, proof.release());
+        return ELECTIONGUARD_STATUS_SUCCESS;
+    } catch (const exception &e) {
+        Log::error(__func__, e);
+        return ELECTIONGUARD_STATUS_ERROR_BAD_ALLOC;
+    }
+}
+
+eg_electionguard_status_t eg_ranged_chaum_pedersen_proof_make_deterministic(
+  eg_elgamal_ciphertext_t *in_message, eg_element_mod_q_t *in_r, uint64_t in_selected,
+  uint64_t in_maxLimit, eg_element_mod_p_t *in_k, eg_element_mod_q_t *in_q,
+  eg_element_mod_q_t *in_seed, eg_ranged_chaum_pedersen_proof_t **out_handle)
+{
+    // TODO: Add validation to selected and maxLimit.
+    if (in_message == nullptr || in_r == nullptr || in_k == nullptr || in_q == nullptr ||
+        in_seed == nullptr) {
+        return ELECTIONGUARD_STATUS_ERROR_INVALID_ARGUMENT;
+    }
+
+    auto *message = AS_TYPE(ElGamalCiphertext, in_message);
+    auto *r = AS_TYPE(ElementModQ, in_r);
+    auto *k = AS_TYPE(ElementModP, in_k);
+    auto *q = AS_TYPE(ElementModQ, in_q);
+    auto *seed = AS_TYPE(ElementModQ, in_seed);
+
+    try {
+        auto proof =
+          RangedChaumPedersenProof::make(*message, *r, in_selected, in_maxLimit, *k, *q, *seed);
+        *out_handle = AS_TYPE(eg_ranged_chaum_pedersen_proof_t, proof.release());
+        return ELECTIONGUARD_STATUS_SUCCESS;
+    } catch (const exception &e) {
+        Log::error(__func__, e);
+        return ELECTIONGUARD_STATUS_ERROR_BAD_ALLOC;
+    }
+}
+
+eg_electionguard_status_t
+eg_ranged_chaum_pedersen_proof_get_range_limit(eg_ranged_chaum_pedersen_proof_t *handle,
+                                               uint64_t *out_element_ref)
+{
+    auto element = AS_TYPE(RangedChaumPedersenProof, handle)->getRangeLimit();
+    *out_element_ref = element;
+    return ELECTIONGUARD_STATUS_SUCCESS;
+}
+
+eg_electionguard_status_t
+eg_ranged_chaum_pedersen_proof_get_challenge(eg_ranged_chaum_pedersen_proof_t *handle,
+                                             eg_element_mod_q_t **out_element_ref)
+{
+    auto *element = AS_TYPE(RangedChaumPedersenProof, handle)->getChallenge();
+    *out_element_ref = AS_TYPE(eg_element_mod_q_t, element);
+    return ELECTIONGUARD_STATUS_SUCCESS;
+}
+
+// TODO: add a getter for integer proofs. This is a vector of ElementModQ,
+// and we need to create a path to marshall a vector out of C layer.
+
+// TODO: Create a getter for proof at an index.
+
+bool eg_ranged_chaum_pedersen_proof_is_valid(eg_ranged_chaum_pedersen_proof_t *in_handle,
+                                             eg_elgamal_ciphertext_t *in_ciphertext,
+                                             eg_element_mod_p_t *in_k, eg_element_mod_q_t *in_q)
+{
+    if (in_handle == nullptr || in_ciphertext == nullptr || in_k == nullptr || in_q == nullptr) {
+        return false;
+    }
+
+    try {
+        auto *ciphertext = AS_TYPE(ElGamalCiphertext, in_ciphertext);
+        auto *k = AS_TYPE(ElementModP, in_k);
+        auto *q = AS_TYPE(ElementModQ, in_q);
+        auto validationResult =
+          AS_TYPE(RangedChaumPedersenProof, in_handle)->isValid(*ciphertext, *k, *q);
+
+        if (!validationResult.isValid) {
+            string messageBuilder = "RangedChaumPedersenProof is invalid";
+            for (int i = 0; i < validationResult.messages.size(); i++) {
+                messageBuilder += "\n" + validationResult.messages[i];
+            }
+            Log::error(__func__, messageBuilder);
+        }
+        return validationResult.isValid;
+    } catch (const std::exception &e) {
+        Log::error(__func__, e);
+        return false;
+    }
+}
+
+#pragma endregion
+
 #pragma region ConstantChaumPedersenProof
 
 eg_electionguard_status_t
@@ -337,7 +461,6 @@ eg_electionguard_status_t eg_chaum_pedersen_proof_make(eg_elgamal_ciphertext_t *
         return ELECTIONGUARD_STATUS_ERROR_BAD_ALLOC;
     }
 }
-
 bool eg_chaum_pedersen_proof_is_valid(eg_chaum_pedersen_proof_t *handle,
                                       eg_elgamal_ciphertext_t *in_ciphertext,
                                       eg_element_mod_p_t *in_k, eg_element_mod_p_t *in_m,
