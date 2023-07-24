@@ -729,6 +729,65 @@ namespace ElectionGuard
 
         }
 
+        internal static class RangedChaumPedersenProof
+        {
+            internal struct RangedChaumPedersenProofType { };
+
+            internal class RangedChaumPedersenProofHandle
+    : ElectionGuardSafeHandle<RangedChaumPedersenProofType>
+            {
+                protected override bool Free()
+                {
+                    if (IsClosed)
+                    {
+                        return true;
+                    }
+
+                    var status = RangedChaumPedersenProof.Free(TypedPtr);
+                    return status != Status.ELECTIONGUARD_STATUS_SUCCESS
+                        ? throw new ElectionGuardException($"DisjunctiveChaumPedersenProof Error Free: {status}", status)
+                        : true;
+                }
+            }
+
+            [DllImport(DllName, EntryPoint = "eg_ranged_chaum_pedersen_proof_make_deterministic",
+               CallingConvention = CallingConvention.Cdecl, SetLastError = true)]
+            internal static extern Status Make(
+               ElGamalCiphertext.ElGamalCiphertextHandle message,
+               ElementModQ.ElementModQHandle r,
+               ulong selected,
+               ulong maxLimit,
+               ElementModP.ElementModPHandle k,
+               ElementModQ.ElementModQHandle q,
+               ElementModQ.ElementModQHandle seed,
+               out RangedChaumPedersenProofHandle handle);
+
+            [DllImport(DllName, EntryPoint = "eg_ranged_chaum_pedersen_proof_make",
+               CallingConvention = CallingConvention.Cdecl, SetLastError = true)]
+            internal static extern Status Make(
+               ElGamalCiphertext.ElGamalCiphertextHandle message,
+               ElementModQ.ElementModQHandle r,
+               ulong selected,
+               ulong maxLimit,
+               ElementModP.ElementModPHandle k,
+               ElementModQ.ElementModQHandle q,
+               out RangedChaumPedersenProofHandle handle);
+
+            [DllImport(DllName, EntryPoint = "eg_ranged_chaum_pedersen_proof_free",
+                CallingConvention = CallingConvention.Cdecl, SetLastError = true)]
+            internal static extern Status Free(RangedChaumPedersenProofType* handle);
+
+            [DllImport(DllName, EntryPoint = "eg_ranged_chaum_pedersen_proof_get_range_limit",
+                CallingConvention = CallingConvention.Cdecl, SetLastError = true)]
+            internal static extern Status GetRangeLimit(RangedChaumPedersenProofType* handle, out ulong elementRef);
+
+            [DllImport(DllName, EntryPoint = "eg_ranged_chaum_pedersen_proof_get_challenge",
+                CallingConvention = CallingConvention.Cdecl, SetLastError = true)]
+            internal static extern Status GetChallenge(RangedChaumPedersenProofType* handle, out ElementModQ.ElementModQHandle elementRef);
+
+
+        }
+
         internal static class ConstantChaumPedersenProof
         {
             internal struct ConstantChaumPedersenProofType { };
