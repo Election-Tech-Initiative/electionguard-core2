@@ -165,9 +165,8 @@ else
 endif
 
 # Builds
-
 build:
-	@echo 🧱 BUILD $(OPERATING_SYSTEM) $(PROCESSOR) $(TARGET)
+	@echo 🧱 BUILD $(OPERATING_SYSTEM) $(PROCESSOR) $(TARGET) $(VSPLATFORM)
 ifeq ($(OPERATING_SYSTEM),Windows)
 	cmake -S . -B $(ELECTIONGUARD_BUILD_LIBS_DIR)/$(OPERATING_SYSTEM)/$(PROCESSOR)/$(TARGET) \
 		-G "Visual Studio 17 2022" -A $(VSPLATFORM) \
@@ -193,23 +192,23 @@ endif
 
 build-arm64:
 ifeq ($(OPERATING_SYSTEM),Windows)
-	set "PROCESSOR=arm64" & make build
+	PROCESSOR=arm64 && make build
 else
 	PROCESSOR=arm64 && make build
 endif
 
-build-x86:
-ifeq ($(OPERATING_SYSTEM),Windows)
-	set "PROCESSOR=x86" & set "VSPLATFORM=Win32" & make build
-else
-	PROCESSOR=x86 VSPLATFORM=Win32 && make build
-endif
-
 build-x64:
 ifeq ($(OPERATING_SYSTEM),Windows)
-	set "PROCESSOR=x64" & make build
+	PROCESSOR=x64 && make build
 else
 	PROCESSOR=x64 && make build
+endif
+
+build-x86:
+ifeq ($(OPERATING_SYSTEM),Windows)
+	PROCESSOR=x86 VSPLATFORM=Win32 && make build
+else
+	PROCESSOR=x86 VSPLATFORM=Win32 USE_32BIT_MATH=ON && make build
 endif
 	
 build-msys2:
@@ -237,7 +236,7 @@ endif
 build-android:
 	@echo 📱 BUILD ANDROID
 ifeq ($(OPERATING_SYSTEM),Windows)
-	set "PROCESSOR=arm64" & set "OPERATING_SYSTEM=Android" & make build
+	PROCESSOR=arm64 OPERATING_SYSTEM=Android && make build
 else
 	PROCESSOR=arm64 OPERATING_SYSTEM=Android && make build
 endif
@@ -274,7 +273,7 @@ build-netstandard: build
 
 build-netstandard-x64:
 ifeq ($(OPERATING_SYSTEM),Windows)
-	set "PROCESSOR=x64" & make build-netstandard
+	PROCESSOR=x64 && make build-netstandard
 else
 	PROCESSOR=x64 && make build-netstandard
 endif
@@ -540,6 +539,7 @@ ifeq ($(OPERATING_SYSTEM),Windows)
 		-DCMAKE_BUILD_TYPE=$(TARGET) \
 		-DDISABLE_VALE=$(TEMP_DISABLE_VALE) \
 		-DUSE_MSVC=ON \
+		-DUSE_32BIT_MATH=$(USE_32BIT_MATH) \
 		-DCPM_SOURCE_CACHE=$(CPM_SOURCE_CACHE) \
 		-DCMAKE_TOOLCHAIN_FILE=cmake/toolchains/test.cmake
 	cmake --build $(ELECTIONGUARD_BUILD_LIBS_DIR)/$(OPERATING_SYSTEM)/$(PROCESSOR)/$(TARGET)/ --config $(TARGET)
@@ -559,24 +559,20 @@ endif
 
 test-arm64:
 ifeq ($(OPERATING_SYSTEM),Windows)
-	set "PROCESSOR=arm64" & make test
+	PROCESSOR=arm64 && make test
 else
 	PROCESSOR=arm64 && make test
 endif
 
 test-x64:
 ifeq ($(OPERATING_SYSTEM),Windows)
-	set "PROCESSOR=x64" & make test
+	PROCESSOR=x64 && make test
 else
 	PROCESSOR=x64 && make test
 endif
 
 test-x86:
-ifeq ($(OPERATING_SYSTEM),Windows)
-	set "PROCESSOR=x86" & set "USE_32BIT_MATH=ON" & set "VSPLATFORM=Win32" & make test
-else
 	PROCESSOR=x86 USE_32BIT_MATH=ON VSPLATFORM=Win32 && make test
-endif
 
 test-msys2:
 	@echo 🧪 TEST MSYS2 $(OPERATING_SYSTEM) $(PROCESSOR) $(TARGET)
@@ -607,7 +603,7 @@ test-netstandard: build-netstandard
 
 test-netstandard-arm64:
 ifeq ($(OPERATING_SYSTEM),Windows)
-	set "PROCESSOR=arm64" && make test-netstandard
+	PROCESSOR=arm64 && make test-netstandard
 else
 	PROCESSOR=arm64 && make test-netstandard
 endif
