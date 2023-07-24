@@ -779,12 +779,19 @@ namespace ElectionGuard
 
             [DllImport(DllName, EntryPoint = "eg_ranged_chaum_pedersen_proof_get_range_limit",
                 CallingConvention = CallingConvention.Cdecl, SetLastError = true)]
-            internal static extern Status GetRangeLimit(RangedChaumPedersenProofType* handle, out ulong elementRef);
+            internal static extern Status GetRangeLimit(RangedChaumPedersenProofHandle handle, out ulong elementRef);
 
             [DllImport(DllName, EntryPoint = "eg_ranged_chaum_pedersen_proof_get_challenge",
                 CallingConvention = CallingConvention.Cdecl, SetLastError = true)]
-            internal static extern Status GetChallenge(RangedChaumPedersenProofType* handle, out ElementModQ.ElementModQHandle elementRef);
+            internal static extern Status GetChallenge(RangedChaumPedersenProofHandle handle, out ElementModQ.ElementModQHandle elementRef);
 
+            [DllImport(DllName, EntryPoint = "eg_ranged_chaum_pedersen_proof_is_valid",
+                CallingConvention = CallingConvention.Cdecl, SetLastError = true)]
+            internal static extern bool IsValid(
+                RangedChaumPedersenProofHandle handle,
+                ElGamalCiphertext.ElGamalCiphertextHandle ciphertext,
+                ElementModP.ElementModPHandle k,
+                ElementModQ.ElementModQHandle q);
 
         }
 
