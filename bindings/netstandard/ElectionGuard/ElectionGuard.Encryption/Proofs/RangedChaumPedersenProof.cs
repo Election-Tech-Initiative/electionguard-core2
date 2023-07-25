@@ -13,6 +13,10 @@ namespace ElectionGuard
     public class RangedChaumPedersenProof : DisposableBase
     {
         internal NativeRangedChaumPedersenProof Handle;
+
+        /// <summary>
+        /// Limit on the range proof
+        /// </summary>
         public ulong RangeLimit
         {
             get
@@ -25,6 +29,9 @@ namespace ElectionGuard
             }
         }
 
+        /// <summary>
+        /// The proof's challenge value
+        /// </summary>
         public ElementModQ Challenge
         {
             get
@@ -37,8 +44,15 @@ namespace ElectionGuard
             }
         }
 
+        /// <summary>
+        /// The individual proofs that make up the ranged proof
+        /// </summary>
         public Dictionary<ulong, ZeroKnowledgeProof> IntegerProofs => throw new System.NotImplementedException();
 
+        /// <summary>
+        /// Create a new instance of <see cref="RangedChaumPedersenProof"/>. This uses a deterministic seed. 
+        /// This ctor is used for unit testing and is not recommended to be directly called in a production election
+        /// </summary>
         public RangedChaumPedersenProof(
  ElGamalCiphertext message,
             ElementModQ r,
@@ -61,6 +75,9 @@ namespace ElectionGuard
             status.ThrowIfError();
         }
 
+        /// <summary>
+        /// Create a new instance of <see cref="RangedChaumPedersenProof"/>. This uses a random seed. This ctor is used for production.
+        /// </summary>
         public RangedChaumPedersenProof(
             ElGamalCiphertext message,
             ElementModQ r,
@@ -80,12 +97,15 @@ namespace ElectionGuard
         {
         }
 
-        public bool IsValid(ElGamalCiphertext ciphertext, ElementModP k, ElementModQ q, out string errorMessage)
+        /// <summary>
+        /// Validates the proof against the specified values
+        /// </summary>
+        public bool IsValid(ElGamalCiphertext ciphertext, ElementModP publicKey, ElementModQ q, out string errorMessage)
         {
             errorMessage = string.Empty;
 
             var isValidResult = NativeInterface.RangedChaumPedersenProof.IsValid(
-                Handle, ciphertext.Handle, k.Handle, q.Handle);
+                Handle, ciphertext.Handle, publicKey.Handle, q.Handle);
 
             if (isValidResult)
             {

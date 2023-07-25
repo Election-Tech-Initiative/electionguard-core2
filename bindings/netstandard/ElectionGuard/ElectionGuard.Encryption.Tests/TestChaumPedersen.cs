@@ -33,5 +33,21 @@ namespace ElectionGuard.Encryption.Tests
 
             Assert.That(proof.IsValid(ciphertext, keyPair.PublicKey, Constants.ONE_MOD_Q));
         }
+
+        [Test]
+        public void Test_RangedChaumPedersen_Deterministic()
+        {
+            var nonce = Constants.ONE_MOD_Q;
+            var seed = Constants.TWO_MOD_Q;
+            var keyPair = ElGamalKeyPair.FromSecret(Constants.TWO_MOD_Q);
+            const ulong vote = 0UL;
+            const ulong max = 1UL;
+            var ciphertext = ElGamal.Encrypt(vote, nonce, keyPair.PublicKey);
+
+            var proof = new RangedChaumPedersenProof(
+                ciphertext, Constants.ONE_MOD_Q, vote, max, keyPair.PublicKey, Constants.ONE_MOD_Q, seed);
+
+            Assert.That(proof.IsValid(ciphertext, keyPair.PublicKey, Constants.ONE_MOD_Q, out var _));
+        }
     }
 }
