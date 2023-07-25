@@ -67,7 +67,7 @@ namespace ElectionGuard.Encryption.Tests
 
             await Task.Delay(2000);
 
-            var waitReturn = _waitHandle.WaitOne(MaxCompleteDelay);
+            var waitReturn = _waitHandle.WaitOne();
 
             var status = _precompute.GetStatus();
             Console.WriteLine($"Completed: {status.CurrentQueueSize}");
