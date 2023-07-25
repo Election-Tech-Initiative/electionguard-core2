@@ -19,7 +19,7 @@
 
 		<!-- Versions -->
 		<ApplicationDisplayVersion>1.90</ApplicationDisplayVersion>
-		<ApplicationVersion>5</ApplicationVersion>
+		<ApplicationVersion>6</ApplicationVersion>
 
 		<SupportedOSPlatformVersion Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'maccatalyst'">15.3</SupportedOSPlatformVersion>
 		<SupportedOSPlatformVersion Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'windows'">10.0.19041.0</SupportedOSPlatformVersion>
@@ -141,6 +141,8 @@
 	</ItemGroup>
 
 	<ItemGroup>
+		<PackageReference Include="MetroLog.Maui" />
+		<PackageReference Include="MetroLog.Net6" />
 		<PackageReference Include="Microsoft.AppCenter.Analytics" />
 		<PackageReference Include="Microsoft.AppCenter.Crashes" />
 		<PackageReference Include="Microsoft.AppCenter.Distribute" />
@@ -214,6 +216,12 @@
 		<ElectionGuardData>..\..\..\data</ElectionGuardData>
 		<ElectionGuardLibs>..\..\..\build\libs</ElectionGuardLibs>
 		<ElectionGuardScripts>..\..\..\scripts</ElectionGuardScripts>
+	</PropertyGroup>
+	<PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Debug|net7.0-windows10.0.19041.0|AnyCPU'">
+	  <DefineConstants>$(DefineConstants);DISABLE_XAML_GENERATED_BREAK_ON_UNHANDLED_EXCEPTION</DefineConstants>
+	</PropertyGroup>
+	<PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Release|net7.0-windows10.0.19041.0|AnyCPU'">
+	  <DefineConstants>$(DefineConstants);DISABLE_XAML_GENERATED_BREAK_ON_UNHANDLED_EXCEPTION</DefineConstants>
 	</PropertyGroup>
 	<ItemGroup Label="C++ Built Libraries">
     <None Name="Windows (MSVC)" Visible="false" Include="$(ElectionGuardLibs)\Windows\x64\$(Configuration)\src\$(Configuration)\*.dll*">

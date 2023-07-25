@@ -24,6 +24,7 @@ public partial class BaseViewModel : ObservableObject, IDisposable
     private string _pageTitle = "";
 
     protected IDispatcherTimer? _timer;
+    protected ILogger _logger;
 
     private void InitTimer()
     {
