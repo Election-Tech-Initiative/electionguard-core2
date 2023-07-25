@@ -361,14 +361,12 @@ namespace electionguard
     void PrecomputeBufferContext::initialize(const ElementModP &publicKey,
                                              uint32_t maxQueueSize /* = 0 */)
     {
-        std::lock_guard<std::mutex> lock(getInstance()._mutex);
         clear();
         getInstance()._instance = make_unique<PrecomputeBuffer>(publicKey, maxQueueSize);
     }
 
     void PrecomputeBufferContext::start()
     {
-        std::lock_guard<std::mutex> lock(getInstance()._mutex);
         if (getInstance()._instance == nullptr) {
             throw std::runtime_error("PrecomputeBufferContext::start() called before "
                                      "PrecomputeBufferContext::initialize()");
@@ -378,7 +376,6 @@ namespace electionguard
 
     void PrecomputeBufferContext::start(const ElementModP &elgamalPublicKey)
     {
-        std::lock_guard<std::mutex> lock(getInstance()._mutex);
         if (getInstance()._instance == nullptr) {
             getInstance()._instance = make_unique<PrecomputeBuffer>(elgamalPublicKey);
         } else if (*getInstance()._instance->getPublicKey() != elgamalPublicKey) {
@@ -390,7 +387,6 @@ namespace electionguard
 
     void PrecomputeBufferContext::startAsync(const ElementModP &elgamalPublicKey)
     {
-        std::lock_guard<std::mutex> lock(getInstance()._mutex);
         if (getInstance()._instance == nullptr) {
             getInstance()._instance = make_unique<PrecomputeBuffer>(elgamalPublicKey);
         } else if (*getInstance()._instance->getPublicKey() != elgamalPublicKey) {
@@ -402,7 +398,6 @@ namespace electionguard
 
     void PrecomputeBufferContext::stop()
     {
-        std::lock_guard<std::mutex> lock(getInstance()._mutex);
         if (getInstance()._instance != nullptr) {
             getInstance()._instance->stop();
         }
