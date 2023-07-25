@@ -48,7 +48,7 @@ namespace ElectionGuard.Encryption.Tests
             _precompute.StartPrecomputeAsync();
             var runningStatus = _precompute.GetStatus();
 
-            await Task.Delay(10);
+            await Task.Delay(500);
 
             _precompute.StopPrecompute();
 
@@ -65,7 +65,7 @@ namespace ElectionGuard.Encryption.Tests
         {
             _precompute.StartPrecomputeAsync();
 
-            await Task.Delay(100);
+            await Task.Delay(2000);
 
             var waitReturn = _waitHandle.WaitOne(MaxCompleteDelay);
 
