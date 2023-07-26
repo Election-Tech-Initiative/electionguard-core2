@@ -2,7 +2,6 @@
 using System.Text.Json;
 using CommunityToolkit.Maui.Storage;
 using CommunityToolkit.Mvvm.Input;
-using ElectionGuard.Ballot;
 using ElectionGuard.Decryption;
 using ElectionGuard.Decryption.Tally;
 
@@ -213,9 +212,10 @@ public partial class BallotUploadViewModel : BaseViewModel
                 _ = Interlocked.Increment(ref totalCount);
                 UploadText = $"{AppResources.SuccessText} {totalCount} / {ballots.Length} {AppResources.Success2Text}";
             }
-            catch (Exception)
+            catch (Exception ex)
             {
                 _ = Interlocked.Increment(ref totalRejected);
+                _logger.LogWarning(ex, "Ballot being rejected {currentBallot}", currentBallot);
             }
         });
 
@@ -331,8 +331,10 @@ public partial class BallotUploadViewModel : BaseViewModel
         BallotService ballotService,
         ManifestService manifestService,
         ContextService contextService,
-        CiphertextTallyService ciphertextTallyService) : base("BallotUploadText", serviceProvider)
+        CiphertextTallyService ciphertextTallyService,
+        ILogger<BallotUploadViewModel> logger) : base("BallotUploadText", serviceProvider)
     {
+        _logger = logger;
         _uploadService = uploadService;
         _ballotService = ballotService;
         _manifestService = manifestService;
