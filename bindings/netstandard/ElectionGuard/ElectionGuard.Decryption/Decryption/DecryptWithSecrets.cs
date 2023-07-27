@@ -51,7 +51,8 @@ public static class DecryptWithSecretsExtensions
         {
             var plaintextContest = plaintextBallot.Contests.First(
                 x => x.Key == contest.ObjectId).Value;
-            foreach (var selection in contest.Selections.Where(x => x.IsPlaceholder == false))
+            foreach (var selection in contest.Selections
+                .Where(x => x.IsPlaceholder == false))
             {
                 var ciphertext = selection.Ciphertext;
                 var plaintextSelection = plaintextContest.Selections.First(
