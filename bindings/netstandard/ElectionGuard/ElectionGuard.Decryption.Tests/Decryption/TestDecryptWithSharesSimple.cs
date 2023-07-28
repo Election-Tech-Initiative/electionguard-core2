@@ -44,7 +44,7 @@ public class TestDecryptWithSharesSimple : DisposableBase
         var guardians = keyCeremony.Guardians
             .ToList();
 
-        // compute lagrange ciefficients
+        // compute lagrange coefficients
         var lagrangeCoefficients = guardians
             .Select(i => i.SharePublicKey()).ToList()
             .ComputeLagrangeCoefficients();

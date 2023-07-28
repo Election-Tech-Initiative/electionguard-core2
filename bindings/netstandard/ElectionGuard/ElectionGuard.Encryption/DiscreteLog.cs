@@ -1,3 +1,5 @@
+using System;
+
 namespace ElectionGuard
 {
     /// <summary>
@@ -12,6 +14,7 @@ namespace ElectionGuard
         /// In Electionguard 2.0 this method is deprecated in favor of the override that
         /// allows for the caller to specify the base for exponentiations.
         /// </Summary>
+        [Obsolete("Use the override that allows for the caller to specify the base for exponentiations")]
         public static ulong GetAsync(ElementModP element)
         {
             ulong result = 0;

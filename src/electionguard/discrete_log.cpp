@@ -89,7 +89,7 @@ namespace electionguard
                 throw std::out_of_range("computeCache: size is larger than max.");
             }
 
-            // multiply the last element by g
+            // multiply the last element by the base
             lastElement = *mul_mod_p(*this->base, lastElement);
 
             // add the new element to the cache

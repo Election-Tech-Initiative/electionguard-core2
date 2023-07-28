@@ -306,9 +306,6 @@ namespace ElectionGuard
             [DllImport(DllName, EntryPoint = "eg_constant_to_json",
                 CallingConvention = CallingConvention.Cdecl, SetLastError = true)]
             internal static extern Status ToJson(out IntPtr data, out ulong size);
-
-
-
         }
 
         #endregion
