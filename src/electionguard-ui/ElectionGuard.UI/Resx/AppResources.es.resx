@@ -627,6 +627,9 @@
   <data name="CreateMultiTallyError" xml:space="preserve">
     <value>¡No hay ceremonias clave que se utilicen para multitallies!</value>
   </data>
+  <data name="ErrorLogs" xml:space="preserve">
+    <value>Ver registros de errores</value>
+  </data>
   <data name="DecryptionComplete" xml:space="preserve">
     <value>¡Descifrado parcial completo!</value>
   </data>
@@ -635,5 +638,11 @@
   </data>
   <data name="CloseText" xml:space="preserve">
     <value>¡Cerca!</value>
+  </data>
+  <data name="PreviousCrash" xml:space="preserve">
+    <value>¡Se ha detectado un bloqueo de la aplicación!</value>
+  </data>
+  <data name="ViewLogsText" xml:space="preserve">
+    <value>Parece que la aplicación se ha bloqueado la última vez que se usó.  Por favor, mire los archivos de registro en la página de configuración para poder determinar el problema.!</value>
   </data>
 </root>

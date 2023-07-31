@@ -108,7 +108,7 @@ namespace ElectionGuard.Ballot
             }
 
             if (contest.Selections.Count !=
-                (int)description.SelectionsSize + (int)description.PlaceholdersSize)
+                (int)description.SelectionsSize)
             {
                 return new BallotValidationResult(
                     $"Selection counts do not match for contest {contest.ObjectId}");
@@ -138,28 +138,6 @@ namespace ElectionGuard.Ballot
                 }
             }
 
-            // Verify the placeholders are valid
-            foreach (var placeholderDescription in description.Placeholders)
-            {
-                // validate there's a selection description for the selection id
-                var selection = contest.Selections
-                    .FirstOrDefault(i => i.ObjectId == placeholderDescription.ObjectId);
-                if (selection == null)
-                {
-                    results.Add(new BallotValidationResult(
-                        $"Placeholder {placeholderDescription.ObjectId} not found in contest {contest.ObjectId}"
-                    ));
-                }
-                else
-                {
-                    // validate the selection is valid
-                    var result = selection.IsValid(placeholderDescription, true);
-                    if (!result.IsValid)
-                    {
-                        results.Add(result);
-                    }
-                }
-            }
 
             return new BallotValidationResult(
                 results.Count == 0 || results.All(i => i.IsValid), results);
