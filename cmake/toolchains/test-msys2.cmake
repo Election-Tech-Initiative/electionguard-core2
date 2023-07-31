@@ -17,5 +17,5 @@ if(USE_32BIT_MATH)
     set(CMAKE_SYSTEM_PROCESSOR ${arch})
 endif()
 
-set(CMAKE_C_COMPILER clang-14)
-set(CMAKE_CXX_COMPILER clang++-14)
+set(CMAKE_C_COMPILER clang) 
+set(CMAKE_CXX_COMPILER clang++)
