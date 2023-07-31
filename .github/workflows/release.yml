@@ -162,7 +162,8 @@ jobs:
         uses: msys2/setup-msys2@v2
         with:
           update: true
-          install: mingw-w64-x86_64-gcc
+          msystem: clang64
+          install: mingw-w64-x86_64-clang
       - name: Install .NET
         uses: actions/setup-dotnet@v3
         with:
@@ -219,7 +220,7 @@ jobs:
         macos_build_arm64,
         macos_build_x64,
         windows_build_x64,
-        windows_build_x86
+        windows_build_x86,
       ]
     runs-on: ubuntu-22.04
     steps:
