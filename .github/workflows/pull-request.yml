@@ -260,7 +260,7 @@ jobs:
         uses: msys2/setup-msys2@v2
         with:
           update: true
-          install: mingw-w64-x86_64-clang-${{ matrix.version }} mingw-w64-clang-x86_64-toolchain mingw-w64-clang-x86_64-llvm-14 mingw-w64-x86_64-cmake make git
+          install: base-devel mingw-w64-x86_64-clang-${{ matrix.version }} mingw-w64-clang-x86_64-toolchain mingw-w64-clang-x86_64-llvm-14 mingw-w64-x86_64-cmake make git
 
       - name: Update Environment (Windows MSVC x64)
         if: (runner.os == 'Windows' && matrix.compiler == 'msvc' && matrix.processor == 'x64' && steps.filter.outputs.any == 'true')
@@ -321,6 +321,7 @@ jobs:
         env:
           PROCESSOR: ${{ matrix.processor }}
         if: (runner.os == 'Windows' && matrix.compiler == 'clang' && matrix.processor == 'x86' && steps.filter.outputs.cpp == 'true')
+        shell: msys2
         run: make test-msys2-x86
 
       - name: Run .Net Tests
