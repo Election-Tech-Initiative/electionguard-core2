@@ -138,24 +138,24 @@ jobs:
             lint: false
             runCsTests: false
             runTsTests: false
-          # - name: windows-2022-msvc-latest-x64
-          #   os: windows-2022
-          #   processor: x64
-          #   compiler: msvc
-          #   version: "latest"
-          #   makeReleaseBuild: false
-          #   lint: false
-          #   runCsTests: true
-          #   runTsTests: false
-          # - name: ubuntu-22.04-linter
-          #   os: ubuntu-22.04
-          #   processor: x64
-          #   compiler: clang
-          #   version: "14"
-          #   makeReleaseBuild: false
-          #   lint: true
-          #   runCsTests: true
-          #   runTsTests: false
+            # - name: windows-2022-msvc-latest-x64
+            #   os: windows-2022
+            #   processor: x64
+            #   compiler: msvc
+            #   version: "latest"
+            #   makeReleaseBuild: false
+            #   lint: false
+            #   runCsTests: true
+            #   runTsTests: false
+            # - name: ubuntu-22.04-linter
+            #   os: ubuntu-22.04
+            #   processor: x64
+            #   compiler: clang
+            #   version: "14"
+            #   makeReleaseBuild: false
+            #   lint: true
+            #   runCsTests: true
+            #   runTsTests: false
 
     steps:
       - name: Configure Change Filter
