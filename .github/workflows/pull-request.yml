@@ -288,7 +288,7 @@ jobs:
 
       # Environment
       - name: Configure Environment MSYS2
-        if: ((runner.os != 'Windows' || matrix.compiler != 'clang') && steps.filter.outputs.any == 'true')
+        if: ((runner.os == 'Windows' && matrix.compiler == 'clang') && steps.filter.outputs.any == 'true')
         shell: msys2 {0}
         run: make environment
 
