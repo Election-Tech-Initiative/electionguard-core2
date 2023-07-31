@@ -262,7 +262,7 @@ jobs:
         with:
           update: true
           msystem: clang64
-          install: mingw-w64-clang-x86_64
+          install: mingw-w64-x86_64-clang
 
       - name: Update Environment (Windows MSVC x64)
         if: (runner.os == 'Windows' && matrix.compiler == 'msvc' && matrix.processor == 'x64' && steps.filter.outputs.any == 'true')
