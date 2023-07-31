@@ -283,7 +283,13 @@ jobs:
 
       # Environment
       - name: Configure Environment
-        if: (steps.filter.outputs.cpp == 'true')
+        if: ((runner.os != 'Windows' || matrix.compiler != 'clang') && steps.filter.outputs.any == 'true')
+        run: make environment
+
+      # Environment
+      - name: Configure Environment MSYS2
+        if: ((runner.os != 'Windows' || matrix.compiler != 'clang') && steps.filter.outputs.any == 'true')
+        shell: msys2 {0}
         run: make environment
 
       # Lint
@@ -322,7 +328,7 @@ jobs:
           PROCESSOR: ${{ matrix.processor }}
         if: (runner.os == 'Windows' && matrix.compiler == 'clang' && matrix.processor == 'x86' && steps.filter.outputs.cpp == 'true')
         shell: msys2 {0}
-        run: make environment-msys2 test-msys2-x86
+        run: make test-msys2-x86
 
       - name: Run .Net Tests
         env:
