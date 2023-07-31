@@ -130,11 +130,11 @@ jobs:
             lint: false
             runCsTests: false
             runTsTests: false
-          - name: windows-2022-clang-11-x86
+          - name: windows-2022-clang-14-x86
             os: windows-2022
             processor: x86
             compiler: clang
-            version: "11"
+            version: "14"
             makeReleaseBuild: false
             lint: false
             runCsTests: false
@@ -262,7 +262,7 @@ jobs:
         with:
           update: true
           msystem: clang64
-          install: mingw-w64-x86_64-clang
+          install: mingw-w64-x86_64-clang-14
 
       - name: Update Environment (Windows MSVC x64)
         if: (runner.os == 'Windows' && matrix.compiler == 'msvc' && matrix.processor == 'x64' && steps.filter.outputs.any == 'true')
