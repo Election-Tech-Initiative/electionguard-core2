@@ -320,7 +320,7 @@ jobs:
       - name: Run Tests (Windows-msys2-clang)
         env:
           PROCESSOR: ${{ matrix.processor }}
-        if: (runner.os == 'Windows' && matrix.processor == 'x86' && steps.filter.outputs.cpp == 'true')
+        if: (runner.os == 'Windows' && matrix.compiler == 'clang' && matrix.processor == 'x86' && steps.filter.outputs.cpp == 'true')
         run: make test-msys2-x86
 
       - name: Run .Net Tests
