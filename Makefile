@@ -592,9 +592,7 @@ endif
 
 test-msys2-x86:
 ifeq ($(OPERATING_SYSTEM),Windows)
-	clang --version
-	uname -s
-	which clang++
+	ls /usr/bin/clang* -alt
 	PROCESSOR=x86 USE_32BIT_MATH=ON && make test-msys2
 else
 	echo "MSYS2 tests are only supported on Windows"
