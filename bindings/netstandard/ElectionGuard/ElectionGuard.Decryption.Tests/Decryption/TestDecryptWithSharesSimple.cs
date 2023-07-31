@@ -1,4 +1,4 @@
-﻿
+
 using ElectionGuard.Ballot;
 using ElectionGuard.Encryption.Utils.Generators;
 using ElectionGuard.Decryption.Decryption;
@@ -7,6 +7,7 @@ using ElectionGuard.ElectionSetup.Tests.Generators;
 using ElectionGuard.Decryption.ChallengeResponse;
 using ElectionGuard.Decryption.Shares;
 using ElectionGuard.Decryption.Extensions;
+using ElectionGuard.ElectionSetup;
 
 namespace ElectionGuard.Decryption.Tests.Decryption;
 
@@ -20,7 +21,7 @@ public class TestDecryptWithSharesSimple : DisposableBase
     private const int NUMBER_OF_GUARDIANS = 3;
     private const int QUORUM = 2;
 
-    [Test, Category("OneShot")]
+    [Test]
     public void Test_Decrypt_Ballot_With_All_Guardians_Present_Simple()
     {
         var tallyId = "fake-tally";
@@ -31,9 +32,10 @@ public class TestDecryptWithSharesSimple : DisposableBase
             QUORUM, runKeyCeremony: true);
         using var manifest = ManifestGenerator.GetFakeManifest();
         using var data = ElectionGenerator.GenerateFakeElectionData(
-            NUMBER_OF_GUARDIANS, QUORUM, manifest);
+            NUMBER_OF_GUARDIANS, QUORUM, manifest, keyCeremony.JointKey);
 
-        using var ballot = BallotGenerator.GetFakeBallot(data.InternalManifest);
+        using var ballot = BallotGenerator.GetFakeBallot(
+            data.InternalManifest);
 
         // Act
         using var ciphertext = Encrypt.Ballot(
@@ -57,14 +59,19 @@ public class TestDecryptWithSharesSimple : DisposableBase
             }
         };
 
+        var secretKey = Constants.ZERO_MOD_Q;
+
         // Create Shares
         foreach (var guardian in guardians)
         {
+            secretKey = BigMath.AddModQ(secretKey, guardian.GetSecretKey());
             var share = guardian.ComputeDecryptionShare(
                 tallyId, ciphertext);
             shares[share.BallotId].AddShare(
                 share, guardian.SharePublicKey());
         }
+
+        Console.WriteLine($"secretKey: {secretKey}");
 
         var result = ciphertext.IsValid(data.InternalManifest);
         Assert.That(result.IsValid, Is.True);
@@ -74,6 +81,12 @@ public class TestDecryptWithSharesSimple : DisposableBase
             data.InternalManifest, data.Context, ballotNonce);
 
         Console.WriteLine($"nonceDecrypted: {nonceDecrypted.ToJson()}");
+
+        // Decrypt with Secret
+        using var secretDecrypted = ciphertext.Decrypt(
+            data.InternalManifest, secretKey, data.Context.ElGamalPublicKey);
+
+        Console.WriteLine($"secretDecrypted: {secretDecrypted}");
 
         // Decrypt with Shares
         using var shareDecrypted = ciphertext.Decrypt(

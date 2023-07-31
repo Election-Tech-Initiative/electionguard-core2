@@ -87,16 +87,16 @@ eg_elgamal_ciphertext_add(eg_elgamal_ciphertext_t *handle, eg_elgamal_ciphertext
                           eg_elgamal_ciphertext_t **out_ciphertext);
 
 /**
- * @brief Decrypts an ElGamal ciphertext with a "known product" (the blinding factor used in the encryption).
+ * @brief Decrypts an ElGamal ciphertext with an "accumulation" (the product of partial decryptions).
  * 
  * @param[in] handle The handle to the ElGamal ciphertext.
- * @param[in] in_product The known product (blinding factor).
+ * @param[in] in_share_accumulation The accumulation of shares (∏𝑀𝑖).
  * @param[in] in_encryption_base The base value used in the encryption.
  * @param[out] out_plaintext An exponentially encoded plaintext message.
  * @return EG_API 
  */
-EG_API eg_electionguard_status_t eg_elgamal_ciphertext_decrypt_known_product(
-  eg_elgamal_ciphertext_t *handle, eg_element_mod_p_t *in_product,
+EG_API eg_electionguard_status_t eg_elgamal_ciphertext_decrypt_accumulation(
+  eg_elgamal_ciphertext_t *handle, eg_element_mod_p_t *in_share_accumulation,
   eg_element_mod_p_t *in_encryption_base, uint64_t *out_plaintext);
 
 /**

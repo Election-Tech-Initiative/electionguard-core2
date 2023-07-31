@@ -97,16 +97,16 @@ namespace ElectionGuard
         }
 
         /// <Summary>
-        /// Decrypts an ElGamal ciphertext with a "known product" (the blinding factor used in the encryption).
+        /// Decrypts an ElGamal ciphertext with an "accumulation" (the product of partial decryptions)
         ///
-        /// This is a convenience accessor useful for some use cases.
-        /// This method should not be used by consumers operating in live secret ballot elections.
+        /// This is the preferred method for decrypting and is the only method
+        /// when decrypting with shares
         /// </Summary>
-        public ulong? Decrypt(ElementModP knownProduct, ElementModP encryptionBase)
+        public ulong? Decrypt(ElementModP shareAccumulation, ElementModP encryptionBase)
         {
             ulong plaintext = 0;
-            var status = NativeInterface.ElGamalCiphertext.DecryptKnownProduct(
-                Handle, knownProduct.Handle, encryptionBase.Handle, ref plaintext);
+            var status = NativeInterface.ElGamalCiphertext.DecryptAccumulation(
+                Handle, shareAccumulation.Handle, encryptionBase.Handle, ref plaintext);
             status.ThrowIfError();
             return plaintext;
         }

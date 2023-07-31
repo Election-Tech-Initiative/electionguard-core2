@@ -260,6 +260,12 @@ public partial class Guardian : DisposableBase, IElectionGuardian
         return _myElectionKeys.Share();
     }
 
+    [Obsolete("Used for testing. Do not use in production.")]
+    public ElementModQ GetSecretKey()
+    {
+        return _myElectionKeys.KeyPair.SecretKey;
+    }
+
     /// <summary>
     /// Adds the public keys of guardians to the list of public keys.
     /// </summary>

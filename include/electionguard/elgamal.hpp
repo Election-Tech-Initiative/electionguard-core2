@@ -121,23 +121,23 @@ namespace electionguard
         elgamalAdd(const std::vector<std::reference_wrapper<ElGamalCiphertext>> &ciphertexts);
 
         /// <Summary>
-        /// Decrypts an ElGamal ciphertext with a "known product" (the blinding factor used in the encryption).
+        /// Decrypts an ElGamal ciphertext with an "accumulation" (the product of partial decryptions).
         /// Calculates 𝑀=𝐵⁄(∏𝑀𝑖) mod 𝑝.
         ///
-        /// <param name="product">The known product (blinding factor).</param>
+        /// <param name="shareAccumulation">The accumulation of shares (∏𝑀𝑖).</param>
         /// <param name="base">The base value used to encrypt the ciphertext.</param>
         /// <returns>An exponentially encoded plaintext message.</returns
         /// </Summary>
-        uint64_t decrypt(const ElementModP &product, const ElementModP &base);
+        uint64_t decrypt(const ElementModP &shareAccumulation, const ElementModP &base);
 
         /// <Summary>
-        /// Decrypts an ElGamal ciphertext with a "known product" (the blinding factor used in the encryption).
+        /// Decrypts an ElGamal ciphertext with an "accumulation" (the product of partial decryptions).
         ///
-        /// <param name="product">The known product (blinding factor).</param>
+        /// <param name="shareAccumulation">The accumulation of shares (∏𝑀𝑖).</param>
         /// <param name="base">The base value used to encrypt the ciphertext.</param>
         /// <returns>An exponentially encoded plaintext message.</returns
         /// </Summary>
-        uint64_t decrypt(const ElementModP &product, const ElementModP &base) const;
+        uint64_t decrypt(const ElementModP &shareAccumulation, const ElementModP &base) const;
 
         /// <Summary>
         /// Decrypt the ciphertext directly using the provided secret key.
@@ -231,6 +231,25 @@ namespace electionguard
         /// Clone the value by making a deep copy.
         /// </Summary>
         std::unique_ptr<ElGamalCiphertext> clone() const;
+
+      protected:
+        /// <Summary>
+        /// Decrypts an ElGamal ciphertext with a "known product" (the blinding factor used in the encryption).
+        ///
+        /// <param name="product">The known product (blinding factor).</param>
+        /// <param name="base">The base value used to encrypt the ciphertext.</param>
+        /// <returns>An exponentially encoded plaintext message.</returns
+        /// </Summary>
+        uint64_t decryptKnownProduct(const ElementModP &product, const ElementModP &base);
+
+        /// <Summary>
+        /// Decrypts an ElGamal ciphertext with a "known product" (the blinding factor used in the encryption).
+        ///
+        /// <param name="product">The known product (blinding factor).</param>
+        /// <param name="base">The base value used to encrypt the ciphertext.</param>
+        /// <returns>An exponentially encoded plaintext message.</returns
+        /// </Summary>
+        uint64_t decryptKnownProduct(const ElementModP &product, const ElementModP &base) const;
 
       private:
         class Impl;

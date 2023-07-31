@@ -1,5 +1,6 @@
 
 using ElectionGuard.Ballot;
+using ElectionGuard.ElectionSetup;
 using ElectionGuard.Decryption.Accumulation;
 using ElectionGuard.Decryption.Extensions;
 using ElectionGuard.Decryption.Shares;

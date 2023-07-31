@@ -447,11 +447,11 @@ namespace ElectionGuard
                 ElGamalCiphertextHandle other,
                 out ElGamalCiphertextHandle handle);
 
-            [DllImport(DllName, EntryPoint = "eg_elgamal_ciphertext_decrypt_known_product",
+            [DllImport(DllName, EntryPoint = "eg_elgamal_ciphertext_decrypt_accumulation",
                 CallingConvention = CallingConvention.Cdecl, SetLastError = true)]
-            internal static extern Status DecryptKnownProduct(
+            internal static extern Status DecryptAccumulation(
                 ElGamalCiphertextHandle handle,
-                ElementModP.ElementModPHandle known_Product,
+                ElementModP.ElementModPHandle shareAccumulation,
                 ElementModP.ElementModPHandle encryption_base,
                 ref ulong plaintext);
 
