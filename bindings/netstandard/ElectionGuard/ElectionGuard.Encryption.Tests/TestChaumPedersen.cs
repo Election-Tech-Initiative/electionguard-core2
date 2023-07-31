@@ -31,7 +31,8 @@ namespace ElectionGuard.Encryption.Tests
             var proof = new DisjunctiveChaumPedersenProof(
                 ciphertext, nonce, keyPair.PublicKey, Constants.ONE_MOD_Q, seed, vote);
 
-            Assert.That(proof.IsValid(ciphertext, keyPair.PublicKey, Constants.ONE_MOD_Q));
+            Assert.That(proof.IsValid(
+                ciphertext, keyPair.PublicKey, Constants.ONE_MOD_Q));
         }
 
         [Test]
@@ -45,9 +46,20 @@ namespace ElectionGuard.Encryption.Tests
             var ciphertext = ElGamal.Encrypt(vote, nonce, keyPair.PublicKey);
 
             var proof = new RangedChaumPedersenProof(
-                ciphertext, Constants.ONE_MOD_Q, vote, max, keyPair.PublicKey, Constants.ONE_MOD_Q, seed);
+                ciphertext,
+                Constants.ONE_MOD_Q,
+                vote,
+                max,
+                keyPair.PublicKey,
+                Constants.ONE_MOD_Q,
+                Hash.Prefix_ContestProof,
+                seed);
 
-            Assert.That(proof.IsValid(ciphertext, keyPair.PublicKey, Constants.ONE_MOD_Q, out var _));
+            Assert.That(
+                proof.IsValid(
+                    ciphertext, keyPair.PublicKey,
+                    Constants.ONE_MOD_Q, Hash.Prefix_ContestProof,
+                    out var _));
         }
     }
 }

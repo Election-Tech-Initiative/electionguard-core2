@@ -197,11 +197,10 @@ eg_ranged_chaum_pedersen_proof_free(eg_ranged_chaum_pedersen_proof_t *handle)
     return ELECTIONGUARD_STATUS_SUCCESS;
 }
 
-eg_electionguard_status_t
-eg_ranged_chaum_pedersen_proof_make(eg_elgamal_ciphertext_t *in_message, eg_element_mod_q_t *in_r,
-                                    uint64_t in_selected, uint64_t in_maxLimit,
-                                    eg_element_mod_p_t *in_k, eg_element_mod_q_t *in_q,
-                                    eg_ranged_chaum_pedersen_proof_t **out_handle)
+eg_electionguard_status_t eg_ranged_chaum_pedersen_proof_make(
+  eg_elgamal_ciphertext_t *in_message, eg_element_mod_q_t *in_r, uint64_t in_selected,
+  uint64_t in_maxLimit, eg_element_mod_p_t *in_k, eg_element_mod_q_t *in_q,
+  const char *in_hash_prefix, eg_ranged_chaum_pedersen_proof_t **out_handle)
 {
     // TODO: Add validation to selected and maxLimit.
     if (in_message == nullptr || in_r == nullptr || in_k == nullptr || in_q == nullptr) {
@@ -214,7 +213,9 @@ eg_ranged_chaum_pedersen_proof_make(eg_elgamal_ciphertext_t *in_message, eg_elem
     auto *q = AS_TYPE(ElementModQ, in_q);
 
     try {
-        auto proof = RangedChaumPedersenProof::make(*message, *r, in_selected, in_maxLimit, *k, *q);
+        auto hashPrefix = string(in_hash_prefix);
+        auto proof = RangedChaumPedersenProof::make(*message, *r, in_selected, in_maxLimit, *k, *q,
+                                                    hashPrefix);
         *out_handle = AS_TYPE(eg_ranged_chaum_pedersen_proof_t, proof.release());
         return ELECTIONGUARD_STATUS_SUCCESS;
     } catch (const exception &e) {
@@ -226,7 +227,8 @@ eg_ranged_chaum_pedersen_proof_make(eg_elgamal_ciphertext_t *in_message, eg_elem
 eg_electionguard_status_t eg_ranged_chaum_pedersen_proof_make_deterministic(
   eg_elgamal_ciphertext_t *in_message, eg_element_mod_q_t *in_r, uint64_t in_selected,
   uint64_t in_maxLimit, eg_element_mod_p_t *in_k, eg_element_mod_q_t *in_q,
-  eg_element_mod_q_t *in_seed, eg_ranged_chaum_pedersen_proof_t **out_handle)
+  const char *in_hash_prefix, eg_element_mod_q_t *in_seed,
+  eg_ranged_chaum_pedersen_proof_t **out_handle)
 {
     // TODO: Add validation to selected and maxLimit.
     if (in_message == nullptr || in_r == nullptr || in_k == nullptr || in_q == nullptr ||
@@ -241,8 +243,9 @@ eg_electionguard_status_t eg_ranged_chaum_pedersen_proof_make_deterministic(
     auto *seed = AS_TYPE(ElementModQ, in_seed);
 
     try {
-        auto proof =
-          RangedChaumPedersenProof::make(*message, *r, in_selected, in_maxLimit, *k, *q, *seed);
+        auto hashPrefix = string(in_hash_prefix);
+        auto proof = RangedChaumPedersenProof::make(*message, *r, in_selected, in_maxLimit, *k, *q,
+                                                    hashPrefix, *seed);
         *out_handle = AS_TYPE(eg_ranged_chaum_pedersen_proof_t, proof.release());
         return ELECTIONGUARD_STATUS_SUCCESS;
     } catch (const exception &e) {
@@ -276,7 +279,8 @@ eg_ranged_chaum_pedersen_proof_get_challenge(eg_ranged_chaum_pedersen_proof_t *h
 
 bool eg_ranged_chaum_pedersen_proof_is_valid(eg_ranged_chaum_pedersen_proof_t *in_handle,
                                              eg_elgamal_ciphertext_t *in_ciphertext,
-                                             eg_element_mod_p_t *in_k, eg_element_mod_q_t *in_q)
+                                             eg_element_mod_p_t *in_k, eg_element_mod_q_t *in_q,
+                                             const char *in_hash_prefix)
 {
     if (in_handle == nullptr || in_ciphertext == nullptr || in_k == nullptr || in_q == nullptr) {
         return false;
@@ -286,8 +290,9 @@ bool eg_ranged_chaum_pedersen_proof_is_valid(eg_ranged_chaum_pedersen_proof_t *i
         auto *ciphertext = AS_TYPE(ElGamalCiphertext, in_ciphertext);
         auto *k = AS_TYPE(ElementModP, in_k);
         auto *q = AS_TYPE(ElementModQ, in_q);
+        auto hashPrefix = string(in_hash_prefix);
         auto validationResult =
-          AS_TYPE(RangedChaumPedersenProof, in_handle)->isValid(*ciphertext, *k, *q);
+          AS_TYPE(RangedChaumPedersenProof, in_handle)->isValid(*ciphertext, *k, *q, hashPrefix);
 
         if (!validationResult.isValid) {
             string messageBuilder = "RangedChaumPedersenProof is invalid";

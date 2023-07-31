@@ -515,6 +515,13 @@ namespace electionguard
         std::unique_ptr<ElGamalCiphertext> elgamalAccumulate() const;
 
         /// <summary>
+        /// Genmerate the contest nonce
+        /// </summary>
+        static std::unique_ptr<ElementModQ> contestNonce(const CiphertextElectionContext &context,
+                                                         uint64_t sequenceOrder,
+                                                         const ElementModQ &nonce);
+
+        /// <summary>
         /// Given an encrypted BallotContest, validates the encryption state against
         /// a specific encryption seed and public key
         /// by verifying the accumulated sum of selections match the proof.

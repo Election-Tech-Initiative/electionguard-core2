@@ -48,6 +48,22 @@ const char *eg_hash_get_prefix_selection_nonce()
 {
     return electionguard::HashPrefix::get_prefix_selection_nonce().c_str();
 }
+const char *eg_hash_get_prefix_selection_proof()
+{
+    return electionguard::HashPrefix::get_prefix_selection_proof().c_str();
+}
+
+// TODO: fill in the rest of the hash string values
+
+const char *eg_hash_get_prefix_contest_proof()
+{
+    return electionguard::HashPrefix::get_prefix_contest_proof().c_str();
+}
+
+const char *eg_hash_get_prefix_decrypt_selection_proof()
+{
+    return electionguard::HashPrefix::get_prefix_decrypt_selection_proof().c_str();
+}
 
 eg_electionguard_status_t eg_hash_elems_string(const char *a, eg_element_mod_q_t **out_handle)
 {
@@ -183,14 +199,28 @@ eg_electionguard_status_t eg_hash_elems_modp_modq(eg_element_mod_p_t *a, eg_elem
     }
 }
 
-EG_API eg_electionguard_status_t eg_hash_elems_modq_modq(eg_element_mod_q_t *a,
-                                                         eg_element_mod_q_t *b,
-                                                         eg_element_mod_q_t **out_handle)
+eg_electionguard_status_t eg_hash_elems_modq_modq(eg_element_mod_q_t *a, eg_element_mod_q_t *b,
+                                                  eg_element_mod_q_t **out_handle)
 {
     try {
         auto *first = AS_TYPE(ElementModQ, a);
         auto *second = AS_TYPE(ElementModQ, b);
         auto result = hash_elems({first, second});
+
+        *out_handle = AS_TYPE(eg_element_mod_q_t, result.release());
+        return ELECTIONGUARD_STATUS_SUCCESS;
+    } catch (const exception &e) {
+        Log::error(__func__, e);
+        return ELECTIONGUARD_STATUS_ERROR_BAD_ALLOC;
+    }
+}
+
+eg_electionguard_status_t eg_hash_elems_modq_int(eg_element_mod_q_t *a, uint64_t b,
+                                                 eg_element_mod_q_t **out_handle)
+{
+    try {
+        auto *first = AS_TYPE(ElementModQ, a);
+        auto result = hash_elems({first, b});
 
         *out_handle = AS_TYPE(eg_element_mod_q_t, result.release());
         return ELECTIONGUARD_STATUS_SUCCESS;

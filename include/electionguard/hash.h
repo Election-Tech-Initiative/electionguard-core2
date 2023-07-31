@@ -136,6 +136,9 @@ EG_API eg_electionguard_status_t eg_hash_elems_modq_modq(eg_element_mod_q_t *a,
                                                          eg_element_mod_q_t *b,
                                                          eg_element_mod_q_t **out_handle);
 
+EG_API eg_electionguard_status_t eg_hash_elems_modq_int(eg_element_mod_q_t *a, uint64_t b,
+                                                        eg_element_mod_q_t **out_handle);
+
 EG_API eg_electionguard_status_t eg_hash_elems_modq_modp(eg_element_mod_q_t *a,
                                                          eg_element_mod_p_t *b,
                                                          eg_element_mod_q_t **out_handle);

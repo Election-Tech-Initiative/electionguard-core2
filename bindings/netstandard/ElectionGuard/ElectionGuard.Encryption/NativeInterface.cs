@@ -756,6 +756,7 @@ namespace ElectionGuard
                ulong maxLimit,
                ElementModP.ElementModPHandle k,
                ElementModQ.ElementModQHandle q,
+               [MarshalAs(UnmanagedType.LPStr)] string hashPrefix,
                ElementModQ.ElementModQHandle seed,
                out RangedChaumPedersenProofHandle handle);
 
@@ -768,6 +769,7 @@ namespace ElectionGuard
                ulong maxLimit,
                ElementModP.ElementModPHandle k,
                ElementModQ.ElementModQHandle q,
+               [MarshalAs(UnmanagedType.LPStr)] string hashPrefix,
                out RangedChaumPedersenProofHandle handle);
 
             [DllImport(DllName, EntryPoint = "eg_ranged_chaum_pedersen_proof_free",
@@ -788,7 +790,9 @@ namespace ElectionGuard
                 RangedChaumPedersenProofHandle handle,
                 ElGamalCiphertext.ElGamalCiphertextHandle ciphertext,
                 ElementModP.ElementModPHandle k,
-                ElementModQ.ElementModQHandle q);
+                ElementModQ.ElementModQHandle q,
+                [MarshalAs(UnmanagedType.LPStr)] string hashPrefix
+                );
 
         }
 
@@ -2441,6 +2445,15 @@ namespace ElectionGuard
                 ElectionGuard.CiphertextBallotContest.External.CiphertextBallotContestHandle handle,
                 ElementModQ.ElementModQHandle encryption_seed,
                 out ElementModQ.ElementModQHandle crypto_hash);
+
+            [DllImport(DllName,
+                EntryPoint = "eg_ciphertext_ballot_contest_contest_nonce",
+                CallingConvention = CallingConvention.Cdecl, SetLastError = true)]
+            internal static extern Status ContestNonce(
+                CiphertextElectionContext.CiphertextElectionContextHandle handle,
+                ulong sequence_order,
+                ElementModQ.ElementModQHandle nonce_seed,
+                out ElementModQ.ElementModQHandle contest_nonce);
 
             [DllImport(DllName,
                 EntryPoint = "eg_ciphertext_ballot_contest_get_extended_data",

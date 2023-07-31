@@ -690,6 +690,14 @@ namespace electionguard
           move(accumulation), move(cryptoHash), move(proof), move(hashedElGamal));
     }
 
+    unique_ptr<ElementModQ>
+    CiphertextBallotContest::contestNonce(const CiphertextElectionContext &context,
+                                          uint64_t sequenceOrder, const ElementModQ &nonceSeed)
+    {
+        return hash_elems({*context.getCryptoExtendedBaseHash(),
+                           HashPrefix::get_prefix_selection_nonce(), nonceSeed, sequenceOrder});
+    }
+
     // Public Methods
 
     unique_ptr<ElementModQ> CiphertextBallotContest::aggregateNonce() const

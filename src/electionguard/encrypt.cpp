@@ -514,9 +514,8 @@ namespace electionguard
 
         // create the encryption nonces
         auto descriptionHash = description.crypto_hash();
-        auto contestNonce = hash_elems({*context.getCryptoExtendedBaseHash(),
-                                        HashPrefix::get_prefix_selection_nonce(), nonceSeed,
-                                        description.getSequenceOrder()});
+        auto contestNonce =
+          CiphertextBallotContest::contestNonce(context, description.getSequenceOrder(), nonceSeed);
         std::shared_ptr<ElementModQ> sharedNonce(move(contestNonce));
 
         // normalize contest selections
@@ -639,7 +638,7 @@ namespace electionguard
 
     unique_ptr<CiphertextBallot>
     encryptBallot(const PlaintextBallot &ballot, const InternalManifest &manifest,
-                  const CiphertextElectionContext &context, const ElementModQ &encryptionSeed,
+                  const CiphertextElectionContext &context, const ElementModQ &ballotCodeSeed,
                   unique_ptr<ElementModQ> nonce /* = nullptr */, uint64_t timestamp /* = 0 */,
                   bool verifyProofs /* = true */, bool usePrecompute /* = false */,
                   bool allowOvervotes /* = true */)
@@ -670,7 +669,7 @@ namespace electionguard
           CiphertextBallot::nonceSeed(*manifest.getManifestHash(), ballot.getObjectId(), *nonce);
 
         Log::trace("manifestHash   :", manifest.getManifestHash()->toHex());
-        Log::trace("encryptionSeed :", encryptionSeed.toHex());
+        Log::trace("encryptionSeed :", ballotCodeSeed.toHex());
         Log::trace("timestamp       :", to_string(timestamp));
 
         // encrypt contests
@@ -685,7 +684,7 @@ namespace electionguard
         // make the Ciphertext Ballot object
         auto encryptedBallot = CiphertextBallot::make(
           ballot.getObjectId(), ballot.getStyleId(), *manifest.getManifestHash(), context,
-          move(encryptedContests), move(nonce), timestamp, make_unique<ElementModQ>(encryptionSeed),
+          move(encryptedContests), move(nonce), timestamp, make_unique<ElementModQ>(ballotCodeSeed),
           nullptr);
 
         //Log::info("ballot      :", encryptedBallot->toJson(true));

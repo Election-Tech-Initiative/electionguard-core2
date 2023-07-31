@@ -84,6 +84,20 @@ namespace ElectionGuard
         }
 
         /// <summary>
+        /// Genmerate the contest nonce
+        /// </summary>
+        public static ElementModQ ContestNonce(
+            CiphertextElectionContext context,
+            ulong sequenceOrder,
+            ElementModQ nonceSeed)
+        {
+            var status = NativeInterface.CiphertextBallotContest.ContestNonce(
+                           context.Handle, sequenceOrder, nonceSeed.Handle, out var value);
+            status.ThrowIfError();
+            return value.IsInvalid ? null : new ElementModQ(value);
+        }
+
+        /// <summary>
         /// An aggregate nonce for the contest composed of the nonces of the selections.
         /// Used when constructing the proof of selection limit
         /// </summary>
