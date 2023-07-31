@@ -317,17 +317,11 @@ jobs:
         if: (runner.os == 'Windows' && matrix.compiler == 'msvc' && steps.filter.outputs.cpp == 'true')
         run: make test
 
-      - name: Run Tests (Windows-msys2)
-        env:
-          PROCESSOR: ${{ matrix.processor }}
-        if: (runner.os == 'Windows' && matrix.compiler == 'gcc' && steps.filter.outputs.cpp == 'true')
-        run: make test-msys2
-
       - name: Run Tests (Windows-msys2-clang)
         env:
           PROCESSOR: ${{ matrix.processor }}
-        if: (runner.os == 'Windows' && matrix.compiler == 'clang' && steps.filter.outputs.cpp == 'true')
-        run: make test-msys2
+        if: (runner.os == 'Windows' && matrix.processor == 'x86' && steps.filter.outputs.cpp == 'true')
+        run: make test-msys2-x86
 
       - name: Run .Net Tests
         env:
