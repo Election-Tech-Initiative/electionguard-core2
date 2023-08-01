@@ -176,6 +176,8 @@ class CiphertextBallotSelectionPrecomputedFixture : public benchmark::Fixture
         const auto *selectionId = "some-selection-object-id";
         auto secret = ElementModQ::fromHex(a_fixed_secret);
         keypair = ElGamalKeyPair::fromSecret(*secret);
+        context = CiphertextElectionContext::make(3, 2, keypair->getPublicKey()->clone(),
+                                                  ONE_MOD_Q().clone(), ONE_MOD_Q().clone());
 
         description = make_unique<SelectionDescription>(selectionId, candidateId, 1UL);
         descriptionHash = description->crypto_hash();
@@ -198,7 +200,8 @@ class CiphertextBallotSelectionPrecomputedFixture : public benchmark::Fixture
 
             auto encrypted = CiphertextBallotSelection::make(
               selectionId, description->getSequenceOrder(), *descriptionHash, move(ciphertext),
-              TWO_MOD_P(), ONE_MOD_Q(), move(precomputedValues), 1UL, false, nullptr, true);
+              *context, TWO_MOD_P(), ONE_MOD_Q(), move(precomputedValues), 1UL, false, nullptr,
+              true);
         }
     }
 
@@ -208,6 +211,7 @@ class CiphertextBallotSelectionPrecomputedFixture : public benchmark::Fixture
     unique_ptr<ElementModQ> descriptionHash;
     unique_ptr<ElGamalKeyPair> keypair;
     unique_ptr<ElGamalCiphertext> ciphertext;
+    unique_ptr<CiphertextElectionContext> context;
 };
 
 BENCHMARK_DEFINE_F(CiphertextBallotSelectionPrecomputedFixture,
@@ -227,7 +231,8 @@ BENCHMARK_DEFINE_F(CiphertextBallotSelectionPrecomputedFixture,
 
             auto encrypted = CiphertextBallotSelection::make(
               selectionId, description->getSequenceOrder(), *descriptionHash, move(localciphertext),
-              TWO_MOD_P(), ONE_MOD_Q(), move(precomputedValues), 1UL, false, nullptr, true);
+              *context, TWO_MOD_P(), ONE_MOD_Q(), move(precomputedValues), 1UL, false, nullptr,
+              true);
         }
     }
 }
@@ -255,8 +260,7 @@ class EncryptSelectionPrecomputedFixture : public benchmark::Fixture
         plaintext = BallotGenerator::selectionFrom(*metadata);
 
         auto nonce = ElementModQ::fromHex(a_fixed_nonce);
-        ciphertext = encryptSelection(*plaintext, *metadata, *keypair->getPublicKey(), ONE_MOD_Q(),
-                                      *nonce, false, false);
+        ciphertext = encryptSelection(*plaintext, *metadata, *context, *nonce, false, false);
 
         // cause precomputed entries that will be used by the selection
         // encryptions, that should be more than enough and on teardown
@@ -279,8 +283,7 @@ BENCHMARK_DEFINE_F(EncryptSelectionPrecomputedFixture, encryptSelectionPrecomput
 {
     while (state.KeepRunningBatch(50)) {
         auto nonce = rand_q();
-        encryptSelection(*plaintext, *metadata, *keypair->getPublicKey(), ONE_MOD_Q(), *nonce,
-                         false, false);
+        encryptSelection(*plaintext, *metadata, *context, *nonce, false, false);
     }
 }
 

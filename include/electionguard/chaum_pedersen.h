@@ -220,7 +220,7 @@ eg_ranged_chaum_pedersen_proof_free(eg_ranged_chaum_pedersen_proof_t *handle);
 EG_API eg_electionguard_status_t eg_ranged_chaum_pedersen_proof_make(
   eg_elgamal_ciphertext_t *in_message, eg_element_mod_q_t *in_r, uint64_t in_selected,
   uint64_t in_maxLimit, eg_element_mod_p_t *in_k, eg_element_mod_q_t *in_q,
-  eg_ranged_chaum_pedersen_proof_t **out_handle);
+  const char *in_hash_prefix, eg_ranged_chaum_pedersen_proof_t **out_handle);
 
 /**
  * make function for a `RangedChaumPedersenProof`
@@ -242,7 +242,8 @@ EG_API eg_electionguard_status_t eg_ranged_chaum_pedersen_proof_make(
 EG_API eg_electionguard_status_t eg_ranged_chaum_pedersen_proof_make_deterministic(
   eg_elgamal_ciphertext_t *in_message, eg_element_mod_q_t *in_r, uint64_t in_selected,
   uint64_t in_maxLimit, eg_element_mod_p_t *in_k, eg_element_mod_q_t *in_q,
-  eg_element_mod_q_t *in_seed, eg_ranged_chaum_pedersen_proof_t **out_handle);
+  const char *in_hash_prefix, eg_element_mod_q_t *in_seed,
+  eg_ranged_chaum_pedersen_proof_t **out_handle);
 
 /**
  * Validates a "ranged" Chaum-Pedersen [0...n] proof.
@@ -254,7 +255,8 @@ EG_API eg_electionguard_status_t eg_ranged_chaum_pedersen_proof_make_determinist
 EG_API bool eg_ranged_chaum_pedersen_proof_is_valid(eg_ranged_chaum_pedersen_proof_t *handle,
                                                     eg_elgamal_ciphertext_t *in_ciphertext,
                                                     eg_element_mod_p_t *in_k,
-                                                    eg_element_mod_q_t *in_q);
+                                                    eg_element_mod_q_t *in_q,
+                                                    const char *in_hash_prefix);
 
 #endif
 

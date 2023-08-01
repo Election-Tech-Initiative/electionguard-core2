@@ -141,7 +141,8 @@ public record SelectionChallenge : DisposableRecordBase
     /// of all selection decryption shares submitted by all participating guardians, 
     /// compute a challenge value by hashing the inputs together. 
     /// The challenge is computed as follows:
-    /// c = H(06,Q;K,A,B,a,b,M). Equation (60)
+    /// c = H(HE;30,K,A,B,a,b,M). Ballot Selection Decryption Proof 3.6.3
+    /// c = H(HE;30,K,α,β,a,b,M). Challenge Ballot Selection Decryption Proof 3.6.5
     ///
     /// Once the challenge is computed, it is offset for each guardian by the lagrange coefficient
     /// and the result is stored in the SelectionChallenge object.
@@ -164,7 +165,8 @@ public record SelectionChallenge : DisposableRecordBase
     /// of all selection decryption shares submitted by all participating guardians, 
     /// compute a challenge value by hashing the inputs together. The challenge
     /// The challenge is computed as follows:
-    /// c = H(06,Q;K,A,B,a,b,M). Equation (60)
+    /// c = H(HE;30,K,A,B,a,b,M). Ballot Selection Decryption Proof 3.6.3
+    /// c = H(HE;30,K,α,β,a,b,M). Challenge Ballot Selection Decryption Proof 3.6.5
     ///
     /// Once the challenge is computed, it is offset for each guardian by the lagrange coefficient
     /// and the result is stored in the SelectionChallenge object.
@@ -188,7 +190,8 @@ public record SelectionChallenge : DisposableRecordBase
     /// of all selection decryption shares submitted by all participating guardians, 
     /// compute a challenge value by hashing the inputs together. The challenge
     /// The challenge is computed as follows:
-    /// c = H(06,Q;K,A,B,a,b,M). Equation (60)
+    /// c = H(HE;30,K,A,B,a,b,M). Ballot Selection Decryption Proof 3.6.3
+    /// c = H(HE;30,K,α,β,a,b,M). Challenge Ballot Selection Decryption Proof 3.6.5
     ///
     /// Once the challenge is computed, it is offset for each guardian by the lagrange coefficient
     /// and the result is stored in the SelectionChallenge object.
@@ -201,7 +204,7 @@ public record SelectionChallenge : DisposableRecordBase
         ElementModP mBar)
     {
         return Hash.HashElems(
-                    Hash.Prefix06,
+                    Hash.Prefix_DecryptSelectionProof,
                     extendedHash,
                     elGamalPublicKey,
                     ciphertext.Pad,

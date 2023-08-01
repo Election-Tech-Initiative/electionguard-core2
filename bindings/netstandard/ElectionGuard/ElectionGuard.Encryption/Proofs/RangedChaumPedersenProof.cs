@@ -60,6 +60,7 @@ namespace ElectionGuard
             ulong maxLimit,
             ElementModP k,
             ElementModQ q,
+            string hashPrefix,
             ElementModQ seed
         )
         {
@@ -70,6 +71,7 @@ namespace ElectionGuard
                 maxLimit,
                 k.Handle,
                 q.Handle,
+                hashPrefix,
                 seed.Handle,
                 out Handle);
             status.ThrowIfError();
@@ -84,28 +86,36 @@ namespace ElectionGuard
             ulong selected,
             ulong maxLimit,
             ElementModP k,
-            ElementModQ q
-        ) : this(
-            message,
-            r,
-            selected,
-            maxLimit,
-            k,
-            q,
-            BigMath.RandQ()
+            ElementModQ q,
+            string hashPrefix
         )
         {
+            var status = NativeInterface.RangedChaumPedersenProof.Make(
+                message.Handle,
+                r.Handle,
+                selected,
+                maxLimit,
+                k.Handle,
+                q.Handle,
+                hashPrefix,
+                out Handle);
+            status.ThrowIfError();
         }
 
         /// <summary>
         /// Validates the proof against the specified values
         /// </summary>
-        public bool IsValid(ElGamalCiphertext ciphertext, ElementModP publicKey, ElementModQ q, out string errorMessage)
+        public bool IsValid(
+            ElGamalCiphertext ciphertext,
+            ElementModP publicKey,
+            ElementModQ q,
+            string hashPrefix,
+            out string errorMessage)
         {
             errorMessage = string.Empty;
 
             var isValidResult = NativeInterface.RangedChaumPedersenProof.IsValid(
-                Handle, ciphertext.Handle, publicKey.Handle, q.Handle);
+                Handle, ciphertext.Handle, publicKey.Handle, q.Handle, hashPrefix);
 
             if (isValidResult)
             {

@@ -368,8 +368,7 @@ namespace electionguard
     /// </summary>
     unique_ptr<CiphertextBallotSelection>
     encryptSelection(const std::string objectId, uint64_t sequenceOrder, uint64_t vote,
-                     const ElementModQ &descriptionHash, const ElementModP &elgamalPublicKey,
-                     const ElementModQ &cryptoExtendedBaseHash,
+                     const ElementModQ &descriptionHash, const CiphertextElectionContext &context,
                      std::unique_ptr<PrecomputedSelection> precomputedValues, bool isPlaceholder)
     {
         // Configure the crypto input values
@@ -378,7 +377,7 @@ namespace electionguard
 
         // Generate the encryption using precomputed values
         auto partialEncryption = *precomputedValues->getPartialEncryption();
-        auto ciphertext = elgamalEncrypt(vote, elgamalPublicKey, partialEncryption);
+        auto ciphertext = elgamalEncrypt(vote, *context.getElGamalPublicKey(), partialEncryption);
         if (ciphertext == nullptr) {
             throw runtime_error("encryptSelection:: Error generating ciphertext");
         }
@@ -387,8 +386,8 @@ namespace electionguard
         // because the public key was used to seed the precompute table and the nonce
         // was generated when the precompute table was generated
         auto encrypted = CiphertextBallotSelection::make(
-          objectId, sequenceOrder, descriptionHash, move(ciphertext), elgamalPublicKey,
-          cryptoExtendedBaseHash, move(precomputedValues), vote, isPlaceholder, nullptr, true);
+          objectId, sequenceOrder, descriptionHash, move(ciphertext), context,
+          move(precomputedValues), vote, isPlaceholder, nullptr, true);
 
         if (encrypted == nullptr || encrypted->getProof() == nullptr) {
             throw runtime_error("encryptSelection:: Error constructing encrypted selection");
@@ -414,21 +413,20 @@ namespace electionguard
     /// <param name="isPlaceholder">whether the selection is a placeholder</param>
     unique_ptr<CiphertextBallotSelection>
     encryptSelection(const std::string objectId, uint64_t sequenceOrder, uint64_t vote,
-                     const ElementModQ &descriptionHash, const ElementModP &elgamalPublicKey,
-                     const ElementModQ &cryptoExtendedBaseHash,
+                     const ElementModQ &descriptionHash, const CiphertextElectionContext &context,
                      unique_ptr<ElementModQ> selectionNonce, bool isPlaceholder)
     {
         Log::trace("encryptSelection: for " + objectId + " hash: ", descriptionHash.toHex());
 
         // standard encryption in real-time
-        auto ciphertext = elgamalEncrypt(vote, *selectionNonce, elgamalPublicKey);
+        auto ciphertext = elgamalEncrypt(vote, *selectionNonce, *context.getElGamalPublicKey());
         if (ciphertext == nullptr) {
             throw runtime_error("encryptSelection:: Error generating ciphertext");
         }
 
-        auto encrypted = CiphertextBallotSelection::make(
-          objectId, sequenceOrder, descriptionHash, move(ciphertext), elgamalPublicKey,
-          cryptoExtendedBaseHash, vote, isPlaceholder, true, move(selectionNonce));
+        auto encrypted = CiphertextBallotSelection::make(objectId, sequenceOrder, descriptionHash,
+                                                         move(ciphertext), context, vote,
+                                                         isPlaceholder, true, move(selectionNonce));
 
         if (encrypted == nullptr || encrypted->getProof() == nullptr) {
             throw runtime_error("encryptSelection:: Error constructing encrypted selection");
@@ -438,8 +436,8 @@ namespace electionguard
 
     unique_ptr<CiphertextBallotSelection>
     encryptSelection(const PlaintextBallotSelection &selection,
-                     const SelectionDescription &description, const ElementModP &elgamalPublicKey,
-                     const ElementModQ &cryptoExtendedBaseHash, const ElementModQ &nonceSeed,
+                     const SelectionDescription &description,
+                     const CiphertextElectionContext &context, const ElementModQ &nonceSeed,
                      bool isPlaceholder /* = false */, bool verifyProofs /* = true */,
                      bool usePrecompute /* = true */)
     {
@@ -462,27 +460,24 @@ namespace electionguard
         // associated with the elgamalPublicKey of this election and we can remove this
         // equality check.
         if (usePrecompute && precomputePublicKey != nullptr &&
-            *precomputePublicKey == elgamalPublicKey) {
+            *precomputePublicKey == *context.getElGamalPublicKey()) {
             Log::trace("encryptSelection: using precomputed values");
             auto precomputedValues = PrecomputeBufferContext::popPrecomputedSelection();
             if (precomputedValues != nullptr && precomputedValues.has_value()) {
-                encrypted =
-                  encryptSelection(selection.getObjectId(), sequenceOrder, selection.getVote(),
-                                   *descriptionHash, elgamalPublicKey, cryptoExtendedBaseHash,
-                                   move(precomputedValues.value()), isPlaceholder);
+                encrypted = encryptSelection(selection.getObjectId(), sequenceOrder,
+                                             selection.getVote(), *descriptionHash, context,
+                                             move(precomputedValues.value()), isPlaceholder);
             }
         }
 
         // if we didn't use precomputed values then we need to generate values in realtime
         if (encrypted == nullptr) {
             Log::trace("encryptSelection: generating values in realtime");
-            auto nonceSequence =
-              make_unique<Nonces>(*descriptionHash, &const_cast<ElementModQ &>(nonceSeed));
-            auto selectionNonce = nonceSequence->get(description.getSequenceOrder());
+            auto selectionNonce = hash_elems({nonceSeed, description.getSequenceOrder()});
 
-            encrypted = encryptSelection(
-              selection.getObjectId(), sequenceOrder, selection.getVote(), *descriptionHash,
-              elgamalPublicKey, cryptoExtendedBaseHash, move(selectionNonce), isPlaceholder);
+            encrypted =
+              encryptSelection(selection.getObjectId(), sequenceOrder, selection.getVote(),
+                               *descriptionHash, context, move(selectionNonce), isPlaceholder);
         }
 
         // optionally, skip the verification step
@@ -491,8 +486,8 @@ namespace electionguard
         }
 
         // verify the selection.
-        if (encrypted->isValidEncryption(*descriptionHash, elgamalPublicKey,
-                                         cryptoExtendedBaseHash)) {
+        if (encrypted->isValidEncryption(*descriptionHash, *context.getElGamalPublicKey(),
+                                         *context.getCryptoExtendedBaseHash())) {
             return encrypted;
         }
         throw runtime_error("encryptSelection failed validity check");
@@ -501,9 +496,9 @@ namespace electionguard
     unique_ptr<CiphertextBallotContest>
     encryptContest(const PlaintextBallotContest &contest, const InternalManifest &internalManifest,
                    const ContestDescriptionWithPlaceholders &description,
-                   const ElementModP &elgamalPublicKey, const ElementModQ &cryptoExtendedBaseHash,
-                   const ElementModQ &nonceSeed, bool verifyProofs /* = true */,
-                   bool usePrecompute /* = true */, bool allowOvervotes /* = true */)
+                   const CiphertextElectionContext &context, const ElementModQ &nonceSeed,
+                   bool verifyProofs /* = true */, bool usePrecompute /* = true */,
+                   bool allowOvervotes /* = true */)
 
     {
         // Validate Input
@@ -516,15 +511,11 @@ namespace electionguard
         }
 
         // TODO: validate the description input
-        const auto elgamalPublicKey_ptr = &elgamalPublicKey;
-        const auto cryptoExtendedBaseHash_ptr = &cryptoExtendedBaseHash;
 
-        // account for sequence id
+        // create the encryption nonces
         auto descriptionHash = description.crypto_hash();
-        auto nonceSequence =
-          make_unique<Nonces>(*descriptionHash, &const_cast<ElementModQ &>(nonceSeed));
-        auto contestNonce = nonceSequence->get(description.getSequenceOrder());
-        auto proofNonce = nonceSequence->next();
+        auto contestNonce =
+          CiphertextBallotContest::contestNonce(context, description.getSequenceOrder(), nonceSeed);
         std::shared_ptr<ElementModQ> sharedNonce(move(contestNonce));
 
         // normalize contest selections
@@ -563,8 +554,7 @@ namespace electionguard
                 // explicitly do not verify proofs when creating the encrypted selections
                 // since we may verify the proofs on the entire contest
                 encryptedSelections.push_back(
-                  encryptSelection(*selection_ptr, selectionDescription.get(),
-                                   *elgamalPublicKey_ptr, *cryptoExtendedBaseHash_ptr,
+                  encryptSelection(*selection_ptr, selectionDescription.get(), context,
                                    *sharedNonce.get(), isPlaceholder, verifyProofs, usePrecompute));
             } else {
                 // Should never happen since the contest is normalized by emplaceMissingValues
@@ -575,23 +565,22 @@ namespace electionguard
         // Encrypt ExtendedData
         auto extendedData = encodeExtendedData(contest, internalManifest, validationResult);
 
-        // Derive the extendedDataNonce from the selection nonce and a constant
-        auto noncesForExtendedData =
-          make_unique<Nonces>(*sharedNonce->clone(), "contest-extended-data");
-        auto extendedDataNonce = noncesForExtendedData->get(0);
+        // Derive the extendedDataNonce from the contest nonce and a constant
+        auto extendedDataNonce = hash_elems({sharedNonce->clone().get(), "contest-data"});
 
         vector<uint8_t> extendedData_plaintext(extendedData.begin(), extendedData.end());
 
         // Perform HashedElGamalCiphertext calculation
         unique_ptr<HashedElGamalCiphertext> hashedElGamal = hashedElgamalEncrypt(
-          extendedData_plaintext, *extendedDataNonce, HashPrefix::get_prefix_05(), elgamalPublicKey,
-          cryptoExtendedBaseHash, BYTES_512, true, usePrecompute);
+          extendedData_plaintext, *extendedDataNonce, HashPrefix::get_prefix_contest_data_secret(),
+          *context.getElGamalPublicKey(), *context.getCryptoExtendedBaseHash(), BYTES_512, true,
+          usePrecompute);
 
         // Create the CiphertextBallotContest return object
         auto encryptedContest = CiphertextBallotContest::make(
           contest.getObjectId(), description.getSequenceOrder(), *descriptionHash,
-          move(encryptedSelections), elgamalPublicKey, cryptoExtendedBaseHash, *proofNonce,
-          selectionCount, description.getNumberElected(), sharedNonce->clone(), nullptr, nullptr,
+          move(encryptedSelections), context, *sharedNonce->clone().get(), selectionCount,
+          description.getNumberElected(), sharedNonce->clone(), nullptr, nullptr,
           move(hashedElGamal));
 
         if (encryptedContest == nullptr || encryptedContest->getProof() == nullptr) {
@@ -604,8 +593,8 @@ namespace electionguard
         }
 
         // verify the contest.
-        if (encryptedContest->isValidEncryption(*descriptionHash, elgamalPublicKey,
-                                                cryptoExtendedBaseHash)) {
+        if (encryptedContest->isValidEncryption(*descriptionHash, *context.getElGamalPublicKey(),
+                                                *context.getCryptoExtendedBaseHash())) {
             return encryptedContest;
         }
 
@@ -630,10 +619,9 @@ namespace electionguard
             for (const auto &contest : normalizedBallot->getContests()) {
                 if (contest.get().getObjectId() == description.get().getObjectId()) {
                     hasContest = true;
-                    auto encrypted = encryptContest(
-                      contest.get(), internalManifest, description.get(),
-                      *context.getElGamalPublicKey(), *context.getCryptoExtendedBaseHash(),
-                      nonceSeed, verifyProofs, usePrecompute, allowOvervotes);
+                    auto encrypted =
+                      encryptContest(contest.get(), internalManifest, description.get(), context,
+                                     nonceSeed, verifyProofs, usePrecompute, allowOvervotes);
 
                     encryptedContests.push_back(move(encrypted));
                     break;
@@ -650,7 +638,7 @@ namespace electionguard
 
     unique_ptr<CiphertextBallot>
     encryptBallot(const PlaintextBallot &ballot, const InternalManifest &manifest,
-                  const CiphertextElectionContext &context, const ElementModQ &encryptionSeed,
+                  const CiphertextElectionContext &context, const ElementModQ &ballotCodeSeed,
                   unique_ptr<ElementModQ> nonce /* = nullptr */, uint64_t timestamp /* = 0 */,
                   bool verifyProofs /* = true */, bool usePrecompute /* = false */,
                   bool allowOvervotes /* = true */)
@@ -681,7 +669,7 @@ namespace electionguard
           CiphertextBallot::nonceSeed(*manifest.getManifestHash(), ballot.getObjectId(), *nonce);
 
         Log::trace("manifestHash   :", manifest.getManifestHash()->toHex());
-        Log::trace("encryptionSeed :", encryptionSeed.toHex());
+        Log::trace("encryptionSeed :", ballotCodeSeed.toHex());
         Log::trace("timestamp       :", to_string(timestamp));
 
         // encrypt contests
@@ -694,10 +682,10 @@ namespace electionguard
         }
 
         // make the Ciphertext Ballot object
-        auto encryptedBallot =
-          CiphertextBallot::make(ballot.getObjectId(), ballot.getStyleId(),
-                                 *manifest.getManifestHash(), move(encryptedContests), move(nonce),
-                                 timestamp, make_unique<ElementModQ>(encryptionSeed), nullptr);
+        auto encryptedBallot = CiphertextBallot::make(
+          ballot.getObjectId(), ballot.getStyleId(), *manifest.getManifestHash(), context,
+          move(encryptedContests), move(nonce), timestamp, make_unique<ElementModQ>(ballotCodeSeed),
+          nullptr);
 
         //Log::info("ballot      :", encryptedBallot->toJson(true));
         if (!encryptedBallot) {

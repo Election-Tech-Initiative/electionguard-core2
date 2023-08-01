@@ -337,12 +337,13 @@ namespace electionguard
 
         static std::unique_ptr<RangedChaumPedersenProof>
         make(const ElGamalCiphertext &message, const ElementModQ &r, uint64_t selected,
-             uint64_t maxLimit, const ElementModP &k, const ElementModQ &q);
+             uint64_t maxLimit, const ElementModP &k, const ElementModQ &q,
+             const std::string &hashPrefix);
 
         static std::unique_ptr<RangedChaumPedersenProof>
         make(const ElGamalCiphertext &message, const ElementModQ &r, uint64_t selected,
              uint64_t maxLimit, const ElementModP &k, const ElementModQ &q,
-             const ElementModQ &seed);
+             const std::string &hashPrefix, const ElementModQ &seed);
 
         /// <Summary>
         /// Validates a `RangedChaumPedersenProof`
@@ -353,7 +354,7 @@ namespace electionguard
         /// <returns> True if everything is consistent. False otherwise. </returns>
         /// </Summary>
         ValidationResult isValid(const ElGamalCiphertext &message, const ElementModP &k,
-                                 const ElementModQ &q);
+                                 const ElementModQ &q, const std::string &hashPrefix);
 
         // protected:
         //   ValidationResult isValid(const ElGamalCiphertext &message, const ZeroKnowledgeProof &proof,
