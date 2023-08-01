@@ -65,11 +65,11 @@
             </Grid>
             <Label Style="{StaticResource H2}" Text="{helper:Translate TallyNameText}" />
             <Label Text="{Binding Tally.Name}" />
-            <VerticalStackLayout IsVisible="{Binding CanUserJoinTally}">
+            <Grid ColumnDefinitions="2*,*,2*" Margin="0,10,0,0" IsVisible="{Binding CanUserJoinTally}">
                 <!--  RO view of Tally filter (future work)  -->
-                <Button Command="{Binding JoinTallyCommand}" Text="{helper:Translate ProcessTallyJoinYes}" />
-                <Button Command="{Binding RejectTallyCommand}" Text="{helper:Translate ProcessTallyJoinNo}" />
-            </VerticalStackLayout>
+                <Button Grid.Column="0" Command="{Binding JoinTallyCommand}" Text="{helper:Translate ProcessTallyJoinYes}" />
+                <Button Grid.Column="2" Command="{Binding RejectTallyCommand}" Text="{helper:Translate ProcessTallyJoinNo}" />
+            </Grid>
             <!--  Admin buttons  -->
             <VerticalStackLayout IsVisible="{Binding CanUserStartTally}">
                 <Button
