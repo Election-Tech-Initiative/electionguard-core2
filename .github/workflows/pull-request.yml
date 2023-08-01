@@ -249,18 +249,20 @@ jobs:
           sudo xcode-select -switch /Applications/Xcode_${{ matrix.version }}.app
 
       - name: Update Environment (Windows MSYS2)
-        if: (runner.os == 'Windows' && matrix.compiler == 'gcc' && steps.filter.outputs.any == 'true')
-        uses: msys2/setup-msys2@v2
-        with:
-          update: true
-          install: mingw-w64-x86_64-gcc
-
-      - name: Update Environment (Install Clang)
         if: (runner.os == 'Windows' && matrix.compiler == 'clang' && steps.filter.outputs.any == 'true')
         uses: msys2/setup-msys2@v2
         with:
           update: true
-          install: base-devel mingw-w64-x86_64-clang-${{ matrix.version }} mingw-w64-clang-x86_64-toolchain mingw-w64-clang-x86_64-llvm-14 mingw-w64-x86_64-cmake make git
+          msystem: clang64
+          install: >-
+            base-devel
+            mingw-w64-x86_64-gcc
+            mingw-w64-clang-x86_64-clang
+            mingw-w64-clang-x86_64-toolchain
+            mingw-w64-clang-x86_64-cmake
+            mingw-w64-clang-x86_64-llvm
+            make
+            git
 
       - name: Update Environment (Windows MSVC x64)
         if: (runner.os == 'Windows' && matrix.compiler == 'msvc' && matrix.processor == 'x64' && steps.filter.outputs.any == 'true')
