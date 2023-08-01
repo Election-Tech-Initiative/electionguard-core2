@@ -762,7 +762,7 @@ TEST_CASE("Test R is converted correctly")
     auto result = ElementModP::fromHex(expected);
 
     // Assert
-    CHECK(R().toHex() == result->toHex());
+    CHECK(convert_bytes == result->toHex());
 }
 
 TEST_CASE("Test G is converted correctly")
