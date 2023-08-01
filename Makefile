@@ -142,7 +142,15 @@ endif
 environment-msys2:
 ifeq ($(OPERATING_SYSTEM),Windows)
 	@echo 🏁 MSYS2 INSTALL
-	pacman -S --noconfirm mingw-w64-x86_64-clang-14 mingw-w64-clang-x86_64-toolchain mingw-w64-x86_64-cmake mingw-w64-clang-x86_64-llvm-14 make git
+	pacman -S --noconfirm \
+			base-devel \
+            mingw-w64-x86_64-gcc \
+            mingw-w64-clang-x86_64-clang \
+            mingw-w64-clang-x86_64-toolchain \
+            mingw-w64-clang-x86_64-cmake \
+            mingw-w64-clang-x86_64-llvm \
+            make \
+            git
 endif
 
 environment-ui:
