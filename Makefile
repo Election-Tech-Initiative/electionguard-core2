@@ -142,7 +142,7 @@ endif
 environment-msys2:
 ifeq ($(OPERATING_SYSTEM),Windows)
 	@echo 🏁 MSYS2 INSTALL
-	pacman -S --noconfirm \
+	pacman -S --noconfirm --needed --overwrite \
 			base-devel \
             mingw-w64-x86_64-gcc \
             mingw-w64-clang-x86_64-clang \
