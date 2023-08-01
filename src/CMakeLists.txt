@@ -211,7 +211,12 @@ if(OPTION_ENABLE_TESTS)
 
     if(CMAKE_CXX_COMPILER_ID MATCHES "Clang|GNU")
         message("++ Configuring TEST compile options for Clang|GNU")
-        target_compile_options(${META_PROJECT_TARGET} PUBLIC -Wall)
+        # TODO: look at other options in WMost and add what makes sense
+        target_compile_options(${META_PROJECT_TARGET} PUBLIC  -Wmisleading-indentation)
+        target_compile_options(${META_PROJECT_TARGET} PUBLIC  -Wparentheses)
+        target_compile_options(${META_PROJECT_TARGET} PUBLIC  -Wpacked-non-pod)
+        target_compile_options(${META_PROJECT_TARGET} PUBLIC  -Wswitch)
+        target_compile_options(${META_PROJECT_TARGET} PUBLIC  -Wswitch-bool)
 
         # TODO: target_compile_options(${META_PROJECT_TARGET} PUBLIC -Werror)
         target_compile_options(${META_PROJECT_TARGET} PUBLIC -Wextra)
