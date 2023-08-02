@@ -163,7 +163,15 @@ jobs:
         with:
           update: true
           msystem: clang64
-          install: mingw-w64-x86_64-clang
+          install: >-
+            base-devel
+            mingw-w64-clang-x86_64-gcc
+            mingw-w64-clang-x86_64-toolchain
+            mingw-w64-clang-x86_64-clang-14
+            mingw-w64-clang-x86_64-cmake
+            mingw-w64-clang-x86_64-llvm-14
+            make
+            git
       - name: Install .NET
         uses: actions/setup-dotnet@v3
         with:
@@ -177,12 +185,12 @@ jobs:
         with:
           name: win-x86
           path: |
-            build/libs/x86/Release/src/*.dll
-            build/libs/x86/Release/src/*.exp
-            build/libs/x86/Release/src/*.lib
-            build/libs/x86/Release/libs/hacl/*.dll
-            build/libs/x86/Release/libs/hacl/*.exp
-            build/libs/x86/Release/libs/hacl/*.lib
+            build/libs/Windows/x86/Release/src/*.dll
+            build/libs/Windows/x86/Release/src/*.exp
+            build/libs/Windows/x86/Release/src/*.lib
+            build/libs/Windows/x86/Release/libs/hacl/*.dll
+            build/libs/Windows/x86/Release/libs/hacl/*.exp
+            build/libs/Windows/x86/Release/libs/hacl/*.lib
 
   windows_build_x64:
     name: Windows Build (x64)
@@ -257,7 +265,7 @@ jobs:
         uses: actions/download-artifact@v3
         with:
           name: win-x86
-          path: build/libs/x86/Release
+          path: build/libs/Windows/x86/Release
 
       - name: Get Windows x64 Artifacts
         uses: actions/download-artifact@v3
