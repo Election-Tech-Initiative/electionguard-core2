@@ -171,12 +171,12 @@ jobs:
         with:
           name: win-x86
           path: |
-            build/libs/Windows/x86/Release/src/*.dll
-            build/libs/Windows/x86/Release/src/*.exp
-            build/libs/Windows/x86/Release/src/*.lib
-            build/libs/Windows/x86/Release/libs/hacl/*.dll
-            build/libs/Windows/x86/Release/libs/hacl/*.exp
-            build/libs/Windows/x86/Release/libs/hacl/*.lib
+            build/libs/Windows/x86/Release/src/Release/*.dll
+            build/libs/Windows/x86/Release/src/Release/*.exp
+            build/libs/Windows/x86/Release/src/Release/*.lib
+            build/libs/Windows/x86/Release/libs/hacl/Release/*.dll
+            build/libs/Windows/x86/Release/libs/hacl/Release/*.exp
+            build/libs/Windows/x86/Release/libs/hacl/Release/*.lib
 
   windows_build_x64:
     name: Windows Build (x64)
