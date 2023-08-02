@@ -71,7 +71,7 @@ jobs:
             "macos-13-xcode-14.2",
             "macos-13-xcode-14.2-arm64",
             "windows-2022-gcc-11",
-            "windows-2022-clang-14-x86",
+            "windows-2022-msvc-latest-x86",
             "windows-2022-msvc-latest-x64",
             "ubuntu-22.04-linter",
           ]
@@ -130,11 +130,11 @@ jobs:
             lint: false
             runCsTests: false
             runTsTests: false
-          - name: windows-2022-clang-14-x86
+          - name: windows-2022-msvc-latest-x86
             os: windows-2022
             processor: x86
-            compiler: clang
-            version: "14"
+            compiler: msvc
+            version: "latest"
             makeReleaseBuild: false
             lint: false
             runCsTests: false
@@ -320,12 +320,11 @@ jobs:
         if: (runner.os == 'Windows' && matrix.compiler == 'msvc' && steps.filter.outputs.cpp == 'true')
         run: make test
 
-      - name: Run Tests (Windows-msys2-clang)
+      - name: Run Tests (Windows-x86)
         env:
           PROCESSOR: ${{ matrix.processor }}
-        if: (runner.os == 'Windows' && matrix.compiler == 'clang' && matrix.processor == 'x86' && steps.filter.outputs.cpp == 'true')
-        shell: msys2 {0}
-        run: make test-msys2-x86
+        if: (runner.os == 'Windows' && matrix.compiler == 'msvc' && matrix.processor == 'x86' && steps.filter.outputs.cpp == 'true')
+        run: make test-x86
 
       - name: Run .Net Tests
         env:
