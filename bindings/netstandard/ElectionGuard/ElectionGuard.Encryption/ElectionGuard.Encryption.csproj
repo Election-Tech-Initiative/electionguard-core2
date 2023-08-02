@@ -64,22 +64,12 @@
       <PackageCopyToOutput>true</PackageCopyToOutput>
       <PackagePath>runtimes\win-arm64\native</PackagePath>
     </Content>
-    <Content Name="Windows x86 (MSVC)" Include="$(ElectionGuardLibs)\Windows\x86\$(Configuration)\src\$(Configuration)\*.dll*">
+    <Content Name="Windows x86 (MSYS2)" Include="$(ElectionGuardLibs)\Windows\x86\$(Configuration)\src\*.dll*">
       <Pack>true</Pack>
       <PackageCopyToOutput>true</PackageCopyToOutput>
       <PackagePath>runtimes\win-x86\native</PackagePath>
     </Content>
-    <Content Name="Windows x86 HACL (MSVC)" Include="$(ElectionGuardLibs)\Windows\x86\$(Configuration)\libs\hacl\$(Configuration)\*.dll*">
-      <Pack>true</Pack>
-      <PackageCopyToOutput>true</PackageCopyToOutput>
-      <PackagePath>runtimes\win-x86\native</PackagePath>
-    </Content>
-    <Content Name="Windows x86 (MSYS2)" Include="$(ElectionGuardLibs)\x86\$(Configuration)\src\*.dll*">
-      <Pack>true</Pack>
-      <PackageCopyToOutput>true</PackageCopyToOutput>
-      <PackagePath>runtimes\win-x86\native</PackagePath>
-    </Content>
-    <Content Name="Windows x86 HACL (MSYS2)" Include="$(ElectionGuardLibs)\x86\$(Configuration)\libs\hacl\*.dll*">
+    <Content Name="Windows x86 HACL (MSYS2)" Include="$(ElectionGuardLibs)\Windows\x86\$(Configuration)\libs\hacl\*.dll*">
       <Pack>true</Pack>
       <PackageCopyToOutput>true</PackageCopyToOutput>
       <PackagePath>runtimes\win-x86\native</PackagePath>
