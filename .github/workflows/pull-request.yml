@@ -275,7 +275,7 @@ jobs:
         if: (runner.os == 'Windows' && matrix.compiler == 'msvc' && matrix.processor == 'x86' && steps.filter.outputs.any == 'true')
         uses: ilammy/msvc-dev-cmd@v1
         with:
-          arch: amd64_x86
+          arch: ${{ matrix.processor }}
 
       # Tools
       - name: Install .NET
