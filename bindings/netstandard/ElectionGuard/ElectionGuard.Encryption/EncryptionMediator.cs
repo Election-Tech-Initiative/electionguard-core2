@@ -40,7 +40,8 @@
         public CiphertextBallot Encrypt(
             PlaintextBallot plaintext, bool verifyProofs = false)
         {
-            return Encrypt(plaintext, false, verifyProofs);
+            // TODO: default to usePrecomputedValues: false
+            return Encrypt(plaintext, usePrecomputedValues: true, verifyProofs);
         }
 
         /// <summary>
