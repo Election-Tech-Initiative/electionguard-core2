@@ -3,6 +3,7 @@
 
 #include "chaum_pedersen.hpp"
 #include "crypto_hashable.hpp"
+#include "election.hpp"
 #include "elgamal.hpp"
 #include "export.h"
 #include "group.hpp"
@@ -189,7 +190,7 @@ namespace electionguard
     ///
     /// By keeping the `proof` the nonce is not required fotor verify the encrypted selection.
     /// </summary>
-    class EG_API CiphertextBallotSelection : public CryptoHashCheckable
+    class EG_API CiphertextBallotSelection : public CryptoHashable
     {
       public:
         CiphertextBallotSelection(const CiphertextBallotSelection &other);
@@ -258,21 +259,7 @@ namespace electionguard
         ///
         /// In most cases the encryption_seed should match the `description_hash`
         /// </summary>
-        virtual std::unique_ptr<ElementModQ>
-        crypto_hash_with(const ElementModQ &encryptionSeed) override;
-
-        /// <summary>
-        /// Given an encrypted BallotSelection, generates a hash, suitable for rolling up
-        /// into a hash / tracking code for an entire ballot. Of note, this particular hash examines
-        /// the `encryptionSeed` and `message`, but not the proof.
-        /// This is deliberate, allowing for the possibility of ElectionGuard variants running on
-        /// much more limited hardware, wherein the Disjunctive Chaum-Pedersen proofs might be computed
-        /// later on.
-        ///
-        /// In most cases the encryption_seed should match the `description_hash`
-        /// </summary>
-        virtual std::unique_ptr<ElementModQ>
-        crypto_hash_with(const ElementModQ &encryptionSeed) const override;
+        virtual std::unique_ptr<ElementModQ> crypto_hash() const override;
 
         /// <summary>
         /// Constructs a `CipherTextBallotSelection` object. Most of the parameters here match up to fields
@@ -283,8 +270,8 @@ namespace electionguard
         static std::unique_ptr<CiphertextBallotSelection>
         make(const std::string &objectId, uint64_t sequenceOrder,
              const ElementModQ &descriptionHash, std::unique_ptr<ElGamalCiphertext> ciphertext,
-             const ElementModP &elgamalPublicKey, const ElementModQ &cryptoExtendedBaseHash,
-             uint64_t plaintext, bool isPlaceholder = false, bool computeProof = true,
+             const CiphertextElectionContext &context, uint64_t plaintext,
+             bool isPlaceholder = false, bool computeProof = true,
              std::unique_ptr<ElementModQ> nonce = nullptr,
              std::unique_ptr<ElementModQ> cryptoHash = nullptr,
              std::unique_ptr<ElGamalCiphertext> extendedData = nullptr);
@@ -298,8 +285,8 @@ namespace electionguard
         static std::unique_ptr<CiphertextBallotSelection>
         make(const std::string &objectId, uint64_t sequenceOrder,
              const ElementModQ &descriptionHash, std::unique_ptr<ElGamalCiphertext> ciphertext,
-             const ElementModP &elgamalPublicKey, const ElementModQ &cryptoExtendedBaseHash,
-             const ElementModQ &proofSeed, uint64_t plaintext, bool isPlaceholder = false,
+             const CiphertextElectionContext &context, const ElementModQ &proofSeed,
+             uint64_t plaintext, bool isPlaceholder = false,
              std::unique_ptr<ElementModQ> nonce = nullptr,
              std::unique_ptr<ElementModQ> cryptoHash = nullptr,
              std::unique_ptr<DisjunctiveChaumPedersenProof> proof = nullptr,
@@ -314,8 +301,7 @@ namespace electionguard
         static std::unique_ptr<CiphertextBallotSelection>
         make(const std::string &objectId, uint64_t sequenceOrder,
              const ElementModQ &descriptionHash, std::unique_ptr<ElGamalCiphertext> ciphertext,
-             const ElementModP &elgamalPublicKey, const ElementModQ &cryptoExtendedBaseHash,
-
+             const CiphertextElectionContext &context,
              std::unique_ptr<PrecomputedSelection> precomputedValues, uint64_t plaintext,
              bool isPlaceholder = false, std::unique_ptr<ElementModQ> cryptoHash = nullptr,
              bool computeProof = true, std::unique_ptr<ElGamalCiphertext> extendedData = nullptr);
@@ -340,11 +326,6 @@ namespace electionguard
         /// reset the nonce value
         /// </summary>
         void resetNonce() const;
-
-      protected:
-        static std::unique_ptr<ElementModQ> makeCryptoHash(const std::string &objectId,
-                                                           const ElementModQ &encryptionSeed,
-                                                           const ElGamalCiphertext &ciphertext);
 
       private:
         class Impl;
@@ -426,7 +407,7 @@ namespace electionguard
     /// seed nonce, both values can be regenerated.  If the `nonce` for this contest is completely random,
     /// then it is required in order to regenerate the proof.
     /// </summary>
-    class EG_API CiphertextBallotContest : public CryptoHashCheckable
+    class EG_API CiphertextBallotContest : public CryptoHashable
     {
       public:
         CiphertextBallotContest(const CiphertextBallotContest &other);
@@ -437,7 +418,7 @@ namespace electionguard
                                 std::unique_ptr<ElementModQ> nonce,
                                 std::unique_ptr<ElGamalCiphertext> ciphertextAccumulation,
                                 std::unique_ptr<ElementModQ> cryptoHash,
-                                std::unique_ptr<ConstantChaumPedersenProof> proof,
+                                std::unique_ptr<RangedChaumPedersenProof> proof,
                                 std::unique_ptr<HashedElGamalCiphertext> hashedElGamal);
         ~CiphertextBallotContest();
 
@@ -484,7 +465,7 @@ namespace electionguard
         /// The proof demonstrates the sum of the selections does not exceed the maximum
         /// available selections for the contest, and that the proof was generated with the nonce
         /// </summary>
-        ConstantChaumPedersenProof *getProof() const;
+        RangedChaumPedersenProof *getProof() const;
 
         /// <summary>
         /// The hashed elgamal ciphertext is the encrypted extended data (overvote information
@@ -502,8 +483,7 @@ namespace electionguard
         ///
         /// In most cases, the encryption_seed is the description_hash
         /// </summary>
-        virtual std::unique_ptr<ElementModQ>
-        crypto_hash_with(const ElementModQ &encryptionSeed) const override;
+        virtual std::unique_ptr<ElementModQ> crypto_hash() const override;
 
         /// <summary>
         /// Constructs a `CipherTextBallotContest` object. Most of the parameters here match up to fields
@@ -515,13 +495,12 @@ namespace electionguard
         make(const std::string &objectId, uint64_t sequenceOrder,
              const ElementModQ &descriptionHash,
              std::vector<std::unique_ptr<CiphertextBallotSelection>> selections,
-             const ElementModP &elgamalPublicKey, const ElementModQ &cryptoExtendedBaseHash,
-             const ElementModQ &proofSeed, const uint64_t numberElected,
+             const CiphertextElectionContext &context, const ElementModQ &proofSeed,
+             const uint64_t numberSelected, const uint64_t numberElected,
              std::unique_ptr<ElementModQ> nonce = nullptr,
              std::unique_ptr<ElementModQ> cryptoHash = nullptr,
-             std::unique_ptr<ConstantChaumPedersenProof> proof = nullptr,
-             std::unique_ptr<HashedElGamalCiphertext> hashedElGamal = nullptr,
-             bool shouldUsePrecomputedValues = false);
+             std::unique_ptr<RangedChaumPedersenProof> proof = nullptr,
+             std::unique_ptr<HashedElGamalCiphertext> hashedElGamal = nullptr);
 
         /// <summary>
         /// An aggregate nonce for the contest composed of the nonces of the selections.
@@ -536,13 +515,20 @@ namespace electionguard
         std::unique_ptr<ElGamalCiphertext> elgamalAccumulate() const;
 
         /// <summary>
+        /// Genmerate the contest nonce
+        /// </summary>
+        static std::unique_ptr<ElementModQ> contestNonce(const CiphertextElectionContext &context,
+                                                         uint64_t sequenceOrder,
+                                                         const ElementModQ &nonce);
+
+        /// <summary>
         /// Given an encrypted BallotContest, validates the encryption state against
         /// a specific encryption seed and public key
         /// by verifying the accumulated sum of selections match the proof.
         /// Calling this function expects that the object is in a well-formed encrypted state
         /// with the `ballot_selections` populated with valid encrypted ballot selections,
         /// the ElementModQ `description_hash`, the ElementModQ `crypto_hash`,
-        /// and the ConstantChaumPedersenProof all populated.
+        /// and the RangedChaumPedersenProof all populated.
         /// Specifically, the seed hash in this context is the hash of the ContestDescription,
         /// or whatever `ElementModQ` was used to populate the `description_hash` field.
         /// </summary>
@@ -552,9 +538,12 @@ namespace electionguard
 
       protected:
         static std::unique_ptr<ElementModQ> makeCryptoHash(
-          std::string objectId,
-          const std::vector<std::reference_wrapper<CiphertextBallotSelection>> &selections,
-          const ElementModQ &encryptionSeed);
+          const CiphertextElectionContext &context, uint64_t sequenceOrder,
+          const std::vector<std::reference_wrapper<CiphertextBallotSelection>> &selections);
+        static std::unique_ptr<ElementModQ> makeCryptoHash(
+          const ElementModP &elgamalPublicKey, const ElementModQ &cryptoExtendedBaseHash,
+          uint64_t sequenceOrder,
+          const std::vector<std::reference_wrapper<CiphertextBallotSelection>> &selections);
         static std::unique_ptr<ElementModQ> aggregateNonce(
           const std::vector<std::reference_wrapper<CiphertextBallotSelection>> &selections);
         static std::unique_ptr<ElGamalCiphertext> elgamalAccumulate(
@@ -656,7 +645,7 @@ namespace electionguard
     ///
     /// Don't make this directly. Use `make_ciphertext_ballot` instead.
     /// </summary>
-    class EG_API CiphertextBallot : public CryptoHashCheckable
+    class EG_API CiphertextBallot : public CryptoHashable
     {
       public:
         CiphertextBallot(const CiphertextBallot &other);
@@ -730,6 +719,7 @@ namespace electionguard
 
         /// <summary>
         /// The hash of the encrypted values on this ballot in sequence order
+        /// this method is deprecated in favor of crypto_hash
         /// </summary>
         ElementModQ *getCryptoHash() const;
 
@@ -741,8 +731,7 @@ namespace electionguard
         /// much more limited hardware, wherein the Disjunctive Chaum-Pedersen proofs might be computed
         /// later on.
         /// </summary>
-        virtual std::unique_ptr<ElementModQ>
-        crypto_hash_with(const ElementModQ &manifestHash) const override;
+        virtual std::unique_ptr<ElementModQ> crypto_hash() const override;
 
         /// <summary>
         /// Makes a `CiphertextBallot`, initially in the state where it's neither been cast nor spoiled.
@@ -759,12 +748,12 @@ namespace electionguard
         /// </summary>
         static std::unique_ptr<CiphertextBallot>
         make(const std::string &objectId, const std::string &styleId,
-             const ElementModQ &manifestHash,
+             const ElementModQ &manifestHash, const CiphertextElectionContext &context,
              std::vector<std::unique_ptr<CiphertextBallotContest>> contests,
              std::unique_ptr<ElementModQ> nonce = nullptr, const uint64_t timestamp = 0,
              std::unique_ptr<ElementModQ> ballotCodeSeed = nullptr,
              std::unique_ptr<ElementModQ> ballotCode = nullptr,
-             BallotBoxState state = BallotBoxState::unknown);
+             BallotBoxState state = BallotBoxState::unknown, const std::string &aux = "");
 
         /// <summary>
         /// A static helper method to derive the nonceSeed used to encrypt the ballot
@@ -772,6 +761,9 @@ namespace electionguard
         static std::unique_ptr<ElementModQ> nonceSeed(const ElementModQ &manifestHash,
                                                       const std::string &objectId,
                                                       const ElementModQ &nonce);
+
+        bool isValidEncryption(const ElementModQ &manifestHash, const ElementModP &elgamalPublicKey,
+                               const ElementModQ &cryptoExtendedBaseHash);
 
         /// <summary>
         /// Given an encrypted Ballot, validates the encryption state
@@ -784,7 +776,7 @@ namespace electionguard
         /// or whatever `ElementModQ` was used to populate the `manifest_hash` field.
         /// </summary>
         bool isValidEncryption(const ElementModQ &manifestHash, const ElementModP &elgamalPublicKey,
-                               const ElementModQ &cryptoExtendedBaseHash);
+                               const ElementModQ &cryptoExtendedBaseHash, const std::string &aux);
 
         /// <summary>
         /// A sufficiently random value used to seed the nonces on the ballot.
@@ -843,9 +835,9 @@ namespace electionguard
 
       protected:
         static std::unique_ptr<ElementModQ>
-        makeCryptoHash(std::string objectId,
+        makeCryptoHash(const ElementModQ &extendedBaseHash,
                        const std::vector<std::reference_wrapper<CiphertextBallotContest>> &contests,
-                       const ElementModQ &manifestHash);
+                       const std::string &aux);
 
       private:
         class Impl;
@@ -904,12 +896,12 @@ namespace electionguard
         /// </summary>
         static std::unique_ptr<SubmittedBallot>
         make(const std::string &objectId, const std::string &styleId,
-             const ElementModQ &manifestHash,
+             const ElementModQ &manifestHash, const CiphertextElectionContext &context,
              std::vector<std::unique_ptr<CiphertextBallotContest>> contests,
              std::unique_ptr<ElementModQ> nonce = nullptr, const uint64_t timestamp = 0,
              std::unique_ptr<ElementModQ> ballotCodeSeed = nullptr,
              std::unique_ptr<ElementModQ> ballotCode = nullptr,
-             BallotBoxState state = BallotBoxState::unknown);
+             BallotBoxState state = BallotBoxState::unknown, const std::string &aux = "");
 
         /// <summary>
         /// Export the ballot representation as BSON

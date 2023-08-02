@@ -3,7 +3,7 @@ name: Pull Request
 on:
   workflow_dispatch:
   pull_request:
-    branches: [main]
+    #branches: [main] # TODO: RE ENABLE BEFORE MERGE
 
 env:
   TARGET: Release
@@ -71,7 +71,8 @@ jobs:
             "macos-13-xcode-14.2",
             "macos-13-xcode-14.2-arm64",
             "windows-2022-gcc-11",
-            "windows-2022-msvc-latest",
+            "windows-2022-clang-14-x86",
+            "windows-2022-msvc-latest-x64",
             "ubuntu-22.04-linter",
           ]
         include:
@@ -129,7 +130,16 @@ jobs:
             lint: false
             runCsTests: false
             runTsTests: false
-          - name: windows-2022-msvc-latest
+          - name: windows-2022-clang-14-x86
+            os: windows-2022
+            processor: x86
+            compiler: clang
+            version: "14"
+            makeReleaseBuild: false
+            lint: false
+            runCsTests: false
+            runTsTests: false
+          - name: windows-2022-msvc-latest-x64
             os: windows-2022
             processor: x64
             compiler: msvc
@@ -240,11 +250,20 @@ jobs:
           sudo xcode-select -switch /Applications/Xcode_${{ matrix.version }}.app
 
       - name: Update Environment (Windows MSYS2)
-        if: (runner.os == 'Windows' && matrix.compiler == 'gcc' && steps.filter.outputs.any == 'true')
+        if: (runner.os == 'Windows' && matrix.compiler == 'clang' && steps.filter.outputs.any == 'true')
         uses: msys2/setup-msys2@v2
         with:
           update: true
-          install: mingw-w64-x86_64-gcc
+          msystem: clang64
+          install: >-
+            base-devel
+            mingw-w64-clang-x86_64-gcc
+            mingw-w64-clang-x86_64-toolchain
+            mingw-w64-clang-x86_64-clang-14
+            mingw-w64-clang-x86_64-cmake
+            mingw-w64-clang-x86_64-llvm-14
+            make
+            git
 
       - name: Update Environment (Windows MSVC x64)
         if: (runner.os == 'Windows' && matrix.compiler == 'msvc' && matrix.processor == 'x64' && steps.filter.outputs.any == 'true')
@@ -301,11 +320,12 @@ jobs:
         if: (runner.os == 'Windows' && matrix.compiler == 'msvc' && steps.filter.outputs.cpp == 'true')
         run: make test
 
-      - name: Run Tests (Windows-msys2)
+      - name: Run Tests (Windows-msys2-clang)
         env:
           PROCESSOR: ${{ matrix.processor }}
-        if: (runner.os == 'Windows' && matrix.compiler == 'gcc' && steps.filter.outputs.cpp == 'true')
-        run: make test-msys2
+        if: (runner.os == 'Windows' && matrix.compiler == 'clang' && matrix.processor == 'x86' && steps.filter.outputs.cpp == 'true')
+        shell: msys2 {0}
+        run: make test-msys2-x86
 
       - name: Run .Net Tests
         env:

@@ -1,3 +1,4 @@
+#include "../../src/electionguard/convert.hpp"
 #include "../../src/electionguard/log.hpp"
 
 #include <doctest/doctest.h>
@@ -6,6 +7,7 @@
 #include <electionguard/group.hpp>
 #include <iostream>
 #include <string>
+#include <utility>
 
 using namespace electionguard;
 using namespace std;
@@ -79,12 +81,36 @@ TEST_CASE("Disjunctive CP Proof simple valid inputs generate valid proofs")
     // Assert
     CHECK(firstMessageZeroProof->isValid(*firstMessage, *keypair->getPublicKey(), ONE_MOD_Q()) ==
           true);
+    CHECK(secondMessageOneProof->isValid(*secondMessage, *keypair->getPublicKey(), ONE_MOD_Q()) ==
+          true);
+}
+
+TEST_CASE("Disjunctive CP Proof simple valid inputs fail invalid proofs")
+{
+    // Arrange
+    const auto &nonce = ONE_MOD_Q();
+    const auto &seed = TWO_MOD_Q();
+    auto keypair = ElGamalKeyPair::fromSecret(TWO_MOD_Q(), false);
+
+    auto firstMessage = elgamalEncrypt(0UL, nonce, *keypair->getPublicKey());
+    auto secondMessage = elgamalEncrypt(1UL, nonce, *keypair->getPublicKey());
+
+    // Act
+    auto firstMessageZeroProof = DisjunctiveChaumPedersenProofHarness::make_zero(
+      *firstMessage, nonce, *keypair->getPublicKey(), ONE_MOD_Q());
+    auto firstMessageOneProof = DisjunctiveChaumPedersenProofHarness::make_one(
+      *firstMessage, nonce, *keypair->getPublicKey(), ONE_MOD_Q());
+
+    auto secondMessageZeroProof = DisjunctiveChaumPedersenProofHarness::make_zero(
+      *secondMessage, nonce, *keypair->getPublicKey(), ONE_MOD_Q());
+    auto secondMessageOneProof = DisjunctiveChaumPedersenProofHarness::make_one(
+      *secondMessage, nonce, *keypair->getPublicKey(), ONE_MOD_Q());
+
+    // Assert
     CHECK(firstMessageOneProof->isValid(*firstMessage, *keypair->getPublicKey(), ONE_MOD_Q()) ==
           false);
     CHECK(secondMessageZeroProof->isValid(*secondMessage, *keypair->getPublicKey(), ONE_MOD_Q()) ==
           false);
-    CHECK(secondMessageOneProof->isValid(*secondMessage, *keypair->getPublicKey(), ONE_MOD_Q()) ==
-          true);
 }
 
 TEST_CASE("Disjunctive CP Proof encryption of zero with precomputed values succeeds")
@@ -195,15 +221,101 @@ TEST_CASE("Disjunctive CP Proof encryption of one with precomputed values invali
     PrecomputeBufferContext::clear();
 }
 
-TEST_CASE("Constant CP Proof encryption of zero" * doctest::may_fail())
+// make a fake ranged CP proof according to the provided parameters
+static pair<unique_ptr<ElGamalCiphertext>, unique_ptr<RangedChaumPedersenProof>>
+makeAFakeRangedProof(const ElGamalKeyPair &keypair, uint64_t selected, uint64_t limit,
+                     uint64_t count)
 {
-    Log::info("Skipping Constant CP Proof Check because the proof is invalid when using the "
-              "base-k elgamal encryption method");
+    const auto &nonce = ONE_MOD_Q();
+    const auto &seed = TWO_MOD_Q();
+
+    // encrypt selections representing a contest on ballot
+    vector<unique_ptr<ElGamalCiphertext>> messages;
+    for (size_t i = 0; i < count; i++) {
+        auto choice = i < selected ? 1UL : 0UL;
+        auto message = elgamalEncrypt(choice, nonce, *keypair.getPublicKey());
+        messages.push_back(move(message));
+    }
+
+    auto accumulation = elgamalAdd(referenceWrap(messages));
+    auto aggregateNonce = mul_mod_q(nonce, *ElementModQ::fromUint64(count));
+
+    auto proof = RangedChaumPedersenProof::make(*accumulation, *aggregateNonce, selected, limit,
+                                                *keypair.getPublicKey(), ONE_MOD_Q(), "test");
+    return make_pair(move(accumulation), move(proof));
+}
+
+TEST_CASE("Ranged CP Proof encryption of zero generates valid proof")
+{
+    auto keypair = ElGamalKeyPair::fromSecret(TWO_MOD_Q(), false);
+    const auto selected = 0UL; // we chose 0 selections on the ballot
+    const auto limit = 4UL;    // can choose up to 4 selections out of 5
+    const auto count = 5UL;    // 5 selections on the ballot
+
+    auto [accumulation, proof] = makeAFakeRangedProof(*keypair, selected, limit, count);
+    auto result = proof->isValid(*accumulation, *keypair->getPublicKey(), ONE_MOD_Q(), "test");
+
+    CHECK(result.isValid == true);
+}
+
+TEST_CASE("Ranged CP Proof encryption of some generates valid proof")
+{
+    auto keypair = ElGamalKeyPair::fromSecret(TWO_MOD_Q(), false);
+    const auto selected = 3UL; // we chose 3 selections on the ballot
+    const auto limit = 4UL;    // can choose up to 4 selections out of 5
+    const auto count = 5UL;    // 5 selections on the ballot
+
+    auto [accumulation, proof] = makeAFakeRangedProof(*keypair, selected, limit, count);
+    auto result = proof->isValid(*accumulation, *keypair->getPublicKey(), ONE_MOD_Q(), "test");
+
+    CHECK(result.isValid == true);
+}
+
+TEST_CASE("Ranged CP Proof encryption of some with missing commitments generates valid proof")
+{
+    auto keypair = ElGamalKeyPair::fromSecret(TWO_MOD_Q(), false);
+    const auto selected = 3UL; // we chose 3 selections on the ballot
+    const auto limit = 4UL;    // can choose up to 4 selections out of 5
+    const auto count = 5UL;    // 5 selections on the ballot
+
+    auto [accumulation, proof] = makeAFakeRangedProof(*keypair, selected, limit, count);
+    auto integerProofs = proof->getProofs();
+    Log::trace("proofs size: " + to_string(integerProofs.size()));
+    for (size_t i = 0; i < limit; i++) {
+        // just arbitrarily remove some but not all of the commitments
+        if (i != selected - 1) {
+            integerProofs.at(i).get().commitment.reset();
+        }
+    }
+
+    auto result = proof->isValid(*accumulation, *keypair->getPublicKey(), ONE_MOD_Q(), "test");
+
+    CHECK(result.isValid == true);
+}
+
+TEST_CASE("Ranged CP Proof encryption of all generates valid proof")
+{
+    auto keypair = ElGamalKeyPair::fromSecret(TWO_MOD_Q(), false);
+    const auto selected = 4UL; // we chose 3 selections on the ballot
+    const auto limit = 4UL;    // can choose up to 4 selections out of 5
+    const auto count = 5UL;    // 5 selections on the ballot
+
+    auto [accumulation, proof] = makeAFakeRangedProof(*keypair, selected, limit, count);
+    auto result = proof->isValid(*accumulation, *keypair->getPublicKey(), ONE_MOD_Q(), "test");
+    CHECK(result.isValid == true);
+}
+
+// the constant CP Proof is only compatible with
+// E.G. 1.0 Compatible ElGamal Encrypt.
+// for E.G. 2.0 Base-K ElGamal Encrypt use RangedChaumPedersenProof
+TEST_CASE("Constant CP Proof encryption of zero")
+{
     const auto &nonce = ONE_MOD_Q();
     const auto &seed = TWO_MOD_Q();
     auto keypair = ElGamalKeyPair::fromSecret(TWO_MOD_Q(), false);
 
-    auto message = elgamalEncrypt(0UL, nonce, *keypair->getPublicKey());
+    // E.G. 1.0 Compatible ElGamal Encrypt.
+    auto message = elgamalEncrypt(0UL, nonce, *keypair->getPublicKey(), G());
     auto proof = ConstantChaumPedersenProof::make(*message, nonce, *keypair->getPublicKey(), seed,
                                                   ONE_MOD_Q(), 0UL);
     auto badProof = ConstantChaumPedersenProof::make(*message, nonce, *keypair->getPublicKey(),
@@ -213,15 +325,14 @@ TEST_CASE("Constant CP Proof encryption of zero" * doctest::may_fail())
     CHECK(badProof->isValid(*message, *keypair->getPublicKey(), ONE_MOD_Q()) == false);
 }
 
-TEST_CASE("Constant CP Proof encryption of one" * doctest::should_fail())
+TEST_CASE("Constant CP Proof encryption of one")
 {
-    Log::info("Skipping Constant CP Proof Check because the proof is invalid when using the "
-              "base-k elgamal encryption method");
     auto keypair = ElGamalKeyPair::fromSecret(TWO_MOD_Q(), false);
     const auto &nonce = ONE_MOD_Q();
     const auto &seed = TWO_MOD_Q();
 
-    auto message = elgamalEncrypt(1UL, nonce, *keypair->getPublicKey());
+    // E.G. 1.0 Compatible ElGamal Encrypt.
+    auto message = elgamalEncrypt(1UL, nonce, *keypair->getPublicKey(), G());
     auto proof = ConstantChaumPedersenProof::make(*message, nonce, *keypair->getPublicKey(), seed,
                                                   ONE_MOD_Q(), 1UL);
     auto badProof = ConstantChaumPedersenProof::make(*message, nonce, *keypair->getPublicKey(),

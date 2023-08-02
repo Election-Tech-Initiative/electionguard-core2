@@ -25,17 +25,19 @@ TEST_CASE("Encrypt simple selection succeeds")
     auto metadata = make_unique<SelectionDescription>(selectionId, candidateId, 1UL);
     auto hashContext = metadata->crypto_hash();
     auto plaintext = BallotGenerator::selectionFrom(*metadata);
+    auto context = CiphertextElectionContext::make(3, 2, keypair->getPublicKey()->clone(),
+                                                   ONE_MOD_Q().clone(), ONE_MOD_Q().clone());
 
     // Act
-    auto result = encryptSelection(*plaintext, *metadata, *keypair->getPublicKey(), ONE_MOD_Q(),
-                                   *nonce, false, true);
+    auto result = encryptSelection(*plaintext, *metadata, *context, *nonce, false, true);
 
     // Assert
     CHECK(result != nullptr);
     CHECK(result->getCiphertext() != nullptr);
-    CHECK(result->isValidEncryption(*hashContext, *keypair->getPublicKey(), ONE_MOD_Q()) == true);
+    CHECK(result->isValidEncryption(*hashContext, *keypair->getPublicKey(),
+                                    *context->getCryptoExtendedBaseHash()) == true);
     CHECK(result->getProof()->isValid(*result->getCiphertext(), *keypair->getPublicKey(),
-                                      ONE_MOD_Q()) == true);
+                                      *context->getCryptoExtendedBaseHash()) == true);
 }
 
 TEST_CASE("Encrypt simple selection using precomputed values succeeds")
@@ -48,6 +50,8 @@ TEST_CASE("Encrypt simple selection using precomputed values succeeds")
     auto metadata = make_unique<SelectionDescription>(selectionId, candidateId, 1UL);
     auto hashContext = metadata->crypto_hash();
     auto plaintext = BallotGenerator::selectionFrom(*metadata);
+    auto context = CiphertextElectionContext::make(3, 2, keypair->getPublicKey()->clone(),
+                                                   ONE_MOD_Q().clone(), ONE_MOD_Q().clone());
 
     // cause a two triples and a quad to be populated
     PrecomputeBufferContext::initialize(*keypair->getPublicKey(), 1);
@@ -61,15 +65,15 @@ TEST_CASE("Encrypt simple selection using precomputed values succeeds")
     CHECK(1 == current_precomputed_queue_size);
 
     // and this ecryptSelection will use the precomputed values
-    auto result = encryptSelection(*plaintext, *metadata, *keypair->getPublicKey(), ONE_MOD_Q(),
-                                   *nonce, false, true);
+    auto result = encryptSelection(*plaintext, *metadata, *context, *nonce, false, true);
 
     // Assert
     CHECK(result != nullptr);
     CHECK(result->getCiphertext() != nullptr);
-    CHECK(result->isValidEncryption(*hashContext, *keypair->getPublicKey(), ONE_MOD_Q()) == true);
+    CHECK(result->isValidEncryption(*hashContext, *keypair->getPublicKey(),
+                                    *context->getCryptoExtendedBaseHash()) == true);
     CHECK(result->getProof()->isValid(*result->getCiphertext(), *keypair->getPublicKey(),
-                                      ONE_MOD_Q()) == true);
+                                      *context->getCryptoExtendedBaseHash()) == true);
     // need to empty the queues because future tests don't use the same keys
     PrecomputeBufferContext::clear();
 }
@@ -84,10 +88,11 @@ TEST_CASE("Encrypt simple selection malformed data fails")
     auto metadata = make_unique<SelectionDescription>(selectionId, candidateId, 1UL);
     auto hashContext = metadata->crypto_hash();
     auto plaintext = BallotGenerator::selectionFrom(*metadata);
+    auto context = CiphertextElectionContext::make(3, 2, keypair->getPublicKey()->clone(),
+                                                   ONE_MOD_Q().clone(), ONE_MOD_Q().clone());
 
     // Act
-    auto result = encryptSelection(*plaintext, *metadata, *keypair->getPublicKey(), ONE_MOD_Q(),
-                                   *nonce, false, true);
+    auto result = encryptSelection(*plaintext, *metadata, *context, *nonce, false, true);
 
     // tamper with the description_hash
     auto malformedDescriptionHash = make_unique<CiphertextBallotSelection>(
@@ -102,19 +107,18 @@ TEST_CASE("Encrypt simple selection malformed data fails")
       result->getCryptoHash()->clone(), nullptr);
 
     // Assert
-    CHECK(result->isValidEncryption(*hashContext, *keypair->getPublicKey(), ONE_MOD_Q()) == true);
+    CHECK(result->isValidEncryption(*hashContext, *keypair->getPublicKey(),
+                                    *context->getCryptoExtendedBaseHash()) == true);
     CHECK(malformedDescriptionHash->isValidEncryption(*hashContext, *keypair->getPublicKey(),
-                                                      ONE_MOD_Q()) == false);
-    CHECK(missingProof->isValidEncryption(*hashContext, *keypair->getPublicKey(), ONE_MOD_Q()) ==
+                                                      *context->getCryptoExtendedBaseHash()) ==
           false);
+    CHECK(missingProof->isValidEncryption(*hashContext, *keypair->getPublicKey(),
+                                          *context->getCryptoExtendedBaseHash()) == false);
 }
 
 TEST_CASE("Encrypt PlaintextBallot with EncryptionMediator against constructed "
-          "InternalManifest succeeds" *
-          doctest::skip())
+          "InternalManifest succeeds")
 {
-    Log::info("Skip due to invalid Constant Chaum Pedersen proof");
-
     // Arrange
     auto secret = ElementModQ::fromHex(a_fixed_secret);
     auto keypair = ElGamalKeyPair::fromSecret(*secret);
@@ -126,9 +130,9 @@ TEST_CASE("Encrypt PlaintextBallot with EncryptionMediator against constructed "
 
     auto mediator = make_unique<EncryptionMediator>(*internal, *context, *device);
 
-    // Act
+    // // Act
     auto plaintext = BallotGenerator::getFakeBallot(*internal);
-    // Log::debug(plaintext->toJson());
+    Log::trace(plaintext->toJson());
     auto ciphertext = mediator->encrypt(*plaintext);
 
     // Assert
@@ -137,10 +141,8 @@ TEST_CASE("Encrypt PlaintextBallot with EncryptionMediator against constructed "
     CHECK(ciphertext->getContests().front().get().getHashedElGamalCiphertext().get() != nullptr);
 }
 
-TEST_CASE("Encrypt PlaintextBallot undervote succeeds" * doctest::skip())
+TEST_CASE("Encrypt PlaintextBallot undervote succeeds")
 {
-    Log::info("Skip due to invalid Constant Chaum Pedersen proof");
-
     // Arrange
     auto secret = ElementModQ::fromHex(a_fixed_secret);
     auto keypair = ElGamalKeyPair::fromSecret(*secret);
@@ -153,7 +155,7 @@ TEST_CASE("Encrypt PlaintextBallot undervote succeeds" * doctest::skip())
 
     // Act
     auto plaintext = BallotGenerator::getFakeBallot(*internal, 0UL);
-    // Log::debug(plaintext->toJson());
+    Log::trace(plaintext->toJson());
     auto ciphertext = mediator->encrypt(*plaintext);
 
     // Assert
@@ -161,10 +163,8 @@ TEST_CASE("Encrypt PlaintextBallot undervote succeeds" * doctest::skip())
                                         *context->getCryptoExtendedBaseHash()) == true);
 }
 
-TEST_CASE("Encrypt PlaintextBallot overvote" * doctest::skip())
+TEST_CASE("Encrypt PlaintextBallot overvote")
 {
-    Log::info("Skip due to invalid Constant Chaum Pedersen proof");
-
     // Arrange
     const auto &secret = TWO_MOD_Q();
     auto keypair = ElGamalKeyPair::fromSecret(secret, false);
@@ -204,9 +204,9 @@ TEST_CASE("Encrypt PlaintextBallot overvote" * doctest::skip())
     unique_ptr<HashedElGamalCiphertext> newHEG =
       make_unique<HashedElGamalCiphertext>(move(new_pad), heg->getData(), heg->getMac());
 
-    vector<uint8_t> new_plaintext =
-      newHEG->decrypt(*keypair->getPublicKey(), secret, HashPrefix::get_prefix_05(),
-                      *context->getCryptoExtendedBaseHash(), true);
+    vector<uint8_t> new_plaintext = newHEG->decrypt(*keypair->getPublicKey(), secret,
+                                                    HashPrefix::get_prefix_contest_data_secret(),
+                                                    *context->getCryptoExtendedBaseHash(), true);
     string new_plaintext_string((char *)&new_plaintext.front(), new_plaintext.size());
 
     CHECK(new_plaintext_string ==
@@ -214,10 +214,8 @@ TEST_CASE("Encrypt PlaintextBallot overvote" * doctest::skip())
                  ",\"john-adams-selection\"]}"));
 }
 
-TEST_CASE("Encrypt simple PlaintextBallot with EncryptionMediator succeeds" * doctest::skip())
+TEST_CASE("Encrypt simple PlaintextBallot with EncryptionMediator succeeds")
 {
-    Log::info("Skip due to invalid Constant Chaum Pedersen proof");
-
     // Arrange
     auto secret = ElementModQ::fromHex(a_fixed_secret);
     auto keypair = ElGamalKeyPair::fromSecret(*secret);
@@ -253,11 +251,8 @@ TEST_CASE("Encrypt simple PlaintextBallot with EncryptionMediator succeeds" * do
     CHECK(fromBson->getNonce()->toHex() == ZERO_MOD_Q().toHex());
 }
 
-TEST_CASE(
-  "Encrypt full PlaintextBallot with WriteIn and Overvote with EncryptionMediator succeeds" *
-  doctest::skip())
+TEST_CASE("Encrypt full PlaintextBallot with WriteIn and Overvote with EncryptionMediator succeeds")
 {
-    Log::info("Skip due to invalid Constant Chaum Pedersen proof");
     const auto &secret = TWO_MOD_Q();
     auto keypair = ElGamalKeyPair::fromSecret(secret, false);
     auto manifest = ManifestGenerator::getManifestFromFile(TEST_SPEC_VERSION, TEST_USE_FULL_SAMPLE);
@@ -304,9 +299,9 @@ TEST_CASE(
     unique_ptr<HashedElGamalCiphertext> newHEG =
       make_unique<HashedElGamalCiphertext>(move(new_pad), heg->getData(), heg->getMac());
 
-    vector<uint8_t> new_plaintext =
-      newHEG->decrypt(*keypair->getPublicKey(), secret, HashPrefix::get_prefix_05(),
-                      *context->getCryptoExtendedBaseHash(), true);
+    vector<uint8_t> new_plaintext = newHEG->decrypt(*keypair->getPublicKey(), secret,
+                                                    HashPrefix::get_prefix_contest_data_secret(),
+                                                    *context->getCryptoExtendedBaseHash(), true);
     string new_plaintext_string((char *)&new_plaintext.front(), new_plaintext.size());
     Log::debug(new_plaintext_string);
 
@@ -316,10 +311,8 @@ TEST_CASE(
                  ":{\"write-in-selection\":\"Susan B. Anthony\"}}"));
 }
 
-TEST_CASE("Encrypt simple CompactPlaintextBallot with EncryptionMediator succeeds" *
-          doctest::skip())
+TEST_CASE("Encrypt simple CompactPlaintextBallot with EncryptionMediator succeeds")
 {
-    Log::info("Skip due to invalid Constant Chaum Pedersen proof");
     // Arrange
     auto secret = ElementModQ::fromHex(a_fixed_secret);
     auto keypair = ElGamalKeyPair::fromSecret(*secret);
@@ -337,10 +330,8 @@ TEST_CASE("Encrypt simple CompactPlaintextBallot with EncryptionMediator succeed
     CHECK(compactCiphertext->getObjectId() == plaintext->getObjectId());
 }
 
-TEST_CASE("Encrypt simple ballot from file with mediator succeeds" * doctest::skip())
+TEST_CASE("Encrypt simple ballot from file with mediator succeeds")
 {
-    Log::info("Skip due to invalid Constant Chaum Pedersen proof");
-
     // Arrange
     auto secret = ElementModQ::fromHex(a_fixed_secret);
     auto keypair = ElGamalKeyPair::fromSecret(*secret);
@@ -360,10 +351,8 @@ TEST_CASE("Encrypt simple ballot from file with mediator succeeds" * doctest::sk
                                         *context->getCryptoExtendedBaseHash()) == true);
 }
 
-TEST_CASE("Encrypt simple ballot from file succeeds" * doctest::skip())
+TEST_CASE("Encrypt simple ballot from file succeeds")
 {
-    Log::info("Skip due to invalid Constant Chaum Pedersen proof");
-
     // Arrange
     auto secret = ElementModQ::fromHex(a_fixed_secret);
     auto keypair = ElGamalKeyPair::fromSecret(*secret);
@@ -386,9 +375,8 @@ TEST_CASE("Encrypt simple ballot from file succeeds" * doctest::skip())
                                         *context->getCryptoExtendedBaseHash()) == true);
 }
 
-TEST_CASE("Encrypt simple ballot from file re-encrypt creates same ballot" * doctest::skip())
+TEST_CASE("Encrypt simple ballot from file re-encrypt creates same ballot")
 {
-    Log::info("Skip due to invalid Constant Chaum Pedersen proof");
     // Arrange
     auto secret = ElementModQ::fromHex(a_fixed_secret);
     auto keypair = ElGamalKeyPair::fromSecret(*secret);
@@ -414,11 +402,8 @@ TEST_CASE("Encrypt simple ballot from file re-encrypt creates same ballot" * doc
 }
 
 TEST_CASE(
-  "Encrypt simple ballot from file using precompute tables re-encrypt creates a different ballot" *
-  doctest::skip())
+  "Encrypt simple ballot from file using precompute tables re-encrypt creates a different ballot")
 {
-    Log::info("Skip due to invalid Constant Chaum Pedersen proof");
-
     // Arrange
     auto secret = ElementModQ::fromHex(a_fixed_secret);
     auto keypair = ElGamalKeyPair::fromSecret(*secret);
@@ -449,10 +434,8 @@ TEST_CASE(
     CHECK(ciphertext->getBallotCode()->toHex() != reencrypted->getBallotCode()->toHex());
 }
 
-TEST_CASE("Encrypt simple ballot from file cast is valid" * doctest::skip())
+TEST_CASE("Encrypt simple ballot from file cast is valid")
 {
-    Log::info("Skip due to invalid Constant Chaum Pedersen proof");
-
     // Arrange
     auto secret = ElementModQ::fromHex(a_fixed_secret);
     auto keypair = ElGamalKeyPair::fromSecret(*secret);
@@ -471,10 +454,8 @@ TEST_CASE("Encrypt simple ballot from file cast is valid" * doctest::skip())
     CHECK(ciphertext->getNonce() == nullptr);
 }
 
-TEST_CASE("Encrypt simple ballot from file submitted is valid" * doctest::skip())
+TEST_CASE("Encrypt simple ballot from file submitted is valid")
 {
-    Log::info("Skip due to invalid Constant Chaum Pedersen proof");
-
     // Arrange
     auto secret = ElementModQ::fromHex(a_fixed_secret);
     auto keypair = ElGamalKeyPair::fromSecret(*secret);
@@ -502,9 +483,8 @@ TEST_CASE("Encrypt simple ballot from file submitted is valid" * doctest::skip()
                                           *context->getCryptoExtendedBaseHash()) == true);
 }
 
-TEST_CASE("Submit multiple ballots" * doctest::skip())
+TEST_CASE("Submit multiple ballots")
 {
-    Log::info("Skip due to invalid Constant Chaum Pedersen proof");
     auto ballotData =
       "{\"object_id\": \"ballot-434ab8e7-22f7-11ed-8bad-04d9f5218a21\", \"style_id\": "
       "\"e3505391-aca6-4666-aadf-4fb31357170b\", \"contests\": [{\"object_id\": "
@@ -1418,10 +1398,8 @@ TEST_CASE("Submit multiple ballots" * doctest::skip())
                                           *context->getCryptoExtendedBaseHash()) == true);
 }
 
-TEST_CASE("Encrypt simple ballot from file succeeds with precomputed values" * doctest::skip())
+TEST_CASE("Encrypt simple ballot from file succeeds with precomputed values")
 {
-    Log::info("Skip due to invalid Constant Chaum Pedersen proof");
-
     // Arrange
     auto secret = ElementModQ::fromHex(a_fixed_secret);
     auto keypair = ElGamalKeyPair::fromSecret(*secret);
@@ -1490,9 +1468,9 @@ TEST_CASE("Create EncryptionMediator with different manifest hash")
     }
 }
 
-TEST_CASE("Verify placeholder flag" * doctest::skip())
+TEST_CASE("Verify placeholder flag")
 {
-    Log::info("Skip due to invalid Constant Chaum Pedersen proof");
+    // placeholders are no longer used in E.G. 2.0
 
     // Arrange
     auto secret = ElementModQ::fromHex(a_fixed_secret);
@@ -1512,5 +1490,5 @@ TEST_CASE("Verify placeholder flag" * doctest::skip())
       ciphertext->getContests().front().get().getSelections().front().get().getIsPlaceholder() ==
       false);
     CHECK(ciphertext->getContests().front().get().getSelections().back().get().getIsPlaceholder() ==
-          true);
+          false);
 }

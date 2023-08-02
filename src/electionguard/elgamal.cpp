@@ -62,7 +62,11 @@ namespace electionguard
 
     ElementModQ *ElGamalKeyPair::getSecretKey() { return pimpl->secretKey.get(); }
 
+    ElementModQ *ElGamalKeyPair::getSecretKey() const { return pimpl->secretKey.get(); }
+
     ElementModP *ElGamalKeyPair::getPublicKey() { return pimpl->publicKey.get(); }
+
+    ElementModP *ElGamalKeyPair::getPublicKey() const { return pimpl->publicKey.get(); }
 
     // Public Members
 
@@ -189,15 +193,17 @@ namespace electionguard
         return make_unique<ElGamalCiphertext>(move(resultPad), move(resultData));
     }
 
-    uint64_t ElGamalCiphertext::decrypt(const ElementModP &product, const ElementModP &base)
+    uint64_t ElGamalCiphertext::decrypt(const ElementModP &shareAccumulation,
+                                        const ElementModP &base)
     {
-        auto result = mul_mod_p(*pimpl->data, product);
+        auto result = div_mod_p(*pimpl->data, shareAccumulation);
         return DiscreteLog::getAsync(*result, base);
     }
 
-    uint64_t ElGamalCiphertext::decrypt(const ElementModP &product, const ElementModP &base) const
+    uint64_t ElGamalCiphertext::decrypt(const ElementModP &shareAccumulation,
+                                        const ElementModP &base) const
     {
-        auto result = mul_mod_p(*pimpl->data, product);
+        auto result = div_mod_p(*pimpl->data, shareAccumulation);
         return DiscreteLog::getAsync(*result, base);
     }
 
@@ -205,21 +211,21 @@ namespace electionguard
     {
         auto difference = sub_from_q(secretKey);
         auto product = pow_mod_p(*pimpl->pad, *difference);
-        return decrypt(*product, base);
+        return decryptKnownProduct(*product, base);
     }
 
     uint64_t ElGamalCiphertext::decrypt(const ElementModQ &secretKey, const ElementModP &base) const
     {
         auto difference = sub_from_q(secretKey);
         auto product = pow_mod_p(*pimpl->pad, *difference);
-        return decrypt(*product, base);
+        return decryptKnownProduct(*product, base);
     }
 
     uint64_t ElGamalCiphertext::decrypt(const ElementModP &publicKey, const ElementModQ &nonce)
     {
         auto difference = sub_from_q(nonce);
         auto product = pow_mod_p(publicKey, *difference);
-        return decrypt(*product, publicKey);
+        return decryptKnownProduct(*product, publicKey);
     }
 
     uint64_t ElGamalCiphertext::decrypt(const ElementModP &publicKey,
@@ -227,7 +233,7 @@ namespace electionguard
     {
         auto difference = sub_from_q(nonce);
         auto product = pow_mod_p(publicKey, *difference);
-        return decrypt(*product, publicKey);
+        return decryptKnownProduct(*product, publicKey);
     }
 
     uint64_t ElGamalCiphertext::decrypt(const ElementModP &publicKey, const ElementModQ &nonce,
@@ -271,6 +277,20 @@ namespace electionguard
     unique_ptr<ElGamalCiphertext> ElGamalCiphertext::clone() const
     {
         return make_unique<ElGamalCiphertext>(pimpl->pad->clone(), pimpl->data->clone());
+    }
+
+    uint64_t ElGamalCiphertext::decryptKnownProduct(const ElementModP &product,
+                                                    const ElementModP &base)
+    {
+        auto result = mul_mod_p(*pimpl->data, product);
+        return DiscreteLog::getAsync(*result, base);
+    }
+
+    uint64_t ElGamalCiphertext::decryptKnownProduct(const ElementModP &product,
+                                                    const ElementModP &base) const
+    {
+        auto result = mul_mod_p(*pimpl->data, product);
+        return DiscreteLog::getAsync(*result, base);
     }
 
 #pragma endregion

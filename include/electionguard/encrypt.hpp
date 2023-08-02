@@ -146,12 +146,10 @@ namespace electionguard
     /// <param name="verifyProofs">specify if the proofs should be verified prior to returning (default True)</param>
     /// <returns>A `CiphertextBallotSelection`</returns>
     /// </summary>
-    EG_API std::unique_ptr<CiphertextBallotSelection>
-    encryptSelection(const PlaintextBallotSelection &selection,
-                     const SelectionDescription &description, const ElementModP &elgamalPublicKey,
-                     const ElementModQ &cryptoExtendedBaseHash, const ElementModQ &nonceSeed,
-                     bool isPlaceholder = false, bool verifyProofs = true,
-                     bool usePrecompute = false);
+    EG_API std::unique_ptr<CiphertextBallotSelection> encryptSelection(
+      const PlaintextBallotSelection &selection, const SelectionDescription &description,
+      const CiphertextElectionContext &context, const ElementModQ &nonceSeed,
+      bool isPlaceholder = false, bool verifyProofs = true, bool usePrecompute = false);
 
     /// <summary>
     /// Encrypt a specific `BallotContest` in the context of a specific `Ballot`
@@ -176,9 +174,9 @@ namespace electionguard
     EG_API std::unique_ptr<CiphertextBallotContest>
     encryptContest(const PlaintextBallotContest &contest, const InternalManifest &internalManifest,
                    const ContestDescriptionWithPlaceholders &description,
-                   const ElementModP &elgamalPublicKey, const ElementModQ &cryptoExtendedBaseHash,
-                   const ElementModQ &nonceSeed, bool verifyProofs = true,
-                   bool usePrecompute = false);
+                   const CiphertextElectionContext &context, const ElementModQ &nonceSeed,
+                   bool verifyProofs = true, bool usePrecompute = false,
+                   bool allowOvervotes = true);
 
     /// <summary>
     /// Encrypt the contests of a specific `Ballot` in the context of a specific `CiphertextElectionContext`
@@ -202,7 +200,8 @@ namespace electionguard
     EG_API std::vector<std::unique_ptr<CiphertextBallotContest>>
     encryptContests(const PlaintextBallot &ballot, const InternalManifest &internalManifest,
                     const CiphertextElectionContext &context, const ElementModQ &nonceSeed,
-                    bool verifyProofs = true, bool usePrecompute = false);
+                    bool verifyProofs = true, bool usePrecompute = false,
+                    bool allowOvervotes = true);
 
     /// <summary>
     /// Encrypt a specific `Ballot` in the context of a specific `CiphertextElectionContext`
@@ -241,7 +240,7 @@ namespace electionguard
     encryptBallot(const PlaintextBallot &ballot, const InternalManifest &internalManifest,
                   const CiphertextElectionContext &context, const ElementModQ &ballotCodeSeed,
                   std::unique_ptr<ElementModQ> nonce = nullptr, uint64_t timestamp = 0,
-                  bool verifyProofs = true, bool usePrecompute = false);
+                  bool verifyProofs = true, bool usePrecompute = false, bool allowOvervotes = true);
 
     /// <summary>
     /// Encrypt a specific `Ballot` in the context of a specific `CiphertextElectionContext`

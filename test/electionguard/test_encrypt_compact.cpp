@@ -39,19 +39,15 @@ struct TestEncryptFixture {
     }
 };
 
-TEST_CASE("Can encrypt compact ballots" * doctest::skip())
+TEST_CASE("Can encrypt compact ballots")
 {
-    Log::info("Skip due to invalid Constant Chaum Pedersen proof");
-
     auto fixture = make_unique<TestEncryptFixture>();
     // Assert
     CHECK(fixture->compactCiphertext->getObjectId() == fixture->plaintext->getObjectId());
 }
 
-TEST_CASE("Can Serialize CompactCiphertextBallot" * doctest::skip())
+TEST_CASE("Can Serialize CompactCiphertextBallot")
 {
-    Log::info("Skip due to invalid Constant Chaum Pedersen proof");
-
     auto fixture = make_unique<TestEncryptFixture>();
     auto json = fixture->compactCiphertext->toJson();
     Log::debug(json);
@@ -61,10 +57,8 @@ TEST_CASE("Can Serialize CompactCiphertextBallot" * doctest::skip())
     CHECK(fromMsgpack->getNonce()->toHex() == fixture->compactCiphertext->getNonce()->toHex());
 }
 
-TEST_CASE("Can Expand Plaintext" * doctest::skip())
+TEST_CASE("Can Expand Plaintext")
 {
-    Log::info("Skip due to invalid Constant Chaum Pedersen proof");
-
     auto fixture = make_unique<TestEncryptFixture>();
     auto expandedPlaintext =
       expandCompactPlaintextBallot(*fixture->compactCiphertext->getPlaintext(), *fixture->manifest);
@@ -77,9 +71,8 @@ TEST_CASE("Can Expand Plaintext" * doctest::skip())
     CHECK(fromMsgPack->getObjectId() == expandedPlaintext->getObjectId());
 }
 
-TEST_CASE("Can Expand Ciphertext" * doctest::skip())
+TEST_CASE("Can Expand Ciphertext")
 {
-    Log::info("Skip due to invalid Constant Chaum Pedersen proof");
     auto fixture = make_unique<TestEncryptFixture>();
     auto json = fixture->compactCiphertext->toJson();
     Log::debug(json);

@@ -3,10 +3,7 @@
 #include "electionguard/hash.hpp"
 #include "log.hpp"
 
-#include <algorithm>
-#include <sstream>
 #include <string>
-#include <vector>
 
 using std::string;
 using std::unique_ptr;

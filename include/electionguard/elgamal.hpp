@@ -31,9 +31,19 @@ namespace electionguard
         ElementModQ *getSecretKey();
 
         /// <Summary>
+        /// The ElGamal Secret Key.
+        /// </Summary>
+        ElementModQ *getSecretKey() const;
+
+        /// <Summary>
         /// The ElGamal Public Key.
         /// </Summary>
         ElementModP *getPublicKey();
+
+        /// <Summary>
+        /// The ElGamal Public Key.
+        /// </Summary>
+        ElementModP *getPublicKey() const;
 
         /// <Summary>
         /// Make an elgamal keypair from a secret.
@@ -111,23 +121,23 @@ namespace electionguard
         elgamalAdd(const std::vector<std::reference_wrapper<ElGamalCiphertext>> &ciphertexts);
 
         /// <Summary>
-        /// Decrypts an ElGamal ciphertext with a "known product" (the blinding factor used in the encryption).
+        /// Decrypts an ElGamal ciphertext with an "accumulation" (the product of partial decryptions).
         /// Calculates 𝑀=𝐵⁄(∏𝑀𝑖) mod 𝑝.
         ///
-        /// <param name="product">The known product (blinding factor).</param>
+        /// <param name="shareAccumulation">The accumulation of shares (∏𝑀𝑖).</param>
         /// <param name="base">The base value used to encrypt the ciphertext.</param>
         /// <returns>An exponentially encoded plaintext message.</returns
         /// </Summary>
-        uint64_t decrypt(const ElementModP &product, const ElementModP &base);
+        uint64_t decrypt(const ElementModP &shareAccumulation, const ElementModP &base);
 
         /// <Summary>
-        /// Decrypts an ElGamal ciphertext with a "known product" (the blinding factor used in the encryption).
+        /// Decrypts an ElGamal ciphertext with an "accumulation" (the product of partial decryptions).
         ///
-        /// <param name="product">The known product (blinding factor).</param>
+        /// <param name="shareAccumulation">The accumulation of shares (∏𝑀𝑖).</param>
         /// <param name="base">The base value used to encrypt the ciphertext.</param>
         /// <returns>An exponentially encoded plaintext message.</returns
         /// </Summary>
-        uint64_t decrypt(const ElementModP &product, const ElementModP &base) const;
+        uint64_t decrypt(const ElementModP &shareAccumulation, const ElementModP &base) const;
 
         /// <Summary>
         /// Decrypt the ciphertext directly using the provided secret key.
@@ -222,6 +232,25 @@ namespace electionguard
         /// </Summary>
         std::unique_ptr<ElGamalCiphertext> clone() const;
 
+      protected:
+        /// <Summary>
+        /// Decrypts an ElGamal ciphertext with a "known product" (the blinding factor used in the encryption).
+        ///
+        /// <param name="product">The known product (blinding factor).</param>
+        /// <param name="base">The base value used to encrypt the ciphertext.</param>
+        /// <returns>An exponentially encoded plaintext message.</returns
+        /// </Summary>
+        uint64_t decryptKnownProduct(const ElementModP &product, const ElementModP &base);
+
+        /// <Summary>
+        /// Decrypts an ElGamal ciphertext with a "known product" (the blinding factor used in the encryption).
+        ///
+        /// <param name="product">The known product (blinding factor).</param>
+        /// <param name="base">The base value used to encrypt the ciphertext.</param>
+        /// <returns>An exponentially encoded plaintext message.</returns
+        /// </Summary>
+        uint64_t decryptKnownProduct(const ElementModP &product, const ElementModP &base) const;
+
       private:
         class Impl;
 #pragma warning(suppress : 4251)
@@ -231,9 +260,12 @@ namespace electionguard
     /// <summary>
     /// Encrypts a message with a given random nonce and an ElGamal public key.
     ///
-    /// <param name="m">Message to elgamal_encrypt; must be an integer in [0,Q). Sometimes V or m, in the spec.</param>
-    /// <param name="nonce"> Randomly chosen nonce in [1,Q). </param>
-    /// <param name="publicKey"> ElGamal public key. </param>
+    /// This method is the "base-K" encruption method used primarily
+    /// for encrypting against K for 2.0 elections.
+    ///
+    /// <param name="m">Message to elgamal_encrypt; must be an integer in [0,Q). Sometimes V or m or σ, in the spec.</param>
+    /// <param name="nonce"> Randomly chosen nonce in [1,Q). (R, r or s or ξ in the spec)</param>
+    /// <param name="publicKey"> ElGamal public key.</param>
     /// <returns>A ciphertext tuple.</returns>
     /// </summary>
     EG_API std::unique_ptr<ElGamalCiphertext>
@@ -248,7 +280,7 @@ namespace electionguard
     /// parameter for E.G. 2.0 elections.
     ///
     /// <param name="m">Message to elgamal_encrypt; must be an integer in [0,Q). Sometimes V or m, in the spec.</param>
-    /// <param name="nonce">Randomly chosen nonce in [1,Q). (R, r, or s in the spec)</param>
+    /// <param name="nonce">Randomly chosen nonce in [1,Q). (R, r, or s or ξ in the spec)</param>
     /// <param name="publicKey">ElGamal public key. (K in the spec)</param>
     /// <param name="encryptionBase"> The encryption base used to encrypt the ciphertext. (g or K in the spec)</param>
     EG_API std::unique_ptr<ElGamalCiphertext> elgamalEncrypt(const uint64_t m,
@@ -260,7 +292,7 @@ namespace electionguard
     /// Encrypts a message with given precomputed values (two triples and a quadruple).
     /// However, only the first triple is used in this function.
     ///
-    /// <param name="m">Message to elgamal_encrypt; must be an integer in [0,Q). Sometimes V or m, in the spec.</param>
+    /// <param name="m">Message to elgamal_encrypt; must be an integer in [0,Q). Sometimes V or m or σ, in the spec.</param>
     /// <param name="precomputedValues">Precomputed encryption values. See Precompute Buffers.</param>
     /// <returns>A ciphertext tuple.</returns>
     /// </summary>

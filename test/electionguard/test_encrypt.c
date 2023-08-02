@@ -72,10 +72,15 @@ bool test_encrypt_selection(void)
         assert(false);
     }
 
+    eg_ciphertext_election_context_t *context = NULL;
+    if (eg_ciphertext_election_context_make(3, 2, public_key, hash_context, hash_context,
+                                            &context)) {
+        assert(false);
+    }
+
     // Act
     eg_ciphertext_ballot_selection_t *result = NULL;
-    if (eg_encrypt_selection(plaintext, metadata, public_key, one_mod_q, nonce, false, true, false,
-                             &result)) {
+    if (eg_encrypt_selection(plaintext, metadata, context, nonce, false, true, false, &result)) {
         assert(false);
     }
 

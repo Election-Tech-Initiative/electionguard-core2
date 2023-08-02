@@ -21,7 +21,7 @@ CPMAddPackage(
     NAME hacl
     GITHUB_REPOSITORY addressxception/hacl-packages
     VERSION 0.6.0
-    GIT_TAG 0669c5553a0a619b1c70414aea2ebcc5f875ac13
+    GIT_TAG 10630ee4425741a0b49b9c65143077ff2765077f
     OPTIONS "HACL_CUSTOM_CONFIG_FILE_PATH ${HACL_CUSTOM_CONFIG_FILE_PATH}"
 )
 
@@ -30,10 +30,11 @@ set(HACL_CPP_EXPORT_NAME "hacl")
 set(HACL_CPP_ALIAS_NAME "hacl::hacl")
 set(HACL_CPP_TARGET_NAME "hacl_cpp")
 
-if(MSVC)
-    message("++ Exporting all Symbols")
-    set(CMAKE_WINDOWS_EXPORT_ALL_SYMBOLS TRUE)
-endif()
+# if(WIN32)
+message("++ Exporting all Symbols")
+set(CMAKE_WINDOWS_EXPORT_ALL_SYMBOLS TRUE)
+
+# endif()
 
 # ---- Library Sources ----
 include(${PROJECT_SOURCE_DIR}/libs/hacl/sources.cmake)

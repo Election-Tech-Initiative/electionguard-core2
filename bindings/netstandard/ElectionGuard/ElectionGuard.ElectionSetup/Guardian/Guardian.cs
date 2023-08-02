@@ -260,6 +260,12 @@ public partial class Guardian : DisposableBase, IElectionGuardian
         return _myElectionKeys.Share();
     }
 
+    [Obsolete("Used for testing. Do not use in production.")]
+    public ElementModQ GetSecretKey()
+    {
+        return _myElectionKeys.KeyPair.SecretKey;
+    }
+
     /// <summary>
     /// Adds the public keys of guardians to the list of public keys.
     /// </summary>
@@ -344,7 +350,7 @@ public partial class Guardian : DisposableBase, IElectionGuardian
 
         using var nonce = BigMath.RandQ();
         var encryptedCoordinate = HashedElgamal.Encrypt(
-            coordinate, nonce, Hash.Prefix02, recipientPublicKey.Key, seed);
+            coordinate, nonce, Hash.Prefix_GuardianShareSecret, recipientPublicKey.Key, seed);
 
         return new(
             myGuardianId,

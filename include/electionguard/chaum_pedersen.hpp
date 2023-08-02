@@ -6,10 +6,94 @@
 #include "group.hpp"
 #include "precompute_buffers.hpp"
 
+#include <map>
 #include <memory>
 
 namespace electionguard
 {
+    /// <summary>
+    /// Validation result for a zero knowledge proof
+    /// </summary>
+    struct ValidationResult {
+        bool isValid;
+        std::vector<std::string> messages;
+    };
+
+    /// <summary>
+    /// A generic zero knowledge proof struct that can encapsulate
+    /// any of the individual proofs used for ballot correctness in electionguard
+    /// </summary>
+    struct ZeroKnowledgeProof {
+        std::optional<std::unique_ptr<ElGamalCiphertext>> commitment;
+        std::unique_ptr<ElementModQ> challenge;
+        std::unique_ptr<ElementModQ> response;
+
+        ZeroKnowledgeProof(std::unique_ptr<ElGamalCiphertext> commitment,
+                           std::unique_ptr<ElementModQ> challenge,
+                           std::unique_ptr<ElementModQ> response)
+            : commitment(std::move(commitment)), challenge(std::move(challenge)),
+              response(std::move(response))
+        {
+        }
+
+        ZeroKnowledgeProof(std::unique_ptr<ElementModQ> challenge,
+                           std::unique_ptr<ElementModQ> response)
+            : challenge(std::move(challenge)), response(std::move(response))
+        {
+        }
+
+        ZeroKnowledgeProof(std::unique_ptr<ElementModP> pad, std::unique_ptr<ElementModP> data,
+                           std::unique_ptr<ElementModQ> challenge,
+                           std::unique_ptr<ElementModQ> response)
+            : commitment(new ElGamalCiphertext(std::move(pad), std::move(data))),
+              challenge(std::move(challenge)), response(std::move(response))
+        {
+        }
+
+        ZeroKnowledgeProof(const ZeroKnowledgeProof &other)
+            : challenge(other.challenge->clone()), response(other.response->clone())
+        {
+            if (other.commitment.has_value()) {
+                commitment = other.commitment.value()->clone();
+            }
+        }
+
+        ZeroKnowledgeProof(ZeroKnowledgeProof &&other)
+            : challenge(std::move(other.challenge)), response(std::move(other.response))
+        {
+            if (other.commitment.has_value()) {
+                commitment = std::move(other.commitment.value());
+            }
+        }
+
+        ~ZeroKnowledgeProof() = default;
+
+        ZeroKnowledgeProof &operator=(ZeroKnowledgeProof other)
+        {
+            std::swap(commitment, other.commitment);
+            std::swap(challenge, other.challenge);
+            std::swap(response, other.response);
+            return *this;
+        }
+
+        std::unique_ptr<ZeroKnowledgeProof> clone() const
+        {
+            if (commitment.has_value()) {
+                return std::make_unique<ZeroKnowledgeProof>(commitment.value()->clone(),
+                                                            challenge->clone(), response->clone());
+            } else {
+                return std::make_unique<ZeroKnowledgeProof>(challenge->clone(), response->clone());
+            }
+        }
+
+        bool operator==(const ZeroKnowledgeProof &other) const
+        {
+            return *commitment == *other.commitment && *challenge == *other.challenge &&
+                   *response == *other.response;
+        }
+
+        bool operator!=(const ZeroKnowledgeProof &other) const { return !(*this == other); }
+    };
 
     /// <Summary>
     /// The Disjunctive Chaum Pederson proof is a Non-Interactive Zero-Knowledge Proof
@@ -206,11 +290,90 @@ namespace electionguard
     };
 
     /// <Summary>
+    /// The Ranged Chaum PedersenProof is a Non-Interactive Zero-Knowledge Proof
+    /// that represents the proof of satisfying the selection limit (that the voter has not over voted).
+    /// The proof demonstrates that the elgamal accumulation of the encrypted selections
+    /// on the ballot forms an aggregate contest encryption matches the combination of random nonces (R)
+    /// used to encrypt the selections and that the encrypted values do not exceed the selection limit L.
+    ///
+    /// This proof is a composite proof similar to the disjunctive whereby it provides a real proof
+    /// for the selections made and then fake proofs for each possible value in the range.
+    /// It replaces the ConstantChaumPedersenProof from previous versions of the spec.
+    ///
+    /// This object should not be made directly.  Use RangedChaumPedersenProof::make
+    ///
+    /// see: https://www.electionguard.vote/spec/0.95.0/5_Ballot_encryption/#proof-of-satisfying-the-selection-limit
+    /// </Summary>
+    class EG_API RangedChaumPedersenProof
+    {
+      public:
+        RangedChaumPedersenProof(const RangedChaumPedersenProof &other);
+        RangedChaumPedersenProof(RangedChaumPedersenProof &&other);
+        RangedChaumPedersenProof(
+          uint64_t rangeLimit, std::unique_ptr<ElementModQ> challenge,
+          std::map<uint64_t, std::unique_ptr<ZeroKnowledgeProof>> integer_proofs);
+
+        ~RangedChaumPedersenProof();
+
+        RangedChaumPedersenProof &operator=(RangedChaumPedersenProof other);
+        RangedChaumPedersenProof &operator=(RangedChaumPedersenProof &&other);
+
+        /// <Summary>
+        /// L in the spec
+        /// </Summary>
+        uint64_t getRangeLimit() const;
+
+        /// <Summary>
+        /// c in the spec
+        /// </Summary>
+        ElementModQ *getChallenge() const;
+
+        /// <Summary>
+        /// v in the spec
+        /// </Summary>
+        ZeroKnowledgeProof *getProofAtIndex(uint64_t index) const;
+
+        std::vector<std::reference_wrapper<ZeroKnowledgeProof>> getProofs() const;
+
+        static std::unique_ptr<RangedChaumPedersenProof>
+        make(const ElGamalCiphertext &message, const ElementModQ &r, uint64_t selected,
+             uint64_t maxLimit, const ElementModP &k, const ElementModQ &q,
+             const std::string &hashPrefix);
+
+        static std::unique_ptr<RangedChaumPedersenProof>
+        make(const ElGamalCiphertext &message, const ElementModQ &r, uint64_t selected,
+             uint64_t maxLimit, const ElementModP &k, const ElementModQ &q,
+             const std::string &hashPrefix, const ElementModQ &seed);
+
+        /// <Summary>
+        /// Validates a `RangedChaumPedersenProof`
+        ///
+        /// <param name="message"> The ciphertext message</param>
+        /// <param name="k"> The public key of the election</param>
+        /// <param name="q"> The extended base hash of the election</param>
+        /// <returns> True if everything is consistent. False otherwise. </returns>
+        /// </Summary>
+        ValidationResult isValid(const ElGamalCiphertext &message, const ElementModP &k,
+                                 const ElementModQ &q, const std::string &hashPrefix);
+
+        // protected:
+        //   ValidationResult isValid(const ElGamalCiphertext &message, const ZeroKnowledgeProof &proof,
+        //                            uint64_t j, const ElementModP &k, const ElementModQ &q);
+
+      private:
+        class Impl;
+#pragma warning(suppress : 4251)
+        std::unique_ptr<Impl> pimpl;
+    };
+
+    /// <Summary>
     /// The Constant Chaum PedersenProof is a Non-Interactive Zero-Knowledge Proof
     /// that represents the proof of satisfying the selection limit (that the voter has not over voted).
     /// The proof demonstrates that the elgamal accumulation of the encrypted selections
     /// on the ballot forms an aggregate contest encryption matches the combination of random nonces (R)
     /// used to encrypt the selections and that the encrypted values do not exceed the selection limit L.
+    ///
+    /// This proof is deprecated in favor of the RangedChaumPedersenProof.
     ///
     /// This object should not be made directly.  Use ConstantChaumPedersenProof::make
     ///

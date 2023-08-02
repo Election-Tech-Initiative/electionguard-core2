@@ -8,6 +8,7 @@
     "omnisharp.enableRoslynAnalyzers": true,
     "omnisharp.enableEditorConfigSupport": true,
     "files.associations": {
+        ".env": "properties",
         "hacl_hmac_drbg.h": "c",
         "array": "cpp",
         "atomic": "cpp",

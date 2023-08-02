@@ -53,4 +53,13 @@ namespace electionguard
         getInstance().message = e.what();
         getInstance().code = code;
     }
+
+    void ExceptionHandler::setData(const std::string &function, uint64_t code,
+                                   const std::string &message)
+    {
+        getInstance().task_lock.wait();
+        getInstance().function = function;
+        getInstance().message = message;
+        getInstance().code = code;
+    }
 } // namespace electionguard

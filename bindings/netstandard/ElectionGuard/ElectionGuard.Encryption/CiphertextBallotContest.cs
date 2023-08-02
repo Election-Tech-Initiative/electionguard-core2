@@ -84,6 +84,20 @@ namespace ElectionGuard
         }
 
         /// <summary>
+        /// Genmerate the contest nonce
+        /// </summary>
+        public static ElementModQ ContestNonce(
+            CiphertextElectionContext context,
+            ulong sequenceOrder,
+            ElementModQ nonceSeed)
+        {
+            var status = NativeInterface.CiphertextBallotContest.ContestNonce(
+                           context.Handle, sequenceOrder, nonceSeed.Handle, out var value);
+            status.ThrowIfError();
+            return value.IsInvalid ? null : new ElementModQ(value);
+        }
+
+        /// <summary>
         /// An aggregate nonce for the contest composed of the nonces of the selections.
         /// Used when constructing the proof of selection limit
         /// </summary>
@@ -114,7 +128,7 @@ namespace ElectionGuard
         /// Calling this function expects that the object is in a well-formed encrypted state
         /// with the `ballot_selections` populated with valid encrypted ballot selections,
         /// the ElementModQ `description_hash`, the ElementModQ `crypto_hash`,
-        /// and the ConstantChaumPedersenProof all populated.
+        /// and the RangedChaumPedersenProof all populated.
         /// Specifically, the seed hash in this context is the hash of the ContestDescription,
         /// or whatever `ElementModQ` was used to populate the `description_hash` field.
         /// </summary>

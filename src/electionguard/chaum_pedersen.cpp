@@ -1,9 +1,11 @@
 #include "electionguard/chaum_pedersen.hpp"
 
+#include "convert.hpp"
 #include "electionguard/nonces.hpp"
 #include "electionguard/precompute_buffers.hpp"
 #include "log.hpp"
 
+#include <algorithm>
 #include <cstdlib>
 #include <cstring>
 #include <electionguard/hash.hpp>
@@ -11,19 +13,24 @@
 #include <stdexcept>
 
 using electionguard::ONE_MOD_Q;
+using std::for_each;
 using std::invalid_argument;
 using std::make_unique;
 using std::map;
 using std::move;
+using std::reference_wrapper;
 using std::string;
+using std::to_string;
 using std::unique_ptr;
 
 namespace electionguard
 {
+
 #pragma region DisjunctiveChaumPedersenProof
 
     struct DisjunctiveChaumPedersenProof::Impl {
 
+        // TODO: #362 reaplce internal structure with the generic ZKP
         unique_ptr<ElementModP> proof_zero_pad;
         unique_ptr<ElementModP> proof_zero_data;
         unique_ptr<ElementModP> proof_one_pad;
@@ -242,11 +249,12 @@ namespace electionguard
         auto inBounds_v0 = v0.isInBounds();
         auto inBounds_v1 = v1.isInBounds();
 
-        // c = H(Q,K,α,β,a0,b0,a1,b1)
+        // c = H(HE;21,K,α,β,a0,b0,a1,b1). Ballot Selection Encryption Proof (selected/unselected) 3.3.5
         auto consistent_c =
           (*add_mod_q(c0, c1) == c) &&
-          (c == *hash_elems({HashPrefix::get_prefix_04(), &const_cast<ElementModQ &>(q),
-                             &const_cast<ElementModP &>(k), alpha, beta, a0p, b0p, a1p, b1p}));
+          (c ==
+           *hash_elems({HashPrefix::get_prefix_selection_proof(), &const_cast<ElementModQ &>(q),
+                        &const_cast<ElementModP &>(k), alpha, beta, a0p, b0p, a1p, b1p}));
 
         // 𝑎0 = 𝑔^𝑣0 mod 𝑝 ⋅ 𝛼^𝑐0 mod 𝑝
         auto consistent_gv0 = (a0 == *mul_mod_p(*g_pow_p(v0), *pow_mod_p(*alpha, c0)));
@@ -350,9 +358,11 @@ namespace electionguard
         auto b1 = pow_mod_p(k, *sub_mod_q(*u1, *w)); // K^(𝑢1-w) mod p
 
         // Compute the challenge
-        auto c = hash_elems({HashPrefix::get_prefix_04(), &const_cast<ElementModQ &>(q),
-                             &const_cast<ElementModP &>(k), alpha, beta, a0.get(), b0.get(),
-                             a1.get(), b1.get()}); // H(04,Q;K,α,β,a0,b0,a1,b1)
+        // c = H(HE;21,K,α,β,a0,b0,a1,b1). Ballot Selection Encryption Proof (selected/unselected) 3.3.5
+        auto c =
+          hash_elems({HashPrefix::get_prefix_selection_proof(), &const_cast<ElementModQ &>(q),
+                      &const_cast<ElementModP &>(k), alpha, beta, a0.get(), b0.get(), a1.get(),
+                      b1.get()}); // H(04,Q;K,α,β,a0,b0,a1,b1)
 
         //c1 = w so we dont assign a new var for it
         auto c0 = sub_mod_q(*c, *w);             // c0 = (c - w) mod q
@@ -401,9 +411,11 @@ namespace electionguard
         auto b1 = fake->getDataZero()->clone();       // K^(𝑢1-w) mod p
 
         // Compute the challenge
-        auto c = hash_elems({HashPrefix::get_prefix_04(), &const_cast<ElementModQ &>(q),
-                             &const_cast<ElementModP &>(k), alpha, beta, a0.get(), b0.get(),
-                             a1.get(), b1.get()}); // H(04,Q;K,α,β,a0,b0,a1,b1)
+        // c = H(HE;21,K,α,β,a0,b0,a1,b1). Ballot Selection Encryption Proof (selected/unselected) 3.3.5
+        auto c =
+          hash_elems({HashPrefix::get_prefix_selection_proof(), &const_cast<ElementModQ &>(q),
+                      &const_cast<ElementModP &>(k), alpha, beta, a0.get(), b0.get(), a1.get(),
+                      b1.get()}); // H(04,Q;K,α,β,a0,b0,a1,b1)
 
         auto c0 = sub_mod_q(*c, *w);             // c0 = (c - w) mod q
         auto v0 = a_minus_bc_mod_q(*u0, *c0, r); // v0 = (𝑢0 - c0 ⋅ R) mod q
@@ -446,9 +458,11 @@ namespace electionguard
         auto b1 = pow_mod_p(k, *u1);                 // K^𝑢1  mod p
 
         // Compute challenge
-        auto c = hash_elems({HashPrefix::get_prefix_04(), &const_cast<ElementModQ &>(q),
-                             &const_cast<ElementModP &>(k), alpha, beta, a0.get(), b0.get(),
-                             a1.get(), b1.get()}); // H(04,Q;K,α,β,a0,b0,a1,b1)
+        // c = H(HE;21,K,α,β,a0,b0,a1,b1). Ballot Selection Encryption Proof (selected/unselected) 3.3.5
+        auto c =
+          hash_elems({HashPrefix::get_prefix_selection_proof(), &const_cast<ElementModQ &>(q),
+                      &const_cast<ElementModP &>(k), alpha, beta, a0.get(), b0.get(), a1.get(),
+                      b1.get()}); // H(04,Q;K,α,β,a0,b0,a1,b1)
 
         // auto c0 = *w                          // c0 = w  mod q
         auto c1 = sub_mod_q(*c, *w);             // c1 = (c - w)  mod q
@@ -496,9 +510,10 @@ namespace electionguard
         auto b1 = real->getBlindingFactor()->clone(); // 𝐾^𝑢1 mod 𝑝
 
         // Compute challenge
-        auto c = hash_elems({HashPrefix::get_prefix_04(), &const_cast<ElementModQ &>(q),
-                             &const_cast<ElementModP &>(k), alpha, beta, a0.get(), b0.get(),
-                             a1.get(), b1.get()});
+        // c = H(HE;21,K,α,β,a0,b0,a1,b1). Ballot Selection Encryption Proof (selected/unselected) 3.3.5
+        auto c = hash_elems({HashPrefix::get_prefix_selection_proof(),
+                             &const_cast<ElementModQ &>(q), &const_cast<ElementModP &>(k), alpha,
+                             beta, a0.get(), b0.get(), a1.get(), b1.get()});
 
         auto c0 = w->clone();                    // c0 = w  mod q
         auto c1 = sub_mod_q(*c, *w);             // c1 = (c - w)  mod q
@@ -509,6 +524,324 @@ namespace electionguard
           move(a0), move(b0), move(a1), move(b1), move(c0), move(c1), move(c), move(v0), move(v1));
     }
 
+#pragma endregion
+
+#pragma region RangedChaumPedersenProof
+
+    struct RangedChaumPedersenProof::Impl {
+        uint64_t rangeLimit;
+        unique_ptr<ElementModQ> challenge;
+        map<uint64_t, unique_ptr<ZeroKnowledgeProof>> integerProofs;
+
+        Impl(uint64_t inRangeLimit, unique_ptr<ElementModQ> inChallenge,
+             map<uint64_t, unique_ptr<ZeroKnowledgeProof>> inProofs)
+            : rangeLimit(inRangeLimit), challenge(move(inChallenge)), integerProofs(move(inProofs))
+        {
+        }
+
+        [[nodiscard]] unique_ptr<RangedChaumPedersenProof::Impl> clone() const
+        {
+            map<uint64_t, unique_ptr<ZeroKnowledgeProof>> _proofs;
+            for (auto &proof : integerProofs) {
+                _proofs[proof.first] = proof.second->clone();
+            }
+            return make_unique<RangedChaumPedersenProof::Impl>(rangeLimit, challenge->clone(),
+                                                               move(_proofs));
+        }
+
+        // get hashable commitments for the integer proofs
+        // if the commitment is not present, recompute it using the public values
+        vector<reference_wrapper<CryptoHashable>>
+        getHashableCommitments(const ElGamalCiphertext &message, const ElementModP &k) const
+        {
+            vector<reference_wrapper<CryptoHashable>> commitments;
+            for (auto &proof : integerProofs) {
+                if (!proof.second->commitment.has_value()) {
+                    // recompute using the publically known values
+                    auto recomputedCommitment = recomputeCommitment(
+                      message, *proof.second->challenge, *proof.second->response, proof.first, k);
+                    proof.second->commitment = move(recomputedCommitment);
+                }
+                commitments.emplace_back(
+                  static_cast<CryptoHashable &>(*proof.second->commitment.value()));
+            }
+            return commitments;
+        }
+
+        vector<reference_wrapper<ElementModQ>> getChallenges() const
+        {
+            vector<reference_wrapper<ElementModQ>> challengeValues;
+            for (auto &proof : integerProofs) {
+                challengeValues.emplace_back(*proof.second->challenge);
+            }
+            return challengeValues;
+        }
+
+        static std::unique_ptr<ElGamalCiphertext>
+        recomputeCommitment(const ElGamalCiphertext &message, const ElementModQ &cj,
+                            const ElementModQ &vj, uint64_t j, const ElementModP &k)
+        {
+            auto *alpha = message.getPad();
+            auto *beta = message.getData();
+
+            // 𝑎 = 𝑔^𝑉 ⋅ 𝐴^𝐶 mod 𝑝
+            auto aj = mul_mod_p(*g_pow_p(vj), *pow_mod_p(*alpha, cj));
+
+            // w = v - jc
+            auto w = sub_mod_q(vj, *mul_mod_q(*ElementModQ::fromUint64(j), cj));
+
+            // 𝑏  = 𝐾^w ⋅ 𝐵^𝐶 mod 𝑝
+            auto bj = mul_mod_p(*pow_mod_p(k, *w), *pow_mod_p(*beta, cj));
+
+            return make_unique<ElGamalCiphertext>(move(aj), move(bj));
+        }
+
+        // validate a specific proof at position j against the message
+        static ValidationResult isValid(const ElGamalCiphertext &message,
+                                        const ZeroKnowledgeProof &proof, uint64_t j,
+                                        const ElementModP &k)
+        {
+            // if we don't have a commitment, we can't validate
+            // so we explicitly return false, but this is expected behavior
+            // when trying to validate against a proof that has been deserialized
+            // from an election record that does not include the commitment values
+            if (!proof.commitment.has_value()) {
+                Log::trace("RangedChaumPedersenProof::Impl::isValid: inconclusive integer proof " +
+                           to_string(j));
+                return ValidationResult{false, {"j: " + to_string(j) + " inconclusive commitment"}};
+            }
+
+            // recompute the commitment using the publically known values
+            auto recomputedCommitment =
+              recomputeCommitment(message, *proof.challenge, *proof.response, j, k);
+
+            auto aj = *proof.commitment.value()->getPad();
+            auto bj = *proof.commitment.value()->getData();
+            auto cj = *proof.challenge;
+            auto vj = *proof.response;
+
+            // 𝑎 = 𝑔^𝑉 ⋅ 𝐴^𝐶 mod 𝑝
+            auto consistent_gv = (aj == *recomputedCommitment->getPad());
+
+            // 𝑏  = 𝐾^w ⋅ 𝐵^𝐶 mod 𝑝
+            auto consistent_kv = (bj == *recomputedCommitment->getData());
+
+            if (!consistent_gv || !consistent_kv) {
+                auto jstring = to_string(j);
+                Log::debug("RangedChaumPedersenProof::Impl::isValid: invalid integer proof " +
+                           jstring);
+                return ValidationResult{
+                  false,
+                  {
+                    "j: " + jstring + " consistent_gv: " + to_string(consistent_gv),
+                    "j: " + jstring + " consistent_kv: " + to_string(consistent_kv),
+                  }};
+            }
+            return ValidationResult{true, {}};
+        }
+
+        // validate the integer proofs against the message
+        ValidationResult isValid(const ElGamalCiphertext &message, const ElementModP &k)
+        {
+            bool proofsAreValid = true;
+            std::vector<std::string> messages;
+            for (uint64_t i = 0; i < this->rangeLimit; i++) {
+                auto proof = *this->integerProofs[i];
+                auto isInclonclusive = !proof.commitment.has_value();
+                auto validationResult = isValid(message, proof, i, k);
+
+                // if the proof is conclusively invalid, meanining it has a commitment
+                // and the commitment does not match the recomputed commitment
+                // then we can return false immediately.
+                // this happens when we are validating a proof that was constructed
+                // from an election record that does include the commitment values
+                // or when we are validating a proof that was constructed from a
+                // direct encryption operation as part of the encryption process.
+                if (!validationResult.isValid & !isInclonclusive) {
+                    proofsAreValid = false;
+                    messages.push_back("proof for selection " + std::to_string(i) + " is invalid");
+                }
+
+                // but if it is inconclusive, we just log the message
+                // and allow the loop to continue.
+                // this happens when we are validating a proof that was constructed
+                // from an election record that does not include the commitment values
+                if (!validationResult.isValid) {
+                    for (const auto &message : validationResult.messages) {
+                        messages.push_back(message);
+                    }
+                }
+            }
+            return ValidationResult{proofsAreValid, messages};
+        }
+    };
+
+    // Lifecycle Methods
+
+    RangedChaumPedersenProof::RangedChaumPedersenProof(const RangedChaumPedersenProof &other)
+        : pimpl(other.pimpl->clone())
+    {
+    }
+
+    RangedChaumPedersenProof::RangedChaumPedersenProof(RangedChaumPedersenProof &&other)
+        : pimpl(move(other.pimpl))
+    {
+    }
+
+    RangedChaumPedersenProof::RangedChaumPedersenProof(
+      uint64_t inRangeLimit, unique_ptr<ElementModQ> challenge,
+      map<uint64_t, unique_ptr<ZeroKnowledgeProof>> inProofs)
+        : pimpl(new Impl(inRangeLimit, move(challenge), move(inProofs)))
+    {
+    }
+
+    RangedChaumPedersenProof::~RangedChaumPedersenProof() = default;
+
+    // Operator Overloads
+
+    RangedChaumPedersenProof &RangedChaumPedersenProof::operator=(RangedChaumPedersenProof other)
+    {
+        swap(pimpl, other.pimpl);
+        return *this;
+    }
+
+    // Property Getters
+
+    uint64_t RangedChaumPedersenProof::getRangeLimit() const { return pimpl->rangeLimit; }
+    ElementModQ *RangedChaumPedersenProof::getChallenge() const { return pimpl->challenge.get(); }
+    ZeroKnowledgeProof *RangedChaumPedersenProof::getProofAtIndex(uint64_t index) const
+    {
+        return pimpl->integerProofs.at(index).get();
+    }
+
+    std::vector<std::reference_wrapper<ZeroKnowledgeProof>>
+    RangedChaumPedersenProof::getProofs() const
+    {
+        return referenceWrap(pimpl->integerProofs);
+    }
+
+    // Public Static Methods
+
+    std::unique_ptr<RangedChaumPedersenProof>
+    RangedChaumPedersenProof::make(const ElGamalCiphertext &message, const ElementModQ &r,
+                                   uint64_t selected, uint64_t maxLimit, const ElementModP &k,
+                                   const ElementModQ &q, const string &hashPrefix)
+
+    {
+        auto seed = rand_q();
+        return make(message, r, selected, maxLimit, k, q, hashPrefix, *seed);
+    }
+
+    /// <summary>
+    /// Note that while mathematically we can recompute the individual integer commitments
+    /// and then hash them to verify the proof, in this implementation we keep the commitments
+    /// made for each integer proof so that we can compare them during verification
+    /// which allows us to know which one failed.
+    /// </summary>
+    unique_ptr<RangedChaumPedersenProof> RangedChaumPedersenProof::make(
+      const ElGamalCiphertext &message, const ElementModQ &r, uint64_t selected, uint64_t maxLimit,
+      const ElementModP &k, const ElementModQ &q, const string &hashPrefix, const ElementModQ &seed)
+    {
+        Log::trace("RangedChaumPedersenProof:: making proof");
+
+        auto *alpha = message.getPad();
+        auto *beta = message.getData();
+        auto l = ElementModQ::fromUint64(selected);
+
+        auto nonces = make_unique<Nonces>(seed, "ranged-chaum-pedersen-proof");
+
+        map<uint64_t, unique_ptr<ElGamalCiphertext>> commitments;
+        map<uint64_t, unique_ptr<ElementModQ>> challenges;
+
+        // Compute commitments
+        for (uint64_t i = 0; i < maxLimit; i++) {
+            auto u = nonces->get(i);
+            auto a = g_pow_p(*u); //𝑔^𝑢 mod 𝑝
+
+            unique_ptr<ElementModQ> cj;
+            unique_ptr<ElementModQ> tj;
+            if (i == selected) {
+                // create the real proof
+                cj = ZERO_MOD_Q().clone();
+                tj = make_unique<ElementModQ>(*u);
+            } else {
+                // create a fake proof
+                auto j = ElementModQ::fromUint64(i);
+
+                // 𝑢 + (𝑙 − 𝑗) ⋅ 𝑐𝑗 mod 𝑞
+                cj = nonces->get(maxLimit + i + 1);
+                tj = add_mod_q(*u, *mul_mod_q(*sub_mod_q(*l, *j), *cj));
+            }
+
+            auto b = pow_mod_p(k, *tj); // 𝐾^tj mod 𝑝
+
+            commitments[i] = make_unique<ElGamalCiphertext>(move(a), move(b));
+            challenges[i] = move(cj);
+        }
+
+        // compute the joint challenge
+
+        // c = H(HE;21,K,α ̄,β ̄,a0,b0,a1,b1,...,aL,bL). Ballot Contest Limit Encryption Proof 3.3.8
+        auto commitmentReferences = referenceWrap<CryptoHashable>(commitments);
+        auto c = hash_elems({&const_cast<ElementModQ &>(q), hashPrefix,
+                             &const_cast<ElementModP &>(k), alpha, beta, commitmentReferences});
+
+        // Compute the challenge for the selected value
+        // and replace it in the challenges map
+        auto c_sum = add_mod_q(referenceWrap(challenges));
+        challenges[selected] = sub_mod_q(*c, *c_sum); // 𝑐𝑙 = 𝑐 − ∑𝑐𝑗 mod 𝑞
+
+        // Compute the responses
+        map<uint64_t, unique_ptr<ZeroKnowledgeProof>> responses;
+        for (uint64_t i = 0; i < maxLimit; i++) {
+            auto u = nonces->get(i);
+            auto cjR = mul_mod_q(*challenges[i], r);
+            auto vj = sub_mod_q(*u, *cjR); // 𝑢 − 𝑐 ⋅ 𝑅 mod 𝑞
+            responses[i] =
+              make_unique<ZeroKnowledgeProof>(move(commitments[i]), move(challenges[i]), move(vj));
+        }
+
+        return make_unique<RangedChaumPedersenProof>(maxLimit, move(c), move(responses));
+    }
+
+    // Public Methods
+
+    ValidationResult RangedChaumPedersenProof::isValid(const ElGamalCiphertext &message,
+                                                       const ElementModP &k, const ElementModQ &q,
+                                                       const std::string &hashPrefix)
+    {
+        auto *alpha = message.getPad();
+        auto *beta = message.getData();
+
+        // validate the integer proofs against the message
+        auto validationResult = pimpl->isValid(message, k);
+
+        auto commitments = pimpl->getHashableCommitments(message, k);
+
+        // Compute the challenge
+        // TODO: change the HashPrefix to an input param since it can also be
+        // use for selection proofs
+        auto computedChallenge =
+          hash_elems({&const_cast<ElementModQ &>(q), hashPrefix, &const_cast<ElementModP &>(k),
+                      alpha, beta, commitments});
+        auto consistent_c = (*pimpl->challenge == *computedChallenge);
+
+        if (!consistent_c) {
+            validationResult.isValid = false;
+            validationResult.messages.push_back("invalid computed challenge");
+        }
+
+        // print out the error messages if the proof is invalid
+        if (!validationResult.isValid) {
+            Log::info("RangedChaumPedersenProof::isValid: found an invalid Range-Bound "
+                      "Chaum-Pedersen proof");
+            for (const auto &message : validationResult.messages) {
+                Log::debug(message);
+            }
+        }
+
+        return validationResult;
+    }
 #pragma endregion
 
 #pragma region ConstantChaumPedersenProof
@@ -690,7 +1023,7 @@ namespace electionguard
     }
 #pragma endregion
 
-#pragma region ConstantChaumPedersenProof
+#pragma region ChaumPedersenProof
 
     struct ChaumPedersenProof::Impl {
         unique_ptr<ElGamalCiphertext> commitment;

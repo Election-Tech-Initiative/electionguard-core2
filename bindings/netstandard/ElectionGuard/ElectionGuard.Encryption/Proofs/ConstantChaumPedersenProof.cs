@@ -21,7 +21,7 @@
             get
             {
                 var status = NativeInterface.ConstantChaumPedersenProof.GetPad(
-                    Handle, out NativeInterface.ElementModP.ElementModPHandle value);
+                    Handle, out var value);
                 status.ThrowIfError();
                 return new ElementModP(value);
             }
@@ -35,7 +35,7 @@
             get
             {
                 var status = NativeInterface.ConstantChaumPedersenProof.GetData(
-                    Handle, out NativeInterface.ElementModP.ElementModPHandle value);
+                    Handle, out var value);
                 status.ThrowIfError();
                 return new ElementModP(value);
             }
@@ -49,7 +49,7 @@
             get
             {
                 var status = NativeInterface.ConstantChaumPedersenProof.GetChallenge(
-                    Handle, out NativeInterface.ElementModQ.ElementModQHandle value);
+                    Handle, out var value);
                 status.ThrowIfError();
                 return new ElementModQ(value);
             }
@@ -63,7 +63,7 @@
             get
             {
                 var status = NativeInterface.ConstantChaumPedersenProof.GetResponse(
-                    Handle, out NativeInterface.ElementModQ.ElementModQHandle value);
+                    Handle, out var value);
                 status.ThrowIfError();
                 return new ElementModQ(value);
             }
