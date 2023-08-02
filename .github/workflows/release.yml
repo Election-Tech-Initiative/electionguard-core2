@@ -179,6 +179,7 @@ jobs:
       - name: Setup Environment
         run: make environment
       - name: Build
+        shell: msys2 {0}
         run: make build-msys2-x86
       - name: Upload Library (x86)
         uses: actions/upload-artifact@v3
