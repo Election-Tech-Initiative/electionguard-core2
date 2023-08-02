@@ -265,6 +265,7 @@ public partial class ElectionViewModel : BaseViewModel
         var egDrives = from drive in DriveInfo.GetDrives()
                        where drive != null
                        where drive.DriveType == DriveType.Removable
+                       where drive.IsReady
                        where drive.VolumeLabel.ToLower() == egDriveLabel
                        select drive;
 
