@@ -12,7 +12,8 @@ public partial class App
     public App(ILogger<App> logger)
     {
         _logger = logger;
-        Microsoft.UI.Xaml.Application.Current.UnhandledException += Current_UnhandledException;
+
+        AddUnhandledExceptionHandler();
 
         JsonConvert.DefaultSettings = SerializationSettings.NewtonsoftSettings;
 
@@ -23,10 +24,17 @@ public partial class App
         MainPage = new AppShell();
     }
 
+    private void AddUnhandledExceptionHandler()
+    {
+#if WINDOWS
+        Microsoft.UI.Xaml.Application.Current.UnhandledException += Current_UnhandledException;
+    }
+
     private void Current_UnhandledException(object sender, Microsoft.UI.Xaml.UnhandledExceptionEventArgs e)
     {
         _logger.LogCritical(e.Exception, "Unhandled Exception");
         ErrorLog.CreateCrashedFile();
+#endif
     }
 
     private void SetupLanguageSupport()
