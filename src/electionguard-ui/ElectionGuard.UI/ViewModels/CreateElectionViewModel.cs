@@ -18,13 +18,15 @@ public partial class CreateElectionViewModel : BaseViewModel
                                    ElectionService electionService,
                                    ManifestService manifestService,
                                    ContextService contextService,
-                                   ConstantsService constantsService) : base(PageName, serviceProvider)
+                                   ConstantsService constantsService,
+                                   ILogger<CreateElectionViewModel> logger) : base(PageName, serviceProvider)
     {
         _keyCeremonyService = keyCeremonyService;
         _electionService = electionService;
         _manifestService = manifestService;
         _contextService = contextService;
         _constantsService = constantsService;
+        _logger = logger;
     }
 
     public override async Task OnAppearing()
@@ -38,7 +40,8 @@ public partial class CreateElectionViewModel : BaseViewModel
         catch (Exception e)
         {
             _logger.LogError($"{nameof(_keyCeremonyService.GetAllCompleteAsync)} error: {e}");
-            await Logout()
+            await Logout();
+        }
     }
 
     [ObservableProperty]
