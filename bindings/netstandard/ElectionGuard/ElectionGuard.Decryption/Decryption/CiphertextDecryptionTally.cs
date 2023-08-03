@@ -116,12 +116,12 @@ public record class CiphertextDecryptionTally : DisposableRecordBase
     {
         if (!_tally.HasBallot(ballot.ObjectId))
         {
-            throw new ArgumentException("Tally does not contain ballot");
+            throw new ArgumentException($"Tally does not contain ballot {ballot.ObjectId}");
         }
 
         if (!ballot.IsSpoiled)
         {
-            throw new ArgumentException("Cannot add unspoiled ballot");
+            throw new ArgumentException($"Cannot add unspoiled ballot {ballot.ObjectId} {ballot.State}");
         }
 
         if (!_spoiledBallots.ContainsKey(ballot.ObjectId))
@@ -146,18 +146,18 @@ public record class CiphertextDecryptionTally : DisposableRecordBase
     {
         if (!_tally.HasBallot(ballot.ObjectId))
         {
-            throw new ArgumentException("Tally does not contain ballot");
+            throw new ArgumentException($"Tally {_tally.TallyId} does not contain ballot {ballot.ObjectId}");
         }
 
         if (ballot.IsSpoiled)
         {
-            throw new ArgumentException("Cannot decrypt spoiled ballot");
+            throw new ArgumentException($"Cannot decrypt spoiled ballot {ballot.ObjectId}");
         }
 
         if (!ballotShare.IsValid(
             ballot, guardian, _tally.Context.CryptoExtendedBaseHash))
         {
-            throw new ArgumentException("Invalid ballot share");
+            throw new ArgumentException($"Invalid ballot share {ballotShare.TallyId}-{ballotShare.GuardianId}");
         }
 
         AddGuardian(guardian);

@@ -237,14 +237,17 @@ public partial class BallotUploadViewModel : BaseViewModel
             ResultsText = $"{AppResources.SuccessText} {totalCount} {AppResources.Success2Text}";
             ShowPanel = BallotUploadPanel.Results;
 
-            var record = new CiphertextTallyRecord()
+            if ( totalSpoiled + totalChallenged + totalImported > 0 )
             {
-                ElectionId = ElectionId,
-                UploadId = upload.UploadId!,
-                IsExportable = false,
-                CiphertextTallyData = ciphertextTally.ToJson()
-            };
-            _ = await _ciphertextTallyService.SaveAsync(record);
+                var record = new CiphertextTallyRecord()
+                {
+                    ElectionId = ElectionId,
+                    UploadId = upload.UploadId!,
+                    IsExportable = false,
+                    CiphertextTallyData = ciphertextTally.ToJson()
+                };
+                _ = await _ciphertextTallyService.SaveAsync(record);
+            }
         }
         catch (Exception)
         {
