@@ -4,6 +4,7 @@ using CommunityToolkit.Maui.Storage;
 using CommunityToolkit.Mvvm.Input;
 using ElectionGuard.Decryption;
 using ElectionGuard.Decryption.Tally;
+using MetroLog.Targets;
 
 namespace ElectionGuard.UI.ViewModels;
 
@@ -268,13 +269,7 @@ public partial class BallotUploadViewModel : BaseViewModel
     private async Task PickDeviceFile()
     {
         FileErrorMessage = string.Empty;
-        var customFileType = new FilePickerFileType(
-                new Dictionary<DevicePlatform, IEnumerable<string>>
-                {
-                    { DevicePlatform.WinUI, new[] { ".json", "." } }, // file extension
-                    { DevicePlatform.macOS, new[] { "json", "" } }, // UTType values
-                });
-        var options = new PickOptions() { FileTypes = customFileType, PickerTitle = AppResources.SelectManifest };
+        var options = new PickOptions() { PickerTitle = AppResources.SelectManifest };
 
         var file = await FilePicker.PickAsync(options);
         if (file == null)
