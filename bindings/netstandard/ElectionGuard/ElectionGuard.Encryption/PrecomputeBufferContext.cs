@@ -1,6 +1,17 @@
 ﻿using System;
 using System.Threading;
 
+/// <summary>
+/// Dummy namespace used by legacy product
+/// </summary>
+namespace ElectionGuard.Encryption
+{
+    public class PrecomputeDummy
+    {
+    }
+
+}
+
 namespace ElectionGuard
 {
     /// <summary>
