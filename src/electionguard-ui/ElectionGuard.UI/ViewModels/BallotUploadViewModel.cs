@@ -117,6 +117,12 @@ public partial class BallotUploadViewModel : BaseViewModel
 
         // save the ballot upload
         var ballots = Directory.GetFiles(BallotFolder);
+        if (ballots.Length == 0)
+        {
+            _logger.LogWarning($"0 ballots in {nameof(BallotFolder)}: {BallotFolder}");
+            return;
+        }
+
         BallotUpload upload = new()
         {
             ElectionId = ElectionId,
@@ -148,7 +154,6 @@ public partial class BallotUploadViewModel : BaseViewModel
             _internalManifest!);
 
         UploadText = $"{AppResources.Uploading} {ballots.Length} {AppResources.Success2Text}";
-
 
         await Parallel.ForEachAsync(ballots, async (currentBallot, cancellationToken) =>
         {
