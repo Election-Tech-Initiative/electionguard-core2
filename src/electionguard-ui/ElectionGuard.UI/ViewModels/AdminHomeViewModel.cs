@@ -26,16 +26,21 @@ public partial class AdminHomeViewModel : BaseViewModel
     {
         await base.OnAppearing();
 
-        var keyCeremonies = await _keyCeremonyService.GetAllNotCompleteAsync();
+        var keyCeremonies = await _keyCeremonyService.GetAllAsync();
         if (keyCeremonies is not null)
         {
-            KeyCeremonies = new ObservableCollection<KeyCeremonyRecord>(keyCeremonies);
+            var keyCeremoniesInProgress = keyCeremonies.Where(ceremony => !ceremony.CompletedAt.HasValue).ToList();
+            var keyCeremoniesCompleted = keyCeremonies.Count - keyCeremoniesInProgress.Count;
+            // only incomplete key ceremonies
+            KeyCeremonies = new ObservableCollection<KeyCeremonyRecord>(keyCeremoniesInProgress);
+            HasCompletedKeyCeremonies = keyCeremoniesCompleted > 0;
         }
 
         var elections = await _electionService.GetAllAsync();
         if (elections is not null)
         {
             Elections = new ObservableCollection<Election>(elections);
+            CanCreateMultiTally = Elections.Count > 1;
         }
 
         MultiTallies.Clear();
@@ -65,6 +70,14 @@ public partial class AdminHomeViewModel : BaseViewModel
 
     [ObservableProperty]
     private ObservableCollection<KeyCeremonyRecord> _keyCeremonies = new();
+
+    [ObservableProperty]
+    [NotifyCanExecuteChangedFor(nameof(CreateElectionCommand))]
+    private bool _hasCompletedKeyCeremonies = false;
+
+    [ObservableProperty]
+    [NotifyCanExecuteChangedFor(nameof(CreateMultipleTalliesCommand))]
+    private bool _canCreateMultiTally = false;
 
     [ObservableProperty]
     private ObservableCollection<MultiTallyRecord> _multiTallies = new();
@@ -110,7 +123,7 @@ public partial class AdminHomeViewModel : BaseViewModel
         await NavigationService.GoToPage(typeof(CreateKeyCeremonyAdminViewModel));
     }
 
-    [RelayCommand(AllowConcurrentExecutions = true)]
+    [RelayCommand(AllowConcurrentExecutions = true, CanExecute =nameof(HasCompletedKeyCeremonies))]
     private async Task CreateElection()
     {
         await NavigationService.GoToPage(typeof(CreateElectionViewModel));
@@ -129,10 +142,9 @@ public partial class AdminHomeViewModel : BaseViewModel
         }
     }
 
-    [RelayCommand(AllowConcurrentExecutions = true)]
+    [RelayCommand(AllowConcurrentExecutions = true, CanExecute = nameof(CanCreateMultiTally))]
     private async Task CreateMultipleTallies()
     {
         await NavigationService.GoToPage(typeof(CreateMultiTallyViewModel));
     }
-
 }
