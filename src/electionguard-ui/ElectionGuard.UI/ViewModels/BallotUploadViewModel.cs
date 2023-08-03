@@ -419,7 +419,7 @@ public partial class BallotUploadViewModel : BaseViewModel
                         DeviceFile = string.Empty;
                         _importing = false;
                         return;
-                    } 
+                    }
 
                     try
                     {
