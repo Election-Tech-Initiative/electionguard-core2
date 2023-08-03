@@ -91,7 +91,7 @@ public record PlaintextTally : DisposableRecordBase, IEquatable<PlaintextTally>
         CiphertextBallot ballot)
     {
         TallyId = tallyId;
-        Name = ballot.ObjectId;
+        Name = ballot.BallotCode.ToHex();
         Contests = ballot.ToPlaintextTallyContestDictionary();
     }
 
