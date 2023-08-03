@@ -4,7 +4,6 @@ using CommunityToolkit.Maui.Storage;
 using CommunityToolkit.Mvvm.Input;
 using ElectionGuard.Decryption;
 using ElectionGuard.Decryption.Tally;
-using MetroLog.Targets;
 
 namespace ElectionGuard.UI.ViewModels;
 
@@ -243,7 +242,7 @@ public partial class BallotUploadViewModel : BaseViewModel
             ResultsText = $"{AppResources.SuccessText} {totalCount} {AppResources.Success2Text}";
             ShowPanel = BallotUploadPanel.Results;
 
-            if ( totalSpoiled + totalChallenged + totalImported > 0 )
+            if ( totalChallenged + totalImported > 0 )
             {
                 var record = new CiphertextTallyRecord()
                 {
