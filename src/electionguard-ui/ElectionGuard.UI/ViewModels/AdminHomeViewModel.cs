@@ -29,7 +29,7 @@ public partial class AdminHomeViewModel : BaseViewModel
         var keyCeremonies = await _keyCeremonyService.GetAllAsync();
         if (keyCeremonies is not null)
         {
-            var keyCeremoniesInProgress = keyCeremonies.Where(ceremony => !ceremony.CompletedAt.HasValue).ToList();
+            var keyCeremoniesInProgress = keyCeremonies.Where(ceremony => ceremony.State != KeyCeremonyState.Complete).ToList();
             var keyCeremoniesCompleted = keyCeremonies.Count - keyCeremoniesInProgress.Count;
             // only incomplete key ceremonies
             KeyCeremonies = new ObservableCollection<KeyCeremonyRecord>(keyCeremoniesInProgress);
