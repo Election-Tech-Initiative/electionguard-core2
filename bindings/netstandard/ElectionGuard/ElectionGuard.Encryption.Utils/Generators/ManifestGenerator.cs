@@ -35,9 +35,9 @@ namespace ElectionGuard.Encryption.Utils.Generators
         {
             var gpUnits = new List<GeopoliticalUnit>
             {
-                new GeopoliticalUnit("jefferson-county", "Jefferson County", ReportingUnitType.County),
+                new GeopoliticalUnit("jefferson-county", "Jefferson County", ReportingUnitType.county),
                 new GeopoliticalUnit(
-                    "jefferson-county-school-district-1", "Jefferson County School District 1", ReportingUnitType.School)
+                    "jefferson-county-school-district-1", "Jefferson County School District 1", ReportingUnitType.school)
             };
 
             var parties = new List<Party>
@@ -74,7 +74,7 @@ namespace ElectionGuard.Encryption.Utils.Generators
                     objectId: "justice-supreme-court",
                     electoralDistrictId: gpUnits[0].ObjectId,  // jefferson-county
                     sequenceOrder: 0,
-                    VoteVariationType.NOfM,
+                    VoteVariationType.n_of_m,
                     numberElected: 1,
                     name: "Justice of the Supreme Court",
                     selections: new[]
@@ -98,7 +98,7 @@ namespace ElectionGuard.Encryption.Utils.Generators
                     objectId: "referendum-pineapple",
                     electoralDistrictId: gpUnits[1].ObjectId, // jefferson-county-school-district-1 
                     sequenceOrder: 1,
-                    VoteVariationType.NOfM,
+                    VoteVariationType.n_of_m,
                     numberElected: 1,
                     votesAllowed: 1,
                     name: "The Pineapple Question",
@@ -147,7 +147,7 @@ namespace ElectionGuard.Encryption.Utils.Generators
             return new Manifest(
                 "jefferson-county-open-primary",
                 "1.0",
-                ElectionType.Primary,
+                ElectionType.primary,
                 startDate: start,
                 endDate: start.AddDays(1),
                 gpUnits.ToArray(),

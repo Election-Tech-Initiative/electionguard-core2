@@ -214,7 +214,7 @@ endif
 
 build-x86:
 ifeq ($(OPERATING_SYSTEM),Windows)
-	PROCESSOR=x86 VSPLATFORM=Win32 && make build
+	PROCESSOR=x86 VSPLATFORM=Win32 USE_32BIT_MATH=ON && make build
 else
 	PROCESSOR=x86 VSPLATFORM=Win32 USE_32BIT_MATH=ON && make build
 endif
@@ -284,6 +284,11 @@ ifeq ($(OPERATING_SYSTEM),Windows)
 	PROCESSOR=x64 && make build-netstandard
 else
 	PROCESSOR=x64 && make build-netstandard
+endif
+
+build-netstandard-x86:
+ifeq ($(OPERATING_SYSTEM),Windows)
+	PROCESSOR=x86 VSPLATFORM=Win32 USE_32BIT_MATH=ON && make build-netstandard
 endif
 
 build-cli:
