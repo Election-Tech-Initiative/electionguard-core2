@@ -31,7 +31,14 @@ public partial class CreateElectionViewModel : BaseViewModel
     {
         await base.OnAppearing();
 
-        KeyCeremonies = await _keyCeremonyService.GetAllCompleteAsync() ?? new();
+        try
+        {
+            KeyCeremonies = await _keyCeremonyService.GetAllCompleteAsync() ?? new();
+        }
+        catch (Exception e)
+        {
+            _logger.LogError($"{nameof(_keyCeremonyService.GetAllCompleteAsync)} error: {e}");
+            await Logout()
     }
 
     [ObservableProperty]
