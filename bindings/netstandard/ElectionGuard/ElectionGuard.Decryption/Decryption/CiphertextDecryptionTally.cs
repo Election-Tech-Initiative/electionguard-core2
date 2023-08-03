@@ -116,12 +116,12 @@ public record class CiphertextDecryptionTally : DisposableRecordBase
     {
         if (!_tally.HasBallot(ballot.ObjectId))
         {
-            throw new ArgumentException($"Tally does not contain ballot {ballot.ObjectId}");
+            throw new ArgumentException($"Tally {TallyId} does not contain ballot {ballot.ObjectId}");
         }
 
         if (!ballot.IsSpoiled)
         {
-            throw new ArgumentException($"Cannot add unspoiled ballot {ballot.ObjectId} {ballot.State}");
+            throw new ArgumentException($"Tally {TallyId} Cannot add unspoiled ballot {ballot.ObjectId} {ballot.State.ToString()}");
         }
 
         if (!_spoiledBallots.ContainsKey(ballot.ObjectId))
@@ -146,12 +146,12 @@ public record class CiphertextDecryptionTally : DisposableRecordBase
     {
         if (!_tally.HasBallot(ballot.ObjectId))
         {
-            throw new ArgumentException($"Tally {_tally.TallyId} does not contain ballot {ballot.ObjectId}");
+            throw new ArgumentException($"Tally {TallyId} does not contain ballot {ballot.ObjectId}");
         }
 
         if (ballot.IsSpoiled)
         {
-            throw new ArgumentException($"Cannot decrypt spoiled ballot {ballot.ObjectId}");
+            throw new ArgumentException($"Tally {TallyId} Cannot decrypt spoiled ballot {ballot.ObjectId}");
         }
 
         if (!ballotShare.IsValid(
@@ -176,7 +176,7 @@ public record class CiphertextDecryptionTally : DisposableRecordBase
     {
         if (!tallyShare.IsValid(_tally, guardian))
         {
-            throw new ArgumentException("Invalid tally share");
+            throw new ArgumentException($"Invalid tally share {TallyId} - {guardian.GuardianId}");
         }
 
         AddGuardian(guardian);
@@ -187,12 +187,12 @@ public record class CiphertextDecryptionTally : DisposableRecordBase
     {
         if (!_guardians.ContainsKey(guardianId))
         {
-            throw new ArgumentException("Tally does not contain guardian");
+            throw new ArgumentException($"Tally {TallyId} does not contain guardian");
         }
 
         if (!_tallyShares.ContainsKey(guardianId))
         {
-            throw new ArgumentException("Tally does not contain share");
+            throw new ArgumentException($"Tally {TallyId} does not contain share");
         }
 
         // get ballot shares if any, it's possible that a guardian
@@ -230,7 +230,7 @@ public record class CiphertextDecryptionTally : DisposableRecordBase
     {
         if (!CanAccumulate())
         {
-            throw new ArgumentException("Cannot accumulate shares");
+            throw new ArgumentException($"Cannot accumulate shares for {TallyId}");
         }
 
         _accumulatedTally = AccumulateTallyShares(skipValidation);
