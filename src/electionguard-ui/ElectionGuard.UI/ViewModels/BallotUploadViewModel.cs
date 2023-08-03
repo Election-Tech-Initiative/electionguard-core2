@@ -266,8 +266,8 @@ public partial class BallotUploadViewModel : BaseViewModel
         var customFileType = new FilePickerFileType(
                 new Dictionary<DevicePlatform, IEnumerable<string>>
                 {
-                    { DevicePlatform.WinUI, new[] { ".json" } }, // file extension
-                    { DevicePlatform.macOS, new[] { "json" } }, // UTType values
+                    { DevicePlatform.WinUI, new[] { ".json", "." } }, // file extension
+                    { DevicePlatform.macOS, new[] { "json", "" } }, // UTType values
                 });
         var options = new PickOptions() { FileTypes = customFileType, PickerTitle = AppResources.SelectManifest };
 
@@ -408,6 +408,7 @@ public partial class BallotUploadViewModel : BaseViewModel
                         }
                         catch (Exception)
                         {
+                            _logger.LogInformation($"file {device} is not an EncryptionDevice");
                         }
                     }
 
@@ -418,7 +419,7 @@ public partial class BallotUploadViewModel : BaseViewModel
                         DeviceFile = string.Empty;
                         _importing = false;
                         return;
-                    }
+                    } 
 
                     try
                     {
