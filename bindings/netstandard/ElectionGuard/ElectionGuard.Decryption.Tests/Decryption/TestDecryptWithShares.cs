@@ -1,7 +1,7 @@
 ﻿
-using ElectionGuard.Encryption.Utils.Generators;
 using ElectionGuard.Decryption.Tests.Tally;
 using ElectionGuard.ElectionSetup.Tests.Generators;
+using ElectionGuard.Encryption.Utils.Generators;
 
 namespace ElectionGuard.Decryption.Tests.Decryption;
 
@@ -51,9 +51,9 @@ public class TestDecryptWithShares : DisposableBase
         var result = mediator.RunDecryptionProcess(Data, guardians, tallyOnly: true);
 
         // Assert
-        var plaintextChallengedBallots = Data.PlaintextBallots
+        var plaintextChallengedBallots = Data.CiphertextBallots
             .Where(i => Data.CiphertextTally.ChallengedBallotIds.Contains(i.ObjectId))
-            .Select(i => i.ToTallyBallot(Data.CiphertextTally)).ToList();
+            .Select(i => i.ToTallyBallot(Data.PlaintextBallots.Single(j => j.ObjectId == i.ObjectId), Data.CiphertextTally)).ToList();
         Assert.That(result.Tally, Is.EqualTo(Data.PlaintextTally));
         Assert.That(result.ChallengedBallots!.Count, Is.EqualTo(0));
     }
@@ -73,9 +73,9 @@ public class TestDecryptWithShares : DisposableBase
         var result = mediator.RunDecryptionProcess(Data, guardians);
 
         // Assert
-        var plaintextChallengedBallots = Data.PlaintextBallots
+        var plaintextChallengedBallots = Data.CiphertextBallots
             .Where(i => Data.CiphertextTally.ChallengedBallotIds.Contains(i.ObjectId))
-            .Select(i => i.ToTallyBallot(Data.CiphertextTally)).ToList();
+            .Select(i => i.ToTallyBallot(Data.PlaintextBallots.Single(j => j.ObjectId == i.ObjectId), Data.CiphertextTally)).ToList();
         Assert.That(result.Tally, Is.EqualTo(Data.PlaintextTally));
         Assert.That(result.ChallengedBallots!.Count, Is.EqualTo(plaintextChallengedBallots.Count));
         Assert.That(result.ChallengedBallots, Is.EqualTo(plaintextChallengedBallots));
@@ -97,9 +97,11 @@ public class TestDecryptWithShares : DisposableBase
         var result = mediator.RunDecryptionProcess(Data, guardians);
 
         // Assert
-        var plaintextChallengedBallots = Data.PlaintextBallots
-            .Where(i => Data.CiphertextTally.ChallengedBallotIds.Contains(i.ObjectId))
-            .Select(i => i.ToTallyBallot(Data.CiphertextTally)).ToList();
+        var plaintextChallengedBallots = Data.CiphertextBallots
+            .Where(plain => Data.CiphertextTally.ChallengedBallotIds.Contains(plain.ObjectId))
+            .Select(cipher => cipher.ToTallyBallot(
+                Data.PlaintextBallots.Single(plain => plain.ObjectId == cipher.ObjectId), Data.CiphertextTally))
+                .ToList();
         Assert.That(result.Tally, Is.EqualTo(Data.PlaintextTally));
         Assert.That(result.ChallengedBallots!.Count, Is.EqualTo(plaintextChallengedBallots.Count));
         Assert.That(result.ChallengedBallots, Is.EqualTo(plaintextChallengedBallots));
