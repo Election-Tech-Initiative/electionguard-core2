@@ -2,7 +2,7 @@
 
 # Enable cross-compilation
 if(NOT ${CMAKE_HOST_SYSTEM_PROCESSOR} MATCHES "aarch64|arm64|arm64v8")
-    set(triple arm64-apple-darwin22.5.0)
+    execute_process( COMMAND clang  -print-multiarch  OUTPUT_VARIABLE triple )
     set(arch arm64)
 
     # For some reason we have to set the system name here in order to make the
