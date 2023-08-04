@@ -64,6 +64,16 @@
       <PackageCopyToOutput>true</PackageCopyToOutput>
       <PackagePath>runtimes\win-arm64\native</PackagePath>
     </Content>
+    <Content Name="Windows x86" Include="$(ElectionGuardLibs)\Windows\x86\$(Configuration)\src\$(Configuration)\*.dll*">
+      <Pack>true</Pack>
+      <PackageCopyToOutput>true</PackageCopyToOutput>
+      <PackagePath>runtimes\win-x86\native</PackagePath>
+    </Content>
+    <Content Name="Windows x86 HACL" Include="$(ElectionGuardLibs)\Windows\x86\$(Configuration)\libs\hacl\$(Configuration)\*.dll*">
+      <Pack>true</Pack>
+      <PackageCopyToOutput>true</PackageCopyToOutput>
+      <PackagePath>runtimes\win-x86\native</PackagePath>
+    </Content>
     <Content Name="Windows x86 (MSYS2)" Include="$(ElectionGuardLibs)\Windows\x86\$(Configuration)\src\*.dll*">
       <Pack>true</Pack>
       <PackageCopyToOutput>true</PackageCopyToOutput>

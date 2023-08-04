@@ -19,12 +19,12 @@
       <Link>electionguard.dll</Link>
       <CopyToOutputDirectory >PreserveNewest</CopyToOutputDirectory>
     </None>
-    <None Name="Windows MSVC x86 HACL" Include="$(MSBuildThisFileDirectory)..\runtimes\win-x86\native\libhacl.dll">
-      <Link>libhacl.dll</Link>
+    <None Name="Windows MSVC x86 HACL" Include="$(MSBuildThisFileDirectory)..\runtimes\win-x86\native\hacl.dll">
+      <Link>hacl.dll</Link>
       <CopyToOutputDirectory >PreserveNewest</CopyToOutputDirectory>
     </None>
-    <None Name="Windows MSVC x86 HACL_CPP" Include="$(MSBuildThisFileDirectory)..\runtimes\win-x86\native\libhacl_cpp.dll">
-      <Link>libhacl_cpp.dll</Link>
+    <None Name="Windows MSVC x86 HACL_CPP" Include="$(MSBuildThisFileDirectory)..\runtimes\win-x86\native\hacl_cpp.dll">
+      <Link>hacl_cpp.dll</Link>
       <CopyToOutputDirectory >PreserveNewest</CopyToOutputDirectory>
     </None>
   </ItemGroup>
