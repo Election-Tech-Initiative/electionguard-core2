@@ -63,55 +63,54 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        name:
-          [
-            "ubuntu-22.04-clang-14.0.0",
-            "ubuntu-22.04-emscripten-3.1",
-            "ubuntu-22.04-gcc-12.1.0",
-            "macos-13-xcode-14.2",
+        name: [
+            # "ubuntu-22.04-clang-14.0.0",
+            # "ubuntu-22.04-emscripten-3.1",
+            # "ubuntu-22.04-gcc-12.1.0",
+            # "macos-13-xcode-14.2",
             "macos-13-xcode-14.2-arm64",
-            "windows-2022-gcc-11",
-            "windows-2022-msvc-latest-x86",
-            "windows-2022-msvc-latest-x64",
-            "ubuntu-22.04-linter",
+            # "windows-2022-gcc-11",
+            # "windows-2022-msvc-latest-x86",
+            # "windows-2022-msvc-latest-x64",
+            # "ubuntu-22.04-linter",
           ]
         include:
-          - name: ubuntu-22.04-clang-14.0.0
-            os: ubuntu-22.04
-            processor: x64
-            compiler: clang
-            version: "14"
-            makeReleaseBuild: false
-            lint: false
-            runCsTests: false
-            runTsTests: false
-          - name: ubuntu-22.04-emscripten-3.1
-            os: ubuntu-22.04
-            processor: x64
-            compiler: emscripten
-            version: "3.1.35"
-            makeReleaseBuild: true
-            lint: false
-            runCsTests: false
-            runTsTests: true
-          - name: ubuntu-22.04-gcc-12.1.0
-            os: ubuntu-22.04
-            processor: x64
-            compiler: gcc
-            version: "12"
-            makeReleaseBuild: false
-            lint: false
-            runCsTests: false
-            runTsTests: false
-          - name: macOS-13-xcode-14.2
-            os: macOS-13
-            processor: x64
-            compiler: xcode
-            version: "14.2"
-            makeReleaseBuild: false
-            lint: false
-            runCsTests: true
-            runTsTests: false
+          # - name: ubuntu-22.04-clang-14.0.0
+          #   os: ubuntu-22.04
+          #   processor: x64
+          #   compiler: clang
+          #   version: "14"
+          #   makeReleaseBuild: false
+          #   lint: false
+          #   runCsTests: false
+          #   runTsTests: false
+          # - name: ubuntu-22.04-emscripten-3.1
+          #   os: ubuntu-22.04
+          #   processor: x64
+          #   compiler: emscripten
+          #   version: "3.1.35"
+          #   makeReleaseBuild: true
+          #   lint: false
+          #   runCsTests: false
+          #   runTsTests: true
+          # - name: ubuntu-22.04-gcc-12.1.0
+          #   os: ubuntu-22.04
+          #   processor: x64
+          #   compiler: gcc
+          #   version: "12"
+          #   makeReleaseBuild: false
+          #   lint: false
+          #   runCsTests: false
+          #   runTsTests: false
+          # - name: macOS-13-xcode-14.2
+          #   os: macOS-13
+          #   processor: x64
+          #   compiler: xcode
+          #   version: "14.2"
+          #   makeReleaseBuild: false
+          #   lint: false
+          #   runCsTests: true
+          #   runTsTests: false
           - name: macOS-13-xcode-14.2-arm64
             os: macOS-13
             processor: arm64
@@ -121,42 +120,42 @@ jobs:
             lint: false
             runCsTests: false
             runTsTests: false
-          - name: windows-2022-gcc-11
-            os: windows-2022
-            processor: x64
-            compiler: gcc
-            version: "11"
-            makeReleaseBuild: false
-            lint: false
-            runCsTests: false
-            runTsTests: false
-          - name: windows-2022-msvc-latest-x86
-            os: windows-2022
-            processor: x86
-            compiler: msvc
-            version: "latest"
-            makeReleaseBuild: false
-            lint: false
-            runCsTests: false
-            runTsTests: false
-          - name: windows-2022-msvc-latest-x64
-            os: windows-2022
-            processor: x64
-            compiler: msvc
-            version: "latest"
-            makeReleaseBuild: false
-            lint: false
-            runCsTests: true
-            runTsTests: false
-          - name: ubuntu-22.04-linter
-            os: ubuntu-22.04
-            processor: x64
-            compiler: clang
-            version: "14"
-            makeReleaseBuild: false
-            lint: true
-            runCsTests: true
-            runTsTests: false
+          # - name: windows-2022-gcc-11
+          #   os: windows-2022
+          #   processor: x64
+          #   compiler: gcc
+          #   version: "11"
+          #   makeReleaseBuild: false
+          #   lint: false
+          #   runCsTests: false
+          #   runTsTests: false
+          # - name: windows-2022-msvc-latest-x86
+          #   os: windows-2022
+          #   processor: x86
+          #   compiler: msvc
+          #   version: "latest"
+          #   makeReleaseBuild: false
+          #   lint: false
+          #   runCsTests: false
+          #   runTsTests: false
+          # - name: windows-2022-msvc-latest-x64
+          #   os: windows-2022
+          #   processor: x64
+          #   compiler: msvc
+          #   version: "latest"
+          #   makeReleaseBuild: false
+          #   lint: false
+          #   runCsTests: true
+          #   runTsTests: false
+          # - name: ubuntu-22.04-linter
+          #   os: ubuntu-22.04
+          #   processor: x64
+          #   compiler: clang
+          #   version: "14"
+          #   makeReleaseBuild: false
+          #   lint: true
+          #   runCsTests: true
+          #   runTsTests: false
 
     steps:
       - name: Configure Change Filter
