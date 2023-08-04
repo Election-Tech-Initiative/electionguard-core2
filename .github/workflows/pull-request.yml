@@ -112,7 +112,7 @@ jobs:
           #   runCsTests: true
           #   runTsTests: false
           - name: macOS-13-xcode-14.3-arm64
-            os: macos-13-xl
+            os: macos-13
             processor: arm64
             compiler: xcode
             version: "14.3"
