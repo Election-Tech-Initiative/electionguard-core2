@@ -185,6 +185,14 @@ public class TestDecryptionData : DisposableBase
             File.WriteAllText(Path.Combine(path, "plaintext", $"{ballot.ObjectId}.json"), plaintext);
         }
 
+        _ = Directory.CreateDirectory(Path.Combine(path, "output"));
+        foreach (var ballot in data.CiphertextBallots)
+        {
+            var ciphertext = JsonConvert.SerializeObject(ballot,
+                SerializationSettings.NewtonsoftSettings());
+            File.WriteAllText(Path.Combine(path, "output", $"{ballot.ObjectId}.json"), ciphertext);
+        }
+
         // write all of it in two files (used by typescript tests)
         var testData = JsonConvert.SerializeObject(data,
             SerializationSettings.NewtonsoftSettings());

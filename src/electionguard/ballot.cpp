@@ -10,9 +10,11 @@
 
 #include <cstdlib>
 #include <ctime>
+#include <stdexcept>
 #include <string>
 #include <unordered_map>
 
+using std::domain_error;
 using std::invalid_argument;
 using std::make_unique;
 using std::map;
@@ -187,12 +189,6 @@ namespace electionguard
               objectId, sequenceOrder, move(_descriptionHash), move(_ciphertext), isPlaceholder,
               move(_nonce), move(_cryptoHash), move(_proof), move(_extendedData));
         }
-
-        [[nodiscard]] unique_ptr<ElementModQ>
-        crypto_hash_with(const ElementModQ &encryptionSeed) const
-        {
-            return makeCryptoHash(objectId, encryptionSeed, *ciphertext);
-        }
     };
 
     // Lifecycle Methods
@@ -254,33 +250,31 @@ namespace electionguard
 
     // Interface Overrides
 
-    unique_ptr<ElementModQ>
-    CiphertextBallotSelection::crypto_hash_with(const ElementModQ &encryptionSeed) const
+    unique_ptr<ElementModQ> CiphertextBallotSelection::crypto_hash() const
     {
-        return pimpl->crypto_hash_with(encryptionSeed);
+        return pimpl->cryptoHash->clone();
     }
 
     // public Static Members
 
     unique_ptr<CiphertextBallotSelection> CiphertextBallotSelection::make(
       const string &objectId, uint64_t sequenceOrder, const ElementModQ &descriptionHash,
-      unique_ptr<ElGamalCiphertext> ciphertext, const ElementModP &elgamalPublicKey,
-      const ElementModQ &cryptoExtendedBaseHash, uint64_t plaintext,
-      bool isPlaceholder /* = false */, bool computeProof /* = true */,
+      unique_ptr<ElGamalCiphertext> ciphertext, const CiphertextElectionContext &context,
+      uint64_t plaintext, bool isPlaceholder /* = false */, bool computeProof /* = true */,
       unique_ptr<ElementModQ> nonce /* = nullptr */,
       unique_ptr<ElementModQ> cryptoHash /* = nullptr */,
       unique_ptr<ElGamalCiphertext> extendedData /* = nullptr */)
     {
         if (cryptoHash == nullptr) {
-            auto crypto_hash = makeCryptoHash(objectId, descriptionHash, *ciphertext);
-            cryptoHash = move(crypto_hash);
+            cryptoHash = ciphertext->crypto_hash();
         }
 
         unique_ptr<DisjunctiveChaumPedersenProof> proof = nullptr;
         if (computeProof) {
             // always make a proof using the faster, non-deterministic method
-            proof = DisjunctiveChaumPedersenProof::make(*ciphertext, *nonce, elgamalPublicKey,
-                                                        cryptoExtendedBaseHash, plaintext);
+            proof = DisjunctiveChaumPedersenProof::make(
+              *ciphertext, *nonce, *context.getElGamalPublicKey(),
+              *context.getCryptoExtendedBaseHash(), plaintext);
         }
 
         return make_unique<CiphertextBallotSelection>(
@@ -290,51 +284,59 @@ namespace electionguard
 
     unique_ptr<CiphertextBallotSelection> CiphertextBallotSelection::make(
       const string &objectId, uint64_t sequenceOrder, const ElementModQ &descriptionHash,
-      unique_ptr<ElGamalCiphertext> ciphertext, const ElementModP &elgamalPublicKey,
-      const ElementModQ &cryptoExtendedBaseHash, const ElementModQ &proofSeed, uint64_t plaintext,
-      bool isPlaceholder /* = false */, unique_ptr<ElementModQ> nonce /* = nullptr */,
+      unique_ptr<ElGamalCiphertext> ciphertext, const CiphertextElectionContext &context,
+      const ElementModQ &proofSeed, uint64_t plaintext, bool isPlaceholder /* = false */,
+      unique_ptr<ElementModQ> nonce /* = nullptr */,
       unique_ptr<ElementModQ> cryptoHash /* = nullptr */,
       unique_ptr<DisjunctiveChaumPedersenProof> proof /* = nullptr */,
       unique_ptr<ElGamalCiphertext> extendedData /* = nullptr */)
     {
         if (cryptoHash == nullptr) {
-            auto crypto_hash = makeCryptoHash(objectId, descriptionHash, *ciphertext);
-            cryptoHash = move(crypto_hash);
+            cryptoHash = ciphertext->crypto_hash();
         }
         // if no proof is provided and there is a nonce
         // then make a proof using the deterministic method
         if (proof == nullptr && nonce != nullptr) {
             proof = DisjunctiveChaumPedersenProof::make(
-              *ciphertext, *nonce, elgamalPublicKey, cryptoExtendedBaseHash, proofSeed, plaintext);
+              *ciphertext, *nonce, *context.getElGamalPublicKey(),
+              *context.getCryptoExtendedBaseHash(), proofSeed, plaintext);
+        } else if (proof != nullptr) {
+            // validate the proof because the caller can provide an invalid one
+            if (!proof->isValid(*ciphertext, *context.getElGamalPublicKey(),
+                                *context.getCryptoExtendedBaseHash())) {
+                throw domain_error("proof is not valid");
+            }
         }
         return make_unique<CiphertextBallotSelection>(
           objectId, sequenceOrder, descriptionHash, move(ciphertext), isPlaceholder, move(nonce),
           move(cryptoHash), move(proof), move(extendedData));
     }
 
-    unique_ptr<CiphertextBallotSelection> CiphertextBallotSelection::make_with_precomputed(
+    unique_ptr<CiphertextBallotSelection> CiphertextBallotSelection::make(
       const std::string &objectId, uint64_t sequenceOrder, const ElementModQ &descriptionHash,
-      unique_ptr<ElGamalCiphertext> ciphertext, const ElementModQ &cryptoExtendedBaseHash,
-      uint64_t plaintext, unique_ptr<TwoTriplesAndAQuadruple> precomputedTwoTriplesAndAQuad,
-      bool isPlaceholder /* = false */, bool computeProof /* = true */,
-      unique_ptr<ElementModQ> cryptoHash /* = nullptr */,
-      unique_ptr<ElGamalCiphertext> extendedData /* = nullptr */)
+      unique_ptr<ElGamalCiphertext> ciphertext, const CiphertextElectionContext &context,
+      unique_ptr<PrecomputedSelection> precomputedValues, uint64_t plaintext,
+      bool isPlaceholder /* = false */, unique_ptr<ElementModQ> cryptoHash /* = nullptr */,
+      bool computeProof /* = true */, unique_ptr<ElGamalCiphertext> extendedData /* = nullptr */)
     {
         unique_ptr<CiphertextBallotSelection> result = NULL;
 
         if (cryptoHash == nullptr) {
-            auto crypto_hash = makeCryptoHash(objectId, descriptionHash, *ciphertext);
-            cryptoHash = move(crypto_hash);
+            cryptoHash = ciphertext->crypto_hash();
         }
 
         // need to make sure we use the nonce used in precomputed values
-        auto nonce = precomputedTwoTriplesAndAQuad->get_triple1()->get_exp();
+        auto nonce = precomputedValues->getPartialEncryption()->getSecret()->clone();
 
         unique_ptr<DisjunctiveChaumPedersenProof> proof = nullptr;
         if (computeProof) {
             // always make a proof using the faster, non-deterministic method
-            proof = DisjunctiveChaumPedersenProof::make_with_precomputed(
-              *ciphertext, move(precomputedTwoTriplesAndAQuad), cryptoExtendedBaseHash, plaintext);
+            auto real = precomputedValues->getRealCommitment()->clone();
+            auto fake = precomputedValues->getFakeCommitment()->clone();
+
+            proof = DisjunctiveChaumPedersenProof::make(
+              *ciphertext, *nonce, move(real), move(fake), *context.getElGamalPublicKey(),
+              *context.getCryptoExtendedBaseHash(), plaintext);
         }
 
         return make_unique<CiphertextBallotSelection>(
@@ -342,12 +344,6 @@ namespace electionguard
           move(cryptoHash), move(proof), move(extendedData));
 
         return result;
-    }
-
-    unique_ptr<ElementModQ>
-    CiphertextBallotSelection::crypto_hash_with(const ElementModQ &encryptionSeed)
-    {
-        return pimpl->crypto_hash_with(encryptionSeed);
     }
 
     // Public Methods
@@ -363,7 +359,7 @@ namespace electionguard
             return false;
         }
 
-        auto recalculatedCryptoHash = crypto_hash_with(encryptionSeed);
+        auto recalculatedCryptoHash = pimpl->ciphertext->crypto_hash();
         if ((*pimpl->cryptoHash != *recalculatedCryptoHash)) {
             Log::info(": CiphertextBallotSelection mismatching crypto hash: ");
             Log::info(": expected: ", recalculatedCryptoHash->toHex());
@@ -379,17 +375,6 @@ namespace electionguard
     }
 
     void CiphertextBallotSelection::resetNonce() const { return pimpl->nonce.reset(); }
-
-    // Protected Members
-
-    unique_ptr<ElementModQ>
-    CiphertextBallotSelection::makeCryptoHash(const string &objectId,
-                                              const ElementModQ &encryptionSeed,
-                                              const ElGamalCiphertext &ciphertext)
-    {
-        return hash_elems(
-          {objectId, &const_cast<ElementModQ &>(encryptionSeed), ciphertext.crypto_hash().get()});
-    }
 
 #pragma endregion
 
@@ -471,12 +456,12 @@ namespace electionguard
                                     bool supportOvervotes /* = true */) const
     {
         if (pimpl->object_id != expectedObjectId) {
-            Log::info(": invalid objectId");
+            Log::warn("PlaintextBallotContest::isValid: invalid objectId for contest");
             return INVALID_OBJECT_ID_ERROR;
         }
 
         if (pimpl->selections.size() > expectedNumberSelections) {
-            Log::info(": too many selections");
+            Log::warn("PlaintextBallotContest::isValid: too many selections for contest");
             return TOO_MANY_SELECTIONS_ERROR;
         }
 
@@ -491,10 +476,12 @@ namespace electionguard
         }
 
         if (numberElected > expectedNumberElected) {
-            Log::info(": too many elections");
             if (supportOvervotes) {
+                Log::info("PlaintextBallotContest::isValid: too many elections (allow overvote)");
                 return OVERVOTE;
             } else {
+                Log::warn(
+                  "PlaintextBallotContest::isValid: too many elections (disallow overvote)");
                 return OVERVOTE_ERROR;
             }
         }
@@ -504,10 +491,11 @@ namespace electionguard
         }
 
         if (votes > votesAllowd) {
-            Log::info(": too many votes");
             if (supportOvervotes) {
+                Log::info("PlaintextBallotContest::isValid: too many votes (allow overvote)");
                 return OVERVOTE;
             } else {
+                Log::warn("PlaintextBallotContest::isValid: too many votes (disallow overvote)");
                 return OVERVOTE_ERROR;
             }
         }
@@ -526,14 +514,14 @@ namespace electionguard
         unique_ptr<ElementModQ> nonce;
         unique_ptr<ElGamalCiphertext> ciphertextAccumulation;
         unique_ptr<ElementModQ> cryptoHash;
-        unique_ptr<ConstantChaumPedersenProof> proof;
+        unique_ptr<RangedChaumPedersenProof> proof;
         unique_ptr<HashedElGamalCiphertext> hashedElGamal;
 
         Impl(const string &objectId, uint64_t sequenceOrder,
              unique_ptr<ElementModQ> descriptionHash,
              vector<unique_ptr<CiphertextBallotSelection>> selections,
              unique_ptr<ElementModQ> nonce, unique_ptr<ElGamalCiphertext> ciphertextAccumulation,
-             unique_ptr<ElementModQ> cryptoHash, unique_ptr<ConstantChaumPedersenProof> proof,
+             unique_ptr<ElementModQ> cryptoHash, unique_ptr<RangedChaumPedersenProof> proof,
              unique_ptr<HashedElGamalCiphertext> hashedElGamal)
             : sequenceOrder(sequenceOrder), descriptionHash(move(descriptionHash)),
               selections(move(selections)), nonce(move(nonce)),
@@ -555,7 +543,7 @@ namespace electionguard
             auto _nonce = make_unique<ElementModQ>(*nonce);
             auto _accumulation = make_unique<ElGamalCiphertext>(*ciphertextAccumulation);
             auto _cryptoHash = make_unique<ElementModQ>(*cryptoHash);
-            auto _proof = make_unique<ConstantChaumPedersenProof>(*proof);
+            auto _proof = make_unique<RangedChaumPedersenProof>(*proof);
             auto _hashedElGamal = make_unique<HashedElGamalCiphertext>(*hashedElGamal);
 
             return make_unique<CiphertextBallotContest::Impl>(
@@ -575,8 +563,7 @@ namespace electionguard
       const string &objectId, uint64_t sequenceOrder, const ElementModQ &descriptionHash,
       vector<unique_ptr<CiphertextBallotSelection>> selections, unique_ptr<ElementModQ> nonce,
       unique_ptr<ElGamalCiphertext> ciphertextAccumulation, unique_ptr<ElementModQ> cryptoHash,
-      unique_ptr<ConstantChaumPedersenProof> proof,
-      unique_ptr<HashedElGamalCiphertext> hashedElGamal)
+      unique_ptr<RangedChaumPedersenProof> proof, unique_ptr<HashedElGamalCiphertext> hashedElGamal)
         : pimpl(new Impl(objectId, sequenceOrder, make_unique<ElementModQ>(descriptionHash),
                          move(selections), move(nonce), move(ciphertextAccumulation),
                          move(cryptoHash), move(proof), move(hashedElGamal)))
@@ -627,7 +614,7 @@ namespace electionguard
 
     ElementModQ *CiphertextBallotContest::getCryptoHash() const { return pimpl->cryptoHash.get(); }
 
-    ConstantChaumPedersenProof *CiphertextBallotContest::getProof() const
+    RangedChaumPedersenProof *CiphertextBallotContest::getProof() const
     {
         return pimpl->proof.get();
     }
@@ -639,23 +626,22 @@ namespace electionguard
 
     // Interface Overrides
 
-    unique_ptr<ElementModQ>
-    CiphertextBallotContest::crypto_hash_with(const ElementModQ &encryptionSeed) const
+    unique_ptr<ElementModQ> CiphertextBallotContest::crypto_hash() const
     {
-        return makeCryptoHash(pimpl->object_id, this->getSelections(), encryptionSeed);
+        return pimpl->cryptoHash->clone();
     }
 
     // Public Static Methods
 
     unique_ptr<CiphertextBallotContest> CiphertextBallotContest::make(
       const string &objectId, uint64_t sequenceOrder, const ElementModQ &descriptionHash,
-      vector<unique_ptr<CiphertextBallotSelection>> selections, const ElementModP &elgamalPublicKey,
-      const ElementModQ &cryptoExtendedBaseHash, const ElementModQ &proofSeed,
-      uint64_t numberElected, unique_ptr<ElementModQ> nonce /* = nullptr */,
+      vector<unique_ptr<CiphertextBallotSelection>> selections,
+      const CiphertextElectionContext &context, const ElementModQ &proofSeed,
+      uint64_t numberSelected, uint64_t numberElected,
+      unique_ptr<ElementModQ> nonce /* = nullptr */,
       unique_ptr<ElementModQ> cryptoHash /* = nullptr */,
-      unique_ptr<ConstantChaumPedersenProof> proof /* = nullptr */,
-      unique_ptr<HashedElGamalCiphertext> hashedElGamal /*nullptr */,
-      bool shouldUsePrecomputedValues /* = false */)
+      unique_ptr<RangedChaumPedersenProof> proof /* = nullptr */,
+      unique_ptr<HashedElGamalCiphertext> hashedElGamal /*nullptr */)
     {
         vector<reference_wrapper<CiphertextBallotSelection>> selectionReferences;
         selectionReferences.reserve(selections.size());
@@ -663,6 +649,7 @@ namespace electionguard
             selectionReferences.push_back(ref(*selection));
         }
 
+        // ensure the selections are sorted in the same order as the description
         sort(selectionReferences.begin(), selectionReferences.end(),
              [](const reference_wrapper<CiphertextBallotSelection> left,
                 const reference_wrapper<CiphertextBallotSelection> right) {
@@ -670,7 +657,7 @@ namespace electionguard
              });
 
         if (cryptoHash == nullptr) {
-            auto crypto_hash = makeCryptoHash(objectId, selectionReferences, descriptionHash);
+            auto crypto_hash = makeCryptoHash(context, sequenceOrder, selectionReferences);
             cryptoHash = move(crypto_hash);
         }
 
@@ -678,15 +665,37 @@ namespace electionguard
         auto accumulation = elgamalAccumulate(selectionReferences);
         if (proof == nullptr) {
             auto aggregate = aggregateNonce(selectionReferences);
-            auto owned_proof = ConstantChaumPedersenProof::make(
-              *accumulation, *aggregate, elgamalPublicKey, proofSeed, cryptoExtendedBaseHash,
-              numberElected, shouldUsePrecomputedValues);
+            auto owned_proof = RangedChaumPedersenProof::make(
+              *accumulation, *aggregate, numberSelected, numberElected,
+              *context.getElGamalPublicKey(), *context.getCryptoExtendedBaseHash(),
+              HashPrefix::get_prefix_contest_proof(), proofSeed);
             proof = move(owned_proof);
+        }
+
+        // always check that the proof is valid when the constructor is called
+        // because it is both possible for a caller to create an invalid proof and also
+        // there is no other guarantee the proof will be validated downstream
+        // such as when serializing from an election record so it must be validated
+        // at the time of construction.
+        auto validationResult = proof->isValid(*accumulation, *context.getElGamalPublicKey(),
+                                               *context.getCryptoExtendedBaseHash(),
+                                               HashPrefix::get_prefix_contest_proof());
+        if (!validationResult.isValid) {
+            validationResult.messages.insert(validationResult.messages.begin(), "invalid proof");
+            throw domain_error(concat(validationResult.messages, 64));
         }
 
         return make_unique<CiphertextBallotContest>(
           objectId, sequenceOrder, descriptionHash, move(selections), move(nonce),
           move(accumulation), move(cryptoHash), move(proof), move(hashedElGamal));
+    }
+
+    unique_ptr<ElementModQ>
+    CiphertextBallotContest::contestNonce(const CiphertextElectionContext &context,
+                                          uint64_t sequenceOrder, const ElementModQ &nonceSeed)
+    {
+        return hash_elems({*context.getCryptoExtendedBaseHash(),
+                           HashPrefix::get_prefix_selection_nonce(), nonceSeed, sequenceOrder});
     }
 
     // Public Methods
@@ -714,7 +723,8 @@ namespace electionguard
         }
 
         bool consistent_crypto_hash = true;
-        auto recalculatedCryptoHash = crypto_hash_with(encryptionSeed);
+        auto recalculatedCryptoHash = makeCryptoHash(elgamalPublicKey, cryptoExtendedBaseHash,
+                                                     pimpl->sequenceOrder, this->getSelections());
         if ((*pimpl->cryptoHash != *recalculatedCryptoHash)) {
             Log::debug("CiphertextBallotContest mismatching crypto hash");
             Log::debug("expected", recalculatedCryptoHash->toHex());
@@ -743,18 +753,21 @@ namespace electionguard
             consistent_accumulation = false;
         }
 
-        bool valid_proof =
-          pimpl->proof->isValid(*computedAccumulation, elgamalPublicKey, cryptoExtendedBaseHash);
+        auto valid_proof =
+          pimpl->proof->isValid(*computedAccumulation, elgamalPublicKey, cryptoExtendedBaseHash,
+                                HashPrefix::get_prefix_contest_proof());
 
         bool success = consistent_encryption_seed && consistent_crypto_hash && proof_exists &&
-                       consistent_accumulation && valid_proof;
+                       consistent_accumulation && valid_proof.isValid;
+
+        // TODO #365 Use ValidationResult
 
         if (!success) {
             map<string, bool> printMap{{"consistent_encryption_seed", consistent_encryption_seed},
                                        {"consistent_crypto_hash", consistent_crypto_hash},
                                        {"proof_exists", proof_exists},
                                        {"consistent_accumulation", consistent_accumulation},
-                                       {"valid_proof", valid_proof}};
+                                       {"valid_proof", valid_proof.isValid}};
 
             Log::info("CiphertextBallotContest::isValidEncryption failed!", printMap);
         }
@@ -786,14 +799,27 @@ namespace electionguard
     }
 
     unique_ptr<ElementModQ> CiphertextBallotContest::makeCryptoHash(
-      string objectId, const vector<reference_wrapper<CiphertextBallotSelection>> &selections,
-      const ElementModQ &encryptionSeed)
+      const CiphertextElectionContext &context, uint64_t sequenceOrder,
+      const vector<reference_wrapper<CiphertextBallotSelection>> &selections)
+    {
+        return makeCryptoHash(*context.getElGamalPublicKey(), *context.getCryptoExtendedBaseHash(),
+                              sequenceOrder, selections);
+    }
+
+    unique_ptr<ElementModQ> CiphertextBallotContest::makeCryptoHash(
+      const ElementModP &elgamalPublicKey, const ElementModQ &cryptoExtendedBaseHash,
+      uint64_t sequenceOrder,
+      const vector<reference_wrapper<CiphertextBallotSelection>> &selections)
     {
         if (selections.empty()) {
-            throw invalid_argument("mismatching selection state for " + objectId +
+            throw invalid_argument("mismatching selection state for " + to_string(sequenceOrder) +
                                    "expected(some) actual(none)");
         }
-        vector<CryptoHashableType> elems = {objectId, &const_cast<ElementModQ &>(encryptionSeed)};
+        // TODO: add extended base hash and public key K from context
+        // remove encryption seed maybe?
+        vector<CryptoHashableType> elems = {cryptoExtendedBaseHash,
+                                            HashPrefix::get_prefix_contest_hash(), sequenceOrder,
+                                            elgamalPublicKey};
         for (const auto &selection : selections) {
             elems.emplace_back(ref(*selection.get().getCryptoHash()));
         }
@@ -1005,21 +1031,21 @@ namespace electionguard
 
     // Interface Overrides
 
-    unique_ptr<ElementModQ>
-    CiphertextBallot::crypto_hash_with(const ElementModQ &manifestHash) const
+    unique_ptr<ElementModQ> CiphertextBallot::crypto_hash() const
     {
-        return makeCryptoHash(pimpl->object_id, this->getContests(), manifestHash);
+        return pimpl->cryptoHash->clone();
     }
 
     // Public Static Methods
 
     unique_ptr<CiphertextBallot> CiphertextBallot::make(
       const string &objectId, const string &styleId, const ElementModQ &manifestHash,
+      const CiphertextElectionContext &context,
       vector<unique_ptr<CiphertextBallotContest>> contests,
       unique_ptr<ElementModQ> nonce /* = nullptr */, const uint64_t timestamp /* = 0 */,
       unique_ptr<ElementModQ> ballotCodeSeed /* = nullptr */,
       unique_ptr<ElementModQ> ballotCode /* = nullptr */,
-      BallotBoxState state /* = BallotBoxState::unknown */)
+      BallotBoxState state /* = BallotBoxState::unknown */, const std::string &aux /* = "" */)
     {
         if (contests.empty()) {
             Log::error(":ballot must have at least some contests");
@@ -1032,17 +1058,13 @@ namespace electionguard
             contestsRefs.push_back(ref(*contest));
         }
 
-        auto cryptoHash = makeCryptoHash(objectId, contestsRefs, manifestHash);
+        // TODO: the crypt hash and the confirmation code are now the same thing so remove one or the other and rename
+        auto cryptoHash = makeCryptoHash(*context.getCryptoExtendedBaseHash(), contestsRefs, aux);
         auto ballotTimestamp = timestamp == 0 ? getSystemTimestamp() : timestamp;
-        if (!ballotCodeSeed) {
-            // if there is no ballotCodeSeed, default to using the manifest
-            auto previous = make_unique<ElementModQ>(manifestHash);
-            ballotCodeSeed = move(previous);
-        }
 
         if (!ballotCode) {
             auto _ballotCode =
-              BallotCode::getBallotCode(*ballotCodeSeed, ballotTimestamp, *cryptoHash);
+              makeCryptoHash(*context.getCryptoExtendedBaseHash(), contestsRefs, aux);
             ballotCode.swap(_ballotCode);
         }
 
@@ -1064,6 +1086,14 @@ namespace electionguard
                                              const ElementModP &elgamalPublicKey,
                                              const ElementModQ &cryptoExtendedBaseHash)
     {
+        return isValidEncryption(manifestHash, elgamalPublicKey, cryptoExtendedBaseHash, "");
+    }
+
+    bool CiphertextBallot::isValidEncryption(const ElementModQ &manifestHash,
+                                             const ElementModP &elgamalPublicKey,
+                                             const ElementModQ &cryptoExtendedBaseHash,
+                                             const string &aux)
+    {
         if ((const_cast<ElementModQ &>(manifestHash) != *pimpl->manifestHash)) {
             Log::info(": CiphertextBallot mismatching manifestHash: ");
             Log::info(": expected: ", manifestHash.toHex());
@@ -1071,7 +1101,7 @@ namespace electionguard
             return false;
         }
 
-        auto recalculatedCryptoHash = crypto_hash_with(manifestHash);
+        auto recalculatedCryptoHash = makeCryptoHash(cryptoExtendedBaseHash, getContests(), aux);
         if ((*pimpl->cryptoHash != *recalculatedCryptoHash)) {
             Log::info(": CiphertextBallot mismatching crypto hash: ");
             Log::info(": expected: ", recalculatedCryptoHash->toHex());
@@ -1208,15 +1238,15 @@ namespace electionguard
     // Protected Methods
 
     unique_ptr<ElementModQ> CiphertextBallot::makeCryptoHash(
-      string objectId, const vector<reference_wrapper<CiphertextBallotContest>> &contests,
-      const ElementModQ &manifestHash)
+      const ElementModQ &extendedBaseHash,
+      const vector<reference_wrapper<CiphertextBallotContest>> &contests, const string &aux)
     {
         if (contests.empty()) {
-            throw invalid_argument("mismatching contests state for " + objectId +
-                                   "expected(some) actual(none)");
+            throw invalid_argument("mismatching contests state");
         }
 
-        vector<CryptoHashableType> elems = {objectId, &const_cast<ElementModQ &>(manifestHash)};
+        vector<CryptoHashableType> elems = {extendedBaseHash, HashPrefix::get_prefix_ballot_code(),
+                                            aux};
         for (const auto &contest : contests) {
             elems.emplace_back(ref(*contest.get().getCryptoHash()));
         }
@@ -1276,20 +1306,21 @@ namespace electionguard
 
     unique_ptr<SubmittedBallot> SubmittedBallot::make(
       const string &objectId, const string &styleId, const ElementModQ &manifestHash,
+      const CiphertextElectionContext &context,
       vector<unique_ptr<CiphertextBallotContest>> contests,
       unique_ptr<ElementModQ> nonce /* = nullptr */, const uint64_t timestamp /* = 0 */,
       unique_ptr<ElementModQ> ballotCodeSeed /* = nullptr */,
       unique_ptr<ElementModQ> ballotCode /* = nullptr */,
-      BallotBoxState state /* = BallotBoxState::unknown */)
+      BallotBoxState state /* = BallotBoxState::unknown */, const std::string &aux /*= ""*/)
     {
         if (contests.empty()) {
             Log::error(":ballot must have at least some contests");
             throw invalid_argument("ballot must have at least some contests");
         }
 
-        auto ciphertextBallot =
-          CiphertextBallot::make(objectId, styleId, manifestHash, move(contests), move(nonce),
-                                 timestamp, move(ballotCodeSeed), move(ballotCode));
+        auto ciphertextBallot = CiphertextBallot::make(
+          objectId, styleId, manifestHash, context, move(contests), move(nonce), timestamp,
+          move(ballotCodeSeed), move(ballotCode), state, aux);
         return SubmittedBallot::from(*ciphertextBallot, state);
     }
 

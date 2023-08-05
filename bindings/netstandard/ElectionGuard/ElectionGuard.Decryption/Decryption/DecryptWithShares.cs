@@ -1,5 +1,6 @@
 
 using ElectionGuard.Ballot;
+using ElectionGuard.ElectionSetup;
 using ElectionGuard.Decryption.Accumulation;
 using ElectionGuard.Decryption.Extensions;
 using ElectionGuard.Decryption.Shares;
@@ -62,7 +63,8 @@ public static class DecryptWithSharesExtensions
 
                 // decrypt the selection
                 var ciphertext = selection.Value;
-                var value = ciphertext!.Decrypt(decryption);
+                var value = ciphertext!.Decrypt(
+                    decryption, self.Context.ElGamalPublicKey);
 
                 // add the decrypted value to the plaintext selection
                 plaintextSelection.Tally += value.Tally;
@@ -111,6 +113,7 @@ public static class DecryptWithSharesExtensions
             ballotShares.GetShares(),
             lagrangeCoefficients,
             tally.TallyId,
+            tally.Context.ElGamalPublicKey,
             tally.Context.CryptoExtendedBaseHash,
             skipValidation);
     }
@@ -123,6 +126,7 @@ public static class DecryptWithSharesExtensions
         CiphertextDecryptionBallot ballotShares,
         Dictionary<string, LagrangeCoefficient> lagrangeCoefficients,
         string tallyId,
+        ElementModP electionPublicKey,
         ElementModQ extendedBaseHash,
         bool skipValidation = false)
     {
@@ -130,6 +134,7 @@ public static class DecryptWithSharesExtensions
             ballotShares.GetShares(),
             lagrangeCoefficients,
             tallyId,
+            electionPublicKey,
             extendedBaseHash,
             skipValidation);
     }
@@ -141,12 +146,14 @@ public static class DecryptWithSharesExtensions
         this CiphertextBallot self,
         List<Tuple<ElectionPublicKey, BallotShare>> guardianShares,
         string tallyId,
+        ElementModP electionPublicKey,
         ElementModQ extendedBaseHash,
         bool skipValidation = false)
     {
         var lagrangeCoefficients = guardianShares.ComputeLagrangeCoefficients();
         return self.Decrypt(
-            guardianShares, lagrangeCoefficients, tallyId, extendedBaseHash, skipValidation
+            guardianShares, lagrangeCoefficients, tallyId,
+            electionPublicKey, extendedBaseHash, skipValidation
         );
     }
 
@@ -158,6 +165,7 @@ public static class DecryptWithSharesExtensions
         List<Tuple<ElectionPublicKey, BallotShare>> guardianShares,
         Dictionary<string, LagrangeCoefficient> lagrangeCoefficients,
         string tallyId,
+        ElementModP electionPublicKey,
         ElementModQ extendedBaseHash,
         bool skipValidation = false)
     {
@@ -170,12 +178,12 @@ public static class DecryptWithSharesExtensions
              skipValidation);
 
         return self.Decrypt(
-            accumulation.Contests.Values.ToList(), tallyId);
+            accumulation.Contests.Values.ToList(), electionPublicKey, tallyId);
     }
 
     public static PlaintextTallyBallot Decrypt(
         this CiphertextBallot self,
-        List<AccumulatedContest> decryptions, string tallyId)
+        List<AccumulatedContest> decryptions, ElementModP publicKey, string tallyId)
     {
         // create a plaintext tally from the first ballot share's style Id.
         var plaintextTally = new PlaintextTallyBallot(tallyId, self);
@@ -198,7 +206,7 @@ public static class DecryptWithSharesExtensions
                 var decryption = contestAccumulation.Selections.First(
                     x => x.Key == selection.ObjectId).Value;
 
-                var value = selection.Decrypt(decryption);
+                var value = selection.Decrypt(decryption, publicKey);
                 plaintextSelection.Tally += value.Tally;
             }
         }
@@ -212,6 +220,7 @@ public static class DecryptWithSharesExtensions
     public static PlaintextTallySelection Decrypt(
         this CiphertextTallySelection self,
         List<Tuple<ElectionPublicKey, SelectionShare>> guardianShares,
+        ElementModP publicKey,
         ElementModQ extendedBaseHash,
         bool skipValidation = false)
     {
@@ -221,7 +230,7 @@ public static class DecryptWithSharesExtensions
             .ComputeLagrangeCoefficients();
         var decryption = self.AccumulateShares(
             guardianShares, lagrangeCoefficients, extendedBaseHash, skipValidation);
-        return self.Decrypt(decryption);
+        return self.Decrypt(decryption, publicKey);
     }
 
     /// <summary>
@@ -231,12 +240,13 @@ public static class DecryptWithSharesExtensions
         this ICiphertextSelection self,
         List<Tuple<ElectionPublicKey, SelectionShare>> guardianShares,
         Dictionary<string, LagrangeCoefficient> lagrangeCoefficients,
+        ElementModP publicKey,
         ElementModQ extendedBaseHash, bool skipValidation = false)
     {
         // accumulate all of the shares calculated for the selection
         var decryption = self.AccumulateShares(
             guardianShares, lagrangeCoefficients, extendedBaseHash, skipValidation);
-        return self.Decrypt(decryption);
+        return self.Decrypt(decryption, publicKey);
     }
 
     /// <summary>
@@ -244,10 +254,10 @@ public static class DecryptWithSharesExtensions
     /// </summary>
     public static PlaintextTallySelection Decrypt(
         this ICiphertextSelection self,
-        AccumulatedSelection decryption)
+        AccumulatedSelection decryption, ElementModP publicKey)
     {
         // Calculate 𝑀=𝐵⁄(∏𝑀𝑖) mod 𝑝.
-        var tally = self.Ciphertext.Decrypt(decryption.Value);
+        var tally = self.Ciphertext.Decrypt(decryption.Value, publicKey);
         if (!tally.HasValue)
         {
             throw new Exception("Failed to decrypt selection");

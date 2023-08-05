@@ -40,6 +40,7 @@ namespace electionguard
         static std::string getMessage();
         static uint64_t getCode();
         static void setData(const std::string &function, uint64_t code, const std::exception &e);
+        static void setData(const std::string &function, uint64_t code, const std::string &message);
 
       private:
         AsyncSemaphore task_lock;

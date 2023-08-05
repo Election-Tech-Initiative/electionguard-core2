@@ -117,6 +117,12 @@ public partial class BallotUploadViewModel : BaseViewModel
 
         // save the ballot upload
         var ballots = Directory.GetFiles(BallotFolder);
+        if (ballots.Length == 0)
+        {
+            _logger.LogWarning($"0 ballots in {nameof(BallotFolder)}: {BallotFolder}");
+            return;
+        }
+
         BallotUpload upload = new()
         {
             ElectionId = ElectionId,
@@ -148,7 +154,6 @@ public partial class BallotUploadViewModel : BaseViewModel
             _internalManifest!);
 
         UploadText = $"{AppResources.Uploading} {ballots.Length} {AppResources.Success2Text}";
-
 
         await Parallel.ForEachAsync(ballots, async (currentBallot, cancellationToken) =>
         {
@@ -237,14 +242,17 @@ public partial class BallotUploadViewModel : BaseViewModel
             ResultsText = $"{AppResources.SuccessText} {totalCount} {AppResources.Success2Text}";
             ShowPanel = BallotUploadPanel.Results;
 
-            var record = new CiphertextTallyRecord()
+            if ( totalChallenged + totalImported > 0 )
             {
-                ElectionId = ElectionId,
-                UploadId = upload.UploadId!,
-                IsExportable = false,
-                CiphertextTallyData = ciphertextTally.ToJson()
-            };
-            _ = await _ciphertextTallyService.SaveAsync(record);
+                var record = new CiphertextTallyRecord()
+                {
+                    ElectionId = ElectionId,
+                    UploadId = upload.UploadId!,
+                    IsExportable = false,
+                    CiphertextTallyData = ciphertextTally.ToJson()
+                };
+                _ = await _ciphertextTallyService.SaveAsync(record);
+            }
         }
         catch (Exception)
         {
@@ -260,13 +268,7 @@ public partial class BallotUploadViewModel : BaseViewModel
     private async Task PickDeviceFile()
     {
         FileErrorMessage = string.Empty;
-        var customFileType = new FilePickerFileType(
-                new Dictionary<DevicePlatform, IEnumerable<string>>
-                {
-                    { DevicePlatform.WinUI, new[] { ".json" } }, // file extension
-                    { DevicePlatform.macOS, new[] { "json" } }, // UTType values
-                });
-        var options = new PickOptions() { FileTypes = customFileType, PickerTitle = AppResources.SelectManifest };
+        var options = new PickOptions() { PickerTitle = AppResources.SelectManifest };
 
         var file = await FilePicker.PickAsync(options);
         if (file == null)
@@ -405,6 +407,7 @@ public partial class BallotUploadViewModel : BaseViewModel
                         }
                         catch (Exception)
                         {
+                            _logger.LogInformation($"file {device} is not an EncryptionDevice");
                         }
                     }
 

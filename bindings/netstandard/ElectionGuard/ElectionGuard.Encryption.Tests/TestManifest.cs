@@ -24,7 +24,7 @@ namespace ElectionGuard.Encryption.Tests
                 contestId,
                 electoralDistrictId,
                 sequenceOrder,
-                VoteVariationType.NOfM,
+                VoteVariationType.n_of_m,
                 numberElected,
                 contestName,
                 selections);
@@ -122,7 +122,7 @@ namespace ElectionGuard.Encryption.Tests
             var contests = new List<ContestDescription>();
             var ballotStyles = new List<BallotStyle>();
 
-            gpUnits.Add(new GeopoliticalUnit("mydistrict", "first unit", ReportingUnitType.City));
+            gpUnits.Add(new GeopoliticalUnit("mydistrict", "first unit", ReportingUnitType.city));
             candidates.Add(new Candidate("mycandidate", false));
             var selections = new List<SelectionDescription>
             {
@@ -130,7 +130,7 @@ namespace ElectionGuard.Encryption.Tests
             };
             contests.Add(new ContestDescription(
                 "firstcontest", "mydistrict",
-                1, VoteVariationType.NOfM, 1,
+                1, VoteVariationType.n_of_m, 1,
                 "mrmayor", selections.ToArray()));
             string[] gps = { "mydistrict" };
             ballotStyles.Add(new BallotStyle("style1", gps));
@@ -140,7 +140,7 @@ namespace ElectionGuard.Encryption.Tests
             var result = new Manifest(
                 "test-manifest",
                 "1.0",
-                ElectionType.General,
+                ElectionType.general,
                 DateTime.Now.AddDays(1),
                 DateTime.Now.AddDays(1).AddDays(1),
                 gpUnits.ToArray(),
@@ -178,7 +178,7 @@ namespace ElectionGuard.Encryption.Tests
             var result = new Manifest(
                 "test-manifest",
                 "1.0",
-                ElectionType.General,
+                ElectionType.general,
                 DateTime.Now,
                 DateTime.Now,
                 new GeopoliticalUnit[] { },

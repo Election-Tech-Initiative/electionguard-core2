@@ -3,6 +3,7 @@
 #define __ELECTIONGUARD_CPP_BALLOT_H_INCLUDED__
 
 #include "chaum_pedersen.h"
+#include "election.h"
 #include "elgamal.h"
 #include "export.h"
 #include "group.h"
@@ -233,6 +234,18 @@ EG_API eg_electionguard_status_t eg_ciphertext_ballot_contest_crypto_hash_with(
 // TODO: eg_ciphertext_ballot_contest_make
 
 /**
+ * @brief A static helper method to derive the nonceSeed used to encrypt the contest
+ * @param[in] in_context A pointer to the `eg_element_mod_q_t` opaque instance
+ * @param[out] out_contest_nonce A pointer to the output Nonce.  The value is a reference and is not owned by the caller.
+ * @return eg_electionguard_status_t indicating success or failure
+ * @retval ELECTIONGUARD_STATUS_SUCCESS The function was successfully executed
+ * @retval ELECTIONGUARD_STATUS_ERROR_BAD_ALLOC The function was unable to allocate memory
+ */
+EG_API eg_electionguard_status_t eg_ciphertext_ballot_contest_contest_nonce(
+  eg_ciphertext_election_context_t *in_context, uint64_t in_sequence_order,
+  eg_element_mod_q_t *nonce_seed, eg_element_mod_q_t **out_contest_nonce);
+
+/**
  * An aggregate nonce for the contest composed of the nonces of the selections.
  * Used when constructing the proof of selection limit.
  * 
@@ -260,7 +273,7 @@ EG_API eg_electionguard_status_t eg_ciphertext_ballot_contest_elgamal_accumulate
  * Calling this function expects that the object is in a well-formed encrypted state
  * with the `ballot_selections` populated with valid encrypted ballot selections,
  * the ElementModQ `description_hash`, the ElementModQ `crypto_hash`,
- * and the ConstantChaumPedersenProof all populated.
+ * and the RangedChaumPedersenProof all populated.
  * Specifically, the seed hash in this context is the hash of the ContestDescription,
  * or whatever `ElementModQ` was used to populate the `description_hash` field.
  */

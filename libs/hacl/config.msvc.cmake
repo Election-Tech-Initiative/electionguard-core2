@@ -10,7 +10,6 @@ set(SOURCES_std
 	${PROJECT_SOURCE_DIR}/src/msvc/Hacl_Hash_Blake2.c
 	${PROJECT_SOURCE_DIR}/src/msvc/Lib_Memzero0.c
 	${PROJECT_SOURCE_DIR}/src/msvc/Hacl_Ed25519.c
-	${PROJECT_SOURCE_DIR}/src/msvc/Hacl_Streaming_SHA2.c
 	${PROJECT_SOURCE_DIR}/src/msvc/Hacl_EC_Ed25519.c
 	${PROJECT_SOURCE_DIR}/src/msvc/Hacl_Hash_Base.c
 	${PROJECT_SOURCE_DIR}/src/msvc/Hacl_Streaming_Blake2.c
@@ -128,15 +127,12 @@ set(INCLUDES
 	${PROJECT_SOURCE_DIR}/include/msvc/Hacl_Hash_Blake2.h
 	${PROJECT_SOURCE_DIR}/include/msvc/Lib_Memzero0.h
 	${PROJECT_SOURCE_DIR}/include/msvc/internal/Hacl_Ed25519.h
-	${PROJECT_SOURCE_DIR}/include/msvc/internal/Hacl_Streaming_SHA2.h
 	${PROJECT_SOURCE_DIR}/include/msvc/internal/Hacl_SHA2_Generic.h
-	${PROJECT_SOURCE_DIR}/include/Hacl_Streaming_SHA2.h
 	${PROJECT_SOURCE_DIR}/include/msvc/internal/Hacl_Ed25519_PrecompTable.h
 	${PROJECT_SOURCE_DIR}/include/msvc/internal/Hacl_Curve25519_51.h
 	${PROJECT_SOURCE_DIR}/include/msvc/internal/Hacl_Bignum25519_51.h
 	${PROJECT_SOURCE_DIR}/include/msvc/Hacl_Curve25519_51.h
 	${PROJECT_SOURCE_DIR}/include/msvc/Hacl_Ed25519.h
-	${PROJECT_SOURCE_DIR}/include/msvc/Hacl_Streaming_SHA2.h
 	${PROJECT_SOURCE_DIR}/include/msvc/Hacl_EC_Ed25519.h
 	${PROJECT_SOURCE_DIR}/include/msvc/Hacl_Hash_Base.h
 	${PROJECT_SOURCE_DIR}/include/msvc/internal/Hacl_Hash_Blake2.h
@@ -271,10 +267,8 @@ set(PUBLIC_INCLUDES
 	${PROJECT_SOURCE_DIR}/include/msvc/Hacl_Hash_SHA1.h
 	${PROJECT_SOURCE_DIR}/include/msvc/Hacl_Hash_Blake2.h
 	${PROJECT_SOURCE_DIR}/include/msvc/Lib_Memzero0.h
-	${PROJECT_SOURCE_DIR}/include/msvc/Hacl_Streaming_SHA2.h
 	${PROJECT_SOURCE_DIR}/include/msvc/Hacl_Curve25519_51.h
 	${PROJECT_SOURCE_DIR}/include/msvc/Hacl_Ed25519.h
-	${PROJECT_SOURCE_DIR}/include/msvc/Hacl_Streaming_SHA2.h
 	${PROJECT_SOURCE_DIR}/include/msvc/Hacl_EC_Ed25519.h
 	${PROJECT_SOURCE_DIR}/include/msvc/Hacl_Hash_Base.h
 	${PROJECT_SOURCE_DIR}/include/msvc/Hacl_Hash_Blake2.h
@@ -555,3 +549,4 @@ set(TEST_FILES_evercrypt
 set(TEST_FILES_aead
 	aead.cc
 )
+

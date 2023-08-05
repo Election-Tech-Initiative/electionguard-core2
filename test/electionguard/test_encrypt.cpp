@@ -8,6 +8,7 @@
 #include <electionguard/ballot.hpp>
 #include <electionguard/election.hpp>
 #include <electionguard/encrypt.hpp>
+#include <electionguard/hash.hpp>
 #include <electionguard/manifest.hpp>
 
 using namespace electionguard;
@@ -24,17 +25,19 @@ TEST_CASE("Encrypt simple selection succeeds")
     auto metadata = make_unique<SelectionDescription>(selectionId, candidateId, 1UL);
     auto hashContext = metadata->crypto_hash();
     auto plaintext = BallotGenerator::selectionFrom(*metadata);
+    auto context = CiphertextElectionContext::make(3, 2, keypair->getPublicKey()->clone(),
+                                                   ONE_MOD_Q().clone(), ONE_MOD_Q().clone());
 
     // Act
-    auto result = encryptSelection(*plaintext, *metadata, *keypair->getPublicKey(), ONE_MOD_Q(),
-                                   *nonce, false, true);
+    auto result = encryptSelection(*plaintext, *metadata, *context, *nonce, false, true);
 
     // Assert
     CHECK(result != nullptr);
     CHECK(result->getCiphertext() != nullptr);
-    CHECK(result->isValidEncryption(*hashContext, *keypair->getPublicKey(), ONE_MOD_Q()) == true);
+    CHECK(result->isValidEncryption(*hashContext, *keypair->getPublicKey(),
+                                    *context->getCryptoExtendedBaseHash()) == true);
     CHECK(result->getProof()->isValid(*result->getCiphertext(), *keypair->getPublicKey(),
-                                      ONE_MOD_Q()) == true);
+                                      *context->getCryptoExtendedBaseHash()) == true);
 }
 
 TEST_CASE("Encrypt simple selection using precomputed values succeeds")
@@ -47,6 +50,8 @@ TEST_CASE("Encrypt simple selection using precomputed values succeeds")
     auto metadata = make_unique<SelectionDescription>(selectionId, candidateId, 1UL);
     auto hashContext = metadata->crypto_hash();
     auto plaintext = BallotGenerator::selectionFrom(*metadata);
+    auto context = CiphertextElectionContext::make(3, 2, keypair->getPublicKey()->clone(),
+                                                   ONE_MOD_Q().clone(), ONE_MOD_Q().clone());
 
     // cause a two triples and a quad to be populated
     PrecomputeBufferContext::initialize(*keypair->getPublicKey(), 1);
@@ -60,15 +65,15 @@ TEST_CASE("Encrypt simple selection using precomputed values succeeds")
     CHECK(1 == current_precomputed_queue_size);
 
     // and this ecryptSelection will use the precomputed values
-    auto result = encryptSelection(*plaintext, *metadata, *keypair->getPublicKey(), ONE_MOD_Q(),
-                                   *nonce, false, true);
+    auto result = encryptSelection(*plaintext, *metadata, *context, *nonce, false, true);
 
     // Assert
     CHECK(result != nullptr);
     CHECK(result->getCiphertext() != nullptr);
-    CHECK(result->isValidEncryption(*hashContext, *keypair->getPublicKey(), ONE_MOD_Q()) == true);
+    CHECK(result->isValidEncryption(*hashContext, *keypair->getPublicKey(),
+                                    *context->getCryptoExtendedBaseHash()) == true);
     CHECK(result->getProof()->isValid(*result->getCiphertext(), *keypair->getPublicKey(),
-                                      ONE_MOD_Q()) == true);
+                                      *context->getCryptoExtendedBaseHash()) == true);
     // need to empty the queues because future tests don't use the same keys
     PrecomputeBufferContext::clear();
 }
@@ -83,10 +88,11 @@ TEST_CASE("Encrypt simple selection malformed data fails")
     auto metadata = make_unique<SelectionDescription>(selectionId, candidateId, 1UL);
     auto hashContext = metadata->crypto_hash();
     auto plaintext = BallotGenerator::selectionFrom(*metadata);
+    auto context = CiphertextElectionContext::make(3, 2, keypair->getPublicKey()->clone(),
+                                                   ONE_MOD_Q().clone(), ONE_MOD_Q().clone());
 
     // Act
-    auto result = encryptSelection(*plaintext, *metadata, *keypair->getPublicKey(), ONE_MOD_Q(),
-                                   *nonce, false, true);
+    auto result = encryptSelection(*plaintext, *metadata, *context, *nonce, false, true);
 
     // tamper with the description_hash
     auto malformedDescriptionHash = make_unique<CiphertextBallotSelection>(
@@ -101,16 +107,19 @@ TEST_CASE("Encrypt simple selection malformed data fails")
       result->getCryptoHash()->clone(), nullptr);
 
     // Assert
-    CHECK(result->isValidEncryption(*hashContext, *keypair->getPublicKey(), ONE_MOD_Q()) == true);
+    CHECK(result->isValidEncryption(*hashContext, *keypair->getPublicKey(),
+                                    *context->getCryptoExtendedBaseHash()) == true);
     CHECK(malformedDescriptionHash->isValidEncryption(*hashContext, *keypair->getPublicKey(),
-                                                      ONE_MOD_Q()) == false);
-    CHECK(missingProof->isValidEncryption(*hashContext, *keypair->getPublicKey(), ONE_MOD_Q()) ==
+                                                      *context->getCryptoExtendedBaseHash()) ==
           false);
+    CHECK(missingProof->isValidEncryption(*hashContext, *keypair->getPublicKey(),
+                                          *context->getCryptoExtendedBaseHash()) == false);
 }
 
 TEST_CASE("Encrypt PlaintextBallot with EncryptionMediator against constructed "
           "InternalManifest succeeds")
 {
+    // Arrange
     auto secret = ElementModQ::fromHex(a_fixed_secret);
     auto keypair = ElGamalKeyPair::fromSecret(*secret);
     auto init = pow_mod_p(*keypair->getPublicKey(), *ElementModQ::fromUint64(1));
@@ -121,9 +130,9 @@ TEST_CASE("Encrypt PlaintextBallot with EncryptionMediator against constructed "
 
     auto mediator = make_unique<EncryptionMediator>(*internal, *context, *device);
 
-    // Act
+    // // Act
     auto plaintext = BallotGenerator::getFakeBallot(*internal);
-    // Log::debug(plaintext->toJson());
+    Log::trace(plaintext->toJson());
     auto ciphertext = mediator->encrypt(*plaintext);
 
     // Assert
@@ -134,6 +143,7 @@ TEST_CASE("Encrypt PlaintextBallot with EncryptionMediator against constructed "
 
 TEST_CASE("Encrypt PlaintextBallot undervote succeeds")
 {
+    // Arrange
     auto secret = ElementModQ::fromHex(a_fixed_secret);
     auto keypair = ElGamalKeyPair::fromSecret(*secret);
     auto manifest = ManifestGenerator::getJeffersonCountyManifest_Minimal();
@@ -145,7 +155,7 @@ TEST_CASE("Encrypt PlaintextBallot undervote succeeds")
 
     // Act
     auto plaintext = BallotGenerator::getFakeBallot(*internal, 0UL);
-    // Log::debug(plaintext->toJson());
+    Log::trace(plaintext->toJson());
     auto ciphertext = mediator->encrypt(*plaintext);
 
     // Assert
@@ -194,8 +204,9 @@ TEST_CASE("Encrypt PlaintextBallot overvote")
     unique_ptr<HashedElGamalCiphertext> newHEG =
       make_unique<HashedElGamalCiphertext>(move(new_pad), heg->getData(), heg->getMac());
 
-    vector<uint8_t> new_plaintext =
-      newHEG->decrypt(secret, *context->getCryptoExtendedBaseHash(), true);
+    vector<uint8_t> new_plaintext = newHEG->decrypt(*keypair->getPublicKey(), secret,
+                                                    HashPrefix::get_prefix_contest_data_secret(),
+                                                    *context->getCryptoExtendedBaseHash(), true);
     string new_plaintext_string((char *)&new_plaintext.front(), new_plaintext.size());
 
     CHECK(new_plaintext_string ==
@@ -205,6 +216,7 @@ TEST_CASE("Encrypt PlaintextBallot overvote")
 
 TEST_CASE("Encrypt simple PlaintextBallot with EncryptionMediator succeeds")
 {
+    // Arrange
     auto secret = ElementModQ::fromHex(a_fixed_secret);
     auto keypair = ElGamalKeyPair::fromSecret(*secret);
     auto manifest = ManifestGenerator::getJeffersonCountyManifest_Minimal();
@@ -287,8 +299,9 @@ TEST_CASE("Encrypt full PlaintextBallot with WriteIn and Overvote with Encryptio
     unique_ptr<HashedElGamalCiphertext> newHEG =
       make_unique<HashedElGamalCiphertext>(move(new_pad), heg->getData(), heg->getMac());
 
-    vector<uint8_t> new_plaintext =
-      newHEG->decrypt(secret, *context->getCryptoExtendedBaseHash(), true);
+    vector<uint8_t> new_plaintext = newHEG->decrypt(*keypair->getPublicKey(), secret,
+                                                    HashPrefix::get_prefix_contest_data_secret(),
+                                                    *context->getCryptoExtendedBaseHash(), true);
     string new_plaintext_string((char *)&new_plaintext.front(), new_plaintext.size());
     Log::debug(new_plaintext_string);
 
@@ -407,7 +420,6 @@ TEST_CASE(
     // fill the precompute table
     PrecomputeBufferContext::initialize(*keypair->getPublicKey(), 100);
     PrecomputeBufferContext::start();
-    PrecomputeBufferContext::stop();
 
     // Act
     auto ciphertext = encryptBallot(*ballot, *internal, *context, codeSeed, nullptr, 0,
@@ -1458,6 +1470,8 @@ TEST_CASE("Create EncryptionMediator with different manifest hash")
 
 TEST_CASE("Verify placeholder flag")
 {
+    // placeholders are no longer used in E.G. 2.0
+
     // Arrange
     auto secret = ElementModQ::fromHex(a_fixed_secret);
     auto keypair = ElGamalKeyPair::fromSecret(*secret);
@@ -1476,5 +1490,5 @@ TEST_CASE("Verify placeholder flag")
       ciphertext->getContests().front().get().getSelections().front().get().getIsPlaceholder() ==
       false);
     CHECK(ciphertext->getContests().front().get().getSelections().back().get().getIsPlaceholder() ==
-          true);
+          false);
 }

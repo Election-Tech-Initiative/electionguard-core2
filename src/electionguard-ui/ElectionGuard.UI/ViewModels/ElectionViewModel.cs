@@ -71,7 +71,6 @@ public partial class ElectionViewModel : BaseViewModel
     private long _ballotAddedTotal = 0;
 
     [ObservableProperty]
-    [NotifyCanExecuteChangedFor(nameof(CreateTallyCommand))]
     [NotifyCanExecuteChangedFor(nameof(ReviewChallengedCommand))]
     private long _ballotSpoiledTotal = 0;
 
@@ -212,7 +211,7 @@ public partial class ElectionViewModel : BaseViewModel
 
     private bool CanCreateTally()
     {
-        return BallotCountTotal > 0 || BallotSpoiledTotal > 0;
+        return BallotCountTotal > 0 || BallotChallengedTotal > 0;
     }
 
     [RelayCommand(CanExecute = nameof(CanUpload))]
@@ -265,6 +264,7 @@ public partial class ElectionViewModel : BaseViewModel
         var egDrives = from drive in DriveInfo.GetDrives()
                        where drive != null
                        where drive.DriveType == DriveType.Removable
+                       where drive.IsReady
                        where drive.VolumeLabel.ToLower() == egDriveLabel
                        select drive;
 

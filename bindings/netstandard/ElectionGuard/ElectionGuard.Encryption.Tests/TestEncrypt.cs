@@ -1,5 +1,6 @@
 using System;
 using System.Linq;
+using System.Threading.Tasks;
 using ElectionGuard.Ballot;
 using ElectionGuard.Encryption.Utils.Generators;
 using NUnit.Framework;
@@ -69,6 +70,42 @@ namespace ElectionGuard.Encryption.Tests
         }
 
         [Test]
+        public async Task Test_Encrypt_Ballot_Simple_With_Precompute_Succeeds()
+        {
+            // Arrange
+            var data = ElectionGenerator.GenerateFakeElectionData();
+            var mediator = new EncryptionMediator(
+                data.InternalManifest, data.Context, data.Device);
+            var precompute = new Precompute();
+
+            var ballot = BallotGenerator.GetFakeBallot(data.InternalManifest);
+
+            // Act
+            precompute.StartPrecomputeAsync(data.Context.ElGamalPublicKey);
+            await Task.Delay(2000);
+
+            // encrypt a ballot using the default method (currently precompute = true)
+            var ciphertext = mediator.Encrypt(ballot);
+
+            var timestamp = ciphertext.Timestamp;
+            var nonce = ciphertext.Nonce;
+
+            // then try to recompute the ballot similar to the deterministic test below
+            var reencryption = Encrypt.Ballot(
+                ballot, data.InternalManifest,
+                data.Context, ciphertext.BallotCodeSeed,
+                nonce, timestamp,
+                shouldVerifyProofs: false,
+                usePrecomputedValues: false);
+
+            // Assert
+            // but we expect that the ballot codes will not match 
+            // because when using precomputed values
+            // the nonces are not deterministically generated
+            Assert.That(reencryption.BallotCode != ciphertext.BallotCode);
+        }
+
+        [Test]
         public void Test_Encrypt_Ballot_Simple_Reencrypt_Creates_Same_Ballot()
         {
             // Arrange
@@ -79,12 +116,20 @@ namespace ElectionGuard.Encryption.Tests
             var codeSeed = Constants.TWO_MOD_Q;
 
             // Act
-            var ciphertext = Encrypt.Ballot(ballot, data.InternalManifest, data.Context, codeSeed);
+            var ciphertext = Encrypt.Ballot(
+                ballot, data.InternalManifest,
+                data.Context, codeSeed,
+                shouldVerifyProofs: false,
+                usePrecomputedValues: false);
             var timestamp = ciphertext.Timestamp;
             var nonce = ciphertext.Nonce;
 
             var reencryption = Encrypt.Ballot(
-                ballot, data.InternalManifest, data.Context, codeSeed, nonce, timestamp);
+                ballot, data.InternalManifest,
+                data.Context, ciphertext.BallotCodeSeed,
+                nonce, timestamp,
+                shouldVerifyProofs: false,
+                usePrecomputedValues: false);
 
             // Assert
             Assert.That(reencryption.BallotCode == ciphertext.BallotCode);
@@ -252,7 +297,8 @@ namespace ElectionGuard.Encryption.Tests
                 var ciphertextSelection = cipheretxtContest.Selections.First(
                     i => i.ObjectId == selection.ObjectId);
 
-                var decrypted = ciphertextSelection.Ciphertext.Decrypt(data.KeyPair.SecretKey);
+                var decrypted = ciphertextSelection.Ciphertext.Decrypt(
+                    data.KeyPair.SecretKey, data.Context.ElGamalPublicKey);
 
                 Assert.AreEqual(selection.Vote, decrypted);
             });

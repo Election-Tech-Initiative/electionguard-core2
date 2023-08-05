@@ -13,7 +13,7 @@ public static class DecryptWithSecretsExtensions
     /// </summary>
     public static PlaintextTally Decrypt(
         this CiphertextTally self,
-        ElementModQ secretKey)
+        ElementModQ secretKey, ElementModP publicKey)
     {
         var plaintextTally = new PlaintextTally(
             self.TallyId, self.Name, self.Manifest);
@@ -28,7 +28,7 @@ public static class DecryptWithSecretsExtensions
                 var plaintextSelection = plaintextContest.Selections.First(
                     x => x.Key == selection.Key).Value;
 
-                var value = ciphertext.Decrypt(secretKey);
+                var value = ciphertext.Decrypt(secretKey, publicKey);
                 plaintextSelection.Tally += value ?? 0;
             }
         }
@@ -42,7 +42,7 @@ public static class DecryptWithSecretsExtensions
     public static PlaintextTallyBallot Decrypt(
         this CiphertextBallot self,
         InternalManifest manifest,
-        ElementModQ secretKey)
+        ElementModQ secretKey, ElementModP publicKey)
     {
         var plaintextBallot = new PlaintextTallyBallot(
             self.ObjectId, self.ObjectId, self.StyleId, manifest);
@@ -51,13 +51,14 @@ public static class DecryptWithSecretsExtensions
         {
             var plaintextContest = plaintextBallot.Contests.First(
                 x => x.Key == contest.ObjectId).Value;
-            foreach (var selection in contest.Selections.Where(x => x.IsPlaceholder == false))
+            foreach (var selection in contest.Selections
+                .Where(x => x.IsPlaceholder == false))
             {
                 var ciphertext = selection.Ciphertext;
                 var plaintextSelection = plaintextContest.Selections.First(
                     x => x.Key == selection.ObjectId).Value;
 
-                var value = ciphertext.Decrypt(secretKey);
+                var value = ciphertext.Decrypt(secretKey, publicKey);
                 plaintextSelection.Tally += value ?? 0;
 
             }
@@ -77,33 +78,11 @@ public static class DecryptWithSecretsExtensions
         bool skipValidation = false,
         bool removePlaceholders = true)
     {
-        return self.Decrypt(
-            manifest,
-            context.ElGamalPublicKey,
-            context.CryptoExtendedBaseHash,
-            nonceSeed,
-            skipValidation,
-            removePlaceholders);
-    }
-
-    /// <summary>
-    /// Decrypts a <see cref="CiphertextBallot" /> using the provided <see cref="ElementModQ" /> nonce value.
-    /// This override can be used to decrypt a single ballot.
-    /// </summary>
-    public static PlaintextBallot Decrypt(
-        this CiphertextBallot self,
-        InternalManifest manifest,
-        ElementModP publicKey,
-        ElementModQ extendedBaseHash,
-        ElementModQ? nonceSeed = null,
-        bool skipValidation = false,
-        bool removePlaceholders = true)
-    {
         if (skipValidation == false)
         {
             // check the enctyption validation
             var isValid = self.IsValidEncryption(
-                manifest.ManifestHash, publicKey, extendedBaseHash);
+                manifest.ManifestHash, context.ElGamalPublicKey, context.CryptoExtendedBaseHash);
             if (isValid == false)
             {
                 throw new Exception($"contest {self.ObjectId} is not valid");
@@ -135,7 +114,7 @@ public static class DecryptWithSecretsExtensions
             var description = manifest.Contests.First(
                 x => x.ObjectId == contest.ObjectId);
             var plaintext = contest.Decrypt(
-                description, publicKey, extendedBaseHash, nonceSeed, skipValidation, removePlaceholders);
+                description, context, nonceSeed, skipValidation, removePlaceholders);
 
             // only decrypt the actual selections on the ballot
             if (plaintext.Selections.Any(x => x.IsPlaceholder == false || removePlaceholders == false))
@@ -155,9 +134,8 @@ public static class DecryptWithSecretsExtensions
     public static PlaintextBallotContest Decrypt(
         this CiphertextBallotContest self,
         ContestDescriptionWithPlaceholders description,
-        ElementModP publicKey,
-        ElementModQ extendedBaseHash,
-        ElementModQ? nonceSeed = null,
+        CiphertextElectionContext context,
+        ElementModQ nonceSeed,
         bool skipValidation = false,
         bool removePlaceholders = true)
     {
@@ -165,30 +143,17 @@ public static class DecryptWithSecretsExtensions
         {
             // check the enctyption validation
             var isValid = self.IsValidEncryption(
-                description.DescriptionHash, publicKey, extendedBaseHash);
+                description.DescriptionHash, context.ElGamalPublicKey, context.CryptoExtendedBaseHash);
             if (isValid == false)
             {
                 throw new Exception($"contest {self.ObjectId} is not valid");
             }
         }
 
-        if (nonceSeed is null)
-        {
-            nonceSeed = self.Nonce;
-        }
-        else
-        {
-            // calculate the nonce using the provided seed
-            var sequence = new Nonces(description.DescriptionHash, nonceSeed);
-            nonceSeed = sequence.Get(description.SequenceOrder);
-        }
+        var contestNonce = CiphertextBallotContest.ContestNonce(
+            context, description.SequenceOrder, nonceSeed);
 
-        if (nonceSeed is null)
-        {
-            throw new Exception($"nonce is null");
-        }
-
-        if (self.Nonce is not null && self.Nonce != nonceSeed)
+        if (self.Nonce is not null && self.Nonce != contestNonce)
         {
             throw new Exception($"nonce mismatch");
         }
@@ -200,7 +165,11 @@ public static class DecryptWithSecretsExtensions
             var descriptionSelection = description.Selections.First(
                 x => x.ObjectId == selection.ObjectId);
             var plaintext = selection.Decrypt(
-                descriptionSelection, publicKey, extendedBaseHash, nonceSeed, skipValidation);
+                descriptionSelection,
+                context.ElGamalPublicKey,
+                context.CryptoExtendedBaseHash,
+                contestNonce,
+                skipValidation);
             if (plaintext.IsPlaceholder == false || removePlaceholders == false)
             {
                 plaintextSelections.Add(plaintext);
@@ -234,6 +203,8 @@ public static class DecryptWithSecretsExtensions
             }
         }
 
+        // if no nonce seed is provided then use the nonce from the ballot
+        // which is common in some cases, such as when using precomputed values
         ElementModQ? nonce = null;
         if (nonceSeed is null)
         {
@@ -242,8 +213,7 @@ public static class DecryptWithSecretsExtensions
         else
         {
             // calculate the nonce using the provided seed
-            var sequence = new Nonces(description.DescriptionHash, nonceSeed);
-            nonce = sequence.Get(description.SequenceOrder);
+            nonce = Hash.HashElems(nonceSeed, description.SequenceOrder);
         }
 
         if (nonce is null)
