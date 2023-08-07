@@ -113,9 +113,7 @@
                         Text="{helper:Translate AddBallots}" />
                 </HorizontalStackLayout>
             </Grid>
-            <ScrollView>
-                <controls:UploadsControl BindingContext="{Binding .}" />
-            </ScrollView>
+            <controls:UploadsControl BindingContext="{Binding .}" />
         </VerticalStackLayout>
 
         <VerticalStackLayout
