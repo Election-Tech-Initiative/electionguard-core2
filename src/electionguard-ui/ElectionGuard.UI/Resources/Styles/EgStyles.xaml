@@ -133,7 +133,7 @@
         <Setter Property="Margin" Value="0,0,0,30" />
     </Style>
 
-    <Style x:Key="PopupView" TargetType="Grid">
+    <Style x:Key="PopupView" TargetType="VerticalStackLayout">
         <Setter Property="Padding" Value="20" />
     </Style>
 
