@@ -22,62 +22,59 @@
                     Grid.Row="0"
                     Style="{StaticResource H1}"
                     Text="{helper:Translate ElectionsText}" />
-                <ScrollView Grid.Row="1">
-                    <CollectionView
-                        ItemsSource="{Binding KeyCeremonies}"
-                        SelectedItem="{Binding CurrentKeyCeremony}"
-                        SelectionMode="Single">
-                        <CollectionView.EmptyView>
-                            <controls:NoContentView Text="{helper:Translate NoKeyCeremonies}" />
-                        </CollectionView.EmptyView>
-                        <CollectionView.ItemTemplate>
-                            <DataTemplate x:DataType="model:KeyCeremonyRecord">
-                                <Frame Style="{StaticResource ButtonishFrame}">
-                                    <Label Style="{StaticResource ButtonishLabel}" Text="{Binding Name}" />
-                                </Frame>
-                            </DataTemplate>
-                        </CollectionView.ItemTemplate>
-                    </CollectionView>
-                </ScrollView>
+                <CollectionView
+                    Grid.Row="1"
+                    ItemsSource="{Binding KeyCeremonies}"
+                    SelectedItem="{Binding CurrentKeyCeremony}"
+                    SelectionMode="Single">
+                    <CollectionView.EmptyView>
+                        <controls:NoContentView Text="{helper:Translate NoKeyCeremonies}" />
+                    </CollectionView.EmptyView>
+                    <CollectionView.ItemTemplate>
+                        <DataTemplate x:DataType="model:KeyCeremonyRecord">
+                            <Frame Style="{StaticResource ButtonishFrame}">
+                                <Label Style="{StaticResource ButtonishLabel}" Text="{Binding Name}" />
+                            </Frame>
+                        </DataTemplate>
+                    </CollectionView.ItemTemplate>
+                </CollectionView>
             </Grid>
             <Grid Grid.Column="1" RowDefinitions="auto, *">
                 <Label
                     Grid.Row="0"
                     Style="{StaticResource H1}"
                     Text="{helper:Translate TalliesText}" />
-                <ScrollView Grid.Row="1">
-                    <Grid RowDefinitions="auto, *">
-                        <CollectionView
-                            Grid.Row="0"
-                            ItemsSource="{Binding MultiTallies}"
-                            SelectedItem="{Binding CurrentMultiTally}"
-                            SelectionMode="Single">
-                            <CollectionView.ItemTemplate>
-                                <DataTemplate x:DataType="model:MultiTallyRecord">
-                                    <Frame Style="{StaticResource MultiTallyFrame}">
-                                        <Label Style="{StaticResource ButtonishLabel}" Text="{Binding Name, StringFormat='[{0}]'}" />
-                                    </Frame>
-                                </DataTemplate>
-                            </CollectionView.ItemTemplate>
-                        </CollectionView>
-                        <CollectionView
-                            Grid.Row="1"
-                            ItemsSource="{Binding Tallies}"
-                            SelectedItem="{Binding CurrentTally}"
-                            SelectionMode="Single">
-                            <CollectionView.EmptyView>
-                                <controls:NoContentView Text="{helper:Translate NoTallies}" />
-                            </CollectionView.EmptyView>
-                            <CollectionView.ItemTemplate>
-                                <DataTemplate x:DataType="model:TallyRecord">
-                                    <Frame Style="{StaticResource ButtonishFrame}" BackgroundColor="{Binding MultiTally, Converter={StaticResource MultiBackgroundColorConverter}}">
-                                        <Label Style="{StaticResource ButtonishLabel}" Text="{Binding Name}" />
-                                    </Frame>
-                                </DataTemplate>
-                            </CollectionView.ItemTemplate>
-                        </CollectionView>
-                    </Grid>
-                </ScrollView>
+                <Grid Grid.Row="1" RowDefinitions="auto, *">
+                    <CollectionView
+                        Grid.Row="0"
+                        ItemsSource="{Binding MultiTallies}"
+                        SelectedItem="{Binding CurrentMultiTally}"
+                        SelectionMode="Single">
+                        <CollectionView.ItemTemplate>
+                            <DataTemplate x:DataType="model:MultiTallyRecord">
+                                <Frame Style="{StaticResource MultiTallyFrame}">
+                                    <Label Style="{StaticResource ButtonishLabel}" Text="{Binding Name, StringFormat='[{0}]'}" />
+                                </Frame>
+                            </DataTemplate>
+                        </CollectionView.ItemTemplate>
+                    </CollectionView>
+                    <CollectionView
+                        Grid.Row="1"
+                        ItemsSource="{Binding Tallies}"
+                        SelectedItem="{Binding CurrentTally}"
+                        SelectionMode="Single">
+                        <CollectionView.EmptyView>
+                            <controls:NoContentView Text="{helper:Translate NoTallies}" />
+                        </CollectionView.EmptyView>
+                        <CollectionView.ItemTemplate>
+                            <DataTemplate x:DataType="model:TallyRecord">
+                                <Frame BackgroundColor="{Binding MultiTally, Converter={StaticResource MultiBackgroundColorConverter}}" Style="{StaticResource ButtonishFrame}">
+                                    <Label Style="{StaticResource ButtonishLabel}" Text="{Binding Name}" />
+                                </Frame>
+                            </DataTemplate>
+                        </CollectionView.ItemTemplate>
+                    </CollectionView>
+                </Grid>
             </Grid>
         </Grid>
     </VerticalStackLayout>
