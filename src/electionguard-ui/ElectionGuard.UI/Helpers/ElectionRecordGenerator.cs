@@ -52,6 +52,11 @@ public static class ElectionRecordGenerator
 
         // create the zip from the folder
         var zipFile = Path.Combine(outputFolder, tally.Name!.Replace(" ", "_") + ".zip");
+        if (File.Exists(zipFile))
+        {
+            File.Delete(zipFile); // TODO: consent for delete
+        }
+
         ZipFile.CreateFromDirectory(tempFolder.FullName, zipFile);
 
         // delete the temp folder1
@@ -115,8 +120,7 @@ public static class ElectionRecordGenerator
 
         await cursor.ForEachAsync(async document =>
         {
-            var ballot = await ballotService.GetByOjectIdAsync(document.BallotCode);
-            var ballotCode = ballot?.BallotCode;
+            var ballotCode = document.BallotCode;
             var fileName = $"{ballotCode}.json";
             var filePath = Path.Combine(ballotFolder, fileName);
 

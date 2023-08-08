@@ -9,6 +9,9 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 	EndProjectSection
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ElectionGuard.CLI", "ElectionGuard.CLI.csproj", "{0771316F-7C71-4795-90DF-705EC63442ED}"
+	ProjectSection(ProjectDependencies) = postProject
+		{DC80E980-829A-4AFF-BB29-AAA594A4118B} = {DC80E980-829A-4AFF-BB29-AAA594A4118B}
+	EndProjectSection
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ElectionGuard.Encryption.Utils", "..\..\bindings\netstandard\ElectionGuard\ElectionGuard.Encryption.Utils\ElectionGuard.Encryption.Utils.csproj", "{9CF2608E-9B97-4E21-B5B7-C59E2435B110}"
 EndProject

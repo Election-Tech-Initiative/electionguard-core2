@@ -160,9 +160,9 @@ EG_API eg_electionguard_status_t eg_encryption_mediator_encrypt_ballot_verify_pr
 */
 EG_API eg_electionguard_status_t eg_encrypt_selection(
   eg_plaintext_ballot_selection_t *in_plaintext, eg_selection_description_t *in_description,
-  eg_element_mod_p_t *in_public_key, eg_element_mod_q_t *in_crypto_extended_base_hash,
-  eg_element_mod_q_t *in_nonce_seed, bool in_is_placeholder, bool in_should_verify_proofs,
-  bool in_use_precomputed_values, eg_ciphertext_ballot_selection_t **out_handle);
+  eg_ciphertext_election_context_t *in_context, eg_element_mod_q_t *in_nonce_seed,
+  bool in_is_placeholder, bool in_should_verify_proofs, bool in_use_precomputed_values,
+  eg_ciphertext_ballot_selection_t **out_handle);
 
 /**
 * Encrypt a specific `BallotContest` in the context of a specific `Ballot`.
@@ -183,12 +183,12 @@ EG_API eg_electionguard_status_t eg_encrypt_selection(
 * @param[in] in_use_precomputed_values: specify if the ballot generation should use precomputed values
 * @param[out] out_handle a handle to an `eg_ciphertext_ballot_contest_t`. Caller is responsible for lifecycle.
 */
-EG_API eg_electionguard_status_t eg_encrypt_contest(
-  eg_plaintext_ballot_contest_t *in_plaintext,
-  eg_contest_description_with_placeholders_t *in_description, eg_element_mod_p_t *in_public_key,
-  eg_element_mod_q_t *in_crypto_extended_base_hash, eg_element_mod_q_t *in_nonce_seed,
-  bool in_should_verify_proofs, bool in_use_precomputed_values,
-  eg_ciphertext_ballot_contest_t **out_handle);
+EG_API eg_electionguard_status_t
+eg_encrypt_contest(eg_plaintext_ballot_contest_t *in_plaintext,
+                   eg_contest_description_with_placeholders_t *in_description,
+                   eg_ciphertext_election_context_t *in_context, eg_element_mod_q_t *in_nonce_seed,
+                   bool in_should_verify_proofs, bool in_use_precomputed_values,
+                   eg_ciphertext_ballot_contest_t **out_handle);
 
 /**
 * Encrypt a specific `Ballot` in the context of a specific `CiphertextElectionContext`.

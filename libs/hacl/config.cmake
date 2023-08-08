@@ -9,7 +9,6 @@ set(SOURCES_std
 	${PROJECT_SOURCE_DIR}/src/Hacl_Hash_Blake2.c
 	${PROJECT_SOURCE_DIR}/src/Lib_Memzero0.c
 	${PROJECT_SOURCE_DIR}/src/Hacl_Ed25519.c
-	${PROJECT_SOURCE_DIR}/src/Hacl_Streaming_SHA2.c
 	${PROJECT_SOURCE_DIR}/src/Hacl_EC_Ed25519.c
 	${PROJECT_SOURCE_DIR}/src/Hacl_Hash_Base.c
 	${PROJECT_SOURCE_DIR}/src/Hacl_Streaming_Blake2.c
@@ -18,7 +17,9 @@ set(SOURCES_std
 	${PROJECT_SOURCE_DIR}/src/Hacl_Bignum256.c
 	${PROJECT_SOURCE_DIR}/src/Hacl_Bignum32.c
 	${PROJECT_SOURCE_DIR}/src/Hacl_Bignum4096_32.c
+	${PROJECT_SOURCE_DIR}/src/Hacl_Bignum4096.c
 	${PROJECT_SOURCE_DIR}/src/Hacl_GenericField32.c
+	${PROJECT_SOURCE_DIR}/src/Hacl_GenericField64.c
 	${PROJECT_SOURCE_DIR}/src/Hacl_Chacha20Poly1305_32.c
 	${PROJECT_SOURCE_DIR}/src/Hacl_Chacha20.c
 	${PROJECT_SOURCE_DIR}/src/Hacl_Streaming_Poly1305_32.c
@@ -72,9 +73,7 @@ set(SOURCES_vec256
 set(SOURCES_vec128
 	${PROJECT_SOURCE_DIR}/src/Hacl_Hash_Blake2s_128.c
 	${PROJECT_SOURCE_DIR}/src/Hacl_Streaming_Blake2s_128.c
-	${PROJECT_SOURCE_DIR}/src/Hacl_Bignum4096.c
 	${PROJECT_SOURCE_DIR}/src/Hacl_Bignum64.c
-	${PROJECT_SOURCE_DIR}/src/Hacl_GenericField64.c
 	${PROJECT_SOURCE_DIR}/src/Hacl_Chacha20Poly1305_128.c
 	${PROJECT_SOURCE_DIR}/src/Hacl_Poly1305_128.c
 	${PROJECT_SOURCE_DIR}/src/Hacl_Chacha20_Vec128.c
@@ -120,22 +119,24 @@ set(INCLUDES
 	${PROJECT_SOURCE_DIR}/include/internal/Hacl_Krmllib.h
 	${PROJECT_SOURCE_DIR}/include/internal/../Hacl_Krmllib.h
 	${PROJECT_SOURCE_DIR}/include/Hacl_HMAC_DRBG.h
-	${PROJECT_SOURCE_DIR}/include/Hacl_Spec.h
+	${PROJECT_SOURCE_DIR}/include/Hacl_Streaming_Types.h
 	${PROJECT_SOURCE_DIR}/include/Hacl_HMAC.h
 	${PROJECT_SOURCE_DIR}/include/Hacl_Hash_SHA2.h
 	${PROJECT_SOURCE_DIR}/include/Hacl_Hash_Blake2.h
 	${PROJECT_SOURCE_DIR}/include/Lib_Memzero0.h
 	${PROJECT_SOURCE_DIR}/include/internal/Hacl_Ed25519.h
-	${PROJECT_SOURCE_DIR}/include/internal/Hacl_Streaming_SHA2.h
-	${PROJECT_SOURCE_DIR}/include/internal/Hacl_SHA2_Generic.h
-	${PROJECT_SOURCE_DIR}/include/internal/../Hacl_Streaming_SHA2.h
-	${PROJECT_SOURCE_DIR}/include/Hacl_Streaming_Types.h
+	${PROJECT_SOURCE_DIR}/include/internal/Hacl_Hash_SHA2.h
+	${PROJECT_SOURCE_DIR}/include/internal/../Hacl_Hash_SHA2.h
 	${PROJECT_SOURCE_DIR}/include/internal/Hacl_Ed25519_PrecompTable.h
 	${PROJECT_SOURCE_DIR}/include/internal/Hacl_Curve25519_51.h
 	${PROJECT_SOURCE_DIR}/include/internal/Hacl_Bignum25519_51.h
 	${PROJECT_SOURCE_DIR}/include/internal/../Hacl_Curve25519_51.h
+	${PROJECT_SOURCE_DIR}/include/internal/Hacl_Bignum_Base.h
+	${PROJECT_SOURCE_DIR}/include/lib_intrinsics.h
+	${PROJECT_SOURCE_DIR}/build/config.h
+	${PROJECT_SOURCE_DIR}/include/Hacl_IntTypes_Intrinsics.h
+	${PROJECT_SOURCE_DIR}/include/Hacl_IntTypes_Intrinsics_128.h
 	${PROJECT_SOURCE_DIR}/include/internal/../Hacl_Ed25519.h
-	${PROJECT_SOURCE_DIR}/include/Hacl_Streaming_SHA2.h
 	${PROJECT_SOURCE_DIR}/include/Hacl_EC_Ed25519.h
 	${PROJECT_SOURCE_DIR}/include/Hacl_Hash_Base.h
 	${PROJECT_SOURCE_DIR}/include/internal/Hacl_Hash_Blake2.h
@@ -144,16 +145,11 @@ set(INCLUDES
 	${PROJECT_SOURCE_DIR}/include/Hacl_Streaming_Blake2.h
 	${PROJECT_SOURCE_DIR}/include/Hacl_Hash_Blake2b_256.h
 	${PROJECT_SOURCE_DIR}/include/libintvector.h
-	${PROJECT_SOURCE_DIR}/build/config.h
 	${PROJECT_SOURCE_DIR}/include/Hacl_Streaming_Blake2b_256.h
 	${PROJECT_SOURCE_DIR}/include/Hacl_Hash_Blake2s_128.h
 	${PROJECT_SOURCE_DIR}/include/Hacl_Streaming_Blake2s_128.h
 	${PROJECT_SOURCE_DIR}/include/Hacl_Bignum256_32.h
 	${PROJECT_SOURCE_DIR}/include/Hacl_Bignum.h
-	${PROJECT_SOURCE_DIR}/include/lib_intrinsics.h
-	${PROJECT_SOURCE_DIR}/include/Hacl_IntTypes_Intrinsics.h
-	${PROJECT_SOURCE_DIR}/include/Hacl_IntTypes_Intrinsics_128.h
-	${PROJECT_SOURCE_DIR}/include/internal/Hacl_Bignum_Base.h
 	${PROJECT_SOURCE_DIR}/include/internal/Hacl_Bignum.h
 	${PROJECT_SOURCE_DIR}/include/internal/../Hacl_Bignum.h
 	${PROJECT_SOURCE_DIR}/include/Hacl_Bignum256.h
@@ -185,8 +181,7 @@ set(INCLUDES
 	${PROJECT_SOURCE_DIR}/include/internal/Vale.h
 	${PROJECT_SOURCE_DIR}/include/curve25519-inline.h
 	${PROJECT_SOURCE_DIR}/include/internal/Hacl_P256.h
-	${PROJECT_SOURCE_DIR}/include/internal/Hacl_Spec.h
-	${PROJECT_SOURCE_DIR}/include/internal/../Hacl_Spec.h
+	${PROJECT_SOURCE_DIR}/include/internal/Hacl_P256_PrecompTable.h
 	${PROJECT_SOURCE_DIR}/include/internal/../Hacl_P256.h
 	${PROJECT_SOURCE_DIR}/include/internal/Hacl_K256_ECDSA.h
 	${PROJECT_SOURCE_DIR}/include/internal/Hacl_K256_PrecompTable.h
@@ -194,11 +189,10 @@ set(INCLUDES
 	${PROJECT_SOURCE_DIR}/include/internal/../Hacl_K256_ECDSA.h
 	${PROJECT_SOURCE_DIR}/include/Hacl_EC_K256.h
 	${PROJECT_SOURCE_DIR}/include/Hacl_FFDHE.h
+	${PROJECT_SOURCE_DIR}/include/Hacl_Spec.h
 	${PROJECT_SOURCE_DIR}/include/internal/Hacl_Impl_FFDHE_Constants.h
 	${PROJECT_SOURCE_DIR}/include/internal/Hacl_Hash_SHA3.h
 	${PROJECT_SOURCE_DIR}/include/internal/../Hacl_Hash_SHA3.h
-	${PROJECT_SOURCE_DIR}/include/internal/Hacl_Hash_SHA2.h
-	${PROJECT_SOURCE_DIR}/include/internal/../Hacl_Hash_SHA2.h
 	${PROJECT_SOURCE_DIR}/include/Hacl_SHA2_Vec128.h
 	${PROJECT_SOURCE_DIR}/include/internal/Hacl_SHA2_Types.h
 	${PROJECT_SOURCE_DIR}/include/Hacl_SHA2_Vec256.h
@@ -230,6 +224,8 @@ set(INCLUDES
 	${PROJECT_SOURCE_DIR}/include/Hacl_HPKE_P256_CP32_SHA256.h
 	${PROJECT_SOURCE_DIR}/include/Hacl_Frodo1344.h
 	${PROJECT_SOURCE_DIR}/include/Hacl_Hash_SHA3.h
+	${PROJECT_SOURCE_DIR}/include/internal/Hacl_Spec.h
+	${PROJECT_SOURCE_DIR}/include/internal/../Hacl_Spec.h
 	${PROJECT_SOURCE_DIR}/include/internal/Hacl_Frodo_KEM.h
 	${PROJECT_SOURCE_DIR}/include/Lib_RandomBuffer_System.h
 	${PROJECT_SOURCE_DIR}/include/Hacl_Frodo640.h
@@ -264,31 +260,29 @@ set(PUBLIC_INCLUDES
 	${PROJECT_SOURCE_DIR}/include/Hacl_Curve25519_51.h
 	${PROJECT_SOURCE_DIR}/include/internal/../Hacl_Krmllib.h
 	${PROJECT_SOURCE_DIR}/include/Hacl_HMAC_DRBG.h
-	${PROJECT_SOURCE_DIR}/include/Hacl_Spec.h
+	${PROJECT_SOURCE_DIR}/include/Hacl_Streaming_Types.h
 	${PROJECT_SOURCE_DIR}/include/Hacl_HMAC.h
 	${PROJECT_SOURCE_DIR}/include/Hacl_Hash_SHA2.h
 	${PROJECT_SOURCE_DIR}/include/Hacl_Hash_Blake2.h
 	${PROJECT_SOURCE_DIR}/include/Lib_Memzero0.h
-	${PROJECT_SOURCE_DIR}/include/internal/../Hacl_Streaming_SHA2.h
-	${PROJECT_SOURCE_DIR}/include/Hacl_Streaming_Types.h
+	${PROJECT_SOURCE_DIR}/include/internal/../Hacl_Hash_SHA2.h
 	${PROJECT_SOURCE_DIR}/include/internal/../Hacl_Curve25519_51.h
+	${PROJECT_SOURCE_DIR}/include/lib_intrinsics.h
+	${PROJECT_SOURCE_DIR}/build/config.h
+	${PROJECT_SOURCE_DIR}/include/Hacl_IntTypes_Intrinsics.h
+	${PROJECT_SOURCE_DIR}/include/Hacl_IntTypes_Intrinsics_128.h
 	${PROJECT_SOURCE_DIR}/include/internal/../Hacl_Ed25519.h
-	${PROJECT_SOURCE_DIR}/include/Hacl_Streaming_SHA2.h
 	${PROJECT_SOURCE_DIR}/include/Hacl_EC_Ed25519.h
 	${PROJECT_SOURCE_DIR}/include/Hacl_Hash_Base.h
 	${PROJECT_SOURCE_DIR}/include/internal/../Hacl_Hash_Blake2.h
 	${PROJECT_SOURCE_DIR}/include/Hacl_Streaming_Blake2.h
 	${PROJECT_SOURCE_DIR}/include/Hacl_Hash_Blake2b_256.h
 	${PROJECT_SOURCE_DIR}/include/libintvector.h
-	${PROJECT_SOURCE_DIR}/build/config.h
 	${PROJECT_SOURCE_DIR}/include/Hacl_Streaming_Blake2b_256.h
 	${PROJECT_SOURCE_DIR}/include/Hacl_Hash_Blake2s_128.h
 	${PROJECT_SOURCE_DIR}/include/Hacl_Streaming_Blake2s_128.h
 	${PROJECT_SOURCE_DIR}/include/Hacl_Bignum256_32.h
 	${PROJECT_SOURCE_DIR}/include/Hacl_Bignum.h
-	${PROJECT_SOURCE_DIR}/include/lib_intrinsics.h
-	${PROJECT_SOURCE_DIR}/include/Hacl_IntTypes_Intrinsics.h
-	${PROJECT_SOURCE_DIR}/include/Hacl_IntTypes_Intrinsics_128.h
 	${PROJECT_SOURCE_DIR}/include/internal/../Hacl_Bignum.h
 	${PROJECT_SOURCE_DIR}/include/Hacl_Bignum256.h
 	${PROJECT_SOURCE_DIR}/include/Hacl_Bignum32.h
@@ -314,13 +308,12 @@ set(PUBLIC_INCLUDES
 	${PROJECT_SOURCE_DIR}/include/Hacl_Streaming_Poly1305_256.h
 	${PROJECT_SOURCE_DIR}/include/Hacl_Curve25519_64.h
 	${PROJECT_SOURCE_DIR}/include/curve25519-inline.h
-	${PROJECT_SOURCE_DIR}/include/internal/../Hacl_Spec.h
 	${PROJECT_SOURCE_DIR}/include/internal/../Hacl_P256.h
 	${PROJECT_SOURCE_DIR}/include/internal/../Hacl_K256_ECDSA.h
 	${PROJECT_SOURCE_DIR}/include/Hacl_EC_K256.h
 	${PROJECT_SOURCE_DIR}/include/Hacl_FFDHE.h
+	${PROJECT_SOURCE_DIR}/include/Hacl_Spec.h
 	${PROJECT_SOURCE_DIR}/include/internal/../Hacl_Hash_SHA3.h
-	${PROJECT_SOURCE_DIR}/include/internal/../Hacl_Hash_SHA2.h
 	${PROJECT_SOURCE_DIR}/include/Hacl_SHA2_Vec128.h
 	${PROJECT_SOURCE_DIR}/include/Hacl_SHA2_Vec256.h
 	${PROJECT_SOURCE_DIR}/include/internal/../Hacl_Hash_SHA1.h
@@ -349,6 +342,7 @@ set(PUBLIC_INCLUDES
 	${PROJECT_SOURCE_DIR}/include/Hacl_HPKE_P256_CP32_SHA256.h
 	${PROJECT_SOURCE_DIR}/include/Hacl_Frodo1344.h
 	${PROJECT_SOURCE_DIR}/include/Hacl_Hash_SHA3.h
+	${PROJECT_SOURCE_DIR}/include/internal/../Hacl_Spec.h
 	${PROJECT_SOURCE_DIR}/include/Lib_RandomBuffer_System.h
 	${PROJECT_SOURCE_DIR}/include/Hacl_Frodo640.h
 	${PROJECT_SOURCE_DIR}/include/Hacl_Frodo976.h

@@ -306,9 +306,6 @@ namespace ElectionGuard
             [DllImport(DllName, EntryPoint = "eg_constant_to_json",
                 CallingConvention = CallingConvention.Cdecl, SetLastError = true)]
             internal static extern Status ToJson(out IntPtr data, out ulong size);
-
-
-
         }
 
         #endregion
@@ -317,10 +314,17 @@ namespace ElectionGuard
 
         internal static class DiscreteLog
         {
+            [DllImport(DllName, EntryPoint = "eg_discrete_log_get_async_base_g",
+                CallingConvention = CallingConvention.Cdecl, SetLastError = true)]
+            internal static extern Status GetAsync(
+                ElementModP.ElementModPHandle in_element,
+                ref ulong out_result);
+
             [DllImport(DllName, EntryPoint = "eg_discrete_log_get_async",
                 CallingConvention = CallingConvention.Cdecl, SetLastError = true)]
             internal static extern Status GetAsync(
                 ElementModP.ElementModPHandle in_element,
+                ElementModP.ElementModPHandle in_encryption_base,
                 ref ulong out_result);
         }
         #endregion
@@ -443,11 +447,12 @@ namespace ElectionGuard
                 ElGamalCiphertextHandle other,
                 out ElGamalCiphertextHandle handle);
 
-            [DllImport(DllName, EntryPoint = "eg_elgamal_ciphertext_decrypt_known_product",
+            [DllImport(DllName, EntryPoint = "eg_elgamal_ciphertext_decrypt_accumulation",
                 CallingConvention = CallingConvention.Cdecl, SetLastError = true)]
-            internal static extern Status DecryptKnownProduct(
+            internal static extern Status DecryptAccumulation(
                 ElGamalCiphertextHandle handle,
-                ElementModP.ElementModPHandle known_Product,
+                ElementModP.ElementModPHandle shareAccumulation,
+                ElementModP.ElementModPHandle encryption_base,
                 ref ulong plaintext);
 
             [DllImport(DllName, EntryPoint = "eg_elgamal_ciphertext_decrypt_with_secret",
@@ -455,6 +460,7 @@ namespace ElectionGuard
             internal static extern Status DecryptWithSecret(
                 ElGamalCiphertextHandle handle,
                 ElementModQ.ElementModQHandle secret_key,
+                ElementModP.ElementModPHandle encryption_base,
                 ref ulong plaintext);
 
             [DllImport(DllName, EntryPoint = "eg_elgamal_ciphertext_decrypt_known_nonce",
@@ -562,8 +568,10 @@ namespace ElectionGuard
                 CallingConvention = CallingConvention.Cdecl, SetLastError = true)]
             internal static extern Status Decrypt(
                 HashedElGamalCiphertextHandle handle,
-                ElementModQ.ElementModQHandle secret_key,
-                ElementModQ.ElementModQHandle description_hash,
+                ElementModP.ElementModPHandle publicKey,
+                ElementModQ.ElementModQHandle secretKey,
+                [MarshalAs(UnmanagedType.LPStr)] string hashPrefix,
+                ElementModQ.ElementModQHandle encryptionSeed,
                 bool lookForPadding,
                 out IntPtr data,
                 out ulong size);
@@ -582,10 +590,26 @@ namespace ElectionGuard
                 CallingConvention = CallingConvention.Cdecl, SetLastError = true)]
             // ReSharper disable once MemberHidesStaticFromOuterClass
             internal static extern Status Encrypt(
-                byte* plaintext, ulong length,
+                byte* message, ulong length,
                 ElementModQ.ElementModQHandle nonce,
-                ElementModP.ElementModPHandle public_key,
+                [MarshalAs(UnmanagedType.LPStr)] string hashPrefix,
+                ElementModP.ElementModPHandle publicKey,
                 ElementModQ.ElementModQHandle seed,
+                uint maxLength,
+                bool allowTruncation,
+                bool usePrecompute,
+                out HashedElGamalCiphertext.HashedElGamalCiphertextHandle handle);
+
+            [DllImport(DllName, EntryPoint = "eg_hashed_elgamal_encrypt_no_pdding",
+                CallingConvention = CallingConvention.Cdecl, SetLastError = true)]
+            // ReSharper disable once MemberHidesStaticFromOuterClass
+            internal static extern Status Encrypt(
+                byte* message, ulong length,
+                ElementModQ.ElementModQHandle nonce,
+                [MarshalAs(UnmanagedType.LPStr)] string hashPrefix,
+                ElementModP.ElementModPHandle publicKey,
+                ElementModQ.ElementModQHandle seed,
+                bool usePrecompute,
                 out HashedElGamalCiphertext.HashedElGamalCiphertextHandle handle);
         }
 
@@ -699,6 +723,76 @@ namespace ElectionGuard
                 ElGamalCiphertext.ElGamalCiphertextHandle message,
                 ElementModP.ElementModPHandle k,
                 ElementModQ.ElementModQHandle q);
+
+        }
+
+        internal static class RangedChaumPedersenProof
+        {
+            internal struct RangedChaumPedersenProofType { };
+
+            internal class RangedChaumPedersenProofHandle
+    : ElectionGuardSafeHandle<RangedChaumPedersenProofType>
+            {
+                protected override bool Free()
+                {
+                    if (IsClosed)
+                    {
+                        return true;
+                    }
+
+                    var status = RangedChaumPedersenProof.Free(TypedPtr);
+                    return status != Status.ELECTIONGUARD_STATUS_SUCCESS
+                        ? throw new ElectionGuardException($"DisjunctiveChaumPedersenProof Error Free: {status}", status)
+                        : true;
+                }
+            }
+
+            [DllImport(DllName, EntryPoint = "eg_ranged_chaum_pedersen_proof_make_deterministic",
+               CallingConvention = CallingConvention.Cdecl, SetLastError = true)]
+            internal static extern Status Make(
+               ElGamalCiphertext.ElGamalCiphertextHandle message,
+               ElementModQ.ElementModQHandle r,
+               ulong selected,
+               ulong maxLimit,
+               ElementModP.ElementModPHandle k,
+               ElementModQ.ElementModQHandle q,
+               [MarshalAs(UnmanagedType.LPStr)] string hashPrefix,
+               ElementModQ.ElementModQHandle seed,
+               out RangedChaumPedersenProofHandle handle);
+
+            [DllImport(DllName, EntryPoint = "eg_ranged_chaum_pedersen_proof_make",
+               CallingConvention = CallingConvention.Cdecl, SetLastError = true)]
+            internal static extern Status Make(
+               ElGamalCiphertext.ElGamalCiphertextHandle message,
+               ElementModQ.ElementModQHandle r,
+               ulong selected,
+               ulong maxLimit,
+               ElementModP.ElementModPHandle k,
+               ElementModQ.ElementModQHandle q,
+               [MarshalAs(UnmanagedType.LPStr)] string hashPrefix,
+               out RangedChaumPedersenProofHandle handle);
+
+            [DllImport(DllName, EntryPoint = "eg_ranged_chaum_pedersen_proof_free",
+                CallingConvention = CallingConvention.Cdecl, SetLastError = true)]
+            internal static extern Status Free(RangedChaumPedersenProofType* handle);
+
+            [DllImport(DllName, EntryPoint = "eg_ranged_chaum_pedersen_proof_get_range_limit",
+                CallingConvention = CallingConvention.Cdecl, SetLastError = true)]
+            internal static extern Status GetRangeLimit(RangedChaumPedersenProofHandle handle, out ulong elementRef);
+
+            [DllImport(DllName, EntryPoint = "eg_ranged_chaum_pedersen_proof_get_challenge",
+                CallingConvention = CallingConvention.Cdecl, SetLastError = true)]
+            internal static extern Status GetChallenge(RangedChaumPedersenProofHandle handle, out ElementModQ.ElementModQHandle elementRef);
+
+            [DllImport(DllName, EntryPoint = "eg_ranged_chaum_pedersen_proof_is_valid",
+                CallingConvention = CallingConvention.Cdecl, SetLastError = true)]
+            internal static extern bool IsValid(
+                RangedChaumPedersenProofHandle handle,
+                ElGamalCiphertext.ElGamalCiphertextHandle ciphertext,
+                ElementModP.ElementModPHandle k,
+                ElementModQ.ElementModQHandle q,
+                [MarshalAs(UnmanagedType.LPStr)] string hashPrefix
+                );
 
         }
 
@@ -2351,6 +2445,15 @@ namespace ElectionGuard
                 ElectionGuard.CiphertextBallotContest.External.CiphertextBallotContestHandle handle,
                 ElementModQ.ElementModQHandle encryption_seed,
                 out ElementModQ.ElementModQHandle crypto_hash);
+
+            [DllImport(DllName,
+                EntryPoint = "eg_ciphertext_ballot_contest_contest_nonce",
+                CallingConvention = CallingConvention.Cdecl, SetLastError = true)]
+            internal static extern Status ContestNonce(
+                CiphertextElectionContext.CiphertextElectionContextHandle handle,
+                ulong sequence_order,
+                ElementModQ.ElementModQHandle nonce_seed,
+                out ElementModQ.ElementModQHandle contest_nonce);
 
             [DllImport(DllName,
                 EntryPoint = "eg_ciphertext_ballot_contest_get_extended_data",

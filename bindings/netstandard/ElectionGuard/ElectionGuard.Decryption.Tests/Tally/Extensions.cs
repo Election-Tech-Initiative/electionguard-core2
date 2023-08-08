@@ -35,6 +35,23 @@ public static class CiphertextTallyExtensions
         }
     }
 
+    public static PlaintextTallyBallot ToTallyBallot(this CiphertextBallot cipher, PlaintextBallot ballot, CiphertextTally tally)
+    {
+        var plaintext = new PlaintextTallyBallot(tally.TallyId, cipher.BallotCode.ToHex(), cipher.StyleId, tally.Manifest);
+        foreach (var (contestId, contest) in plaintext.Contests)
+        {
+            var plaintextContest = ballot.Contests.First(i => i.ObjectId == contestId);
+            foreach (var (selectionId, selection) in contest.Selections)
+            {
+                var plaintextSelection = plaintextContest.Selections.First(i => i.ObjectId == selectionId);
+                selection.Tally = plaintextSelection.Vote;
+                // TODO: add support for extended data
+            }
+        }
+
+        return plaintext;
+    }
+
     public static PlaintextTallyBallot ToTallyBallot(this PlaintextBallot ballot, CiphertextTally tally)
     {
         var plaintext = new PlaintextTallyBallot(tally.TallyId, ballot.ObjectId, ballot.StyleId, tally.Manifest);

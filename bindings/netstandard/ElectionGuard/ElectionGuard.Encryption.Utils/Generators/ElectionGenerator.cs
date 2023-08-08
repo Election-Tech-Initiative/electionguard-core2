@@ -9,7 +9,6 @@ namespace ElectionGuard.Encryption.Utils.Generators
         public InternalManifest InternalManifest { get; set; }
         public CiphertextElectionContext Context { get; set; }
         public ElGamalKeyPair KeyPair { get; set; }
-
         public EncryptionDevice Device { get; set; }
 
         protected override void DisposeUnmanaged()
@@ -99,7 +98,34 @@ namespace ElectionGuard.Encryption.Utils.Generators
         }
 
         /// <summary>
-        /// Generates fake election data
+        /// Generates fake election data using an election joint key from a key ceremony
+        /// </summary>
+        public static TestElectionData GenerateFakeElectionData(
+            ulong numberOfGuardians,
+            ulong quorum,
+            Manifest manifest,
+            ElectionJointKey jointKey)
+        {
+            Console.WriteLine($"Generating fake election data {numberOfGuardians} guardians, {quorum} quorum");
+            var internalManifest = new InternalManifest(manifest);
+            var context = new CiphertextElectionContext(
+                numberOfGuardians, quorum,
+                jointKey.JointPublicKey,
+                jointKey.CommitmentHash,
+                internalManifest.ManifestHash);
+            var device = GetFakeEncryptionDevice();
+            return new TestElectionData
+            {
+                Manifest = manifest,
+                InternalManifest = internalManifest,
+                Context = context,
+                // KeyPair = keyPair,
+                Device = device
+            };
+        }
+
+        /// <summary>
+        /// Generates fake election data using a fixed or random secret
         /// </summary>
         public static TestElectionData GenerateFakeElectionData(
             ulong numberOfGuardians = 1,

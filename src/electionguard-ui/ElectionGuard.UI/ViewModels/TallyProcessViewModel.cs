@@ -85,9 +85,11 @@ public partial class TallyProcessViewModel : BaseViewModel
         DecryptionShareService decryptionShareService,
         ChallengeResponseService challengeResponseService,
         MultiTallyService multiTallyService,
-        ITallyStateMachine tallyRunner) :
+        ITallyStateMachine tallyRunner,
+        ILogger<TallyProcessViewModel> logger) :
         base("TallyProcess", serviceProvider)
     {
+        _logger = logger;
         _tallyService = tallyService;
         _electionService = electionService;
         _tallyJoinedService = tallyJoinedService;
@@ -451,6 +453,7 @@ public partial class TallyProcessViewModel : BaseViewModel
                 catch (Exception ex)
                 {
                     ErrorMessage = ex.Message;
+                    _logger.LogError(ex, "Exception in Tally Ceremony at {localTally.State}", localTally.State);
                 }
             }
         });

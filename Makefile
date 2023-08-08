@@ -135,9 +135,23 @@ ifeq ($(OPERATING_SYSTEM),Windows)
 	choco upgrade ninja -y
 	choco upgrade vswhere -y
 endif
-	wget -O cmake/CPM.cmake https://github.com/cpm-cmake/CPM.cmake/releases/download/v0.35.5/CPM.cmake
+	wget -O cmake/CPM.cmake https://github.com/cpm-cmake/CPM.cmake/releases/download/v0.38.2/CPM.cmake
 	make fetch-sample-data
 	dotnet tool restore
+
+environment-msys2:
+ifeq ($(OPERATING_SYSTEM),Windows)
+	@echo 🏁 MSYS2 INSTALL
+	pacman -S --noconfirm --needed --overwrite \
+			base-devel \
+            mingw-w64-x86_64-gcc \
+            mingw-w64-clang-x86_64-clang \
+            mingw-w64-clang-x86_64-toolchain \
+            mingw-w64-clang-x86_64-cmake \
+            mingw-w64-clang-x86_64-llvm \
+            make \
+            git
+endif
 
 environment-ui:
 ifeq ($(OPERATING_SYSTEM),Windows)
@@ -159,9 +173,8 @@ else
 endif
 
 # Builds
-
 build:
-	@echo 🧱 BUILD $(OPERATING_SYSTEM) $(PROCESSOR) $(TARGET)
+	@echo 🧱 BUILD $(OPERATING_SYSTEM) $(PROCESSOR) $(TARGET) $(VSPLATFORM)
 ifeq ($(OPERATING_SYSTEM),Windows)
 	cmake -S . -B $(ELECTIONGUARD_BUILD_LIBS_DIR)/$(OPERATING_SYSTEM)/$(PROCESSOR)/$(TARGET) \
 		-G "Visual Studio 17 2022" -A $(VSPLATFORM) \
@@ -169,6 +182,7 @@ ifeq ($(OPERATING_SYSTEM),Windows)
 		-DBUILD_SHARED_LIBS=ON \
 		-DDISABLE_VALE=$(TEMP_DISABLE_VALE) \
 		-DUSE_MSVC=ON \
+		-DUSE_32BIT_MATH=$(USE_32BIT_MATH) \
 		-DANDROID_NDK_PATH=$(ANDROID_NDK_PATH) \
 		-DCPM_SOURCE_CACHE=$(CPM_SOURCE_CACHE) \
 		-DCMAKE_TOOLCHAIN_FILE=cmake/toolchains/$(PROCESSOR)-$(OPERATING_SYSTEM).cmake
@@ -186,23 +200,23 @@ endif
 
 build-arm64:
 ifeq ($(OPERATING_SYSTEM),Windows)
-	set "PROCESSOR=arm64" & make build
+	PROCESSOR=arm64 && make build
 else
 	PROCESSOR=arm64 && make build
 endif
 
-build-x86:
-ifeq ($(OPERATING_SYSTEM),Windows)
-	set "PROCESSOR=x86" & set "VSPLATFORM=Win32" & make build
-else
-	PROCESSOR=x86 VSPLATFORM=Win32 && make build
-endif
-
 build-x64:
 ifeq ($(OPERATING_SYSTEM),Windows)
-	set "PROCESSOR=x64" & make build
+	PROCESSOR=x64 && make build
 else
 	PROCESSOR=x64 && make build
+endif
+
+build-x86:
+ifeq ($(OPERATING_SYSTEM),Windows)
+	PROCESSOR=x86 VSPLATFORM=Win32 USE_32BIT_MATH=ON && make build
+else
+	PROCESSOR=x86 VSPLATFORM=Win32 USE_32BIT_MATH=ON && make build
 endif
 	
 build-msys2:
@@ -211,7 +225,8 @@ ifeq ($(OPERATING_SYSTEM),Windows)
 	cmake -S . -B $(ELECTIONGUARD_BUILD_LIBS_DIR)/$(OPERATING_SYSTEM)/$(PROCESSOR)/$(TARGET) -G "MSYS Makefiles" \
 		-DCMAKE_BUILD_TYPE=$(TARGET) \
 		-DBUILD_SHARED_LIBS=ON \
-		-DCAN_USE_VECTOR_INTRINSICS=ON \
+		-DDISABLE_VALE=$(TEMP_DISABLE_VALE) \
+		-DUSE_32BIT_MATH=$(USE_32BIT_MATH) \
 		-DCPM_SOURCE_CACHE=$(CPM_SOURCE_CACHE) \
 		-DCMAKE_TOOLCHAIN_FILE=cmake/toolchains/$(PROCESSOR)-$(OPERATING_SYSTEM)-msys2.cmake
 	cmake --build $(ELECTIONGUARD_BUILD_LIBS_DIR)/$(OPERATING_SYSTEM)/$(PROCESSOR)/$(TARGET)
@@ -219,10 +234,17 @@ else
 	echo "MSYS2 builds are only supported on Windows"
 endif
 
+build-msys2-x86:
+ifeq ($(OPERATING_SYSTEM),Windows)
+	PROCESSOR=x86 USE_32BIT_MATH=ON && make build-msys2
+else
+	echo "MSYS2 builds are only supported on Windows"
+endif
+
 build-android:
 	@echo 📱 BUILD ANDROID
 ifeq ($(OPERATING_SYSTEM),Windows)
-	set "PROCESSOR=arm64" & set "OPERATING_SYSTEM=Android" & make build
+	PROCESSOR=arm64 OPERATING_SYSTEM=Android && make build
 else
 	PROCESSOR=arm64 OPERATING_SYSTEM=Android && make build
 endif
@@ -259,9 +281,14 @@ build-netstandard: build
 
 build-netstandard-x64:
 ifeq ($(OPERATING_SYSTEM),Windows)
-	set "PROCESSOR=x64" & make build-netstandard
+	PROCESSOR=x64 && make build-netstandard
 else
 	PROCESSOR=x64 && make build-netstandard
+endif
+
+build-netstandard-x86:
+ifeq ($(OPERATING_SYSTEM),Windows)
+	PROCESSOR=x86 VSPLATFORM=Win32 USE_32BIT_MATH=ON && make build-netstandard
 endif
 
 build-cli:
@@ -518,25 +545,36 @@ endif
 # Test
 
 test:
-	@echo 🧪 TEST $(OPERATING_SYSTEM) $(PROCESSOR) $(TARGET)
+	@echo 🧪 TEST $(OPERATING_SYSTEM) $(PROCESSOR) $(TARGET) $(VSPLATFORM)
 ifeq ($(OPERATING_SYSTEM),Windows)
 	cmake -S . -B $(ELECTIONGUARD_BUILD_LIBS_DIR)/$(OPERATING_SYSTEM)/$(PROCESSOR)/$(TARGET) \
 		-G "Visual Studio 17 2022" -A $(VSPLATFORM) \
 		-DCMAKE_BUILD_TYPE=$(TARGET) \
+		-DBUILD_SHARED_LIBS=ON \
+		-DEXPORT_INTERNALS=ON \
+		-DUSE_TEST_PRIMES=OFF \
 		-DDISABLE_VALE=$(TEMP_DISABLE_VALE) \
 		-DUSE_MSVC=ON \
+		-DUSE_32BIT_MATH=$(USE_32BIT_MATH) \
+		-DOPTION_ENABLE_TESTS=ON \
+		-DLOG_LEVEL=debug \
 		-DCPM_SOURCE_CACHE=$(CPM_SOURCE_CACHE) \
-		-DCMAKE_TOOLCHAIN_FILE=cmake/toolchains/test.cmake
+		-DCMAKE_TOOLCHAIN_FILE=cmake/toolchains/$(PROCESSOR)-$(OPERATING_SYSTEM).cmake
 	cmake --build $(ELECTIONGUARD_BUILD_LIBS_DIR)/$(OPERATING_SYSTEM)/$(PROCESSOR)/$(TARGET)/ --config $(TARGET)
 	$(ELECTIONGUARD_BUILD_LIBS_DIR)/$(OPERATING_SYSTEM)/$(PROCESSOR)/$(TARGET)/test/$(TARGET)/ElectionGuardTests
 	$(ELECTIONGUARD_BUILD_LIBS_DIR)/$(OPERATING_SYSTEM)/$(PROCESSOR)/$(TARGET)/test/$(TARGET)/ElectionGuardCTests
 else
 	cmake -S . -B $(ELECTIONGUARD_BUILD_LIBS_DIR)/$(PROCESSOR)/$(TARGET) \
 		-DCMAKE_BUILD_TYPE=$(TARGET) \
-		-DCPM_SOURCE_CACHE=$(CPM_SOURCE_CACHE) \
+		-DBUILD_SHARED_LIBS=ON \
+		-DEXPORT_INTERNALS=ON \
+		-DUSE_TEST_PRIMES=OFF \
 		-DDISABLE_VALE=$(TEMP_DISABLE_VALE) \
 		-DUSE_32BIT_MATH=$(USE_32BIT_MATH) \
-		-DCMAKE_TOOLCHAIN_FILE=cmake/toolchains/test.cmake
+		-DOPTION_ENABLE_TESTS=ON \
+		-DLOG_LEVEL=debug \
+		-DCPM_SOURCE_CACHE=$(CPM_SOURCE_CACHE) \
+		-DCMAKE_TOOLCHAIN_FILE=cmake/toolchains/$(PROCESSOR)-$(OPERATING_SYSTEM).cmake
 	cmake --build $(ELECTIONGUARD_BUILD_LIBS_DIR)/$(PROCESSOR)/$(TARGET)
 	$(ELECTIONGUARD_BUILD_LIBS_DIR)/$(PROCESSOR)/$(TARGET)/test/ElectionGuardTests
 	$(ELECTIONGUARD_BUILD_LIBS_DIR)/$(PROCESSOR)/$(TARGET)/test/ElectionGuardCTests
@@ -544,35 +582,45 @@ endif
 
 test-arm64:
 ifeq ($(OPERATING_SYSTEM),Windows)
-	set "PROCESSOR=arm64" & make test
+	PROCESSOR=arm64 && make test
 else
 	PROCESSOR=arm64 && make test
 endif
 
 test-x64:
 ifeq ($(OPERATING_SYSTEM),Windows)
-	set "PROCESSOR=x64" & make test
+	PROCESSOR=x64 && make test
 else
 	PROCESSOR=x64 && make test
 endif
 
 test-x86:
-ifeq ($(OPERATING_SYSTEM),Windows)
-	set "PROCESSOR=x86" & set "USE_32BIT_MATH=ON" & set "VSPLATFORM=Win32" & make test
-else
 	PROCESSOR=x86 USE_32BIT_MATH=ON VSPLATFORM=Win32 && make test
-endif
 
 test-msys2:
 	@echo 🧪 TEST MSYS2 $(OPERATING_SYSTEM) $(PROCESSOR) $(TARGET)
 ifeq ($(OPERATING_SYSTEM),Windows)
 	cmake -S . -B $(ELECTIONGUARD_BUILD_LIBS_DIR)/$(PROCESSOR)/$(TARGET) -G "MSYS Makefiles" \
 		-DCMAKE_BUILD_TYPE=$(TARGET) \
+		-DBUILD_SHARED_LIBS=ON \
+		-DEXPORT_INTERNALS=ON \
+		-DUSE_TEST_PRIMES=OFF \
+		-DDISABLE_VALE=$(TEMP_DISABLE_VALE) \
+		-DUSE_32BIT_MATH=$(USE_32BIT_MATH) \
+		-DOPTION_ENABLE_TESTS=ON \
+		-DLOG_LEVEL=debug \
 		-DCPM_SOURCE_CACHE=$(CPM_SOURCE_CACHE) \
-		-DCMAKE_TOOLCHAIN_FILE=cmake/toolchains/test.cmake
+		-DCMAKE_TOOLCHAIN_FILE=cmake/toolchains/$(PROCESSOR)-$(OPERATING_SYSTEM)-msys2.cmake
 	cmake --build $(ELECTIONGUARD_BUILD_LIBS_DIR)/$(PROCESSOR)/$(TARGET)
 	$(ELECTIONGUARD_BUILD_LIBS_DIR)/$(PROCESSOR)/$(TARGET)/test/ElectionGuardTests
 	$(ELECTIONGUARD_BUILD_LIBS_DIR)/$(PROCESSOR)/$(TARGET)/test/ElectionGuardCTests
+endif
+
+test-msys2-x86:
+ifeq ($(OPERATING_SYSTEM),Windows)
+	PROCESSOR=x86 USE_32BIT_MATH=ON && make test-msys2
+else
+	echo "MSYS2 tests are only supported on Windows"
 endif
 
 test-netstandard: build-netstandard
@@ -583,7 +631,7 @@ test-netstandard: build-netstandard
 
 test-netstandard-arm64:
 ifeq ($(OPERATING_SYSTEM),Windows)
-	set "PROCESSOR=arm64" && make test-netstandard
+	PROCESSOR=arm64 && make test-netstandard
 else
 	PROCESSOR=arm64 && make test-netstandard
 endif
@@ -651,7 +699,7 @@ ifeq ($(OPERATING_SYSTEM),Windows)
 		-DCMAKE_BUILD_TYPE=$(TARGET) \
 		-DCODE_COVERAGE=ON \
 		-DCPM_SOURCE_CACHE=$(CPM_SOURCE_CACHE) \
-		-DCMAKE_TOOLCHAIN_FILE=cmake/toolchains/test.cmake
+		-DCMAKE_TOOLCHAIN_FILE=cmake/toolchains/$(PROCESSOR)-$(OPERATING_SYSTEM).cmake
 else
 	cmake -S . -B $(ELECTIONGUARD_BUILD_LIBS_DIR)/$(PROCESSOR)/$(TARGET) \
 		-DCMAKE_BUILD_TYPE=$(TARGET) \
@@ -659,7 +707,7 @@ else
 		-DUSE_STATIC_ANALYSIS=ON \
 		-DDISABLE_VALE=$(TEMP_DISABLE_VALE) \
 		-DCPM_SOURCE_CACHE=$(CPM_SOURCE_CACHE) \
-		-DCMAKE_TOOLCHAIN_FILE=cmake/toolchains/test.cmake
+		-DCMAKE_TOOLCHAIN_FILE=cmake/toolchains/$(PROCESSOR)-$(OPERATING_SYSTEM).cmake
 endif
 	cmake --build $(ELECTIONGUARD_BUILD_LIBS_DIR)/$(PROCESSOR)/$(TARGET)
 	$(ELECTIONGUARD_BUILD_LIBS_DIR)/$(PROCESSOR)/$(TARGET)/test/ElectionGuardTests

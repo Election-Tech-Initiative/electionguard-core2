@@ -24,7 +24,8 @@ export type CiphertextBallotHandle = {
   isValidEncryption(
     manifestHash: ElementModQHandle,
     publicKey: ElementModPHandle,
-    extendedHash: ElementModQHandle
+    extendedHash: ElementModQHandle,
+    aux: string
   ): boolean;
 
   cast(): void;

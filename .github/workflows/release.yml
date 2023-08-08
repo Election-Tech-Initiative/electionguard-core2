@@ -152,7 +152,31 @@ jobs:
             build/libs/wasm/Release/src/electionguard/wasm/*.js
             build/libs/wasm/Release/src/electionguard/wasm/*.wasm
 
-  # TODO: win x86
+  windows_build_x86:
+    name: Windows Build (x86)
+    runs-on: windows-2022
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v3
+      - name: Install .NET
+        uses: actions/setup-dotnet@v3
+        with:
+          dotnet-version: 7.0.x
+      - name: Setup Environment
+        run: make environment
+      - name: Build
+        run: make build-x86
+      - name: Upload Library (x86)
+        uses: actions/upload-artifact@v3
+        with:
+          name: win-x86
+          path: |
+            build/libs/Windows/x86/Release/src/Release/*.dll
+            build/libs/Windows/x86/Release/src/Release/*.exp
+            build/libs/Windows/x86/Release/src/Release/*.lib
+            build/libs/Windows/x86/Release/libs/hacl/Release/*.dll
+            build/libs/Windows/x86/Release/libs/hacl/Release/*.exp
+            build/libs/Windows/x86/Release/libs/hacl/Release/*.lib
 
   windows_build_x64:
     name: Windows Build (x64)
@@ -190,6 +214,7 @@ jobs:
         macos_build_arm64,
         macos_build_x64,
         windows_build_x64,
+        windows_build_x86,
       ]
     runs-on: ubuntu-22.04
     steps:
@@ -221,6 +246,12 @@ jobs:
         with:
           name: osx-x64
           path: build/libs/Darwin/x64/Release
+
+      - name: Get Windows x86 Artifacts
+        uses: actions/download-artifact@v3
+        with:
+          name: win-x86
+          path: build/libs/Windows/x86/Release
 
       - name: Get Windows x64 Artifacts
         uses: actions/download-artifact@v3

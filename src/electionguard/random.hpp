@@ -1,6 +1,7 @@
 #ifndef __ELECTIONGUARD_CPP_RANDOM_HPP_INCLUDED__
 #define __ELECTIONGUARD_CPP_RANDOM_HPP_INCLUDED__
 
+#include <cstdint>
 #include <ctime>
 #include <electionguard/export.h>
 #include <iomanip>

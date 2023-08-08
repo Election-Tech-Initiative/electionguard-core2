@@ -1,10 +1,10 @@
 ﻿using CommunityToolkit.Maui;
 using ElectionGuard.Decryption;
 using ElectionGuard.UI.Services;
-using Microsoft.Extensions.Logging;
 using Microsoft.AppCenter;
 using Microsoft.AppCenter.Crashes;
 using Microsoft.AppCenter.Analytics;
+using MetroLog.MicrosoftExtensions;
 
 namespace ElectionGuard.UI;
 
@@ -45,6 +45,10 @@ public static class MauiProgram
         builder.Logging.AddDebug();
         //builder.Logging.add();
 #endif
+        builder.Logging.AddStreamingFileLogger(configure =>
+        {
+            configure.FolderPath = ErrorLog.CreateLogPath();
+        });
         return builder;
     }
 
@@ -53,8 +57,8 @@ public static class MauiProgram
     {
         builder.ConfigureFonts(fonts =>
         {
-            fonts.AddFont("OpenSans-Regular.ttf", "OpenSansRegular");
-            fonts.AddFont("OpenSans-Semibold.ttf", "OpenSansSemibold");
+            fonts.AddFont("opensans_regular.ttf", "OpenSansRegular");
+            fonts.AddFont("opensans_semibold.ttf", "OpenSansSemibold");
         });
 
         return builder;

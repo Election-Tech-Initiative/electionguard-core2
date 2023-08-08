@@ -43,4 +43,11 @@ public partial class SettingsViewModel : BaseViewModel
         DbService.Init(DatabaseAddress, DatabasePassword);
     }
 
+    [RelayCommand]
+    private async Task Logs()
+    {
+        _ = await Launcher.Default.OpenAsync(ErrorLog.CreateLogPath());
+    }
+
+
 }

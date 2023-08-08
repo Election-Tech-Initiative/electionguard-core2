@@ -62,7 +62,11 @@ namespace electionguard
 
     ElementModQ *ElGamalKeyPair::getSecretKey() { return pimpl->secretKey.get(); }
 
+    ElementModQ *ElGamalKeyPair::getSecretKey() const { return pimpl->secretKey.get(); }
+
     ElementModP *ElGamalKeyPair::getPublicKey() { return pimpl->publicKey.get(); }
+
+    ElementModP *ElGamalKeyPair::getPublicKey() const { return pimpl->publicKey.get(); }
 
     // Public Members
 
@@ -189,41 +193,75 @@ namespace electionguard
         return make_unique<ElGamalCiphertext>(move(resultPad), move(resultData));
     }
 
-    uint64_t ElGamalCiphertext::decrypt(const ElementModP &product)
+    uint64_t ElGamalCiphertext::decrypt(const ElementModP &shareAccumulation,
+                                        const ElementModP &base)
     {
-        auto result = div_mod_p(*pimpl->data, product);
-        return DiscreteLog::getAsync(*result);
+        auto result = div_mod_p(*pimpl->data, shareAccumulation);
+        return DiscreteLog::getAsync(*result, base);
     }
 
-    uint64_t ElGamalCiphertext::decrypt(const ElementModP &product) const
+    uint64_t ElGamalCiphertext::decrypt(const ElementModP &shareAccumulation,
+                                        const ElementModP &base) const
     {
-        auto result = div_mod_p(*pimpl->data, product);
-        return DiscreteLog::getAsync(*result);
+        auto result = div_mod_p(*pimpl->data, shareAccumulation);
+        return DiscreteLog::getAsync(*result, base);
     }
 
-    uint64_t ElGamalCiphertext::decrypt(const ElementModQ &secretKey)
+    uint64_t ElGamalCiphertext::decrypt(const ElementModQ &secretKey, const ElementModP &base)
     {
-        auto product = pow_mod_p(*pimpl->pad, secretKey);
-        return decrypt(*product);
+        auto difference = sub_from_q(secretKey);
+        auto product = pow_mod_p(*pimpl->pad, *difference);
+        return decryptKnownProduct(*product, base);
     }
 
-    uint64_t ElGamalCiphertext::decrypt(const ElementModQ &secretKey) const
+    uint64_t ElGamalCiphertext::decrypt(const ElementModQ &secretKey, const ElementModP &base) const
     {
-        auto product = pow_mod_p(*pimpl->pad, secretKey);
-        return decrypt(*product);
+        auto difference = sub_from_q(secretKey);
+        auto product = pow_mod_p(*pimpl->pad, *difference);
+        return decryptKnownProduct(*product, base);
     }
 
     uint64_t ElGamalCiphertext::decrypt(const ElementModP &publicKey, const ElementModQ &nonce)
     {
-        auto product = pow_mod_p(publicKey, nonce);
-        return decrypt(*product);
+        auto difference = sub_from_q(nonce);
+        auto product = pow_mod_p(publicKey, *difference);
+        return decryptKnownProduct(*product, publicKey);
     }
 
     uint64_t ElGamalCiphertext::decrypt(const ElementModP &publicKey,
                                         const ElementModQ &nonce) const
     {
+        auto difference = sub_from_q(nonce);
+        auto product = pow_mod_p(publicKey, *difference);
+        return decryptKnownProduct(*product, publicKey);
+    }
+
+    uint64_t ElGamalCiphertext::decrypt(const ElementModP &publicKey, const ElementModQ &nonce,
+                                        const ElementModP &base)
+    {
+        // E.G. 2.0 Base-K Decrypt
+        if (publicKey == base) {
+            return decrypt(publicKey, nonce);
+        }
+
+        // E.G. 1.0 Compatible Decrypt
         auto product = pow_mod_p(publicKey, nonce);
-        return decrypt(*product);
+        auto result = div_mod_p(*pimpl->data, *product);
+        return DiscreteLog::getAsync(*result, base);
+    }
+
+    uint64_t ElGamalCiphertext::decrypt(const ElementModP &publicKey, const ElementModQ &nonce,
+                                        const ElementModP &base) const
+    {
+        // E.G. 2.0 Base-K Decrypt
+        if (publicKey == base) {
+            return decrypt(publicKey, nonce);
+        }
+
+        // E.G. 1.0 Compatible Decrypt
+        auto product = pow_mod_p(publicKey, nonce);
+        auto result = div_mod_p(*pimpl->data, *product);
+        return DiscreteLog::getAsync(*result, base);
     }
 
     unique_ptr<ElementModP> ElGamalCiphertext::partialDecrypt(const ElementModQ &secretKey)
@@ -241,7 +279,62 @@ namespace electionguard
         return make_unique<ElGamalCiphertext>(pimpl->pad->clone(), pimpl->data->clone());
     }
 
+    uint64_t ElGamalCiphertext::decryptKnownProduct(const ElementModP &product,
+                                                    const ElementModP &base)
+    {
+        auto result = mul_mod_p(*pimpl->data, product);
+        return DiscreteLog::getAsync(*result, base);
+    }
+
+    uint64_t ElGamalCiphertext::decryptKnownProduct(const ElementModP &product,
+                                                    const ElementModP &base) const
+    {
+        auto result = mul_mod_p(*pimpl->data, product);
+        return DiscreteLog::getAsync(*result, base);
+    }
+
 #pragma endregion
+
+    /// <summary>
+    /// elgamal encrypt using the provided pad and blinding factor against a specific base
+    /// this method supports the case where the encryption base is different than the public key
+    /// which was the case in EG 1.0.
+    ///
+    /// this method is used both for encrypting against G for 1.0 elections
+    /// and for encrypting against K for 2.0 elections using precomputed values.
+    ///
+    /// ecryptionBase (B) is usually either the generator (G()) or the public key of the election (K)
+    /// <param name="m">the message to encrypt (m or V in the spec)</param>
+    /// <param name="pad">the pad to use for the encryption (g^R mod p)</param>
+    /// <param name="blindingFactor">the blinding factor to use for the encryption (K^R mod p)</param>
+    /// <param name="publicKey">the public key to use for the encryption (K in the spec)</param>
+    /// <param name="encryptionBase">the base to use for the encryption (g or K in the spec)</param>
+    /// </summary>
+    unique_ptr<ElGamalCiphertext> elgamalEncrypt(uint64_t m, unique_ptr<ElementModP> pad,
+                                                 const ElementModP blindingFactor,
+                                                 const ElementModP &publicKey,
+                                                 const ElementModP &encryptionBase)
+    {
+        // E.G. 1.0 Compatible ElGamal Encrypt.
+        // (g^R mod p, B^V ·K^R mod p)
+
+        unique_ptr<ElementModP> data = nullptr;
+        if (m == 1) {
+            data = mul_mod_p(encryptionBase, blindingFactor); // B^1 * K^R mod p
+        } else if (m == 0) {
+            data = blindingFactor.clone(); // B^0 * K^R mod p
+        } else {
+            auto message = pow_mod_p(encryptionBase, m);
+            data = mul_mod_p(*message, blindingFactor); // B^V * K^R mod p
+        }
+
+        Log::trace("Compatible Base Generated Encryption");
+        Log::trace("publicKey", publicKey.toHex());
+        Log::trace("pad", pad->toHex());
+        Log::trace("data", data->toHex());
+
+        return make_unique<ElGamalCiphertext>(move(pad), move(data));
+    }
 
     unique_ptr<ElGamalCiphertext> elgamalEncrypt(uint64_t m, const ElementModQ &nonce,
                                                  const ElementModP &publicKey)
@@ -250,16 +343,22 @@ namespace electionguard
             throw invalid_argument("elgamalEncrypt encryption requires a non-zero nonce");
         }
 
-        auto pad = g_pow_p(nonce);
-        auto pubkey_pow_n = pow_mod_p(publicKey, nonce);
-        unique_ptr<ElementModP> data = nullptr;
-        if (m == 1) {
-            data = mul_mod_p(G(), *pubkey_pow_n);
+        // E.G. 2.0 Base-K ElGamal Encrypt in realtime.
+        // (g^R mod p, K^V ·K^R mod p) = (g^R mod p, K^(V+R) mod p)
+
+        auto pad = g_pow_p(nonce); // g^R mod p
+        unique_ptr<ElementModQ> exponent = nullptr;
+        if (m == 0) {
+            exponent = nonce.clone(); // (V+0)
+        } else if (m == 1) {
+            exponent = add_mod_q(nonce, ONE_MOD_Q()); // (V+1)
         } else {
-            data = move(pubkey_pow_n);
+            exponent = add_mod_q(nonce, *ElementModQ::fromUint64(m)); // (V+R)
         }
 
-        Log::trace("Generated Encryption");
+        auto data = pow_mod_p(publicKey, *exponent); // K^(V+R) mod p
+
+        Log::trace("Base-K Generated Encryption");
         Log::trace("publicKey", publicKey.toHex());
         Log::trace("pad", pad->toHex());
         Log::trace("data", data->toHex());
@@ -267,22 +366,31 @@ namespace electionguard
         return make_unique<ElGamalCiphertext>(move(pad), move(data));
     }
 
-    unique_ptr<ElGamalCiphertext> elgamalEncrypt_with_precomputed(uint64_t m, ElementModP &g_to_rho,
-                                                                  ElementModP &pubkey_to_rho)
+    unique_ptr<ElGamalCiphertext> elgamalEncrypt(uint64_t m, const ElementModQ &nonce,
+                                                 const ElementModP &publicKey,
+                                                 const ElementModP &encryptionBase)
     {
-        ElementModP data = pubkey_to_rho;
+        // E.G. 1.0 Compatible ElGamal Encrypt.
+        // (g^R mod p, B^V ·K^R mod p)
 
-        if (m == 1) {
-            unique_ptr<ElementModP> temp = mul_mod_p(G(), pubkey_to_rho);
-            data = *temp;
+        if (publicKey == encryptionBase) {
+            return elgamalEncrypt(m, nonce, publicKey);
         }
 
-        Log::trace("Generated Encryption with Precomputed Values");
-        Log::trace("pad", g_to_rho.toHex());
-        Log::trace("data", data.toHex());
+        auto pad = g_pow_p(nonce);                         // g^R
+        auto blindingFactor = pow_mod_p(publicKey, nonce); // K^R
+        return elgamalEncrypt(m, move(pad), *blindingFactor, publicKey, encryptionBase);
+    }
 
-        return make_unique<ElGamalCiphertext>(make_unique<ElementModP>(g_to_rho),
-                                              make_unique<ElementModP>(data));
+    unique_ptr<ElGamalCiphertext> elgamalEncrypt(uint64_t m, const ElementModP &publicKey,
+                                                 const PrecomputedEncryption &precomputedValues)
+    {
+        // E.G 2.0 Encrypt using precomputed values.
+        // (g^R mod p, K^V ·K^R mod p) = (g^R mod p, K^(V+R) mod p)
+
+        auto pad = precomputedValues.getPad()->clone();              // g^R mod p
+        auto blindingFactor = precomputedValues.getBlindingFactor(); // K^R mod p
+        return elgamalEncrypt(m, move(pad), *blindingFactor, publicKey, publicKey);
     }
 
     unique_ptr<ElGamalCiphertext>
@@ -397,9 +505,10 @@ namespace electionguard
         return make_unique<HashedElGamalCiphertext>(make_unique<ElementModP>(pad), data, mac);
     }
 
-    vector<uint8_t> HashedElGamalCiphertext::decrypt(const ElementModQ &secret_key,
-                                                     const ElementModQ &encryption_seed,
-                                                     bool look_for_padding)
+    vector<uint8_t> HashedElGamalCiphertext::decrypt(const ElementModP &publicKey,
+                                                     const ElementModQ &secretKey,
+                                                     const string &hashPrefix,
+                                                     const ElementModQ &seed, bool expectPadding)
     {
         // Note this decryption method is primarily used for testing
         vector<uint8_t> plaintext_with_padding;
@@ -412,13 +521,16 @@ namespace electionguard
                                    "is not a multiple of the block length 32");
         }
 
-        auto publicKey_to_r = pow_mod_p(*pimpl->pad, secret_key);
+        auto publicKey_to_r = pow_mod_p(*pimpl->pad, secretKey);
 
-        // hash g_to_r and publicKey_to_r to get the session key
-        auto session_key = hash_elems({pimpl->pad.get(), publicKey_to_r.get()});
+        // hash g_to_r and publicKey_to_r to get the session key (k)
+        auto session_key = hash_elems({hashPrefix, &const_cast<ElementModQ &>(seed),
+                                       &const_cast<ElementModP &>(publicKey), pimpl->pad.get(),
+                                       publicKey_to_r.get()});
 
-        vector<uint8_t> mac_key = HMAC::compute(session_key->toBytes(), encryption_seed.toBytes(),
-                                                number_of_blocks * HASHED_BLOCK_LENGTH_IN_BITS, 0);
+        vector<uint8_t> mac_key =
+          HMAC::compute(session_key->toBytes(), seed.toBytes(),
+                        number_of_blocks * HASHED_CIPHERTEXT_BLOCK_LENGTH_IN_BITS, 0);
 
         // calculate the mac (c0 is g ^ r mod p and c1 is the ciphertext, they are concatenated)
         vector<uint8_t> c0_and_c1(pimpl->pad->toBytes());
@@ -436,8 +548,8 @@ namespace electionguard
             vector<int8_t> temp_plaintext(HASHED_CIPHERTEXT_BLOCK_LENGTH, 0);
 
             vector<uint8_t> xor_key =
-              HMAC::compute(session_key->toBytes(), encryption_seed.toBytes(),
-                            number_of_blocks * HASHED_BLOCK_LENGTH_IN_BITS, i + 1);
+              HMAC::compute(session_key->toBytes(), seed.toBytes(),
+                            number_of_blocks * HASHED_CIPHERTEXT_BLOCK_LENGTH_IN_BITS, i + 1);
 
             // XOR the key with the plaintext
             for (int j = 0; j < (int)HASHED_CIPHERTEXT_BLOCK_LENGTH; j++) {
@@ -452,7 +564,7 @@ namespace electionguard
             hacl::Lib::memZero(&temp_plaintext.front(), temp_plaintext.size());
         }
 
-        if (look_for_padding) {
+        if (expectPadding) {
             uint16_t pad_len_be;
             memcpy(&pad_len_be, &plaintext_with_padding.front(), sizeof(pad_len_be));
             uint16_t pad_len = be16toh(pad_len_be);
@@ -514,96 +626,108 @@ namespace electionguard
 
 #pragma endregion // HashedElGamalCiphertext
 
-    unique_ptr<HashedElGamalCiphertext>
-    hashedElgamalEncrypt(std::vector<uint8_t> message, const ElementModQ &nonce,
-                         const ElementModP &publicKey, const ElementModQ &encryption_seed,
-                         padded_data_size_t max_len, bool allow_truncation,
-                         bool shouldUsePrecomputedValues /* = false */)
+    vector<uint8_t> formatMessage(vector<uint8_t> message,
+                                  HASHED_CIPHERTEXT_PADDED_DATA_SIZE max_len, bool allow_truncation)
     {
-        vector<uint8_t> ciphertext;
-        vector<uint8_t> plaintext_on_boundary;
+        if (max_len == 0 || max_len > HASHED_CIPHERTEXT_PADDED_DATA_SIZE::BYTES_512) {
+            throw invalid_argument("HashedElGamalCiphertext::encrypt max_len is invalid");
+        }
+
+        // TODO: HACK: ISSUE #358: we need to check the modulo of the max_len matches the block length
+        // and handle the indicator size truncation inline inside this function
 
         // padding scheme is to concatenate [length of the padding][plaintext][padding bytes of 0x00]
         // padding bytes 0x00 are padded out to the first HASHED_CIPHERTEXT_BLOCK_LENGTH boundary
         // past max_len. So if max_len is 62 then it will pad to the 64 byte boundary
-        if (max_len != NO_PADDING) {
-            uint16_t pad_len = 0;
-            uint16_t pad_len_be = 0;
 
-            if (allow_truncation && (message.size() > max_len)) {
-                // truncate the data
-                // insert length in big endian form
-                plaintext_on_boundary.insert(plaintext_on_boundary.end(), (uint8_t *)&pad_len_be,
-                                             (uint8_t *)&pad_len_be + sizeof(pad_len_be));
-                // insert plaintext
-                plaintext_on_boundary.insert(plaintext_on_boundary.end(), &message.front(),
-                                             &message.front() + max_len);
-            } else {
-                if (message.size() > max_len) {
-                    throw invalid_argument(
-                      "HashedElGamalCiphertext::encrypt the plaintext is greater than max_len");
-                }
+        vector<uint8_t> formattedMessage;
 
-                uint16_t pad_len = max_len - message.size();
-                uint16_t pad_len_be = htobe16(pad_len);
+        uint16_t pad_len = 0;
+        uint16_t pad_len_be = 0;
 
-                std::vector<uint8_t> padding(pad_len, 0);
-
-                // insert length in big endian form
-                plaintext_on_boundary.insert(plaintext_on_boundary.end(), (uint8_t *)&pad_len_be,
-                                             (uint8_t *)&pad_len_be + sizeof(pad_len_be));
-                // insert plaintext
-                plaintext_on_boundary.insert(plaintext_on_boundary.end(), message.begin(),
-                                             message.end());
-
-                // we dont pad 0x00s if the length field plus plaintext length falls on a block length boundary
-                if (pad_len > 0) {
-                    // insert padding
-                    plaintext_on_boundary.insert(plaintext_on_boundary.end(), padding.begin(),
-                                                 padding.end());
-                }
-            }
+        if (allow_truncation && (message.size() > max_len)) {
+            // truncate the data
+            // insert length in big endian form
+            formattedMessage.insert(formattedMessage.end(), (uint8_t *)&pad_len_be,
+                                    (uint8_t *)&pad_len_be + sizeof(pad_len_be));
+            // insert plaintext
+            formattedMessage.insert(formattedMessage.end(), &message.front(),
+                                    &message.front() + max_len);
         } else {
-            if (0 != (message.size() % HASHED_CIPHERTEXT_BLOCK_LENGTH)) {
+            if (message.size() > max_len) {
                 throw invalid_argument(
-                  "HashedElGamalCiphertext::encrypt the apply_padding was false "
-                  "but the plaintext is not a multiple of the block length 32");
+                  "HashedElGamalCiphertext::encrypt the plaintext is greater than max_len");
             }
-            plaintext_on_boundary.insert(plaintext_on_boundary.end(), message.begin(),
-                                         message.end());
+
+            uint16_t pad_len = max_len - message.size();
+            uint16_t pad_len_be = htobe16(pad_len);
+
+            std::vector<uint8_t> padding(pad_len, 0);
+
+            // insert length in big endian form
+            formattedMessage.insert(formattedMessage.end(), (uint8_t *)&pad_len_be,
+                                    (uint8_t *)&pad_len_be + sizeof(pad_len_be));
+            // insert plaintext
+            formattedMessage.insert(formattedMessage.end(), message.begin(), message.end());
+
+            // we dont pad 0x00s if the length field plus plaintext length falls on a block length boundary
+            if (pad_len > 0) {
+                // insert padding
+                formattedMessage.insert(formattedMessage.end(), padding.begin(), padding.end());
+            }
         }
 
-        uint32_t plaintext_len = plaintext_on_boundary.size();
-        uint32_t number_of_blocks = plaintext_len / HASHED_CIPHERTEXT_BLOCK_LENGTH;
+        return formattedMessage;
+    }
 
-        unique_ptr<ElementModP> g_to_r = nullptr;
-        unique_ptr<ElementModP> publicKey_to_r = nullptr;
+    unique_ptr<HashedElGamalCiphertext>
+    hashedElgamalEncrypt(std::vector<uint8_t> message, const ElementModQ &nonce,
+                         const std::string &hashPrefix, const ElementModP &publicKey,
+                         const ElementModQ &seed, bool usePrecompute /* = false */)
+    {
 
-        if (shouldUsePrecomputedValues) {
+        if (0 != (message.size() % HASHED_CIPHERTEXT_BLOCK_LENGTH)) {
+            throw invalid_argument("HashedElGamalCiphertext::encrypt the apply_padding was false "
+                                   "but the plaintext is not a multiple of the block length 32");
+        }
+
+        vector<uint8_t> plaintext_on_boundary;
+        plaintext_on_boundary.insert(plaintext_on_boundary.end(), message.begin(), message.end());
+
+        unique_ptr<ElementModP> alpha = nullptr; // g^Ri,l mod p
+        unique_ptr<ElementModP> beta = nullptr;  // K^Ri,l mod p
+
+        if (usePrecompute) {
             // check if the are precompute values rather than doing the exponentiations here
-            auto triple = PrecomputeBufferContext::popTriple();
+            auto triple = PrecomputeBufferContext::popPrecomputedEncryption();
             if (triple != nullptr && triple.has_value()) {
-                g_to_r = triple.value()->get_g_to_exp();
-                publicKey_to_r = triple.value()->get_pubkey_to_exp();
+                alpha = triple.value()->getPad()->clone();
+                beta = triple.value()->getBlindingFactor()->clone();
             }
         }
 
         // fallback to doing the exponentiations here
-        if (g_to_r == nullptr || publicKey_to_r == nullptr) {
-            g_to_r = g_pow_p(nonce);
-            publicKey_to_r = pow_mod_p(publicKey, nonce);
+        if (alpha == nullptr || beta == nullptr) {
+            alpha = g_pow_p(nonce);
+            beta = pow_mod_p(publicKey, nonce);
         }
 
-        // hash g_to_r and publicKey_to_r to get the session key
-        auto session_key = hash_elems({g_to_r.get(), publicKey_to_r.get()});
+        // hash g_to_r and publicKey_to_r to get the session key (k_i,l)
+        auto session_key =
+          hash_elems({hashPrefix, &const_cast<ElementModQ &>(seed),
+                      &const_cast<ElementModP &>(publicKey), alpha.get(), beta.get()});
 
         uint32_t plaintext_index = 0;
+        uint32_t plaintext_len = plaintext_on_boundary.size();
+        uint32_t number_of_blocks = plaintext_len / HASHED_CIPHERTEXT_BLOCK_LENGTH;
+
+        vector<uint8_t> ciphertext;
         for (uint32_t i = 0; i < number_of_blocks; i++) {
             vector<uint8_t> temp_ciphertext(HASHED_CIPHERTEXT_BLOCK_LENGTH, 0);
 
             vector<uint8_t> xor_key =
-              HMAC::compute(session_key->toBytes(), encryption_seed.toBytes(),
-                            number_of_blocks * HASHED_BLOCK_LENGTH_IN_BITS, i + 1);
+              HMAC::compute(session_key->toBytes(), seed.toBytes(),
+                            number_of_blocks * HASHED_CIPHERTEXT_BLOCK_LENGTH_IN_BITS, i + 1);
 
             // XOR the key with the plaintext
             for (int j = 0; j < (int)HASHED_CIPHERTEXT_BLOCK_LENGTH; j++) {
@@ -617,16 +741,28 @@ namespace electionguard
             hacl::Lib::memZero(&temp_ciphertext.front(), temp_ciphertext.size());
         }
 
-        vector<uint8_t> mac_key = HMAC::compute(session_key->toBytes(), encryption_seed.toBytes(),
-                                                number_of_blocks * HASHED_BLOCK_LENGTH_IN_BITS, 0);
+        vector<uint8_t> mac_key =
+          HMAC::compute(session_key->toBytes(), seed.toBytes(),
+                        number_of_blocks * HASHED_CIPHERTEXT_BLOCK_LENGTH_IN_BITS, 0);
 
         // calculate the mac (c0 is g ^ r mod p and c1 is the ciphertext, they are concatenated)
-        vector<uint8_t> c0_and_c1(g_to_r->toBytes());
+        vector<uint8_t> c0_and_c1(alpha->toBytes());
         c0_and_c1.insert(c0_and_c1.end(), ciphertext.begin(), ciphertext.end());
         vector<uint8_t> mac = HMAC::compute(mac_key, c0_and_c1, 0, 0);
         hacl::Lib::memZero(&mac_key.front(), mac_key.size());
 
-        return make_unique<HashedElGamalCiphertext>(move(g_to_r), ciphertext, mac);
+        return make_unique<HashedElGamalCiphertext>(move(alpha), ciphertext, mac);
+    }
+
+    unique_ptr<HashedElGamalCiphertext>
+    hashedElgamalEncrypt(std::vector<uint8_t> message, const ElementModQ &nonce,
+                         const std::string &hashPrefix, const ElementModP &publicKey,
+                         const ElementModQ &seed, HASHED_CIPHERTEXT_PADDED_DATA_SIZE max_len,
+                         bool allowTruncation, bool usePrecompute /* = false */)
+    {
+        vector<uint8_t> formattedMessage = formatMessage(message, max_len, allowTruncation);
+        return hashedElgamalEncrypt(formattedMessage, nonce, hashPrefix, publicKey, seed,
+                                    usePrecompute);
     }
 
 } // namespace electionguard
