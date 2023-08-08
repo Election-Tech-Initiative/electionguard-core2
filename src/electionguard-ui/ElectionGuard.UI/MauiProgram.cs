@@ -34,7 +34,6 @@ public static class MauiProgram
                 essentials.UseVersionTracking();
             });
 
-        AddAppCenterAnalytics();
 
         return builder.Build();
     }
