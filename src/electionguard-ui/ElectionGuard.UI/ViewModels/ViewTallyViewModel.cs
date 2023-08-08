@@ -1,6 +1,7 @@
 ﻿using CommunityToolkit.Maui.Storage;
 using CommunityToolkit.Mvvm.Input;
 using ElectionGuard.Decryption.Tally;
+using ElectionGuard.UI.Lib.Models;
 using ElectionGuard.UI.Models;
 using Newtonsoft.Json;
 
@@ -180,8 +181,6 @@ public partial class ViewTallyViewModel : BaseViewModel
             var contest = CurrentManifest.Contests.Single(c => c.ObjectId == item.ObjectId);
             var contestItem = new ContestItem() { Name = contest.Name, TotalVotes = contest.VotesAllowed * (ulong)Tally.CastBallotCount };
             ulong writeInTotal = 0;
-            ulong overVoteTotal = 0;
-            ulong underVoteTotal = 0;
             ulong totalVotes = 0;
 
             foreach (var (skey, selection) in item.Selections)
@@ -204,14 +203,29 @@ public partial class ViewTallyViewModel : BaseViewModel
                 var percent = (float)writeInTotal / (contest.VotesAllowed * (ulong)Tally.CastBallotCount) * 100;
                 contestItem.Selections.Add(new() { Name = "Write-ins", Party = string.Empty, Votes = writeInTotal, Percent = percent });
             }
-            underVoteTotal = (contest.VotesAllowed * (ulong)Tally.CastBallotCount) - totalVotes;
-            var underPercent = (float)underVoteTotal / (contest.VotesAllowed * (ulong)Tally.CastBallotCount) * 100;
-            contestItem.Selections.Add(new() { Name = "Undervotes", Party = string.Empty, Votes = underVoteTotal, Percent = underPercent });
-            var overPercent = (float)overVoteTotal / (contest.VotesAllowed * (ulong)Tally.CastBallotCount) * 100;
-            contestItem.Selections.Add(new() { Name = "Overvotes", Party = string.Empty, Votes = overVoteTotal, Percent = overPercent });
+
+            // TallyOverVoteUndervote(contest, Tally, contestItem, totalVotes);
 
             Contests.Add(contestItem);
         }
+    }
+
+    // TODO: Fix calculation and add to contest item.
+    private void TallyOverVoteUndervote(ContestDescriptionWithPlaceholders contest, ContestItem contestItem, ulong totalVotes)
+    {
+        if (Tally == null)
+        {
+            return;
+        }
+
+        var overVoteTotal = 0UL;
+        var underVoteTotal = (contest.VotesAllowed * (ulong)Tally.CastBallotCount) - totalVotes;
+        var underPercent = (float)underVoteTotal / (contest.VotesAllowed * (ulong)Tally.CastBallotCount) * 100;
+
+        contestItem.Selections.Add(new() { Name = "Undervotes", Party = string.Empty, Votes = underVoteTotal, Percent = underPercent });
+        var overPercent = (float)overVoteTotal / (contest.VotesAllowed * (ulong)Tally.CastBallotCount) * 100;
+
+        contestItem.Selections.Add(new() { Name = "Overvotes", Party = string.Empty, Votes = overVoteTotal, Percent = overPercent });
     }
 
     public override async Task OnLeavingPage()
