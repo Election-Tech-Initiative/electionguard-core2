@@ -215,7 +215,12 @@
                     </Grid>
                 </VerticalStackLayout>
             </Grid>
-            <ContentPresenter Grid.Row="1" />
+            <ScrollView Grid.Row="1">
+                <VerticalStackLayout>
+                    <ContentPresenter />
+                    <Grid HeightRequest="100" />
+                </VerticalStackLayout>
+            </ScrollView>
             <Grid
                 Grid.Row="2"
                 Padding="10"
