@@ -7,7 +7,7 @@ public partial class LoginViewModel : BaseViewModel
     private bool _hasSeenAutoSettingPage = false;
     private IServiceProvider _serviceProvider;
 
-    public LoginViewModel(IServiceProvider serviceProvider, ILogger<App> logger) : base("UserLogin", serviceProvider)
+    public LoginViewModel(IServiceProvider serviceProvider, ILogger<LoginViewModel> logger) : base("UserLogin", serviceProvider)
     {
         _serviceProvider = serviceProvider;
         _logger = logger;

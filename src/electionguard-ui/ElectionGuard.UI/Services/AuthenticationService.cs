@@ -13,7 +13,7 @@ public class AuthenticationService : IAuthenticationService
         _databaseService = userService;
     }
 
-    public async Task Login(string username, ILogger? logger)
+    public async Task Login(string username, ILogger logger)
     {
         await Task.Run(() =>
         {
@@ -21,7 +21,7 @@ public class AuthenticationService : IAuthenticationService
             App.CurrentUser.Name = username;
             var isAdmin = username.ToLower(CultureInfo.CurrentCulture).Contains(UISettings.AdminUser);
             App.CurrentUser.IsAdmin = isAdmin;
-            logger?.LogInformation("Logging in as {UserName} {1}", UserName, isAdmin ? "(admin)" : string.Empty);
+            logger.LogInformation("Logging in as {UserName} {admin}", UserName, isAdmin ? "(admin)" : string.Empty);
         });
     }
 

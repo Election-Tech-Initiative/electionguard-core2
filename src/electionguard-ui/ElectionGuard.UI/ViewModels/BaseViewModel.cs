@@ -59,7 +59,7 @@ public partial class BaseViewModel : ObservableObject, IDisposable
     {
         _logger?.LogInformation("Logging out as {UserName}", UserName);
         await OnLeavingPage();
-        await Shell.Current.CurrentPage.Dispatcher.DispatchAsync(async () => 
+        await Shell.Current.CurrentPage.Dispatcher.DispatchAsync(async () =>
         await NavigationService.GoToPage(typeof(LoginViewModel)));
         Dispose();
     }
