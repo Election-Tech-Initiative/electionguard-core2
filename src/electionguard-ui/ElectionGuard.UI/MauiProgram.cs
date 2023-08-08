@@ -137,37 +137,4 @@ public static class MauiProgram
 
         return builder;
     }
-
-
-    /// <summary>
-    /// Include crash analytics via appcenter.
-    /// This requires both APPCENTER_SECRET_MACOS and APPCENTER_SECRET_UWP to be set.
-    /// TODO: https://github.com/dotnet/maui/issues/4408 for user secret support.
-    /// </summary>
-    private static void AddAppCenterAnalytics()
-    {
-#if DEBUG
-        return;
-#endif
-
-        string uwpSecret = string.Empty;
-        string macSecret = string.Empty;
-
-#if APPCENTER_SECRET_MACOS
-        macSecret = APPCENTER_SECRET_MACOS;
-#endif
-
-#if APPCENTER_SECRET_UWP
-        uwpSecret = APPCENTER_SECRET_UWP;
-#endif
-        if (string.IsNullOrEmpty(macSecret) && string.IsNullOrEmpty(uwpSecret))
-        {
-            return;
-        }
-
-        AppCenter.Start(
-            $"uwp={uwpSecret};macos={macSecret};",
-            typeof(Analytics), typeof(Crashes));
-
-    }
 }
