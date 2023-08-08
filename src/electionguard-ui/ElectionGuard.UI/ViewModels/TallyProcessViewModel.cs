@@ -105,7 +105,10 @@ public partial class TallyProcessViewModel : BaseViewModel
 
     private void Current_PropertyChanged(object? sender, System.ComponentModel.PropertyChangedEventArgs e)
     {
-        UpdateProgressString();
+        if (IsMultiTally && CurrentMultiTally != null && string.IsNullOrEmpty(TallyId) && MultiTallyIds.Any())
+        {
+            UpdateProgressString();
+        }
     }
 
     private void MultiTallyIds_CollectionChanged(object? sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
@@ -344,21 +347,21 @@ public partial class TallyProcessViewModel : BaseViewModel
     void UpdateProgressString()
     {
         var count = 0;
-        if (MultiTallyIds.Count == CurrentMultiTally.TallyIds.Count)
+        if (MultiTallyIds.Count == CurrentMultiTally?.TallyIds.Count)
         {
             count = 0;
         }
         else if (MultiTallyIds.Count == 0 && string.IsNullOrEmpty(TallyId))
         {
-            count = CurrentMultiTally.TallyIds.Count;
+            count = CurrentMultiTally?.TallyIds.Count ?? 0;
         }
         else
         {
             // separate formula here since the ceremony will be working on 1 of them
             // and it will be removed from the list and not counted yet
-            count = CurrentMultiTally.TallyIds.Count - MultiTallyIds.Count - 1;
+            count = (CurrentMultiTally?.TallyIds.Count ?? 0) - MultiTallyIds.Count - 1;
         }
-        MultiTallyProgress = $"{count} / {CurrentMultiTally.TallyIds.Count} {AppResources.Complete}";
+        MultiTallyProgress = $"{count} / {CurrentMultiTally?.TallyIds.Count ?? 0} {AppResources.Complete}";
     }
 
     private void CeremonyPollingTimer_Tick(object? sender, EventArgs e)
