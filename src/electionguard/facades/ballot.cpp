@@ -2,6 +2,7 @@
 
 #include "../log.hpp"
 #include "convert.hpp"
+#include "electionguard/election.hpp"
 #include "electionguard/group.hpp"
 #include "variant_cast.hpp"
 
@@ -25,6 +26,7 @@ using electionguard::BallotBoxState;
 using electionguard::CiphertextBallot;
 using electionguard::CiphertextBallotContest;
 using electionguard::CiphertextBallotSelection;
+using electionguard::CiphertextElectionContext;
 using electionguard::dynamicCopy;
 using electionguard::ElementModP;
 using electionguard::ElementModQ;
@@ -329,7 +331,7 @@ eg_ciphertext_ballot_selection_crypto_hash_with(eg_ciphertext_ballot_selection_t
 {
     try {
         auto *encryptionSeed = AS_TYPE(ElementModQ, in_encryption_seed);
-        auto result = AS_TYPE(CiphertextBallotSelection, handle)->crypto_hash_with(*encryptionSeed);
+        auto result = AS_TYPE(CiphertextBallotSelection, handle)->crypto_hash();
         *out_crypto_hash = AS_TYPE(eg_element_mod_q_t, result.release());
         return ELECTIONGUARD_STATUS_SUCCESS;
     } catch (const exception &e) {
@@ -609,11 +611,28 @@ eg_ciphertext_ballot_contest_crypto_hash_with(eg_ciphertext_ballot_contest_t *ha
 {
     try {
         auto *encryptionSeed = AS_TYPE(ElementModQ, in_encryption_seed);
-        auto result = AS_TYPE(CiphertextBallotContest, handle)->crypto_hash_with(*encryptionSeed);
+        auto result = AS_TYPE(CiphertextBallotContest, handle)->crypto_hash();
         *out_crypto_hash = AS_TYPE(eg_element_mod_q_t, result.release());
         return ELECTIONGUARD_STATUS_SUCCESS;
     } catch (const exception &e) {
         Log::error("eg_ciphertext_ballot_contest_crypto_hash_with", e);
+        return ELECTIONGUARD_STATUS_ERROR_BAD_ALLOC;
+    }
+}
+
+eg_electionguard_status_t eg_ciphertext_ballot_contest_contest_nonce(
+  eg_ciphertext_election_context_t *in_context, uint64_t in_sequence_order,
+  eg_element_mod_q_t *nonce_seed, eg_element_mod_q_t **out_contest_nonce)
+{
+    try {
+        auto *context = AS_TYPE(CiphertextElectionContext, in_context);
+        auto *nonceSeed = AS_TYPE(ElementModQ, nonce_seed);
+        auto result =
+          CiphertextBallotContest::contestNonce(*context, in_sequence_order, *nonceSeed);
+        *out_contest_nonce = AS_TYPE(eg_element_mod_q_t, result.release());
+        return ELECTIONGUARD_STATUS_SUCCESS;
+    } catch (const exception &e) {
+        Log::error("eg_ciphertext_ballot_contest_contest_nonce", e);
         return ELECTIONGUARD_STATUS_ERROR_BAD_ALLOC;
     }
 }
@@ -1017,7 +1036,7 @@ eg_ciphertext_ballot_crypto_hash_with(eg_ciphertext_ballot_t *handle,
 {
     try {
         auto *manifestHash = AS_TYPE(ElementModQ, in_manifest_hash);
-        auto result = AS_TYPE(CiphertextBallot, handle)->crypto_hash_with(*manifestHash);
+        auto result = AS_TYPE(CiphertextBallot, handle)->crypto_hash();
         *out_hash_ref = AS_TYPE(eg_element_mod_q_t, result.release());
         return ELECTIONGUARD_STATUS_SUCCESS;
     } catch (const exception &e) {

@@ -34,6 +34,9 @@ using std::vector;
 
 namespace electionguard
 {
+
+#pragma region Manifest Helpers
+
     // TODO: input sanitization and safety
 
     static json annotatedStringToJson(const AnnotatedString &serializable)
@@ -497,6 +500,8 @@ namespace electionguard
         }
         return elements;
     }
+
+#pragma endregion
 
     class Serialize
     {
@@ -1108,17 +1113,47 @@ namespace electionguard
                         selections.push_back(selection_props);
                     }
 
+                    // CiphertextBallotContest
+
                     json ciphertext = {
                       {"pad", contest.get().getCiphertextAccumulation()->getPad()->toHex()},
                       {"data", contest.get().getCiphertextAccumulation()->getData()->toHex()}};
 
+                    // RangedChaumPedersenProof
                     auto *p = contest.get().getProof();
+                    json integer_proofs;
+                    uint64_t i = 0;
+                    for (const auto &proof : p->getProofs()) {
+                        json proof_json;
+
+                        // HACK: disable serializing out commitments
+                        // as a means of enforcing that commitments are not
+                        // included in the election record.
+                        // TODO: allow a caller to specify this behavior
+                        auto expliclyDisableSerializingCommimtnets = true;
+                        if (proof.get().commitment.has_value() &&
+                            !expliclyDisableSerializingCommimtnets) {
+                            proof_json = {
+                              {"pad", proof.get().commitment.value()->getPad()->toHex()},
+                              {"data", proof.get().commitment.value()->getData()->toHex()},
+                              {"challenge", proof.get().challenge->toHex()},
+                              {"response", proof.get().response->toHex()},
+                            };
+                        } else {
+                            proof_json = {
+                              {"challenge", proof.get().challenge->toHex()},
+                              {"response", proof.get().response->toHex()},
+                            };
+                        }
+
+                        integer_proofs.push_back({i, proof_json});
+                        i++;
+                    }
+
                     json contest_proof = {
-                      {"pad", p->getPad()->toHex()},
-                      {"data", p->getData()->toHex()},
+                      {"range_limit", p->getRangeLimit()},
                       {"challenge", p->getChallenge()->toHex()},
-                      {"response", p->getResponse()->toHex()},
-                      {"constant", p->getConstant()},
+                      {"proofs", integer_proofs},
                     };
                     auto e = contest.get().getHashedElGamalCiphertext();
                     json extended_data = {
@@ -1190,6 +1225,7 @@ namespace electionguard
                         ElementModP::fromHex(contest_ciphertext_data));
                     auto contest_crypto_hash = contest["crypto_hash"].get<string>();
 
+                    // hashed elgamal
                     auto hashed_el_gamal = contest["extended_data"];
                     auto hashed_el_gamal_pad = hashed_el_gamal["pad"].get<string>();
                     auto hashed_el_gamal_data = hashed_el_gamal["data"].get<string>();
@@ -1204,19 +1240,40 @@ namespace electionguard
                         hex_to_bytes(hashed_el_gamal_data_sanitized),
                         hex_to_bytes(hashed_el_gamal_mac_sanitized));
 
+                    // proof of selection limit
                     auto proof = contest["proof"];
-                    auto contest_proof_pad = proof["pad"].get<string>();
-                    auto contest_proof_data = proof["data"].get<string>();
+                    auto contest_proof_range_limit = proof["range_limit"].get<uint64_t>();
                     auto contest_proof_challenge = proof["challenge"].get<string>();
-                    auto contest_proof_response = proof["response"].get<string>();
-                    auto contest_proof_constant = proof["constant"].get<uint64_t>();
 
-                    auto deserializedProof = make_unique<electionguard::ConstantChaumPedersenProof>(
-                      ElementModP::fromHex(contest_proof_pad),
-                      ElementModP::fromHex(contest_proof_data),
-                      ElementModQ::fromHex(contest_proof_challenge),
-                      ElementModQ::fromHex(contest_proof_response), contest_proof_constant);
+                    map<uint64_t, unique_ptr<ZeroKnowledgeProof>> integer_proofs;
 
+                    for (auto &proof : proof["proofs"]) {
+                        auto proof_index = proof[0].get<uint64_t>();
+
+                        auto proof_challenge = proof[1]["challenge"].get<string>();
+                        auto proof_response = proof[1]["response"].get<string>();
+
+                        if (proof[1].contains("pad")) {
+                            auto proof_pad = proof[1]["pad"].get<string>();
+                            auto proof_data = proof[1]["data"].get<string>();
+
+                            integer_proofs[proof_index] = make_unique<ZeroKnowledgeProof>(
+                              ElementModP::fromHex(proof_pad), ElementModP::fromHex(proof_data),
+                              ElementModQ::fromHex(proof_challenge),
+                              ElementModQ::fromHex(proof_response));
+                        } else {
+                            integer_proofs[proof_index] =
+                              make_unique<ZeroKnowledgeProof>(ElementModQ::fromHex(proof_challenge),
+                                                              ElementModQ::fromHex(proof_response));
+                        }
+                    }
+
+                    // TODO: handle deserialization
+                    auto deserializedProof = make_unique<electionguard::RangedChaumPedersenProof>(
+                      contest_proof_range_limit, ElementModQ::fromHex(contest_proof_challenge),
+                      move(integer_proofs));
+
+                    // selections
                     auto selections = contest["ballot_selections"];
                     vector<unique_ptr<electionguard::CiphertextBallotSelection>>
                       ciphertextSelections;
@@ -1240,6 +1297,7 @@ namespace electionguard
                           ElementModP::fromHex(ciphertext_pad),
                           ElementModP::fromHex(ciphertext_data));
 
+                        // disjunctive proof
                         auto selection_proof = selection["proof"];
                         auto selection_proof_zero_pad =
                           selection_proof["proof_zero_pad"].get<string>();

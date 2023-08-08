@@ -165,6 +165,101 @@ eg_disjunctive_chaum_pedersen_proof_is_valid(eg_disjunctive_chaum_pedersen_proof
 
 #endif
 
+#ifndef RangedChaumPedersenProof
+
+/**
+* The Ranged Chaum Pederson proof is a Non-Interactive Zero-Knowledge Proof
+* that represents the proof of ballot correctness (that a value is in the range [0,n]).
+* This proof demonstrates that an ElGamal encryption pair (𝛼,𝛽) is a number between 0 and n, inclusive
+* (given knowledge of encryption nonce R).
+*
+* This object should not be constructed directly.  Use `eg_ranged_chaum_pedersen_proof_make`
+*/
+struct eg_ranged_chaum_pedersen_proof_s;
+
+typedef struct eg_ranged_chaum_pedersen_proof_s eg_ranged_chaum_pedersen_proof_t;
+
+// No constructor provided.  Use `eg_disjunctive_chaum_pedersen_proof_make`
+
+/**
+ * @brief get the proof's range limit
+ * 
+ * @param handle A handle to a `eg_ranged_chaum_pedersen_proof_t` opaque instance
+ * @param out_element_ref range limit
+ **/
+EG_API eg_electionguard_status_t eg_ranged_chaum_pedersen_proof_get_range_limit(
+  eg_ranged_chaum_pedersen_proof_t *handle, uint64_t *out_element_ref);
+
+/**
+ * @brief get the proof's challenge
+ * 
+ * @param handle A handle to a `eg_ranged_chaum_pedersen_proof_t` opaque instance
+ * @param out_element_ref challenge
+ */
+EG_API eg_electionguard_status_t eg_ranged_chaum_pedersen_proof_get_challenge(
+  eg_ranged_chaum_pedersen_proof_t *handle, eg_element_mod_q_t **out_element_ref);
+
+EG_API eg_electionguard_status_t
+eg_ranged_chaum_pedersen_proof_free(eg_ranged_chaum_pedersen_proof_t *handle);
+
+/**
+ * make function for a `RangedChaumPedersenProof`
+ *
+ * This overload does not accept a seed value and calculates
+ * proofs independent of the original encryption. (faster performance)
+ * @param[in] in_message The ciphertext message
+ * @param[in] in_r The nonce used creating the ElGamal ciphertext
+ * @param[in] in_selected index of the selection
+ * @param[in] in_maxLimit number of commitments in the proof
+ * @param[in] in_k The public key of the election
+ * @param[in] in_q A value used when generating the challenge,
+ *                 usually the election extended base hash (𝑄')
+ * @param[out] out_handle A handle to an `eg_ranged_chaum_pedersen_proof_t`. 
+ *                        Caller is responsible for lifecycle.
+ */
+EG_API eg_electionguard_status_t eg_ranged_chaum_pedersen_proof_make(
+  eg_elgamal_ciphertext_t *in_message, eg_element_mod_q_t *in_r, uint64_t in_selected,
+  uint64_t in_maxLimit, eg_element_mod_p_t *in_k, eg_element_mod_q_t *in_q,
+  const char *in_hash_prefix, eg_ranged_chaum_pedersen_proof_t **out_handle);
+
+/**
+ * make function for a `RangedChaumPedersenProof`
+ *
+ * This overload accepts a seed value and calculates
+ * proofs deterministically based on the seed. (slower, but reproduceable proofs)
+ * @param[in] in_message The ciphertext message
+ * @param[in] in_r The nonce used creating the ElGamal ciphertext
+ * @param[in] in_selected index of the selection
+ * @param[in] in_maxLimit number of commitments in the proof
+ * @param[in] in_k The public key of the election
+ * @param[in] in_q A value used when generating the challenge,
+ *                 usually the election extended base hash (𝑄')
+ * @param[in] in_seed Used to generate other random values here
+ * @param[in] in_plaintext Zero or one
+ * @param[out] out_handle A handle to an `eg_disjunctive_chaum_pedersen_proof_t`. 
+ *                        Caller is responsible for lifecycle.
+ */
+EG_API eg_electionguard_status_t eg_ranged_chaum_pedersen_proof_make_deterministic(
+  eg_elgamal_ciphertext_t *in_message, eg_element_mod_q_t *in_r, uint64_t in_selected,
+  uint64_t in_maxLimit, eg_element_mod_p_t *in_k, eg_element_mod_q_t *in_q,
+  const char *in_hash_prefix, eg_element_mod_q_t *in_seed,
+  eg_ranged_chaum_pedersen_proof_t **out_handle);
+
+/**
+ * Validates a "ranged" Chaum-Pedersen [0...n] proof.
+ *
+ * @param[in] in_ciphertext The ciphertext message
+ * @param[in] in_k The public key of the election
+ * @param[in] in_q The extended base hash of the election
+ */
+EG_API bool eg_ranged_chaum_pedersen_proof_is_valid(eg_ranged_chaum_pedersen_proof_t *handle,
+                                                    eg_elgamal_ciphertext_t *in_ciphertext,
+                                                    eg_element_mod_p_t *in_k,
+                                                    eg_element_mod_q_t *in_q,
+                                                    const char *in_hash_prefix);
+
+#endif
+
 #ifndef ConstantChaumPedersenProof
 
 struct eg_constant_chaum_pedersen_proof_s;

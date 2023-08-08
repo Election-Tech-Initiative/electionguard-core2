@@ -77,7 +77,7 @@ Building for WebAssembly (wasm) is supported with the `emscripten` toolchain.
 
 ### 🖥️ Windows (using MSVC)
 
-Building on windows is supported using the `MSVC` toolchain.
+Building on windows is supported using the `MSVC` toolchain. MSVC is the default toolchain on Windows.
 
 - Install [Chocolatey](https://chocolatey.org/install)
 - Install [Powershell Core](https://github.com/powershell/powershell)
@@ -90,7 +90,7 @@ Building on windows is supported using the `MSVC` toolchain.
 
 ### 🖥️ Windows (using MSYS2)
 
-Building on windows is supported using the `MSYS2` toolchain. MSYS is the default toolchain on Windows.
+Building on windows is supported using the `MSYS2` toolchain. 
 
 - Install [Chocolatey](https://chocolatey.org/install)
 - Install [Powershell Core](https://github.com/powershell/powershell)

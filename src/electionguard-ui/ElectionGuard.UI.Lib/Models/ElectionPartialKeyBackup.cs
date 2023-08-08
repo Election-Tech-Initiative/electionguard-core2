@@ -7,8 +7,16 @@ public class ElectionPartialKeyBackup : DisposableBase
 {
     // TODO: implement IElectionGuardian
 
+    /// <summary>
+    /// The guardian id of the owner who created this backup
+    /// </summary>
     public string OwnerId { get; set; }
 
+    public ulong OwnerSequenceOrder { get; set; }
+
+    /// <summary>
+    /// The guardian id of the designated guardian who should receive this backup
+    /// </summary>
     public string DesignatedId { get; set; }
 
     public ulong DesignatedSequenceOrder { get; set; }
@@ -17,11 +25,13 @@ public class ElectionPartialKeyBackup : DisposableBase
 
     public ElectionPartialKeyBackup(
         string ownerId,
+        ulong ownerSequenceOrder,
         string designatedId,
         ulong designatedSequenceOrder,
         HashedElGamalCiphertext encryptedCoordinate)
     {
         OwnerId = ownerId;
+        OwnerSequenceOrder = ownerSequenceOrder;
         DesignatedId = designatedId;
         DesignatedSequenceOrder = designatedSequenceOrder;
         EncryptedCoordinate = new(encryptedCoordinate);
@@ -30,6 +40,7 @@ public class ElectionPartialKeyBackup : DisposableBase
     public ElectionPartialKeyBackup(ElectionPartialKeyBackup other)
     {
         OwnerId = other.OwnerId;
+        OwnerSequenceOrder = other.OwnerSequenceOrder;
         DesignatedId = other.DesignatedId;
         DesignatedSequenceOrder = other.DesignatedSequenceOrder;
         EncryptedCoordinate = new(other.EncryptedCoordinate);
@@ -38,7 +49,6 @@ public class ElectionPartialKeyBackup : DisposableBase
     protected override void DisposeUnmanaged()
     {
         base.DisposeUnmanaged();
-
         EncryptedCoordinate?.Dispose();
     }
 }

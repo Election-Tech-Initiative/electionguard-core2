@@ -33,6 +33,16 @@ namespace ElectionGuard
         }
 
         /// <summary>
+        /// Creates an <see cref="EncryptionDevice">EncryptionDevice</see> object from a <see href="https://www.rfc-editor.org/rfc/rfc8259.html#section-8.1">[RFC-8259]</see> UTF-8 encoded JSON string
+        /// </summary>
+        /// <param name="json">A UTF-8 Encoded JSON data string</param>
+        public EncryptionDevice(string json)
+        {
+            var status = NativeInterface.EncryptionDevice.FromJson(json, out Handle);
+            status.ThrowIfError();
+        }
+
+        /// <summary>
         /// Get a new hash value
         ///
         /// <return>An `ElementModQ`</return>
@@ -44,15 +54,6 @@ namespace ElectionGuard
             return new ElementModQ(value);
         }
 
-        /// <summary>
-        /// Creates an <see cref="EncryptionDevice">EncryptionDevice</see> object from a <see href="https://www.rfc-editor.org/rfc/rfc8259.html#section-8.1">[RFC-8259]</see> UTF-8 encoded JSON string
-        /// </summary>
-        /// <param name="json">A UTF-8 Encoded JSON data string</param>
-        public EncryptionDevice(string json)
-        {
-            var status = NativeInterface.EncryptionDevice.FromJson(json, out Handle);
-            status.ThrowIfError();
-        }
         /// <Summary>
         /// Export the encryption device representation as JSON
         /// </Summary>

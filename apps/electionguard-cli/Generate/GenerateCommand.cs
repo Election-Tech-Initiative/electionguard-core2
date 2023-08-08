@@ -34,7 +34,7 @@ namespace ElectionGuard.CLI.Generate
                 internalManifest, Random.Shared, options.BallotCount);
 
             var plaintextPath = Path.Combine(options.WorkingDir, "plaintext");
-            var encryptedPath = Path.Combine(options.WorkingDir, "encrypted");
+            var encryptedPath = Path.Combine(options.WorkingDir, "encrypted_ballots");
 
             foreach (var ballot in plaintextBallots)
             {

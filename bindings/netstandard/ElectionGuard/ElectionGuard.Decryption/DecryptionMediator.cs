@@ -149,7 +149,8 @@ public class DecryptionMediator : DisposableBase
         SubmitShare(shares.TallyShare);
         if (ballots.Count > 0)
         {
-            SubmitShares(shares.BallotShares.Values.Select(i => new BallotShare(i)).ToList(),
+            SubmitShares(
+                shares.BallotShares.Values.Select(i => new BallotShare(i)).ToList(),
                 ballots.Select(i => new CiphertextBallot(i)).ToList());
         }
     }
@@ -303,12 +304,12 @@ public class DecryptionMediator : DisposableBase
     {
         if (!Tallies.ContainsKey(share.TallyId))
         {
-            throw new ArgumentException("Tally does not exist");
+            throw new ArgumentException($"Tally does not exist {share.TallyId}");
         }
 
         if (!Guardians.ContainsKey(share.GuardianId))
         {
-            throw new ArgumentException("Guardian does not exist");
+            throw new ArgumentException($"Guardian does not exist {share.GuardianId}");
         }
 
         if (!TallyDecryptions.ContainsKey(share.TallyId))

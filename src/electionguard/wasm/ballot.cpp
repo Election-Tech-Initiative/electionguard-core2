@@ -25,7 +25,9 @@ EMSCRIPTEN_BINDINGS(electionguard)
       .function("getBallotCode", &CiphertextBallot::getBallotCode, allow_raw_pointers())
       .function("getTimestamp", &CiphertextBallot::getTimestamp, allow_raw_pointers())
       .function("getNonce", &CiphertextBallot::getNonce, allow_raw_pointers())
-      .function("isValidEncryption", &CiphertextBallot::isValidEncryption)
+      .function("isValidEncryption",
+                select_overload<bool(const ElementModQ &, const ElementModP &, const ElementModQ &,
+                                     const string &)>(&CiphertextBallot::isValidEncryption))
       .function("cast", &CiphertextBallot::cast)
       .function("challenge", &CiphertextBallot::challenge)
       .function("spoil", &CiphertextBallot::spoil)

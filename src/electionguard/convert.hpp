@@ -217,6 +217,14 @@ namespace electionguard
         return result;
     }
 
+    template <std::size_t Width = 32>
+    inline std::vector<uint8_t> string_to_fixed_width_bytes(const std::string &str)
+    {
+        std::vector<uint8_t> byteVector(Width, 0); // Initialize with zeros
+        std::copy(str.begin(), str.end(), byteVector.begin());
+        return byteVector;
+    }
+
     string hacl_to_hex_256(uint64_t *data);
 
     string hacl_to_hex_4096(uint64_t *data);
@@ -235,6 +243,20 @@ namespace electionguard
         std::wstring_convert<convert_typeX, wchar_t> converterX;
 
         return converterX.to_bytes(wstr);
+    }
+
+    template <typename T> inline string concat(const std::vector<T> &vec, std::size_t maxLength)
+    {
+        std::stringstream ss;
+        for (const auto &element : vec) {
+            ss << element;
+            if (ss.tellp() > static_cast<std::streampos>(maxLength)) {
+                std::string result = ss.str();
+                result.resize(maxLength); // cut the string to the maximum length
+                return result;
+            }
+        }
+        return ss.str();
     }
 
     /// Copy the string to a heap-allocated null-termianted array
@@ -289,6 +311,62 @@ namespace electionguard
     std::chrono::system_clock::time_point timePointFromIsoString(const string &time);
     std::chrono::system_clock::time_point timePointFromIsoString(const string &time,
                                                                  const string &format);
+
+    template <typename T>
+    std::vector<std::reference_wrapper<T>>
+    referenceWrap(const std::vector<std::unique_ptr<T>> &input)
+    {
+        std::vector<std::reference_wrapper<T>> result;
+        result.reserve(input.size());
+
+        for (const auto &item : input) {
+            result.emplace_back(*item);
+        }
+
+        return result;
+    }
+
+    template <typename T>
+    std::vector<std::reference_wrapper<T>>
+    referenceWrap(const std::map<uint64_t, std::unique_ptr<T>> &input)
+    {
+        std::vector<std::reference_wrapper<T>> result;
+        result.reserve(input.size());
+
+        for (const auto &item : input) {
+            result.emplace_back(*item.second);
+        }
+
+        return result;
+    }
+
+    template <typename T, typename U>
+    std::vector<std::reference_wrapper<T>>
+    referenceWrap(const std::vector<std::reference_wrapper<U>> &input)
+    {
+        std::vector<std::reference_wrapper<T>> result;
+        result.reserve(input.size());
+
+        for (const auto &item : input) {
+            result.emplace_back(static_cast<T &>(*item));
+        }
+
+        return result;
+    }
+
+    template <typename T, typename U>
+    std::vector<std::reference_wrapper<T>>
+    referenceWrap(const std::map<uint64_t, std::unique_ptr<U>> &input)
+    {
+        std::vector<std::reference_wrapper<T>> result;
+        result.reserve(input.size());
+
+        for (const auto &item : input) {
+            result.emplace_back(static_cast<T &>(*item.second));
+        }
+
+        return result;
+    }
 
 } // namespace electionguard
 

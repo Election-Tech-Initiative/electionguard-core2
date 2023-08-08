@@ -1,4 +1,4 @@
-﻿using System.Globalization;
+using System.Globalization;
 using ElectionGuard.Converters;
 using Newtonsoft.Json;
 
@@ -7,17 +7,34 @@ namespace ElectionGuard.UI;
 public partial class App
 {
     public static User CurrentUser { get; set; } = new();
+    private readonly ILogger _logger;
 
-    public App()
+    public App(ILogger<App> logger)
     {
+        _logger = logger;
+
+        AddUnhandledExceptionHandler();
+
         JsonConvert.DefaultSettings = SerializationSettings.NewtonsoftSettings;
 
         InitializeComponent();
         UserAppTheme = AppTheme.Light;
 
         SetupLanguageSupport();
-
         MainPage = new AppShell();
+    }
+
+    private void AddUnhandledExceptionHandler()
+    {
+#if WINDOWS
+        Microsoft.UI.Xaml.Application.Current.UnhandledException += Current_UnhandledException;
+    }
+
+    private void Current_UnhandledException(object sender, Microsoft.UI.Xaml.UnhandledExceptionEventArgs e)
+    {
+        _logger.LogCritical(e.Exception, "Unhandled Exception");
+        ErrorLog.CreateCrashedFile();
+#endif
     }
 
     private void SetupLanguageSupport()
