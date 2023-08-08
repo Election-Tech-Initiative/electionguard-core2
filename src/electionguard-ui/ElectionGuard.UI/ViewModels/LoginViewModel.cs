@@ -7,9 +7,10 @@ public partial class LoginViewModel : BaseViewModel
     private bool _hasSeenAutoSettingPage = false;
     private IServiceProvider _serviceProvider;
 
-    public LoginViewModel(IServiceProvider serviceProvider) : base("UserLogin", serviceProvider)
+    public LoginViewModel(IServiceProvider serviceProvider, ILogger<App> logger) : base("UserLogin", serviceProvider)
     {
         _serviceProvider = serviceProvider;
+        _logger = logger;
     }
 
     [ObservableProperty]
@@ -23,7 +24,7 @@ public partial class LoginViewModel : BaseViewModel
     [RelayCommand(CanExecute = nameof(CanLogin), AllowConcurrentExecutions = true)]
     public async Task Login()
     {
-        await AuthenticationService.Login(Name);
+        await AuthenticationService.Login(Name, _logger);
         HomeCommand.Execute(this);
         // reset the UI name field
         Name = string.Empty;

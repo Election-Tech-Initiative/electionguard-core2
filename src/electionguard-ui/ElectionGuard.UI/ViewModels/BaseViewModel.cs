@@ -24,7 +24,7 @@ public partial class BaseViewModel : ObservableObject, IDisposable
     private string _pageTitle = "";
 
     protected IDispatcherTimer? _timer;
-    protected ILogger _logger;
+    protected ILogger? _logger;
 
     private void InitTimer()
     {
@@ -57,6 +57,7 @@ public partial class BaseViewModel : ObservableObject, IDisposable
     [RelayCommand]
     protected async Task Logout()
     {
+        _logger?.LogInformation("Logging out as {UserName}", UserName);
         await OnLeavingPage();
         await Shell.Current.CurrentPage.Dispatcher.DispatchAsync(async () => 
         await NavigationService.GoToPage(typeof(LoginViewModel)));

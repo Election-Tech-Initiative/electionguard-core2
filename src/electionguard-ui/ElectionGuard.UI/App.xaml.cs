@@ -1,4 +1,4 @@
-using System.Globalization;
+﻿using System.Globalization;
 using ElectionGuard.Converters;
 using Newtonsoft.Json;
 
@@ -22,6 +22,7 @@ public partial class App
 
         SetupLanguageSupport();
         MainPage = new AppShell();
+        _logger.LogInformation("Application Started");
     }
 
     private void AddUnhandledExceptionHandler()
