@@ -31,6 +31,7 @@ public partial class ViewKeyCeremonyViewModel : BaseViewModel
     }
 
     [ObservableProperty]
+    [NotifyCanExecuteChangedFor(nameof(JoinCommand))]
     private KeyCeremonyRecord? _keyCeremony;
 
     [ObservableProperty]
@@ -97,8 +98,6 @@ public partial class ViewKeyCeremonyViewModel : BaseViewModel
                 _timer!.Start();
                 CeremonyPollingTimer_Tick(this, null);
             }
-
-            JoinCommand.NotifyCanExecuteChanged();
         }
     }
 
