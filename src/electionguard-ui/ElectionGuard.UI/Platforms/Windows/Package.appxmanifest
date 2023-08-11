@@ -6,7 +6,7 @@
   xmlns:rescap="http://schemas.microsoft.com/appx/manifest/foundation/windows10/restrictedcapabilities"
   IgnorableNamespaces="uap rescap">
 
-  <Identity Name="ElectionGuard.Admin" Publisher="CN=Microsoft" Version="0.0.0.0" />
+  <Identity Name="ElectionGuard.Admin" Publisher="CN=Microsoft" Version="1.91.6.0" />
 
   <mp:PhoneIdentity PhoneProductId="F7E69798-9268-43DC-A51E-3A95FA4992AD" PhonePublisherId="00000000-0000-0000-0000-000000000000"/>
 
@@ -34,6 +34,8 @@
         Square44x44Logo="$placeholder$.png"
         BackgroundColor="transparent">
         <uap:DefaultTile Square71x71Logo="$placeholder$.png" Wide310x150Logo="$placeholder$.png" Square310x310Logo="$placeholder$.png" />
+        <uap:InitialRotationPreference>
+          <uap:Rotation Preference="landscape"/></uap:InitialRotationPreference>
       </uap:VisualElements>
     </Application>
   </Applications>
