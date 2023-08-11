@@ -1,4 +1,5 @@
 ﻿using CommunityToolkit.Mvvm.Input;
+using ElectionGuard.UI.Lib.Extensions;
 
 namespace ElectionGuard.UI.ViewModels;
 
@@ -58,44 +59,41 @@ public partial class AdminHomeViewModel : BaseViewModel
             var keyCeremoniesInProgress = keyCeremonies.Where(ceremony => ceremony.State != KeyCeremonyState.Complete).ToList();
             var keyCeremoniesCompleted = keyCeremonies.Count - keyCeremoniesInProgress.Count;
             // only incomplete key ceremonies
-            await Shell.Current.CurrentPage.Dispatcher.DispatchAsync(() => {
-                KeyCeremonies = new ObservableCollection<KeyCeremonyRecord>(keyCeremoniesInProgress);
+            KeyCeremonies = new ObservableCollection<KeyCeremonyRecord>(keyCeremoniesInProgress);
             HasCompletedKeyCeremonies = keyCeremoniesCompleted > 0;
-            });
         }
 
         var elections = await _electionService.GetAllAsync();
 
-        await Shell.Current.CurrentPage.Dispatcher.DispatchAsync(() =>
+        if (elections is not null)
         {
-            if (elections is not null)
-            {
-                Elections = new ObservableCollection<Election>(elections);
-                CanCreateMultiTally = Elections.Count > 1;
-            }
-        });
+            Elections = new ObservableCollection<Election>(elections);
+            CanCreateMultiTally = Elections.Count > 1;
+        }
 
         var multiTallies = await _multiTallyService.GetAllAsync();
-        await Shell.Current.CurrentPage.Dispatcher.DispatchAsync(() => MultiTallies.Clear());
+        var newMultiTallies = new List<MultiTallyRecord>();
+        foreach (var multiTally in multiTallies)
+        {
+            var addMultiTally = false;
 
-            foreach (var multiTally in multiTallies)
+            // check each tally in the multitally to see if any are not complete / abandoned
+            foreach (var (tallyId, _, _) in multiTally.TallyIds)
             {
-                var addMultiTally = false;
-
-                // check each tally in the multitally to see if any are not complete / abandoned
-                foreach (var (tallyId, _, _) in multiTally.TallyIds)
+                if (await _tallyService.IsRunningByTallyIdAsync(tallyId))
                 {
-                    if (await _tallyService.IsRunningByTallyIdAsync(tallyId))
-                    {
-                        addMultiTally = true;
-                        break;
-                    }
-                }
-                if (addMultiTally)
-                {
-                    await Shell.Current.CurrentPage.Dispatcher.DispatchAsync(() => MultiTallies.Add(multiTally));
+                    addMultiTally = true;
+                    break;
                 }
             }
+            if (addMultiTally)
+            {
+                newMultiTallies.Add(multiTally);
+            }
+        }
+
+        MultiTallies.Clear();
+        MultiTallies.AddRange(newMultiTallies);
     }
 
     partial void OnCurrentMultiTallyChanged(MultiTallyRecord? value)
@@ -130,7 +128,7 @@ public partial class AdminHomeViewModel : BaseViewModel
         await NavigationService.GoToPage(typeof(CreateKeyCeremonyAdminViewModel));
     }
 
-    [RelayCommand(AllowConcurrentExecutions = true, CanExecute =nameof(HasCompletedKeyCeremonies))]
+    [RelayCommand(AllowConcurrentExecutions = true, CanExecute = nameof(HasCompletedKeyCeremonies))]
     private async Task CreateElection()
     {
         await NavigationService.GoToPage(typeof(CreateElectionViewModel));
