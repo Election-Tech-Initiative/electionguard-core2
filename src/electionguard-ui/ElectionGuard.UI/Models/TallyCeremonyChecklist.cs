@@ -2,7 +2,9 @@
 
 public partial class TallyCeremonyChecklist : ObservableObject
 {
-    public bool QuorumReached => _guardiansJoined >= _quorum;
+    [ObservableProperty]
+    private bool _quorumReached;
+
     public bool TallyStarted => State >= TallyState.TallyStarted;
     public bool SubtaliesCombined => State >= TallyState.PendingGuardianDecryptShares;
     public bool AllDecryptionSharesComputed => SubtaliesCombined && (
@@ -43,10 +45,11 @@ public partial class TallyCeremonyChecklist : ObservableObject
         int sharesComputed,
         int challengesResponded)
     {
-        State = tally.State;
         _quorum = tally.Quorum;
         _guardiansJoined = guardiansJoined;
         _sharesComputed = sharesComputed;
         _challengesResponded = challengesResponded;
+        QuorumReached = _guardiansJoined >= _quorum;
+        State = tally.State;
     }
 }

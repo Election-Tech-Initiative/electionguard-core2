@@ -1,6 +1,6 @@
 <Project>
   <ItemGroup>
-    <PackageVersion Include="CommunityToolkit.Maui" Version="5.2.0" />
+    <PackageVersion Include="CommunityToolkit.Maui" Version="5.3.0" />
     <PackageVersion Include="CommunityToolkit.Mvvm" Version="8.2.1" />
     <PackageVersion Include="MetroLog.Maui" Version="2.1.0" />
     <PackageVersion Include="MetroLog.Net6" Version="2.1.0" />
