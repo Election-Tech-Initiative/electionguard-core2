@@ -9,62 +9,6 @@ public partial class AdminHomeViewModel : BaseViewModel
     private readonly MultiTallyService _multiTallyService;
     private readonly TallyService _tallyService;
 
-    public AdminHomeViewModel(
-        IServiceProvider serviceProvider,
-        KeyCeremonyService keyCeremonyService,
-        ElectionService electionService,
-        TallyService tallyService,
-        MultiTallyService multiTallyService) : base("AdminHome", serviceProvider)
-    {
-        _keyCeremonyService = keyCeremonyService;
-        _electionService = electionService;
-        _tallyService = tallyService;
-        _multiTallyService = multiTallyService;
-    }
-
-    public override async Task OnAppearing()
-    {
-        await base.OnAppearing();
-
-        var keyCeremonies = await _keyCeremonyService.GetAllAsync();
-        if (keyCeremonies is not null)
-        {
-            var keyCeremoniesInProgress = keyCeremonies.Where(ceremony => ceremony.State != KeyCeremonyState.Complete).ToList();
-            var keyCeremoniesCompleted = keyCeremonies.Count - keyCeremoniesInProgress.Count;
-            // only incomplete key ceremonies
-            KeyCeremonies = new ObservableCollection<KeyCeremonyRecord>(keyCeremoniesInProgress);
-            HasCompletedKeyCeremonies = keyCeremoniesCompleted > 0;
-        }
-
-        var elections = await _electionService.GetAllAsync();
-        if (elections is not null)
-        {
-            Elections = new ObservableCollection<Election>(elections);
-            CanCreateMultiTally = Elections.Count > 1;
-        }
-
-        MultiTallies.Clear();
-        var multiTallies = await _multiTallyService.GetAllAsync();
-        foreach (var multiTally in multiTallies)
-        {
-            var addMultiTally = false;
-            
-            // check each tally in the multitally to see if any are not complete / abandoned
-            foreach (var (tallyId, _, _) in multiTally.TallyIds)
-            {
-                if (await _tallyService.IsRunningByTallyIdAsync(tallyId))
-                {
-                    addMultiTally = true;
-                    break;
-                }
-            }
-            if (addMultiTally)
-            {
-                MultiTallies.Add(multiTally);
-            }
-        }
-    }
-
     [ObservableProperty]
     private ObservableCollection<Election> _elections = new();
 
@@ -90,6 +34,69 @@ public partial class AdminHomeViewModel : BaseViewModel
 
     [ObservableProperty]
     private MultiTallyRecord? _currentMultiTally;
+
+    public AdminHomeViewModel(
+        IServiceProvider serviceProvider,
+        KeyCeremonyService keyCeremonyService,
+        ElectionService electionService,
+        TallyService tallyService,
+        MultiTallyService multiTallyService) : base("AdminHome", serviceProvider)
+    {
+        _keyCeremonyService = keyCeremonyService;
+        _electionService = electionService;
+        _tallyService = tallyService;
+        _multiTallyService = multiTallyService;
+    }
+
+    public override async Task OnAppearing()
+    {
+        await base.OnAppearing();
+
+        var keyCeremonies = await _keyCeremonyService.GetAllAsync();
+        if (keyCeremonies is not null)
+        {
+            var keyCeremoniesInProgress = keyCeremonies.Where(ceremony => ceremony.State != KeyCeremonyState.Complete).ToList();
+            var keyCeremoniesCompleted = keyCeremonies.Count - keyCeremoniesInProgress.Count;
+            // only incomplete key ceremonies
+            await Shell.Current.CurrentPage.Dispatcher.DispatchAsync(() => {
+                KeyCeremonies = new ObservableCollection<KeyCeremonyRecord>(keyCeremoniesInProgress);
+            HasCompletedKeyCeremonies = keyCeremoniesCompleted > 0;
+            });
+        }
+
+        var elections = await _electionService.GetAllAsync();
+
+        await Shell.Current.CurrentPage.Dispatcher.DispatchAsync(() =>
+        {
+            if (elections is not null)
+            {
+                Elections = new ObservableCollection<Election>(elections);
+                CanCreateMultiTally = Elections.Count > 1;
+            }
+        });
+
+        var multiTallies = await _multiTallyService.GetAllAsync();
+        await Shell.Current.CurrentPage.Dispatcher.DispatchAsync(() => MultiTallies.Clear());
+
+            foreach (var multiTally in multiTallies)
+            {
+                var addMultiTally = false;
+
+                // check each tally in the multitally to see if any are not complete / abandoned
+                foreach (var (tallyId, _, _) in multiTally.TallyIds)
+                {
+                    if (await _tallyService.IsRunningByTallyIdAsync(tallyId))
+                    {
+                        addMultiTally = true;
+                        break;
+                    }
+                }
+                if (addMultiTally)
+                {
+                    await Shell.Current.CurrentPage.Dispatcher.DispatchAsync(() => MultiTallies.Add(multiTally));
+                }
+            }
+    }
 
     partial void OnCurrentMultiTallyChanged(MultiTallyRecord? value)
     {
