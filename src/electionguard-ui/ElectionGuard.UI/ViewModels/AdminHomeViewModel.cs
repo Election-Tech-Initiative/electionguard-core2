@@ -1,4 +1,5 @@
 ﻿using CommunityToolkit.Mvvm.Input;
+using ElectionGuard.UI.Lib.Extensions;
 
 namespace ElectionGuard.UI.ViewModels;
 
@@ -8,6 +9,32 @@ public partial class AdminHomeViewModel : BaseViewModel
     private readonly ElectionService _electionService;
     private readonly MultiTallyService _multiTallyService;
     private readonly TallyService _tallyService;
+
+    [ObservableProperty]
+    private ObservableCollection<Election> _elections = new();
+
+    [ObservableProperty]
+    private ObservableCollection<KeyCeremonyRecord> _keyCeremonies = new();
+
+    [ObservableProperty]
+    [NotifyCanExecuteChangedFor(nameof(CreateElectionCommand))]
+    private bool _hasCompletedKeyCeremonies = false;
+
+    [ObservableProperty]
+    [NotifyCanExecuteChangedFor(nameof(CreateMultipleTalliesCommand))]
+    private bool _canCreateMultiTally = false;
+
+    [ObservableProperty]
+    private ObservableCollection<MultiTallyRecord> _multiTallies = new();
+
+    [ObservableProperty]
+    private Election? _currentElection;
+
+    [ObservableProperty]
+    private KeyCeremonyRecord? _currentKeyCeremony;
+
+    [ObservableProperty]
+    private MultiTallyRecord? _currentMultiTally;
 
     public AdminHomeViewModel(
         IServiceProvider serviceProvider,
@@ -37,18 +64,19 @@ public partial class AdminHomeViewModel : BaseViewModel
         }
 
         var elections = await _electionService.GetAllAsync();
+
         if (elections is not null)
         {
             Elections = new ObservableCollection<Election>(elections);
             CanCreateMultiTally = Elections.Count > 1;
         }
 
-        MultiTallies.Clear();
         var multiTallies = await _multiTallyService.GetAllAsync();
+        var newMultiTallies = new List<MultiTallyRecord>();
         foreach (var multiTally in multiTallies)
         {
             var addMultiTally = false;
-            
+
             // check each tally in the multitally to see if any are not complete / abandoned
             foreach (var (tallyId, _, _) in multiTally.TallyIds)
             {
@@ -60,36 +88,13 @@ public partial class AdminHomeViewModel : BaseViewModel
             }
             if (addMultiTally)
             {
-                MultiTallies.Add(multiTally);
+                newMultiTallies.Add(multiTally);
             }
         }
+
+        MultiTallies.Clear();
+        MultiTallies.AddRange(newMultiTallies);
     }
-
-    [ObservableProperty]
-    private ObservableCollection<Election> _elections = new();
-
-    [ObservableProperty]
-    private ObservableCollection<KeyCeremonyRecord> _keyCeremonies = new();
-
-    [ObservableProperty]
-    [NotifyCanExecuteChangedFor(nameof(CreateElectionCommand))]
-    private bool _hasCompletedKeyCeremonies = false;
-
-    [ObservableProperty]
-    [NotifyCanExecuteChangedFor(nameof(CreateMultipleTalliesCommand))]
-    private bool _canCreateMultiTally = false;
-
-    [ObservableProperty]
-    private ObservableCollection<MultiTallyRecord> _multiTallies = new();
-
-    [ObservableProperty]
-    private Election? _currentElection;
-
-    [ObservableProperty]
-    private KeyCeremonyRecord? _currentKeyCeremony;
-
-    [ObservableProperty]
-    private MultiTallyRecord? _currentMultiTally;
 
     partial void OnCurrentMultiTallyChanged(MultiTallyRecord? value)
     {
@@ -123,7 +128,7 @@ public partial class AdminHomeViewModel : BaseViewModel
         await NavigationService.GoToPage(typeof(CreateKeyCeremonyAdminViewModel));
     }
 
-    [RelayCommand(AllowConcurrentExecutions = true, CanExecute =nameof(HasCompletedKeyCeremonies))]
+    [RelayCommand(AllowConcurrentExecutions = true, CanExecute = nameof(HasCompletedKeyCeremonies))]
     private async Task CreateElection()
     {
         await NavigationService.GoToPage(typeof(CreateElectionViewModel));
