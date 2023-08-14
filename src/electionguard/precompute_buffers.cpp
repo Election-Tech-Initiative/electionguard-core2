@@ -65,9 +65,10 @@ namespace electionguard
     void PrecomputedEncryption::generate(const ElementModP &publicKey)
     {
         // generate a random rho
-        secret = rand_q();
-        pad = g_pow_p(*secret);                         // g ^ r
-        blindingFactor = pow_mod_p(publicKey, *secret); // K ^ r
+        secret = ElementModQ::fromHex(
+          "2B3B025E50E09C119CBA7E9448ACD1CABC9447EF39BF06327D81C665CDD86296"); // rand_q();
+        pad = g_pow_p(*secret);                                                // g ^ r
+        blindingFactor = pow_mod_p(publicKey, *secret);                        // K ^ r
     }
 
     unique_ptr<PrecomputedEncryption> PrecomputedEncryption::clone()
@@ -254,8 +255,8 @@ namespace electionguard
             std::lock_guard<std::mutex> lock2(selection_queue_lock);
 
             // generate two triples and a quadruple
-            auto quad = createPrecomputedSelection(*publicKey);
-            selection_queue.push(move(quad));
+            // auto quad = createPrecomputedSelection(*publicKey);
+            // selection_queue.push(move(quad));
 
             // This is very rudimentary. We can add a more complex algorithm in
             // the future, that would look at the queues and increase production if one
@@ -268,8 +269,8 @@ namespace electionguard
             // on how many precomputes we will need.
             if ((iteration_count % iterationCountToGenerateTwoTriples) == 0) {
                 auto tuple = createTwoPrecomputedEncryptions(*publicKey);
-                encryption_queue.push(move(std::get<0>(tuple)));
-                encryption_queue.push(move(std::get<1>(tuple)));
+                // encryption_queue.push(move(std::get<0>(tuple)));
+                // encryption_queue.push(move(std::get<1>(tuple)));
             }
             iteration_count++;
 
@@ -340,8 +341,8 @@ namespace electionguard
     PrecomputeBuffer::createTwoPrecomputedEncryptions(const ElementModP &publicKey)
     {
         auto triple1 = make_unique<PrecomputedEncryption>(publicKey);
-        auto triple2 = make_unique<PrecomputedEncryption>(publicKey);
-        return std::make_tuple(move(triple1), move(triple2));
+        //auto triple2 = make_unique<PrecomputedEncryption>(publicKey);
+        return std::make_tuple(nullptr, nullptr); //move(triple1), move(triple2));
     }
     unique_ptr<PrecomputedSelection>
     PrecomputeBuffer::createPrecomputedSelection(const ElementModP &publicKey)

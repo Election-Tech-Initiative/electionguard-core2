@@ -924,6 +924,7 @@ namespace electionguard
         free(bigNum);
 
         auto random_q = make_unique<ElementModQ>(element, true);
+        //return random_q;
         return add_mod_q(*random_q, ZERO_MOD_Q());
     }
 
