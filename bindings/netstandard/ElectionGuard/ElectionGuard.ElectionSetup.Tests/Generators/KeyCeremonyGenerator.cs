@@ -60,6 +60,7 @@ public class KeyCeremonyGenerator
                 sequenceOrder,
                 keyCeremony.NumberOfGuardians,
                 keyCeremony.Quorum,
+                CiphertextElectionContext.ParameterBaseHash,
                 keyCeremony.Id,
                 random);
             guardians.Add(guardian);

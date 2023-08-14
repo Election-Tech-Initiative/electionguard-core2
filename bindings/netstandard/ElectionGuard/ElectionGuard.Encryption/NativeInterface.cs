@@ -2182,6 +2182,12 @@ namespace ElectionGuard
                 }
             }
 
+            [DllImport(DllName,
+                EntryPoint = "eg_election_constant_parameter_hash",
+                CallingConvention = CallingConvention.Cdecl, SetLastError = true)]
+            internal static extern Status ParameterBaseHash(
+                out ElementModQ.ElementModQHandle parameter_hash);
+
             [DllImport(DllName, EntryPoint = "eg_ciphertext_election_context_free",
                 CallingConvention = CallingConvention.Cdecl, SetLastError = true)]
             internal static extern Status Free(CiphertextElectionType* handle);
@@ -2213,6 +2219,13 @@ namespace ElectionGuard
             internal static extern Status GetElGamalPublicKey(
                 CiphertextElectionContextHandle handle,
                 out ElementModP.ElementModPHandle elgamal_public_key);
+
+            [DllImport(DllName,
+                EntryPoint = "eg_ciphertext_election_context_get_parameter_hash",
+                CallingConvention = CallingConvention.Cdecl, SetLastError = true)]
+            internal static extern Status GetParameterHash(
+                CiphertextElectionContextHandle handle,
+                out ElementModQ.ElementModQHandle parameter_hash);
 
             [DllImport(DllName,
                 EntryPoint = "eg_ciphertext_election_context_get_commitment_hash",

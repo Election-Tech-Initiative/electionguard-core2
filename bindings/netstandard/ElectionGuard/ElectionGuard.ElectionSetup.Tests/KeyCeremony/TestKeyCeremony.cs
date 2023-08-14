@@ -24,8 +24,11 @@ public class TestKeyCeremony : DisposableBase
             var guardianId = sequenceOrder.ToString();
             var random = new Random((int)sequenceOrder);
             var guardian = new Guardian(
-                guardianId, sequenceOrder, numberOfGuardians,
-                quorum, keyCeremony.Id,
+                guardianId, sequenceOrder,
+                numberOfGuardians,
+                quorum,
+                CiphertextElectionContext.ParameterBaseHash,
+                keyCeremony.Id,
                 random);
             guardians.Add(guardian);
         }

@@ -2,12 +2,12 @@
 namespace ElectionGuard
 {
     /// <summary>
-    /// An exponential ElGamal key pair
+    /// An exponential ElGamal key pair computed as K = g^a mod p.
     /// </summary>
     public class ElGamalKeyPair : DisposableBase
     {
         /// <Summary>
-        /// The ElGamal Public Key.
+        /// The ElGamal Public Key (K in the spec).
         /// </Summary>
         public ElementModP PublicKey
         {
@@ -21,7 +21,7 @@ namespace ElectionGuard
         }
 
         /// <Summary>
-        /// The ElGamal Secret Key.
+        /// The ElGamal Secret Key (a,k, or s in the spec).
         /// </Summary>
         public ElementModQ SecretKey
         {
@@ -62,7 +62,7 @@ namespace ElectionGuard
         }
 
         /// <Summary>
-        /// Make an elgamal key pair from a secret.
+        /// Make an elgamal key pair from a secret computed as K = g^a mod p.
         /// </Summary>
         public static ElGamalKeyPair FromSecret(ElementModQ secretKey)
         {
@@ -86,7 +86,11 @@ namespace ElectionGuard
         {
             base.DisposeUnmanaged();
 
-            if (Handle == null || Handle.IsInvalid) return;
+            if (Handle == null || Handle.IsInvalid)
+            {
+                return;
+            }
+
             Handle.Dispose();
             Handle = null;
         }

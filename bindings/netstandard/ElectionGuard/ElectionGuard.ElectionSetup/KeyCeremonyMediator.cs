@@ -671,6 +671,7 @@ public class KeyCeremonyMediator
             sequenceOrder,
             CeremonyDetails.NumberOfGuardians,
             CeremonyDetails.Quorum,
+            CiphertextElectionContext.ParameterBaseHash,
             keyCeremonyId);
 
         // save guardian to local drive / yubikey
