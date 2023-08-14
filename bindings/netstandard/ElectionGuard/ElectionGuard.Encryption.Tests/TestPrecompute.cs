@@ -67,36 +67,31 @@ namespace ElectionGuard.Encryption.Tests
             // Assert.AreEqual(PrecomputeState.Running, runningStatus.CurrentState);
         }
 
-        // [Test, Order(4)]
-        // public async Task Test_Precompute_Status_Complete()
-        // {
-        //     Console.WriteLine($"Test_Precompute_Status_Complete");
+        [Test, Order(4)]
+        public async Task Test_Precompute_Status_Complete()
+        {
+            _precompute.StartPrecomputeAsync();
 
-        //     _precompute.StartPrecomputeAsync();
+            await RunForAsync(TimeSpan.FromSeconds(10));
 
-        //     await RunForAsync(TimeSpan.FromSeconds(10));
+            var waitReturn = _waitHandle.WaitOne();
 
-        //     var waitReturn = _waitHandle.WaitOne();
+            var status = _precompute.GetStatus();
 
-        //     var status = _precompute.GetStatus();
-        //     Console.WriteLine($"Completed: {status.CurrentQueueSize}");
+            // Assert.That(status.CurrentQueueSize, Is.GreaterThanOrEqualTo(TestBufferSize));
+            // Assert.That(status.Progress, Is.GreaterThanOrEqualTo(1.0));
+            // Assert.AreEqual(PrecomputeState.Completed, status.CurrentState);
+            // Assert.AreEqual(true, waitReturn);
+        }
 
-        //     // Assert.That(status.CurrentQueueSize, Is.GreaterThanOrEqualTo(TestBufferSize));
-        //     // Assert.That(status.Progress, Is.GreaterThanOrEqualTo(1.0));
-        //     // Assert.AreEqual(PrecomputeState.Completed, status.CurrentState);
-        //     // Assert.AreEqual(true, waitReturn);
-        // }
-
-        // [Test, Order(4)]
-        // public void Test_Precompute_Using_Old_Interface()
-        // {
-        //     Console.WriteLine($"Test_Precompute_Using_Old_Interface");
-
-        //     var compute = new Precompute();
-        //     compute.StartPrecomputeAsync(_precompute.PublicKey, TestBufferSize);
-        //     RunFor(TimeSpan.FromSeconds(TestRunLengthInS));
-        //     compute.StopPrecompute();
-        // }
+        [Test, Order(4)]
+        public void Test_Precompute_Using_Old_Interface()
+        {
+            var compute = new Precompute();
+            compute.StartPrecomputeAsync(_precompute.PublicKey, TestBufferSize);
+            RunFor(TimeSpan.FromSeconds(TestRunLengthInS));
+            compute.StopPrecompute();
+        }
 
         private static async Task RunForAsync(TimeSpan duration)
         {
