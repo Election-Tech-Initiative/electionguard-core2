@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Diagnostics;
 using System.Threading;
 using System.Threading.Tasks;
 using NUnit.Framework;
@@ -11,6 +12,7 @@ namespace ElectionGuard.Encryption.Tests
     {
         private const int MaxCompleteDelay = 30000;
         private const int TestBufferSize = 500;
+        private const int TestRunLengthInS = 10;
 
         private PrecomputeBufferContext _precompute;
         private AutoResetEvent _waitHandle;
@@ -48,7 +50,7 @@ namespace ElectionGuard.Encryption.Tests
             _precompute.StartPrecomputeAsync();
             var runningStatus = _precompute.GetStatus();
 
-            await Task.Delay(500);
+            await TestHelpers.RunForAsync(TimeSpan.FromSeconds(1));
 
             _precompute.StopPrecompute();
 
@@ -65,17 +67,25 @@ namespace ElectionGuard.Encryption.Tests
         {
             _precompute.StartPrecomputeAsync();
 
-            await Task.Delay(2000);
+            await TestHelpers.RunForAsync(TimeSpan.FromSeconds(TestRunLengthInS));
 
             var waitReturn = _waitHandle.WaitOne();
 
             var status = _precompute.GetStatus();
-            Console.WriteLine($"Completed: {status.CurrentQueueSize}");
 
             Assert.That(status.CurrentQueueSize, Is.GreaterThanOrEqualTo(TestBufferSize));
             Assert.That(status.Progress, Is.GreaterThanOrEqualTo(1.0));
             Assert.AreEqual(PrecomputeState.Completed, status.CurrentState);
             Assert.AreEqual(true, waitReturn);
+        }
+
+        [Test, Order(5)]
+        public void Test_Precompute_Using_Old_Interface()
+        {
+            var compute = new Precompute();
+            compute.StartPrecomputeAsync(_precompute.PublicKey, TestBufferSize);
+            TestHelpers.RunFor(TimeSpan.FromSeconds(TestRunLengthInS));
+            compute.StopPrecompute();
         }
     }
 }

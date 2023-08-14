@@ -643,7 +643,7 @@ test-netstandard-x86:
 ifeq ($(OPERATING_SYSTEM),Darwin)
 	echo "x86 builds are not supported on MacOS"
 else
-	PROCESSOR=x86 && make test-netstandard
+	PROCESSOR=x86 VSPLATFORM=Win32 USE_32BIT_MATH=ON && make test-netstandard
 endif
 
 # copy the build output from the processor builds to 

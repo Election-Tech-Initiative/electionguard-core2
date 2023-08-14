@@ -147,6 +147,8 @@ namespace ElectionGuard
         public event StatusEventHandler ProgressEvent;
         public event StatusEventHandler CompletedEvent;
 
+        public ElementModP PublicKey => _elgamalPublicKey;
+
         private PrecomputeStatus _currentStatus = new PrecomputeStatus
         {
             Progress = 0,

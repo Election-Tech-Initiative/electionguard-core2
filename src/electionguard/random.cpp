@@ -8,6 +8,7 @@
 #include <ctime>
 #include <iomanip>
 #include <iostream>
+#include <memory>
 #include <sstream>
 #include <string>
 #include <vector>
@@ -22,10 +23,11 @@ using std::vector;
 
 namespace electionguard
 {
-    static void cleanup(vector<uint8_t> entropy, vector<uint8_t> nonce)
+    static void cleanup(vector<uint8_t> entropy, vector<uint8_t> nonce, vector<uint8_t> input)
     {
         release(entropy);
         release(nonce);
+        release(input);
     }
 
     /// <summary>
@@ -69,7 +71,7 @@ namespace electionguard
         auto entropy = getRandomBytes(static_cast<uint32_t>(size * 2));
 
         // Allocate the DRBG
-        auto state = HMAC_DRBG{HMAC_DRBG_HashAlgorithm::SHA2_256};
+        auto state = std::make_unique<HMAC_DRBG>(HMAC_DRBG_HashAlgorithm::SHA2_256);
 
         // Derive a nonce from the OS entropy pool
         auto nonce = getRandomBytes(size);
@@ -78,21 +80,21 @@ namespace electionguard
         auto personalization = getTime();
 
         // Instantiate the DRBG
-        state.instantiate(convert(entropy.size()), entropy.data(), convert(nonce.size()),
-                          nonce.data(), convert(personalization.size()),
-                          reinterpret_cast<uint8_t *>(personalization.data()));
+        state->instantiate(convert(entropy.size()), entropy.data(), convert(nonce.size()),
+                           nonce.data(), convert(personalization.size()),
+                           reinterpret_cast<uint8_t *>(personalization.data()));
 
         auto *array = new uint8_t[size];
         auto input = getRandomBytes(size);
 
         // Try to generate some random bits
-        if (state.generate(array, size, convert(input.size()), input.data())) {
+        if (state->generate(array, size, convert(input.size()), input.data())) {
             vector<uint8_t> result(array, array + size);
-            cleanup(entropy, nonce);
+            cleanup(entropy, nonce, input);
             delete[] array;
             return result;
         } else {
-            cleanup(entropy, nonce);
+            cleanup(entropy, nonce, input);
             delete[] array;
             throw bad_alloc();
         }
