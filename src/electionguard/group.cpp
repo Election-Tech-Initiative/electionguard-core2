@@ -924,8 +924,7 @@ namespace electionguard
         free(bigNum);
 
         auto random_q = make_unique<ElementModQ>(element, true);
-        //return random_q;
-        return add_mod_q(*random_q, ZERO_MOD_Q());
+        return random_q;
     }
 
     string vector_uint8_t_to_hex(const vector<uint8_t> &bytes) { return bytes_to_hex(bytes); }

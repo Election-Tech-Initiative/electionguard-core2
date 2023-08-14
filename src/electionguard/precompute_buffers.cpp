@@ -65,8 +65,6 @@ namespace electionguard
     void PrecomputedEncryption::generate(const ElementModP &publicKey)
     {
         // generate a random rho
-        // secret = ElementModQ::fromHex(
-        //   "2B3B025E50E09C119CBA7E9448ACD1CABC9447EF39BF06327D81C665CDD86296"); // rand_q();
         secret = rand_q();
         pad = g_pow_p(*secret);                         // g ^ r
         blindingFactor = pow_mod_p(publicKey, *secret); // K ^ r
@@ -343,7 +341,7 @@ namespace electionguard
     {
         auto triple1 = make_unique<PrecomputedEncryption>(publicKey);
         auto triple2 = make_unique<PrecomputedEncryption>(publicKey);
-        return std::make_tuple(nullptr, nullptr); //move(triple1), move(triple2));
+        return std::make_tuple(move(triple1), move(triple2));
     }
     unique_ptr<PrecomputedSelection>
     PrecomputeBuffer::createPrecomputedSelection(const ElementModP &publicKey)
