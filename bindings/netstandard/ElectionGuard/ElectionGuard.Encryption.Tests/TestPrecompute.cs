@@ -8,12 +8,10 @@ namespace ElectionGuard.Encryption.Tests
 {
     [NonParallelizable]
     [TestFixture]
-    //[Category("MemoryLeak")]
     public class TestPrecompute
     {
         private const int MaxCompleteDelay = 30000;
-        private const int TestBufferSize = 20000;
-
+        private const int TestBufferSize = 500;
         private const int TestRunLengthInS = 10;
 
         private PrecomputeBufferContext _precompute;
@@ -49,13 +47,10 @@ namespace ElectionGuard.Encryption.Tests
         [Test, Order(3)]
         public async Task Test_Precompute_Status_Running()
         {
-            Console.WriteLine($"Test_Precompute_Status_Running");
-
             _precompute.StartPrecomputeAsync();
             var runningStatus = _precompute.GetStatus();
 
-            await RunForAsync(TimeSpan.FromSeconds(TestRunLengthInS));
-            //await Task.Delay(1000);
+            await TestHelpers.RunForAsync(TimeSpan.FromSeconds(1));
 
             _precompute.StopPrecompute();
 
@@ -63,8 +58,8 @@ namespace ElectionGuard.Encryption.Tests
 
             Console.WriteLine($"Running: {status.CurrentQueueSize}");
 
-            // Assert.That(status.CurrentQueueSize, Is.GreaterThan(0));
-            // Assert.AreEqual(PrecomputeState.Running, runningStatus.CurrentState);
+            Assert.That(status.CurrentQueueSize, Is.GreaterThan(0));
+            Assert.AreEqual(PrecomputeState.Running, runningStatus.CurrentState);
         }
 
         [Test, Order(4)]
@@ -72,54 +67,25 @@ namespace ElectionGuard.Encryption.Tests
         {
             _precompute.StartPrecomputeAsync();
 
-            await RunForAsync(TimeSpan.FromSeconds(10));
+            await TestHelpers.RunForAsync(TimeSpan.FromSeconds(TestRunLengthInS));
 
             var waitReturn = _waitHandle.WaitOne();
 
             var status = _precompute.GetStatus();
 
-            // Assert.That(status.CurrentQueueSize, Is.GreaterThanOrEqualTo(TestBufferSize));
-            // Assert.That(status.Progress, Is.GreaterThanOrEqualTo(1.0));
-            // Assert.AreEqual(PrecomputeState.Completed, status.CurrentState);
-            // Assert.AreEqual(true, waitReturn);
+            Assert.That(status.CurrentQueueSize, Is.GreaterThanOrEqualTo(TestBufferSize));
+            Assert.That(status.Progress, Is.GreaterThanOrEqualTo(1.0));
+            Assert.AreEqual(PrecomputeState.Completed, status.CurrentState);
+            Assert.AreEqual(true, waitReturn);
         }
 
-        [Test, Order(4)]
+        [Test, Order(5)]
         public void Test_Precompute_Using_Old_Interface()
         {
             var compute = new Precompute();
             compute.StartPrecomputeAsync(_precompute.PublicKey, TestBufferSize);
-            RunFor(TimeSpan.FromSeconds(TestRunLengthInS));
+            TestHelpers.RunFor(TimeSpan.FromSeconds(TestRunLengthInS));
             compute.StopPrecompute();
-        }
-
-        private static async Task RunForAsync(TimeSpan duration)
-        {
-            var start = DateTime.Now;
-            var end = start + duration;
-            while (DateTime.Now < end)
-            {
-                PrintMemory();
-                await Task.Delay(1000);
-            }
-        }
-
-        private static void RunFor(TimeSpan duration)
-        {
-            var start = DateTime.Now;
-            var end = start + duration;
-            while (DateTime.Now < end)
-            {
-                PrintMemory();
-                Thread.Sleep(1000);
-            }
-        }
-
-        private static void PrintMemory()
-        {
-            var currentProcess = Process.GetCurrentProcess();
-            var workingSet = currentProcess.WorkingSet64;
-            Console.WriteLine($"Memory Size: {workingSet / (1024.0 * 1024.0):F2} MB");
         }
     }
 }
