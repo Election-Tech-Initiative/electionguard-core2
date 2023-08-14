@@ -42,7 +42,7 @@
                     <controls:NoContentView Text="{helper:Translate NoKeyCeremonies}" />
                 </CollectionView.EmptyView>
                 <CollectionView.ItemTemplate>
-                    <DataTemplate x:DataType="model:Election">
+                    <DataTemplate x:DataType="model:KeyCeremonyRecord">
                         <Frame Style="{StaticResource ButtonishFrame}">
                             <Label Style="{StaticResource ButtonishLabel}" Text="{Binding Name}" />
                         </Frame>
