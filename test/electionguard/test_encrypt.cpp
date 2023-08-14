@@ -1441,7 +1441,7 @@ TEST_CASE("Create EncryptionMediator with same manifest hash")
     auto manifest = ManifestGenerator::getJeffersonCountyManifest_Minimal();
     auto internal = make_unique<InternalManifest>(*manifest);
     auto context = make_unique<CiphertextElectionContext>(
-      1UL, 1UL, keypair->getPublicKey()->clone(), Q().clone(),
+      1UL, 1UL, keypair->getPublicKey()->clone(), PARAMETER_BASE_HASH().clone(), Q().clone(),
       internal.get()->getManifestHash()->clone(), Q().clone(), Q().clone());
     auto device = make_unique<EncryptionDevice>(12345UL, 23456UL, 34567UL, "Location");
 
@@ -1455,9 +1455,9 @@ TEST_CASE("Create EncryptionMediator with different manifest hash")
     auto keypair = ElGamalKeyPair::fromSecret(*secret);
     auto manifest = ManifestGenerator::getJeffersonCountyManifest_Minimal();
     auto internal = make_unique<InternalManifest>(*manifest);
-    auto context =
-      make_unique<CiphertextElectionContext>(1UL, 1UL, keypair->getPublicKey()->clone(),
-                                             Q().clone(), Q().clone(), Q().clone(), Q().clone());
+    auto context = make_unique<CiphertextElectionContext>(
+      1UL, 1UL, keypair->getPublicKey()->clone(), PARAMETER_BASE_HASH().clone(), Q().clone(),
+      Q().clone(), Q().clone(), Q().clone());
     auto device = make_unique<EncryptionDevice>(12345UL, 23456UL, 34567UL, "Location");
 
     try {

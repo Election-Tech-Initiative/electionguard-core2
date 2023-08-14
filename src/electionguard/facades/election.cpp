@@ -22,6 +22,7 @@ using electionguard::dynamicCopy;
 using electionguard::ElementModP;
 using electionguard::ElementModQ;
 using electionguard::Log;
+using electionguard::PARAMETER_BASE_HASH;
 
 using std::make_unique;
 using std::string;
@@ -29,10 +30,22 @@ using std::unique_ptr;
 using std::unordered_map;
 using std::vector;
 
+#pragma region Election Constants
+
+eg_electionguard_status_t eg_election_constant_parameter_hash(eg_element_mod_q_t **out_constant_ref)
+{
+    *out_constant_ref =
+      AS_TYPE(eg_element_mod_q_t, const_cast<ElementModQ *>(&PARAMETER_BASE_HASH()));
+    return ELECTIONGUARD_STATUS_SUCCESS;
+}
+
+#pragma endregion
+
 #pragma region CiphertextElectionContextConfiguration
 
-EG_API eg_electionguard_status_t eg_ciphertext_election_context_config_get_allowed_overvotes(
-  eg_context_configuration_t *handle, bool *out_allowed_overvotes)
+eg_electionguard_status_t
+eg_ciphertext_election_context_config_get_allowed_overvotes(eg_context_configuration_t *handle,
+                                                            bool *out_allowed_overvotes)
 {
     if (handle == nullptr) {
         return ELECTIONGUARD_STATUS_ERROR_INVALID_ARGUMENT;
@@ -43,8 +56,9 @@ EG_API eg_electionguard_status_t eg_ciphertext_election_context_config_get_allow
     return ELECTIONGUARD_STATUS_SUCCESS;
 }
 
-EG_API eg_electionguard_status_t eg_ciphertext_election_context_config_get_max_ballots(
-  eg_context_configuration_t *handle, uint64_t *out_max_ballots)
+eg_electionguard_status_t
+eg_ciphertext_election_context_config_get_max_ballots(eg_context_configuration_t *handle,
+                                                      uint64_t *out_max_ballots)
 {
     if (handle == nullptr) {
         return ELECTIONGUARD_STATUS_ERROR_INVALID_ARGUMENT;
@@ -98,14 +112,6 @@ eg_ciphertext_election_context_free(eg_ciphertext_election_context_t *handle)
     return ELECTIONGUARD_STATUS_SUCCESS;
 }
 
-eg_electionguard_status_t eg_ciphertext_election_context_get_elgamal_public_key(
-  eg_ciphertext_election_context_t *handle, eg_element_mod_p_t **out_elgamal_public_key_ref)
-{
-    const auto *pointer = AS_TYPE(CiphertextElectionContext, handle)->getElGamalPublicKey();
-    *out_elgamal_public_key_ref = AS_TYPE(eg_element_mod_p_t, const_cast<ElementModP *>(pointer));
-    return ELECTIONGUARD_STATUS_SUCCESS;
-}
-
 eg_electionguard_status_t
 eg_ciphertext_election_context_get_configuration(eg_ciphertext_election_context_t *handle,
                                                  eg_context_configuration_t **out_config)
@@ -128,6 +134,23 @@ eg_ciphertext_election_context_get_quorum(eg_ciphertext_election_context_t *hand
                                           uint64_t *out_quorum)
 {
     *out_quorum = AS_TYPE(CiphertextElectionContext, handle)->getQuorum();
+    return ELECTIONGUARD_STATUS_SUCCESS;
+}
+
+eg_electionguard_status_t eg_ciphertext_election_context_get_elgamal_public_key(
+  eg_ciphertext_election_context_t *handle, eg_element_mod_p_t **out_elgamal_public_key_ref)
+{
+    const auto *pointer = AS_TYPE(CiphertextElectionContext, handle)->getElGamalPublicKey();
+    *out_elgamal_public_key_ref = AS_TYPE(eg_element_mod_p_t, const_cast<ElementModP *>(pointer));
+    return ELECTIONGUARD_STATUS_SUCCESS;
+}
+
+eg_electionguard_status_t
+eg_ciphertext_election_context_get_parameter_hash(eg_ciphertext_election_context_t *handle,
+                                                  eg_element_mod_q_t **out_parameter_hash_ref)
+{
+    const auto *pointer = AS_TYPE(CiphertextElectionContext, handle)->getParameterHash();
+    *out_parameter_hash_ref = AS_TYPE(eg_element_mod_q_t, const_cast<ElementModQ *>(pointer));
     return ELECTIONGUARD_STATUS_SUCCESS;
 }
 

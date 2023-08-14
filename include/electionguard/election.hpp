@@ -17,6 +17,14 @@ using std::make_unique;
 namespace electionguard
 {
     /// <summary>
+    /// The prime modulus p, the subgroup order q, and the subgroup generator g are hashed using the ElectionGuard hash function H.
+    /// HP = H(HV ;00,p,q,g). Parameter Hash 3.1.2
+    ///
+    /// This static version is compiled into the software and may be updated from time to time according to the ElectionGuard Specification
+    /// </summary>
+    EG_API const ElementModQ &PARAMETER_BASE_HASH();
+
+    /// <summary>
     /// Structure for supporting the configuration settings inside of the Electioncontext
     /// </summary>
     struct EG_API ContextConfiguration {
@@ -62,6 +70,7 @@ namespace electionguard
         CiphertextElectionContext(const CiphertextElectionContext &&other);
         explicit CiphertextElectionContext(const uint64_t numberOfGuardians, const uint64_t quorum,
                                            std::unique_ptr<ElementModP> elGamalPublicKey,
+                                           std::unique_ptr<ElementModQ> parameterHash,
                                            std::unique_ptr<ElementModQ> commitmentHash,
                                            std::unique_ptr<ElementModQ> manifestHash,
                                            std::unique_ptr<ElementModQ> cryptoBaseHash,
@@ -69,13 +78,14 @@ namespace electionguard
                                            std::unique_ptr<ContextConfiguration> config);
         explicit CiphertextElectionContext(const uint64_t numberOfGuardians, const uint64_t quorum,
                                            std::unique_ptr<ElementModP> elGamalPublicKey,
+                                           std::unique_ptr<ElementModQ> parameterHash,
                                            std::unique_ptr<ElementModQ> commitmentHash,
                                            std::unique_ptr<ElementModQ> manifestHash,
                                            std::unique_ptr<ElementModQ> cryptoBaseHash,
                                            std::unique_ptr<ElementModQ> cryptoExtendedBaseHash);
         explicit CiphertextElectionContext(
           const uint64_t numberOfGuardians, const uint64_t quorum,
-          std::unique_ptr<ElementModP> elGamalPublicKey,
+          std::unique_ptr<ElementModP> elGamalPublicKey, std::unique_ptr<ElementModQ> parameterHash,
           std::unique_ptr<ElementModQ> commitmentHash, std::unique_ptr<ElementModQ> manifestHash,
           std::unique_ptr<ElementModQ> cryptoBaseHash,
           std::unique_ptr<ElementModQ> cryptoExtendedBaseHash,
@@ -83,7 +93,7 @@ namespace electionguard
           std::unordered_map<std::string, std::string> extendedData);
         explicit CiphertextElectionContext(
           const uint64_t numberOfGuardians, const uint64_t quorum,
-          std::unique_ptr<ElementModP> elGamalPublicKey,
+          std::unique_ptr<ElementModP> elGamalPublicKey, std::unique_ptr<ElementModQ> parameterHash,
           std::unique_ptr<ElementModQ> commitmentHash, std::unique_ptr<ElementModQ> manifestHash,
           std::unique_ptr<ElementModQ> cryptoBaseHash,
           std::unique_ptr<ElementModQ> cryptoExtendedBaseHash,
@@ -114,6 +124,14 @@ namespace electionguard
         const ElementModP *getElGamalPublicKey() const;
 
         const ElementModP &getElGamalPublicKeyRef() const;
+
+        /// <summary>
+        /// the `parameter hash HP = H(ver;0x00,p,q,g)` of the parameters used in the election.
+        ///
+        /// This member function holds the parameter hash values used for the election,
+        /// which may be different than the values compiled into this version of the software.
+        /// </summary>
+        const ElementModQ *getParameterHash() const;
 
         /// <summary>
         /// the `commitment hash H(K 1,0 , K 2,0 ... , K n,0 )` of the public commitments

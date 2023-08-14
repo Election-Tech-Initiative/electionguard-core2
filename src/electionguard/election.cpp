@@ -27,6 +27,15 @@ using ContextSerializer = electionguard::Serialize::CiphertextElectionContext;
 
 namespace electionguard
 {
+    const ElementModQ &PARAMETER_BASE_HASH()
+    {
+        static auto versionCode = string_to_fixed_width_bytes<32>("v2.0.0");
+        static auto parameterHash = hash_elems(
+          {versionCode, HashPrefix::get_prefix_parameter_hash(), &const_cast<ElementModP &>(P()),
+           &const_cast<ElementModQ &>(Q()), &const_cast<ElementModP &>(G())});
+        static ElementModQ instance{parameterHash->ref(), true};
+        return instance;
+    }
 
 #pragma region CiphertextElectionContext
 
@@ -34,6 +43,7 @@ namespace electionguard
         uint64_t numberOfGuardians;
         uint64_t quorum;
         unique_ptr<ElementModP> elGamalPublicKey;
+        unique_ptr<ElementModQ> parameterHash;
         unique_ptr<ElementModQ> commitmentHash;
         unique_ptr<ElementModQ> manifestHash;
         unique_ptr<ElementModQ> cryptoBaseHash;
@@ -42,10 +52,12 @@ namespace electionguard
         unique_ptr<ContextConfiguration> configuration;
 
         Impl(uint64_t numberOfGuardians, uint64_t quorum, unique_ptr<ElementModP> elGamalPublicKey,
-             unique_ptr<ElementModQ> commitmentHash, unique_ptr<ElementModQ> manifestHash,
-             unique_ptr<ElementModQ> cryptoBaseHash, unique_ptr<ElementModQ> cryptoExtendedBaseHash)
-            : elGamalPublicKey(move(elGamalPublicKey)), commitmentHash(move(commitmentHash)),
-              manifestHash(move(manifestHash)), cryptoBaseHash(move(cryptoBaseHash)),
+             unique_ptr<ElementModQ> parameterHash, unique_ptr<ElementModQ> commitmentHash,
+             unique_ptr<ElementModQ> manifestHash, unique_ptr<ElementModQ> cryptoBaseHash,
+             unique_ptr<ElementModQ> cryptoExtendedBaseHash)
+            : elGamalPublicKey(move(elGamalPublicKey)), parameterHash(move(parameterHash)),
+              commitmentHash(move(commitmentHash)), manifestHash(move(manifestHash)),
+              cryptoBaseHash(move(cryptoBaseHash)),
               cryptoExtendedBaseHash(move(cryptoExtendedBaseHash))
         {
             this->numberOfGuardians = numberOfGuardians;
@@ -55,11 +67,13 @@ namespace electionguard
         }
 
         Impl(uint64_t numberOfGuardians, uint64_t quorum, unique_ptr<ElementModP> elGamalPublicKey,
-             unique_ptr<ElementModQ> commitmentHash, unique_ptr<ElementModQ> manifestHash,
-             unique_ptr<ElementModQ> cryptoBaseHash, unique_ptr<ElementModQ> cryptoExtendedBaseHash,
+             unique_ptr<ElementModQ> parameterHash, unique_ptr<ElementModQ> commitmentHash,
+             unique_ptr<ElementModQ> manifestHash, unique_ptr<ElementModQ> cryptoBaseHash,
+             unique_ptr<ElementModQ> cryptoExtendedBaseHash,
              unique_ptr<ContextConfiguration> config)
-            : Impl(numberOfGuardians, quorum, move(elGamalPublicKey), move(commitmentHash),
-                   move(manifestHash), move(cryptoBaseHash), move(cryptoExtendedBaseHash))
+            : Impl(numberOfGuardians, quorum, move(elGamalPublicKey), move(parameterHash),
+                   move(commitmentHash), move(manifestHash), move(cryptoBaseHash),
+                   move(cryptoExtendedBaseHash))
 
         {
             this->numberOfGuardians = numberOfGuardians;
@@ -69,11 +83,13 @@ namespace electionguard
         }
 
         Impl(uint64_t numberOfGuardians, uint64_t quorum, unique_ptr<ElementModP> elGamalPublicKey,
-             unique_ptr<ElementModQ> commitmentHash, unique_ptr<ElementModQ> manifestHash,
-             unique_ptr<ElementModQ> cryptoBaseHash, unique_ptr<ElementModQ> cryptoExtendedBaseHash,
+             unique_ptr<ElementModQ> parameterHash, unique_ptr<ElementModQ> commitmentHash,
+             unique_ptr<ElementModQ> manifestHash, unique_ptr<ElementModQ> cryptoBaseHash,
+             unique_ptr<ElementModQ> cryptoExtendedBaseHash,
              unordered_map<string, string> extendedData)
-            : elGamalPublicKey(move(elGamalPublicKey)), commitmentHash(move(commitmentHash)),
-              manifestHash(move(manifestHash)), cryptoBaseHash(move(cryptoBaseHash)),
+            : elGamalPublicKey(move(elGamalPublicKey)), parameterHash(move(parameterHash)),
+              commitmentHash(move(commitmentHash)), manifestHash(move(manifestHash)),
+              cryptoBaseHash(move(cryptoBaseHash)),
               cryptoExtendedBaseHash(move(cryptoExtendedBaseHash)), extendedData(move(extendedData))
         {
             this->numberOfGuardians = numberOfGuardians;
@@ -82,12 +98,13 @@ namespace electionguard
         }
 
         Impl(uint64_t numberOfGuardians, uint64_t quorum, unique_ptr<ElementModP> elGamalPublicKey,
-             unique_ptr<ElementModQ> commitmentHash, unique_ptr<ElementModQ> manifestHash,
-             unique_ptr<ElementModQ> cryptoBaseHash, unique_ptr<ElementModQ> cryptoExtendedBaseHash,
+             unique_ptr<ElementModQ> parameterHash, unique_ptr<ElementModQ> commitmentHash,
+             unique_ptr<ElementModQ> manifestHash, unique_ptr<ElementModQ> cryptoBaseHash,
+             unique_ptr<ElementModQ> cryptoExtendedBaseHash,
              unique_ptr<ContextConfiguration> config, unordered_map<string, string> extendedData)
-            : Impl(numberOfGuardians, quorum, move(elGamalPublicKey), move(commitmentHash),
-                   move(manifestHash), move(cryptoBaseHash), move(cryptoExtendedBaseHash),
-                   move(extendedData))
+            : Impl(numberOfGuardians, quorum, move(elGamalPublicKey), move(parameterHash),
+                   move(commitmentHash), move(manifestHash), move(cryptoBaseHash),
+                   move(cryptoExtendedBaseHash), move(extendedData))
         {
             this->numberOfGuardians = numberOfGuardians;
             this->quorum = quorum;
@@ -99,40 +116,43 @@ namespace electionguard
 
     CiphertextElectionContext::CiphertextElectionContext(
       uint64_t numberOfGuardians, uint64_t quorum, unique_ptr<ElementModP> elGamalPublicKey,
-      unique_ptr<ElementModQ> commitmentHash, unique_ptr<ElementModQ> manifestHash,
-      unique_ptr<ElementModQ> cryptoBaseHash, unique_ptr<ElementModQ> cryptoExtendedBaseHash)
-        : pimpl(new Impl(numberOfGuardians, quorum, move(elGamalPublicKey), move(commitmentHash),
-                         move(manifestHash), move(cryptoBaseHash), move(cryptoExtendedBaseHash)))
+      unique_ptr<ElementModQ> parameterHash, unique_ptr<ElementModQ> commitmentHash,
+      unique_ptr<ElementModQ> manifestHash, unique_ptr<ElementModQ> cryptoBaseHash,
+      unique_ptr<ElementModQ> cryptoExtendedBaseHash)
+        : pimpl(new Impl(numberOfGuardians, quorum, move(elGamalPublicKey), move(parameterHash),
+                         move(commitmentHash), move(manifestHash), move(cryptoBaseHash),
+                         move(cryptoExtendedBaseHash)))
     {
     }
     CiphertextElectionContext::CiphertextElectionContext(
       uint64_t numberOfGuardians, uint64_t quorum, unique_ptr<ElementModP> elGamalPublicKey,
-      unique_ptr<ElementModQ> commitmentHash, unique_ptr<ElementModQ> manifestHash,
-      unique_ptr<ElementModQ> cryptoBaseHash, unique_ptr<ElementModQ> cryptoExtendedBaseHash,
-      unique_ptr<ContextConfiguration> config)
-        : pimpl(new Impl(numberOfGuardians, quorum, move(elGamalPublicKey), move(commitmentHash),
-                         move(manifestHash), move(cryptoBaseHash), move(cryptoExtendedBaseHash),
-                         move(config)))
+      unique_ptr<ElementModQ> parameterHash, unique_ptr<ElementModQ> commitmentHash,
+      unique_ptr<ElementModQ> manifestHash, unique_ptr<ElementModQ> cryptoBaseHash,
+      unique_ptr<ElementModQ> cryptoExtendedBaseHash, unique_ptr<ContextConfiguration> config)
+        : pimpl(new Impl(numberOfGuardians, quorum, move(elGamalPublicKey), move(parameterHash),
+                         move(commitmentHash), move(manifestHash), move(cryptoBaseHash),
+                         move(cryptoExtendedBaseHash), move(config)))
     {
     }
     CiphertextElectionContext::CiphertextElectionContext(
       uint64_t numberOfGuardians, uint64_t quorum, unique_ptr<ElementModP> elGamalPublicKey,
-      unique_ptr<ElementModQ> commitmentHash, unique_ptr<ElementModQ> manifestHash,
-      unique_ptr<ElementModQ> cryptoBaseHash, unique_ptr<ElementModQ> cryptoExtendedBaseHash,
+      unique_ptr<ElementModQ> parameterHash, unique_ptr<ElementModQ> commitmentHash,
+      unique_ptr<ElementModQ> manifestHash, unique_ptr<ElementModQ> cryptoBaseHash,
+      unique_ptr<ElementModQ> cryptoExtendedBaseHash, unordered_map<string, string> extendedData)
+        : pimpl(new Impl(numberOfGuardians, quorum, move(elGamalPublicKey), move(parameterHash),
+                         move(commitmentHash), move(manifestHash), move(cryptoBaseHash),
+                         move(cryptoExtendedBaseHash), move(extendedData)))
+    {
+    }
+    CiphertextElectionContext::CiphertextElectionContext(
+      uint64_t numberOfGuardians, uint64_t quorum, unique_ptr<ElementModP> elGamalPublicKey,
+      unique_ptr<ElementModQ> parameterHash, unique_ptr<ElementModQ> commitmentHash,
+      unique_ptr<ElementModQ> manifestHash, unique_ptr<ElementModQ> cryptoBaseHash,
+      unique_ptr<ElementModQ> cryptoExtendedBaseHash, unique_ptr<ContextConfiguration> config,
       unordered_map<string, string> extendedData)
-        : pimpl(new Impl(numberOfGuardians, quorum, move(elGamalPublicKey), move(commitmentHash),
-                         move(manifestHash), move(cryptoBaseHash), move(cryptoExtendedBaseHash),
-                         move(extendedData)))
-    {
-    }
-    CiphertextElectionContext::CiphertextElectionContext(
-      uint64_t numberOfGuardians, uint64_t quorum, unique_ptr<ElementModP> elGamalPublicKey,
-      unique_ptr<ElementModQ> commitmentHash, unique_ptr<ElementModQ> manifestHash,
-      unique_ptr<ElementModQ> cryptoBaseHash, unique_ptr<ElementModQ> cryptoExtendedBaseHash,
-      unique_ptr<ContextConfiguration> config, unordered_map<string, string> extendedData)
-        : pimpl(new Impl(numberOfGuardians, quorum, move(elGamalPublicKey), move(commitmentHash),
-                         move(manifestHash), move(cryptoBaseHash), move(cryptoExtendedBaseHash),
-                         move(config), move(extendedData)))
+        : pimpl(new Impl(numberOfGuardians, quorum, move(elGamalPublicKey), move(parameterHash),
+                         move(commitmentHash), move(manifestHash), move(cryptoBaseHash),
+                         move(cryptoExtendedBaseHash), move(config), move(extendedData)))
     {
     }
     CiphertextElectionContext::~CiphertextElectionContext() = default;
@@ -163,6 +183,10 @@ namespace electionguard
     const ElementModP &CiphertextElectionContext::getElGamalPublicKeyRef() const
     {
         return *pimpl->elGamalPublicKey.get();
+    }
+    const ElementModQ *CiphertextElectionContext::getParameterHash() const
+    {
+        return pimpl->parameterHash.get();
     }
     const ElementModQ *CiphertextElectionContext::getCommitmentHash() const
     {
@@ -211,20 +235,12 @@ namespace electionguard
       uint64_t numberOfGuardians, uint64_t quorum, unique_ptr<ElementModP> elGamalPublicKey,
       unique_ptr<ElementModQ> commitmentHash, unique_ptr<ElementModQ> manifestHash)
     {
-        // TODO: configurable version code
-
-        // HP = H(HV ;00,p,q,g). Parameter Hash 3.1.2
-        auto versionCode = string_to_fixed_width_bytes<32>("v2.0");
-        auto parameterHash = hash_elems(
-          {versionCode, HashPrefix::get_prefix_parameter_hash(), &const_cast<ElementModP &>(P()),
-           &const_cast<ElementModQ &>(Q()), &const_cast<ElementModP &>(G())});
-
         // HM = H(HP;01,manifest). Manifest Hash 3.1.4
         auto manifestDigest = hash_elems(
-          {parameterHash.get(), HashPrefix::get_prefix_manifest_hash(), manifestHash.get()});
+          {PARAMETER_BASE_HASH(), HashPrefix::get_prefix_manifest_hash(), manifestHash.get()});
 
         // HB =(HP;02,n,k,date,info,HM). Election Base Hash 3.1.5
-        auto cryptoBaseHash = hash_elems({parameterHash.get(), HashPrefix::get_prefix_base_hash(),
+        auto cryptoBaseHash = hash_elems({PARAMETER_BASE_HASH(), HashPrefix::get_prefix_base_hash(),
                                           manifestDigest.get(), numberOfGuardians, quorum});
 
         // HE = H(HB;12,K,K1,0,K1,1,...,K1,k−1,K2,0,...,Kn,k−2,Kn,k−1). // Extended Base Hash 3.2.3
@@ -236,8 +252,9 @@ namespace electionguard
         elGamalPublicKey->setIsFixedBase(true);
 
         return make_unique<CiphertextElectionContext>(
-          numberOfGuardians, quorum, move(elGamalPublicKey), move(commitmentHash),
-          move(manifestHash), move(cryptoBaseHash), move(cryptoExtendedBaseHash));
+          numberOfGuardians, quorum, move(elGamalPublicKey), PARAMETER_BASE_HASH().clone(),
+          move(commitmentHash), move(manifestHash), move(cryptoBaseHash),
+          move(cryptoExtendedBaseHash));
     }
 
     unique_ptr<CiphertextElectionContext> CiphertextElectionContext::make(
@@ -245,21 +262,13 @@ namespace electionguard
       unique_ptr<ElementModQ> commitmentHash, unique_ptr<ElementModQ> manifestHash,
       unique_ptr<ContextConfiguration> config)
     {
-        // TODO: configurable version code
-
-        // HP = H(HV ;00,p,q,g). Parameter Hash 3.1.2
-        auto versionCode = string_to_fixed_width_bytes<32>("v2.0");
-        auto parameterHash = hash_elems(
-          {versionCode, HashPrefix::get_prefix_parameter_hash(), &const_cast<ElementModP &>(P()),
-           &const_cast<ElementModQ &>(Q()), &const_cast<ElementModP &>(G())});
-
         // HM = H(HP;01,manifest). Manifest Hash 3.1.4
         auto manifestDigest = hash_elems(
-          {parameterHash.get(), HashPrefix::get_prefix_manifest_hash(), manifestHash.get()});
+          {PARAMETER_BASE_HASH(), HashPrefix::get_prefix_manifest_hash(), manifestHash.get()});
 
         // TODO: complete according to spec
         // HB =(HP;02,n,k,date,info,HM). Election Base Hash 3.1.5
-        auto cryptoBaseHash = hash_elems({parameterHash.get(), HashPrefix::get_prefix_base_hash(),
+        auto cryptoBaseHash = hash_elems({PARAMETER_BASE_HASH(), HashPrefix::get_prefix_base_hash(),
                                           numberOfGuardians, quorum, manifestDigest.get()});
 
         // HE = H(HB;12,K,K1,0,K1,1,...,K1,k−1,K2,0,...,Kn,k−2,Kn,k−1). // Extended Base Hash 3.2.3
@@ -271,8 +280,9 @@ namespace electionguard
         elGamalPublicKey->setIsFixedBase(true);
 
         return make_unique<CiphertextElectionContext>(
-          numberOfGuardians, quorum, move(elGamalPublicKey), move(commitmentHash),
-          move(manifestHash), move(cryptoBaseHash), move(cryptoExtendedBaseHash), move(config));
+          numberOfGuardians, quorum, move(elGamalPublicKey), PARAMETER_BASE_HASH().clone(),
+          move(commitmentHash), move(manifestHash), move(cryptoBaseHash),
+          move(cryptoExtendedBaseHash), move(config));
     }
 
     unique_ptr<CiphertextElectionContext> CiphertextElectionContext::make(
@@ -280,21 +290,13 @@ namespace electionguard
       unique_ptr<ElementModQ> commitmentHash, unique_ptr<ElementModQ> manifestHash,
       std::unordered_map<std::string, std::string> extendedData)
     {
-        // TODO: configurable version code
-
-        // HP = H(HV ;00,p,q,g). Parameter Hash 3.1.2
-        auto versionCode = string_to_fixed_width_bytes<32>("v2.0");
-        auto parameterHash = hash_elems(
-          {versionCode, HashPrefix::get_prefix_parameter_hash(), &const_cast<ElementModP &>(P()),
-           &const_cast<ElementModQ &>(Q()), &const_cast<ElementModP &>(G())});
-
         // HM = H(HP;01,manifest). Manifest Hash 3.1.4
         auto manifestDigest = hash_elems(
-          {parameterHash.get(), HashPrefix::get_prefix_manifest_hash(), manifestHash.get()});
+          {PARAMETER_BASE_HASH(), HashPrefix::get_prefix_manifest_hash(), manifestHash.get()});
 
         // TODO: complete according to spec
         // HB =(HP;02,n,k,date,info,HM). Election Base Hash 3.1.5
-        auto cryptoBaseHash = hash_elems({parameterHash.get(), HashPrefix::get_prefix_base_hash(),
+        auto cryptoBaseHash = hash_elems({PARAMETER_BASE_HASH(), HashPrefix::get_prefix_base_hash(),
                                           numberOfGuardians, quorum, manifestDigest.get()});
 
         // HE = H(HB;12,K,K1,0,K1,1,...,K1,k−1,K2,0,...,Kn,k−2,Kn,k−1). // Extended Base Hash 3.2.3
@@ -306,9 +308,9 @@ namespace electionguard
         elGamalPublicKey->setIsFixedBase(true);
 
         return make_unique<CiphertextElectionContext>(
-          numberOfGuardians, quorum, move(elGamalPublicKey), move(commitmentHash),
-          move(manifestHash), move(cryptoBaseHash), move(cryptoExtendedBaseHash),
-          move(extendedData));
+          numberOfGuardians, quorum, move(elGamalPublicKey), PARAMETER_BASE_HASH().clone(),
+          move(commitmentHash), move(manifestHash), move(cryptoBaseHash),
+          move(cryptoExtendedBaseHash), move(extendedData));
     }
 
     unique_ptr<CiphertextElectionContext> CiphertextElectionContext::make(
@@ -317,21 +319,13 @@ namespace electionguard
       unique_ptr<ContextConfiguration> config,
       std::unordered_map<std::string, std::string> extendedData)
     {
-        // TODO: configurable version code
-
-        // HP = H(HV ;00,p,q,g). Parameter Hash 3.1.2
-        auto versionCode = string_to_fixed_width_bytes<32>("v2.0");
-        auto parameterHash = hash_elems(
-          {versionCode, HashPrefix::get_prefix_parameter_hash(), &const_cast<ElementModP &>(P()),
-           &const_cast<ElementModQ &>(Q()), &const_cast<ElementModP &>(G())});
-
         // HM = H(HP;01,manifest). Manifest Hash 3.1.4
         auto manifestDigest = hash_elems(
-          {parameterHash.get(), HashPrefix::get_prefix_manifest_hash(), manifestHash.get()});
+          {PARAMETER_BASE_HASH(), HashPrefix::get_prefix_manifest_hash(), manifestHash.get()});
 
         // TODO: complete according to spec
         // HB =(HP;02,n,k,date,info,HM). Election Base Hash 3.1.5
-        auto cryptoBaseHash = hash_elems({parameterHash.get(), HashPrefix::get_prefix_base_hash(),
+        auto cryptoBaseHash = hash_elems({PARAMETER_BASE_HASH(), HashPrefix::get_prefix_base_hash(),
                                           numberOfGuardians, quorum, manifestDigest.get()});
 
         // HE = H(HB;12,K,K1,0,K1,1,...,K1,k−1,K2,0,...,Kn,k−2,Kn,k−1). // Extended Base Hash 3.2.3
@@ -343,9 +337,9 @@ namespace electionguard
         elGamalPublicKey->setIsFixedBase(true);
 
         return make_unique<CiphertextElectionContext>(
-          numberOfGuardians, quorum, move(elGamalPublicKey), move(commitmentHash),
-          move(manifestHash), move(cryptoBaseHash), move(cryptoExtendedBaseHash), move(config),
-          move(extendedData));
+          numberOfGuardians, quorum, move(elGamalPublicKey), PARAMETER_BASE_HASH().clone(),
+          move(commitmentHash), move(manifestHash), move(cryptoBaseHash),
+          move(cryptoExtendedBaseHash), move(config), move(extendedData));
     }
 
     unique_ptr<CiphertextElectionContext> CiphertextElectionContext::make(
