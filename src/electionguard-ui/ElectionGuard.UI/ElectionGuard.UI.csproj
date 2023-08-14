@@ -19,42 +19,42 @@
 
 		<!-- Versions -->
 		<ApplicationDisplayVersion>1.91</ApplicationDisplayVersion>
-		<ApplicationVersion>6</ApplicationVersion>
+		<ApplicationVersion>8</ApplicationVersion>
 
 		<SupportedOSPlatformVersion Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'maccatalyst'">15.3</SupportedOSPlatformVersion>
 		<SupportedOSPlatformVersion Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'windows'">10.0.19041.0</SupportedOSPlatformVersion>
 		<TargetPlatformMinVersion Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'windows'">10.0.19041.0</TargetPlatformMinVersion>
 		<Nullable>enable</Nullable>
-    <CopyLocalLockFileAssemblies>true</CopyLocalLockFileAssemblies>
-    <RestoreProjectStyle>PackageReference</RestoreProjectStyle>    
-    <!--<Configurations>Release;Debug</Configurations>-->
+		<CopyLocalLockFileAssemblies>true</CopyLocalLockFileAssemblies>
+		<RestoreProjectStyle>PackageReference</RestoreProjectStyle>
+		<!--<Configurations>Release;Debug</Configurations>-->
 		<Platforms Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'maccatalyst'">arm64;x64</Platforms>
 		<Platforms Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'windows'">AnyCPU</Platforms>
-    <UserSecretsId>efb177b9-29c3-4df1-adaa-be7e64bdc8ce</UserSecretsId>
-  </PropertyGroup>
+		<UserSecretsId>efb177b9-29c3-4df1-adaa-be7e64bdc8ce</UserSecretsId>
+	</PropertyGroup>
 
 	<PropertyGroup>
-    <DefineConstants>$(DefineConstants);APPCENTER_SECRET_MACOS=$(APPCENTER_SECRET_MACOS);APPCENTER_SECRET_UWP=$(APPCENTER_SECRET_UWP)</DefineConstants>
-</PropertyGroup>
+		<DefineConstants>$(DefineConstants);APPCENTER_SECRET_MACOS=$(APPCENTER_SECRET_MACOS);APPCENTER_SECRET_UWP=$(APPCENTER_SECRET_UWP)</DefineConstants>
+	</PropertyGroup>
 
 
- <PropertyGroup Label="Debug|arm64" Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Debug|net7.0-maccatalyst|arm64'">
-	  <CreatePackage>false</CreatePackage>
+	<PropertyGroup Label="Debug|arm64" Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Debug|net7.0-maccatalyst|arm64'">
+		<CreatePackage>false</CreatePackage>
 		<RuntimeIdentifiers>maccatalyst-arm64;maccatalyst-x64</RuntimeIdentifiers>
 	</PropertyGroup>
 
 	<PropertyGroup Label="Release|arm64" Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Release|net7.0-maccatalyst|arm64'">
-	  <CreatePackage>true</CreatePackage>
+		<CreatePackage>true</CreatePackage>
 		<RuntimeIdentifiers>maccatalyst-arm64;maccatalyst-x64</RuntimeIdentifiers>
 	</PropertyGroup>
 
-	 <PropertyGroup Label="Debug|x64" Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Debug|net7.0-maccatalyst|x64'">
-	  <CreatePackage>false</CreatePackage>
+	<PropertyGroup Label="Debug|x64" Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Debug|net7.0-maccatalyst|x64'">
+		<CreatePackage>false</CreatePackage>
 		<RuntimeIdentifiers>maccatalyst-x64</RuntimeIdentifiers>
 	</PropertyGroup>
 
 	<PropertyGroup Label="Release|x64" Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Release|net7.0-maccatalyst|x64'">
-	  <CreatePackage>false</CreatePackage>
+		<CreatePackage>false</CreatePackage>
 		<RuntimeIdentifiers>maccatalyst-x64</RuntimeIdentifiers>
 	</PropertyGroup>
 
@@ -67,58 +67,58 @@
 	</PropertyGroup>
 
 	<PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
-	  <IntermediateOutputPath></IntermediateOutputPath>
-	  <DebugSymbols></DebugSymbols>
-	  <DebugType></DebugType>
-	  <Optimize></Optimize>
-	  <OutputPath></OutputPath>
-	  <DefineConstants></DefineConstants>
-	  <WarningLevel></WarningLevel>
-	  <DocumentationFile></DocumentationFile>
-	  <ConsolePause>true</ConsolePause>
-	  <ExternalConsole>false</ExternalConsole>
-	  <Commandlineparameters></Commandlineparameters>
-	  <RunWithWarnings>true</RunWithWarnings>
-	  <AssemblyName></AssemblyName>
-	  <SignAssembly></SignAssembly>
-	  <DelaySign>false</DelaySign>
-	  <PublicSign>false</PublicSign>
-	  <AssemblyOriginatorKeyFile></AssemblyOriginatorKeyFile>
-	  <NoWarn></NoWarn>
-	  <AllowUnsafeBlocks></AllowUnsafeBlocks>
-	  <CheckForOverflowUnderflow></CheckForOverflowUnderflow>
-	  <LangVersion>Default</LangVersion>
-	  <NoStdLib></NoStdLib>
-	  <PlatformTarget></PlatformTarget>
-	  <WarningsNotAsErrors></WarningsNotAsErrors>
-	  <Nullable>enable</Nullable>
+		<IntermediateOutputPath></IntermediateOutputPath>
+		<DebugSymbols></DebugSymbols>
+		<DebugType></DebugType>
+		<Optimize></Optimize>
+		<OutputPath></OutputPath>
+		<DefineConstants></DefineConstants>
+		<WarningLevel></WarningLevel>
+		<DocumentationFile></DocumentationFile>
+		<ConsolePause>true</ConsolePause>
+		<ExternalConsole>false</ExternalConsole>
+		<Commandlineparameters></Commandlineparameters>
+		<RunWithWarnings>true</RunWithWarnings>
+		<AssemblyName></AssemblyName>
+		<SignAssembly></SignAssembly>
+		<DelaySign>false</DelaySign>
+		<PublicSign>false</PublicSign>
+		<AssemblyOriginatorKeyFile></AssemblyOriginatorKeyFile>
+		<NoWarn></NoWarn>
+		<AllowUnsafeBlocks></AllowUnsafeBlocks>
+		<CheckForOverflowUnderflow></CheckForOverflowUnderflow>
+		<LangVersion>Default</LangVersion>
+		<NoStdLib></NoStdLib>
+		<PlatformTarget></PlatformTarget>
+		<WarningsNotAsErrors></WarningsNotAsErrors>
+		<Nullable>enable</Nullable>
 	</PropertyGroup>
 	<PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
-	  <IntermediateOutputPath></IntermediateOutputPath>
-	  <DebugSymbols></DebugSymbols>
-	  <DebugType></DebugType>
-	  <Optimize></Optimize>
-	  <OutputPath></OutputPath>
-	  <DefineConstants></DefineConstants>
-	  <WarningLevel></WarningLevel>
-	  <DocumentationFile></DocumentationFile>
-	  <ConsolePause>true</ConsolePause>
-	  <ExternalConsole>false</ExternalConsole>
-	  <Commandlineparameters></Commandlineparameters>
-	  <RunWithWarnings>true</RunWithWarnings>
-	  <AssemblyName></AssemblyName>
-	  <SignAssembly></SignAssembly>
-	  <DelaySign>false</DelaySign>
-	  <PublicSign>false</PublicSign>
-	  <AssemblyOriginatorKeyFile></AssemblyOriginatorKeyFile>
-	  <NoWarn></NoWarn>
-	  <AllowUnsafeBlocks></AllowUnsafeBlocks>
-	  <CheckForOverflowUnderflow></CheckForOverflowUnderflow>
-	  <LangVersion>Default</LangVersion>
-	  <NoStdLib></NoStdLib>
-	  <PlatformTarget>anycpu</PlatformTarget>
-	  <WarningsNotAsErrors></WarningsNotAsErrors>
-	  <Nullable>enable</Nullable>
+		<IntermediateOutputPath></IntermediateOutputPath>
+		<DebugSymbols></DebugSymbols>
+		<DebugType></DebugType>
+		<Optimize></Optimize>
+		<OutputPath></OutputPath>
+		<DefineConstants></DefineConstants>
+		<WarningLevel></WarningLevel>
+		<DocumentationFile></DocumentationFile>
+		<ConsolePause>true</ConsolePause>
+		<ExternalConsole>false</ExternalConsole>
+		<Commandlineparameters></Commandlineparameters>
+		<RunWithWarnings>true</RunWithWarnings>
+		<AssemblyName></AssemblyName>
+		<SignAssembly></SignAssembly>
+		<DelaySign>false</DelaySign>
+		<PublicSign>false</PublicSign>
+		<AssemblyOriginatorKeyFile></AssemblyOriginatorKeyFile>
+		<NoWarn></NoWarn>
+		<AllowUnsafeBlocks></AllowUnsafeBlocks>
+		<CheckForOverflowUnderflow></CheckForOverflowUnderflow>
+		<LangVersion>Default</LangVersion>
+		<NoStdLib></NoStdLib>
+		<PlatformTarget>anycpu</PlatformTarget>
+		<WarningsNotAsErrors></WarningsNotAsErrors>
+		<Nullable>enable</Nullable>
 	</PropertyGroup>
 	<ItemGroup>
 		<!-- App Icon -->
@@ -127,7 +127,7 @@
 		<!-- Images -->
 		<MauiImage Include="Resources\Images\*" />
 
-    <!-- Custom Fonts -->
+		<!-- Custom Fonts -->
 		<MauiFont Include="Resources\Fonts\*" />
 
 		<!-- Raw Assets (also remove the "Resources\Raw" prefix) -->
@@ -152,65 +152,65 @@
 	</ItemGroup>
 
 	<ItemGroup>
-	  <ProjectReference Include="..\..\..\bindings\netstandard\ElectionGuard\ElectionGuard.Decryption\ElectionGuard.Decryption.csproj" />
-	  <ProjectReference Include="..\..\..\bindings\netstandard\ElectionGuard\ElectionGuard.ElectionSetup\ElectionGuard.ElectionSetup.csproj" />
+		<ProjectReference Include="..\..\..\bindings\netstandard\ElectionGuard\ElectionGuard.Decryption\ElectionGuard.Decryption.csproj" />
+		<ProjectReference Include="..\..\..\bindings\netstandard\ElectionGuard\ElectionGuard.ElectionSetup\ElectionGuard.ElectionSetup.csproj" />
 		<ProjectReference Include="..\..\..\bindings\netstandard\ElectionGuard\ElectionGuard.Encryption\ElectionGuard.Encryption.csproj">
-	    <!-- <CopyLocalSatelliteAssemblies>True</CopyLocalSatelliteAssemblies>
+			<!-- <CopyLocalSatelliteAssemblies>True</CopyLocalSatelliteAssemblies>
 	    <Private>True</Private> -->
-	  </ProjectReference>
-	  <ProjectReference Include="..\ElectionGuard.UI.Lib\ElectionGuard.UI.Lib.csproj" />
+		</ProjectReference>
+		<ProjectReference Include="..\ElectionGuard.UI.Lib\ElectionGuard.UI.Lib.csproj" />
 	</ItemGroup>
 
 	<ItemGroup>
-	  <Compile Update="Controls\ContestControl.xaml.cs">
-	    <DependentUpon>ContestControl.xaml</DependentUpon>
-	  </Compile>
-	  <Compile Update="Resx\AppResources.Designer.cs">
-	    <DesignTime>True</DesignTime>
-	    <AutoGen>True</AutoGen>
-	    <DependentUpon>AppResources.resx</DependentUpon>
-	  </Compile>
-	  <Compile Update="Views\CreateElectionAdminPage.xaml.cs">
-	    <DependentUpon>CreateElectionAdminPage.xaml</DependentUpon>
-	  </Compile>
-	  <Compile Update="Views\ChallengedPopup.xaml.cs">
-	    <DependentUpon>ChallengedPopup.xaml</DependentUpon>
-	  </Compile>
-	  <Compile Update="Views\TallyProcessPage.xaml.cs">
-	    <DependentUpon>TallyProcessPage.xaml</DependentUpon>
-	  </Compile>
-	  <Compile Update="Views\ViewKeyCeremonyPage.xaml.cs">
-	    <DependentUpon>ViewKeyCeremonyPage.xaml</DependentUpon>
-	  </Compile>
+		<Compile Update="Controls\ContestControl.xaml.cs">
+			<DependentUpon>ContestControl.xaml</DependentUpon>
+		</Compile>
+		<Compile Update="Resx\AppResources.Designer.cs">
+			<DesignTime>True</DesignTime>
+			<AutoGen>True</AutoGen>
+			<DependentUpon>AppResources.resx</DependentUpon>
+		</Compile>
+		<Compile Update="Views\CreateElectionAdminPage.xaml.cs">
+			<DependentUpon>CreateElectionAdminPage.xaml</DependentUpon>
+		</Compile>
+		<Compile Update="Views\ChallengedPopup.xaml.cs">
+			<DependentUpon>ChallengedPopup.xaml</DependentUpon>
+		</Compile>
+		<Compile Update="Views\TallyProcessPage.xaml.cs">
+			<DependentUpon>TallyProcessPage.xaml</DependentUpon>
+		</Compile>
+		<Compile Update="Views\ViewKeyCeremonyPage.xaml.cs">
+			<DependentUpon>ViewKeyCeremonyPage.xaml</DependentUpon>
+		</Compile>
 	</ItemGroup>
 
 	<ItemGroup>
-	  <EmbeddedResource Update="Resx\AppResources.es.resx">
-	    <Generator></Generator>
-	  </EmbeddedResource>
-	  <EmbeddedResource Update="Resx\AppResources.resx">
-	    <Generator>ResXFileCodeGenerator</Generator>
-	    <LastGenOutput>AppResources.Designer.cs</LastGenOutput>
-	  </EmbeddedResource>
+		<EmbeddedResource Update="Resx\AppResources.es.resx">
+			<Generator></Generator>
+		</EmbeddedResource>
+		<EmbeddedResource Update="Resx\AppResources.resx">
+			<Generator>ResXFileCodeGenerator</Generator>
+			<LastGenOutput>AppResources.Designer.cs</LastGenOutput>
+		</EmbeddedResource>
 	</ItemGroup>
 	<ItemGroup>
-	  <None Remove="Resources\Images\collapse.png" />
-	  <None Remove="Resources\Images\expand.png" />
-	  <None Remove="Services\" />
+		<None Remove="Resources\Images\collapse.png" />
+		<None Remove="Resources\Images\expand.png" />
+		<None Remove="Services\" />
 	</ItemGroup>
 	<ItemGroup>
-	  <MauiXaml Update="Controls\ExpanderControl.xaml">
-	    <Generator>MSBuild:Compile</Generator>
-	  </MauiXaml>
-	  <MauiXaml Update="Controls\ContestControl.xaml">
-	    <Generator>MSBuild:Compile</Generator>
-	  </MauiXaml>
-	  <MauiXaml Update="Controls\LabelValueControl.xaml">
-	    <Generator>MSBuild:Compile</Generator>
-	  </MauiXaml>
-    <MauiXaml Update="Controls\UploadsControl.xaml">
-	    <Generator>MSBuild:Compile</Generator>
-	  </MauiXaml>
+		<MauiXaml Update="Controls\ExpanderControl.xaml">
+			<Generator>MSBuild:Compile</Generator>
+		</MauiXaml>
+		<MauiXaml Update="Controls\ContestControl.xaml">
+			<Generator>MSBuild:Compile</Generator>
+		</MauiXaml>
+		<MauiXaml Update="Controls\LabelValueControl.xaml">
+			<Generator>MSBuild:Compile</Generator>
+		</MauiXaml>
+		<MauiXaml Update="Controls\UploadsControl.xaml">
+			<Generator>MSBuild:Compile</Generator>
+		</MauiXaml>
 	</ItemGroup>
 	<PropertyGroup Label="Custom Paths">
 		<ElectionGuardData>..\..\..\data</ElectionGuardData>
@@ -218,27 +218,27 @@
 		<ElectionGuardScripts>..\..\..\scripts</ElectionGuardScripts>
 	</PropertyGroup>
 	<PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Debug|net7.0-windows10.0.19041.0|AnyCPU'">
-	  <DefineConstants>$(DefineConstants);DISABLE_XAML_GENERATED_BREAK_ON_UNHANDLED_EXCEPTION</DefineConstants>
+		<DefineConstants>$(DefineConstants);DISABLE_XAML_GENERATED_BREAK_ON_UNHANDLED_EXCEPTION</DefineConstants>
 	</PropertyGroup>
 	<PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Release|net7.0-windows10.0.19041.0|AnyCPU'">
-	  <DefineConstants>$(DefineConstants);DISABLE_XAML_GENERATED_BREAK_ON_UNHANDLED_EXCEPTION</DefineConstants>
+		<DefineConstants>$(DefineConstants);DISABLE_XAML_GENERATED_BREAK_ON_UNHANDLED_EXCEPTION</DefineConstants>
 	</PropertyGroup>
 	<ItemGroup Label="C++ Built Libraries">
-    <None Name="Windows (MSVC)" Visible="false" Include="$(ElectionGuardLibs)\Windows\x64\$(Configuration)\src\$(Configuration)\*.dll*">
-      <CopyToOutputDirectory Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'windows'">PreserveNewest</CopyToOutputDirectory>
-    </None>
-    <None Name="Windows HACL (MSVC)" Visible="false" Include="$(ElectionGuardLibs)\Windows\x64\$(Configuration)\libs\hacl\$(Configuration)\*.dll*">
-      <CopyToOutputDirectory Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'windows'">PreserveNewest</CopyToOutputDirectory>
-    </None>
-    <None Name="Windows Symbols (MSVC)" Visible="false" Include="$(ElectionGuardLibs)\Windows\x64\$(Configuration)\src\$(Configuration)\*.pdb*">
-      <CopyToOutputDirectory Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'windows'">PreserveNewest</CopyToOutputDirectory>
-    </None>
+		<None Name="Windows (MSVC)" Visible="false" Include="$(ElectionGuardLibs)\Windows\x64\$(Configuration)\src\$(Configuration)\*.dll*">
+			<CopyToOutputDirectory Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'windows'">PreserveNewest</CopyToOutputDirectory>
+		</None>
+		<None Name="Windows HACL (MSVC)" Visible="false" Include="$(ElectionGuardLibs)\Windows\x64\$(Configuration)\libs\hacl\$(Configuration)\*.dll*">
+			<CopyToOutputDirectory Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'windows'">PreserveNewest</CopyToOutputDirectory>
+		</None>
+		<None Name="Windows Symbols (MSVC)" Visible="false" Include="$(ElectionGuardLibs)\Windows\x64\$(Configuration)\src\$(Configuration)\*.pdb*">
+			<CopyToOutputDirectory Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'windows'">PreserveNewest</CopyToOutputDirectory>
+		</None>
 
-    <None Name="MacCatalyst" Visible="false" Include="$(ElectionGuardLibs)\MacCatalyst\arm64\$(Configuration)\src\*.dylib">
+		<None Name="MacCatalyst" Visible="false" Include="$(ElectionGuardLibs)\MacCatalyst\arm64\$(Configuration)\src\*.dylib">
 			<CopyToOutputDirectory Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'maccatalyst'">PreserveNewest</CopyToOutputDirectory>
 		</None>
-    <None Name="MacCatalyst HACL" Visible="false" Include="$(ElectionGuardLibs)\MacCatalyst\arm64\$(Configuration)\libs\hacl\*.dylib">
-			<CopyToOutputDirectory Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'maccatalyst'">PreserveNewest</CopyToOutputDirectory>		
+		<None Name="MacCatalyst HACL" Visible="false" Include="$(ElectionGuardLibs)\MacCatalyst\arm64\$(Configuration)\libs\hacl\*.dylib">
+			<CopyToOutputDirectory Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'maccatalyst'">PreserveNewest</CopyToOutputDirectory>
 		</None>
 	</ItemGroup>
 	<!-- <Target Name="Copy Windows x64" AfterTargets="Build">
