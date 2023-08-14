@@ -65,10 +65,11 @@ namespace electionguard
     void PrecomputedEncryption::generate(const ElementModP &publicKey)
     {
         // generate a random rho
-        secret = ElementModQ::fromHex(
-          "2B3B025E50E09C119CBA7E9448ACD1CABC9447EF39BF06327D81C665CDD86296"); // rand_q();
-        pad = g_pow_p(*secret);                                                // g ^ r
-        blindingFactor = pow_mod_p(publicKey, *secret);                        // K ^ r
+        // secret = ElementModQ::fromHex(
+        //   "2B3B025E50E09C119CBA7E9448ACD1CABC9447EF39BF06327D81C665CDD86296"); // rand_q();
+        secret = rand_q();
+        pad = g_pow_p(*secret);                         // g ^ r
+        blindingFactor = pow_mod_p(publicKey, *secret); // K ^ r
     }
 
     unique_ptr<PrecomputedEncryption> PrecomputedEncryption::clone()

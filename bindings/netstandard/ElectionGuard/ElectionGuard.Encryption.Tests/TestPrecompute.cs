@@ -14,7 +14,7 @@ namespace ElectionGuard.Encryption.Tests
         private const int MaxCompleteDelay = 30000;
         private const int TestBufferSize = 20000;
 
-        private const int TestRunLengthInS = 5;
+        private const int TestRunLengthInS = 10;
 
         private PrecomputeBufferContext _precompute;
         private AutoResetEvent _waitHandle;

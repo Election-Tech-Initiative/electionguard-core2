@@ -434,18 +434,28 @@ namespace ElectionGuard.Encryption.Tests
             var device = new EncryptionDevice(12345UL, 23456UL, 34567UL, "Location");
             var mediator = new EncryptionMediator(internalManifest, context, device);
 
+            var compute = new Precompute();
+            compute.StartPrecomputeAsync(keypair.PublicKey);
+            RunFor(TimeSpan.FromSeconds(1));
+            compute.StopPrecompute();
+
             var ballot = new PlaintextBallot(ballotData);
 
             // Act
-            var ciphertext = mediator.Encrypt(ballot);
+
             Assert.DoesNotThrow(() =>
             {
-                Enumerable.Range(1, 10000)
+                Enumerable.Range(1, 10)
                     .ToList()
                     .ForEach(_ =>
                     {
                         PrintMemory();
+                        var ciphertext = mediator.Encrypt(ballot);
                         new SubmittedBallot(ciphertext, BallotBoxState.Cast).Dispose();
+
+                        compute.StartPrecomputeAsync(keypair.PublicKey);
+                        RunFor(TimeSpan.FromSeconds(1));
+                        compute.StopPrecompute();
                     });
             });
 
