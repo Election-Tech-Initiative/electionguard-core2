@@ -161,7 +161,7 @@ namespace electionguard
         /// <summary>
         /// calcuate pow_mod_p using the provided fixed base.
         /// </summary>
-        static std::vector<uint64_t> pow_mod_p(std::string key, uint64_t (&base)[MAX_P_LEN],
+        static std::vector<uint64_t> pow_mod_p(std::string &key, uint64_t (&base)[MAX_P_LEN],
                                                uint64_t (&exponent)[MAX_Q_LEN])
         {
             LookupTableType *public_key_table = NULL;
@@ -176,7 +176,7 @@ namespace electionguard
         AsyncSemaphore task_lock;
         std::map<std::string, std::unique_ptr<LookupTableType>> key_map;
 
-        LookupTableType *getBaseLookupTable(const std::string key, uint64_t (&base)[MAX_P_LEN])
+        LookupTableType *getBaseLookupTable(const std::string &key, uint64_t (&base)[MAX_P_LEN])
         {
             auto const iter = key_map.find(key);
             if (iter != key_map.end()) {
