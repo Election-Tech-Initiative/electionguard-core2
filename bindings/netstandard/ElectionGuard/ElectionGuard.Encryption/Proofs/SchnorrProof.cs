@@ -61,7 +61,7 @@ namespace ElectionGuard.Proofs
                 PublicKey = new ElementModP(keyPair.PublicKey);
                 Commitment = BigMath.GPowP(seed);
                 Challenge = ComputeChallenge(parameterHash, offset, index, PublicKey, Commitment);
-                Response = BigMath.APlusBMulCModQ(seed, keyPair.SecretKey, Challenge);
+                Response = BigMath.AMinusBMulCModQ(seed, keyPair.SecretKey, Challenge);
             }
         }
 
@@ -79,7 +79,7 @@ namespace ElectionGuard.Proofs
                 PublicKey = new ElementModP(keyPair.PublicKey);
                 Commitment = BigMath.GPowP(seed);
                 Challenge = ComputeChallenge(parameterHash, offset, index, PublicKey, Commitment);
-                Response = BigMath.APlusBMulCModQ(seed, keyPair.SecretKey, Challenge);
+                Response = BigMath.AMinusBMulCModQ(seed, keyPair.SecretKey, Challenge);
             }
         }
 
@@ -99,7 +99,7 @@ namespace ElectionGuard.Proofs
                 PublicKey = new ElementModP(keyPair.PublicKey);
                 Commitment = BigMath.GPowP(seed);
                 Challenge = ComputeChallenge(parameterHash, offset, index, PublicKey, Commitment);
-                Response = BigMath.APlusBMulCModQ(seed, keyPair.SecretKey, Challenge);
+                Response = BigMath.AMinusBMulCModQ(seed, keyPair.SecretKey, Challenge);
             }
         }
 
@@ -116,7 +116,7 @@ namespace ElectionGuard.Proofs
             PublicKey = new ElementModP(keyPair.PublicKey);
             Commitment = BigMath.GPowP(seed);
             Challenge = ComputeChallenge(parameterHash, offset, index, PublicKey, Commitment);
-            Response = BigMath.APlusBMulCModQ(seed, keyPair.SecretKey, Challenge);
+            Response = BigMath.AMinusBMulCModQ(seed, keyPair.SecretKey, Challenge);
         }
 
         public SchnorrProof(SchnorrProof other)
@@ -138,35 +138,31 @@ namespace ElectionGuard.Proofs
             ElementModQ parameterHash
         )
         {
-            var k = PublicKey;
-            var h = Commitment;
-            var v = Response;
-            var validPublicKey = k.IsValidResidue();
-            var inBoundsH = h.IsInBounds();
-            var inBoundsU = v.IsInBounds();
 
 #pragma warning disable IDE0063 // Use simple 'using' statement. Need to support Net Standard 2.0, which doesn't have this.
-            using (var c = ComputeChallenge(parameterHash, offset, index, k, h))
-            using (var gp = BigMath.GPowP(v))
-            using (var pp = BigMath.PowModP(k, c))
-            using (var mp = BigMath.MultModP(h, pp))
+            using (var challenge = ComputeChallenge(parameterHash, offset, index, PublicKey, Commitment))
+            using (var gv = BigMath.GPowP(Response)) // G^v mod p
+            using (var kc = BigMath.PowModP(PublicKey, challenge)) // K^c mod p
+            using (var gvkc = BigMath.MultModP(gv, kc)) // G^v * K^c mod p
 #pragma warning restore IDE0063
             {
-
-                var validChallenge = c.Equals(Challenge);
-                var validProof = gp.Equals(mp);
+                var validCommitment = Commitment.Equals(gvkc); // hi,j = gvi,j · Kci,j mod p
+                var validChallenge = Challenge.Equals(challenge); // ci,j = H (HP;0x10,i,j,Kij,hij)
 
                 var messages = new List<string>();
-                var success = validPublicKey && inBoundsH && inBoundsU && validChallenge && validProof;
+                var success = PublicKey.IsValidResidue()
+                    && Commitment.IsInBounds()
+                    && Response.IsInBounds()
+                    && validCommitment && validChallenge;
                 if (success is false)
                 {
 
                     messages.Add("found an invalid Schnorr proof");
-                    messages.Add($"in_bounds_h: {inBoundsH}");
-                    messages.Add($"in_bounds_u: {inBoundsU}");
-                    messages.Add($"valid_public_key: {validPublicKey}");
+                    messages.Add($"in_bounds_h: {Commitment.IsInBounds()}");
+                    messages.Add($"in_bounds_v: {Response.IsInBounds()}");
+                    messages.Add($"valid_public_key: {PublicKey.IsValidResidue()}");
+                    messages.Add($"valid_commitment: {validCommitment}");
                     messages.Add($"valid_challenge: {validChallenge}");
-                    messages.Add($"valid_proof: {validProof}");
                 }
                 return new ValidationResult() { Success = success, Error = messages };
             }

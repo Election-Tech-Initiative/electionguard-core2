@@ -244,6 +244,20 @@ namespace ElectionGuard
         }
 
         /// <summary>
+        /// Calculate the formula a-b*c mod Q
+        /// </summary>
+        /// <param name="a">Value to subtract</param>
+        /// <param name="b">First parameter to multiply</param>
+        /// <param name="c">Second parameter to multiply</param>
+        public static ElementModQ AMinusBMulCModQ(ElementModQ a, ElementModQ b, ElementModQ c)
+        {
+            var status = External.AMinusBMulCModQ(a.Handle, b.Handle, c.Handle,
+                out var value);
+            status.ThrowIfError();
+            return value.IsInvalid ? null : new ElementModQ(value);
+        }
+
+        /// <summary>
         /// Generate random number between 0 and Q.
         /// </summary>
         public static ElementModQ RandQ()
@@ -402,6 +416,18 @@ namespace ElectionGuard
                 CallingConvention = CallingConvention.Cdecl,
                 SetLastError = true)]
             internal static extern Status APlusBMulCModQ(
+                NativeInterface.ElementModQ.ElementModQHandle a,
+                NativeInterface.ElementModQ.ElementModQHandle b,
+                NativeInterface.ElementModQ.ElementModQHandle c,
+                out NativeInterface.ElementModQ.ElementModQHandle handle
+                );
+
+            [DllImport(
+                NativeInterface.DllName,
+                EntryPoint = "eg_element_mod_q_a_minus_b_mul_c_mod_q",
+                CallingConvention = CallingConvention.Cdecl,
+                SetLastError = true)]
+            internal static extern Status AMinusBMulCModQ(
                 NativeInterface.ElementModQ.ElementModQHandle a,
                 NativeInterface.ElementModQ.ElementModQHandle b,
                 NativeInterface.ElementModQ.ElementModQHandle c,
