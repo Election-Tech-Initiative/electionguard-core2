@@ -11,6 +11,9 @@ namespace ElectionGuard.UI.ViewModels;
 public partial class BallotUploadViewModel : BaseViewModel
 {
     public const string ElectionIdParam = "ElectionId";
+    private const string _artifactSubFolder = "artifacts";
+    private const string _ballotSubFolder = "encrypted_ballots";
+    private readonly string[] _deviceFolderNames = { "devices", "encryption_devices" };
 
     [ObservableProperty]
     private string _electionId = string.Empty;
@@ -242,7 +245,7 @@ public partial class BallotUploadViewModel : BaseViewModel
             ResultsText = $"{AppResources.SuccessText} {totalCount} {AppResources.Success2Text}";
             ShowPanel = BallotUploadPanel.Results;
 
-            if ( totalChallenged + totalImported > 0 )
+            if (totalChallenged + totalImported > 0)
             {
                 var record = new CiphertextTallyRecord()
                 {
@@ -361,7 +364,7 @@ public partial class BallotUploadViewModel : BaseViewModel
             var drives = DriveInfo.GetDrives();
             foreach (var drive in drives)
             {
-                if (drive.DriveType == DriveType.Removable && drive.VolumeLabel.ToLower() == "egdrive")
+                if (drive.DriveType == DriveType.Removable && drive.IsReady && drive.VolumeLabel.ToLower() == "egdrive")
                 {
                     _serialNumber = 0;
                     _ = StorageUtils.GetVolumeInformation(drive.Name, out _serialNumber);
@@ -387,8 +390,8 @@ public partial class BallotUploadViewModel : BaseViewModel
                         });
                     }
 
-                    var devicePath = Path.Combine(drive.Name, "artifacts", "encryption_devices");
-                    if (!Directory.Exists(devicePath))
+                    var devicePath = GetDevicesPath(drive);
+                    if (string.IsNullOrEmpty(devicePath))
                     {
                         _importing = false;
                         return;
@@ -412,7 +415,7 @@ public partial class BallotUploadViewModel : BaseViewModel
                     }
 
                     // find submitted ballots folder
-                    var ballotPath = Path.Combine(drive.Name, "artifacts", "encrypted_ballots");
+                    var ballotPath = Path.Combine(drive.Name, _artifactSubFolder, _ballotSubFolder);
                     if (!Directory.Exists(ballotPath))
                     {
                         DeviceFile = string.Empty;
@@ -440,6 +443,21 @@ public partial class BallotUploadViewModel : BaseViewModel
             }
             _importing = false;
         });
+    }
+
+    private string GetDevicesPath(DriveInfo drive)
+    {
+        foreach (var deviceFolderName in _deviceFolderNames)
+        {
+            var devicePath = Path.Combine(drive.Name, _artifactSubFolder, deviceFolderName);
+            if (Directory.Exists(devicePath))
+            {
+                return devicePath;
+            }
+        }
+
+        // If we get here, we didn't find a device folder.
+        return string.Empty;
     }
 
     public override async Task OnAppearing()
