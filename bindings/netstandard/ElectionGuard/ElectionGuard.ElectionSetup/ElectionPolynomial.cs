@@ -69,7 +69,7 @@ public class ElectionPolynomial : DisposableBase
         Coefficients = new List<Coefficient>
         {
             new(sequenceOrder, 0, parameterHash, secretKey)
-            };
+        };
         for (var i = 1; i < numberOfCoefficients; i++)
         {
             using var secret = BigMath.RandQ();
