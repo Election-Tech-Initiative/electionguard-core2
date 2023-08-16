@@ -242,7 +242,7 @@ public partial class BallotUploadViewModel : BaseViewModel
             ResultsText = $"{AppResources.SuccessText} {totalCount} {AppResources.Success2Text}";
             ShowPanel = BallotUploadPanel.Results;
 
-            if ( totalChallenged + totalImported > 0 )
+            if (totalChallenged + totalImported > 0)
             {
                 var record = new CiphertextTallyRecord()
                 {
@@ -361,7 +361,7 @@ public partial class BallotUploadViewModel : BaseViewModel
             var drives = DriveInfo.GetDrives();
             foreach (var drive in drives)
             {
-                if (drive.DriveType == DriveType.Removable && drive.VolumeLabel.ToLower() == "egdrive")
+                if (drive.DriveType == DriveType.Removable && drive.IsReady && drive.VolumeLabel.ToLower() == "egdrive")
                 {
                     _serialNumber = 0;
                     _ = StorageUtils.GetVolumeInformation(drive.Name, out _serialNumber);
@@ -387,8 +387,8 @@ public partial class BallotUploadViewModel : BaseViewModel
                         });
                     }
 
-                    var devicePath = Path.Combine(drive.Name, "artifacts", "encryption_devices");
-                    if (!Directory.Exists(devicePath))
+                    var devicePath = GetDevicesPath(drive);
+                    if (string.IsNullOrEmpty(devicePath))
                     {
                         _importing = false;
                         return;
@@ -440,6 +440,22 @@ public partial class BallotUploadViewModel : BaseViewModel
             }
             _importing = false;
         });
+    }
+
+    private string GetDevicesPath(DriveInfo drive)
+    {
+        const string artifactFolder = "artifacts";
+        string[] devicePaths = { "devices", "encryption_devices" };
+        foreach( var path in devicePaths)
+        { 
+            var devicePath = Path.Combine(drive.Name, artifactFolder, path);
+            if (Directory.Exists(devicePath))
+            {
+                return devicePath;
+            }
+        }
+
+        return string.Empty;
     }
 
     public override async Task OnAppearing()
