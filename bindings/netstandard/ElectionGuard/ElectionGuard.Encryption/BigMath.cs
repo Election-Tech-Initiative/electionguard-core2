@@ -89,6 +89,11 @@ namespace ElectionGuard
             return value.IsInvalid ? null : new ElementModP(value);
         }
 
+        /// <summary>
+        /// Raise a ElementModP value to a long exponent
+        /// </summary>
+        /// <param name="b">base value for the calculation</param>
+        /// <param name="e">exponent to raise the base by</param>
         public static ElementModP PowModP(ElementModP b, ulong e)
         {
             using (var eQ = new ElementModQ(e, true))
@@ -98,6 +103,11 @@ namespace ElectionGuard
             }
         }
 
+        /// <summary>
+        /// Raise a ElementModQ value to a long exponent
+        /// </summary>
+        /// <param name="b">base value for the calculation</param>
+        /// <param name="e">exponent to raise the base by</param>
         public static ElementModP PowModP(ElementModQ b, ulong e)
         {
             using (var bP = new ElementModP(b))
