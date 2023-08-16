@@ -11,8 +11,8 @@ namespace ElectionGuard.UI.ViewModels;
 public partial class BallotUploadViewModel : BaseViewModel
 {
     public const string ElectionIdParam = "ElectionId";
-    private const string _artifactFolder = "artifacts";
-    private const string _ballotFolder = "encrypted_ballots";
+    private const string _artifactSubFolder = "artifacts";
+    private const string _ballotSubFolder = "encrypted_ballots";
     private readonly string[] _deviceFolderNames = { "devices", "encryption_devices" };
 
     [ObservableProperty]
@@ -415,7 +415,7 @@ public partial class BallotUploadViewModel : BaseViewModel
                     }
 
                     // find submitted ballots folder
-                    var ballotPath = Path.Combine(drive.Name, _artifactFolder, _ballotFolder);
+                    var ballotPath = Path.Combine(drive.Name, _artifactSubFolder, _ballotSubFolder);
                     if (!Directory.Exists(ballotPath))
                     {
                         DeviceFile = string.Empty;
@@ -449,7 +449,7 @@ public partial class BallotUploadViewModel : BaseViewModel
     {
         foreach (var deviceFolderName in _deviceFolderNames)
         {
-            var devicePath = Path.Combine(drive.Name, _artifactFolder, deviceFolderName);
+            var devicePath = Path.Combine(drive.Name, _artifactSubFolder, deviceFolderName);
             if (Directory.Exists(devicePath))
             {
                 return devicePath;
