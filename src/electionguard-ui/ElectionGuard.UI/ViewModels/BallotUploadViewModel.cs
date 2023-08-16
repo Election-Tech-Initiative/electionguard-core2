@@ -445,10 +445,10 @@ public partial class BallotUploadViewModel : BaseViewModel
     private string GetDevicesPath(DriveInfo drive)
     {
         const string artifactFolder = "artifacts";
-        string[] devicePaths = { "devices", "encryption_devices" };
-        foreach( var path in devicePaths)
-        { 
-            var devicePath = Path.Combine(drive.Name, artifactFolder, path);
+        string[] deviceFolderNames = { "devices", "encryption_devices" };
+        foreach (var deviceFolderName in deviceFolderNames)
+        {
+            var devicePath = Path.Combine(drive.Name, artifactFolder, deviceFolderName);
             if (Directory.Exists(devicePath))
             {
                 return devicePath;
