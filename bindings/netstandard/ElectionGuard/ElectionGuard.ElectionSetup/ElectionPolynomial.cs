@@ -41,7 +41,9 @@ public class ElectionPolynomial : DisposableBase
     /// Generates a polynomial for sharing election keys. 
     /// Each coefficient is an exponential order for polynomial and the guardian secret key is the 0-index coefficient.
     /// </summary>
+    /// <param name="sequenceOrder">offset used to calculate the Coefficient</param>
     /// <param name="numberOfCoefficients">Number of coefficients of polynomial, typically the quorum count of guardians</param>
+    /// <param name="parameterHash">parameter used to create proof</param>
     public ElectionPolynomial(
         ulong sequenceOrder,
         [Range(1, int.MaxValue)] int numberOfCoefficients,
@@ -59,7 +61,10 @@ public class ElectionPolynomial : DisposableBase
     /// Generates a polynomial for sharing election keys using the provided secret key as the zero-index coefficient.
     /// Each coefficient is an exponential order for the polynomial and the guardian secret key is the 0-index coefficient.
     /// </summary>
+    /// <param name="sequenceOrder">offset used to calculate the Coefficient</param>
     /// <param name="numberOfCoefficients">Number of coefficients of polynomial, typically the quorum count of guardians</param>
+    /// <param name="parameterHash">parameter used to create proof</param>
+    /// <param name="secretKey">secret used to make Coefficients</param>
     public ElectionPolynomial(
         ulong sequenceOrder,
         [Range(1, int.MaxValue)] int numberOfCoefficients,
@@ -81,7 +86,10 @@ public class ElectionPolynomial : DisposableBase
     /// Generates a polynomial for sharing election keys using the provided key pair as the zero-index coefficient.
     /// Each coefficient is an exponential order for the polynomial and the guardian secret key is the 0-index coefficient.
     /// </summary>
+    /// <param name="sequenceOrder">offset used to calculate the Coefficient</param>
     /// <param name="numberOfCoefficients">Number of coefficients of polynomial, typically the quorum count of guardians</param>
+    /// <param name="parameterHash">parameter used to create proof</param>
+    /// <param name="keyPair">keyPair with secret used to make Coefficients</param>
     public ElectionPolynomial(
         ulong sequenceOrder,
         [Range(1, int.MaxValue)] int numberOfCoefficients,
@@ -103,7 +111,11 @@ public class ElectionPolynomial : DisposableBase
     /// Generates a polynomial for sharing election keys using the provided key pair as the zero-index coefficient.
     /// Each coefficient is an exponential order for the polynomial and the guardian secret key is the 0-index coefficient.
     /// </summary>
+    /// <param name="sequenceOrder">offset used to calculate the Coefficient</param>
     /// <param name="numberOfCoefficients">Number of coefficients of polynomial, typically the quorum count of guardians</param>
+    /// <param name="parameterHash">parameter used to create proof</param>
+    /// <param name="keyPair">keyPair with secret used to make Coefficients</param>
+    /// <param name="random">random number generator</param>
     public ElectionPolynomial(
         ulong sequenceOrder,
         [Range(1, int.MaxValue)] int numberOfCoefficients,
