@@ -126,12 +126,32 @@ namespace electionguard
     }
     CiphertextElectionContext::CiphertextElectionContext(
       uint64_t numberOfGuardians, uint64_t quorum, unique_ptr<ElementModP> elGamalPublicKey,
+      unique_ptr<ElementModQ> commitmentHash, unique_ptr<ElementModQ> manifestHash,
+      unique_ptr<ElementModQ> cryptoBaseHash, unique_ptr<ElementModQ> cryptoExtendedBaseHash)
+        : pimpl(new Impl(numberOfGuardians, quorum, move(elGamalPublicKey),
+                         move(PARAMETER_BASE_HASH().clone()), move(commitmentHash),
+                         move(manifestHash), move(cryptoBaseHash), move(cryptoExtendedBaseHash)))
+    {
+    }
+    CiphertextElectionContext::CiphertextElectionContext(
+      uint64_t numberOfGuardians, uint64_t quorum, unique_ptr<ElementModP> elGamalPublicKey,
       unique_ptr<ElementModQ> parameterHash, unique_ptr<ElementModQ> commitmentHash,
       unique_ptr<ElementModQ> manifestHash, unique_ptr<ElementModQ> cryptoBaseHash,
       unique_ptr<ElementModQ> cryptoExtendedBaseHash, unique_ptr<ContextConfiguration> config)
         : pimpl(new Impl(numberOfGuardians, quorum, move(elGamalPublicKey), move(parameterHash),
                          move(commitmentHash), move(manifestHash), move(cryptoBaseHash),
                          move(cryptoExtendedBaseHash), move(config)))
+    {
+    }
+    CiphertextElectionContext::CiphertextElectionContext(
+      uint64_t numberOfGuardians, uint64_t quorum, unique_ptr<ElementModP> elGamalPublicKey,
+      unique_ptr<ElementModQ> commitmentHash, unique_ptr<ElementModQ> manifestHash,
+      unique_ptr<ElementModQ> cryptoBaseHash, unique_ptr<ElementModQ> cryptoExtendedBaseHash,
+      unique_ptr<ContextConfiguration> config)
+        : pimpl(new Impl(numberOfGuardians, quorum, move(elGamalPublicKey),
+                         move(PARAMETER_BASE_HASH().clone()), move(commitmentHash),
+                         move(manifestHash), move(cryptoBaseHash), move(cryptoExtendedBaseHash),
+                         move(config)))
     {
     }
     CiphertextElectionContext::CiphertextElectionContext(
@@ -146,6 +166,17 @@ namespace electionguard
     }
     CiphertextElectionContext::CiphertextElectionContext(
       uint64_t numberOfGuardians, uint64_t quorum, unique_ptr<ElementModP> elGamalPublicKey,
+      unique_ptr<ElementModQ> commitmentHash, unique_ptr<ElementModQ> manifestHash,
+      unique_ptr<ElementModQ> cryptoBaseHash, unique_ptr<ElementModQ> cryptoExtendedBaseHash,
+      unordered_map<string, string> extendedData)
+        : pimpl(new Impl(numberOfGuardians, quorum, move(elGamalPublicKey),
+                         move(PARAMETER_BASE_HASH().clone()), move(commitmentHash),
+                         move(manifestHash), move(cryptoBaseHash), move(cryptoExtendedBaseHash),
+                         move(extendedData)))
+    {
+    }
+    CiphertextElectionContext::CiphertextElectionContext(
+      uint64_t numberOfGuardians, uint64_t quorum, unique_ptr<ElementModP> elGamalPublicKey,
       unique_ptr<ElementModQ> parameterHash, unique_ptr<ElementModQ> commitmentHash,
       unique_ptr<ElementModQ> manifestHash, unique_ptr<ElementModQ> cryptoBaseHash,
       unique_ptr<ElementModQ> cryptoExtendedBaseHash, unique_ptr<ContextConfiguration> config,
@@ -153,6 +184,17 @@ namespace electionguard
         : pimpl(new Impl(numberOfGuardians, quorum, move(elGamalPublicKey), move(parameterHash),
                          move(commitmentHash), move(manifestHash), move(cryptoBaseHash),
                          move(cryptoExtendedBaseHash), move(config), move(extendedData)))
+    {
+    }
+    CiphertextElectionContext::CiphertextElectionContext(
+      uint64_t numberOfGuardians, uint64_t quorum, unique_ptr<ElementModP> elGamalPublicKey,
+      unique_ptr<ElementModQ> commitmentHash, unique_ptr<ElementModQ> manifestHash,
+      unique_ptr<ElementModQ> cryptoBaseHash, unique_ptr<ElementModQ> cryptoExtendedBaseHash,
+      unique_ptr<ContextConfiguration> config, unordered_map<string, string> extendedData)
+        : pimpl(new Impl(numberOfGuardians, quorum, move(elGamalPublicKey),
+                         move(PARAMETER_BASE_HASH().clone()), move(commitmentHash),
+                         move(manifestHash), move(cryptoBaseHash), move(cryptoExtendedBaseHash),
+                         move(config), move(extendedData)))
     {
     }
     CiphertextElectionContext::~CiphertextElectionContext() = default;
