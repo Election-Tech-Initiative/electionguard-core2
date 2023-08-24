@@ -19,7 +19,7 @@ public partial class LoginViewModel : BaseViewModel
 
     [ObservableProperty]
     [NotifyCanExecuteChangedFor(nameof(LoginCommand))]
-    private bool _dbNotAvailable;
+    private bool _dbNotAvailable = true;
 
     [RelayCommand(CanExecute = nameof(CanLogin), AllowConcurrentExecutions = true)]
     public async Task Login()
@@ -56,6 +56,14 @@ public partial class LoginViewModel : BaseViewModel
     {
         await base.OnAppearing();
         SubscribeDbPing();
+        if (ErrorLog.AppPreviousCrashed())
+        {
+            ErrorLog.DeleteCrashedFile();
+            _ = Shell.Current.CurrentPage.Dispatcher.DispatchAsync(async () =>
+            {
+                await Shell.Current.CurrentPage.DisplayAlert(AppResources.PreviousCrash, AppResources.ViewLogsText, AppResources.OkText);
+            });
+        }
     }
 
     public override async Task OnLeavingPage()
@@ -86,15 +94,5 @@ public partial class LoginViewModel : BaseViewModel
     {
         DbNotAvailable = !DbService.Ping();
         ErrorMessage = DbNotAvailable ? AppResources.DatabaseUnavailable : string.Empty;
-
-        if (ErrorLog.AppPreviousCrashed())
-        {
-            ErrorLog.DeleteCrashedFile();
-            _ = Shell.Current.CurrentPage.Dispatcher.DispatchAsync(async () =>
-            {
-                await Shell.Current.CurrentPage.DisplayAlert(AppResources.PreviousCrash, AppResources.ViewLogsText, AppResources.OkText);
-            });
-        }
-
     }
 }

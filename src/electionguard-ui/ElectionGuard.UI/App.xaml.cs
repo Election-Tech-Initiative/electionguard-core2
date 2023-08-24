@@ -1,4 +1,6 @@
 ﻿using System.Globalization;
+using System.Runtime.CompilerServices;
+using CommunityToolkit.Maui.Views;
 using ElectionGuard.Converters;
 using Newtonsoft.Json;
 
@@ -23,6 +25,19 @@ public partial class App
         SetupLanguageSupport();
         MainPage = new AppShell();
         _logger.LogInformation("Application Started");
+
+        DbService.DatabaseDisconnected += DbService_DatabaseDisconnected;
+    }
+
+    private async void DbService_DatabaseDisconnected(object? sender, DbEventArgs e)
+    {
+        if (Shell.Current.CurrentPage as LoginPage is null)
+        {
+            await Shell.Current.Dispatcher.DispatchAsync(async () =>
+            {
+                _ = await Shell.Current.CurrentPage.ShowPopupAsync(new NetworkPopup());
+            });
+        }
     }
 
     private void AddUnhandledExceptionHandler()

@@ -170,6 +170,9 @@
 			<AutoGen>True</AutoGen>
 			<DependentUpon>AppResources.resx</DependentUpon>
 		</Compile>
+		<Compile Update="Views\NetworkPopup.xaml.cs">
+		  <DependentUpon>NetworkPopup.xaml</DependentUpon>
+		</Compile>
 		<Compile Update="Views\CreateElectionAdminPage.xaml.cs">
 			<DependentUpon>CreateElectionAdminPage.xaml</DependentUpon>
 		</Compile>

@@ -4,10 +4,10 @@ using ElectionGuard.UI.Models;
 
 namespace ElectionGuard.UI.ViewModels;
 
-[QueryProperty(CurrentKeyCeremonyParam, "KeyCeremonyId")]
+[QueryProperty(CurrentKeyCeremonyParam, "KeyCeremony")]
 public partial class ViewKeyCeremonyViewModel : BaseViewModel
 {
-    public const string CurrentKeyCeremonyParam = "KeyCeremonyId";
+    public const string CurrentKeyCeremonyParam = "KeyCeremony";
 
     private KeyCeremonyMediator? _mediator;
 
@@ -65,11 +65,6 @@ public partial class ViewKeyCeremonyViewModel : BaseViewModel
         KeyCeremony?.Dispose();
     }
 
-    partial void OnKeyCeremonyIdChanged(string value)
-    {
-        _ = Task.Run(async () => KeyCeremony = await _keyCeremonyService.GetByKeyCeremonyIdAsync(value));
-    }
-
     private void UpdateKeyCeremony()
     {
         if (KeyCeremonyId != string.Empty)
@@ -82,6 +77,7 @@ public partial class ViewKeyCeremonyViewModel : BaseViewModel
     {
         if (value is not null)
         {
+            KeyCeremonyId = value.KeyCeremonyId!;
             IsJoinVisible = (!AuthenticationService.IsAdmin && (value.State == KeyCeremonyState.PendingGuardiansJoin));
 
             _mediator = new KeyCeremonyMediator(
@@ -111,6 +107,11 @@ public partial class ViewKeyCeremonyViewModel : BaseViewModel
 
     private void CeremonyPollingTimer_Tick(object? sender, EventArgs e)
     {
+        if (KeyCeremony is null)
+        {
+            return;
+        }
+
         if (KeyCeremony.State == KeyCeremonyState.Complete)
         {
             _timer!.Stop();

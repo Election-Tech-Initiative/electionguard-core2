@@ -18,7 +18,7 @@ public partial class BaseViewModel : ObservableObject, IDisposable
     private bool _isLoading;
 
     [ObservableProperty]
-    private string _errorMessage;
+    private string _errorMessage = String.Empty;
 
     [ObservableProperty]
     private string _pageTitle = "";
@@ -51,6 +51,7 @@ public partial class BaseViewModel : ObservableObject, IDisposable
     public virtual async Task OnLeavingPage()
     {
         LocalizationService.OnLanguageChanged -= OnLanguageChanged;
+        _timer?.Stop();
         await Task.Yield();
     }
 
