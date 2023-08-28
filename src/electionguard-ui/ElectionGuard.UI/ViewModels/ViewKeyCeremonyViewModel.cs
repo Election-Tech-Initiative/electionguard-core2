@@ -49,10 +49,17 @@ public partial class ViewKeyCeremonyViewModel : BaseViewModel
 
         _timer!.Tick += CeremonyPollingTimer_Tick;
 
-        _joinPressed = await HasJoined();
-        if (!_timer.IsRunning)
+        try
         {
-            _timer.Start();
+            _joinPressed = await HasJoined();
+            if (!_timer.IsRunning)
+            {
+                _timer.Start();
+            }
+        }
+        catch(Exception)
+        {
+            _timer.Stop();
         }
     }
 
@@ -102,7 +109,15 @@ public partial class ViewKeyCeremonyViewModel : BaseViewModel
     {
         _joinPressed = true;
         // TODO: Tell the signalR hub what user has joined
-        await _mediator!.RunKeyCeremony(IsAdmin);
+        try
+        {
+            await _mediator!.RunKeyCeremony(IsAdmin);
+        }
+        catch (Exception ex)
+        {
+            ErrorMessage = ex.Message;
+            _logger.LogError(ex, "Exception in Key Ceremony at {KeyCeremony.State}", KeyCeremony.State);
+        }
     }
 
     private void CeremonyPollingTimer_Tick(object? sender, EventArgs e)

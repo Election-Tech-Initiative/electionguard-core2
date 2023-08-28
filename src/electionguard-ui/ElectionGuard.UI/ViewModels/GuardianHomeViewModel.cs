@@ -8,7 +8,7 @@ public partial class GuardianHomeViewModel : BaseViewModel
     private readonly TallyJoinedService _tallyJoinedService;
     private readonly MultiTallyService _multiTallyService;
 
-    public GuardianHomeViewModel(IServiceProvider serviceProvider, 
+    public GuardianHomeViewModel(IServiceProvider serviceProvider,
         KeyCeremonyService keyCeremonyService,
         GuardianPublicKeyService guardianService,
         TallyService tallyService,
@@ -59,7 +59,7 @@ public partial class GuardianHomeViewModel : BaseViewModel
 
     partial void OnCurrentKeyCeremonyChanged(KeyCeremonyRecord? value)
     {
-        if (value == null)
+        if (value is null)
         {
             return;
         }
@@ -67,7 +67,7 @@ public partial class GuardianHomeViewModel : BaseViewModel
         MainThread.BeginInvokeOnMainThread(async() =>
             await NavigationService.GoToPage(typeof(ViewKeyCeremonyViewModel), new Dictionary<string, object>
             {
-                { "KeyCeremonyId", value.KeyCeremonyId! }
+                { ViewKeyCeremonyViewModel.CurrentKeyCeremonyParam, value }
             }));
     }
 
@@ -101,57 +101,65 @@ public partial class GuardianHomeViewModel : BaseViewModel
 
     private async void PollingTimer_Tick(object? sender, EventArgs e)
     {
-        var keyCeremonies = await _keyCeremonyService.GetAllNotCompleteAsync();
-        KeyCeremonies.Clear();
-        foreach (var item in keyCeremonies)
+        try
         {
-            KeyCeremonies.Add(item);
+            var keyCeremonies = await _keyCeremonyService.GetAllNotCompleteAsync();
+            KeyCeremonies.Clear();
+            foreach (var item in keyCeremonies)
+            {
+                KeyCeremonies.Add(item);
+            }
+
+            var keys = await _guardianService.GetKeyCeremonyIdsAsync(UserName!);
+            var tallies = await _tallyService.GetAllByKeyCeremoniesAsync(keys);
+            var rejected = await _tallyJoinedService.GetGuardianRejectedIdsAsync(UserName!);
+            Tallies.Clear();
+            foreach (var item in tallies)
+            {
+                if (!rejected.Contains(item.TallyId) && item.State < TallyState.Complete)
+                {
+                    Tallies.Add(item);
+                }
+            }
+
+            var multiTallies = await _multiTallyService.GetAllAsync();
+            foreach (var tally in multiTallies)
+            {
+                if (!keys.Contains(tally.KeyCeremonyId!))
+                {
+                    continue;
+                }
+
+                var addMulti = false;
+                // check each tally in the multitally to see if any are not complete / abandoned
+                foreach (var (tallyId, _, _) in tally.TallyIds)
+                {
+                    if (await _tallyService.IsRunningByTallyIdAsync(tallyId))
+                    {
+                        addMulti = true;
+                        break;
+                    }
+                }
+                if (addMulti)
+                {
+                    if (MultiTallies.Count(m => m.MultiTallyId == tally.MultiTallyId) == 0)
+                    {
+                        MultiTallies.Add(tally);
+                    }
+                }
+                else
+                {
+                    if (MultiTallies.Count(m => m.MultiTallyId == tally.MultiTallyId) > 0)
+                    {
+                        MultiTallies.Remove(tally);
+                    }
+                }
+            }
         }
-
-        var keys = await _guardianService.GetKeyCeremonyIdsAsync(UserName!);
-        var tallies = await _tallyService.GetAllByKeyCeremoniesAsync(keys);
-        var rejected = await _tallyJoinedService.GetGuardianRejectedIdsAsync(UserName!);
-        Tallies.Clear();
-        foreach (var item in tallies)
+        catch(Exception)
         {
-            if (!rejected.Contains(item.TallyId) && item.State < TallyState.Complete)
-            {
-                Tallies.Add(item);
-            }
-        }
-
-        var multiTallies = await _multiTallyService.GetAllAsync();
-        foreach (var tally in multiTallies)
-        {
-            if (!keys.Contains(tally.KeyCeremonyId!))
-            {
-                continue;
-            }
-
-            var addMulti = false;
-            // check each tally in the multitally to see if any are not complete / abandoned
-            foreach (var (tallyId, _, _) in tally.TallyIds)
-            {
-                if (await _tallyService.IsRunningByTallyIdAsync(tallyId))
-                {
-                    addMulti = true;
-                    break;
-                }
-            }
-            if (addMulti)
-            {
-                if (MultiTallies.Count(m => m.MultiTallyId == tally.MultiTallyId) == 0)
-                {
-                    MultiTallies.Add(tally);
-                }
-            }
-            else
-            {
-                if (MultiTallies.Count(m => m.MultiTallyId == tally.MultiTallyId) > 0)
-                {
-                    MultiTallies.Remove(tally);
-                }
-            }
+            // if we have an exception, do not try to update anymore
+            _timer.Stop();
         }
     }
 }

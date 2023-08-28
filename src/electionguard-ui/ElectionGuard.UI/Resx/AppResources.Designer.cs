@@ -898,6 +898,15 @@ namespace ElectionGuard.UI.Resx {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to There was an issue with the network that caused an issue with what you were doing.  Please log back in when the network connection has been restored.
+        /// </summary>
+        internal static string NetworkIssueText {
+            get {
+                return ResourceManager.GetString("NetworkIssueText", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to No Ballots Uploaded.
         /// </summary>
         internal static string NoBallotUploads {
@@ -1087,7 +1096,7 @@ namespace ElectionGuard.UI.Resx {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Application Crash Detected.
+        ///   Looks up a localized string similar to Error Detected.
         /// </summary>
         internal static string PreviousCrash {
             get {
@@ -1573,7 +1582,7 @@ namespace ElectionGuard.UI.Resx {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to It appears that the application has crashed the last time that it was used.  Please look at the log files in the Settings page to be able to determine the issue..
+        ///   Looks up a localized string similar to It appears that something went wrong.  You can contine with what you were doing before this happened.  Details are available in the log files in the Settings page..
         /// </summary>
         internal static string ViewLogsText {
             get {

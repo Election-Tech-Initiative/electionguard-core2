@@ -55,15 +55,10 @@ public partial class LoginViewModel : BaseViewModel
     public override async Task OnAppearing()
     {
         await base.OnAppearing();
+
+        // update the database info right away
+        HandleDbPing(null, EventArgs.Empty);
         SubscribeDbPing();
-        if (ErrorLog.AppPreviousCrashed())
-        {
-            ErrorLog.DeleteCrashedFile();
-            _ = Shell.Current.CurrentPage.Dispatcher.DispatchAsync(async () =>
-            {
-                await Shell.Current.CurrentPage.DisplayAlert(AppResources.PreviousCrash, AppResources.ViewLogsText, AppResources.OkText);
-            });
-        }
     }
 
     public override async Task OnLeavingPage()
@@ -94,5 +89,13 @@ public partial class LoginViewModel : BaseViewModel
     {
         DbNotAvailable = !DbService.Ping();
         ErrorMessage = DbNotAvailable ? AppResources.DatabaseUnavailable : string.Empty;
+        if (sender != null && ErrorLog.AppPreviousCrashed())
+        {
+            ErrorLog.DeleteCrashedFile();
+            _ = Shell.Current.CurrentPage.Dispatcher.DispatchAsync(async () =>
+            {
+                await Shell.Current.CurrentPage.DisplayAlert(AppResources.PreviousCrash, AppResources.ViewLogsText, AppResources.OkText);
+            });
+        }
     }
 }

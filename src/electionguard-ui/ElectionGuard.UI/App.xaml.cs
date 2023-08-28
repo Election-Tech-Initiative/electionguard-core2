@@ -1,5 +1,4 @@
 ﻿using System.Globalization;
-using System.Runtime.CompilerServices;
 using CommunityToolkit.Maui.Views;
 using ElectionGuard.Converters;
 using Newtonsoft.Json;
