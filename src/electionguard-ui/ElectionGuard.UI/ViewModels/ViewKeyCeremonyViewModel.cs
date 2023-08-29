@@ -57,7 +57,7 @@ public partial class ViewKeyCeremonyViewModel : BaseViewModel
                 _timer.Start();
             }
         }
-        catch(Exception)
+        catch (Exception)
         {
             _timer.Stop();
         }

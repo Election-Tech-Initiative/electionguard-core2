@@ -8,8 +8,6 @@ public partial class NetworkPopup : Popup
     public NetworkPopup()
     {
         InitializeComponent();
-        //var vm = Ioc.Default.GetService(typeof(ChallengedPopupViewModel));
-        //BindingContext = vm;
     }
     private void ReconnectButton_Clicked(object sender, EventArgs e)
     {

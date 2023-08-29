@@ -49,9 +49,8 @@ public partial class CreateKeyCeremonyAdminViewModel : BaseViewModel
             { ViewKeyCeremonyViewModel.CurrentKeyCeremonyParam, keyCeremonyId }
         });
         }
-        catch (Exception ex)
+        catch (Exception)
         {
-            //throw;
         }
     }
 
