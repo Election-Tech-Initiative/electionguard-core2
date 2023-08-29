@@ -3,6 +3,9 @@ using System.IO;
 
 namespace ElectionGuard.CLI.Encrypt
 {
+    /// <summary>
+    /// Create an Election Package.
+    /// </summary>
     internal class CreateElectionCommand
     {
         public static Task Execute(CreateElectionOptions options)

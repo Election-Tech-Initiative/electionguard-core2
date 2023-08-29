@@ -1,5 +1,8 @@
 ﻿namespace ElectionGuard.CLI.Encrypt
 {
+    /// <summary>
+    /// Encrypt a collection of plaintext ballots
+    /// </summary>
     internal class EncryptCommand
     {
         public static Task Execute(EncryptOptions options)
