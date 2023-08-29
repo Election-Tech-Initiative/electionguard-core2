@@ -247,7 +247,7 @@ public partial class BallotUploadViewModel : BaseViewModel
 
             if (totalChallenged + totalImported > 0)
             {
-                var record = new CiphertextTallyRecord()
+                var record = new ElectionGuard.UI.Lib.Models.CiphertextTallyRecord()
                 {
                     ElectionId = ElectionId,
                     UploadId = upload.UploadId!,

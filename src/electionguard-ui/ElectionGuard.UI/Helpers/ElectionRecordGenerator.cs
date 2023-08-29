@@ -1,27 +1,12 @@
 ﻿using System.IO.Compression;
 using System.Text.Json;
 using MongoDB.Driver;
+using ElectionGuard.Decryption.ElectionRecord;
 
 namespace ElectionGuard.UI.Helpers;
 
-public static class ElectionRecordGenerator
+public class ElectionRecordGenerator
 {
-    private static readonly string GUARDIAN_FOLDER = "guardians";
-    private static readonly string DEVICE_FOLDER = "encryption_devices";
-    private static readonly string BALLOT_FOLDER = "submitted_ballots";
-    private static readonly string CHALLENGED_FOLDER = "spoiled_ballots";
-
-    private static readonly string GUARDIAN_PREFIX = "guardian_";
-    private static readonly string DEVICE_PREFIX = "device_";
-    private static readonly string FOLDER_PREFIX = "eg_";
-
-    private static readonly string MANIFEST_FILENAME = "manifest.json";
-    private static readonly string CONTEXT_FILENAME = "context.json";
-    private static readonly string CONSTANTS_FILENAME = "constants.json";
-    private static readonly string COEFFICIENTS_FILENAME = "coefficients.json";
-    private static readonly string TALLY_FILENAME = "tally.json";
-    private static readonly string ENCRYPTED_TALLY_FILENAME = "encrypted_tally.json";
-
     public static async Task GenerateElectionRecordAsync(TallyRecord tally, string outputFolder)
     {
         ArgumentException.ThrowIfNullOrEmpty(nameof(outputFolder));
@@ -33,19 +18,19 @@ public static class ElectionRecordGenerator
         }
 
         // generate temp path to export all of the files to
-        var tempFolder = Directory.CreateTempSubdirectory(FOLDER_PREFIX);
+        var tempFolder = Directory.CreateTempSubdirectory(ElectionRecordManager.FOLDER_PREFIX);
 
         // export the guardians
-        await ExportGuardiansAsync(Path.Combine(tempFolder.FullName, GUARDIAN_FOLDER), tally.KeyCeremonyId!);
+        await ExportGuardiansAsync(Path.Combine(tempFolder.FullName, ElectionRecordManager.GUARDIAN_FOLDER), tally.KeyCeremonyId!);
 
         // export the devices
-        await ExportDevices(Path.Combine(tempFolder.FullName, DEVICE_FOLDER), tally.ElectionId!);
+        await ExportDevices(Path.Combine(tempFolder.FullName, ElectionRecordManager.DEVICE_FOLDER), tally.ElectionId!);
 
         // export the ballots
-        await ExportBallotsAsync(Path.Combine(tempFolder.FullName, BALLOT_FOLDER), tally.ElectionId!);
+        await ExportBallotsAsync(Path.Combine(tempFolder.FullName, ElectionRecordManager.BALLOT_FOLDER), tally.ElectionId!);
 
         // export the challenged ballots v2 / spoiled ballots v1
-        await ExportChallengedBallotsAsync(Path.Combine(tempFolder.FullName, CHALLENGED_FOLDER), tally.ElectionId!);
+        await ExportChallengedBallotsAsync(Path.Combine(tempFolder.FullName, ElectionRecordManager.CHALLENGED_FOLDER), tally.ElectionId!);
 
         // export the top level
         await ExportSummaryAsync(tempFolder.FullName, tally.ElectionId!, tally.TallyId);
@@ -72,7 +57,7 @@ public static class ElectionRecordGenerator
         var guardians = await guardianPublicKeyService.GetAllByKeyCeremonyIdAsync(keyCeremonyId);
         foreach (var guardian in guardians)
         {
-            await File.WriteAllTextAsync(Path.Combine(guardianFolder, $"{GUARDIAN_PREFIX}{guardian.GuardianId}.json"), JsonSerializer.Serialize(guardian.PublicKey));
+            await File.WriteAllTextAsync(Path.Combine(guardianFolder, $"{ElectionRecordManager.GUARDIAN_PREFIX}{guardian.GuardianId}.json"), JsonSerializer.Serialize(guardian.PublicKey));
         }
     }
 
@@ -87,7 +72,7 @@ public static class ElectionRecordGenerator
         foreach (var upload in ballotUploads)
         {
             using var device = new EncryptionDevice((ulong)upload.DeviceId, (ulong)upload.SessionId, (ulong)upload.LaunchCode, upload.Location);
-            await File.WriteAllTextAsync(Path.Combine(deviceFolder, $"{DEVICE_PREFIX}{upload.DeviceId}.json"), device.ToJson());
+            await File.WriteAllTextAsync(Path.Combine(deviceFolder, $"{ElectionRecordManager.DEVICE_PREFIX}{upload.DeviceId}.json"), device.ToJson());
         }
     }
 
@@ -135,31 +120,31 @@ public static class ElectionRecordGenerator
         // write manifest
         ManifestService manifestService = new();
         var manifest = await manifestService.GetByElectionIdAsync(electionId);
-        await File.WriteAllTextAsync(Path.Combine(summaryFolder, MANIFEST_FILENAME), manifest);
+        await File.WriteAllTextAsync(Path.Combine(summaryFolder, ElectionRecordManager.MANIFEST_FILENAME), manifest);
 
         // write context
         ContextService contextService = new();
         var context = await contextService.GetByElectionIdAsync(electionId);
-        await File.WriteAllTextAsync(Path.Combine(summaryFolder, CONTEXT_FILENAME), context);
+        await File.WriteAllTextAsync(Path.Combine(summaryFolder, ElectionRecordManager.CONTEXT_FILENAME), context);
 
         // write constants
         ConstantsService constantsService = new();
         var constants = await constantsService.GetByElectionIdAsync(electionId);
-        await File.WriteAllTextAsync(Path.Combine(summaryFolder, CONSTANTS_FILENAME), constants);
+        await File.WriteAllTextAsync(Path.Combine(summaryFolder, ElectionRecordManager.CONSTANTS_FILENAME), constants);
 
         // write coefficients
         LagrangeCoefficientsService lagrangeCoefficientsService = new();
         var coefficients = await lagrangeCoefficientsService.GetByTallyIdAsync(tallyId);
-        await File.WriteAllTextAsync(Path.Combine(summaryFolder, COEFFICIENTS_FILENAME), coefficients);
+        await File.WriteAllTextAsync(Path.Combine(summaryFolder, ElectionRecordManager.COEFFICIENTS_FILENAME), coefficients);
 
         // write plaintext tally
         PlaintextTallyService plaintextTallyService = new();
         var plaintextTally = await plaintextTallyService.GetByTallyIdAsync(tallyId);
-        await File.WriteAllTextAsync(Path.Combine(summaryFolder, TALLY_FILENAME), plaintextTally);
+        await File.WriteAllTextAsync(Path.Combine(summaryFolder, ElectionRecordManager.TALLY_FILENAME), plaintextTally);
 
         // write ciphertext tally
         CiphertextTallyService ciphertextTallyService = new();
         var ciphertextTally = await ciphertextTallyService.GetByTallyIdAsync(tallyId);
-        await File.WriteAllTextAsync(Path.Combine(summaryFolder, ENCRYPTED_TALLY_FILENAME), ciphertextTally);
+        await File.WriteAllTextAsync(Path.Combine(summaryFolder, ElectionRecordManager.ENCRYPTED_TALLY_FILENAME), ciphertextTally);
     }
 }

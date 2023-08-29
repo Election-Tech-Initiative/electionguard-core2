@@ -9,7 +9,9 @@ using ElectionGuard.Extensions;
 
 namespace ElectionGuard.Decryption.Tests.Decryption;
 
-// common elements used when running decryption tests
+/// <summary>
+/// common elements used when running decryption tests
+/// </summary>
 public class TestDecryptionData : DisposableBase
 {
     public TestElectionData Election { get; set; } = default!;
