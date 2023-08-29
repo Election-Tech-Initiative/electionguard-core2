@@ -45,7 +45,7 @@ public static class DecryptWithSecretsExtensions
         ElementModQ secretKey, ElementModP publicKey)
     {
         var plaintextBallot = new PlaintextTallyBallot(
-            self.ObjectId, self.ObjectId, self.StyleId, manifest);
+            self.ObjectId, self.ObjectId, self.ObjectId, self.StyleId, manifest);
 
         foreach (var contest in self.Contests)
         {

@@ -37,7 +37,7 @@ public static class CiphertextTallyExtensions
 
     public static PlaintextTallyBallot ToTallyBallot(this CiphertextBallot cipher, PlaintextBallot ballot, CiphertextTally tally)
     {
-        var plaintext = new PlaintextTallyBallot(tally.TallyId, cipher.BallotCode.ToHex(), cipher.StyleId, tally.Manifest);
+        var plaintext = new PlaintextTallyBallot(tally.TallyId, cipher.ObjectId, cipher.BallotCode.ToHex(), cipher.StyleId, tally.Manifest);
         foreach (var (contestId, contest) in plaintext.Contests)
         {
             var plaintextContest = ballot.Contests.First(i => i.ObjectId == contestId);
@@ -54,7 +54,7 @@ public static class CiphertextTallyExtensions
 
     public static PlaintextTallyBallot ToTallyBallot(this PlaintextBallot ballot, CiphertextTally tally)
     {
-        var plaintext = new PlaintextTallyBallot(tally.TallyId, ballot.ObjectId, ballot.StyleId, tally.Manifest);
+        var plaintext = new PlaintextTallyBallot(tally.TallyId, ballot.ObjectId, ballot.ObjectId, ballot.StyleId, tally.Manifest);
         foreach (var (contestId, contest) in plaintext.Contests)
         {
             var plaintextContest = ballot.Contests.First(i => i.ObjectId == contestId);
