@@ -1,4 +1,5 @@
-﻿using System.Text.Json;
+﻿using System.Runtime.CompilerServices;
+using System.Text.Json;
 using MongoDB.Bson;
 using MongoDB.Bson.Serialization;
 using MongoDB.Bson.Serialization.Serializers;
@@ -32,6 +33,12 @@ public class ComplexTypeSerializer : SerializerBase<object>
     }
 }
 
+
+public class DbEventArgs : EventArgs
+{
+    public string Message { get; set; } = String.Empty;
+}
+
 /// <summary>
 /// Database service class to access the mongo database
 /// </summary>
@@ -46,6 +53,17 @@ public static class DbService
     private static string DbConnection = string.Empty;
     private static MongoClient client = new();
 
+    public static event EventHandler<DbEventArgs> DatabaseDisconnected;
+
+    public static void OnDatabaseDisconnect(DbEventArgs e)
+    {
+        EventHandler<DbEventArgs> handler = DatabaseDisconnected;
+        if (handler != null)
+        {
+            handler(null, e);
+        }
+    }
+
     /// <summary>
     /// Initializes the connection to the database server
     /// This will need to be called if the address or the password needs to be changed.
@@ -56,9 +74,7 @@ public static class DbService
     {
         DbHost = host;
         DbPassword = password;
-
-        // Create a new MongoClient that uses the user, password, host, port and database names
-        client = new MongoClient($"mongodb://{DefaultUsername}:{DbPassword}@{DbHost}:{DefaultPort}/{DefaultDatabase}?authSource=admin&keepAlive=true&poolSize=30&autoReconnect=true&socketTimeoutMS=360000&connectTimeoutMS=360000");
+        Reconnect();
     }
 
     /// <summary>
@@ -69,9 +85,7 @@ public static class DbService
     public static void Init(string connection)
     {
         DbConnection = connection;
-
-        // Create a new MongoClient that uses connection string
-        client = new MongoClient(connection);
+        Reconnect();
     }
 
     /// <summary>
@@ -79,14 +93,16 @@ public static class DbService
     /// </summary>
     public static void Reconnect()
     {
+        string connection;
         if (!string.IsNullOrEmpty(DbConnection))
         {
-            client = new MongoClient(DbConnection);
+            connection = DbConnection;
         }
         else
         {
-            client = new MongoClient($"mongodb://{DefaultUsername}:{DbPassword}@{DbHost}:{DefaultPort}/{DefaultDatabase}?authSource=admin&keepAlive=true&poolSize=30&autoReconnect=true&socketTimeoutMS=360000&connectTimeoutMS=360000");
+            connection = $"mongodb://{DefaultUsername}:{DbPassword}@{DbHost}:{DefaultPort}/{DefaultDatabase}?authSource=admin&keepAlive=true&poolSize=30&autoReconnect=true&socketTimeoutMS=360000&connectTimeoutMS=360000";
         }
+        client = new MongoClient(connection);
     }
 
 
@@ -108,8 +124,16 @@ public static class DbService
     /// <returns>The found collection</returns>
     public static IMongoCollection<T> GetCollection<T>(string? collectionName)
     {
-        var db = GetDb();
-        return db.GetCollection<T>(collectionName);
+        try
+        {
+            var db = GetDb();
+            return db.GetCollection<T>(collectionName);
+        }
+        catch(Exception ex)
+        {
+            OnDatabaseDisconnect(new DbEventArgs { Message = "GetCollection call failed" });
+            throw new ElectionGuardException("GetCollection call failed", ex);
+        }
     }
 
     /// <summary>
@@ -118,8 +142,16 @@ public static class DbService
     /// <returns>True/false if the client is connected to the server</returns>
     public static bool Verify()
     {
-        var db = GetDb();
-        return db.ListCollectionNames().ToList().Count > 0;
+        try
+        {
+            var db = GetDb();
+            return db.ListCollectionNames().ToList().Count > 0;
+        }
+        catch(Exception ex)
+        {
+            OnDatabaseDisconnect(new DbEventArgs { Message = "Verify call failed" });
+            throw new ElectionGuardException("Verify call failed", ex);
+        }
     }
 
     /// <summary>
@@ -134,22 +166,28 @@ public static class DbService
             return false;
         }
 
-        var db = GetDb();
         try
         {
+            var db = GetDb();
             // One of the interesting things about MongoDb driver is we don't get state
             // information about the connection until we actually try to use it.
             // to try to ping the server to do the smallest possible query.
-            _ = db.RunCommandAsync((Command<BsonDocument>)"{ping: 1}").Wait(1000);
+            var r = db.RunCommandAsync((Command<BsonDocument>)/*lang=json*/ "{ping: 1}").Wait(1000);
         }
         catch (Exception)
         {
+            OnDatabaseDisconnect(new DbEventArgs { Message = "Ping call failed" });
+            return false;
         }
 
         var server = client.Cluster.Description.Servers.FirstOrDefault();
-        return
-            server is not null &&
+        var ret = server is not null &&
             server.HeartbeatException is null &&
             server.State == ServerState.Connected;
+        if(!ret)
+        {
+            OnDatabaseDisconnect(new DbEventArgs { Message = "Ping call failed" });
+        }
+        return ret;
     }
 }

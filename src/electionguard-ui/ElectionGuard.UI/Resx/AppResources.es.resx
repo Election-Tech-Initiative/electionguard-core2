@@ -234,10 +234,10 @@
   <data name="AdminHomePageTitle" xml:space="preserve">
     <value>¿Qué quieres hacer?</value>
   </data>
-  <data name="GoToCreateKeyCeremonyAdmin">
+  <data name="GoToCreateKeyCeremonyAdmin" xml:space="preserve">
     <value>Go To Key Ceremony in spanish</value>
   </data>
-  <data name="CreateKeyCeremony">
+  <data name="CreateKeyCeremony" xml:space="preserve">
     <value>Key Ceremony</value>
   </data>
   <data name="Quorum" xml:space="preserve">
@@ -536,7 +536,7 @@
   </data>
   <data name="Status" xml:space="preserve">
     <value>Estado</value>
-    </data>
+  </data>
   <data name="TallyAllChallengesResponded" xml:space="preserve">
     <value>¡Todos los Guardianes respondieron al Desafío!</value>
   </data>
@@ -640,9 +640,12 @@
     <value>¡Cerca!</value>
   </data>
   <data name="PreviousCrash" xml:space="preserve">
-    <value>¡Se ha detectado un bloqueo de la aplicación!</value>
+    <value>¡Error detectado!</value>
   </data>
   <data name="ViewLogsText" xml:space="preserve">
-    <value>Parece que la aplicación se ha bloqueado la última vez que se usó.  Por favor, mire los archivos de registro en la página de configuración para poder determinar el problema.!</value>
+    <value>Parece que algo ha salido mal.  Puedes seguir con lo que estabas haciendo antes de que esto sucediera.  Los detalles están disponibles en los archivos de registro en la página Configuración.!</value>
+  </data>
+  <data name="NetworkIssueText" xml:space="preserve">
+    <value>Hubo un problema con la red que causó un problema con lo que estabas haciendo.  ¡Vuelve a iniciar sesión cuando se haya restablecido la conexión de red!</value>
   </data>
 </root>

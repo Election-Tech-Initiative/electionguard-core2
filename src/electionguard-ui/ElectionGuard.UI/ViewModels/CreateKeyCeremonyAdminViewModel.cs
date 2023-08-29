@@ -30,22 +30,28 @@ public partial class CreateKeyCeremonyAdminViewModel : BaseViewModel
     [RelayCommand(CanExecute = nameof(CanCreate), AllowConcurrentExecutions = true)]
     public async Task CreateKeyCeremony()
     {
-        var existingKeyCeremony = await _keyCeremonyService.GetByNameAsync(KeyCeremonyName);
-        if (existingKeyCeremony != null)
+        try
         {
-            var alreadyExists = LocalizationService.GetValue("AlreadyExists");
-            ErrorMessage = $"{KeyCeremonyName} {alreadyExists}";
-            CreateKeyCeremonyCommand.NotifyCanExecuteChanged();
-            return;
-        }
+            var existingKeyCeremony = await _keyCeremonyService.GetByNameAsync(KeyCeremonyName);
+            if (existingKeyCeremony != null)
+            {
+                var alreadyExists = LocalizationService.GetValue("AlreadyExists");
+                ErrorMessage = $"{KeyCeremonyName} {alreadyExists}";
+                CreateKeyCeremonyCommand.NotifyCanExecuteChanged();
+                return;
+            }
 
-        var keyCeremony = new KeyCeremonyRecord(KeyCeremonyName, NumberOfGuardians, Quorum, this.UserName!);
-        var ret = await _keyCeremonyService.SaveAsync(keyCeremony);
-        var keyCeremonyId = ret.KeyCeremonyId!;
-        await NavigationService.GoToPage(typeof(ViewKeyCeremonyViewModel), new Dictionary<string, object>
+            var keyCeremony = new KeyCeremonyRecord(KeyCeremonyName, NumberOfGuardians, Quorum, this.UserName!);
+            var ret = await _keyCeremonyService.SaveAsync(keyCeremony);
+            var keyCeremonyId = ret.KeyCeremonyId!;
+            await NavigationService.GoToPage(typeof(ViewKeyCeremonyViewModel), new Dictionary<string, object>
         {
             { ViewKeyCeremonyViewModel.CurrentKeyCeremonyParam, keyCeremonyId }
         });
+        }
+        catch (Exception)
+        {
+        }
     }
 
     private bool CanCreate()

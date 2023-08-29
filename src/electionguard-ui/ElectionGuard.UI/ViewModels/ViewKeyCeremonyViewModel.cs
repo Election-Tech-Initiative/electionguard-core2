@@ -4,10 +4,10 @@ using ElectionGuard.UI.Models;
 
 namespace ElectionGuard.UI.ViewModels;
 
-[QueryProperty(CurrentKeyCeremonyParam, "KeyCeremonyId")]
+[QueryProperty(CurrentKeyCeremonyParam, "KeyCeremony")]
 public partial class ViewKeyCeremonyViewModel : BaseViewModel
 {
-    public const string CurrentKeyCeremonyParam = "KeyCeremonyId";
+    public const string CurrentKeyCeremonyParam = "KeyCeremony";
 
     private KeyCeremonyMediator? _mediator;
 
@@ -49,10 +49,17 @@ public partial class ViewKeyCeremonyViewModel : BaseViewModel
 
         _timer!.Tick += CeremonyPollingTimer_Tick;
 
-        _joinPressed = await HasJoined();
-        if (!_timer.IsRunning)
+        try
         {
-            _timer.Start();
+            _joinPressed = await HasJoined();
+            if (!_timer.IsRunning)
+            {
+                _timer.Start();
+            }
+        }
+        catch (Exception)
+        {
+            _timer.Stop();
         }
     }
 
@@ -63,11 +70,6 @@ public partial class ViewKeyCeremonyViewModel : BaseViewModel
         _timer.Stop();
 
         KeyCeremony?.Dispose();
-    }
-
-    partial void OnKeyCeremonyIdChanged(string value)
-    {
-        _ = Task.Run(async () => KeyCeremony = await _keyCeremonyService.GetByKeyCeremonyIdAsync(value));
     }
 
     private void UpdateKeyCeremony()
@@ -82,6 +84,7 @@ public partial class ViewKeyCeremonyViewModel : BaseViewModel
     {
         if (value is not null)
         {
+            KeyCeremonyId = value.KeyCeremonyId!;
             IsJoinVisible = (!AuthenticationService.IsAdmin && (value.State == KeyCeremonyState.PendingGuardiansJoin));
 
             _mediator = new KeyCeremonyMediator(
@@ -106,11 +109,24 @@ public partial class ViewKeyCeremonyViewModel : BaseViewModel
     {
         _joinPressed = true;
         // TODO: Tell the signalR hub what user has joined
-        await _mediator!.RunKeyCeremony(IsAdmin);
+        try
+        {
+            await _mediator!.RunKeyCeremony(IsAdmin);
+        }
+        catch (Exception ex)
+        {
+            ErrorMessage = ex.Message;
+            _logger.LogError(ex, "Exception in Key Ceremony at {KeyCeremony.State}", KeyCeremony.State);
+        }
     }
 
     private void CeremonyPollingTimer_Tick(object? sender, EventArgs e)
     {
+        if (KeyCeremony is null)
+        {
+            return;
+        }
+
         if (KeyCeremony.State == KeyCeremonyState.Complete)
         {
             _timer!.Stop();
