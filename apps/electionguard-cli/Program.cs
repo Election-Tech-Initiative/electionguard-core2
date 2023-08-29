@@ -34,6 +34,9 @@ class Program
             case GenerateOptions g:
                 await GenerateCommand.Execute(g);
                 break;
+            case VerifyOptions v:
+                await VerifyCommand.Execute(v);
+                break;
         }
     }
 }
