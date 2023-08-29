@@ -39,9 +39,17 @@ public class BaseDatabaseService<T> : IDatabaseService<T> where T : DatabaseReco
     /// <returns></returns>
     public virtual async Task<IEnumerable<T>> SaveManyAsync(IEnumerable<T> data, string? table = null)
     {
-        var collection = DbService.GetCollection<T>(table ?? _collection);
-        await collection.InsertManyAsync(data);
-        return data;
+        try
+        {
+            var collection = DbService.GetCollection<T>(table ?? _collection);
+            await collection.InsertManyAsync(data);
+            return data;
+        }
+        catch (Exception ex)
+        {
+            DbService.OnDatabaseDisconnect(new DbEventArgs { Message = "SaveManyAsync call failed" });
+            throw new ElectionGuardException("SaveManyAsync call failed", ex);
+        }
     }
 
     /// <summary>
@@ -52,11 +60,18 @@ public class BaseDatabaseService<T> : IDatabaseService<T> where T : DatabaseReco
     /// <returns></returns>
     public virtual async Task<T> SaveAsync(T data, FilterDefinition<T>? customFilter = null, string? table = null)
     {
-        var collection = DbService.GetCollection<T>(table ?? _collection);
-        var filter = FilterBuilder.Eq(Constants.Id, data.Id);
-        await collection.DeleteOneAsync(UpdateFilter(customFilter ?? filter));
-        await collection.InsertOneAsync(data);
-        return data;
+        try
+        {
+            var collection = DbService.GetCollection<T>(table ?? _collection);
+            var filter = FilterBuilder.Eq(Constants.Id, data.Id);
+            _ = await collection.ReplaceOneAsync(UpdateFilter(customFilter ?? filter), data, new ReplaceOptions { IsUpsert = true });
+            return data;
+        }
+        catch (Exception ex)
+        {
+            DbService.OnDatabaseDisconnect(new DbEventArgs { Message = "SaveAsync call failed" });
+            throw new ElectionGuardException("SaveAsync call failed", ex);
+        }
     }
 
     /// <summary>
@@ -74,6 +89,7 @@ public class BaseDatabaseService<T> : IDatabaseService<T> where T : DatabaseReco
         }
         catch (Exception ex)
         {
+            DbService.OnDatabaseDisconnect(new DbEventArgs { Message = "Error updating a record" });
             throw new ElectionGuardException("Error updating a record", ex);
         }
     }
@@ -127,13 +143,16 @@ public class BaseDatabaseService<T> : IDatabaseService<T> where T : DatabaseReco
     {
         try
         {
-            var data = DbService.GetCollection<T>(table ?? _collection);
-            var item = await data.FindAsync<T>(UpdateFilter(filter));
+            var collection = DbService.GetCollection<T>(table ?? _collection);
+            var item = await collection.FindAsync<T>(UpdateFilter(filter));
             return item?.ToList() ?? new();
         }
         catch (Exception ex)
         {
+            DbService.OnDatabaseDisconnect(new DbEventArgs { Message = "Error updating a record" });
+            
             throw new ElectionGuardException("Error getting all by filter", ex);
+            //return new();
         }
     }
 
@@ -146,11 +165,12 @@ public class BaseDatabaseService<T> : IDatabaseService<T> where T : DatabaseReco
     {
         try
         {
-            var data = DbService.GetCollection<T>(table ?? _collection);
-            return await data.FindAsync<T>(UpdateFilter(filter));
+            var collection = DbService.GetCollection<T>(table ?? _collection);
+            return await collection.FindAsync<T>(UpdateFilter(filter));
         }
         catch (Exception ex)
         {
+            DbService.OnDatabaseDisconnect(new DbEventArgs { Message = "Error getting all by filter" });
             throw new ElectionGuardException("Error getting all by filter", ex);
         }
     }
@@ -211,8 +231,16 @@ public class BaseDatabaseService<T> : IDatabaseService<T> where T : DatabaseReco
     /// <param name="table">collection to use</param>
     public async Task<long> CountByFilterAsync(FilterDefinition<T> filter, string? table = null)
     {
-        var data = DbService.GetCollection<T>(table ?? _collection);
-        return await data.CountDocumentsAsync(UpdateFilter(filter));
+        try
+        {
+            var collection = DbService.GetCollection<T>(table ?? _collection);
+            return await collection.CountDocumentsAsync(UpdateFilter(filter));
+        }
+        catch (Exception ex)
+        {
+            DbService.OnDatabaseDisconnect(new DbEventArgs { Message = "Error CountByFilterAsync" });
+            throw new ElectionGuardException("Error CountByFilterAsync", ex);
+        }
     }
 
     /// <summary>
@@ -222,8 +250,16 @@ public class BaseDatabaseService<T> : IDatabaseService<T> where T : DatabaseReco
     /// <param name="table">collection to use</param>
     public async Task<bool> ExistsByFilterAsync(FilterDefinition<T> filter, string? table = null)
     {
-        var data = DbService.GetCollection<T>(table ?? _collection);
-        return await data.CountDocumentsAsync(UpdateFilter(filter)) != 0;
+        try
+        {
+            var collection = DbService.GetCollection<T>(table ?? _collection);
+            return await collection.CountDocumentsAsync(UpdateFilter(filter)) != 0;
+        }
+        catch (Exception ex)
+        {
+            DbService.OnDatabaseDisconnect(new DbEventArgs { Message = "Error ExistsByFilterAsync" });
+            throw new ElectionGuardException("Error ExistsByFilterAsync", ex);
+        }
     }
 
     /// <summary>
@@ -245,7 +281,8 @@ public class BaseDatabaseService<T> : IDatabaseService<T> where T : DatabaseReco
         }
         catch (Exception ex)
         {
-            throw new ElectionGuardException("Error updating a record", ex);
+            DbService.OnDatabaseDisconnect(new DbEventArgs { Message = "Error MarkAsDeletedAsync" });
+            throw new ElectionGuardException("Error MarkAsDeletedAsync", ex);
         }
     }
 

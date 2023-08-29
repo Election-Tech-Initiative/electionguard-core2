@@ -15,4 +15,10 @@ public class ContentPageBase<TViewModel> : ContentPage where TViewModel : BaseVi
         base.OnAppearing();
         await ViewModel.OnAppearing();
     }
+
+    protected override async void OnDisappearing()
+    {
+        base.OnDisappearing();
+        await ViewModel.OnLeavingPage();
+    }
 }

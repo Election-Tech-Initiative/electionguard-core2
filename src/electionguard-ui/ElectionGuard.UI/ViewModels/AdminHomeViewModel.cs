@@ -118,7 +118,7 @@ public partial class AdminHomeViewModel : BaseViewModel
             return;
         await NavigationService.GoToPage(typeof(ViewKeyCeremonyViewModel), new()
         {
-            { ViewKeyCeremonyViewModel.CurrentKeyCeremonyParam, CurrentKeyCeremony.KeyCeremonyId! }
+            { ViewKeyCeremonyViewModel.CurrentKeyCeremonyParam, CurrentKeyCeremony }
         });
     }
 

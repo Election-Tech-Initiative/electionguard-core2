@@ -207,18 +207,26 @@ public partial class TallyProcessViewModel : BaseViewModel
     [RelayCommand(CanExecute = nameof(CanJoinTally))]
     private async Task JoinTally()
     {
-        var joiner = new TallyJoinedRecord()
+        try
         {
-            TallyId = TallyId,
-            GuardianId = UserName!, // can assume not null, since you need to be signed into 
-            Joined = true,
-        };
+            var joiner = new TallyJoinedRecord()
+            {
+                TallyId = TallyId,
+                GuardianId = UserName!, // can assume not null, since you need to be signed into 
+                Joined = true,
+            };
 
-        await _tallyJoinedService.JoinTallyAsync(joiner);
+            await _tallyJoinedService.JoinTallyAsync(joiner);
 
-        if (!(_timer?.IsRunning ?? true))
+            if (!(_timer?.IsRunning ?? true))
+            {
+                _timer.Start();
+            }
+        }
+        catch (Exception ex)
         {
-            _timer.Start();
+            ErrorMessage = ex.Message;
+            _logger.LogError(ex, "Cannot join the tally {TallyId}", TallyId);
         }
     }
 

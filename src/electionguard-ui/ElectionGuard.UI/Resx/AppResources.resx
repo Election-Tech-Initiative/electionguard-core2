@@ -637,9 +637,12 @@
     <value>Close</value>
   </data>
   <data name="PreviousCrash" xml:space="preserve">
-    <value>Application Crash Detected</value>
+    <value>Error Detected</value>
   </data>
   <data name="ViewLogsText" xml:space="preserve">
-    <value>It appears that the application has crashed the last time that it was used.  Please look at the log files in the Settings page to be able to determine the issue.</value>
+    <value>It appears that something went wrong.  You can contine with what you were doing before this happened.  Details are available in the log files in the Settings page.</value>
+  </data>
+  <data name="NetworkIssueText" xml:space="preserve">
+    <value>There was an issue with the network that caused an issue with what you were doing.  Please log back in when the network connection has been restored</value>
   </data>
 </root>
