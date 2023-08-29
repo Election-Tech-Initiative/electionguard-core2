@@ -2885,9 +2885,33 @@ namespace ElectionGuard
 
             internal static extern Status Free(EncryptionDeviceType* handle);
 
+            [DllImport(DllName, EntryPoint = "eg_encryption_device_get_timestamp",
+                CallingConvention = CallingConvention.Cdecl, SetLastError = true)]
+            internal static extern Status GetTimestamp(
+                EncryptionDeviceHandle handle, out ulong timestamp);
+
+            [DllImport(DllName, EntryPoint = "eg_encryption_device_get_uuid",
+                CallingConvention = CallingConvention.Cdecl, SetLastError = true)]
+            internal static extern Status GetDeviceUuid(
+                EncryptionDeviceHandle handle, out ulong device_uuid);
+
+            [DllImport(DllName, EntryPoint = "eg_encryption_device_get_session_uuid",
+                CallingConvention = CallingConvention.Cdecl, SetLastError = true)]
+            internal static extern Status GetSessionUuid(
+                EncryptionDeviceHandle handle, out ulong session_uuid);
+
+            [DllImport(DllName, EntryPoint = "eg_encryption_device_get_launch_code",
+                CallingConvention = CallingConvention.Cdecl, SetLastError = true)]
+            internal static extern Status GetLaunchCode(
+                EncryptionDeviceHandle handle, out ulong launch_code);
+
+            [DllImport(DllName, EntryPoint = "eg_encryption_device_get_location",
+                CallingConvention = CallingConvention.Cdecl, SetLastError = true)]
+            internal static extern Status GetLocation(
+                EncryptionDeviceHandle handle, out IntPtr data, out ulong size);
+
             [DllImport(DllName, EntryPoint = "eg_encryption_device_get_hash",
                 CallingConvention = CallingConvention.Cdecl, SetLastError = true)]
-
             internal static extern Status GetHash(
                 EncryptionDeviceHandle handle,
                 out ElementModQ.ElementModQHandle device_hash);

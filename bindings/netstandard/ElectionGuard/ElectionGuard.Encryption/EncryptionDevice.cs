@@ -13,6 +13,62 @@ namespace ElectionGuard
     {
         internal NativeInterface.EncryptionDevice.EncryptionDeviceHandle Handle;
 
+        public ulong Timestamp
+        {
+            get
+            {
+                var status = NativeInterface.EncryptionDevice.GetTimestamp(
+                    Handle, out var value);
+                status.ThrowIfError();
+                return value;
+            }
+        }
+
+        public ulong DeviceUuid
+        {
+            get
+            {
+                var status = NativeInterface.EncryptionDevice.GetDeviceUuid(
+                    Handle, out var value);
+                status.ThrowIfError();
+                return value;
+            }
+        }
+
+        public ulong SessionUuid
+        {
+            get
+            {
+                var status = NativeInterface.EncryptionDevice.GetSessionUuid(
+                    Handle, out var value);
+                status.ThrowIfError();
+                return value;
+            }
+        }
+
+        public ulong LaunchCode
+        {
+            get
+            {
+                var status = NativeInterface.EncryptionDevice.GetLaunchCode(
+                    Handle, out var value);
+                status.ThrowIfError();
+                return value;
+            }
+        }
+
+        public string Location
+        {
+            get
+            {
+                var status = NativeInterface.EncryptionDevice.GetLocation(Handle, out var pointer, out _);
+                status.ThrowIfError();
+                var location = pointer.PtrToStringUTF8();
+                _ = NativeInterface.Memory.FreeIntPtr(pointer);
+                return location;
+            }
+        }
+
         /// <summary>
         /// Create a new EncryptionDevice
         /// </summary>
@@ -49,7 +105,7 @@ namespace ElectionGuard
         /// </summary>
         public ElementModQ GetHash()
         {
-            var status = NativeInterface.EncryptionDevice.GetHash(Handle, out NativeInterface.ElementModQ.ElementModQHandle value);
+            var status = NativeInterface.EncryptionDevice.GetHash(Handle, out var value);
             status.ThrowIfError();
             return new ElementModQ(value);
         }
@@ -59,10 +115,10 @@ namespace ElectionGuard
         /// </Summary>
         public string ToJson()
         {
-            var status = NativeInterface.EncryptionDevice.ToJson(Handle, out IntPtr pointer, out _);
+            var status = NativeInterface.EncryptionDevice.ToJson(Handle, out var pointer, out _);
             status.ThrowIfError();
             var json = pointer.PtrToStringUTF8();
-            NativeInterface.Memory.FreeIntPtr(pointer);
+            _ = NativeInterface.Memory.FreeIntPtr(pointer);
             return json;
         }
 

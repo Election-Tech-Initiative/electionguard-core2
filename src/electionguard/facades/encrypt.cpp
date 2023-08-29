@@ -66,6 +66,70 @@ eg_electionguard_status_t eg_encryption_device_free(eg_encryption_device_t *hand
     return ELECTIONGUARD_STATUS_SUCCESS;
 }
 
+eg_electionguard_status_t eg_encryption_device_get_timestamp(eg_encryption_device_t *handle,
+                                                             uint64_t *out_timestamp)
+{
+
+    try {
+        *out_timestamp = AS_TYPE(EncryptionDevice, handle)->getTimestamp();
+        return ELECTIONGUARD_STATUS_SUCCESS;
+    } catch (const exception &e) {
+        Log::error(":eg_encryption_device_get_timestamp", e);
+        return ELECTIONGUARD_STATUS_ERROR_BAD_ALLOC;
+    }
+}
+
+eg_electionguard_status_t eg_encryption_device_get_uuid(eg_encryption_device_t *handle,
+                                                        uint64_t *out_uuid)
+{
+    try {
+        *out_uuid = AS_TYPE(EncryptionDevice, handle)->getDeviceUuid();
+        return ELECTIONGUARD_STATUS_SUCCESS;
+    } catch (const exception &e) {
+        Log::error(":eg_encryption_device_get_uuid", e);
+        return ELECTIONGUARD_STATUS_ERROR_BAD_ALLOC;
+    }
+}
+
+eg_electionguard_status_t eg_encryption_device_get_session_uuid(eg_encryption_device_t *handle,
+                                                                uint64_t *out_session_id)
+{
+    try {
+        *out_session_id = AS_TYPE(EncryptionDevice, handle)->getSessionUuid();
+        return ELECTIONGUARD_STATUS_SUCCESS;
+    } catch (const exception &e) {
+        Log::error(":eg_encryption_device_get_session_uuid", e);
+        return ELECTIONGUARD_STATUS_ERROR_BAD_ALLOC;
+    }
+}
+
+eg_electionguard_status_t eg_encryption_device_get_launch_code(eg_encryption_device_t *handle,
+                                                               uint64_t *out_launch_code)
+{
+    try {
+        *out_launch_code = AS_TYPE(EncryptionDevice, handle)->getLaunchCode();
+        return ELECTIONGUARD_STATUS_SUCCESS;
+    } catch (const exception &e) {
+        Log::error(":eg_encryption_device_get_launch_code", e);
+        return ELECTIONGUARD_STATUS_ERROR_BAD_ALLOC;
+    }
+}
+
+eg_electionguard_status_t eg_encryption_device_get_location(eg_encryption_device_t *handle,
+                                                            char **out_location, uint64_t *out_size)
+{
+    try {
+        auto location = AS_TYPE(EncryptionDevice, handle)->getLocation();
+        size_t size = 0;
+        *out_location = dynamicCopy(location, &size);
+        *out_size = (uint64_t)size;
+        return ELECTIONGUARD_STATUS_SUCCESS;
+    } catch (const exception &e) {
+        Log::error(":eg_encryption_device_get_location", e);
+        return ELECTIONGUARD_STATUS_ERROR_BAD_ALLOC;
+    }
+}
+
 eg_electionguard_status_t eg_encryption_device_get_hash(eg_encryption_device_t *handle,
                                                         eg_element_mod_q_t **out_hash)
 {
