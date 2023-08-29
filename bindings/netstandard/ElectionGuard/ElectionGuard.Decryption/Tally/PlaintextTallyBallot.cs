@@ -21,6 +21,16 @@ public record PlaintextTallyBallot : PlaintextTally, IEquatable<PlaintextTallyBa
         BallotId = ballotId;
     }
 
+    [JsonConstructor]
+    public PlaintextTallyBallot(
+        string tallyId,
+        string ballotId,
+        string name,
+        Dictionary<string, PlaintextTallyContest> contests) : base(tallyId, name, contests)
+    {
+        BallotId = ballotId;
+    }
+
     public PlaintextTallyBallot(
         string tallyId,
         CiphertextBallot ballot)
