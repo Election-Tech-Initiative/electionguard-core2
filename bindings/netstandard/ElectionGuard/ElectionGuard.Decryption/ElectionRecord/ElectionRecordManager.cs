@@ -23,7 +23,7 @@ public static class ElectionRecordManager
     public static readonly string TALLY_FILENAME = "tally.json";
     public static readonly string ENCRYPTED_TALLY_FILENAME = "encrypted_tally.json";
 
-    public static async Task<ElectionRecordData> Import(string zipFile)
+    public static async Task<ElectionRecordData> ImportAsync(string zipFile)
     {
         ArgumentException.ThrowIfNullOrEmpty(nameof(zipFile));
 
@@ -42,7 +42,7 @@ public static class ElectionRecordManager
         return record;
     }
 
-    public static async Task<string> Export(ElectionRecordData record, string outputFolder)
+    public static async Task<string> ExportAsync(ElectionRecordData record, string outputFolder)
     {
         ArgumentException.ThrowIfNullOrEmpty(nameof(outputFolder));
 

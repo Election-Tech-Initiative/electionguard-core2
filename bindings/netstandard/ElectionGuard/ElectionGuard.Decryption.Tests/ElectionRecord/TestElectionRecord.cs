@@ -71,11 +71,10 @@ public class TestElectionRecord : DisposableBase
         };
 
         var path = "ElectionRecord";
-        var subject = await ElectionRecordManager.Export(electionRecord, path);
-
+        var subject = await ElectionRecordManager.ExportAsync(electionRecord, path);
 
         // Act
-        var result = await ElectionRecordManager.Import(subject);
+        var result = await ElectionRecordManager.ImportAsync(subject);
 
         // Assert
         Assert.That(result.Constants.P, Is.EqualTo(electionRecord.Constants.P));
