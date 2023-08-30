@@ -38,8 +38,6 @@ public partial class BaseViewModel : ObservableObject, IDisposable
 
     public virtual async Task OnAppearing()
     {
-        UserName = AuthenticationService.UserName;
-        IsAdmin = AuthenticationService.IsAdmin;
         SetPageTitle();
         LocalizationService.OnLanguageChanged += OnLanguageChanged;
 
@@ -102,6 +100,8 @@ public partial class BaseViewModel : ObservableObject, IDisposable
         AuthenticationService = serviceProvider.GetInstance<IAuthenticationService>();
 
         AppVersion = ConfigurationService.GetVersion();
+        UserName = AuthenticationService.UserName;
+        IsAdmin = AuthenticationService.IsAdmin;
 
         InitTimer();
     }

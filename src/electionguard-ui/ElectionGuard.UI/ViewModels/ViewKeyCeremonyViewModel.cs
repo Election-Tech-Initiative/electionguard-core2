@@ -88,13 +88,13 @@ public partial class ViewKeyCeremonyViewModel : BaseViewModel
             IsJoinVisible = (!AuthenticationService.IsAdmin && (value.State == KeyCeremonyState.PendingGuardiansJoin));
 
             _mediator = new KeyCeremonyMediator(
-                mediatorId: "mediator",
-                userId: this.UserName!,
-                keyCeremony: value,
-                keyCeremonyService: _keyCeremonyService,
-                backupService: _backupService,
-                publicKeyService: _publicKeyService,
-                verificationService: _verificationService);
+                "mediator",
+                UserName!,
+                value,
+                _keyCeremonyService,
+                _backupService,
+                _publicKeyService,
+                _verificationService);
 
             if (!IsJoinVisible)
             {
