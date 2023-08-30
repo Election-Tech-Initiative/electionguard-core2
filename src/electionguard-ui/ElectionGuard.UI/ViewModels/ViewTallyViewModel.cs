@@ -185,8 +185,8 @@ public partial class ViewTallyViewModel : BaseViewModel
 
             foreach (var (skey, selection) in item.Selections)
             {
-                var candidateId = selection.ObjectId.Replace($"{item.ObjectId}-", string.Empty);
-                var candidate = candidates.Single(c => c.CandidateId == candidateId);
+                var fullSelection = contest.Selections.Single(c => c.ObjectId == selection.ObjectId);
+                var candidate = candidates.Single(c => c.CandidateId == fullSelection.CandidateId);
                 var percent = (float)selection.Tally / (contest.VotesAllowed * (ulong)Tally.CastBallotCount) * 100;
                 if (!candidate.isWritein)
                 {
