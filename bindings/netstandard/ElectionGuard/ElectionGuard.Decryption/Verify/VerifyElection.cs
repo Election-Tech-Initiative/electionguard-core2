@@ -69,13 +69,30 @@ public static class VerifyElection
             record.Constants,
             record.Context,
             record.Manifest,
-            record.EncryptedBallots
+            record.EncryptedBallots,
+            record.EncryptedTally
         );
         results.Add(ballotAggregation);
 
         // Verification 8 (Correctness of decryptions)
+        var decryptions = await VerifyDecryptions(
+            record.Constants,
+            record.Context,
+            record.Manifest,
+            record.EncryptedTally,
+            record.Tally
+        );
+        results.Add(decryptions);
 
         // Verification 9 (Validation of correct decryption of tallies)
+        var tallyDecryptions = await VerifyTallyDecryptions(
+            record.Constants,
+            record.Context,
+            record.Manifest,
+            record.EncryptedTally,
+            record.Tally
+        );
+        results.Add(tallyDecryptions);
 
         return new VerificationResult("Election Verification", results);
     }
@@ -233,6 +250,21 @@ public static class VerifyElection
     )
     {
         var results = new List<VerificationResult>();
+
+        // Verification 3.A
+        var inBoundsK = context.ElGamalPublicKey.IsInBounds();
+        results.Add(new VerificationResult(inBoundsK, $"- Verification 3.A: Election public key is in bounds"));
+
+        // Verification 3.B
+        var publicKeys = guardians.Select(k => k.Key).ToList();
+        var product = Constants.ONE_MOD_P;
+        _ = product.MultModP(publicKeys);
+        results.Add(new VerificationResult(product.Equals(context.ElGamalPublicKey), $"- Verification 3.B: Election public key is valid"));
+
+        // Verification 3.C
+        // TODO: E.G. 2.0 - implement
+        results.Add(new VerificationResult(IsValidwithKnownSpecDeviations, "- Verification 3.C: TODO: E.G. 2.0 - implement"));
+
         return Task.FromResult(new VerificationResult("Verification 3 (Election public-key validation)", results));
     }
 
@@ -258,12 +290,25 @@ public static class VerifyElection
     )
     {
         var results = new List<VerificationResult>();
+
+        foreach (var ballot in ballots)
+        {
+            foreach (var contest in ballot.Contests)
+            {
+                foreach (var selection in contest.Selections)
+                {
+                    // Verification 4.1
+                }
+            }
+        }
+
         return Task.FromResult(new VerificationResult("Verification 4 (Correctness of selection encryptions)", results));
     }
 
     /// <summary>
     /// Verification 5 (Adherence to vote limits)
-    /// For each contest on each cast ballot, an election verifier must compute the contest totals (5.1) α ̄ = Qi αi mod p,
+    /// For each contest on each cast ballot, an election verifier must compute the contest totals 
+    /// (5.1) α ̄ = Qi αi mod p,
     /// (5.2) β ̄ = Qi βi mod p,
     /// where the (αi,βi) represent all possible selections for the contest, as well as the values
     /// (5.3) aj =gvj ·α ̄cj modpforall0≤j≤L,
@@ -281,6 +326,15 @@ public static class VerifyElection
     )
     {
         var results = new List<VerificationResult>();
+
+        foreach (var ballot in ballots)
+        {
+            foreach (var contest in ballot.Contests)
+            {
+                // Verification 5.1
+            }
+        }
+
         return Task.FromResult(new VerificationResult("Verification 5 (Adherence to vote limits)", results));
     }
 
@@ -310,30 +364,43 @@ public static class VerifyElection
     )
     {
         var results = new List<VerificationResult>();
+
+        foreach (var ballot in ballots)
+        {
+            // Verification 6.A
+        }
+
         return Task.FromResult(new VerificationResult("Verification 6 (Validation of confirmation codes)", results));
     }
 
     /// <summary>
     /// Verification 7 (Correctness of ballot aggregation)
     /// An election verifier must confirm for each option in each contest in the election manifest that the aggregate encryption (A, B) satisfies
-    /// (7.A) A = (Qj αj) mod p, (7.B) B = (Qj βj) mod p,
+    /// (7.A) A = (Qj αj) mod p, 
+    /// (7.B) B = (Qj βj) mod p,
     /// where the (αj,βj) are the corresponding encryptions on all cast ballots in the election record.
     /// </summary>
     public static Task<VerificationResult> VerifyBallotAggregation(
         ElectionConstants constants,
         CiphertextElectionContext context,
         Manifest manifest,
-        List<CiphertextBallot> ballots
+        List<CiphertextBallot> ballots,
+        CiphertextTallyRecord tally
     )
     {
         var results = new List<VerificationResult>();
+
+
+
         return Task.FromResult(new VerificationResult("Verification 7 (Correctness of ballot aggregation)", results));
     }
 
     /// <summary>
     /// Verification 8 (Correctness of decryptions)
     /// For each option in each contest on each tally, an election verifier must compute the values
-    /// (8.1) M = B · T −1 mod p, (8.2) a=gv ·Kc modp, (8.3) b=Av ·Mc modp.
+    /// (8.1) M = B · T −1 mod p, 
+    /// (8.2) a=gv ·Kc modp, 
+    /// (8.3) b=Av ·Mc modp.
     /// An election verifier must then confirm the following:
     /// (8.A) The given value v is in the set Zq.
     /// (8.B) The challenge value c satisfies c = H(HE;0x30,K,A,B,a,b,M).
@@ -342,7 +409,8 @@ public static class VerifyElection
         ElectionConstants constants,
         CiphertextElectionContext context,
         Manifest manifest,
-        List<PlaintextTally> tallies
+        CiphertextTallyRecord encryptedTally,
+        PlaintextTally decryptedTally
     )
     {
         var results = new List<VerificationResult>();
@@ -366,7 +434,8 @@ public static class VerifyElection
         ElectionConstants constants,
         CiphertextElectionContext context,
         Manifest manifest,
-        List<PlaintextTally> tallies
+        CiphertextTallyRecord encryptedTally,
+        PlaintextTally decryptedTally
     )
     {
         var results = new List<VerificationResult>();
