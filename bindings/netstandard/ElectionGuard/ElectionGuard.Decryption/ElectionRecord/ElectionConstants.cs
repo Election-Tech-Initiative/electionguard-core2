@@ -10,6 +10,7 @@ public record ElectionConstants : DisposableRecordBase
     public ElementModP G { get; init; }
     public ElementModP P { get; init; }
     public ElementModQ Q { get; init; }
+    public ElementModP R { get; init; }
 
     protected override void DisposeUnmanaged()
     {
@@ -17,6 +18,7 @@ public record ElectionConstants : DisposableRecordBase
         G?.Dispose();
         P?.Dispose();
         Q?.Dispose();
+        R?.Dispose();
     }
 
     public static ElectionConstants Current()
@@ -25,7 +27,8 @@ public record ElectionConstants : DisposableRecordBase
         {
             G = Constants.G,
             P = Constants.P,
-            Q = Constants.Q
+            Q = Constants.Q,
+            R = Constants.R
         };
     }
 }

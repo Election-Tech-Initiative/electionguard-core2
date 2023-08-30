@@ -34,7 +34,6 @@ namespace ElectionGuard.CLI.Encrypt
             }
 
             var electionRecord = await ElectionRecordManager.ImportAsync(options.ZipFile);
-
             var reuslts = await VerifyElection.VerifyAsync(electionRecord);
 
             Console.WriteLine(reuslts);

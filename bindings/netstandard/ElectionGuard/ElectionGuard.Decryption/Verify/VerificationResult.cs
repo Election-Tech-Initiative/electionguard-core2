@@ -52,7 +52,7 @@ public class VerificationResult : IValidationResult
 
         foreach (var child in Children)
         {
-            _ = sb.AppendLine($"+ {child}");
+            _ = sb.AppendLine($"  {child}");
         }
         return sb.ToString();
     }
