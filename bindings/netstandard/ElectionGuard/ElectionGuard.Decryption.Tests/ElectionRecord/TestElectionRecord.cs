@@ -53,7 +53,7 @@ public class TestElectionRecord : DisposableBase
         Data.Dispose();
     }
 
-    [Test, Category("OneShot")]
+    [Test, Category("GenerateElectionRecord")]
     public async Task Test_Import_Export_Election_record()
     {
         // Arrange
