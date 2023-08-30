@@ -22,7 +22,7 @@ public partial class ElectionViewModel : BaseViewModel
     private readonly ContextService _contextService;
 
     public ElectionViewModel(
-        IServiceProvider serviceProvider,
+        ILogger<ElectionViewModel> logger,
         KeyCeremonyService keyCeremonyService,
         ManifestService manifestService,
         ContextService contextService,
@@ -31,7 +31,7 @@ public partial class ElectionViewModel : BaseViewModel
         ElectionService electionService,
         TallyService tallyService,
         ZipStorageService zipStorageService,
-        IStorageService driveService) : base(null, serviceProvider)
+        IStorageService driveService) : base(null, logger)
     {
         _keyCeremonyService = keyCeremonyService;
         _manifestService = manifestService;

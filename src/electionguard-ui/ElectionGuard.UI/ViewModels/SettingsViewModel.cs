@@ -4,7 +4,7 @@ namespace ElectionGuard.UI.ViewModels;
 
 public partial class SettingsViewModel : BaseViewModel
 {
-    public SettingsViewModel(IServiceProvider serviceProvider) : base(null, serviceProvider)
+    public SettingsViewModel(ILogger<SettingsViewModel> logger) : base(null, logger)
     {
     }
 

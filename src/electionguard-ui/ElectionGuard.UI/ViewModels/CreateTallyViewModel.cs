@@ -16,13 +16,13 @@ public partial class CreateTallyViewModel : BaseViewModel
     private BallotService _ballotService;
 
     public CreateTallyViewModel(
-        IServiceProvider serviceProvider,
+        ILogger<CreateTallyViewModel> logger,
         TallyService tallyService,
         ManifestService manifestService,
         ElectionService electionService,
         KeyCeremonyService keyCeremonyService,
         BallotUploadService ballotUploadService,
-        BallotService ballotService) : base("CreateTally", serviceProvider)
+        BallotService ballotService) : base("CreateTally", logger)
     {
         _tallyService = tallyService;
         _manifestService = manifestService;

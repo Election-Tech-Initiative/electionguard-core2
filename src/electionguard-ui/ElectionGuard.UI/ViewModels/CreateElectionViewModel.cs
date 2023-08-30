@@ -19,14 +19,13 @@ public partial class CreateElectionViewModel : BaseViewModel
                                    ManifestService manifestService,
                                    ContextService contextService,
                                    ConstantsService constantsService,
-                                   ILogger<CreateElectionViewModel> logger) : base(PageName, serviceProvider)
+                                   ILogger<CreateElectionViewModel> logger) : base(PageName, logger)
     {
         _keyCeremonyService = keyCeremonyService;
         _electionService = electionService;
         _manifestService = manifestService;
         _contextService = contextService;
         _constantsService = constantsService;
-        _logger = logger;
     }
 
     public override async Task OnAppearing()

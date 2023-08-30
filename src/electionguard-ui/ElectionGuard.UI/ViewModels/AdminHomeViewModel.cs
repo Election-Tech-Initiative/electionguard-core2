@@ -37,11 +37,11 @@ public partial class AdminHomeViewModel : BaseViewModel
     private MultiTallyRecord? _currentMultiTally;
 
     public AdminHomeViewModel(
-        IServiceProvider serviceProvider,
+        ILogger<AdminHomeViewModel> logger,
         KeyCeremonyService keyCeremonyService,
         ElectionService electionService,
         TallyService tallyService,
-        MultiTallyService multiTallyService) : base("AdminHome", serviceProvider)
+        MultiTallyService multiTallyService) : base("AdminHome", logger)
     {
         _keyCeremonyService = keyCeremonyService;
         _electionService = electionService;

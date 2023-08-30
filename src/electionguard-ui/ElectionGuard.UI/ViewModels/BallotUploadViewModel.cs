@@ -331,15 +331,14 @@ public partial class BallotUploadViewModel : BaseViewModel
     private bool _importing;
     private long _lastDrive = -1;
 
-    public BallotUploadViewModel(IServiceProvider serviceProvider,
+    public BallotUploadViewModel(
         BallotUploadService uploadService,
         BallotService ballotService,
         ManifestService manifestService,
         ContextService contextService,
         CiphertextTallyService ciphertextTallyService,
-        ILogger<BallotUploadViewModel> logger) : base("BallotUploadText", serviceProvider)
+        ILogger<BallotUploadViewModel> logger) : base("BallotUploadText", logger)
     {
-        _logger = logger;
         _uploadService = uploadService;
         _ballotService = ballotService;
         _manifestService = manifestService;

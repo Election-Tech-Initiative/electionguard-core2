@@ -5,12 +5,9 @@ namespace ElectionGuard.UI.ViewModels;
 public partial class LoginViewModel : BaseViewModel
 {
     private bool _hasSeenAutoSettingPage = false;
-    private IServiceProvider _serviceProvider;
 
-    public LoginViewModel(IServiceProvider serviceProvider, ILogger<LoginViewModel> logger) : base("UserLogin", serviceProvider)
+    public LoginViewModel(ILogger<LoginViewModel> logger) : base("UserLogin", logger)
     {
-        _serviceProvider = serviceProvider;
-        _logger = logger;
     }
 
     [ObservableProperty]

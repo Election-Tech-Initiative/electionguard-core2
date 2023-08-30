@@ -19,7 +19,6 @@ public partial class CreateMultiTallyViewModel : BaseViewModel
     private MultiTallyService _multiTallyService;
 
     public CreateMultiTallyViewModel(
-        IServiceProvider serviceProvider,
         TallyService tallyService,
         ManifestService manifestService,
         ElectionService electionService,
@@ -27,7 +26,8 @@ public partial class CreateMultiTallyViewModel : BaseViewModel
         BallotUploadService ballotUploadService,
         BallotService ballotService,
         TallyJoinedService tallyJoinedService,
-        MultiTallyService multiTallyService) : base("CreateMultiTally", serviceProvider)
+        MultiTallyService multiTallyService,
+        ILogger<CreateMultiTallyViewModel> logger) : base("CreateMultiTally", logger)
     {
         _tallyService = tallyService;
         _manifestService = manifestService;
@@ -192,7 +192,7 @@ public partial class CreateMultiTallyViewModel : BaseViewModel
         JoinTalliesCommand.NotifyCanExecuteChanged();
     }
 
-    private async Task<(string, string)> CreateNewTally(ElectionItem electionItem, bool multi=false)
+    private async Task<(string, string)> CreateNewTally(ElectionItem electionItem, bool multi = false)
     {
         ElectionGuardException.ThrowIfNull(electionItem, $"Could not load election selected");
         ElectionGuardException.ThrowIfNull(electionItem.Election, $"ElectionItem does not contain an election");
@@ -232,7 +232,7 @@ public partial class CreateMultiTallyViewModel : BaseViewModel
     [RelayCommand(CanExecute = nameof(TalliesSelected))]
     private async Task CreateTallies()
     {
-        if(SelectedElections.Count == 1)
+        if (SelectedElections.Count == 1)
         {
             // do a normal tally for a single election
             var election = SelectedElections.First() as ElectionItem;

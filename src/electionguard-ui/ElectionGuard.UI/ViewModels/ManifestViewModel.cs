@@ -3,7 +3,7 @@
 namespace ElectionGuard.UI.ViewModels;
 
 public record PartyDisplay(string Name, string Abbreviation, string PartyId);
-public record CandidateDisplay(string CandidateName, string Party, string CandidateId, bool isWritein=false);
+public record CandidateDisplay(string CandidateName, string Party, string CandidateId, bool isWritein = false);
 public record BallotStyleDisplay(string Name, string Units);
 public record GeopoliticalUnitDisplay(string UnitName, string GPType, string GeopoliticalUnitId);
 public record ContestDisplay(string Name, string Variation, ulong NumberElected, ulong VotesAllowed, string Selections);
@@ -13,7 +13,7 @@ public partial class ManifestViewModel : BaseViewModel
 {
     private ManifestService _manifestService;
 
-    public ManifestViewModel(IServiceProvider serviceProvider, ManifestService manifestService) : base("ManifestViewer", serviceProvider)
+    public ManifestViewModel(ILogger<ManifestViewModel> logger, ManifestService manifestService) : base("ManifestViewer", logger)
     {
         _manifestService = manifestService;
     }
@@ -86,7 +86,7 @@ public partial class ManifestViewModel : BaseViewModel
             var local = Manifest.GetCandidateAtIndex(i);
             var party = Parties.FirstOrDefault(p => p.PartyId == local.PartyId) ?? new PartyDisplay(string.Empty, string.Empty, string.Empty);
             var name = local.Name.GetTextAt(0).Value;
-            if(name == string.Empty)
+            if (name == string.Empty)
             {
                 name = AppResources.WriteinText;
             }

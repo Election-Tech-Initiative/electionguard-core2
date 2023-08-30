@@ -1,5 +1,7 @@
-﻿using CommunityToolkit.Mvvm.Input;
+﻿using CommunityToolkit.Mvvm.DependencyInjection;
+using CommunityToolkit.Mvvm.Input;
 using ElectionGuard.UI.Lib.Extensions;
+
 
 namespace ElectionGuard.UI.ViewModels;
 
@@ -38,8 +40,6 @@ public partial class BaseViewModel : ObservableObject, IDisposable
 
     public virtual async Task OnAppearing()
     {
-        UserName = AuthenticationService.UserName;
-        IsAdmin = AuthenticationService.IsAdmin;
         SetPageTitle();
         LocalizationService.OnLanguageChanged += OnLanguageChanged;
 
@@ -91,17 +91,33 @@ public partial class BaseViewModel : ObservableObject, IDisposable
         await NavigationService.GoBack();
     }
 
+    /// <summary>
+    ///   Constructor for BaseViewModel. 
+    /// </summary>
+    /// <param name="pageTitleLocalizationId">Page title</param>
+    /// <param name="serviceProvider">IOC container</param>
+    /// <param name="logger">Logger. Note, BaseViewModel is default logger and may incorrectly show in logs.</param>
+    private BaseViewModel(
+        string? pageTitleLocalizationId,
+        IServiceProvider serviceProvider = null,
+        ILogger logger = null) : this(pageTitleLocalizationId, logger)
+    {
+    }
+
     public BaseViewModel(
         string? pageTitleLocalizationId,
-        IServiceProvider serviceProvider)
+        ILogger logger)
     {
         _pageTitleLocalizationId = pageTitleLocalizationId;
-        ConfigurationService = serviceProvider.GetInstance<IConfigurationService>();
-        LocalizationService = serviceProvider.GetInstance<ILocalizationService>();
-        NavigationService = serviceProvider.GetInstance<INavigationService>();
-        AuthenticationService = serviceProvider.GetInstance<IAuthenticationService>();
+        _logger = logger;
 
+        ConfigurationService = Ioc.Default.GetService<IConfigurationService>();
+        LocalizationService = Ioc.Default.GetService<ILocalizationService>();
+        NavigationService = Ioc.Default.GetService<INavigationService>();
+        AuthenticationService = Ioc.Default.GetService<IAuthenticationService>();
         AppVersion = ConfigurationService.GetVersion();
+        UserName = AuthenticationService.UserName;
+        IsAdmin = AuthenticationService.IsAdmin;
 
         InitTimer();
     }

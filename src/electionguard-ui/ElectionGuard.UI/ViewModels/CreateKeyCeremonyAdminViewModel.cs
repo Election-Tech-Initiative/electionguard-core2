@@ -7,7 +7,7 @@ public partial class CreateKeyCeremonyAdminViewModel : BaseViewModel
     private readonly KeyCeremonyService _keyCeremonyService;
     private const string PageName = "CreateKeyCeremony";
 
-    public CreateKeyCeremonyAdminViewModel(IServiceProvider serviceProvider, KeyCeremonyService keyCeremonyService) : base(PageName, serviceProvider)
+    public CreateKeyCeremonyAdminViewModel(ILogger<CreateKeyCeremonyAdminViewModel> logger, KeyCeremonyService keyCeremonyService) : base(PageName, logger)
     {
         _keyCeremonyService = keyCeremonyService;
     }

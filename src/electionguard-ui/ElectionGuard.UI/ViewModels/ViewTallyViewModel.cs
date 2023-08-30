@@ -46,7 +46,7 @@ public partial class ViewTallyViewModel : BaseViewModel
     private readonly PlaintextTallyService _plaintextTallyService;
 
     public ViewTallyViewModel(
-        IServiceProvider serviceProvider,
+        ILogger<ViewTallyViewModel> logger,
         TallyService tallyService,
         TallyJoinedService tallyJoinedService,
         ElectionService electionService,
@@ -55,7 +55,7 @@ public partial class ViewTallyViewModel : BaseViewModel
         PlaintextTallyService plaintextTallyService,
         ManifestService manifestService,
         ChallengeResponseService challengeResponseService) :
-        base("ViewTally", serviceProvider)
+        base("ViewTally", logger)
     {
         _tallyService = tallyService;
         _electionService = electionService;

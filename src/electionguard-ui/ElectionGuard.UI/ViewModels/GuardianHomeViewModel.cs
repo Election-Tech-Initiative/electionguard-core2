@@ -8,12 +8,12 @@ public partial class GuardianHomeViewModel : BaseViewModel
     private readonly TallyJoinedService _tallyJoinedService;
     private readonly MultiTallyService _multiTallyService;
 
-    public GuardianHomeViewModel(IServiceProvider serviceProvider,
+    public GuardianHomeViewModel(ILogger<GuardianHomeViewModel> logger,
         KeyCeremonyService keyCeremonyService,
         GuardianPublicKeyService guardianService,
         TallyService tallyService,
         TallyJoinedService tallyJoinedService,
-        MultiTallyService multiTallyService) : base("GuardianHome", serviceProvider)
+        MultiTallyService multiTallyService) : base("GuardianHome", logger)
     {
         _keyCeremonyService = keyCeremonyService;
         _guardianService = guardianService;
@@ -64,7 +64,7 @@ public partial class GuardianHomeViewModel : BaseViewModel
             return;
         }
 
-        MainThread.BeginInvokeOnMainThread(async() =>
+        MainThread.BeginInvokeOnMainThread(async () =>
             await NavigationService.GoToPage(typeof(ViewKeyCeremonyViewModel), new Dictionary<string, object>
             {
                 { ViewKeyCeremonyViewModel.CurrentKeyCeremonyParam, value }
@@ -156,7 +156,7 @@ public partial class GuardianHomeViewModel : BaseViewModel
                 }
             }
         }
-        catch(Exception)
+        catch (Exception)
         {
             // if we have an exception, do not try to update anymore
             _timer.Stop();

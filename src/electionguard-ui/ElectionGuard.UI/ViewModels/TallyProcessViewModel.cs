@@ -87,9 +87,8 @@ public partial class TallyProcessViewModel : BaseViewModel
         MultiTallyService multiTallyService,
         ITallyStateMachine tallyRunner,
         ILogger<TallyProcessViewModel> logger) :
-        base("TallyProcess", serviceProvider)
+        base("TallyProcess", logger)
     {
-        _logger = logger;
         _tallyService = tallyService;
         _electionService = electionService;
         _tallyJoinedService = tallyJoinedService;
@@ -140,7 +139,7 @@ public partial class TallyProcessViewModel : BaseViewModel
                 }
             });
     }
-    
+
     partial void OnJoinedGuardiansChanged(ObservableCollection<GuardianTallyItem> value)
     {
         CanUserJoinTally = CanJoinTally(); // needs to be aware of who joined the tally.

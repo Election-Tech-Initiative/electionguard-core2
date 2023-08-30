@@ -22,9 +22,9 @@ public partial class ChallengedPopupViewModel : BaseViewModel
     private BallotService _ballotService;
 
     public ChallengedPopupViewModel(
-        IServiceProvider serviceProvider,
+        ILogger<ChallengedPopupViewModel> logger,
         BallotService ballotService) :
-        base(null, serviceProvider)
+        base(null, logger)
     {
         _ballotService = ballotService;
     }

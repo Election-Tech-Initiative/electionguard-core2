@@ -13,15 +13,14 @@ public partial class ViewKeyCeremonyViewModel : BaseViewModel
 
     private bool _joinPressed;
 
-    public ViewKeyCeremonyViewModel(IServiceProvider serviceProvider,
+    public ViewKeyCeremonyViewModel(
                                     KeyCeremonyService keyCeremonyService,
                                     GuardianPublicKeyService guardianService,
                                     GuardianBackupService backupService,
                                     VerificationService verificationService,
                                     ILogger<ViewKeyCeremonyViewModel> logger) :
-        base("ViewKeyCeremony", serviceProvider)
+        base("ViewKeyCeremony", logger)
     {
-        _logger = logger;
         _keyCeremonyService = keyCeremonyService;
         _publicKeyService = guardianService;
         _backupService = backupService;
