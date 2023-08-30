@@ -54,7 +54,8 @@ public partial class ViewTallyViewModel : BaseViewModel
         DecryptionShareService decryptionShareService,
         PlaintextTallyService plaintextTallyService,
         ManifestService manifestService,
-        ChallengeResponseService challengeResponseService) :
+        ChallengeResponseService challengeResponseService,
+        ILogger<ViewTallyViewModel> logger) :
         base("ViewTally", serviceProvider)
     {
         _tallyService = tallyService;
@@ -65,6 +66,7 @@ public partial class ViewTallyViewModel : BaseViewModel
         _decryptionShareService = decryptionShareService;
         _challengeResponseService = challengeResponseService;
         _plaintextTallyService = plaintextTallyService;
+        _logger = logger;
     }
 
     partial void OnTallyIdChanged(string value)
@@ -185,18 +187,25 @@ public partial class ViewTallyViewModel : BaseViewModel
 
             foreach (var (skey, selection) in item.Selections)
             {
-                var candidateId = selection.ObjectId.Replace($"{item.ObjectId}-", string.Empty);
-                var candidate = candidates.Single(c => c.CandidateId == candidateId);
-                var percent = (float)selection.Tally / (contest.VotesAllowed * (ulong)Tally.CastBallotCount) * 100;
-                if (!candidate.isWritein)
+                try
                 {
-                    contestItem.Selections.Add(new() { Name = candidate.CandidateName, Party = candidate.Party, Votes = selection.Tally, Percent = percent });
+                    var fullSelection = contest.Selections.Single(c => c.ObjectId == selection.ObjectId);
+                    var candidate = candidates.Single(c => c.CandidateId == fullSelection.CandidateId);
+                    var percent = (float)selection.Tally / (contest.VotesAllowed * (ulong)Tally.CastBallotCount) * 100;
+                    if (!candidate.isWritein)
+                    {
+                        contestItem.Selections.Add(new() { Name = candidate.CandidateName, Party = candidate.Party, Votes = selection.Tally, Percent = percent });
+                    }
+                    else
+                    {
+                        writeInTotal += selection.Tally;
+                    }
+                    totalVotes += selection.Tally;
                 }
-                else
+                catch (Exception ex)
                 {
-                    writeInTotal += selection.Tally;
+                    _logger?.LogError(ex, "Error parsing contest {item.ObjectId} selection {selection.ObjectId}", item.ObjectId, selection.ObjectId);
                 }
-                totalVotes += selection.Tally;
             }
             if (writeInTotal > 0)
             {
