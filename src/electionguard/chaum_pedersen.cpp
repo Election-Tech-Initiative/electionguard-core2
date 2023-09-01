@@ -620,10 +620,12 @@ namespace electionguard
             auto cj = *proof.challenge;
             auto vj = *proof.response;
 
-            // 𝑎 = 𝑔^𝑉 ⋅ 𝐴^𝐶 mod 𝑝
+            // Verification 6.3
+            // 𝑎j = 𝑔^𝑉j ⋅ 𝐴^𝐶j mod 𝑝
             auto consistent_gv = (aj == *recomputedCommitment->getPad());
 
-            // 𝑏  = 𝐾^w ⋅ 𝐵^𝐶 mod 𝑝
+            // Verification 6.4
+            // 𝑏j  = 𝐾^wj ⋅ 𝐵^𝐶j mod 𝑝
             auto consistent_kv = (bj == *recomputedCommitment->getData());
 
             if (!consistent_gv || !consistent_kv) {
@@ -756,7 +758,7 @@ namespace electionguard
         // Compute commitments
         for (uint64_t i = 0; i < maxLimit; i++) {
             auto u = nonces->get(i);
-            auto a = g_pow_p(*u); //𝑔^𝑢 mod 𝑝
+            auto a = g_pow_p(*u); // 𝑔^𝑢 mod 𝑝
 
             unique_ptr<ElementModQ> cj;
             unique_ptr<ElementModQ> tj;
@@ -821,6 +823,9 @@ namespace electionguard
         // Compute the challenge
         // TODO: change the HashPrefix to an input param since it can also be
         // use for selection proofs
+
+        // Verification 5.5
+        // c = H(HE;0x21,K,α ̄,β ̄,a0,b0,a1,b1,...,aL,bL), Ballot Contest Limit Encryption Proof 3.3.8
         auto computedChallenge =
           hash_elems({&const_cast<ElementModQ &>(q), hashPrefix, &const_cast<ElementModP &>(k),
                       alpha, beta, commitments});
@@ -828,7 +833,7 @@ namespace electionguard
 
         if (!consistent_c) {
             validationResult.isValid = false;
-            validationResult.messages.push_back("invalid computed challenge");
+            validationResult.messages.push_back("- Verification 6.5: invalid computed challenge");
         }
 
         // print out the error messages if the proof is invalid

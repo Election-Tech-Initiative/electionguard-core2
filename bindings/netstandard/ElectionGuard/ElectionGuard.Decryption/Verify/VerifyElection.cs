@@ -37,7 +37,14 @@ public static class VerifyElection
         );
         results.Add(electionKeys);
 
-        // Verification 4 (Correctness of selection encryptions)
+        // Verification 4 (Extended base hash validation)
+        var extendedBaseHash = await VerifyExtendedBaseHash(
+            record.Constants,
+            record.Context
+        );
+        results.Add(extendedBaseHash);
+
+        // Verification 5 (Well-formedness of selection encryptions)
         var selectionEncryptions = await VerifySelectionEncryptions(
             record.Constants,
             record.Context,
@@ -46,7 +53,7 @@ public static class VerifyElection
         );
         results.Add(selectionEncryptions);
 
-        // Verification 5 (Adherence to vote limits)
+        // Verification 6 (Adherence to vote limits)
         var voteLimits = await VerifyVoteLimits(
             record.Constants,
             record.Context,
@@ -55,7 +62,7 @@ public static class VerifyElection
         );
         results.Add(voteLimits);
 
-        // Verification 6 (Validation of confirmation codes)
+        // Verification 7 (Validation of confirmation codes)
         var confirmationCodes = await VerifyConfirmationCodes(
             record.Constants,
             record.Context,
@@ -96,6 +103,7 @@ public static class VerifyElection
 
         return new VerificationResult("Election Verification", results);
     }
+
     /// <summary>
     /// Verification 1 (Parameter validation)
     /// An ElectionGuard election verifier must verify that it uses the correct version of the 
@@ -227,7 +235,7 @@ public static class VerifyElection
                 results.Add(new VerificationResult(inboundsv, $"- Verification 2.B: Guardian {guardian.ObjectId} response {i} is in bounds"));
 
                 // Verification 2.C
-                // TODO: E.G. 2.0 - implement
+                // cannot verify the hash values because the hash values do not match the E.G. 2.0 Spec
                 results.Add(new VerificationResult(IsValidwithKnownSpecDeviations, "- Verification 2.C: TODO: E.G. 2.0 - implement"));
             }
         }
@@ -261,26 +269,38 @@ public static class VerifyElection
         _ = product.MultModP(publicKeys);
         results.Add(new VerificationResult(product.Equals(context.ElGamalPublicKey), $"- Verification 3.B: Election public key is valid"));
 
-        // Verification 3.C
-        // TODO: E.G. 2.0 - implement
-        results.Add(new VerificationResult(IsValidwithKnownSpecDeviations, "- Verification 3.C: TODO: E.G. 2.0 - implement"));
-
         return Task.FromResult(new VerificationResult("Verification 3 (Election public-key validation)", results));
     }
 
     /// <summary>
-    /// Verification 4 (Correctness of selection encryptions)
+    /// Verification 4 (Extended base hash validation)
+    /// An election verifier must verify the correct computation of the extended base hash. 
+    /// (4.A) HE = H(HB;0x12,K).
+    /// </summary>
+    private static Task<VerificationResult> VerifyExtendedBaseHash(ElectionConstants constants, CiphertextElectionContext context)
+    {
+        var results = new List<VerificationResult>();
+
+        // Verification 4.A
+        // cannot verify the hash values because the hash values do not match the E.G. 2.0 Spec
+        results.Add(new VerificationResult(IsValidwithKnownSpecDeviations, "- Verification 4.A: TODO: E.G. 2.0 - implement"));
+
+        return Task.FromResult(new VerificationResult("Verification 4 (Extended base hash validation)", results));
+    }
+
+    /// <summary>
+    /// Verification 5 (Well-formedness of selection encryptions)
     /// For each selectable option on each cast ballot, an election verifier must compute the values
-    /// (4.1) aj =g^vj ·α^cj mod p for all 0 ≤ j ≤ R,
-    /// (4.2) bj =K^wj ·β^cj mod p,where wj =(vj −jcj) mod q for all 0 ≤ j ≤ R, 
-    /// (4.3) c = H(HE;0x21,K,α,β,a0,b0,a1,b1,...,aR,bR),
+    /// (5.1) aj = g^vj ·α^cj mod p for all 0 ≤ j ≤ R,
+    /// (5.2) bj = K^wj ·β^cj mod p,where wj =(vj −jcj) mod q for all 0 ≤ j ≤ R, 
+    /// (5.3) c = H(HE;0x21,K,α,β,a0,b0,a1,b1,...,aR,bR),
     ///       where R is the option selection limit. An election verifier must then confirm the following:
-    /// (4.A) The given values α and β are in the set Zrp.
+    /// (5.A) The given values α and β are in the set Zrp.
     ///       (A value x is in Zrp if and only if x is an integer such that 0 ≤ x < p and xq mod p = 1.)
-    /// (4.B) The given values cj each satisfy 0 ≤ cj <2256 for all 0 ≤ j ≤ R.
-    /// (4.C) The given values vj are each in the set Zq for all 0 ≤ j ≤ R.
+    /// (5.B) The given values cj each satisfy 0 ≤ cj <2256 for all 0 ≤ j ≤ R.
+    /// (5.C) The given values vj are each in the set Zq for all 0 ≤ j ≤ R.
     ///       (A value x is in Zq if and only if x is an integer such that 0 ≤ x < q.)
-    /// (4.D) The equation c=(c0+c1+···+cR) mod q is satisfied.
+    /// (5.D) The equation c = (c0 + c1 + ··· + cR) mod q is satisfied.
     /// </sumary>
     public static async Task<VerificationResult> VerifySelectionEncryptions(
         ElectionConstants constants,
@@ -301,14 +321,16 @@ public static class VerifyElection
                 {
                     // spec version 1.x uses disjunctive proofs, 
                     // which are implemented in this version
+                    // note they are numbered Verification 4 in spec v1.5.3
+                    // even though they are in section 5 in spec v2.0.0
                     selectionResults.Add(await VerifyDisjunctiveProof(constants, context, selection));
                 }
-                contestResults.Add(new VerificationResult($"  - Verification 4: Contest {contest.ObjectId}", selectionResults));
+                contestResults.Add(new VerificationResult($"  - Verification 5: Contest {contest.ObjectId}", selectionResults));
             }
-            results.Add(new VerificationResult($"- Verification 4: Ballot {ballot.ObjectId}", contestResults));
+            results.Add(new VerificationResult($"- Verification 5: Ballot {ballot.ObjectId}", contestResults));
         }
 
-        return new VerificationResult("Verification 4 (Correctness of selection encryptions)", results);
+        return new VerificationResult("Verification 5 (Correctness of selection encryptions)", results);
     }
 
     /// <summary>
@@ -376,6 +398,7 @@ public static class VerifyElection
         //     selection.Proof.OneData);
         // var consistent_hash = selection.Proof.Challenge.Equals(recomputedHash);
         // results.Add(new VerificationResult(consistent_hash, $"      - Verification 4.5: c = H(04,Q,K,α,β,a0,b0,a1,b1)"));
+        // cannot verify the hash values because the hash values do not match the E.G. 2.0 Spec
         results.Add(new VerificationResult(IsValidwithKnownSpecDeviations, "- Verification 4.5: TODO: E.G. 2.0 - implement"));
 
 
@@ -400,11 +423,13 @@ public static class VerifyElection
         var consistent_c = c0c1.Equals(selection.Proof.Challenge);
         results.Add(new VerificationResult(consistent_c, $"      - Verification 4.C: C = (c0 + c1) mod q"));
 
+        // note numbered Verification 4 in spec v1.5.3
+        // note numbered Verification 5 in spec v2.0.0
         return Task.FromResult(new VerificationResult($"    - Verification 4: Selection {selection.ObjectId}", results));
     }
 
     // spec version 2.0 uses range proofs, which are not implemented in this version
-    private static Task<VerificationResult> VerifyRangeProof(
+    private static Task<VerificationResult> VerifySelectionRangeProof(
         ElectionConstants constants,
         CiphertextElectionContext context,
         CiphertextBallotSelection selection
@@ -412,37 +437,41 @@ public static class VerifyElection
     {
         var results = new List<VerificationResult>();
 
-        // Verification 4.1
-        results.Add(new VerificationResult(IsValidwithKnownSpecDeviations, "- Verification 4.1: TODO: E.G. 2.0 - implement"));
+        // Verification 5.1
+        results.Add(new VerificationResult(IsValidwithKnownSpecDeviations, "- Verification 5.1: TODO: E.G. 2.0 - implement"));
 
-        // Verification 4.2
-        results.Add(new VerificationResult(IsValidwithKnownSpecDeviations, "- Verification 4.2: TODO: E.G. 2.0 - implement"));
+        // Verification 5.2
+        results.Add(new VerificationResult(IsValidwithKnownSpecDeviations, "- Verification 5.2: TODO: E.G. 2.0 - implement"));
 
-        // Verification 4.3
-        results.Add(new VerificationResult(IsValidwithKnownSpecDeviations, "- Verification 4.3: TODO: E.G. 2.0 - implement"));
+        // Verification 5.3
+        results.Add(new VerificationResult(IsValidwithKnownSpecDeviations, "- Verification 5.3: TODO: E.G. 2.0 - implement"));
 
-        // Verification 4.A
+        // Verification 5.A
         var inBoundsAlpha = selection.Ciphertext.Pad.IsInBounds();
-        results.Add(new VerificationResult(inBoundsAlpha, $"- Verification 4.A: Alpha is in bounds"));
+        results.Add(new VerificationResult(inBoundsAlpha, $"- Verification 5.A: Alpha is in bounds"));
         var inboundsBeta = selection.Ciphertext.Data.IsInBounds();
-        results.Add(new VerificationResult(inboundsBeta, $"- Verification 4.A: Beta is in bounds"));
+        results.Add(new VerificationResult(inboundsBeta, $"- Verification 5.A: Beta is in bounds"));
 
-
-        return Task.FromResult(new VerificationResult(results.All(i => i.AllValid), $"    - Verification 4: Selection {selection.ObjectId}"));
+        // note numbered Verification 4 in spec v1.5.3
+        // note numbered Verification 5 in spec v2.0.0
+        return Task.FromResult(new VerificationResult($"    - Verification 5: Selection {selection.ObjectId}", results));
     }
 
     /// <summary>
-    /// Verification 5 (Adherence to vote limits)
+    /// Verification 6 (Adherence to vote limits)
     /// For each contest on each cast ballot, an election verifier must compute the contest totals 
-    /// (5.1) α ̄ = Qi αi mod p,
-    /// (5.2) β ̄ = Qi βi mod p,
+    /// (6.1) α ̄ = ∏iαi mod p,
+    /// (6.2) β ̄ = ∏iβi mod p,
     /// where the (αi,βi) represent all possible selections for the contest, as well as the values
-    /// (5.3) aj =gvj ·α ̄cj modpforall0≤j≤L,
-    /// (5.4) bj =Kwj ·β ̄cj modp,wherewj =(vj −jcj)modqforall0≤j≤L, (5.5) c = H(HE;0x21,K,α ̄,β ̄,a0,b0,a1,b1,...,aL,bL),
-    /// where L is the contest selection limit. An election verifier must then confirm the following:
+    /// (6.3) aj = g^vj ·α ̄^cj mod p for all 0 ≤ j ≤ L,
+    /// (6.4) bj = K^wj · β ̄^cj mod p, where wj = (vj −jcj) mod q for all 0 ≤ j ≤ L, 
+    /// (6.5) c = H(HE;0x21,K,α ̄,β ̄,a0,b0,a1,b1,...,aL,bL),
+    ///       where L is the contest selection limit. 
+    /// An election verifier must then confirm the following:
     /// (5.A) The given values αi and βi are each in Zrp.
-    /// (5.B) The given values cj each satisfy 0 ≤ cj < 2256.
-    /// (5.C) Thegivenvaluesvj areeachinZq forall0≤j≤L. (5.D) Theequationc=(c0+c1+···+cL)modqissatisfied.
+    /// (5.B) The given values cj each satisfy 0 ≤ cj < 2^256.
+    /// (5.C) The given values vj are each in Zq for all 0 ≤ j ≤ L. 
+    /// (5.D) The equation c = (c0 + c1 + ··· + cL) mod q is satisfied.
     /// </summary>
     public static Task<VerificationResult> VerifyVoteLimits(
         ElectionConstants constants,
@@ -465,24 +494,27 @@ public static class VerifyElection
     }
 
     /// <summary>
-    /// Verification 6 (Validation of confirmation codes)
+    /// Verification 7 (Validation of confirmation codes)
     /// An election verifier must confirm the following for each ballot B.
-    /// (6.A) The contest hash χl for the contest with contest index l for all 1 ≤ l ≤ mB has been correctly
-    /// computed from the contest selection encryptions (αi,βi) as
-    /// χl = H(HE;0x23,l,K,α1,β1,α2,β2 ...,αm,βm).
-    /// (6.B) The ballot confirmation code H(B) has been correctly computed from the contest hashes and if specified in the election manifest file from the additional byte array Baux as
-    /// H(B) = H(HE;0x24,χ1,χ2,...,χmB ,Baux).
+    /// (7.A) The contest hash χl for the contest with contest index l for all 1 ≤ l ≤ mB has been correctly
+    ///       computed from the contest selection encryptions (αi,βi) as
+    ///       χl = H(HE;0x23,l,K,α1,β1,α2,β2 ...,αm,βm).
+    /// (7.B) The ballot confirmation code H(B) has been correctly computed from the contest hashes and if specified in the election manifest file from the additional byte array Baux as
+    ///       H(B) = H(HE;0x24,χ1,χ2,...,χmB ,Baux).
     /// An election verifier must also verify the following.
-    /// (6.C) There are no duplicate confirmation codes, i.e. among the set of submitted (cast and chal- lenged) ballots, no two have the same confirmation code.
-    /// Additionally, if the election manifest file specifies a hash chain, an election verifier must confirm the following for each voting device.
-    /// (6.D) The initial hash code H0 satisfies H0 = H(HE;0x24,Baux,0) and Baux,0 contains the unique voting device information.
-    /// (6.E) For all 1 ≤ j ≤ l, the additional input byte array used to compute Hj = H(Bj) is equal to
-    /// Baux,j = H(Bj−1) ∥ Baux,0.
-    /// (6.F) The final additional input byte array is equal to Baux = H(Bl ) ∥ Baux,0 ∥ b(“CLOSE”, 5) and
-    /// H(Bl) is the final confirmation code on this device.
-    /// (6.G) The closing hash is correctly computed as H = H(HE;0x24,Baux).
+    /// (7.C) There are no duplicate confirmation codes, 
+    ///       i.e. among the set of submitted (cast and challenged) ballots, 
+    ///       no two have the same confirmation code.
+    /// Additionally, if the election manifest file specifies a hash chain, 
+    /// an election verifier must confirm the following for each voting device.
+    /// (7.D) The initial hash code H0 satisfies H0 = H(HE;0x24,Baux,0) and Baux,0 contains the unique voting device information.
+    /// (7.E) For all 1 ≤ j ≤ l, the additional input byte array used to compute Hj = H(Bj) is equal to
+    ///       Baux,j = H(Bj−1) ∥ Baux,0.
+    /// (7.F) The final additional input byte array is equal to Baux = H(Bl ) ∥ Baux,0 ∥ b(“CLOSE”, 5) and
+    ///       H(Bl) is the final confirmation code on this device.
+    /// (7.G) The closing hash is correctly computed as H = H(HE;0x24,Baux).
     /// </summary>
-    public static Task<VerificationResult> VerifyConfirmationCodes(
+    public static async Task<VerificationResult> VerifyConfirmationCodes(
         ElectionConstants constants,
         CiphertextElectionContext context,
         Manifest manifest,
@@ -500,10 +532,10 @@ public static class VerifyElection
     }
 
     /// <summary>
-    /// Verification 7 (Correctness of ballot aggregation)
+    /// Verification 8 (Correctness of ballot aggregation)
     /// An election verifier must confirm for each option in each contest in the election manifest that the aggregate encryption (A, B) satisfies
-    /// (7.A) A = (Qj αj) mod p, 
-    /// (7.B) B = (Qj βj) mod p,
+    /// (8.A) A = (∏jαj) mod p, 
+    /// (8.B) B = (∏jβj) mod p,
     /// where the (αj,βj) are the corresponding encryptions on all cast ballots in the election record.
     /// </summary>
     public static Task<VerificationResult> VerifyBallotAggregation(
@@ -522,14 +554,14 @@ public static class VerifyElection
     }
 
     /// <summary>
-    /// Verification 8 (Correctness of decryptions)
+    /// Verification 9 (Correctness of decryptions)
     /// For each option in each contest on each tally, an election verifier must compute the values
-    /// (8.1) M = B · T −1 mod p, 
-    /// (8.2) a=gv ·Kc modp, 
-    /// (8.3) b=Av ·Mc modp.
+    /// (9.1) M = B · T −1 mod p, 
+    /// (9.2) a=g^v ·K^c mod p, 
+    /// (9.3) b=A^v ·M^c mod p.
     /// An election verifier must then confirm the following:
-    /// (8.A) The given value v is in the set Zq.
-    /// (8.B) The challenge value c satisfies c = H(HE;0x30,K,A,B,a,b,M).
+    /// (9.A) The given value v is in the set Zq.
+    /// (9.B) The challenge value c satisfies c = H(HE;0x30,K,A,B,a,b,M).
     /// </summary>
     public static Task<VerificationResult> VerifyDecryptions(
         ElectionConstants constants,
@@ -544,17 +576,17 @@ public static class VerifyElection
     }
 
     /// <summary>
-    /// Verification 9 (Validation of correct decryption of tallies)
+    /// Verification 10 (Validation of correct decryption of tallies)
     /// An election verifier must confirm the following equations for each option in each contest in the election manifest.
-    /// (9.A) T = Kt mod p.
+    /// (10.A) T = K^t mod p.
     /// An election verifier must also confirm that the text labels listed in the election record tallies match the corresponding text labels in the election manifest. For each contest in a decrypted tally, an election verifier must confirm the following.
-    /// (9.B) The contest text label occurs as a contest label in the list of contests in the election manifest.
-    /// (9.C) For each option in the contest, the option text label occurs as an option label for the contest
+    /// (10.B) The contest text label occurs as a contest label in the list of contests in the election manifest.
+    /// (10.C) For each option in the contest, the option text label occurs as an option label for the contest
     /// in the election manifest.
-    /// (9.D) For each option text label listed for this contest in the election manifest, the option label
+    /// (10.D) For each option text label listed for this contest in the election manifest, the option label
     /// occurs for a option in the decrypted tally contest.
     /// An election verifier must also confirm the following.
-    /// (9.E) For each contest text label that occurs in at least one submitted ballot, that contest text label occurs in the list of contests in the corresponding tally.
+    /// (10.E) For each contest text label that occurs in at least one submitted ballot, that contest text label occurs in the list of contests in the corresponding tally.
     /// </summary>
     public static Task<VerificationResult> VerifyTallyDecryptions(
         ElectionConstants constants,
