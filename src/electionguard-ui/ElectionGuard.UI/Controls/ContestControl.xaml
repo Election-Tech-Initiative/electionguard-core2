@@ -39,10 +39,10 @@
                     Grid.Column="2"
                     FontAttributes="Bold"
                     Text="{helper:Translate VotesText}" />
-                <Label
+                <!--<Label
                     Grid.Column="3"
                     FontAttributes="Bold"
-                    Text="{helper:Translate PercentText}" />
+                    Text="{helper:Translate PercentText}" />-->
             </Grid>
             <Line
                 BackgroundColor="{StaticResource Gray950}"
@@ -70,11 +70,11 @@
                             Grid.Column="2"
                             Margin="10"
                             Text="{Binding Votes}" />
-                        <Label
+                        <!--<Label
                             Grid.Column="3"
                             Margin="10"
                             Text="{Binding Percent, StringFormat='{0:F1}'}"
-                            VerticalOptions="End" />
+                            VerticalOptions="End" />-->
                     </Grid>
                 </DataTemplate>
             </CollectionView.ItemTemplate>
@@ -83,7 +83,7 @@
             Grid.Row="3"
             BackgroundColor="{StaticResource Gray400}"
             ColumnDefinitions="4*, 2*, *, *">
-            <Label
+            <!--<Label
                 Grid.Column="0"
                 Margin="10"
                 FontAttributes="Bold,Italic"
@@ -97,7 +97,7 @@
                 Grid.Column="3"
                 Margin="10"
                 FontAttributes="Bold"
-                Text="100.0%" />
+                Text="100.0%" />-->
         </Grid>
     </Grid>
 </ContentView>
