@@ -640,7 +640,7 @@ public static class VerifyElection
 
         var internalManifest = new InternalManifest(manifest);
         var recomputedTally = new CiphertextTally(tally.Name, context, internalManifest);
-        var accumulationResult = recomputedTally.Accumulate(ballots);
+        _ = recomputedTally.Accumulate(ballots);
 
         foreach (var (contestId, contest) in tally.Contests)
         {
@@ -653,7 +653,7 @@ public static class VerifyElection
                 // Verification 8.A
                 contestResults.Add(new VerificationResult(consistentA, $"- Verification 8.A: {contest.ObjectId} {selection.ObjectId} Consistent A"));
                 // Verification 8.B
-                contestResults.Add(new VerificationResult(consistentA, $"- Verification 8.A: {contest.ObjectId} {selection.ObjectId} Consistent B"));
+                contestResults.Add(new VerificationResult(consistentB, $"- Verification 8.A: {contest.ObjectId} {selection.ObjectId} Consistent B"));
             }
             results.Add(new VerificationResult($"- Verification 8: Contest {contestId}", contestResults));
         }
