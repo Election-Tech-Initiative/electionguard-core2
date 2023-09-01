@@ -525,10 +525,66 @@ public static class VerifyElection
 
         foreach (var ballot in ballots)
         {
-            // Verification 6.A
+            results.Add(await VerifyConfirmationCodes_SpecV1x(constants, context, manifest, ballot));
         }
 
-        return Task.FromResult(new VerificationResult("Verification 6 (Validation of confirmation codes)", results));
+        // Verification 7.C
+        var noDuplicates = ballots.Distinct(new CiphertextBallot.BallotCodeComparer()).Count() == ballots.Count;
+        results.Add(new VerificationResult(noDuplicates, "- Verification 7.C: No duplicate confirmation codes"));
+
+        // Verification 7.D
+        // cannot verify the hash values because the hash values do not match the E.G. 2.0 Spec
+        results.Add(new VerificationResult(IsValidwithKnownSpecDeviations, "- Verification 7.D: TODO: E.G. 2.0 - implement"));
+
+        // Verification 7.E
+        // cannot verify the hash values because precompute is used, which breaks hash chaining
+        results.Add(new VerificationResult(IsValidwithKnownSpecDeviations, "- Verification 7.E: TODO: E.G. 2.0 - implement"));
+
+        // Verification 7.F
+        // cannot verify the hash values because precompute is used, which breaks hash chaining
+        results.Add(new VerificationResult(IsValidwithKnownSpecDeviations, "- Verification 7.F: TODO: E.G. 2.0 - implement"));
+
+        // Verification 7.G
+        // cannot verify the hash values because precompute is used, which breaks hash chaining
+        results.Add(new VerificationResult(IsValidwithKnownSpecDeviations, "- Verification 7.G: TODO: E.G. 2.0 - implement"));
+
+        return new VerificationResult("Verification 7 (Validation of confirmation codes)", results);
+    }
+
+    private static Task<VerificationResult> VerifyConfirmationCodes_SpecV1x(
+        ElectionConstants constants,
+        CiphertextElectionContext context,
+        Manifest manifest,
+        CiphertextBallot ballot
+    )
+    {
+        var results = new List<VerificationResult>();
+
+        // Verification 6.A
+        // cannot verify the hash values because the hash values do not match the E.G. 2.0 Spec
+        results.Add(new VerificationResult(IsValidwithKnownSpecDeviations, "- Verification 6.A: TODO: E.G. 2.0 - implement"));
+
+        // note numbered Verification 6 in spec v1.5.3
+        // note numbered Verification 7 in spec v2.0.0
+        return Task.FromResult(new VerificationResult($"Verification 6 Ballot: {ballot.ObjectId}", results));
+    }
+
+    private static Task<VerificationResult> VerifyConfirmationCodes_SpecV2x(
+        ElectionConstants constants,
+        CiphertextElectionContext context,
+        Manifest manifest,
+        CiphertextBallot ballot
+    )
+    {
+        var results = new List<VerificationResult>();
+
+        // Verification 7.A
+        results.Add(new VerificationResult(IsValidwithKnownSpecDeviations, "- Verification 7.A: TODO: E.G. 2.0 - implement"));
+
+        // Verification 7.B
+        results.Add(new VerificationResult(IsValidwithKnownSpecDeviations, "- Verification 7.B: TODO: E.G. 2.0 - implement"));
+
+        return Task.FromResult(new VerificationResult($"Verification 7 Ballot: {ballot.ObjectId}", results));
     }
 
     /// <summary>
