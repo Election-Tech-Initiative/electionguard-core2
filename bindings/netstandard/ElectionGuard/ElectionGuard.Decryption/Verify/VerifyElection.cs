@@ -604,7 +604,25 @@ public static class VerifyElection
     {
         var results = new List<VerificationResult>();
 
+        var internalManifest = new InternalManifest(manifest);
+        var recomputedTally = new CiphertextTally(tally.Name, context, internalManifest);
+        var accumulationResult = recomputedTally.Accumulate(ballots);
 
+        foreach (var (contestId, contest) in tally.Contests)
+        {
+            var contestResults = new List<VerificationResult>();
+            foreach (var (selectionId, selection) in contest.Selections)
+            {
+                var recomputed = recomputedTally.Contests[contestId].Selections[selectionId].Ciphertext;
+                var consistentA = selection.Ciphertext.Pad.Equals(recomputed.Pad);
+                var consistentB = selection.Ciphertext.Data.Equals(recomputed.Data);
+                // Verification 8.A
+                contestResults.Add(new VerificationResult(consistentA, $"- Verification 8.A: {contest.ObjectId} {selection.ObjectId} Consistent A"));
+                // Verification 8.B
+                contestResults.Add(new VerificationResult(consistentA, $"- Verification 8.A: {contest.ObjectId} {selection.ObjectId} Consistent B"));
+            }
+            results.Add(new VerificationResult($"- Verification 8: Contest {contestId}", contestResults));
+        }
 
         return Task.FromResult(new VerificationResult("Verification 7 (Correctness of ballot aggregation)", results));
     }
