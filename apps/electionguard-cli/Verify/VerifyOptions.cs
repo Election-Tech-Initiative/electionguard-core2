@@ -9,6 +9,9 @@ internal class VerifyOptions
     [Option('f', "file", Required = true, HelpText = "Zipfile contining an election record")]
     public string? ZipFile { get; set; }
 
+    [Option('v', "verbose", Required = false, HelpText = "Show verbose output (print all checks tht pass)")]
+    public bool Verbose { get; set; } = false;
+
     public void Validate()
     {
         ValidateFiles();

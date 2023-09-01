@@ -47,12 +47,23 @@ public class VerificationResult : IValidationResult
 
     public override string ToString()
     {
+        return ToString(printTrues: false);
+    }
+
+    public string ToString(bool printTrues)
+    {
         var sb = new StringBuilder();
-        _ = sb.AppendLine($"{Message} {IsValid}");
+        if (printTrues || !AllValid)
+        {
+            _ = sb.AppendLine($"{Message} {AllValid}");
+        }
 
         foreach (var child in Children)
         {
-            _ = sb.AppendLine($"  {child}");
+            if (printTrues || !child.IsValid)
+            {
+                _ = sb.Append($"  {child}");
+            }
         }
         return sb.ToString();
     }
