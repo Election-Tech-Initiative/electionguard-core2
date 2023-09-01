@@ -367,7 +367,7 @@ namespace ElectionGuard
         {
             var hashCode = new HashCode();
             hashCode.Add(ToHex());
-            return hashCode.GetHashCode();
+            return hashCode.ToHashCode();
         }
 
         /// <summary>
