@@ -473,7 +473,7 @@ public static class VerifyElection
     /// (5.C) The given values vj are each in Zq for all 0 ≤ j ≤ L. 
     /// (5.D) The equation c = (c0 + c1 + ··· + cL) mod q is satisfied.
     /// </summary>
-    public static Task<VerificationResult> VerifyVoteLimits(
+    public static async Task<VerificationResult> VerifyVoteLimits(
         ElectionConstants constants,
         CiphertextElectionContext context,
         Manifest manifest,
@@ -481,16 +481,50 @@ public static class VerifyElection
     )
     {
         var results = new List<VerificationResult>();
-
         foreach (var ballot in ballots)
         {
+            var contestResults = new List<VerificationResult>();
             foreach (var contest in ballot.Contests)
             {
                 // Verification 5.1
+                contestResults.Add(await VerifyContestRangeProof(constants, context, manifest, contest));
             }
+            results.Add(new VerificationResult($"    - Verification 6: Ballot {ballot.ObjectId}", contestResults));
         }
 
-        return Task.FromResult(new VerificationResult("Verification 5 (Adherence to vote limits)", results));
+        return new VerificationResult("Verification 6 (Adherence to vote limits)", results);
+    }
+
+    private static Task<VerificationResult> VerifyContestRangeProof(
+        ElectionConstants constants,
+        CiphertextElectionContext context,
+        Manifest manifest,
+        CiphertextBallotContest contest
+    )
+    {
+        var results = new List<VerificationResult>();
+
+        // Verification 6.1
+
+        // Verification 6.2
+
+        // Verification 6.3
+
+        // Verification 6.4
+
+        // Verification 6.5
+        // cannot verify the hash values because the hash values do not match the E.G. 2.0 Spec
+        results.Add(new VerificationResult(IsValidwithKnownSpecDeviations, "- Verification 6.5: TODO: E.G. 2.0 - implement"));
+
+        // Verification 6.A
+
+        // Verification 6.B
+
+        // Verification 6.C
+
+        // Verification 6.D
+
+        return Task.FromResult(new VerificationResult($"    - Verification 6: Contest {contest.ObjectId}", results));
     }
 
     /// <summary>
