@@ -1,4 +1,4 @@
-﻿using System.Runtime.InteropServices;
+using System.Runtime.InteropServices;
 using Newtonsoft.Json;
 
 namespace ElectionGuard
@@ -115,9 +115,33 @@ namespace ElectionGuard
         public bool IsValid(
             ElGamalCiphertext message, ElementModP k, ElementModP m, ElementModQ q)
         {
-            return External.ChaumPedersenProof.IsValid(
-                Handle,
-                message.Handle, k.Handle, m.Handle, q.Handle);
+            // Verification 9.2 - 𝑎 = 𝑔^𝑣 • 𝐾^𝑐 mod 𝑝
+            var gv = BigMath.PowModP(Constants.G, Response);
+            var kc = BigMath.PowModP(k, Challenge);
+            var gvkc = BigMath.MultModP(gv, kc);
+            var consistentA = Pad.Equals(gvkc);
+
+            if (!consistentA)
+            {
+                Console.WriteLine($"ChaumPedersenProof: Invalid A: \n {Pad} \n {gvkc}");
+            }
+
+            // Verification 9.3 - 𝑏 = 𝐴^𝑣 • 𝑀^𝑐 mod 𝑝
+            var av = BigMath.PowModP(message.Pad, Response);
+            var mc = BigMath.PowModP(m, Challenge);
+            var avmc = BigMath.MultModP(av, mc);
+            var consistentB = Data.Equals(avmc);
+
+            if (!consistentB)
+            {
+                Console.WriteLine($"ChaumPedersenProof: Invalid B: \n {Data} \n {avmc}");
+            }
+
+            return consistentA && consistentB;
+
+            // return External.ChaumPedersenProof.IsValid(
+            //     Handle,
+            //     message.Handle, k.Handle, m.Handle, q.Handle);
         }
 
 #pragma warning disable CS1591 // Missing XML comment for publicly visible type or member

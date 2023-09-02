@@ -665,8 +665,8 @@ public static class VerifyElection
     /// Verification 9 (Correctness of decryptions)
     /// For each option in each contest on each tally, an election verifier must compute the values
     /// (9.1) M = B · T −1 mod p, 
-    /// (9.2) a=g^v ·K^c mod p, 
-    /// (9.3) b=A^v ·M^c mod p.
+    /// (9.2) a = g^v ·K^c mod p, 
+    /// (9.3) b = A^v ·M^c mod p.
     /// An election verifier must then confirm the following:
     /// (9.A) The given value v is in the set Zq.
     /// (9.B) The challenge value c satisfies c = H(HE;0x30,K,A,B,a,b,M).
@@ -680,7 +680,44 @@ public static class VerifyElection
     )
     {
         var results = new List<VerificationResult>();
-        return Task.FromResult(new VerificationResult("Verification 8 (Correctness of decryptions)", results));
+
+        foreach (var (contestId, contest) in decryptedTally.Contests)
+        {
+            var contestResults = new List<VerificationResult>();
+            foreach (var (selectionId, selection) in contest.Selections)
+            {
+                var ciphertext = encryptedTally.Contests[contestId].Selections[selectionId].Ciphertext;
+                // Verification 9.1
+                using var m = BigMath.DivModP(ciphertext.Data, new ElementModP(selection.Tally));
+                var consistentM = selection.Value.Equals(m);
+                contestResults.Add(new VerificationResult(IsValidwithKnownSpecDeviations, $"- Verification 9.1: Selection {selection.ObjectId} Consistent decryption M"));
+
+                // Verification 9.2
+                using var gv = BigMath.PowModP(constants.G, selection.Proof!.Response);
+                using var kc = BigMath.PowModP(context.ElGamalPublicKey, selection.Proof.Challenge);
+                using var gvkc = BigMath.MultModP(gv, kc);
+                var consistentA = selection.Proof!.Pad.Equals(gvkc);
+                contestResults.Add(new VerificationResult(consistentA, $"- Verification 9.2: Selection {selection.ObjectId} Consistent Commitment a"));
+
+                // Verification 9.3
+                using var av = BigMath.PowModP(ciphertext.Pad, selection.Proof.Response);
+                using var mc = BigMath.PowModP(selection.Value, selection.Proof.Challenge);
+                using var avmc = BigMath.MultModP(av, mc);
+                var consistentB = selection.Proof!.Data.Equals(avmc);
+                contestResults.Add(new VerificationResult(consistentB, $"- Verification 9.3: Selection {selection.ObjectId} Consistent Commitment b"));
+
+                // Verification 9.A
+                var consistentV = selection.Proof.Response.IsInBounds();
+                contestResults.Add(new VerificationResult(consistentV, $"- Verification 9.A: Selection {selection.ObjectId} Consistent Response V"));
+
+                // Verification 9.B
+                // cannot verify the hash values because the hash values do not match the E.G. 2.0 Spec
+                results.Add(new VerificationResult(IsValidwithKnownSpecDeviations, "- Verification 9.B: TODO: E.G. 2.0 - implement"));
+            }
+            results.Add(new VerificationResult($"- Verification 9: Contest {contestId}", contestResults));
+        }
+
+        return Task.FromResult(new VerificationResult("Verification 9 (Correctness of decryptions)", results));
     }
 
     /// <summary>

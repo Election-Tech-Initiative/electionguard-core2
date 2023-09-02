@@ -82,6 +82,7 @@ public record GuardianChallengeResponse : DisposableRecordBase
             share.Tally,
             challenge.Tally))
         {
+            Console.WriteLine($"Tally is invalid");
             return false;
         }
 

@@ -215,9 +215,11 @@ public static class ComputeChaumPedersenProofs
         ElementModQ challenge,
         List<SelectionChallengeResponse> responses)
     {
+        // Equation (76) in v2.0.0
+        // v = E vi mod q 
         var response = responses.Aggregate(
-            new ElementModQ(Constants.ONE_MOD_Q),
-            (acc, response) => acc.MultModQ(response.Response));
+            new ElementModQ(Constants.ZERO_MOD_Q),
+            (acc, response) => acc.AddModQ(response.Response));
 
         return new ChaumPedersenProof(
             self.Commitment,

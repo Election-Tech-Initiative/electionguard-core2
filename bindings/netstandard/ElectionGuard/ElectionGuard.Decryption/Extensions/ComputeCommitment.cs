@@ -61,7 +61,7 @@ public static class ComputeCommitmentExtensions
     /// Compute the commitment for the selection using 
     /// the publically available data.
     ///
-    /// equations (63) and (64) in the spec
+    /// equations (74) and (75) in the v2.0.0 spec
     /// </summary>
     public static ElGamalCiphertext ComputeCommitment(
         this SelectionChallengeResponse self,
@@ -89,7 +89,7 @@ public static class ComputeCommitmentExtensions
     /// Compute the commitment for the selection using 
     /// the publically available data.
     ///
-    /// equations (63) and (64) in the spec
+    ///  equations (74) and (75) in the v2.0.0 spec
     /// </summary>
     public static ElGamalCiphertext ComputeCommitment(
         this SelectionShare self,
@@ -110,7 +110,7 @@ public static class ComputeCommitmentExtensions
     /// Compute the commitment for the selection using 
     /// the publically available data.
     ///
-    /// equations (63) and (64) in the spec
+    ///  equations (74) and (75) in the v2.0.0 spec
     /// </summary>
     public static ElGamalCiphertext ComputeCommitment(
         this SelectionChallengeResponse self,
@@ -131,7 +131,7 @@ public static class ComputeCommitmentExtensions
     /// Compute the commitment for the selection using 
     /// the publically available data.
     ///
-    /// equations (63) and (64) in the spec
+    ///  equations (74) and (75) in the v2.0.0 spec
     /// </summary>
     public static ElGamalCiphertext ComputeCommitment(
         ElementModP ciphertextPad,

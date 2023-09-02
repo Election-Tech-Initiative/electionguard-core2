@@ -1,4 +1,4 @@
-.PHONY: all build build-msys2 build-android build-ios build-netstandard build-ui build-wasm build-npm clean clean-netstandard clean-ui clean-wasm environment environment-wasm format memcheck sanitize sanitize-asan sanitize-tsan bench bench-netstandard test test-msys2 test-netstandard test-netstandard-copy-output verify
+.PHONY: all build build-msys2 build-android build-ios build-netstandard build-ui build-wasm build-npm clean clean-netstandard clean-ui clean-wasm environment environment-wasm format memcheck sanitize sanitize-asan sanitize-tsan bench bench-netstandard test test-msys2 test-netstandard test-netstandard-copy-output generate-sample-election-record verify
 
 .EXPORT_ALL_VARIABLES:
 ELECTIONGUARD_CACHE=$(subst \,/,$(realpath .))/.cache
@@ -725,6 +725,11 @@ fetch-sample-data:
 generate-sample-data: build-netstandard
 	@echo Generate Sample Data
 	dotnet test -a $(PROCESSOR) -c $(TARGET) --filter TestCategory=OutputTestData ./bindings/netstandard/ElectionGuard/ElectionGuard.Decryption.Tests/ElectionGuard.Decryption.Tests.csproj
+
+generate-sample-election-record: build-netstandard
+	@echo Generate Sample Data
+	dotnet test -a $(PROCESSOR) -c $(TARGET) --filter TestCategory=GenerateElectionRecord ./bindings/netstandard/ElectionGuard/ElectionGuard.Decryption.Tests/ElectionGuard.Decryption.Tests.csproj
+
 
 verify: build-cli
 	@echo 🧪 Executing CLI Verifier $(OPERATING_SYSTEM) $(PROCESSOR) $(TARGET)

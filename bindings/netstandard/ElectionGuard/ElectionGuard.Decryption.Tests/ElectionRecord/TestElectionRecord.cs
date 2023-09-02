@@ -90,7 +90,6 @@ public class TestElectionRecord : DisposableBase
             Data.KeyCeremony.Guardians.Select(i => i.SharePublicKey()).ToList(),
             ballots: Data.CiphertextBallots.Where(i => i.IsSpoiled).ToList());
 
-        Console.WriteLine($"Tally: one time setup");
         Result = Mediator.RunDecryptionProcess(Data, guardians);
     }
 }

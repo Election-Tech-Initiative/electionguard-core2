@@ -1,4 +1,4 @@
-﻿
+
 using ElectionGuard.Encryption.Utils.Generators;
 using ElectionGuard.Decryption.Decryption;
 using ElectionGuard.Decryption.Shares;
@@ -57,8 +57,8 @@ public class TestChallenge : DisposableBase
         foreach (var guardian in guardians)
         {
             // compute the share & the commitment that goes with it
-            // 𝑀𝑖 = 𝐴^𝑠𝑖 mod 𝑝                              Equation (55)
-            // (𝑎𝑖, 𝑏𝑖) = (𝑔^𝑢𝑖 mod 𝑝, 𝐴^𝑢𝑖 mod 𝑝)          Equation (58)
+            // 𝑀𝑖 = 𝐴^𝑠𝑖 mod 𝑝                              Equation (66) in v2.0.0
+            // (𝑎𝑖, 𝑏𝑖) = (𝑔^𝑢𝑖 mod 𝑝, 𝐴^𝑢𝑖 mod 𝑝)          Equation (69) in v2.0.0
             var share = guardian.ComputeDecryptionShare(selection);
             shares.Add(guardian.GuardianId, share!);
         }
@@ -71,12 +71,12 @@ public class TestChallenge : DisposableBase
         }).ToList();
 
         // accumulate shares
-        // 𝑀𝑏𝑎𝑟 = Π (𝑀𝑖 ^ 𝑤𝑖) mod p Equation (57)
+        // 𝑀𝑏𝑎𝑟 = Π (𝑀𝑖 ^ 𝑤𝑖) mod p Equation (68) in v2.0.0
         var accumulation = selection.AccumulateShares(
             guardianShares, coefficients);
 
         // create challenge
-        // c = H(06,Q;K,A,B,a,b,M) Equation (60)
+        // c = H(06,Q;K,A,B,a,b,M) Equation (71) in v2.0.0
         var challenge = SelectionChallenge.ComputeChallenge(
                     context,
                     selection,
@@ -88,7 +88,7 @@ public class TestChallenge : DisposableBase
         {
             var guardian = guardians.First(g => g.GuardianId == guardianId);
 
-            // ci =(c·wi)modq. Equation (61)
+            // ci =(c·wi)modq. Equation (72) in v2.0.0
             var guardianChallenge = new SelectionChallenge(
                 selection, guardian, coefficient, challenge);
 
@@ -105,7 +105,7 @@ public class TestChallenge : DisposableBase
             var guardian = guardians.First(g => g.GuardianId == guardianId);
             var share = shares[guardianId];
 
-            // vi = (ui − 𝑐𝑖P(i)) mod q. Equation (62)
+            // vi = (ui − 𝑐𝑖P(i)) mod q. Equation (73) in v2.0.0
             var response = guardian.ComputeChallengeResponse(share, guardianChallenge);
             responses.Add(guardianId, response!);
         }
@@ -120,8 +120,8 @@ public class TestChallenge : DisposableBase
             var share = shares[guardianId];
             var guardianChallenge = challenges[guardianId];
 
-            // 𝑎𝑖 = 𝑔^𝑣𝑖 • 𝐾^𝑐𝑖 mod 𝑝 Equation (63)
-            // 𝑏𝑖 = 𝐴^𝑣𝑖 • 𝑀𝑖^𝑐𝑖 mod 𝑝 Equation (64)
+            // 𝑎𝑖 = 𝑔^𝑣𝑖 • 𝐾^𝑐𝑖 mod 𝑝 Equation (74) in v2.0.0
+            // 𝑏𝑖 = 𝐴^𝑣𝑖 • 𝑀𝑖^𝑐𝑖 mod 𝑝 Equation (75) in v2.0.0
             var validated = response.IsValid(
                 selection,
                 guardian.CommitmentOffset!,
@@ -131,16 +131,23 @@ public class TestChallenge : DisposableBase
         }
 
         // create the proof
-        // Equation (65)
+        // Equation (76) in v2.0.0
         var proof = accumulation.ComputeProof(
             challenge, responses.Values.ToList());
         accumulation.AddProof(proof);
 
-        // decrypt
+        // TODO: verify the proof
+        var proofValid = proof.IsValid(
+            selection.Ciphertext,
+            context.ElGamalPublicKey,
+            accumulation.Value,
+            context.CryptoExtendedBaseHash);
+
+        Assert.That(proofValid, Is.True);
+
+        // decrypt the selection
         var decrypted = selection.Decrypt(
             accumulation, context.ElGamalPublicKey);
-
-        // TODO: verify the proof
 
         Assert.That(decrypted.Tally, Is.EqualTo(plaintext.Tally));
     }

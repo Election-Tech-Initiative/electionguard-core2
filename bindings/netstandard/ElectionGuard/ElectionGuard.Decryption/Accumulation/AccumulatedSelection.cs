@@ -185,7 +185,9 @@ public record AccumulatedSelection : DisposableRecordBase, IElectionSelection
         ElementModQ lagrangeCoefficient)
     {
         // 𝑀𝑏𝑎𝑟 = 𝑀𝑏𝑎𝑟 * (𝑀𝑖 ^ 𝑤𝑖) mod p
-        using var interpolatedshare = BigMath.PowModP(share, lagrangeCoefficient);
+        using var interpolatedshare = BigMath.PowModP(
+            share, lagrangeCoefficient
+        );
         Value = Value.MultModP(interpolatedshare);
 
         // a = Πai modp, b = Πbi mod p.

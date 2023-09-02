@@ -360,6 +360,20 @@ namespace ElectionGuard
             return inBounds;
         }
 
+        public ElementModQ AddModQ(ElementModQ rhs)
+        {
+            var status = BigMath.External.AddModQ(Handle, rhs.Handle,
+                out var value);
+            status.ThrowIfError();
+
+            // BigMath static operators reutrn null if invalid
+            // but instance functions throw an exception
+            value.ThrowIfInvalid();
+            Reassign(value);
+
+            return this;
+        }
+
         /// <summary>
         /// Multiply by an ElementModP value
         /// </summary>
