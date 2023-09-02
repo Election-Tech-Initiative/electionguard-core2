@@ -707,31 +707,32 @@ public static class VerifyElection
         foreach (var (contestId, contest) in decryptedTally.Contests)
         {
             var contestResults = new List<VerificationResult>();
-            foreach (var (selectionId, selection) in contest.Selections)
+            foreach (var (selectionId, plaintext) in contest.Selections)
             {
                 var ciphertext = encryptedTally.Contests[contestId].Selections[selectionId].Ciphertext;
-                // Verification 9.1
-                using var m = BigMath.DivModP(ciphertext.Data, new ElementModP(selection.Tally));
-                var consistentM = selection.Value.Equals(m);
-                contestResults.Add(new VerificationResult(IsValidwithKnownSpecDeviations, $"- Verification 9.1: Selection {selection.ObjectId} Consistent decryption M"));
 
-                // Verification 9.2
-                using var gv = BigMath.PowModP(constants.G, selection.Proof!.Response);
-                using var kc = BigMath.PowModP(context.ElGamalPublicKey, selection.Proof.Challenge);
+                // Verification 9.1 - M = B · T −1 mod p
+                using var m = BigMath.DivModP(ciphertext.Data, new ElementModP(plaintext.Tally));
+                var consistentM = plaintext.Value.Equals(m);
+                contestResults.Add(new VerificationResult(IsValidwithKnownSpecDeviations, $"- Verification 9.1: Selection {plaintext.ObjectId} Consistent decryption M"));
+
+                // Verification 9.2 - 𝑎 = 𝑔^𝑣 • 𝐾^𝑐 mod 𝑝
+                using var gv = BigMath.PowModP(constants.G, plaintext.Proof!.Response);
+                using var kc = BigMath.PowModP(context.ElGamalPublicKey, plaintext.Proof.Challenge);
                 using var gvkc = BigMath.MultModP(gv, kc);
-                var consistentA = selection.Proof!.Pad.Equals(gvkc);
-                contestResults.Add(new VerificationResult(consistentA, $"- Verification 9.2: Selection {selection.ObjectId} Consistent Commitment a"));
+                var consistentA = plaintext.Proof!.Pad.Equals(gvkc);
+                contestResults.Add(new VerificationResult(consistentA, $"- Verification 9.2: Selection {plaintext.ObjectId} Consistent Commitment a"));
 
-                // Verification 9.3
-                using var av = BigMath.PowModP(ciphertext.Pad, selection.Proof.Response);
-                using var mc = BigMath.PowModP(selection.Value, selection.Proof.Challenge);
+                // Verification 9.3 - 𝑏 = 𝐴^𝑣 • 𝑀^𝑐 mod 𝑝
+                using var av = BigMath.PowModP(ciphertext.Pad, plaintext.Proof.Response);
+                using var mc = BigMath.PowModP(plaintext.Value, plaintext.Proof.Challenge);
                 using var avmc = BigMath.MultModP(av, mc);
-                var consistentB = selection.Proof!.Data.Equals(avmc);
-                contestResults.Add(new VerificationResult(consistentB, $"- Verification 9.3: Selection {selection.ObjectId} Consistent Commitment b"));
+                var consistentB = plaintext.Proof!.Data.Equals(avmc);
+                contestResults.Add(new VerificationResult(consistentB, $"- Verification 9.3: Selection {plaintext.ObjectId} Consistent Commitment b"));
 
                 // Verification 9.A
-                var consistentV = selection.Proof.Response.IsInBounds();
-                contestResults.Add(new VerificationResult(consistentV, $"- Verification 9.A: Selection {selection.ObjectId} Consistent Response V"));
+                var consistentV = plaintext.Proof.Response.IsInBounds();
+                contestResults.Add(new VerificationResult(consistentV, $"- Verification 9.A: Selection {plaintext.ObjectId} Consistent Response V"));
 
                 // Verification 9.B
                 // cannot verify the hash values because the hash values do not match the E.G. 2.0 Spec
