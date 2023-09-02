@@ -53,12 +53,6 @@ public class TestElectionRecord : DisposableBase
             Tally = Result.Tally!,
         };
 
-        var tallySelection = electionRecord.Tally!.Contests.Values.First().Selections.Values.First();
-
-        Console.WriteLine(tallySelection.ObjectId);
-
-        Console.WriteLine($"{tallySelection.Proof!.ToJson()}");
-
         var path = "ElectionRecord";
         var subject = await ElectionRecordManager.ExportAsync(electionRecord, path);
 
