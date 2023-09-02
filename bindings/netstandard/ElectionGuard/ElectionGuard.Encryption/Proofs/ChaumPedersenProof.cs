@@ -116,22 +116,30 @@ namespace ElectionGuard
         public bool IsValid(
             ElGamalCiphertext message, ElementModP k, ElementModP m, ElementModQ q)
         {
+            var consistentA = false;
+
             // Verification 9.2 - 𝑎 = 𝑔^𝑣 • 𝐾^𝑐 mod 𝑝
-            var gv = BigMath.PowModP(Constants.G, Response);
-            var kc = BigMath.PowModP(k, Challenge);
-            var gvkc = BigMath.MultModP(gv, kc);
-            var consistentA = Pad.Equals(gvkc);
+            using (var gv = BigMath.PowModP(Constants.G, Response))
+            using (var kc = BigMath.PowModP(k, Challenge))
+            using (var gvkc = BigMath.MultModP(gv, kc))
+            {
+                consistentA = Pad.Equals(gvkc);
+            }
 
             if (!consistentA)
             {
                 Console.WriteLine($"ChaumPedersenProof: Invalid A: \n {Pad} \n {gvkc}");
             }
 
+            var consistentB = false;
+
             // Verification 9.3 - 𝑏 = 𝐴^𝑣 • 𝑀^𝑐 mod 𝑝
-            var av = BigMath.PowModP(message.Pad, Response);
-            var mc = BigMath.PowModP(m, Challenge);
-            var avmc = BigMath.MultModP(av, mc);
-            var consistentB = Data.Equals(avmc);
+            using (var av = BigMath.PowModP(message.Pad, Response))
+            using (var mc = BigMath.PowModP(m, Challenge))
+            using (var avmc = BigMath.MultModP(av, mc))
+            {
+                consistentB = Data.Equals(avmc);
+            }
 
             if (!consistentB)
             {
@@ -139,10 +147,6 @@ namespace ElectionGuard
             }
 
             return consistentA && consistentB;
-
-            // return External.ChaumPedersenProof.IsValid(
-            //     Handle,
-            //     message.Handle, k.Handle, m.Handle, q.Handle);
         }
 
 #pragma warning disable CS1591 // Missing XML comment for publicly visible type or member
