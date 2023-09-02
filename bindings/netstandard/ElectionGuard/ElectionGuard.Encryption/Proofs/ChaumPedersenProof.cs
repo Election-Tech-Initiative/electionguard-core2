@@ -128,7 +128,7 @@ namespace ElectionGuard
 
             if (!consistentA)
             {
-                Console.WriteLine($"ChaumPedersenProof: Invalid A: \n {Pad} \n {gvkc}");
+                Console.WriteLine($"ChaumPedersenProof: Invalid A");
             }
 
             var consistentB = false;
@@ -143,7 +143,7 @@ namespace ElectionGuard
 
             if (!consistentB)
             {
-                Console.WriteLine($"ChaumPedersenProof: Invalid B: \n {Data} \n {avmc}");
+                Console.WriteLine($"ChaumPedersenProof: Invalid B");
             }
 
             return consistentA && consistentB;
