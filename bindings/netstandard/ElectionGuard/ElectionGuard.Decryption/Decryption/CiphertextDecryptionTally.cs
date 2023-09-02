@@ -556,7 +556,6 @@ public record class CiphertextDecryptionTally : DisposableRecordBase
         }
 
         var guardianShares = GetGuardianShares();
-        var lagrangeCoefficients = guardianShares.ComputeLagrangeCoefficients();
 
         // decrypt
         var plaintextTally = _tally.Decrypt(_accumulatedTally!);

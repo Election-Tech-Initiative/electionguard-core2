@@ -82,17 +82,7 @@ public static class VerifyElection
         results.Add(ballotAggregation);
 
         // Verification 9 (Correctness of decryptions)
-        var decryptions = await VerifyTallyDecryptions(
-            record.Constants,
-            record.Context,
-            record.Manifest,
-            record.EncryptedTally,
-            record.Tally
-        );
-        results.Add(decryptions);
-
-        // Verification 10 (Validation of correct decryption of tallies)
-        var tallyDecryptions = await VerifyTallyDecryptionMetadata(
+        var tallyDecryptions = await VerifyTallyDecryptions(
             record.Constants,
             record.Context,
             record.Manifest,
@@ -101,10 +91,30 @@ public static class VerifyElection
         );
         results.Add(tallyDecryptions);
 
+        // Verification 10 (Validation of correct decryption of tallies)
+        var tallyMetadata = await VerifyTallyDecryptionMetadata(
+            record.Constants,
+            record.Context,
+            record.Manifest,
+            record.EncryptedTally,
+            record.Tally
+        );
+        results.Add(tallyMetadata);
+
         // Verification 11 (Correctness of decryptions of contest data)
         results.Add(new VerificationResult(IsValidwithKnownSpecDeviations, "Verification 11 (Correctness of decryptions of contest data): TODO: E.G. 2.0 - implement"));
 
         // Verification 12 (Correctness of decryptions for challenged ballots)
+        var ballotDecryptions = await VerifyBallotDecryptions(
+            record.Constants,
+            record.Context,
+            record.Manifest,
+            record.EncryptedBallots
+                .Where(i => i.IsChallenged)
+                .ToList(),
+            record.ChallengedBallots
+        );
+        results.Add(ballotDecryptions);
 
         // Verification 13 (Validation of correct decryption of challenged ballots)
 
@@ -736,7 +746,7 @@ public static class VerifyElection
 
                 // Verification 9.B
                 // cannot verify the hash values because the hash values do not match the E.G. 2.0 Spec
-                results.Add(new VerificationResult(IsValidwithKnownSpecDeviations, "- Verification 9.B: TODO: E.G. 2.0 - implement"));
+                contestResults.Add(new VerificationResult(IsValidwithKnownSpecDeviations, "- Verification 9.B: TODO: E.G. 2.0 - implement"));
             }
             results.Add(new VerificationResult($"- Verification 9: Contest {contestId}", contestResults));
         }
@@ -766,7 +776,77 @@ public static class VerifyElection
     )
     {
         var results = new List<VerificationResult>();
-        return Task.FromResult(new VerificationResult("Verification 9 (Validation of correct decryption of tallies)", results));
+        return Task.FromResult(new VerificationResult("Verification 10 (Validation of correct decryption of tallies)", results));
     }
 
+    /// <summary>
+    /// Verification 12 (Correctness of decryptions for challenged ballots)
+    /// For each challenged ballot, for each option in each contest on 
+    /// the challenged ballot, an election verifier must compute the values
+    /// (12.1) M = β · S−1 mod p, 
+    /// (12.2) a = g^v ·K^c mod p, 
+    /// (12.3) b = α^v ·M^c mod p.
+    /// An election verifier must then confirm the following.
+    /// (12.A) The given value v is in the set Zq.
+    /// (12.B) The challenge value c satisfies 
+    ///        c = H(HE;0x30,K,α,β,a,b,M).
+    /// </summary>
+    public static Task<VerificationResult> VerifyBallotDecryptions(
+        ElectionConstants constants,
+        CiphertextElectionContext context,
+        Manifest manifest,
+        List<CiphertextBallot> encryptedBallots,
+        List<PlaintextTallyBallot> decryptedBallots
+    )
+    {
+        var results = new List<VerificationResult>();
+
+        foreach (var ballot in encryptedBallots)
+        {
+            var ballotResults = new List<VerificationResult>();
+            var plaintext = decryptedBallots.FirstOrDefault(x => x.BallotId == ballot.ObjectId);
+            foreach (var contest in ballot.Contests)
+            {
+                var contestResults = new List<VerificationResult>();
+                var plaintextContest = plaintext!.Contests[contest.ObjectId];
+                foreach (var selection in contest.Selections)
+                {
+                    var plaintextSelection = plaintextContest.Selections[selection.ObjectId];
+
+                    // TODO: factor out into a single check supporting both 9 and 12
+
+                    // Verification 9.1 - M = B · T −1 mod p
+                    using var m = BigMath.DivModP(selection.Ciphertext.Data, new ElementModP(plaintextSelection.Tally));
+                    var consistentM = plaintextSelection.Value.Equals(m);
+                    contestResults.Add(new VerificationResult(IsValidwithKnownSpecDeviations, $"- Verification 12.1: Selection {plaintextSelection.ObjectId} Consistent decryption M"));
+
+                    // Verification 9.2 - 𝑎 = 𝑔^𝑣 • 𝐾^𝑐 mod 𝑝
+                    using var gv = BigMath.PowModP(constants.G, plaintextSelection.Proof!.Response);
+                    using var kc = BigMath.PowModP(context.ElGamalPublicKey, plaintextSelection.Proof.Challenge);
+                    using var gvkc = BigMath.MultModP(gv, kc);
+                    var consistentA = plaintextSelection.Proof!.Pad.Equals(gvkc);
+                    contestResults.Add(new VerificationResult(consistentA, $"- Verification 12.2: Selection {plaintextSelection.ObjectId} Consistent Commitment a"));
+
+                    // Verification 9.3 - 𝑏 = 𝐴^𝑣 • 𝑀^𝑐 mod 𝑝
+                    using var av = BigMath.PowModP(selection.Ciphertext.Pad, plaintextSelection.Proof.Response);
+                    using var mc = BigMath.PowModP(plaintextSelection.Value, plaintextSelection.Proof.Challenge);
+                    using var avmc = BigMath.MultModP(av, mc);
+                    var consistentB = plaintextSelection.Proof!.Data.Equals(avmc);
+                    contestResults.Add(new VerificationResult(consistentB, $"- Verification 12.3: Selection {plaintextSelection.ObjectId} Consistent Commitment b"));
+
+                    // Verification 9.A
+                    var consistentV = plaintextSelection.Proof.Response.IsInBounds();
+                    contestResults.Add(new VerificationResult(consistentV, $"- Verification 12.A: Selection {plaintextSelection.ObjectId} Consistent Response V"));
+
+                    // Verification 9.B
+                    // cannot verify the hash values because the hash values do not match the E.G. 2.0 Spec
+                    contestResults.Add(new VerificationResult(IsValidwithKnownSpecDeviations, "- Verification 12.B: TODO: E.G. 2.0 - implement"));
+                }
+                ballotResults.Add(new VerificationResult($"- Verification 12: Contest {plaintextContest.ObjectId}", contestResults));
+            }
+            results.Add(new VerificationResult($"- Verification 12: Ballot {ballot.ObjectId}", ballotResults));
+        }
+
+        return Task.FromResult(new VerificationResult("Verification 12 (Correctness of decryptions for challenged ballots)", results));
+    }
 }
