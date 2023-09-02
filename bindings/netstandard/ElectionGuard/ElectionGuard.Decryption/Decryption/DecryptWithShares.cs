@@ -126,7 +126,10 @@ public static class DecryptWithSharesExtensions
 
                 // add the decrypted value to the plaintext selection
                 plaintextSelection.Tally += value.Tally;
-                plaintextSelection.Proof = new(value.Proof);
+                if (value.Proof != null)
+                {
+                    plaintextSelection.Proof = new(value.Proof);
+                }
             }
         }
 
@@ -368,7 +371,10 @@ public static class DecryptWithSharesExtensions
                 var value = selection.Decrypt(
                     selectionAcumulation, publicKey);
                 plaintextSelection.Tally += value.Tally;
-                plaintextSelection.Proof = new(value.Proof);
+                if (value.Proof != null)
+                {
+                    plaintextSelection.Proof = new(value.Proof);
+                }
             }
         }
 
