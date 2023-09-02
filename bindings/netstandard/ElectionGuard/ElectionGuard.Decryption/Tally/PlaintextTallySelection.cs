@@ -69,7 +69,6 @@ public class PlaintextTallySelection
             selection.DescriptionHash,
             tally, value, proof)
     {
-
     }
 
     [JsonConstructor]

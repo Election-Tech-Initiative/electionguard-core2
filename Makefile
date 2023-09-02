@@ -717,7 +717,6 @@ endif
 
 TEMPFILE=sample-data-1-0.zip
 fetch-sample-data:
-
 	@echo ⬇️ FETCH Sample Data
 	wget -O $(TEMPFILE) https://github.com/microsoft/electionguard/releases/download/v1.0/sample-data.zip
 	unzip -o $(TEMPFILE)

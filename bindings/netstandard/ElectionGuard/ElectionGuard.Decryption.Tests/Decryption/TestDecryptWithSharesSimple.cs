@@ -89,17 +89,16 @@ public class TestDecryptWithSharesSimple : DisposableBase
         Console.WriteLine($"secretDecrypted: {secretDecrypted}");
 
         // Decrypt with Shares
-        using var shareDecrypted = ciphertext.Decrypt(
-            shares[ballot.ObjectId],
+        using var shareDecrypted = ciphertext.DecryptNoProofs(
+            shares[ballot.ObjectId].GetShares(),
             lagrangeCoefficients,
             tallyId,
-            data.Context.ElGamalPublicKey,
-            data.Context.CryptoExtendedBaseHash
+            data.Context
             );
 
         Console.WriteLine($"shareDecrypted: {shareDecrypted}");
 
-        // TODO: assert share and secret rtunr same resutl
+        // TODO: assert share and secret return same result
 
         //Assert.That(nonceDecrypted, Is.EqualTo(ballot));
     }

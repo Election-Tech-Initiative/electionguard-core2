@@ -233,7 +233,8 @@ namespace ElectionGuard
         /// <param name="manifestHash"> the hash of the election metadata </param>
         /// <param name="extendedData"> an unordered map of key value strings relevant to the consuming application </param>
         /// </summary>
-        public CiphertextElectionContext(ulong numberOfGuardians,
+        public CiphertextElectionContext(
+            ulong numberOfGuardians,
             ulong quorum,
             ElementModP publicKey,
             ElementModQ commitmentHash,
@@ -258,7 +259,8 @@ namespace ElectionGuard
         /// <param name="config"> the context configuration</param>
         /// <param name="extendedData"> an unordered map of key value strings relevant to the consuming application </param>
         /// </summary>
-        public CiphertextElectionContext(ulong numberOfGuardians,
+        public CiphertextElectionContext(
+            ulong numberOfGuardians,
             ulong quorum,
             ElementModP publicKey,
             ElementModQ commitmentHash,

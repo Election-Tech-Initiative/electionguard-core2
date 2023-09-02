@@ -137,7 +137,8 @@ public class TestChallenge : DisposableBase
         accumulation.AddProof(proof);
 
         // decrypt
-        var decrypted = selection.Decrypt(accumulation, context.ElGamalPublicKey);
+        var decrypted = selection.Decrypt(
+            accumulation, context.ElGamalPublicKey);
 
         // TODO: verify the proof
 

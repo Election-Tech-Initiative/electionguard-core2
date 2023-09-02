@@ -302,5 +302,4 @@ public static class ElectionRecordManager
             tally,
             SerializationSettings.NewtonsoftSettings()));
     }
-
 }
