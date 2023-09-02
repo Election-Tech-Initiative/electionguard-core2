@@ -71,7 +71,7 @@ public static class VerifyElection
         );
         results.Add(confirmationCodes);
 
-        // Verification 7 (Correctness of ballot aggregation)
+        // Verification 8 (Correctness of ballot aggregation)
         var ballotAggregation = await VerifyBallotAggregation(
             record.Constants,
             record.Context,
@@ -81,8 +81,8 @@ public static class VerifyElection
         );
         results.Add(ballotAggregation);
 
-        // Verification 8 (Correctness of decryptions)
-        var decryptions = await VerifyDecryptions(
+        // Verification 9 (Correctness of decryptions)
+        var decryptions = await VerifyTallyDecryptions(
             record.Constants,
             record.Context,
             record.Manifest,
@@ -91,8 +91,8 @@ public static class VerifyElection
         );
         results.Add(decryptions);
 
-        // Verification 9 (Validation of correct decryption of tallies)
-        var tallyDecryptions = await VerifyTallyDecryptions(
+        // Verification 10 (Validation of correct decryption of tallies)
+        var tallyDecryptions = await VerifyTallyDecryptionMetadata(
             record.Constants,
             record.Context,
             record.Manifest,
@@ -100,6 +100,28 @@ public static class VerifyElection
             record.Tally
         );
         results.Add(tallyDecryptions);
+
+        // Verification 11 (Correctness of decryptions of contest data)
+        results.Add(new VerificationResult(IsValidwithKnownSpecDeviations, "Verification 11 (Correctness of decryptions of contest data): TODO: E.G. 2.0 - implement"));
+
+        // Verification 12 (Correctness of decryptions for challenged ballots)
+
+        // Verification 13 (Validation of correct decryption of challenged ballots)
+
+        // Verification 14 (Correctness of contest data decryptions for challenged ballots)
+        results.Add(new VerificationResult(IsValidwithKnownSpecDeviations, "Verification 14 (Correctness of contest data decryptions for challenged ballots): TODO: E.G. 2.0 - implement"));
+
+        // Verification 15 (Well-formedness of selection encryptions in pre-encrypted ballots)
+        results.Add(new VerificationResult(IsValidwithKnownSpecDeviations, "Verification 15 (Well-formedness of selection encryptions in pre-encrypted ballots): TODO: E.G. 2.0 - implement"));
+
+        // Verification 16 (Adherence to vote limits in pre-encrypted ballots)
+        results.Add(new VerificationResult(IsValidwithKnownSpecDeviations, "Verification 16 (Adherence to vote limits in pre-encrypted ballots): TODO: E.G. 2.0 - implement"));
+
+        // Verification 17 (Validation of confirmation codes in pre-encrypted ballots)
+        results.Add(new VerificationResult(IsValidwithKnownSpecDeviations, "Verification 17 (Validation of confirmation codes in pre-encrypted ballots): TODO: E.G. 2.0 - implement"));
+
+        // Verification 18 (Validation of short codes in pre-encrypted ballots)
+        results.Add(new VerificationResult(IsValidwithKnownSpecDeviations, "Verification 18 (Validation of short codes in pre-encrypted ballots): TODO: E.G. 2.0 - implement"));
 
         return new VerificationResult("Election Verification", results);
     }
@@ -201,7 +223,8 @@ public static class VerifyElection
     ///       such that 0 ≤ x < p and xq mod p = 1 is satisfied.)
     /// (2.B) The value vi,j is in Zq. ( A value x is in Zq if and only if x is an integer 
     ///       such that 0 ≤ x < q.) 
-    /// (2.C) The challenge ci,j is correctly computed as ci,j = H (HP ; 0x10, i, j, Ki,j , hi,j ).
+    /// (2.C) The challenge ci,j is correctly computed as 
+    ///       ci,j = H (HP ; 0x10, i, j, Ki,j , hi,j ).
     /// </summary>
     public static Task<VerificationResult> VerifyGuardianPublicKeys(
         ElectionConstants constants,
@@ -671,7 +694,7 @@ public static class VerifyElection
     /// (9.A) The given value v is in the set Zq.
     /// (9.B) The challenge value c satisfies c = H(HE;0x30,K,A,B,a,b,M).
     /// </summary>
-    public static Task<VerificationResult> VerifyDecryptions(
+    public static Task<VerificationResult> VerifyTallyDecryptions(
         ElectionConstants constants,
         CiphertextElectionContext context,
         Manifest manifest,
@@ -733,7 +756,7 @@ public static class VerifyElection
     /// An election verifier must also confirm the following.
     /// (10.E) For each contest text label that occurs in at least one submitted ballot, that contest text label occurs in the list of contests in the corresponding tally.
     /// </summary>
-    public static Task<VerificationResult> VerifyTallyDecryptions(
+    public static Task<VerificationResult> VerifyTallyDecryptionMetadata(
         ElectionConstants constants,
         CiphertextElectionContext context,
         Manifest manifest,
