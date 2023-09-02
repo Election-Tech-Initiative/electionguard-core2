@@ -25,6 +25,52 @@ public class TestElectionRecord : DisposableBase
     [OneTimeSetUp]
     public void OneTimeSetup()
     {
+        // RunSetup();
+    }
+
+    [OneTimeTearDown]
+    public void OneTimeTearDown()
+    {
+        Data.Dispose();
+    }
+
+    [Test, Category("GenerateElectionRecord")]
+    public async Task Test_Import_Export_Election_record()
+    {
+        RunSetup();
+
+        // Arrange
+        var electionRecord = new ElectionRecordData()
+        {
+            Constants = ElectionConstants.Current(),
+            Guardians = Data.KeyCeremony.Guardians.Select(i => i.SharePublicKey()).ToList(),
+            Manifest = Data.Election.Manifest,
+            Context = Data.Election.Context,
+            Devices = new List<EncryptionDevice>() { Data.Election.Device },
+            EncryptedBallots = Data.CiphertextBallots,
+            ChallengedBallots = Result.ChallengedBallots!,
+            EncryptedTally = Data.CiphertextTally,
+            Tally = Result.Tally!,
+        };
+
+        var tallySelection = electionRecord.Tally!.Contests.Values.First().Selections.Values.First();
+
+        Console.WriteLine(tallySelection.ObjectId);
+
+        Console.WriteLine($"{tallySelection.Proof!.ToJson()}");
+
+        var path = "ElectionRecord";
+        var subject = await ElectionRecordManager.ExportAsync(electionRecord, path);
+
+        // Act
+        var result = await ElectionRecordManager.ImportAsync(subject);
+
+        // Assert
+        Assert.That(result.Constants.P, Is.EqualTo(electionRecord.Constants.P));
+    }
+
+    private void RunSetup()
+    {
         Data = TestDecryptionData.ConfigureTestCase(
             KeyCeremonyGenerator.GenerateKeyCeremonyData(
             NUMBER_OF_GUARDIANS,
@@ -44,39 +90,7 @@ public class TestElectionRecord : DisposableBase
             Data.KeyCeremony.Guardians.Select(i => i.SharePublicKey()).ToList(),
             ballots: Data.CiphertextBallots.Where(i => i.IsSpoiled).ToList());
 
+        Console.WriteLine($"Tally: one time setup");
         Result = Mediator.RunDecryptionProcess(Data, guardians);
-    }
-
-    [OneTimeTearDown]
-    public void OneTimeTearDown()
-    {
-        Data.Dispose();
-    }
-
-    [Test, Category("GenerateElectionRecord")]
-    public async Task Test_Import_Export_Election_record()
-    {
-        // Arrange
-        var electionRecord = new ElectionRecordData()
-        {
-            Constants = ElectionConstants.Current(),
-            Guardians = Data.KeyCeremony.Guardians.Select(i => i.SharePublicKey()).ToList(),
-            Manifest = Data.Election.Manifest,
-            Context = Data.Election.Context,
-            Devices = new List<EncryptionDevice>() { Data.Election.Device },
-            EncryptedBallots = Data.CiphertextBallots,
-            ChallengedBallots = Result.ChallengedBallots!,
-            EncryptedTally = Data.CiphertextTally,
-            Tally = Result.Tally!,
-        };
-
-        var path = "ElectionRecord";
-        var subject = await ElectionRecordManager.ExportAsync(electionRecord, path);
-
-        // Act
-        var result = await ElectionRecordManager.ImportAsync(subject);
-
-        // Assert
-        Assert.That(result.Constants.P, Is.EqualTo(electionRecord.Constants.P));
     }
 }
