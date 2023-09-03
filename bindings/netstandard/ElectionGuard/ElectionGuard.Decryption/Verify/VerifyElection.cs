@@ -117,6 +117,16 @@ public static class VerifyElection
         results.Add(ballotDecryptions);
 
         // Verification 13 (Validation of correct decryption of challenged ballots)
+        var ballotDecryptionMetadata = await VerifyBallotDecryptionMetadata(
+            record.Constants,
+            record.Context,
+            record.Manifest,
+            record.EncryptedBallots
+                .Where(i => i.IsChallenged)
+                .ToList(),
+            record.ChallengedBallots
+        );
+        results.Add(ballotDecryptionMetadata);
 
         // Verification 14 (Correctness of contest data decryptions for challenged ballots)
         results.Add(new VerificationResult(IsValidwithKnownSpecDeviations, "Verification 14 (Correctness of contest data decryptions for challenged ballots): TODO: E.G. 2.0 - implement"));
@@ -797,7 +807,7 @@ public static class VerifyElection
 
                 // Verification 10.A - T = K^t mod p
                 using var t = BigMath.PowModP(context.ElGamalPublicKey, plaintext.Tally);
-                var consistentT = encrypted.Ciphertext.Data.Equals(t);
+                var consistentT = plaintext.Value.Equals(t);
                 contestResults.Add(new VerificationResult(consistentT, $"- Verification 10.A: Selection {plaintext.ObjectId} Consistent Tally T"));
 
                 // Verification 10.C
@@ -875,30 +885,30 @@ public static class VerifyElection
 
                     // TODO: factor out into a single check supporting both 9 and 12
 
-                    // Verification 9.1 - M = B · T −1 mod p
+                    // Verification 12.1 - M = β · S−1 mod p,
                     using var m = BigMath.DivModP(selection.Ciphertext.Data, new ElementModP(plaintextSelection.Tally));
                     var consistentM = plaintextSelection.Value.Equals(m);
                     contestResults.Add(new VerificationResult(IsValidwithKnownSpecDeviations, $"- Verification 12.1: Selection {plaintextSelection.ObjectId} Consistent decryption M"));
 
-                    // Verification 9.2 - 𝑎 = 𝑔^𝑣 • 𝐾^𝑐 mod 𝑝
+                    // Verification 12.2 - 𝑎 = 𝑔^𝑣 • 𝐾^𝑐 mod 𝑝
                     using var gv = BigMath.PowModP(constants.G, plaintextSelection.Proof!.Response);
                     using var kc = BigMath.PowModP(context.ElGamalPublicKey, plaintextSelection.Proof.Challenge);
                     using var gvkc = BigMath.MultModP(gv, kc);
                     var consistentA = plaintextSelection.Proof!.Pad.Equals(gvkc);
                     contestResults.Add(new VerificationResult(consistentA, $"- Verification 12.2: Selection {plaintextSelection.ObjectId} Consistent Commitment a"));
 
-                    // Verification 9.3 - 𝑏 = 𝐴^𝑣 • 𝑀^𝑐 mod 𝑝
+                    // Verification 12.3 - 𝑏 = 𝐴^𝑣 • 𝑀^𝑐 mod 𝑝
                     using var av = BigMath.PowModP(selection.Ciphertext.Pad, plaintextSelection.Proof.Response);
                     using var mc = BigMath.PowModP(plaintextSelection.Value, plaintextSelection.Proof.Challenge);
                     using var avmc = BigMath.MultModP(av, mc);
                     var consistentB = plaintextSelection.Proof!.Data.Equals(avmc);
                     contestResults.Add(new VerificationResult(consistentB, $"- Verification 12.3: Selection {plaintextSelection.ObjectId} Consistent Commitment b"));
 
-                    // Verification 9.A
+                    // Verification 12.A
                     var consistentV = plaintextSelection.Proof.Response.IsInBounds();
                     contestResults.Add(new VerificationResult(consistentV, $"- Verification 12.A: Selection {plaintextSelection.ObjectId} Consistent Response V"));
 
-                    // Verification 9.B
+                    // Verification 12.B
                     // cannot verify the hash values because the hash values do not match the E.G. 2.0 Spec
                     contestResults.Add(new VerificationResult(IsValidwithKnownSpecDeviations, "- Verification 12.B: TODO: E.G. 2.0 - implement"));
                 }
@@ -908,5 +918,110 @@ public static class VerifyElection
         }
 
         return Task.FromResult(new VerificationResult("Verification 12 (Correctness of decryptions for challenged ballots)", results));
+    }
+
+    /// <summary>
+    /// Verification 13 (Validation of correct decryption of challenged ballots)
+    /// An election verifier must confirm the correct decryption of each selection σ in each contest. 
+    /// (13.A) S = K^σ mod p.
+    /// An election verifier must also confirm that the challenged ballot is well-formed, 
+    /// i.e. for each contest on the challenged ballot, it must confirm the following.
+    /// (13.B) For each option in the contest, the selection σ is a valid value — usually either a 0 or a 1. 
+    /// (13.C) The sum of all selections in the contest is at most the selection limit L for that contest.
+    /// An election verifier must also confirm that for each decrypted challenged ballot, 
+    /// the selections listed in text match the corresponding text in the election manifest.
+    /// (13.D) The contest text label occurs as a contest label in the list of contests in the election manifest. 
+    /// (13.E) For each option in the contest, the option text label occurs as an option label for the contest
+    /// in the election manifest.
+    /// (13.F) For each option text label listed for this contest in the election manifest, the option label
+    /// occurs for a option in the decrypted challenged ballot.
+    /// </summary>
+    public static Task<VerificationResult> VerifyBallotDecryptionMetadata(
+        ElectionConstants constants,
+        CiphertextElectionContext context,
+        Manifest manifest,
+        List<CiphertextBallot> encryptedBallots,
+        List<PlaintextTallyBallot> decryptedBallots
+    )
+    {
+        // convert to the internal manifest representation
+        var internalManifest = new InternalManifest(manifest);
+
+        var results = new List<VerificationResult>();
+        foreach (var ballot in decryptedBallots)
+        {
+            var encryptedBallot = encryptedBallots.FirstOrDefault(x => x.ObjectId == ballot.BallotId)!;
+
+            var ballotResults = new List<VerificationResult>();
+            foreach (var (_, contest) in ballot.Contests)
+            {
+                var manifestContest = internalManifest.Contests.FirstOrDefault(x => x.ObjectId == contest.ObjectId)!;
+                var encryptedContest = encryptedBallot.Contests.FirstOrDefault(x => x.ObjectId == contest.ObjectId)!;
+
+                var contestResults = new List<VerificationResult>();
+                var verificationEResults = new List<VerificationResult>();
+                var verificationFResults = new List<VerificationResult>();
+
+                var selectionSum = 0UL;
+                foreach (var (_, selection) in contest.Selections)
+                {
+                    var description = manifestContest.Selections.FirstOrDefault(x => x.ObjectId == selection.ObjectId)!;
+                    var encrypted = encryptedContest.Selections.FirstOrDefault(x => x.ObjectId == selection.ObjectId)!;
+
+                    // Verification 13.A - S = K^σ mod p
+                    using var s = BigMath.PowModP(context.ElGamalPublicKey, selection.Tally);
+                    var consistentT = selection.Value.Equals(s);
+                    contestResults.Add(new VerificationResult(consistentT, $"- Verification 13.A: Selection {description.ObjectId} Consistent Decryption S"));
+
+                    // Verification 13.B
+                    var consistentSelection = selection.Tally is 0 or 1;
+                    contestResults.Add(new VerificationResult(consistentSelection, $"- Verification 13.B: Selection {description.ObjectId} Consistent Selection"));
+
+                    // Verification 13.C
+                    selectionSum += selection.Tally;
+
+                    // Verification 13.E
+                    // same as 13.D, but for the plaintext selection
+                    var plaintextOptionLabelIsValid = description.DescriptionHash.Equals(selection.DescriptionHash);
+                    var plaintextOptionSequenceIsValid = description.SequenceOrder == selection.SequenceOrder;
+                    verificationEResults.Add(new VerificationResult(plaintextOptionLabelIsValid && plaintextOptionSequenceIsValid, $"- Verification 13.E: Selection {description.ObjectId} in manifest"));
+
+                    // Verification 13.F
+                    // same as 13.D, but for the encrypted selection
+                    var encryptedOptionLabelIsValid = encrypted.DescriptionHash.Equals(selection.DescriptionHash);
+                    var encryptedOptionSequenceIsValid = encrypted.SequenceOrder == selection.SequenceOrder;
+                    verificationFResults.Add(new VerificationResult(encryptedOptionLabelIsValid && encryptedOptionSequenceIsValid, $"- Verification 13.F: Selection {encrypted.ObjectId} in manifest"));
+                }
+
+                // Verification 13.C
+                var consistentSelectionSum = selectionSum <= manifestContest.VotesAllowed;
+                contestResults.Add(new VerificationResult(consistentSelectionSum, $"- Verification 13.C: Contest {manifestContest.ObjectId} Consistent Selection Sum"));
+
+                // Verification 13.D
+                // we do not propagate the friendly labels into the plaintext tally selection
+                // so instead we check tht the hash of the plaintext selection matches the hash of the manifest selection
+                // and that the sequence order also matches. We have implicitly checked the objectId by this point via the dictionary lookup
+                var plaintextContestHashIsValid = manifestContest.DescriptionHash.Equals(contest.DescriptionHash);
+                var plaintextContestSequenceIsValid = manifestContest.SequenceOrder == contest.SequenceOrder;
+                contestResults.Add(new VerificationResult(plaintextContestHashIsValid && plaintextContestSequenceIsValid, $"- Verification 13.D: Contest {contest.ObjectId} in manifest"));
+
+                // Verification 10.E
+                // same as 13.D, but for the encrypted contest
+                var encryptedContestHashIsValid = encryptedContest.DescriptionHash.Equals(contest.DescriptionHash);
+                var encryptedContestSequenceIsValid = encryptedContest.SequenceOrder == contest.SequenceOrder;
+                contestResults.Add(new VerificationResult(encryptedContestHashIsValid && encryptedContestSequenceIsValid, $"- Verification 13.D: Contest {encryptedContest.ObjectId} in manifest"));
+
+                // Verification 10.E - add the results
+                contestResults.AddRange(verificationEResults);
+
+                // Verification 10.F - add the results
+                contestResults.AddRange(verificationFResults);
+
+                ballotResults.Add(new VerificationResult($"- Verification 13: Contest {contest.ObjectId}", contestResults));
+            }
+            results.Add(new VerificationResult($"- Verification 13: Ballot {ballot.BallotId}", ballotResults));
+        }
+
+        return Task.FromResult(new VerificationResult("Verification 13 (Validation of correct decryption of tallies)", results));
     }
 }
