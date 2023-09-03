@@ -427,17 +427,17 @@ public static class DecryptWithSharesExtensions
     /// </summary>
     public static PlaintextTallySelection Decrypt(
         this ICiphertextSelection self,
-        AccumulatedSelection decryption, ElementModP publicKey)
+        AccumulatedSelection accumulation, ElementModP publicKey)
     {
         // Calculate 𝑀=𝐵⁄(∏𝑀𝑖) mod 𝑝.
-        var tally = self.Ciphertext.Decrypt(decryption.Value, publicKey);
+        var tally = self.Ciphertext.Decrypt(accumulation.Value, publicKey);
         if (!tally.HasValue)
         {
             throw new Exception("Failed to decrypt selection");
         }
 
         var plaintext = new PlaintextTallySelection(
-            self, tally ?? 0UL, decryption.Value!, decryption.Proof!);
+            self, tally ?? 0UL, accumulation.Value!, accumulation.Proof!);
         return plaintext;
     }
 }

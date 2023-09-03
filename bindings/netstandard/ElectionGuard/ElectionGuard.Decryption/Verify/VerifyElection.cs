@@ -697,7 +697,7 @@ public static class VerifyElection
     /// <summary>
     /// Verification 9 (Correctness of decryptions)
     /// For each option in each contest on each tally, an election verifier must compute the values
-    /// (9.1) M = B · T −1 mod p, 
+    /// (9.1) M = B · T^−1 mod p, 
     /// (9.2) a = g^v ·K^c mod p, 
     /// (9.3) b = A^v ·M^c mod p.
     /// An election verifier must then confirm the following:
@@ -721,7 +721,7 @@ public static class VerifyElection
             {
                 var ciphertext = encryptedTally.Contests[contestId].Selections[selectionId].Ciphertext;
 
-                // Verification 9.1 - M = B · T −1 mod p
+                // Verification 9.1 - M = B · T^−1 mod p
                 using var m = BigMath.DivModP(ciphertext.Data, new ElementModP(plaintext.Tally));
                 var consistentM = plaintext.Value.Equals(m);
                 contestResults.Add(new VerificationResult(IsValidwithKnownSpecDeviations, $"- Verification 9.1: Selection {plaintext.ObjectId} Consistent decryption M"));
@@ -758,14 +758,17 @@ public static class VerifyElection
     /// Verification 10 (Validation of correct decryption of tallies)
     /// An election verifier must confirm the following equations for each option in each contest in the election manifest.
     /// (10.A) T = K^t mod p.
-    /// An election verifier must also confirm that the text labels listed in the election record tallies match the corresponding text labels in the election manifest. For each contest in a decrypted tally, an election verifier must confirm the following.
+    /// An election verifier must also confirm that the text labels listed in the election record tallies 
+    /// match the corresponding text labels in the election manifest. 
+    /// For each contest in a decrypted tally, an election verifier must confirm the following.
     /// (10.B) The contest text label occurs as a contest label in the list of contests in the election manifest.
     /// (10.C) For each option in the contest, the option text label occurs as an option label for the contest
     /// in the election manifest.
     /// (10.D) For each option text label listed for this contest in the election manifest, the option label
-    /// occurs for a option in the decrypted tally contest.
+    ///        occurs for a option in the decrypted tally contest.
     /// An election verifier must also confirm the following.
-    /// (10.E) For each contest text label that occurs in at least one submitted ballot, that contest text label occurs in the list of contests in the corresponding tally.
+    /// (10.E) For each contest text label that occurs in at least one submitted ballot, 
+    ///        that contest text label occurs in the list of contests in the corresponding tally.
     /// </summary>
     public static Task<VerificationResult> VerifyTallyDecryptionMetadata(
         ElectionConstants constants,
@@ -775,7 +778,64 @@ public static class VerifyElection
         PlaintextTally decryptedTally
     )
     {
+        // convert to the internal manifest representation
+        var internalManifest = new InternalManifest(manifest);
+
         var results = new List<VerificationResult>();
+        foreach (var contest in internalManifest.Contests)
+        {
+            var plaintextContest = decryptedTally.Contests[contest.ObjectId];
+            var encryptedContest = encryptedTally.Contests[contest.ObjectId];
+
+            var contestResults = new List<VerificationResult>();
+            var verificationCResults = new List<VerificationResult>();
+            var verificationDResults = new List<VerificationResult>();
+            foreach (var selection in contest.Selections)
+            {
+                var plaintext = plaintextContest.Selections[selection.ObjectId];
+                var encrypted = encryptedContest.Selections[selection.ObjectId];
+
+                // Verification 10.A - T = K^t mod p
+                using var t = BigMath.PowModP(context.ElGamalPublicKey, plaintext.Tally);
+                var consistentT = encrypted.Ciphertext.Data.Equals(t);
+                contestResults.Add(new VerificationResult(consistentT, $"- Verification 10.A: Selection {plaintext.ObjectId} Consistent Tally T"));
+
+                // Verification 10.C
+                // same as 10.B, but for the plaintext selection
+                var plaintextOptionLabelIsValid = plaintext.DescriptionHash.Equals(selection.DescriptionHash);
+                var plaintextOptionSequenceIsValid = plaintext.SequenceOrder == selection.SequenceOrder;
+                verificationCResults.Add(new VerificationResult(plaintextOptionLabelIsValid && plaintextOptionSequenceIsValid, $"- Verification 10.C: Selection {plaintext.ObjectId} in manifest"));
+
+                // Verification 10.D
+                // same as 10.B, but for the encrypted selection
+                var encryptedOptionLabelIsValid = encrypted.DescriptionHash.Equals(selection.DescriptionHash);
+                var encryptedOptionSequenceIsValid = encrypted.SequenceOrder == selection.SequenceOrder;
+                verificationDResults.Add(new VerificationResult(encryptedOptionLabelIsValid && encryptedOptionSequenceIsValid, $"- Verification 10.D: Selection {encrypted.ObjectId} in manifest"));
+            }
+
+            // Verification 10.B
+            // we do not propagate the friendly labels into the plaintext tally selection
+            // so instead we check tht the hash of the plaintext selection matches the hash of the manifest selection
+            // and that the sequence order also matches. We have implicitly checked the objectId by this point via the dictionary lookup
+            var plaintextContestHashIsValid = plaintextContest.DescriptionHash.Equals(contest.DescriptionHash);
+            var plaintextContestSequenceIsValid = plaintextContest.SequenceOrder == contest.SequenceOrder;
+            contestResults.Add(new VerificationResult(plaintextContestHashIsValid && plaintextContestSequenceIsValid, $"- Verification 10.B: Contest {plaintextContest.ObjectId} in manifest"));
+
+            // Verification 10.C - add the results
+            contestResults.AddRange(verificationCResults);
+
+            // Verification 10.D - add the results
+            contestResults.AddRange(verificationDResults);
+
+            // Verification 10.E
+            // same as 10.B, but for the encrypted contest
+            var encryptedContestHashIsValid = encryptedContest.DescriptionHash.Equals(contest.DescriptionHash);
+            var encryptedContestSequenceIsValid = encryptedContest.SequenceOrder == contest.SequenceOrder;
+            contestResults.Add(new VerificationResult(encryptedContestHashIsValid && encryptedContestSequenceIsValid, $"- Verification 10.E: Contest {encryptedContest.ObjectId} in manifest"));
+
+            results.Add(new VerificationResult($"- Verification 10: Contest {contest.ObjectId}", contestResults));
+        }
+
         return Task.FromResult(new VerificationResult("Verification 10 (Validation of correct decryption of tallies)", results));
     }
 
