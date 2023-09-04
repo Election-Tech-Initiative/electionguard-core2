@@ -786,12 +786,13 @@ namespace ElectionGuard
 
             [DllImport(DllName, EntryPoint = "eg_ranged_chaum_pedersen_proof_is_valid",
                 CallingConvention = CallingConvention.Cdecl, SetLastError = true)]
-            internal static extern bool IsValid(
+            internal static extern Status IsValid(
                 RangedChaumPedersenProofHandle handle,
                 ElGamalCiphertext.ElGamalCiphertextHandle ciphertext,
                 ElementModP.ElementModPHandle k,
                 ElementModQ.ElementModQHandle q,
-                [MarshalAs(UnmanagedType.LPStr)] string hashPrefix
+                [MarshalAs(UnmanagedType.LPStr)] string hashPrefix,
+                out bool isValid
                 );
 
         }
@@ -2437,6 +2438,13 @@ namespace ElectionGuard
             internal static extern Status GetCiphertextAccumulation(
                 ElectionGuard.CiphertextBallotContest.External.CiphertextBallotContestHandle handle,
                 out ElGamalCiphertext.ElGamalCiphertextHandle nonce);
+
+            [DllImport(DllName,
+                EntryPoint = "eg_ciphertext_ballot_contest_get_proof",
+                CallingConvention = CallingConvention.Cdecl, SetLastError = true)]
+            internal static extern Status GetProof(
+                ElectionGuard.CiphertextBallotContest.External.CiphertextBallotContestHandle handle,
+                out RangedChaumPedersenProof.RangedChaumPedersenProofHandle nonce);
 
             [DllImport(DllName,
                 EntryPoint = "eg_ciphertext_ballot_contest_crypto_hash_with",

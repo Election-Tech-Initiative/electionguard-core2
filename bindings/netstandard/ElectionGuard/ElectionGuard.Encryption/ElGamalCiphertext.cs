@@ -222,7 +222,7 @@ namespace ElectionGuard
                 return true;
             }
 
-            return Pad == other.Pad && Data == other.Data;
+            return Pad.Equals(other.Pad) && Data.Equals(other.Data);
         }
 
         /// <summary>

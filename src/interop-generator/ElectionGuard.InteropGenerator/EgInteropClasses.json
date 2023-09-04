@@ -388,15 +388,6 @@
           "NativeHandleType": "NativeInterface.ElementModQ.ElementModQHandle",
           "TypeC": "eg_element_mod_q_t"
         }
-      },
-      {
-        "Name": "Proof",
-        "Description": "The proof demonstrates the sum of the selections does not exceed the maximum available selections for the contest, and that the proof was generated with the nonce",
-        "Type": {
-          "TypeCs": "DisjunctiveChaumPedersenProof",
-          "NativeHandleType": "NativeInterface.DisjunctiveChaumPedersenProof.DisjunctiveChaumPedersenProofHandle",
-          "TypeC": "eg_disjunctive_chaum_pedersen_proof_t"
-        }
       }
     ],
     "Methods": []

@@ -272,18 +272,19 @@ eg_ranged_chaum_pedersen_proof_get_challenge(eg_ranged_chaum_pedersen_proof_t *h
     return ELECTIONGUARD_STATUS_SUCCESS;
 }
 
-// TODO: add a getter for integer proofs. This is a vector of ElementModQ,
-// and we need to create a path to marshall a vector out of C layer.
+// TODO: Issue #420 - add a getter for integer proofs.
 
-// TODO: Create a getter for proof at an index.
+// TODO: Issue #420 - Create a getter for proof at an index.
 
-bool eg_ranged_chaum_pedersen_proof_is_valid(eg_ranged_chaum_pedersen_proof_t *in_handle,
-                                             eg_elgamal_ciphertext_t *in_ciphertext,
-                                             eg_element_mod_p_t *in_k, eg_element_mod_q_t *in_q,
-                                             const char *in_hash_prefix)
+eg_electionguard_status_t
+eg_ranged_chaum_pedersen_proof_is_valid(eg_ranged_chaum_pedersen_proof_t *in_handle,
+                                        eg_elgamal_ciphertext_t *in_ciphertext,
+                                        eg_element_mod_p_t *in_k, eg_element_mod_q_t *in_q,
+                                        const char *in_hash_prefix, bool *out_is_valid)
 {
     if (in_handle == nullptr || in_ciphertext == nullptr || in_k == nullptr || in_q == nullptr) {
-        return false;
+        *out_is_valid = false;
+        return ELECTIONGUARD_STATUS_SUCCESS;
     }
 
     try {
@@ -301,10 +302,12 @@ bool eg_ranged_chaum_pedersen_proof_is_valid(eg_ranged_chaum_pedersen_proof_t *i
             }
             Log::error(__func__, messageBuilder);
         }
-        return validationResult.isValid;
+
+        *out_is_valid = validationResult.isValid;
+        return ELECTIONGUARD_STATUS_SUCCESS;
     } catch (const std::exception &e) {
         Log::error(__func__, e);
-        return false;
+        return ELECTIONGUARD_STATUS_ERROR_BAD_ALLOC;
     }
 }
 
