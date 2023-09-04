@@ -174,7 +174,8 @@ public static class VerifyElection
         var results = new List<VerificationResult>();
 
         // Verification 1.A
-        // TODO: E.G. 2.0 - implement
+        // TODO: Issue #433 - E.G. 2.0 - implement
+        // https://github.com/microsoft/electionguard-core2/issues/433
         results.Add(new VerificationResult(IsValidwithKnownSpecDeviations, "- Verification 1.A: TODO: E.G. 2.0 - implement"));
 
 
@@ -219,15 +220,18 @@ public static class VerifyElection
         }
 
         // Verification 1.F
-        // TODO: E.G. 2.0 - implement
+        // TODO: Issue #433 - E.G. 2.0 - implement
+        // https://github.com/microsoft/electionguard-core2/issues/433
         results.Add(new VerificationResult(IsValidwithKnownSpecDeviations, "- Verification 1.F: TODO: E.G. 2.0 - implement"));
 
         // Verification 1.G
-        // TODO: E.G. 2.0 - implement
+        // TODO: Issue #433 - E.G. 2.0 - implement
+        // https://github.com/microsoft/electionguard-core2/issues/433
         results.Add(new VerificationResult(IsValidwithKnownSpecDeviations, "- Verification 1.G: TODO: E.G. 2.0 - implement"));
 
         // Verification 1.H
-        // TODO: E.G. 2.0 - implement
+        // TODO: Issue #433 - E.G. 2.0 - implement
+        // https://github.com/microsoft/electionguard-core2/issues/433
         results.Add(new VerificationResult(IsValidwithKnownSpecDeviations, "- Verification 1.H: TODO: E.G. 2.0 - implement"));
 
 
@@ -278,7 +282,8 @@ public static class VerifyElection
                 results.Add(new VerificationResult(inboundsv, $"- Verification 2.B: Guardian {guardian.ObjectId} response {i} is in bounds"));
 
                 // Verification 2.C
-                // cannot verify the hash values because the hash values do not match the E.G. 2.0 Spec
+                // TODO: Issue #433 - E.G. 2.0 - implement
+                // https://github.com/microsoft/electionguard-core2/issues/433
                 results.Add(new VerificationResult(IsValidwithKnownSpecDeviations, "- Verification 2.C: TODO: E.G. 2.0 - implement"));
             }
         }
@@ -325,7 +330,8 @@ public static class VerifyElection
         var results = new List<VerificationResult>();
 
         // Verification 4.A
-        // cannot verify the hash values because the hash values do not match the E.G. 2.0 Spec
+        // TODO: Issue #433 - E.G. 2.0 - implement
+        // https://github.com/microsoft/electionguard-core2/issues/433
         results.Add(new VerificationResult(IsValidwithKnownSpecDeviations, "- Verification 4.A: TODO: E.G. 2.0 - implement"));
 
         return Task.FromResult(new VerificationResult("Verification 4 (Extended base hash validation)", results));
@@ -441,7 +447,9 @@ public static class VerifyElection
         //     selection.Proof.OneData);
         // var consistent_hash = selection.Proof.Challenge.Equals(recomputedHash);
         // results.Add(new VerificationResult(consistent_hash, $"      - Verification 4.5: c = H(04,Q,K,α,β,a0,b0,a1,b1)"));
-        // cannot verify the hash values because the hash values do not match the E.G. 2.0 Spec
+
+        // TODO: Issue #433 - E.G. 2.0 - implement
+        // https://github.com/microsoft/electionguard-core2/issues/433
         results.Add(new VerificationResult(IsValidwithKnownSpecDeviations, "- Verification 4.5: TODO: E.G. 2.0 - implement"));
 
 
@@ -478,6 +486,9 @@ public static class VerifyElection
         CiphertextBallotSelection selection
     )
     {
+        // TODO: Issue #420 - Implement range proofs for selection
+        // https://github.com/microsoft/electionguard-core2/issues/420
+
         var results = new List<VerificationResult>();
 
         // Verification 5.1
@@ -533,7 +544,7 @@ public static class VerifyElection
                 var accumulation = new ElGamalCiphertext(Constants.ONE_MOD_P, Constants.ONE_MOD_P);
                 foreach (var selection in contest.Selections)
                 {
-                    _ = accumulation.Add(selection.Ciphertext);
+                    accumulation = accumulation.Add(selection.Ciphertext);
                 }
                 // Verification 6.1
                 var consistentA = accumulation.Pad.Equals(contest.CiphertextAccumulation.Pad);
@@ -543,8 +554,10 @@ public static class VerifyElection
                 var consistentB = accumulation.Data.Equals(contest.CiphertextAccumulation.Data);
                 contestResults.Add(new VerificationResult(consistentB, $"- Verification 6.2: {contest.ObjectId} Consistent B"));
 
-                // Verification 6.3 - 
+                // Verification 6.3 - 6.D
                 contestResults.Add(await VerifyContestRangeProof(constants, context, manifest, contest));
+
+                accumulation.Dispose();
             }
             results.Add(new VerificationResult($"    - Verification 6: Ballot {ballot.ObjectId}", contestResults));
         }
@@ -581,16 +594,17 @@ public static class VerifyElection
         results.Add(new VerificationResult(IsValidwithKnownSpecDeviations, "- Verification 6.5: TODO: E.G. 2.0 - implement"));
 
         // Verification 6.A
+        // included in temp_internal_check_is_valid
 
         // Verification 6.B
+        // included in temp_internal_check_is_valid
 
         // Verification 6.C
+        // included in temp_internal_check_is_valid
 
         // Verification 6.D
         // cannot verify the hash values because the hash values do not match the E.G. 2.0 Spec
         results.Add(new VerificationResult(IsValidwithKnownSpecDeviations, "- Verification 6.D: TODO: E.G. 2.0 - implement"));
-
-
 
 
         return Task.FromResult(new VerificationResult($"    - Verification 6: Contest {contest.ObjectId}", results));
@@ -640,14 +654,20 @@ public static class VerifyElection
         results.Add(new VerificationResult(IsValidwithKnownSpecDeviations, "- Verification 7.D: TODO: E.G. 2.0 - implement"));
 
         // Verification 7.E
+        // TODO: Issue #422
+        // https://github.com/microsoft/electionguard-core2/issues/422
         // cannot verify the hash values because precompute is used, which breaks hash chaining
         results.Add(new VerificationResult(IsValidwithKnownSpecDeviations, "- Verification 7.E: TODO: E.G. 2.0 - implement"));
 
         // Verification 7.F
+        // TODO: Issue #422
+        // https://github.com/microsoft/electionguard-core2/issues/422
         // cannot verify the hash values because precompute is used, which breaks hash chaining
         results.Add(new VerificationResult(IsValidwithKnownSpecDeviations, "- Verification 7.F: TODO: E.G. 2.0 - implement"));
 
         // Verification 7.G
+        // TODO: Issue #422
+        // https://github.com/microsoft/electionguard-core2/issues/422
         // cannot verify the hash values because precompute is used, which breaks hash chaining
         results.Add(new VerificationResult(IsValidwithKnownSpecDeviations, "- Verification 7.G: TODO: E.G. 2.0 - implement"));
 
@@ -664,7 +684,8 @@ public static class VerifyElection
         var results = new List<VerificationResult>();
 
         // Verification 6.A
-        // cannot verify the hash values because the hash values do not match the E.G. 2.0 Spec
+        // TODO: Issue #433 - E.G. 2.0 - implement
+        // https://github.com/microsoft/electionguard-core2/issues/433
         results.Add(new VerificationResult(IsValidwithKnownSpecDeviations, "- Verification 6.A: TODO: E.G. 2.0 - implement"));
 
         // note numbered Verification 6 in spec v1.5.3
@@ -720,9 +741,9 @@ public static class VerifyElection
                 var consistentA = selection.Ciphertext.Pad.Equals(recomputed.Pad);
                 var consistentB = selection.Ciphertext.Data.Equals(recomputed.Data);
                 // Verification 8.A
-                contestResults.Add(new VerificationResult(consistentA, $"- Verification 8.A: {contest.ObjectId} {selection.ObjectId} Consistent A"));
+                contestResults.Add(new VerificationResult(consistentA, $"- Verification 8.A: {selection.ObjectId} Consistent A"));
                 // Verification 8.B
-                contestResults.Add(new VerificationResult(consistentB, $"- Verification 8.A: {contest.ObjectId} {selection.ObjectId} Consistent B"));
+                contestResults.Add(new VerificationResult(consistentB, $"- Verification 8.A: {selection.ObjectId} Consistent B"));
             }
             results.Add(new VerificationResult($"- Verification 8: Contest {contestId}", contestResults));
         }
@@ -776,12 +797,25 @@ public static class VerifyElection
                 var consistentB = plaintext.Proof!.Data.Equals(avmc);
                 contestResults.Add(new VerificationResult(consistentB, $"- Verification 9.3: Selection {plaintext.ObjectId} Consistent Commitment b"));
 
+                // var proofValid = plaintext.Proof!.IsValid(
+                //     ciphertext,
+                //     context.ElGamalPublicKey,
+                //     plaintext.Value,
+                //     context.CryptoExtendedBaseHash
+                // );
+
+                // if (!proofValid)
+                // {
+                //     contestResults.Add(new VerificationResult(proofValid, $"- Verification 9.4: Selection {plaintext.ObjectId} Proof is valid"));
+                // }
+
                 // Verification 9.A
                 var consistentV = plaintext.Proof.Response.IsInBounds();
                 contestResults.Add(new VerificationResult(consistentV, $"- Verification 9.A: Selection {plaintext.ObjectId} Consistent Response V"));
 
                 // Verification 9.B
-                // cannot verify the hash values because the hash values do not match the E.G. 2.0 Spec
+                // TODO: Issue #433 - E.G. 2.0 - implement
+                // https://github.com/microsoft/electionguard-core2/issues/433
                 contestResults.Add(new VerificationResult(IsValidwithKnownSpecDeviations, "- Verification 9.B: TODO: E.G. 2.0 - implement"));
             }
             results.Add(new VerificationResult($"- Verification 9: Contest {contestId}", contestResults));
