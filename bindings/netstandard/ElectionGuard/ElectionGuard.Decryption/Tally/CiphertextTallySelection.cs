@@ -119,10 +119,7 @@ public class CiphertextTallySelection : DisposableBase,
     {
         lock (_lock)
         {
-            var newValue = Ciphertext.Add(ciphertext);
-            var oldValue = Ciphertext;
-            Ciphertext = newValue;
-            oldValue.Dispose();
+            Ciphertext = Ciphertext.Add(ciphertext);
             return Ciphertext;
         }
     }

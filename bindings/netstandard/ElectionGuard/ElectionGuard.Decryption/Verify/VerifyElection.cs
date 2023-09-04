@@ -507,14 +507,15 @@ public static class VerifyElection
     /// (6.2) β ̄ = ∏iβi mod p,
     /// where the (αi,βi) represent all possible selections for the contest, as well as the values
     /// (6.3) aj = g^vj ·α ̄^cj mod p for all 0 ≤ j ≤ L,
-    /// (6.4) bj = K^wj · β ̄^cj mod p, where wj = (vj −jcj) mod q for all 0 ≤ j ≤ L, 
+    /// (6.4) bj = K^wj · β ̄^cj mod p, 
+    ///       where wj = (vj −jcj) mod q for all 0 ≤ j ≤ L, 
     /// (6.5) c = H(HE;0x21,K,α ̄,β ̄,a0,b0,a1,b1,...,aL,bL),
     ///       where L is the contest selection limit. 
     /// An election verifier must then confirm the following:
-    /// (5.A) The given values αi and βi are each in Zrp.
-    /// (5.B) The given values cj each satisfy 0 ≤ cj < 2^256.
-    /// (5.C) The given values vj are each in Zq for all 0 ≤ j ≤ L. 
-    /// (5.D) The equation c = (c0 + c1 + ··· + cL) mod q is satisfied.
+    /// (6.A) The given values αi and βi are each in Zrp.
+    /// (6.B) The given values cj each satisfy 0 ≤ cj < 2^256.
+    /// (6.C) The given values vj are each in Zq for all 0 ≤ j ≤ L. 
+    /// (6.D) The equation c = (c0 + c1 + ··· + cL) mod q is satisfied.
     /// </summary>
     public static async Task<VerificationResult> VerifyVoteLimits(
         ElectionConstants constants,
@@ -529,7 +530,20 @@ public static class VerifyElection
             var contestResults = new List<VerificationResult>();
             foreach (var contest in ballot.Contests)
             {
-                // Verification 5.1
+                var accumulation = new ElGamalCiphertext(Constants.ONE_MOD_P, Constants.ONE_MOD_P);
+                foreach (var selection in contest.Selections)
+                {
+                    _ = accumulation.Add(selection.Ciphertext);
+                }
+                // Verification 6.1
+                var consistentA = accumulation.Pad.Equals(contest.CiphertextAccumulation.Pad);
+                contestResults.Add(new VerificationResult(consistentA, $"- Verification 6.1: {contest.ObjectId} Consistent A"));
+
+                // Verification 6.2
+                var consistentB = accumulation.Data.Equals(contest.CiphertextAccumulation.Data);
+                contestResults.Add(new VerificationResult(consistentB, $"- Verification 6.2: {contest.ObjectId} Consistent B"));
+
+                // Verification 6.3 - 
                 contestResults.Add(await VerifyContestRangeProof(constants, context, manifest, contest));
             }
             results.Add(new VerificationResult($"    - Verification 6: Ballot {ballot.ObjectId}", contestResults));
@@ -547,13 +561,20 @@ public static class VerifyElection
     {
         var results = new List<VerificationResult>();
 
-        // Verification 6.1
+        // TODO: Issue #420 - implement range proofs for selection
+        // https://github.com/microsoft/electionguard-core2/issues/420
+        // 
+        // Once the ZeroKnowledgeProof cpp struct is exposed across the api surface
+        // reimplement this method by verifying all of the math is correct manually
+        // instead of calling RangedChaumPedersenProof.IsValid. 
 
-        // Verification 6.2
-
-        // Verification 6.3
-
-        // Verification 6.4
+        // Verification 6.3 - aj = g^vj ·α ̄^cj mod p
+        // Verification 6.4 - bj = K^wj · β ̄^cj mod p
+        var temp_internal_check_is_valid = contest.Proof.IsValid(
+            contest.CiphertextAccumulation,
+            context.ElGamalPublicKey,
+            context.CryptoExtendedBaseHash, Hash.Prefix_ContestProof);
+        results.Add(new VerificationResult(temp_internal_check_is_valid.IsValid, $"      - Verification 6.3, 6.4, 6.A, 6.B, 6.C: temp internal check is valid"));
 
         // Verification 6.5
         // cannot verify the hash values because the hash values do not match the E.G. 2.0 Spec
@@ -566,6 +587,11 @@ public static class VerifyElection
         // Verification 6.C
 
         // Verification 6.D
+        // cannot verify the hash values because the hash values do not match the E.G. 2.0 Spec
+        results.Add(new VerificationResult(IsValidwithKnownSpecDeviations, "- Verification 6.D: TODO: E.G. 2.0 - implement"));
+
+
+
 
         return Task.FromResult(new VerificationResult($"    - Verification 6: Contest {contest.ObjectId}", results));
     }
