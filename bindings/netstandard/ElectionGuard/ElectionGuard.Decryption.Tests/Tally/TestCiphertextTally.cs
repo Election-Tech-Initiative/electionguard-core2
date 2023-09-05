@@ -39,7 +39,7 @@ public class TestCiphertextTally : DisposableBase
             .Select(i => PlaintextBallots[i].Copy()).ToList();
         var plaintextTally = new PlaintextTally("test-cast",
             Data.InternalManifest);
-        plaintextTally.AccumulateBallots(plaintextBallots);
+        plaintextTally.AccumulateBallots(plaintextBallots, Data.Context.ElGamalPublicKey);
         var ciphertextBallots = CiphertextBallots
             .Where(i => plaintextBallots.Any(j => j.ObjectId == i.ObjectId))
             .Select(ballot =>
@@ -83,7 +83,7 @@ public class TestCiphertextTally : DisposableBase
         var plaintextBallots = Enumerable.Range(0, (int)count)
             .Select(i => PlaintextBallots[i].Copy()).ToList();
         var plaintextTally = new PlaintextTally("test-cast-async", Data.InternalManifest);
-        plaintextTally.AccumulateBallots(plaintextBallots);
+        plaintextTally.AccumulateBallots(plaintextBallots, Data.Context.ElGamalPublicKey);
         var ciphertextBallots = Enumerable.Range(0, (int)count)
             .Select(i =>
             {
@@ -196,7 +196,7 @@ public class TestCiphertextTally : DisposableBase
             .Select(i => PlaintextBallots[i].Copy()).ToList();
         var plaintextTally = new PlaintextTally(
             "test-cast-and-spoil", Data.InternalManifest);
-        plaintextTally.AccumulateBallots(plaintextCastBallots);
+        plaintextTally.AccumulateBallots(plaintextCastBallots, Data.Context.ElGamalPublicKey);
 
         var ciphertextCastBallots = Enumerable.Range(0, (int)count / 2)
             .Select(i =>
@@ -259,8 +259,8 @@ public class TestCiphertextTally : DisposableBase
             "test-combine-tallies", Data.InternalManifest);
 
         // Add all of the ballots to the plaintext tallies
-        plaintextTally.AccumulateBallots(plaintextCastBallots_1);
-        plaintextTally.AccumulateBallots(plaintextCastBallots_2);
+        plaintextTally.AccumulateBallots(plaintextCastBallots_1, Data.Context.ElGamalPublicKey);
+        plaintextTally.AccumulateBallots(plaintextCastBallots_2, Data.Context.ElGamalPublicKey);
 
         // Create 2 separate tallies
         var ciphertextCastBallots_1 = Enumerable.Range(0, firstCount - 1)

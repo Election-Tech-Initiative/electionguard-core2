@@ -1,6 +1,5 @@
 
 using ElectionGuard.Ballot;
-using ElectionGuard.ElectionSetup;
 using ElectionGuard.Decryption.Accumulation;
 using ElectionGuard.Decryption.Extensions;
 using ElectionGuard.Decryption.Shares;
@@ -421,15 +420,13 @@ public static class DecryptWithSharesExtensions
         this ICiphertextSelection self,
         AccumulatedSelection accumulation, ElementModP publicKey)
     {
-        // Calculate 𝑀=𝐵⁄(∏𝑀𝑖) mod 𝑝.
-        var tally = self.Ciphertext.Decrypt(accumulation.Value, publicKey);
-        if (!tally.HasValue)
-        {
-            throw new Exception("Failed to decrypt selection");
-        }
+        // Calculate T = 𝐵 ⁄ (∏𝑀𝑖) mod 𝑝.
+        using var decryptedValue = BigMath.DivModP(
+            self.Ciphertext.Data, accumulation.Value);
+        var tally = DiscreteLog.GetAsync(decryptedValue, publicKey);
 
         var plaintext = new PlaintextTallySelection(
-            self, tally ?? 0UL, accumulation.Value!, accumulation.Proof!);
+            self, tally, decryptedValue, accumulation.Proof!);
         return plaintext;
     }
 }

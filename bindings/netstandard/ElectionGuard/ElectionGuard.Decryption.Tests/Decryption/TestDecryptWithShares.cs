@@ -75,7 +75,9 @@ public class TestDecryptWithShares : DisposableBase
         // Assert
         var plaintextChallengedBallots = Data.CiphertextBallots
             .Where(i => Data.CiphertextTally.ChallengedBallotIds.Contains(i.ObjectId))
-            .Select(i => i.ToTallyBallot(Data.PlaintextBallots.Single(j => j.ObjectId == i.ObjectId), Data.CiphertextTally)).ToList();
+            .Select(i => i.ToTallyBallot(
+                Data.PlaintextBallots.Single(j => j.ObjectId == i.ObjectId), Data.CiphertextTally))
+            .ToList();
         Assert.That(result.Tally, Is.EqualTo(Data.PlaintextTally));
         Assert.That(result.ChallengedBallots!.Count, Is.EqualTo(plaintextChallengedBallots.Count));
         Assert.That(result.ChallengedBallots, Is.EqualTo(plaintextChallengedBallots));

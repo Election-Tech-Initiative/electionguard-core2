@@ -196,6 +196,7 @@ namespace electionguard
     uint64_t ElGamalCiphertext::decrypt(const ElementModP &shareAccumulation,
                                         const ElementModP &base)
     {
+        // T = B · M^−1 mod p
         auto result = div_mod_p(*pimpl->data, shareAccumulation);
         return DiscreteLog::getAsync(*result, base);
     }
@@ -203,6 +204,7 @@ namespace electionguard
     uint64_t ElGamalCiphertext::decrypt(const ElementModP &shareAccumulation,
                                         const ElementModP &base) const
     {
+        // T = B · M^−1 mod p
         auto result = div_mod_p(*pimpl->data, shareAccumulation);
         return DiscreteLog::getAsync(*result, base);
     }

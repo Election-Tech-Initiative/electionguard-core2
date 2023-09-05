@@ -781,9 +781,7 @@ public static class VerifyElection
                 var ciphertext = encryptedTally.Contests[contestId].Selections[selectionId].Ciphertext;
 
                 // Verification 9.1 - M = B · T^−1 mod p
-                using var m = BigMath.DivModP(ciphertext.Data, new ElementModP(plaintext.Tally));
-                var consistentM = plaintext.Value.Equals(m);
-                contestResults.Add(new VerificationResult(consistentM, $"- Verification 9.1: Selection {plaintext.ObjectId} Consistent decryption M"));
+                using var m = BigMath.DivModP(ciphertext.Data, plaintext.Value);
 
                 // since the proof object is nullable, we check that it is there before proceeding
                 if (plaintext.Proof == null)
@@ -803,22 +801,10 @@ public static class VerifyElection
 
                 // Verification 9.3 - 𝑏 = 𝐴^𝑣 • 𝑀^𝑐 mod 𝑝
                 using var av = BigMath.PowModP(ciphertext.Pad, plaintext.Proof.Response);
-                using var mc = BigMath.PowModP(plaintext.Value, plaintext.Proof.Challenge);
+                using var mc = BigMath.PowModP(m, plaintext.Proof.Challenge);
                 using var avmc = BigMath.MultModP(av, mc);
                 var consistentB = plaintext.Proof.Data.Equals(avmc);
                 contestResults.Add(new VerificationResult(consistentB, $"- Verification 9.3: Selection {plaintext.ObjectId} Consistent Commitment b"));
-
-                // var proofValid = plaintext.Proof!.IsValid(
-                //     ciphertext,
-                //     context.ElGamalPublicKey,
-                //     plaintext.Value,
-                //     context.CryptoExtendedBaseHash
-                // );
-
-                // if (!proofValid)
-                // {
-                //     contestResults.Add(new VerificationResult(proofValid, $"- Verification 9.4: Selection {plaintext.ObjectId} Proof is valid"));
-                // }
 
                 // Verification 9.A
                 var consistentV = plaintext.Proof.Response.IsInBounds();
@@ -954,12 +940,10 @@ public static class VerifyElection
                 {
                     var plaintextSelection = plaintextContest.Selections[selection.ObjectId];
 
-                    // TODO: factor out into a single check supporting both 9 and 12
+                    // Verification 12 (challenge ballots) is similar to Verification 9 (tally)
 
                     // Verification 12.1 - M = β · S−1 mod p,
-                    using var m = BigMath.DivModP(selection.Ciphertext.Data, new ElementModP(plaintextSelection.Tally));
-                    var consistentM = plaintextSelection.Value.Equals(m);
-                    contestResults.Add(new VerificationResult(consistentM, $"- Verification 12.1: Selection {plaintextSelection.ObjectId} Consistent decryption M"));
+                    using var m = BigMath.DivModP(selection.Ciphertext.Data, plaintextSelection.Value);
 
                     // since the proof object is nullable, we check that it is there before proceeding
                     if (plaintextSelection.Proof == null)
@@ -979,7 +963,7 @@ public static class VerifyElection
 
                     // Verification 12.3 - 𝑏 = 𝐴^𝑣 • 𝑀^𝑐 mod 𝑝
                     using var av = BigMath.PowModP(selection.Ciphertext.Pad, plaintextSelection.Proof.Response);
-                    using var mc = BigMath.PowModP(plaintextSelection.Value, plaintextSelection.Proof.Challenge);
+                    using var mc = BigMath.PowModP(m, plaintextSelection.Proof.Challenge);
                     using var avmc = BigMath.MultModP(av, mc);
                     var consistentB = plaintextSelection.Proof!.Data.Equals(avmc);
                     contestResults.Add(new VerificationResult(consistentB, $"- Verification 12.3: Selection {plaintextSelection.ObjectId} Consistent Commitment b"));
@@ -1035,6 +1019,8 @@ public static class VerifyElection
             var ballotResults = new List<VerificationResult>();
             foreach (var (_, contest) in ballot.Contests)
             {
+                // Verification 13 (challenge ballots) is similar to Verification 10 (tally)
+
                 var manifestContest = internalManifest.Contests.FirstOrDefault(x => x.ObjectId == contest.ObjectId)!;
                 var encryptedContest = encryptedBallot.Contests.FirstOrDefault(x => x.ObjectId == contest.ObjectId)!;
 

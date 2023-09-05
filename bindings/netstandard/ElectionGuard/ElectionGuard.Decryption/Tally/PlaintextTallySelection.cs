@@ -23,12 +23,13 @@ public class PlaintextTallySelection
 
     /// <summary>
     /// The decrypted representation of the sum of all ballots for the selection
+    /// t in the spec
     /// </summary>
     public ulong Tally { get; private set; }
 
     /// <summary>
     /// The decrypted representation of the sum of all ballots for the selection
-    /// g^tally or M in the spec
+    /// K^tally or T in the spec
     /// </summary>
     public ElementModP Value { get; private set; }
 
@@ -63,11 +64,12 @@ public class PlaintextTallySelection
     public PlaintextTallySelection(
         IElectionSelection selection,
         ulong tally,
-        ElementModP value, ChaumPedersenProof proof) : this(
+        ElementModP decryptedValue,
+        ChaumPedersenProof proof) : this(
             selection.ObjectId,
             selection.SequenceOrder,
             selection.DescriptionHash,
-            tally, value, proof)
+            tally, decryptedValue, proof)
     {
     }
 
@@ -109,11 +111,11 @@ public class PlaintextTallySelection
     }
 
     public void Update(ulong tally,
-        ElementModP value,
+        ElementModP decryptedValue,
         ChaumPedersenProof? proof)
     {
         Tally = tally;
-        Value = new(value);
+        Value = new(decryptedValue);
         if (proof != null)
         {
             Proof = new(proof);
@@ -156,6 +158,8 @@ public class PlaintextTallySelection
                DescriptionHash.Equals(other.DescriptionHash) &&
                Tally == other.Tally &&
                Value.Equals(other.Value);
+        if (!equal)
+            Console.WriteLine($"equal: {ObjectId} {equal}");
         return equal;
     }
 

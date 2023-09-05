@@ -9,10 +9,11 @@ public static class DecryptWithSecretsExtensions
 {
     // when decrypting with secrets, we do not currently have a proof
     [Obsolete("This method is obsolete and kept for testing purposes only when decrypting with secret values during unit testing. Use the overload with a proof.")]
-    public static void Update(this PlaintextTallySelection self, ulong tally)
+    public static void Update(this PlaintextTallySelection self, ulong tally, ElementModP publicKey)
     {
-        using var value = BigMath.PowModP(Constants.G, tally);
-        self.Update(tally, value, self.Proof);
+        // recreate a decrypted value using the public key
+        using var decrypted = BigMath.PowModP(publicKey, tally);
+        self.Update(tally, decrypted, self.Proof);
     }
 
     /// <summary>
@@ -37,7 +38,7 @@ public static class DecryptWithSecretsExtensions
                     x => x.Key == selection.Key).Value;
 
                 var value = ciphertext.Decrypt(secretKey, publicKey);
-                plaintextSelection.Update(value ?? 0);
+                plaintextSelection.Update(value ?? 0, publicKey);
             }
         }
         return plaintextTally;
@@ -67,7 +68,7 @@ public static class DecryptWithSecretsExtensions
                     x => x.Key == selection.ObjectId).Value;
 
                 var value = ciphertext.Decrypt(secretKey, publicKey);
-                plaintextSelection.Update(value ?? 0);
+                plaintextSelection.Update(value ?? 0, publicKey);
             }
         }
         return plaintextBallot;

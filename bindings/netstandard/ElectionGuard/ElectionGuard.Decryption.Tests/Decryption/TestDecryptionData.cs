@@ -118,7 +118,7 @@ public class TestDecryptionData : DisposableBase
         // create a tally
         var plaintextTally = new PlaintextTally(
             "test-decrypt-with-shares", election.InternalManifest);
-        plaintextTally.AccumulateBallots(plaintextCastBallots);
+        plaintextTally.AccumulateBallots(plaintextCastBallots, context.ElGamalPublicKey);
 
         var mediator = new TallyMediator();
         var ciphertextTally = mediator.CreateTally(
