@@ -1,6 +1,8 @@
 ﻿using System.IO.Compression;
 using System.Text.Json;
 using MongoDB.Driver;
+using Newtonsoft.Json;
+
 
 namespace ElectionGuard.UI.Helpers;
 
@@ -72,7 +74,7 @@ public static class ElectionRecordGenerator
         var guardians = await guardianPublicKeyService.GetAllByKeyCeremonyIdAsync(keyCeremonyId);
         foreach (var guardian in guardians)
         {
-            await File.WriteAllTextAsync(Path.Combine(guardianFolder, $"{GUARDIAN_PREFIX}{guardian.GuardianId}.json"), JsonSerializer.Serialize(guardian.PublicKey));
+            await File.WriteAllTextAsync(Path.Combine(guardianFolder, $"{GUARDIAN_PREFIX}{guardian.GuardianId}.json"), JsonConvert.SerializeObject(guardian.PublicKey));
         }
     }
 
