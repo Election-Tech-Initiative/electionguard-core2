@@ -25,7 +25,7 @@ public class TestElectionRecord : DisposableBase
     [OneTimeSetUp]
     public void OneTimeSetup()
     {
-        // RunSetup();
+        RunSetup();
     }
 
     [OneTimeTearDown]
@@ -37,8 +37,6 @@ public class TestElectionRecord : DisposableBase
     [Test, Category("GenerateElectionRecord")]
     public async Task Test_Import_Export_Election_record()
     {
-        RunSetup();
-
         // Arrange
         var electionRecord = new ElectionRecordData()
         {

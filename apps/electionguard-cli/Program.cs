@@ -2,6 +2,8 @@
 using ElectionGuard.CLI.Encrypt;
 using ElectionGuard.CLI.Generate;
 using System.Reflection;
+using ElectionGuard.Converters;
+using Newtonsoft.Json;
 
 namespace ElectionGuard.CLI;
 
@@ -9,6 +11,7 @@ class Program
 {
     static async Task Main(string[] args)
     {
+        JsonConvert.DefaultSettings = SerializationSettings.NewtonsoftSettings;
         var verbs = LoadVerbs();
         _ = await Parser.Default.ParseArguments(args, verbs)
             .WithParsedAsync(Run);

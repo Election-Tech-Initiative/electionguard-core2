@@ -20,6 +20,7 @@ public static class DecryptWithSecretsExtensions
     /// Decrypts a <see cref="CiphertextTally" /> using the provided <see cref="ElementModQ" /> secret key.
     /// This method is primarily for testing purposes and should not be used in production.
     /// </summary>
+    [Obsolete("This method is primarily for testing purposes and should not be used in production.")]
     public static PlaintextTally Decrypt(
         this CiphertextTally self,
         ElementModQ secretKey, ElementModP publicKey)
@@ -48,6 +49,7 @@ public static class DecryptWithSecretsExtensions
     /// Decrypts a <see cref="CiphertextBallot" /> using the provided <see cref="ElementModQ" /> secret key.
     /// This method is primarily for testing purposes and should not be used in production.
     /// </summary>
+    [Obsolete("This method is primarily for testing purposes and should not be used in production.")]
     public static PlaintextTallyBallot Decrypt(
         this CiphertextBallot self,
         InternalManifest manifest,
