@@ -7,9 +7,16 @@ namespace ElectionGuard.Decryption.ElectionRecord;
 /// </summary>
 public record ElectionConstants : DisposableRecordBase
 {
+    [JsonProperty("generator")]
     public ElementModP G { get; init; }
+
+    [JsonProperty("large_prime")]
     public ElementModP P { get; init; }
+
+    [JsonProperty("small_prime")]
     public ElementModQ Q { get; init; }
+
+    [JsonProperty("cofactor")]
     public ElementModP R { get; init; }
 
     protected override void DisposeUnmanaged()
