@@ -125,11 +125,7 @@ public static class DecryptWithSharesExtensions
                     self.Context.ElGamalPublicKey);
 
                 // add the decrypted value to the plaintext selection
-                plaintextSelection.Tally += value.Tally;
-                if (value.Proof != null)
-                {
-                    plaintextSelection.Proof = new(value.Proof);
-                }
+                plaintextSelection.Update(value);
             }
         }
 
@@ -370,11 +366,7 @@ public static class DecryptWithSharesExtensions
 
                 var value = selection.Decrypt(
                     selectionAcumulation, publicKey);
-                plaintextSelection.Tally += value.Tally;
-                if (value.Proof != null)
-                {
-                    plaintextSelection.Proof = new(value.Proof);
-                }
+                plaintextSelection.Update(value);
             }
         }
 

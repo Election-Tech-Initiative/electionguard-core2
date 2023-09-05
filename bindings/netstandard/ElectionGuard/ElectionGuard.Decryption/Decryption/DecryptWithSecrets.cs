@@ -7,6 +7,14 @@ namespace ElectionGuard.Decryption.Decryption;
 /// </summary>
 public static class DecryptWithSecretsExtensions
 {
+    // when decrypting with secrets, we do not currently have a proof
+    [Obsolete("This method is obsolete and kept for testing purposes only when decrypting with secret values during unit testing. Use the overload with a proof.")]
+    public static void Update(this PlaintextTallySelection self, ulong tally)
+    {
+        using var value = BigMath.PowModP(Constants.G, tally);
+        self.Update(tally, value, self.Proof);
+    }
+
     /// <summary>
     /// Decrypts a <see cref="CiphertextTally" /> using the provided <see cref="ElementModQ" /> secret key.
     /// This method is primarily for testing purposes and should not be used in production.
@@ -29,7 +37,7 @@ public static class DecryptWithSecretsExtensions
                     x => x.Key == selection.Key).Value;
 
                 var value = ciphertext.Decrypt(secretKey, publicKey);
-                plaintextSelection.Tally += value ?? 0;
+                plaintextSelection.Update(value ?? 0);
             }
         }
         return plaintextTally;
@@ -59,8 +67,7 @@ public static class DecryptWithSecretsExtensions
                     x => x.Key == selection.ObjectId).Value;
 
                 var value = ciphertext.Decrypt(secretKey, publicKey);
-                plaintextSelection.Tally += value ?? 0;
-
+                plaintextSelection.Update(value ?? 0);
             }
         }
         return plaintextBallot;

@@ -1,4 +1,5 @@
 using ElectionGuard.Decryption.Tally;
+using ElectionGuard.Decryption.Decryption;
 
 namespace ElectionGuard.Decryption.Tests.Tally;
 
@@ -24,7 +25,7 @@ public static class CiphertextTallyExtensions
                 foreach (var selection in contest.Selections)
                 {
                     var selectionTally = contestTally.Selections[selection.ObjectId];
-                    selectionTally.Tally += selection.Vote;
+                    selectionTally.Update(selection.Vote);
                 }
             }
         }
@@ -44,7 +45,7 @@ public static class CiphertextTallyExtensions
             foreach (var (selectionId, selection) in contest.Selections)
             {
                 var plaintextSelection = plaintextContest.Selections.First(i => i.ObjectId == selectionId);
-                selection.Tally = plaintextSelection.Vote;
+                selection.Update(plaintextSelection.Vote);
                 // TODO: add support for extended data
             }
         }
@@ -61,7 +62,7 @@ public static class CiphertextTallyExtensions
             foreach (var (selectionId, selection) in contest.Selections)
             {
                 var plaintextSelection = plaintextContest.Selections.First(i => i.ObjectId == selectionId);
-                selection.Tally = plaintextSelection.Vote;
+                selection.Update(plaintextSelection.Vote);
                 // TODO: add support for extended data
             }
         }

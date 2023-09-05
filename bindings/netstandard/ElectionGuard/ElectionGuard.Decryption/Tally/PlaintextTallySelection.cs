@@ -24,18 +24,18 @@ public class PlaintextTallySelection
     /// <summary>
     /// The decrypted representation of the sum of all ballots for the selection
     /// </summary>
-    public ulong Tally { get; set; }
+    public ulong Tally { get; private set; }
 
     /// <summary>
     /// The decrypted representation of the sum of all ballots for the selection
     /// g^tally or M in the spec
     /// </summary>
-    public ElementModP Value { get; set; }
+    public ElementModP Value { get; private set; }
 
     /// <summary>
     /// The proof that the decrypted representation of the sum of all ballots for the selection is correct
     /// </summary>
-    public ChaumPedersenProof? Proof { get; set; }
+    public ChaumPedersenProof? Proof { get; private set; }
 
     public PlaintextTallySelection(
         IElectionSelection selection) : this(
@@ -101,6 +101,23 @@ public class PlaintextTallySelection
             other.Proof)
     {
 
+    }
+
+    public void Update(PlaintextTallySelection other)
+    {
+        Update(other.Tally, other.Value, other.Proof);
+    }
+
+    public void Update(ulong tally,
+        ElementModP value,
+        ChaumPedersenProof? proof)
+    {
+        Tally = tally;
+        Value = new(value);
+        if (proof != null)
+        {
+            Proof = new(proof);
+        }
     }
 
     protected override void DisposeUnmanaged()
