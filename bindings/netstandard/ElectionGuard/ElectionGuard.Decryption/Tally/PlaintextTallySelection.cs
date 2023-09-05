@@ -158,8 +158,6 @@ public class PlaintextTallySelection
                DescriptionHash.Equals(other.DescriptionHash) &&
                Tally == other.Tally &&
                Value.Equals(other.Value);
-        if (!equal)
-            Console.WriteLine($"equal: {ObjectId} {equal}");
         return equal;
     }
 
