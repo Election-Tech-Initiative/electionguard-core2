@@ -738,17 +738,19 @@ public static class VerifyElection
             foreach (var (selectionId, selection) in contest.Selections)
             {
                 var recomputed = recomputedTally.Contests[contestId].Selections[selectionId].Ciphertext;
-                var consistentA = selection.Ciphertext.Pad.Equals(recomputed.Pad);
-                var consistentB = selection.Ciphertext.Data.Equals(recomputed.Data);
+
                 // Verification 8.A
+                var consistentA = selection.Ciphertext.Pad.Equals(recomputed.Pad);
                 contestResults.Add(new VerificationResult(consistentA, $"- Verification 8.A: {selection.ObjectId} Consistent A"));
+
                 // Verification 8.B
-                contestResults.Add(new VerificationResult(consistentB, $"- Verification 8.A: {selection.ObjectId} Consistent B"));
+                var consistentB = selection.Ciphertext.Data.Equals(recomputed.Data);
+                contestResults.Add(new VerificationResult(consistentB, $"- Verification 8.B: {selection.ObjectId} Consistent B"));
             }
             results.Add(new VerificationResult($"- Verification 8: Contest {contestId}", contestResults));
         }
 
-        return Task.FromResult(new VerificationResult("Verification 7 (Correctness of ballot aggregation)", results));
+        return Task.FromResult(new VerificationResult("Verification 8 (Correctness of ballot aggregation)", results));
     }
 
     /// <summary>
@@ -781,20 +783,29 @@ public static class VerifyElection
                 // Verification 9.1 - M = B · T^−1 mod p
                 using var m = BigMath.DivModP(ciphertext.Data, new ElementModP(plaintext.Tally));
                 var consistentM = plaintext.Value.Equals(m);
-                contestResults.Add(new VerificationResult(IsValidwithKnownSpecDeviations, $"- Verification 9.1: Selection {plaintext.ObjectId} Consistent decryption M"));
+                contestResults.Add(new VerificationResult(consistentM, $"- Verification 9.1: Selection {plaintext.ObjectId} Consistent decryption M"));
+
+                // since the proof object is nullable, we check that it is there before proceeding
+                if (plaintext.Proof == null)
+                {
+                    contestResults.Add(new VerificationResult(false, $"- Verification 9.2: Selection {plaintext.ObjectId} Proof is null"));
+                    contestResults.Add(new VerificationResult(false, $"- Verification 9.3: Selection {plaintext.ObjectId} Proof is null"));
+                    contestResults.Add(new VerificationResult(false, $"- Verification 9.A: Selection {plaintext.ObjectId} Consistent Response V"));
+                    continue;
+                }
 
                 // Verification 9.2 - 𝑎 = 𝑔^𝑣 • 𝐾^𝑐 mod 𝑝
-                using var gv = BigMath.PowModP(constants.G, plaintext.Proof!.Response);
+                using var gv = BigMath.PowModP(constants.G, plaintext.Proof.Response);
                 using var kc = BigMath.PowModP(context.ElGamalPublicKey, plaintext.Proof.Challenge);
                 using var gvkc = BigMath.MultModP(gv, kc);
-                var consistentA = plaintext.Proof!.Pad.Equals(gvkc);
+                var consistentA = plaintext.Proof.Pad.Equals(gvkc);
                 contestResults.Add(new VerificationResult(consistentA, $"- Verification 9.2: Selection {plaintext.ObjectId} Consistent Commitment a"));
 
                 // Verification 9.3 - 𝑏 = 𝐴^𝑣 • 𝑀^𝑐 mod 𝑝
                 using var av = BigMath.PowModP(ciphertext.Pad, plaintext.Proof.Response);
                 using var mc = BigMath.PowModP(plaintext.Value, plaintext.Proof.Challenge);
                 using var avmc = BigMath.MultModP(av, mc);
-                var consistentB = plaintext.Proof!.Data.Equals(avmc);
+                var consistentB = plaintext.Proof.Data.Equals(avmc);
                 contestResults.Add(new VerificationResult(consistentB, $"- Verification 9.3: Selection {plaintext.ObjectId} Consistent Commitment b"));
 
                 // var proofValid = plaintext.Proof!.IsValid(
@@ -948,7 +959,16 @@ public static class VerifyElection
                     // Verification 12.1 - M = β · S−1 mod p,
                     using var m = BigMath.DivModP(selection.Ciphertext.Data, new ElementModP(plaintextSelection.Tally));
                     var consistentM = plaintextSelection.Value.Equals(m);
-                    contestResults.Add(new VerificationResult(IsValidwithKnownSpecDeviations, $"- Verification 12.1: Selection {plaintextSelection.ObjectId} Consistent decryption M"));
+                    contestResults.Add(new VerificationResult(consistentM, $"- Verification 12.1: Selection {plaintextSelection.ObjectId} Consistent decryption M"));
+
+                    // since the proof object is nullable, we check that it is there before proceeding
+                    if (plaintextSelection.Proof == null)
+                    {
+                        contestResults.Add(new VerificationResult(false, $"- Verification 12.2: Selection {plaintextSelection.ObjectId} Proof is null"));
+                        contestResults.Add(new VerificationResult(false, $"- Verification 12.3: Selection {plaintextSelection.ObjectId} Proof is null"));
+                        contestResults.Add(new VerificationResult(false, $"- Verification 12.A: Selection {plaintextSelection.ObjectId} Consistent Response V"));
+                        continue;
+                    }
 
                     // Verification 12.2 - 𝑎 = 𝑔^𝑣 • 𝐾^𝑐 mod 𝑝
                     using var gv = BigMath.PowModP(constants.G, plaintextSelection.Proof!.Response);
