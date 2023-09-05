@@ -150,8 +150,8 @@ public partial class BallotUploadViewModel : BaseViewModel
         var endDate = ulong.MinValue;
         object tallyLock = new();
 
-        var mediator = new TallyMediator();
-        var ciphertextTally = mediator.CreateTally(Guid.NewGuid().ToString(),
+        using var mediator = new TallyMediator();
+        using var ciphertextTally = mediator.CreateTally(Guid.NewGuid().ToString(),
             "subtally",
             _context!,
             _internalManifest!);
