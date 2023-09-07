@@ -41,7 +41,11 @@ public partial class ChallengedPopupViewModel : BaseViewModel
     {
         if (!string.IsNullOrEmpty(value))
         {
-            _ = Shell.Current.CurrentPage.Dispatcher.DispatchAsync(async () => await SetElection(value));
+            _ = Shell.Current.CurrentPage.Dispatcher.DispatchAsync(async () =>
+            {
+                SearchText = string.Empty;
+                await SetElection(value);
+            });
         }
     }
 

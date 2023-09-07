@@ -47,6 +47,17 @@
                 SelectedItem="{Binding CurrentBallot}"
                 SelectionChangedCommand="{Binding SpoilBallotCommand}"
                 SelectionMode="Single">
+                <CollectionView.EmptyViewTemplate>
+                    <DataTemplate>
+                        <ActivityIndicator
+                            HeightRequest="100"
+                            IsEnabled="true"
+                            IsRunning="True"
+                            IsVisible="true"
+                            WidthRequest="100"
+                            Color="{StaticResource Primary}" />
+                    </DataTemplate>
+                </CollectionView.EmptyViewTemplate>
                 <CollectionView.ItemTemplate>
                     <DataTemplate x:DataType="model:BallotRecord">
                         <Frame

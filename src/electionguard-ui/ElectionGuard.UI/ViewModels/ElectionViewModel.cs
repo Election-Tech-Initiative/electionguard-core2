@@ -239,6 +239,9 @@ public partial class ElectionViewModel : BaseViewModel
     private async Task ReviewChallenged()
     {
         var vm = Ioc.Default.GetService(typeof(ChallengedPopupViewModel)) as ChallengedPopupViewModel;
+
+        // resetting the election so that the loading will be called a second time
+        vm!.ElectionId = string.Empty;
         vm!.ElectionId = CurrentElection!.ElectionId!;
 
         await NavigationService.GoToModal(typeof(ChallengedPopupViewModel));
