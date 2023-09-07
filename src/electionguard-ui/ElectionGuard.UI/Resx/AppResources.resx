@@ -532,7 +532,7 @@
     <value>View Tally</value>
   </data>
   <data name="ChallengedText" xml:space="preserve">
-    <value>Challenged</value>
+    <value>Challenge</value>
   </data>
   <data name="ElectionNameText" xml:space="preserve">
     <value>Election Name</value>

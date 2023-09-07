@@ -58,8 +58,8 @@ public partial class BallotUploadViewModel : BaseViewModel
         {
             var record = await _manifestService.GetByElectionIdAsync(value);
             using var manifest = new Manifest(record?.ManifestData);
-            _manifestHash = new(manifest.CryptoHash());
             _internalManifest = new InternalManifest(manifest);
+            _manifestHash = new(_internalManifest.ManifestHash);
 
             var contextRecord = await _contextService.GetByElectionIdAsync(value);
             _context = new CiphertextElectionContext(contextRecord?.ContextData);
