@@ -61,6 +61,10 @@ internal static class Constants
 
     public readonly static string ObjectId = "ObjectId";
 
+    public readonly static string BallotChallenged = "BallotChallenged";
+
+    public readonly static string BallotSpoiled = "BallotSpoiled";
+
 }
 
 

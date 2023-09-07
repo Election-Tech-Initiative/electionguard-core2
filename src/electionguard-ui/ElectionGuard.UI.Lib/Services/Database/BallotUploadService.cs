@@ -35,4 +35,15 @@ public class BallotUploadService : BaseDatabaseService<BallotUpload>
         var uploadCount = await CountByFilterAsync(filter);
         return uploadCount > 0;
     }
+
+    public async Task DecrementBallotsChallenged(string uploadId)
+    {
+        var filter = FilterBuilder.And(FilterBuilder.Eq(Constants.UploadId, uploadId));
+        var upload = await GetByFieldAsync(Constants.UploadId, uploadId);
+        var update = Builders<BallotUpload>.Update
+                        .Set(Constants.BallotChallenged, upload!.BallotChallenged - 1)
+                        .Set(Constants.BallotSpoiled, upload!.BallotSpoiled + 1);
+
+        await UpdateAsync(filter, update);
+    }
 }

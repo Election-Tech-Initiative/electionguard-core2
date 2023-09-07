@@ -114,9 +114,9 @@ public record class CiphertextDecryptionTally : DisposableRecordBase
     // add a spoiled ballot which will not be decrypted
     public void AddSpoiledBallot(CiphertextBallot ballot)
     {
-        if (!_tally.HasBallot(ballot.ObjectId))
+        if (_tally.HasBallot(ballot.ObjectId))
         {
-            throw new ArgumentException($"Tally {TallyId} does not contain ballot {ballot.ObjectId}");
+            throw new ArgumentException($"Tally {TallyId} already contains ballot {ballot.ObjectId}");
         }
 
         if (!ballot.IsSpoiled)
@@ -144,9 +144,9 @@ public record class CiphertextDecryptionTally : DisposableRecordBase
         BallotShare ballotShare,
         CiphertextBallot ballot)
     {
-        if (!_tally.HasBallot(ballot.ObjectId))
+        if (_tally.HasBallot(ballot.ObjectId))
         {
-            throw new ArgumentException($"Tally {TallyId} does not contain ballot {ballot.ObjectId}");
+            throw new ArgumentException($"Tally {TallyId} already contains ballot {ballot.ObjectId}");
         }
 
         if (ballot.IsSpoiled)
@@ -279,7 +279,7 @@ public record class CiphertextDecryptionTally : DisposableRecordBase
     public void LoadChallenge(string guardianId, GuardianChallenge challenge)
     {
         _challenges.Add(guardianId, challenge);
-        if(_challenges.Count == _guardians.Count)
+        if (_challenges.Count == _guardians.Count)
         {
             // state transition
             DecryptionState = DecryptionState.PendingGuardianChallengeResponses;

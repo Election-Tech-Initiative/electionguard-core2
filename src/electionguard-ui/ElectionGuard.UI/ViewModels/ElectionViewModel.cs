@@ -142,6 +142,28 @@ public partial class ElectionViewModel : BaseViewModel
         }
     }
 
+    private async Task RefreshUploads(string electionId)
+    {
+        var uploads = await _uploadService.GetByElectionIdAsync(electionId);
+        BallotUploads.Clear();
+        BallotCountTotal = 0;
+        BallotAddedTotal = 0;
+        BallotSpoiledTotal = 0;
+        BallotChallengedTotal = 0;
+        BallotDuplicateTotal = 0;
+        BallotRejectedTotal = 0;
+        uploads.ForEach((upload) =>
+        {
+            BallotUploads.Add(upload);
+            BallotCountTotal += upload.BallotCount;
+            BallotAddedTotal += upload.BallotImported;
+            BallotChallengedTotal += upload.BallotChallenged;
+            BallotSpoiledTotal += upload.BallotSpoiled;
+            BallotDuplicateTotal += upload.BallotDuplicated;
+            BallotRejectedTotal += upload.BallotRejected;
+        });
+    }
+
     partial void OnCurrentElectionChanged(Election? value)
     {
         PageTitle = value?.Name ?? "";
@@ -149,29 +171,12 @@ public partial class ElectionViewModel : BaseViewModel
         {
             try
             {
-                ManifestRecord = await _manifestService.GetByElectionIdAsync(value?.ElectionId);
-                KeyCeremony = await _keyCeremonyService.GetByKeyCeremonyIdAsync(value?.KeyCeremonyId);
-                var uploads = await _uploadService.GetByElectionIdAsync(value?.ElectionId);
-                BallotUploads.Clear();
-                BallotCountTotal = 0;
-                BallotAddedTotal = 0;
-                BallotSpoiledTotal = 0;
-                BallotChallengedTotal = 0;
-                BallotDuplicateTotal = 0;
-                BallotRejectedTotal = 0;
-                uploads.ForEach((upload) =>
-                {
-                    BallotUploads.Add(upload);
-                    BallotCountTotal += upload.BallotCount;
-                    BallotAddedTotal += upload.BallotImported;
-                    BallotChallengedTotal += upload.BallotChallenged;
-                    BallotSpoiledTotal += upload.BallotSpoiled;
-                    BallotDuplicateTotal += upload.BallotDuplicated;
-                    BallotRejectedTotal += upload.BallotRejected;
-                });
-
+                ManifestRecord = await _manifestService.GetByElectionIdAsync(value?.ElectionId!);
+                KeyCeremony = await _keyCeremonyService.GetByKeyCeremonyIdAsync(value?.KeyCeremonyId!);
+                await RefreshUploads(value?.ElectionId!);
+                
                 Tallies.Clear();
-                var tallies = await _tallyService.GetAllActiveByElectionIdAsync(value?.ElectionId);
+                var tallies = await _tallyService.GetAllActiveByElectionIdAsync(value?.ElectionId!);
                 foreach (var item in tallies)
                 {
                     Tallies.Add(item);
@@ -237,6 +242,7 @@ public partial class ElectionViewModel : BaseViewModel
         vm!.ElectionId = CurrentElection!.ElectionId!;
 
         await NavigationService.GoToModal(typeof(ChallengedPopupViewModel));
+        await RefreshUploads(CurrentElection!.ElectionId!);
     }
 
     private bool CanReview()

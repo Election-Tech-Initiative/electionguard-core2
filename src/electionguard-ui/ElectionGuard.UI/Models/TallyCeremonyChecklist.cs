@@ -5,21 +5,26 @@ public partial class TallyCeremonyChecklist : ObservableObject
     [ObservableProperty]
     private bool _quorumReached;
 
-    public bool TallyStarted => State >= TallyState.TallyStarted;
-    public bool SubtaliesCombined => State >= TallyState.PendingGuardianDecryptShares;
-    public bool AllDecryptionSharesComputed => SubtaliesCombined && (
-        State > TallyState.PendingGuardianDecryptShares ||
-        (State == TallyState.PendingGuardianDecryptShares && _sharesComputed >= _quorum));
+    [ObservableProperty]
+    private bool _tallyStarted;
 
-    public bool ChallengeCreated =>
-        AllDecryptionSharesComputed && State >= TallyState.PendingGuardianRespondChallenge;
-    public bool AllChallengesResponded =>
-        ChallengeCreated && (
-        State > TallyState.PendingGuardianRespondChallenge ||
-        (State == TallyState.PendingGuardianRespondChallenge && _challengesResponded == _quorum));
-    public bool TallyComplete => State == TallyState.Complete;
+    [ObservableProperty]
+    private bool _subtaliesCombined;
 
-    public bool IsAbandoned => State == TallyState.Abandoned;
+    [ObservableProperty]
+    private bool _allDecryptionSharesComputed;
+
+    [ObservableProperty]
+    private bool _challengeCreated;
+
+    [ObservableProperty]
+    private bool _allChallengesResponded;
+
+    [ObservableProperty]
+    private bool _tallyComplete;
+
+    [ObservableProperty]
+    private bool _isAbandoned;
 
     [ObservableProperty]
     [NotifyPropertyChangedFor(nameof(QuorumReached))]
@@ -51,5 +56,16 @@ public partial class TallyCeremonyChecklist : ObservableObject
         _challengesResponded = challengesResponded;
         QuorumReached = _guardiansJoined >= _quorum;
         State = tally.State;
+        TallyComplete = State == TallyState.Complete;
+        ChallengeCreated = AllDecryptionSharesComputed && State >= TallyState.PendingGuardianRespondChallenge;
+        AllChallengesResponded = ChallengeCreated && 
+            (State > TallyState.PendingGuardianRespondChallenge ||
+            (State == TallyState.PendingGuardianRespondChallenge && _challengesResponded == _quorum));
+        AllDecryptionSharesComputed = SubtaliesCombined && 
+            (State > TallyState.PendingGuardianDecryptShares ||
+            (State == TallyState.PendingGuardianDecryptShares && _sharesComputed >= _quorum));
+        SubtaliesCombined = State >= TallyState.PendingGuardianDecryptShares;
+        TallyStarted = State >= TallyState.TallyStarted;
+        IsAbandoned = State == TallyState.Abandoned;
     }
 }
