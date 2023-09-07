@@ -1,4 +1,4 @@
-﻿using ElectionGuard.Decryption.Accumulation;
+using ElectionGuard.Decryption.Accumulation;
 using ElectionGuard.Decryption.Challenge;
 using ElectionGuard.Decryption.ChallengeResponse;
 using ElectionGuard.Decryption.Extensions;
@@ -114,9 +114,9 @@ public record class CiphertextDecryptionTally : DisposableRecordBase
     // add a spoiled ballot which will not be decrypted
     public void AddSpoiledBallot(CiphertextBallot ballot)
     {
-        if (!_tally.HasBallot(ballot.ObjectId))
+        if (_tally.HasBallot(ballot.ObjectId))
         {
-            throw new ArgumentException($"Tally {TallyId} does not contain ballot {ballot.ObjectId}");
+            throw new ArgumentException($"Tally {TallyId} already contains ballot {ballot.ObjectId}");
         }
 
         if (!ballot.IsSpoiled)
@@ -144,9 +144,9 @@ public record class CiphertextDecryptionTally : DisposableRecordBase
         BallotShare ballotShare,
         CiphertextBallot ballot)
     {
-        if (!_tally.HasBallot(ballot.ObjectId))
+        if (_tally.HasBallot(ballot.ObjectId))
         {
-            throw new ArgumentException($"Tally {TallyId} does not contain ballot {ballot.ObjectId}");
+            throw new ArgumentException($"Tally {TallyId} already contains ballot {ballot.ObjectId}");
         }
 
         if (ballot.IsSpoiled)

@@ -1166,10 +1166,6 @@ namespace electionguard
             Log::error(":ballot has already been cast");
             throw invalid_argument("ballot has already been cast");
         }
-        if (pimpl->state == BallotBoxState::challenged) {
-            Log::error(":ballot has already been challenged");
-            throw invalid_argument("ballot has already been challenged");
-        }
 
         // iterate over the collection of contests and selections and reset the nonce
         for (const auto &contest : this->getContests()) {
