@@ -89,17 +89,16 @@ public class TestDecryptWithSharesSimple : DisposableBase
         Console.WriteLine($"secretDecrypted: {secretDecrypted}");
 
         // Decrypt with Shares
-        using var shareDecrypted = ciphertext.Decrypt(
-            shares[ballot.ObjectId],
+        using var shareDecrypted = ciphertext.DecryptNoProofs(
+            shares[ballot.ObjectId].GetShares(),
             lagrangeCoefficients,
             tallyId,
-            data.Context.ElGamalPublicKey,
-            data.Context.CryptoExtendedBaseHash
+            data.Context
             );
 
         Console.WriteLine($"shareDecrypted: {shareDecrypted}");
 
-        // TODO: assert share and secret rtunr same resutl
+        // TODO: assert share and secret return same result
 
         //Assert.That(nonceDecrypted, Is.EqualTo(ballot));
     }
@@ -138,7 +137,6 @@ public class TestDecryptWithSharesSimple : DisposableBase
     }
 
     [Test]
-    [Category("SingleTest")]
     public void Test_Decrypt_With_Quorum_Guardians_Present_Simple()
     {
         // Arrange
@@ -166,7 +164,9 @@ public class TestDecryptWithSharesSimple : DisposableBase
         // Assert
         var plaintextChallengedBallots = data.CiphertextBallots
             .Where(i => data.CiphertextTally.ChallengedBallotIds.Contains(i.ObjectId))
-            .Select(i => i.ToTallyBallot(data.PlaintextBallots.Single(j => j.ObjectId == i.ObjectId), data.CiphertextTally)).ToList();
+            .Select(i => i.ToTallyBallot(
+                data.PlaintextBallots.Single(j => j.ObjectId == i.ObjectId), data.CiphertextTally))
+            .ToList();
         Assert.That(result.Tally, Is.EqualTo(data.PlaintextTally));
         Assert.That(result.ChallengedBallots!.Count, Is.EqualTo(plaintextChallengedBallots.Count));
         Assert.That(result.ChallengedBallots, Is.EqualTo(plaintextChallengedBallots));

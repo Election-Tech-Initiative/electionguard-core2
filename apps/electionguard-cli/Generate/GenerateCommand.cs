@@ -4,6 +4,9 @@ using Newtonsoft.Json;
 
 namespace ElectionGuard.CLI.Generate
 {
+    /// <summary>
+    /// Generate plaintext ballots from a manifest and encrypt them using a context.
+    /// </summary>
     internal class GenerateCommand
     {
         public static Task Execute(GenerateOptions options)

@@ -109,12 +109,12 @@ public class PlaintextTallyContest : DisposableBase, IElectionContest, IEquatabl
 
     public override bool Equals(object? obj)
     {
-        return ReferenceEquals(this, obj) || obj is PlaintextTallyContest other && Equals(other);
+        return ReferenceEquals(this, obj) || (obj is PlaintextTallyContest other && Equals(other));
     }
 
     public override int GetHashCode()
     {
-        return HashCode.Combine(ObjectId, SequenceOrder, DescriptionHash, Selections);
+        return HashCode.Combine(ObjectId, SequenceOrder, DescriptionHash, Selections.OrderBy(x => x.Key));
     }
 
     public static bool operator ==(PlaintextTallyContest? left, PlaintextTallyContest? right)

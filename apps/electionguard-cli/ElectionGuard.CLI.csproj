@@ -9,7 +9,7 @@
     <AssemblyName>ElectionGuard.CLI</AssemblyName>
     <EnableNETAnalyzers>true</EnableNETAnalyzers>
     <EnforceCodeStyleInBuild>true</EnforceCodeStyleInBuild>
-    <Platforms>x64;x86</Platforms>
+    <Platforms>arm64;x64;x86</Platforms>
   </PropertyGroup>
 
   <PropertyGroup>
@@ -21,9 +21,13 @@
 
   <ItemGroup>
     <PackageReference Include="CommandLineParser" Version="2.9.1" />
+    <!-- <PackageReference Include="ElectionGuard.Encryption" Version="1.91.11" /> -->
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\..\bindings\netstandard\ElectionGuard\ElectionGuard.Decryption\ElectionGuard.Decryption.csproj" />
+    <ProjectReference Include="..\..\bindings\netstandard\ElectionGuard\ElectionGuard.ElectionSetup\ElectionGuard.ElectionSetup.csproj" />
+    <ProjectReference Include="..\..\bindings\netstandard\ElectionGuard\ElectionGuard.Encryption\ElectionGuard.Encryption.csproj" />
     <ProjectReference Include="..\..\bindings\netstandard\ElectionGuard\ElectionGuard.Encryption.Utils\ElectionGuard.Encryption.Utils.csproj" />
   </ItemGroup>
 
@@ -41,5 +45,33 @@
     <WarningLevel>4</WarningLevel>
     <WarningsNotAsErrors>SYSLIB0004</WarningsNotAsErrors>
   </PropertyGroup>
+
+  <PropertyGroup Label="Library Paths">
+    <ElectionGuardData>..\..\data</ElectionGuardData>
+    <ElectionGuardLibs>..\..\build\libs</ElectionGuardLibs>
+  </PropertyGroup>
+  <ItemGroup>
+    <Content Include="$(ElectionGuardData)\**" LinkBase="data">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>  
+  </ItemGroup>
+  <ItemGroup Label="C++ Built Libraries">
+    <None Name="Windows (MSVC)" Visible="false" Include="$(ElectionGuardLibs)\Windows\$(PlatformTarget)\$(Configuration)\src\$(Configuration)\*.dll*">
+      <CopyToOutputDirectory Condition="'$(OS)' == 'Windows_NT'">PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Name="Windows HACL (MSVC)" Visible="false" Include="$(ElectionGuardLibs)\Windows\$(PlatformTarget)\$(Configuration)\libs\hacl\$(Configuration)\*.dll*">
+      <CopyToOutputDirectory Condition="'$(OS)' == 'Windows_NT'">PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Name="Windows Symbols (MSVC)" Visible="false" Include="$(ElectionGuardLibs)\Windows\$(PlatformTarget)\$(Configuration)\src\$(Configuration)\*.pdb*">
+      <CopyToOutputDirectory Condition="'$(OS)' == 'Windows_NT'">PreserveNewest</CopyToOutputDirectory>
+    </None>
+
+    <None Name="Windows (msys2)" Visible="false" Include="$(ElectionGuardLibs)\$(PlatformTarget)\$(Configuration)\src\*.dll*" CopyToOutputDirectory="PreserveNewest" />
+    <None Name="Windows HACL (msys2)" Visible="false" Include="$(ElectionGuardLibs)\$(PlatformTarget)\$(Configuration)\libs\hacl\*.dll*" CopyToOutputDirectory="PreserveNewest" />
+    <None Name="MacOS" Visible="false" Include="$(ElectionGuardLibs)\Darwin\$(PlatformTarget)\$(Configuration)\src\*.dylib" CopyToOutputDirectory="PreserveNewest" />
+    <None Name="MacOS HACL" Visible="false" Include="$(ElectionGuardLibs)\Darwin\$(PlatformTarget)\$(Configuration)\libs\hacl\*.dylib" CopyToOutputDirectory="PreserveNewest" />
+    <None Name="Linux" Visible="false" Include="$(ElectionGuardLibs)\Linux\$(PlatformTarget)\$(Configuration)\src\*.so" CopyToOutputDirectory="PreserveNewest" />
+    <None Name="Linux HACL" Visible="false" Include="$(ElectionGuardLibs)\Linux\$(PlatformTarget)\$(Configuration)\libs\hacl\*.so" CopyToOutputDirectory="PreserveNewest" />
+  </ItemGroup>
 
 </Project>

@@ -577,12 +577,12 @@ eg_ciphertext_ballot_contest_get_crypto_hash(eg_ciphertext_ballot_contest_t *han
 }
 
 eg_electionguard_status_t
-eg_ciphertext_ballot_contest_get_proof(eg_ciphertext_ballot_selection_t *handle,
-                                       eg_disjunctive_chaum_pedersen_proof_t **out_proof_ref)
+eg_ciphertext_ballot_contest_get_proof(eg_ciphertext_ballot_contest_t *handle,
+                                       eg_ranged_chaum_pedersen_proof_t **out_proof)
 {
     try {
-        auto *reference = AS_TYPE(CiphertextBallotContest, handle)->getProof();
-        *out_proof_ref = AS_TYPE(eg_disjunctive_chaum_pedersen_proof_t, reference);
+        auto result = AS_TYPE(CiphertextBallotContest, handle)->getProof();
+        *out_proof = AS_TYPE(eg_ranged_chaum_pedersen_proof_t, result);
         return ELECTIONGUARD_STATUS_SUCCESS;
     } catch (const exception &e) {
         Log::error("eg_ciphertext_ballot_contest_get_proof", e);

@@ -20,6 +20,34 @@ namespace ElectionGuard
     public partial class CiphertextBallotContest : DisposableBase, ICiphertextContest
     {
         /// <summary>
+        /// The encrypted representation of all of the vote fields (the contest total)
+        /// </summary>
+        public ElGamalCiphertext CiphertextAccumulation
+        {
+            get
+            {
+                var status = NativeInterface.CiphertextBallotContest.GetCiphertextAccumulation(
+                    Handle, out var value);
+                status.ThrowIfError();
+                return value.IsInvalid ? null : new ElGamalCiphertext(value);
+            }
+        }
+
+        /// <Summary>
+        /// The proof demonstrates the sum of the selections does not exceed the maximum available selections for the contest, and that the proof was generated with the nonce
+        /// </Summary>
+        public RangedChaumPedersenProof Proof
+        {
+            get
+            {
+                var status = NativeInterface.CiphertextBallotContest.GetProof(
+                    Handle, out var value);
+                status.ThrowIfError();
+                return value.IsInvalid ? null : new RangedChaumPedersenProof(value);
+            }
+        }
+
+        /// <summary>
         /// The collection of selections for the contest
         /// </summary>
         public IReadOnlyList<CiphertextBallotSelection> Selections =>

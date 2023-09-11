@@ -220,6 +220,10 @@ make build-netstandard
 
 Then, open Visual studio for Mac and run the `ElectionGuard.Tests.Android` or `ElectionGuard.Tests.iOS` project.
 
+## Command Line Interface
+
+There is a command line interface in the `./apps/electionguard-cli` folder. This is a tool useful for generating test data and interacting with ElectionGuard.
+
 ## 📄 Documentation
 
 ## Contributing

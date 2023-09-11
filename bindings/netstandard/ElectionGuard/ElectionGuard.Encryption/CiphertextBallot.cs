@@ -224,5 +224,18 @@ namespace ElectionGuard
             _ = NativeInterface.Memory.DeleteIntPtr(data);
             return byteArray;
         }
+
+        public class BallotCodeComparer : IEqualityComparer<CiphertextBallot>
+        {
+            public bool Equals(CiphertextBallot x, CiphertextBallot y)
+            {
+                return x.BallotCode.Equals(y.BallotCode);
+            }
+
+            public int GetHashCode(CiphertextBallot obj)
+            {
+                return obj.BallotCode.GetHashCode();
+            }
+        }
     }
 }

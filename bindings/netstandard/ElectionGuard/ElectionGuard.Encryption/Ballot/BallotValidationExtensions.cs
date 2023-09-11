@@ -1,18 +1,21 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using ElectionGuard.Base;
 
 namespace ElectionGuard.Ballot
 {
     /// <summary>
     /// The result of a ballot validation operation.
     /// </summary>
-    public class BallotValidationResult
+    public class BallotValidationResult : IValidationResult
     {
         public bool IsValid { get; set; }
         public string Message { get; set; }
 
         public List<BallotValidationResult> Children { get; set; }
+
+        List<IValidationResult> IValidationResult.Children => Children.Select(x => (IValidationResult)x).ToList();
 
         public BallotValidationResult(
             bool isValid,

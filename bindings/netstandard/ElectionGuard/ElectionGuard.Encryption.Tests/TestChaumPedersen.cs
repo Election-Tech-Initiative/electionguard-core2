@@ -55,11 +55,11 @@ namespace ElectionGuard.Encryption.Tests
                 Hash.Prefix_ContestProof,
                 seed);
 
-            Assert.That(
-                proof.IsValid(
+            var result = proof.IsValid(
                     ciphertext, keyPair.PublicKey,
-                    Constants.ONE_MOD_Q, Hash.Prefix_ContestProof,
-                    out var _));
+                    Constants.ONE_MOD_Q, Hash.Prefix_ContestProof);
+
+            Assert.That(result.IsValid);
         }
     }
 }

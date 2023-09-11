@@ -9,7 +9,9 @@ using ElectionGuard.Extensions;
 
 namespace ElectionGuard.Decryption.Tests.Decryption;
 
-// common elements used when running decryption tests
+/// <summary>
+/// common elements used when running decryption tests
+/// </summary>
 public class TestDecryptionData : DisposableBase
 {
     public TestElectionData Election { get; set; } = default!;
@@ -116,7 +118,7 @@ public class TestDecryptionData : DisposableBase
         // create a tally
         var plaintextTally = new PlaintextTally(
             "test-decrypt-with-shares", election.InternalManifest);
-        plaintextTally.AccumulateBallots(plaintextCastBallots);
+        plaintextTally.AccumulateBallots(plaintextCastBallots, context.ElGamalPublicKey);
 
         var mediator = new TallyMediator();
         var ciphertextTally = mediator.CreateTally(

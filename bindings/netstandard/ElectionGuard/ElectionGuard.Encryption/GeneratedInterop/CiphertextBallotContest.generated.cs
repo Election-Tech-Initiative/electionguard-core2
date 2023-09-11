@@ -104,24 +104,6 @@ namespace ElectionGuard
             }
         }
 
-        /// <Summary>
-        /// The proof demonstrates the sum of the selections does not exceed the maximum available selections for the contest, and that the proof was generated with the nonce
-        /// </Summary>
-        public DisjunctiveChaumPedersenProof Proof
-        {
-            get
-            {
-                var status = External.GetProof(
-                    Handle, out NativeInterface.DisjunctiveChaumPedersenProof.DisjunctiveChaumPedersenProofHandle value);
-                status.ThrowIfError();
-                if (value.IsInvalid)
-                {
-                    return null;
-                }
-                return new DisjunctiveChaumPedersenProof(value);
-            }
-        }
-
         #endregion
 
         #region Methods
@@ -221,17 +203,6 @@ namespace ElectionGuard
                 CiphertextBallotContestHandle handle,
                 out NativeInterface.ElementModQ.ElementModQHandle objectId
                 );
-
-            [DllImport(
-                NativeInterface.DllName,
-                EntryPoint = "eg_ciphertext_ballot_contest_get_proof",
-                CallingConvention = CallingConvention.Cdecl,
-                SetLastError = true)]
-            internal static extern Status GetProof(
-                CiphertextBallotContestHandle handle,
-                out NativeInterface.DisjunctiveChaumPedersenProof.DisjunctiveChaumPedersenProofHandle objectId
-                );
-
         }
         #endregion
     }

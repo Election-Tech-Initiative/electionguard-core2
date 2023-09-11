@@ -22,6 +22,7 @@ namespace ElectionGuard.Converters
             settings.Converters.Add(new ElGamalKeyPairConverter());
             settings.Converters.Add(new InternalManifestConverter());
             settings.Converters.Add(new ManifestConverter());
+            settings.Converters.Add(new EncryptionDeviceConverter());
             settings.Converters.Add(new PlaintextBallotConverter());
             settings.Converters.Add(new ElGamalCiphertextConverter());
             return settings;

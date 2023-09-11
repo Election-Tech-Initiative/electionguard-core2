@@ -252,11 +252,10 @@ EG_API eg_electionguard_status_t eg_ranged_chaum_pedersen_proof_make_determinist
  * @param[in] in_k The public key of the election
  * @param[in] in_q The extended base hash of the election
  */
-EG_API bool eg_ranged_chaum_pedersen_proof_is_valid(eg_ranged_chaum_pedersen_proof_t *handle,
-                                                    eg_elgamal_ciphertext_t *in_ciphertext,
-                                                    eg_element_mod_p_t *in_k,
-                                                    eg_element_mod_q_t *in_q,
-                                                    const char *in_hash_prefix);
+EG_API eg_electionguard_status_t eg_ranged_chaum_pedersen_proof_is_valid(
+  eg_ranged_chaum_pedersen_proof_t *handle, eg_elgamal_ciphertext_t *in_ciphertext,
+  eg_element_mod_p_t *in_k, eg_element_mod_q_t *in_q, const char *in_hash_prefix,
+  bool *out_is_valid);
 
 #endif
 

@@ -6,7 +6,7 @@ Learn More in the [ElectionGuard Repository](https://github.com/microsoft/electi
 
 ## CLI
 
-This project is a command line utility for encrypting ballots which simulates an encryption device.
+This project is a command line utility that includes various functions to generate test data and interact with election guard. It is able to create an encryption package that would be used with an encryption device, it can simulate an encryption device by encrypting ballots, it can generate ballots from a manifest, and it can verify an election record.
 
 ## Getting Started
 
@@ -25,3 +25,23 @@ dotnet pack
 dotnet tool install --global --add-source ./nupkg electionguard
 
 ```
+
+## Commands
+
+The CLI Tool includes a number of commands for working with electionguard data.
+
+### Create Election
+
+Create an election package to be used by an encryption device.
+
+### Encrypt Ballot
+
+Encrypt Ballots using a context.
+
+### Generate Ballots
+
+Generate plaintext ballots from a manifest and context, and encrypt them.
+
+### Verify Election Record
+
+Verify an election record.

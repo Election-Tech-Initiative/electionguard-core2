@@ -157,8 +157,8 @@ public record PlaintextTally : DisposableRecordBase, IEquatable<PlaintextTally>
     public override string ToString()
     {
         var builder = new StringBuilder();
-        _ = builder.AppendLine($"TallyId: {TallyId}");
-        _ = builder.AppendLine($"Name: {Name}");
+        _ = builder.AppendLine($" TallyId: {TallyId}");
+        _ = builder.AppendLine($"    Name: {Name}");
         _ = builder.AppendLine($"Contests: {Contests.Count}");
         foreach (var contest in Contests)
         {
@@ -167,7 +167,7 @@ public record PlaintextTally : DisposableRecordBase, IEquatable<PlaintextTally>
             foreach (var selection in contest.Value.Selections)
             {
                 _ = builder.AppendLine($"      Selection: {selection.Key}");
-                _ = builder.AppendLine($"        Votes: {selection.Value.Tally}");
+                _ = builder.AppendLine($"          Votes: {selection.Value.Tally}");
             }
         }
         return builder.ToString();

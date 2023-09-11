@@ -25,7 +25,7 @@
             get
             {
                 var status = NativeInterface.DisjunctiveChaumPedersenProof.GetZeroPad(
-                    Handle, out NativeElementModP value);
+                    Handle, out var value);
                 status.ThrowIfError();
                 return new ElementModP(value);
             }
@@ -39,7 +39,7 @@
             get
             {
                 var status = NativeInterface.DisjunctiveChaumPedersenProof.GetZeroData(
-                    Handle, out NativeElementModP value);
+                    Handle, out var value);
                 status.ThrowIfError();
                 return new ElementModP(value);
             }
@@ -53,7 +53,7 @@
             get
             {
                 var status = NativeInterface.DisjunctiveChaumPedersenProof.GetOnePad(
-                    Handle, out NativeElementModP value);
+                    Handle, out var value);
                 status.ThrowIfError();
                 return new ElementModP(value);
             }
@@ -67,7 +67,7 @@
             get
             {
                 var status = NativeInterface.DisjunctiveChaumPedersenProof.GetOneData(
-                    Handle, out NativeElementModP value);
+                    Handle, out var value);
                 status.ThrowIfError();
                 return new ElementModP(value);
             }
@@ -81,7 +81,7 @@
             get
             {
                 var status = NativeInterface.DisjunctiveChaumPedersenProof.GetZeroChallenge(
-                    Handle, out NativeElementModQ value);
+                    Handle, out var value);
                 status.ThrowIfError();
                 return new ElementModQ(value);
             }
@@ -95,7 +95,7 @@
             get
             {
                 var status = NativeInterface.DisjunctiveChaumPedersenProof.GetOneChallenge(
-                    Handle, out NativeElementModQ value);
+                    Handle, out var value);
                 status.ThrowIfError();
                 return new ElementModQ(value);
             }
@@ -109,7 +109,7 @@
             get
             {
                 var status = NativeInterface.DisjunctiveChaumPedersenProof.GetChallenge(
-                    Handle, out NativeElementModQ value);
+                    Handle, out var value);
                 status.ThrowIfError();
                 return new ElementModQ(value);
             }
@@ -123,7 +123,7 @@
             get
             {
                 var status = NativeInterface.DisjunctiveChaumPedersenProof.GetZeroResponse(
-                    Handle, out NativeElementModQ value);
+                    Handle, out var value);
                 status.ThrowIfError();
                 return new ElementModQ(value);
             }
@@ -137,7 +137,7 @@
             get
             {
                 var status = NativeInterface.DisjunctiveChaumPedersenProof.GetOneResponse(
-                    Handle, out NativeElementModQ value);
+                    Handle, out var value);
                 status.ThrowIfError();
                 return new ElementModQ(value);
             }

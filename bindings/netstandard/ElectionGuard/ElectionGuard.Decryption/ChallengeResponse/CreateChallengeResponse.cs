@@ -91,7 +91,6 @@ public static class GuardianChallengeResponseExtensions
         return responses;
     }
 
-
     /// <summary>
     /// Compute a challenge response for a specific ballot.
     /// </summary>

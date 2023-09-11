@@ -50,7 +50,7 @@ namespace ElectionGuard.Guardians
         public ulong SequenceOrder { get; set; }
 
         /// <summary>
-        /// The election public for the guardian
+        /// The election public key for the guardian
         /// Note: This is the same as the first coefficient commitment
         /// </summary>
         public ElementModP Key { get; set; }
@@ -58,7 +58,7 @@ namespace ElectionGuard.Guardians
         /// <summary>
         /// The commitments for the coefficients in the secret polynomial
         ///
-        /// 𝐾𝑖,j = g^𝑎𝑖,j mod p in the spec Equation (7) 
+        /// 𝐾𝑖,j = g^𝑎𝑖,j mod p in the spec Equation (10) 
         /// </summary>
         public List<ElementModP> CoefficientCommitments { get; set; }
 
