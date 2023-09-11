@@ -116,8 +116,7 @@ public class TestDecryptWithShares : DisposableBase
         var mediator = new DecryptionMediator(
             "fake-mediator",
             Data.CiphertextTally,
-            Data.KeyCeremony.Guardians.Select(i => i.SharePublicKey()).ToList(),
-            ballots: Data.CiphertextBallots.Where(i => i.IsSpoiled).ToList());
+            Data.KeyCeremony.Guardians.Select(i => i.SharePublicKey()).ToList());
 
         // Act
         var guardians = Data.KeyCeremony.Guardians

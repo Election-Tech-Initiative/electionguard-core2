@@ -79,8 +79,7 @@ public class TestElectionRecord : DisposableBase
         Mediator = new DecryptionMediator(
             "fake-mediator",
             Data.CiphertextTally,
-            Data.KeyCeremony.Guardians.Select(i => i.SharePublicKey()).ToList(),
-            ballots: Data.CiphertextBallots.Where(i => i.IsSpoiled).ToList());
+            Data.KeyCeremony.Guardians.Select(i => i.SharePublicKey()).ToList());
 
         Result = Mediator.RunDecryptionProcess(Data, guardians);
     }
