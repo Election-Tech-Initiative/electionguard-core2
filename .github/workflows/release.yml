@@ -17,7 +17,7 @@ jobs:
       build_number: ${{ steps.get_version_code.outputs.build_number }}
     steps:
       - name: Checkout Code
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
       - name: Get Version Code
         id: get_version_code
         run: |
@@ -38,7 +38,7 @@ jobs:
       compiler_version: 14
     steps:
       - name: Checkout Code
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
       - name: Update Environment
         run: |
           sudo apt-get update
@@ -64,7 +64,7 @@ jobs:
       compiler_version: 14.2
     steps:
       - name: Checkout Code
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
       - name: Setup Compiler
         run: sudo xcode-select -switch /Applications/Xcode_${{ env.compiler_version }}.app
       - name: Configure Environment
@@ -87,7 +87,7 @@ jobs:
       compiler_version: 14.2
     steps:
       - name: Checkout Code
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
       - name: Setup Compiler
         run: sudo xcode-select -switch /Applications/Xcode_${{ env.compiler_version }}.app
       - name: Configure Environment
@@ -110,7 +110,7 @@ jobs:
       compiler_version: 14.2
     steps:
       - name: Checkout Code
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
       - name: Setup Compiler
         run: sudo xcode-select -switch /Applications/Xcode_${{ env.compiler_version }}.app
       - name: Configure Environment
@@ -134,7 +134,7 @@ jobs:
       compiler_version: 14
     steps:
       - name: Checkout Code
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
       - name: Update Environment
         run: |
           sudo apt-get update
@@ -157,7 +157,7 @@ jobs:
     runs-on: windows-2022
     steps:
       - name: Checkout Code
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
       - name: Install .NET
         uses: actions/setup-dotnet@v3
         with:
@@ -183,7 +183,7 @@ jobs:
     runs-on: windows-2022
     steps:
       - name: Checkout Code
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
       - name: Install .NET
         uses: actions/setup-dotnet@v3
         with:
@@ -219,7 +219,7 @@ jobs:
     runs-on: ubuntu-22.04
     steps:
       - name: Checkout Code
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
       - name: Setup Environment
         run: make environment
 
@@ -278,7 +278,7 @@ jobs:
     runs-on: ubuntu-22.04
     steps:
       - name: Checkout Code
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
       - name: Install Node
         uses: actions/setup-node@v3
         with:
@@ -321,7 +321,7 @@ jobs:
 
     steps:
       - name: Checkout Code
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
       - name: Change Directory
         run: cd ${{ github.workspace }}
