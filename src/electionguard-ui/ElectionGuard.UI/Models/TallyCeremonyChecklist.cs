@@ -56,15 +56,15 @@ public partial class TallyCeremonyChecklist : ObservableObject
         _challengesResponded = challengesResponded;
         QuorumReached = _guardiansJoined >= _quorum;
         State = tally.State;
-        TallyComplete = State == TallyState.Complete;
-        ChallengeCreated = AllDecryptionSharesComputed && State >= TallyState.PendingGuardianRespondChallenge;
-        AllChallengesResponded = ChallengeCreated && 
-            (State > TallyState.PendingGuardianRespondChallenge ||
-            (State == TallyState.PendingGuardianRespondChallenge && _challengesResponded == _quorum));
-        AllDecryptionSharesComputed = SubtaliesCombined && 
+        SubtaliesCombined = State >= TallyState.PendingGuardianDecryptShares;
+        AllDecryptionSharesComputed = SubtaliesCombined &&
             (State > TallyState.PendingGuardianDecryptShares ||
             (State == TallyState.PendingGuardianDecryptShares && _sharesComputed >= _quorum));
-        SubtaliesCombined = State >= TallyState.PendingGuardianDecryptShares;
+        ChallengeCreated = AllDecryptionSharesComputed && State >= TallyState.PendingGuardianRespondChallenge;
+        AllChallengesResponded = ChallengeCreated &&
+            (State > TallyState.PendingGuardianRespondChallenge ||
+            (State == TallyState.PendingGuardianRespondChallenge && _challengesResponded == _quorum));
+        TallyComplete = State == TallyState.Complete;
         TallyStarted = State >= TallyState.TallyStarted;
         IsAbandoned = State == TallyState.Abandoned;
     }
