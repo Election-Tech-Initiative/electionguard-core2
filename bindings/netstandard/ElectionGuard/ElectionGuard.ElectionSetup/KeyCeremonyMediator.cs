@@ -465,7 +465,7 @@ public class KeyCeremonyMediator
     private static ElementModP ElgamalCombinePublicKeys(List<ElementModP> keys)
     {
         var product = Constants.ONE_MOD_P;
-        product.MultModP(keys);
+        _ = product.MultModP(keys);
         return product;
     }
 

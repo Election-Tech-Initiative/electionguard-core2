@@ -48,7 +48,11 @@ public static class DecryptionMediatorExtensions
         // Add spoiled ballots
         foreach (var ballot in spoiledBallots)
         {
-            mediator.AddBallot(data.CiphertextTally.TallyId, ballot);
+            if (ballot.IsChallenged
+            || (ballot.IsSpoiled && !data.CiphertextTally.SpoiledBallotIds.Contains(ballot.ObjectId)))
+            {
+                mediator.AddBallot(data.CiphertextTally.TallyId, ballot);
+            }
         }
 
         // Create Shares

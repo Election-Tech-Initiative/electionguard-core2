@@ -1,11 +1,11 @@
 
 using ElectionGuard.Ballot;
-using ElectionGuard.ElectionSetup;
 using ElectionGuard.Decryption.Accumulation;
 using ElectionGuard.Decryption.Extensions;
 using ElectionGuard.Decryption.Shares;
 using ElectionGuard.Decryption.Tally;
 using ElectionGuard.Guardians;
+using ElectionGuard.Decryption.ChallengeResponse;
 
 namespace ElectionGuard.Decryption.Decryption;
 
@@ -14,29 +14,85 @@ public static class DecryptWithSharesExtensions
     public static PlaintextTally Decrypt(
         this CiphertextTally self,
         List<Tuple<ElectionPublicKey, TallyShare>> guardianShares,
+        List<GuardianChallengeResponse> challengeResponses,
         bool skipValidation = false)
     {
         var lagrangeCoefficients = guardianShares.ComputeLagrangeCoefficients();
         return self.Decrypt(
-            guardianShares, lagrangeCoefficients, skipValidation
+            guardianShares,
+            challengeResponses,
+            lagrangeCoefficients,
+            skipValidation
         );
     }
 
     public static PlaintextTally Decrypt(
         this CiphertextTally self,
         List<Tuple<ElectionPublicKey, TallyShare>> guardianShares,
+        List<GuardianChallengeResponse> challengeResponses,
         Dictionary<string, LagrangeCoefficient> lagrangeCoefficients,
         bool skipValidation = false)
     {
         var accumulation = self.AccumulateShares(
             guardianShares, lagrangeCoefficients, skipValidation);
 
+        accumulation!.AddProofs(
+            self,
+            challengeResponses,
+            skipValidation
+        );
+
+        return self.Decrypt(accumulation, skipValidation);
+    }
+
+    public static PlaintextTally DecryptNoProofs(
+        this CiphertextTally self,
+        List<Tuple<ElectionPublicKey, TallyShare>> guardianShares,
+        Dictionary<string, LagrangeCoefficient> lagrangeCoefficients)
+    {
+        var accumulation = self.AccumulateShares(
+            guardianShares, lagrangeCoefficients, skipValidation: true);
+
+        return self.Decrypt(accumulation, skipValidation: true);
+    }
+
+    public static PlaintextTally Decrypt(
+        this CiphertextTally self,
+        AccumulatedTally accumulation,
+        bool skipValidation = false)
+    {
+        if (!skipValidation)
+        {
+            // iterate over the contests and make sure there are proofs
+            foreach (var contest in self.Contests)
+            {
+                var contestAccumulation = accumulation.Contests.First(
+                    x => x.Key == contest.Key).Value;
+
+                foreach (var selection in contest.Value.Selections)
+                {
+                    var selectionAccumulation = contestAccumulation.Selections.First(
+                        x => x.Key == selection.Key).Value;
+
+                    if (selectionAccumulation.Value == null)
+                    {
+                        throw new Exception($"Selection value is null for {self.TallyId} {contest.Key} {selection.Key}");
+                    }
+
+                    if (selectionAccumulation.Proof == null)
+                    {
+                        throw new Exception($"Selection proof is null for {self.TallyId} {contest.Key} {selection.Key}");
+                    }
+                }
+            }
+        }
+
         return self.Decrypt(accumulation.Contests.Values.ToList());
     }
 
     public static PlaintextTally Decrypt(
         this CiphertextTally self,
-        List<AccumulatedContest> decryptions)
+        List<AccumulatedContest> accumulatedContests)
     {
         // Create a plaintext tally from the ciphertext tally
         var plaintextTally = new PlaintextTally(
@@ -49,7 +105,7 @@ public static class DecryptWithSharesExtensions
             var plaintextContest = plaintextTally.Contests.First(
                 x => x.Key == contest.Key).Value;
 
-            var contestAccumulation = decryptions.First(
+            var contestAccumulation = accumulatedContests.First(
                 x => x.ObjectId == contest.Key);
 
             foreach (var selection in contest.Value.Selections)
@@ -58,16 +114,17 @@ public static class DecryptWithSharesExtensions
                 var plaintextSelection = plaintextContest.Selections.First(
                     x => x.Key == selection.Key).Value;
 
-                var decryption = contestAccumulation.Selections.First(
+                var selectionAccumulation = contestAccumulation.Selections.First(
                     x => x.Key == selection.Key).Value;
 
                 // decrypt the selection
                 var ciphertext = selection.Value;
                 var value = ciphertext!.Decrypt(
-                    decryption, self.Context.ElGamalPublicKey);
+                    selectionAccumulation,
+                    self.Context.ElGamalPublicKey);
 
                 // add the decrypted value to the plaintext selection
-                plaintextSelection.Tally += value.Tally;
+                plaintextSelection.Update(value);
             }
         }
 
@@ -82,6 +139,7 @@ public static class DecryptWithSharesExtensions
     public static List<PlaintextTallyBallot> Decrypt(
         this Dictionary<string, CiphertextBallot> self,
         Dictionary<string, CiphertextDecryptionBallot> ballotShares,
+        Dictionary<string, List<BallotChallengeResponse>> challengeResponses,
         Dictionary<string, LagrangeCoefficient> lagrangeCoefficients,
         CiphertextTally tally,
         bool skipValidation = false)
@@ -90,7 +148,9 @@ public static class DecryptWithSharesExtensions
         foreach (var (ballotId, ballot) in self)
         {
             var plaintextBallot = ballot.Decrypt(
-                ballotShares[ballotId], lagrangeCoefficients,
+                ballotShares[ballotId],
+                challengeResponses[ballotId],
+                lagrangeCoefficients,
                 tally,
                 skipValidation);
             plaintextBallots.Add(plaintextBallot);
@@ -105,16 +165,17 @@ public static class DecryptWithSharesExtensions
     public static PlaintextTallyBallot Decrypt(
         this CiphertextBallot self,
         CiphertextDecryptionBallot ballotShares,
+        List<BallotChallengeResponse> challengeResponses,
         Dictionary<string, LagrangeCoefficient> lagrangeCoefficients,
         CiphertextTally tally,
         bool skipValidation = false)
     {
         return self.Decrypt(
             ballotShares.GetShares(),
+            challengeResponses,
             lagrangeCoefficients,
             tally.TallyId,
-            tally.Context.ElGamalPublicKey,
-            tally.Context.CryptoExtendedBaseHash,
+            tally.Context,
             skipValidation);
     }
 
@@ -124,18 +185,18 @@ public static class DecryptWithSharesExtensions
     public static PlaintextTallyBallot Decrypt(
         this CiphertextBallot self,
         CiphertextDecryptionBallot ballotShares,
+        List<BallotChallengeResponse> challengeResponses,
         Dictionary<string, LagrangeCoefficient> lagrangeCoefficients,
         string tallyId,
-        ElementModP electionPublicKey,
-        ElementModQ extendedBaseHash,
+        CiphertextElectionContext context,
         bool skipValidation = false)
     {
         return self.Decrypt(
             ballotShares.GetShares(),
+            challengeResponses,
             lagrangeCoefficients,
             tallyId,
-            electionPublicKey,
-            extendedBaseHash,
+            context,
             skipValidation);
     }
 
@@ -145,15 +206,18 @@ public static class DecryptWithSharesExtensions
     public static PlaintextTallyBallot Decrypt(
         this CiphertextBallot self,
         List<Tuple<ElectionPublicKey, BallotShare>> guardianShares,
+        List<BallotChallengeResponse> challengeResponses,
         string tallyId,
-        ElementModP electionPublicKey,
-        ElementModQ extendedBaseHash,
+        CiphertextElectionContext context,
         bool skipValidation = false)
     {
         var lagrangeCoefficients = guardianShares.ComputeLagrangeCoefficients();
         return self.Decrypt(
-            guardianShares, lagrangeCoefficients, tallyId,
-            electionPublicKey, extendedBaseHash, skipValidation
+            guardianShares,
+            challengeResponses,
+            lagrangeCoefficients,
+            tallyId,
+            context, skipValidation
         );
     }
 
@@ -163,10 +227,10 @@ public static class DecryptWithSharesExtensions
     public static PlaintextTallyBallot Decrypt(
         this CiphertextBallot self,
         List<Tuple<ElectionPublicKey, BallotShare>> guardianShares,
+        List<BallotChallengeResponse> challengeResponses,
         Dictionary<string, LagrangeCoefficient> lagrangeCoefficients,
         string tallyId,
-        ElementModP electionPublicKey,
-        ElementModQ extendedBaseHash,
+        CiphertextElectionContext context,
         bool skipValidation = false)
     {
         // Accumulate the shares
@@ -174,16 +238,109 @@ public static class DecryptWithSharesExtensions
             tallyId,
             guardianShares,
             lagrangeCoefficients,
-             extendedBaseHash,
+             context.CryptoExtendedBaseHash,
              skipValidation);
 
+        // Add the proofs
+        accumulation.AddProofs(
+            self,
+            context,
+            challengeResponses
+        );
+
         return self.Decrypt(
-            accumulation.Contests.Values.ToList(), electionPublicKey, tallyId);
+            accumulation, tallyId, context, skipValidation);
+    }
+
+    public static PlaintextTallyBallot DecryptNoProofs(
+        this CiphertextBallot self,
+        List<Tuple<ElectionPublicKey, BallotShare>> guardianShares,
+        Dictionary<string, LagrangeCoefficient> lagrangeCoefficients,
+        string tallyId,
+        CiphertextElectionContext context)
+    {
+        // Accumulate the shares
+        var accumulation = self.AccumulateShares(
+            tallyId,
+            guardianShares,
+            lagrangeCoefficients,
+             context.CryptoExtendedBaseHash,
+             skipValidation: true);
+
+        return self.Decrypt(
+            accumulation, tallyId, context, skipValidation: true);
+    }
+
+    /// <summary>
+    /// Decrypt a single ballot using the provided ballot shares
+    /// </summary>
+    public static List<PlaintextTallyBallot> Decrypt(
+        this Dictionary<string, CiphertextBallot> self,
+        List<AccumulatedBallot> accumulations,
+        string tallyId,
+        CiphertextElectionContext context,
+        bool skipValidation = false)
+    {
+        var plaintextBallots = new List<PlaintextTallyBallot>();
+        foreach (var (ballotId, ballot) in self)
+        {
+            var plaintextBallot = ballot.Decrypt(
+                accumulations.First(x => x.ObjectId == ballotId),
+                tallyId,
+                context,
+                skipValidation);
+            plaintextBallots.Add(plaintextBallot);
+        }
+
+        return plaintextBallots;
+    }
+
+    /// <summary>
+    /// Decrypt a single ballot using the provided ballot shares
+    /// </summary>
+    public static PlaintextTallyBallot Decrypt(
+        this CiphertextBallot self,
+        AccumulatedBallot accumulation,
+        string tallyId,
+        CiphertextElectionContext context,
+        bool skipValidation = false)
+    {
+        if (!skipValidation)
+        {
+            if (accumulation.ObjectId != self.ObjectId)
+            {
+                throw new Exception("Ballot Id does not match");
+            }
+
+            foreach (var contest in self.Contests)
+            {
+                var contestAccumulation = accumulation.Contests.First(
+                    x => x.Key == contest.ObjectId).Value;
+
+                foreach (var selection in contest.Selections)
+                {
+                    var selectionAccumulation = contestAccumulation.Selections.First(
+                        x => x.Key == selection.ObjectId).Value;
+
+                    if (selectionAccumulation.Value == null)
+                    {
+                        throw new Exception($"Selection value is null for {self.ObjectId} {contest.ObjectId} {selection.ObjectId}");
+                    }
+                }
+            }
+        }
+
+        return self.Decrypt(
+            accumulation.Contests.Values.ToList(),
+            context.ElGamalPublicKey,
+            tallyId);
     }
 
     public static PlaintextTallyBallot Decrypt(
         this CiphertextBallot self,
-        List<AccumulatedContest> decryptions, ElementModP publicKey, string tallyId)
+        List<AccumulatedContest> accumulatedContests,
+        ElementModP publicKey,
+        string tallyId)
     {
         // create a plaintext tally from the first ballot share's style Id.
         var plaintextTally = new PlaintextTallyBallot(tallyId, self);
@@ -194,7 +351,7 @@ public static class DecryptWithSharesExtensions
             var plaintextContest = plaintextTally.Contests.First(
                 x => x.Key == contest.ObjectId).Value;
 
-            var contestAccumulation = decryptions.First(
+            var contestAccumulation = accumulatedContests.First(
                 x => x.ObjectId == contest.ObjectId);
 
             // iterate over the selections from the contest
@@ -203,11 +360,12 @@ public static class DecryptWithSharesExtensions
                 var plaintextSelection = plaintextContest.Selections.First(
                     x => x.Key == selection.ObjectId).Value;
 
-                var decryption = contestAccumulation.Selections.First(
+                var selectionAcumulation = contestAccumulation.Selections.First(
                     x => x.Key == selection.ObjectId).Value;
 
-                var value = selection.Decrypt(decryption, publicKey);
-                plaintextSelection.Tally += value.Tally;
+                var value = selection.Decrypt(
+                    selectionAcumulation, publicKey);
+                plaintextSelection.Update(value);
             }
         }
 
@@ -217,7 +375,7 @@ public static class DecryptWithSharesExtensions
     /// <summary>
     /// Decrypt a single selection using the provided selection shares
     /// </summary>
-    public static PlaintextTallySelection Decrypt(
+    public static PlaintextTallySelection DecryptNoProofs(
         this CiphertextTallySelection self,
         List<Tuple<ElectionPublicKey, SelectionShare>> guardianShares,
         ElementModP publicKey,
@@ -229,14 +387,17 @@ public static class DecryptWithSharesExtensions
             .ToList()
             .ComputeLagrangeCoefficients();
         var decryption = self.AccumulateShares(
-            guardianShares, lagrangeCoefficients, extendedBaseHash, skipValidation);
+            guardianShares,
+            lagrangeCoefficients,
+            extendedBaseHash,
+            skipValidation);
         return self.Decrypt(decryption, publicKey);
     }
 
     /// <summary>
     /// Decrypt a single selection using the provided selection shares
     /// </summary>
-    public static PlaintextTallySelection Decrypt(
+    public static PlaintextTallySelection DecryptNoProofs(
         this ICiphertextSelection self,
         List<Tuple<ElectionPublicKey, SelectionShare>> guardianShares,
         Dictionary<string, LagrangeCoefficient> lagrangeCoefficients,
@@ -244,9 +405,12 @@ public static class DecryptWithSharesExtensions
         ElementModQ extendedBaseHash, bool skipValidation = false)
     {
         // accumulate all of the shares calculated for the selection
-        var decryption = self.AccumulateShares(
-            guardianShares, lagrangeCoefficients, extendedBaseHash, skipValidation);
-        return self.Decrypt(decryption, publicKey);
+        var accumulation = self.AccumulateShares(
+            guardianShares,
+            lagrangeCoefficients,
+            extendedBaseHash,
+            skipValidation);
+        return self.Decrypt(accumulation, publicKey);
     }
 
     /// <summary>
@@ -254,17 +418,15 @@ public static class DecryptWithSharesExtensions
     /// </summary>
     public static PlaintextTallySelection Decrypt(
         this ICiphertextSelection self,
-        AccumulatedSelection decryption, ElementModP publicKey)
+        AccumulatedSelection accumulation, ElementModP publicKey)
     {
-        // Calculate 𝑀=𝐵⁄(∏𝑀𝑖) mod 𝑝.
-        var tally = self.Ciphertext.Decrypt(decryption.Value, publicKey);
-        if (!tally.HasValue)
-        {
-            throw new Exception("Failed to decrypt selection");
-        }
+        // Calculate T = 𝐵 ⁄ (∏𝑀𝑖) mod 𝑝.
+        using var decryptedValue = BigMath.DivModP(
+            self.Ciphertext.Data, accumulation.Value);
+        var tally = DiscreteLog.GetAsync(decryptedValue, publicKey);
 
         var plaintext = new PlaintextTallySelection(
-            self, tally ?? 0UL, decryption.Value!, decryption.Proof!);
+            self, tally, decryptedValue, accumulation.Proof!);
         return plaintext;
     }
 }

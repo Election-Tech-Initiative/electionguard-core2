@@ -84,16 +84,67 @@ namespace ElectionGuard
         }
 
         /// <summary>
+        /// Reassign this object's handle by taking ownership of the handle from the other object
+        /// but does not explicitly dispose the other object in order to maintain compatibility
+        /// with the `using` directive. This method is similar to `std::move` in C++ since we cannot
+        /// override the assignment operator in csharp.
+        ///
+        /// This is useful for avoiding unnecessary copies of large objects when passing them
+        /// and assigning them to new variables. It is also useful for avoiding unnecessary
+        /// allocations when reassigning objects in a loop.
+        /// </summary>
+        internal void Reassign(ElGamalCiphertext other)
+        {
+            if (other == null)
+            {
+                throw new ArgumentNullException(nameof(other));
+            }
+
+            Reassign(other.Handle);
+            other.Handle = null;
+        }
+
+        // TODO: ISSUE #189 - this is a temporary function to handle object reassignment and disposal
+        // this should be removed when the native library is updated to handle this behavior
+        private void Reassign(NativeElGamalCiphertext other)
+        {
+            if (other is null)
+            {
+                return;
+            }
+
+            var old = Handle; // assign the old handle to dispose
+            Handle = other; // assign the new handle to the instance member
+            old.Dispose(); // dispose of the old handle
+        }
+
+        /// <summary>
+        /// Homomorphically accumulates other ElGamal ciphertext by pairwise multiplication
+        /// and returns the result. By default, this method will reassign the current object.
+        /// </summary>
+        public ElGamalCiphertext Add(ElGamalCiphertext other, bool reassign = true)
+        {
+            if (!reassign)
+            {
+                return Add(this, other);
+            }
+
+            var newValue = Add(this, other);
+            Reassign(newValue);
+            return this;
+        }
+
+        /// <summary>
         /// Homomorphically accumulates other ElGamal ciphertext by pairwise multiplication
         /// and returns the result without modifying the original.
         /// </summary>
-        public ElGamalCiphertext Add(ElGamalCiphertext other)
+        public static ElGamalCiphertext Add(
+            ElGamalCiphertext lhs, ElGamalCiphertext rhs)
         {
             var status = NativeInterface.ElGamalCiphertext.Add(
-                Handle, other.Handle, out var value);
+                lhs.Handle, rhs.Handle, out var value);
             status.ThrowIfError();
             return value.IsInvalid ? null : new ElGamalCiphertext(value);
-            //return ElGamal.Add(this, other);
         }
 
         /// <Summary>
@@ -222,7 +273,7 @@ namespace ElectionGuard
                 return true;
             }
 
-            return Pad == other.Pad && Data == other.Data;
+            return Pad.Equals(other.Pad) && Data.Equals(other.Data);
         }
 
         /// <summary>

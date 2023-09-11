@@ -530,6 +530,9 @@ namespace electionguard
 
     struct RangedChaumPedersenProof::Impl {
         uint64_t rangeLimit;
+
+        // the joint challenge Equation (56) in the v2.0.0 spec
+        // c = H(HE;0x21,K,α ̄,β ̄,a0,b0,a1,b1,...,aL,bL)
         unique_ptr<ElementModQ> challenge;
         map<uint64_t, unique_ptr<ZeroKnowledgeProof>> integerProofs;
 
@@ -568,6 +571,7 @@ namespace electionguard
             return commitments;
         }
 
+        // get the challenges for the integer proofs
         vector<reference_wrapper<ElementModQ>> getChallenges() const
         {
             vector<reference_wrapper<ElementModQ>> challengeValues;
@@ -620,11 +624,23 @@ namespace electionguard
             auto cj = *proof.challenge;
             auto vj = *proof.response;
 
-            // 𝑎 = 𝑔^𝑉 ⋅ 𝐴^𝐶 mod 𝑝
+            // Verification 6.3
+            // 𝑎j = 𝑔^𝑉j ⋅ 𝐴^𝐶j mod 𝑝
             auto consistent_gv = (aj == *recomputedCommitment->getPad());
 
-            // 𝑏  = 𝐾^w ⋅ 𝐵^𝐶 mod 𝑝
+            // Verification 6.4
+            // 𝑏j = 𝐾^wj ⋅ 𝐵^𝐶j mod 𝑝
             auto consistent_kv = (bj == *recomputedCommitment->getData());
+
+            // Verification 6.A
+            auto in_range_aj = aj.isInBounds();
+            auto in_range_bj = bj.isInBounds();
+
+            // Verification 6.B
+            auto in_range_cj = cj.isInBounds();
+
+            // Verification 6.C
+            auto in_range_vj = vj.isInBounds();
 
             if (!consistent_gv || !consistent_kv) {
                 auto jstring = to_string(j);
@@ -635,6 +651,10 @@ namespace electionguard
                   {
                     "j: " + jstring + " consistent_gv: " + to_string(consistent_gv),
                     "j: " + jstring + " consistent_kv: " + to_string(consistent_kv),
+                    "j: " + jstring + " in_range_aj: " + to_string(in_range_aj),
+                    "j: " + jstring + " in_range_bj: " + to_string(in_range_bj),
+                    "j: " + jstring + " in_range_cj: " + to_string(in_range_cj),
+                    "j: " + jstring + " in_range_vj: " + to_string(in_range_vj),
                   }};
             }
             return ValidationResult{true, {}};
@@ -756,7 +776,7 @@ namespace electionguard
         // Compute commitments
         for (uint64_t i = 0; i < maxLimit; i++) {
             auto u = nonces->get(i);
-            auto a = g_pow_p(*u); //𝑔^𝑢 mod 𝑝
+            auto a = g_pow_p(*u); // 𝑔^𝑢 mod 𝑝
 
             unique_ptr<ElementModQ> cj;
             unique_ptr<ElementModQ> tj;
@@ -821,6 +841,9 @@ namespace electionguard
         // Compute the challenge
         // TODO: change the HashPrefix to an input param since it can also be
         // use for selection proofs
+
+        // Verification 6.5
+        // c = H(HE;0x21,K,α ̄,β ̄,a0,b0,a1,b1,...,aL,bL), Ballot Contest Limit Encryption Proof 3.3.8
         auto computedChallenge =
           hash_elems({&const_cast<ElementModQ &>(q), hashPrefix, &const_cast<ElementModP &>(k),
                       alpha, beta, commitments});
@@ -828,7 +851,7 @@ namespace electionguard
 
         if (!consistent_c) {
             validationResult.isValid = false;
-            validationResult.messages.push_back("invalid computed challenge");
+            validationResult.messages.push_back("- Verification 6.5: invalid computed challenge");
         }
 
         // print out the error messages if the proof is invalid

@@ -49,6 +49,52 @@ EG_API eg_electionguard_status_t eg_encryption_device_new(uint64_t in_device_uui
 EG_API eg_electionguard_status_t eg_encryption_device_free(eg_encryption_device_t *handle);
 
 /**
+ * @brief Get the timestamp for the encrypion device
+ * 
+ * @param[out] out_timestamp The timestamp for the encryption device
+ *                      The caller is responsible for freeing the object.
+ */
+EG_API eg_electionguard_status_t eg_encryption_device_get_timestamp(eg_encryption_device_t *handle,
+                                                                    uint64_t *out_timestamp);
+
+/**
+ * @brief Get the uuid for the encrypion device
+ * 
+ * @param[out] out_uuid The uuid code for the encryption device
+ *                      The caller is responsible for freeing the object.
+ */
+EG_API eg_electionguard_status_t eg_encryption_device_get_uuid(eg_encryption_device_t *handle,
+                                                               uint64_t *out_uuid);
+
+/**
+ * @brief Get the session uuid for the encrypion device
+ * 
+ * @param[out] out_session_id The session uuid for the encryption device
+ *                      The caller is responsible for freeing the object.
+ */
+EG_API eg_electionguard_status_t
+eg_encryption_device_get_session_uuid(eg_encryption_device_t *handle, uint64_t *out_session_id);
+
+/**
+ * @brief Get the launch code for the encrypion device
+ * 
+ * @param[out] out_launch_code The launch code for the encryption device
+ *                      The caller is responsible for freeing the object.
+ */
+EG_API eg_electionguard_status_t
+eg_encryption_device_get_launch_code(eg_encryption_device_t *handle, uint64_t *out_launch_code);
+
+/**
+ * @brief Get the location for the encrypion device
+ * 
+ * @param[out] out_location The lcoation for the encryption device
+ *                      The caller is responsible for freeing the object.
+ */
+EG_API eg_electionguard_status_t eg_encryption_device_get_location(eg_encryption_device_t *handle,
+                                                                   char **out_location,
+                                                                   uint64_t *out_size);
+
+/**
  * @brief Get the hash for the encrypion device
  * 
  * @param[out] out_hash The hash code for the encryption device

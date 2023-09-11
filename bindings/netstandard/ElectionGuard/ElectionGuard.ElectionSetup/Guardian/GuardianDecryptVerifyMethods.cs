@@ -12,7 +12,7 @@ public partial class Guardian
     /// The commitment is used as part of the validation process
     /// to prove that the guardian computed their share correctly.
     ///
-    // (𝑎𝑖, 𝑏𝑖) = (𝑔^𝑢𝑖 mod 𝑝, 𝐴^𝑢𝑖 mod 𝑝).
+    // (𝑎𝑖, 𝑏𝑖) = (𝑔^𝑢𝑖 mod 𝑝, 𝐴^𝑢𝑖 mod 𝑝). Equation (69) in v2.0.0
     /// </summary>
     public ElGamalCiphertext CreateCommitment(ICiphertextSelection selection)
     {
@@ -39,10 +39,10 @@ public partial class Guardian
     ///
     /// The challenge is the guardian-scoped challenge 
     /// that has been adjusted by the lagrange coefficient
-    /// as part of Equation (61) in the spec. 𝑐𝑖 = 𝑐 • ω𝑖 mod q
+    /// as part of Equation (72) in the spec v2.0.0. 𝑐𝑖 = 𝑐 ⋅ ω𝑖 mod q
     /// 
     /// Computes:
-    /// 𝑣𝑖 = (𝑢𝑖 − 𝑐𝑖𝑃(𝑖)) mod q. Equation (62)
+    /// 𝑣𝑖 = (𝑢𝑖 − 𝑐𝑖 ⋅ 𝑃(𝑖)) mod q. Equation (73) in v2.0.0
     /// </summary>
     public ElementModQ CreateResponse(
         IElectionSelection selection,
@@ -65,7 +65,7 @@ public partial class Guardian
             _ = CombinePrivateKeyShares();
         }
 
-        // 𝑣𝑖 = (𝑢𝑖 − 𝑐𝑖P(𝑖)) mod q. Equation (62)
+        // 𝑣𝑖 = (𝑢𝑖 − 𝑐𝑖 ⋅ P(𝑖)) mod q. Equation (73) in v2.0.0
         using var product = BigMath.MultModQ(challenge, _myPartialSecretKey);
         var v = BigMath.SubModQ(u, product);
         return v;

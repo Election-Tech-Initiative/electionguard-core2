@@ -205,6 +205,17 @@ EG_API eg_electionguard_status_t eg_ciphertext_ballot_contest_get_ciphertext_acc
   eg_elgamal_ciphertext_t **out_ciphertext_accumulation_ref);
 
 /**
+ * @brief The proof demonstrates the sum of the selections does not exceed the maximum available selections for the contest, and that the proof was generated with the nonce
+ * @param[in] handle A pointer to the `eg_plaintext_ballot_selection_t` opaque instance
+ * @param[out] out_proof A pointer to the output Proof.  The value is a reference and is not owned by the caller.
+ * @return eg_electionguard_status_t indicating success or failure
+ * @retval ELECTIONGUARD_STATUS_SUCCESS The function was successfully executed
+ * @retval ELECTIONGUARD_STATUS_ERROR_BAD_ALLOC The function was unable to allocate memory
+ */
+EG_API eg_electionguard_status_t eg_ciphertext_ballot_contest_get_proof(
+  eg_ciphertext_ballot_contest_t *handle, eg_ranged_chaum_pedersen_proof_t **out_proof);
+
+/**
  * @brief The hashed elgamal ciphertext is the encrypted extended data (overvote information
  *        and writeins).
  * 

@@ -144,11 +144,6 @@ public record class CiphertextDecryptionTally : DisposableRecordBase
         BallotShare ballotShare,
         CiphertextBallot ballot)
     {
-        if (_tally.HasBallot(ballot.ObjectId))
-        {
-            throw new ArgumentException($"Tally {TallyId} already contains ballot {ballot.ObjectId}");
-        }
-
         if (ballot.IsSpoiled)
         {
             throw new ArgumentException($"Tally {TallyId} Cannot decrypt spoiled ballot {ballot.ObjectId}");
@@ -544,7 +539,7 @@ public record class CiphertextDecryptionTally : DisposableRecordBase
             return _decryptionResult;
         }
 
-        // try to compute the proofs if they ahve not been computed already
+        // try to compute the proofs if they have not been computed already
         if (DecryptionState == DecryptionState.PendingAdminComputeProofs)
         {
             ComputeDecryptionProofs(skipValidation);
@@ -556,13 +551,11 @@ public record class CiphertextDecryptionTally : DisposableRecordBase
         }
 
         var guardianShares = GetGuardianShares();
-        var lagrangeCoefficients = guardianShares.ComputeLagrangeCoefficients();
 
         // decrypt
-        var plaintextTally = _tally.Decrypt(
-            guardianShares, lagrangeCoefficients, skipValidation);
+        var plaintextTally = _tally.Decrypt(_accumulatedTally!);
         var plaintextBallots = _challengedBallots.Decrypt(
-            _ballotShares, lagrangeCoefficients, _tally, skipValidation);
+            _accumulatedBallots!, _tally.TallyId, _tally.Context);
         var spoiledBallots = _spoiledBallots.Values.ToList();
 
         // construct the decryption result
@@ -574,15 +567,6 @@ public record class CiphertextDecryptionTally : DisposableRecordBase
         _decryptionResult = result;
 
         return result;
-    }
-
-    public DecryptionResult DecryptBallot(string ballotId, bool skipValidation = false)
-    {
-        var ballot = _challengedBallots[ballotId];
-        var ballotShares = _ballotShares[ballotId];
-        var guardianShares = GetGuardianShares();
-        var lagrangeCoefficients = guardianShares.ComputeLagrangeCoefficients();
-        return ballot.Decrypt(ballotShares, lagrangeCoefficients, _tally, skipValidation);
     }
 
     #endregion

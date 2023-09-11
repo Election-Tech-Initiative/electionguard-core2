@@ -23,19 +23,20 @@ public class PlaintextTallySelection
 
     /// <summary>
     /// The decrypted representation of the sum of all ballots for the selection
+    /// t in the spec
     /// </summary>
-    public ulong Tally { get; set; }
+    public ulong Tally { get; private set; }
 
     /// <summary>
     /// The decrypted representation of the sum of all ballots for the selection
-    /// g^tally or M in the spec
+    /// K^tally or T in the spec
     /// </summary>
-    public ElementModP Value { get; set; }
+    public ElementModP Value { get; private set; }
 
     /// <summary>
     /// The proof that the decrypted representation of the sum of all ballots for the selection is correct
     /// </summary>
-    public ChaumPedersenProof? Proof { get; set; }
+    public ChaumPedersenProof? Proof { get; private set; }
 
     public PlaintextTallySelection(
         IElectionSelection selection) : this(
@@ -63,13 +64,13 @@ public class PlaintextTallySelection
     public PlaintextTallySelection(
         IElectionSelection selection,
         ulong tally,
-        ElementModP value, ChaumPedersenProof proof) : this(
+        ElementModP decryptedValue,
+        ChaumPedersenProof proof) : this(
             selection.ObjectId,
             selection.SequenceOrder,
             selection.DescriptionHash,
-            tally, value, proof)
+            tally, decryptedValue, proof)
     {
-
     }
 
     [JsonConstructor]
@@ -102,6 +103,23 @@ public class PlaintextTallySelection
             other.Proof)
     {
 
+    }
+
+    public void Update(PlaintextTallySelection other)
+    {
+        Update(other.Tally, other.Value, other.Proof);
+    }
+
+    public void Update(ulong tally,
+        ElementModP decryptedValue,
+        ChaumPedersenProof? proof)
+    {
+        Tally = tally;
+        Value = new(decryptedValue);
+        if (proof != null)
+        {
+            Proof = new(proof);
+        }
     }
 
     protected override void DisposeUnmanaged()

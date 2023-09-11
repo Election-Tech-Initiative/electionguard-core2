@@ -1,6 +1,7 @@
 namespace ElectionGuard
 {
     using System.Collections.Generic;
+    using ElectionGuard.Ballot;
     using NativeElementModP = NativeInterface.ElementModP.ElementModPHandle;
     using NativeElementModQ = NativeInterface.ElementModQ.ElementModQHandle;
     // native types for convenience
@@ -12,8 +13,6 @@ namespace ElectionGuard
     /// </summary>
     public class RangedChaumPedersenProof : DisposableBase
     {
-        internal NativeRangedChaumPedersenProof Handle;
-
         /// <summary>
         /// Limit on the range proof
         /// </summary>
@@ -49,12 +48,19 @@ namespace ElectionGuard
         /// </summary>
         public Dictionary<ulong, ZeroKnowledgeProof> IntegerProofs => throw new System.NotImplementedException();
 
+        internal NativeRangedChaumPedersenProof Handle;
+
+        internal RangedChaumPedersenProof(NativeRangedChaumPedersenProof handle)
+        {
+            Handle = handle;
+        }
+
         /// <summary>
         /// Create a new instance of <see cref="RangedChaumPedersenProof"/>. This uses a deterministic seed. 
         /// This ctor is used for unit testing and is not recommended to be directly called in a production election
         /// </summary>
         public RangedChaumPedersenProof(
- ElGamalCiphertext message,
+            ElGamalCiphertext message,
             ElementModQ r,
             ulong selected,
             ulong maxLimit,
@@ -105,26 +111,23 @@ namespace ElectionGuard
         /// <summary>
         /// Validates the proof against the specified values
         /// </summary>
-        public bool IsValid(
+        public BallotValidationResult IsValid(
             ElGamalCiphertext ciphertext,
             ElementModP publicKey,
             ElementModQ q,
-            string hashPrefix,
-            out string errorMessage)
+            string hashPrefix)
         {
-            errorMessage = string.Empty;
+            var status = NativeInterface.RangedChaumPedersenProof.IsValid(
+                Handle, ciphertext.Handle, publicKey.Handle, q.Handle, hashPrefix, out var isValid);
+            status.ThrowIfError();
 
-            var isValidResult = NativeInterface.RangedChaumPedersenProof.IsValid(
-                Handle, ciphertext.Handle, publicKey.Handle, q.Handle, hashPrefix);
-
-            if (isValidResult)
+            var message = string.Empty;
+            if (!isValid)
             {
-                return isValidResult;
+                ExceptionHandler.GetData(out var _, out message, out var _);
             }
 
-            ExceptionHandler.GetData(out var function, out var message, out var _);
-            errorMessage = $"status: {nameof(RangedChaumPedersenProof)} {nameof(IsValid)} function: {function} message: {message}";
-            return isValidResult;
+            return new BallotValidationResult(isValid, message);
         }
     }
 }

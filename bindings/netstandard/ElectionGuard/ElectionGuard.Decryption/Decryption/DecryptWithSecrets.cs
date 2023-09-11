@@ -7,10 +7,20 @@ namespace ElectionGuard.Decryption.Decryption;
 /// </summary>
 public static class DecryptWithSecretsExtensions
 {
+    // when decrypting with secrets, we do not currently have a proof
+    [Obsolete("This method is obsolete and kept for testing purposes only when decrypting with secret values during unit testing. Use the overload with a proof.")]
+    public static void Update(this PlaintextTallySelection self, ulong tally, ElementModP publicKey)
+    {
+        // recreate a decrypted value using the public key
+        using var decrypted = BigMath.PowModP(publicKey, tally);
+        self.Update(tally, decrypted, self.Proof);
+    }
+
     /// <summary>
     /// Decrypts a <see cref="CiphertextTally" /> using the provided <see cref="ElementModQ" /> secret key.
     /// This method is primarily for testing purposes and should not be used in production.
     /// </summary>
+    [Obsolete("This method is primarily for testing purposes and should not be used in production.")]
     public static PlaintextTally Decrypt(
         this CiphertextTally self,
         ElementModQ secretKey, ElementModP publicKey)
@@ -29,7 +39,7 @@ public static class DecryptWithSecretsExtensions
                     x => x.Key == selection.Key).Value;
 
                 var value = ciphertext.Decrypt(secretKey, publicKey);
-                plaintextSelection.Tally += value ?? 0;
+                plaintextSelection.Update(value ?? 0, publicKey);
             }
         }
         return plaintextTally;
@@ -39,13 +49,14 @@ public static class DecryptWithSecretsExtensions
     /// Decrypts a <see cref="CiphertextBallot" /> using the provided <see cref="ElementModQ" /> secret key.
     /// This method is primarily for testing purposes and should not be used in production.
     /// </summary>
+    [Obsolete("This method is primarily for testing purposes and should not be used in production.")]
     public static PlaintextTallyBallot Decrypt(
         this CiphertextBallot self,
         InternalManifest manifest,
         ElementModQ secretKey, ElementModP publicKey)
     {
         var plaintextBallot = new PlaintextTallyBallot(
-            self.ObjectId, self.ObjectId, self.StyleId, manifest);
+            self.ObjectId, self.ObjectId, self.ObjectId, self.StyleId, manifest);
 
         foreach (var contest in self.Contests)
         {
@@ -59,8 +70,7 @@ public static class DecryptWithSecretsExtensions
                     x => x.Key == selection.ObjectId).Value;
 
                 var value = ciphertext.Decrypt(secretKey, publicKey);
-                plaintextSelection.Tally += value ?? 0;
-
+                plaintextSelection.Update(value ?? 0, publicKey);
             }
         }
         return plaintextBallot;

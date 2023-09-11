@@ -7,11 +7,7 @@ using ElectionGuard.Converters;
 
 namespace ElectionGuard.Decryption.Tally;
 
-/// <summary>
-/// The encrypted representation of all contests in the election.
-/// A `CiphertextTally` accepts cast and spoiled ballots and accumulates a tally on the cast ballots.
-/// </summary>
-public record CiphertextTally : DisposableRecordBase, IEquatable<CiphertextTally>
+public record CiphertextTallyRecord : DisposableRecordBase
 {
     /// <summary>
     /// The unique identifier for the tally.
@@ -22,16 +18,6 @@ public record CiphertextTally : DisposableRecordBase, IEquatable<CiphertextTally
     /// The name of the tally.
     /// </summary>
     public string Name { get; init; } = default!;
-
-    /// <summary>
-    /// The election context.
-    /// </summary>
-    public CiphertextElectionContext Context { get; init; } = default!;
-
-    /// <summary>
-    /// The election manifest.
-    /// </summary>
-    public InternalManifest Manifest { get; init; } = default!;
 
     /// <summary>
     /// a set of cast ballot ids cast in the election.
@@ -50,6 +36,30 @@ public record CiphertextTally : DisposableRecordBase, IEquatable<CiphertextTally
     /// Retains an encrypted representation of a tally for each selection
     /// </summary>
     public Dictionary<string, CiphertextTallyContest> Contests { get; init; } = default!;
+
+
+    protected override void DisposeManaged()
+    {
+        base.DisposeManaged();
+        Contests?.Dispose();
+    }
+}
+
+/// <summary>
+/// The encrypted representation of all contests in the election.
+/// A `CiphertextTally` accepts cast and spoiled ballots and accumulates a tally on the cast ballots.
+/// </summary>
+public record CiphertextTally : CiphertextTallyRecord, IEquatable<CiphertextTally>
+{
+    /// <summary>
+    /// The election context.
+    /// </summary>
+    public CiphertextElectionContext Context { get; init; } = default!;
+
+    /// <summary>
+    /// The election manifest.
+    /// </summary>
+    public InternalManifest Manifest { get; init; } = default!;
 
     public CiphertextTally(
         string name,
