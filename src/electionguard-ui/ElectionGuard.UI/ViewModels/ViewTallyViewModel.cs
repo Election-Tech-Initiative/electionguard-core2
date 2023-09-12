@@ -204,11 +204,11 @@ public partial class ViewTallyViewModel : BaseViewModel
                 var percent = (float)writeInTotal / (contest.VotesAllowed * (ulong)Tally.CastBallotCount) * 100;
                 contestItem.Selections.Add(new() { Name = "Write-ins", Party = string.Empty, Votes = writeInTotal, Percent = percent });
             }
-            underVoteTotal = (contest.VotesAllowed * (ulong)Tally.CastBallotCount) - totalVotes;
-            var underPercent = (float)underVoteTotal / (contest.VotesAllowed * (ulong)Tally.CastBallotCount) * 100;
-            contestItem.Selections.Add(new() { Name = "Undervotes", Party = string.Empty, Votes = underVoteTotal, Percent = underPercent });
-            var overPercent = (float)overVoteTotal / (contest.VotesAllowed * (ulong)Tally.CastBallotCount) * 100;
-            contestItem.Selections.Add(new() { Name = "Overvotes", Party = string.Empty, Votes = overVoteTotal, Percent = overPercent });
+            //underVoteTotal = (contest.VotesAllowed * (ulong)Tally.CastBallotCount) - totalVotes;
+            //var underPercent = (float)underVoteTotal / (contest.VotesAllowed * (ulong)Tally.CastBallotCount) * 100;
+            //contestItem.Selections.Add(new() { Name = "Undervotes", Party = string.Empty, Votes = underVoteTotal, Percent = underPercent });
+            //var overPercent = (float)overVoteTotal / (contest.VotesAllowed * (ulong)Tally.CastBallotCount) * 100;
+            //contestItem.Selections.Add(new() { Name = "Overvotes", Party = string.Empty, Votes = overVoteTotal, Percent = overPercent });
 
             Contests.Add(contestItem);
         }
