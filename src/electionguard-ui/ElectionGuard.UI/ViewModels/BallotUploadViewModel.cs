@@ -163,7 +163,8 @@ public partial class BallotUploadViewModel : BaseViewModel
             try
             {
                 var filename = Path.GetFileName(currentBallot);
-                var ballotData = await ReadFileAsync(currentBallot, cancellationToken);
+                var ballotOriginalData = await ReadFileAsync(currentBallot, cancellationToken);
+                var ballotData = RemoveSpoiled(ballotOriginalData);
                 using var ballot = new CiphertextBallot(ballotData);
 
                 if (ballot.Timestamp < startDate)
