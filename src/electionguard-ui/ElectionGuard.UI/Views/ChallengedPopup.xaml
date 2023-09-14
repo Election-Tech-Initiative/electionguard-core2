@@ -43,26 +43,18 @@
                 Text="{Binding SearchText}"
                 TextColor="{StaticResource Gray950}" />
             <CollectionView
+                x:Name="ChallengedBallotCollectionView"
+                HeightRequest="470"
                 ItemsSource="{Binding FilteredBallotList}"
                 SelectedItem="{Binding CurrentBallot}"
                 SelectionChangedCommand="{Binding SpoilBallotCommand}"
-                SelectionMode="Single">
-                <CollectionView.EmptyViewTemplate>
-                    <DataTemplate>
-                        <ActivityIndicator
-                            HeightRequest="100"
-                            IsEnabled="true"
-                            IsRunning="True"
-                            IsVisible="true"
-                            WidthRequest="100"
-                            Color="{StaticResource Primary}" />
-                    </DataTemplate>
-                </CollectionView.EmptyViewTemplate>
+                SelectionMode="Single"
+                VerticalScrollBarVisibility="Always">
                 <CollectionView.ItemTemplate>
                     <DataTemplate x:DataType="model:BallotRecord">
                         <Frame
                             Margin="0,0,0,5"
-                            BackgroundColor="{Binding ., Converter={StaticResource AlternateRowColorConverter}, ConverterParameter={x:Reference UploadCollectionView}}"
+                            BackgroundColor="{Binding ., Converter={StaticResource AlternateRowColorConverter}, ConverterParameter={x:Reference ChallengedBallotCollectionView}}"
                             BorderColor="{StaticResource Gray950}">
                             <Grid ColumnDefinitions="3*, 2*">
                                 <Label
