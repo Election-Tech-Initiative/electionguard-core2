@@ -114,11 +114,6 @@ public record class CiphertextDecryptionTally : DisposableRecordBase
     // add a spoiled ballot which will not be decrypted
     public void AddSpoiledBallot(CiphertextBallot ballot)
     {
-        if (_tally.HasBallot(ballot.ObjectId))
-        {
-            throw new ArgumentException($"Tally {TallyId} already contains ballot {ballot.ObjectId}");
-        }
-
         if (!ballot.IsSpoiled)
         {
             throw new ArgumentException($"Tally {TallyId} Cannot add unspoiled ballot {ballot.ObjectId} {ballot.State.ToString()}");

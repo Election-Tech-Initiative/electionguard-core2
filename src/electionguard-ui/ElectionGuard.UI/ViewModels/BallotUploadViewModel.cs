@@ -97,6 +97,11 @@ public partial class BallotUploadViewModel : BaseViewModel
         return await stream.ReadToEndAsync(cancellationToken);
     }
 
+    private static string RemoveSpoiled(string ballotData)
+    {
+        return ballotData.Replace("\"state\":3,", "\"state\":2,");
+    }
+
     [RelayCommand(CanExecute = nameof(CanUpload))]
     private async Task Upload()
     {
@@ -164,7 +169,7 @@ public partial class BallotUploadViewModel : BaseViewModel
             {
                 var filename = Path.GetFileName(currentBallot);
                 var ballotData = await ReadFileAsync(currentBallot, cancellationToken);
-                using var ballot = new CiphertextBallot(ballotData);
+                using var ballot = new CiphertextBallot(RemoveSpoiled(ballotData));
 
                 if (ballot.Timestamp < startDate)
                 {
