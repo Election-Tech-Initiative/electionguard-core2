@@ -648,4 +648,7 @@
   <data name="NetworkIssueText" xml:space="preserve">
     <value>Hubo un problema con la red que causó un problema con lo que estabas haciendo.  ¡Vuelve a iniciar sesión cuando se haya restablecido la conexión de red!</value>
   </data>
+  <data name="WrongElectionText" xml:space="preserve">
+    <value>Drive contiene papeletas para una elección diferente.!</value>
+  </data>
 </root>

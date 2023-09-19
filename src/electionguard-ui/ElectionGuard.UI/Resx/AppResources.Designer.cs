@@ -214,7 +214,7 @@ namespace ElectionGuard.UI.Resx {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Challenged.
+        ///   Looks up a localized string similar to Challenge.
         /// </summary>
         internal static string ChallengedText {
             get {
@@ -1632,6 +1632,15 @@ namespace ElectionGuard.UI.Resx {
         internal static string WriteinText {
             get {
                 return ResourceManager.GetString("WriteinText", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Drive contains ballots for a different election..
+        /// </summary>
+        internal static string WrongElectionText {
+            get {
+                return ResourceManager.GetString("WrongElectionText", resourceCulture);
             }
         }
         
