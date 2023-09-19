@@ -645,4 +645,7 @@
   <data name="NetworkIssueText" xml:space="preserve">
     <value>There was an issue with the network that caused an issue with what you were doing.  Please log back in when the network connection has been restored</value>
   </data>
+  <data name="WrongElectionText" xml:space="preserve">
+    <value>Drive contains ballots for a different election.</value>
+  </data>
 </root>

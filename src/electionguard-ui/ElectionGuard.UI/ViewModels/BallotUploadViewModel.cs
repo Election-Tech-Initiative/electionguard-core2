@@ -12,6 +12,7 @@ public partial class BallotUploadViewModel : BaseViewModel
 {
     public const string ElectionIdParam = "ElectionId";
     private const string _artifactSubFolder = "artifacts";
+    private const string _contextFilename = "context.json";
     private const string _ballotSubFolder = "encrypted_ballots";
     private readonly string[] _deviceFolderNames = { "devices", "encryption_devices" };
 
@@ -403,6 +404,17 @@ public partial class BallotUploadViewModel : BaseViewModel
                         return;
                     }
 
+                    if (await ValidateElectionId(drive, _manifestHash!) == false)
+                    {
+                        ErrorMessage = AppResources.WrongElectionText;
+                        _importing = false;
+                        return;
+                    }
+                    else
+                    {
+                        ErrorMessage = string.Empty;
+                    }
+
                     // find device file
                     var devices = Directory.GetFiles(devicePath);
                     foreach (var device in devices)
@@ -464,6 +476,18 @@ public partial class BallotUploadViewModel : BaseViewModel
 
         // If we get here, we didn't find a device folder.
         return string.Empty;
+    }
+
+    private async Task<bool> ValidateElectionId(DriveInfo drive, ElementModQ electionHash)
+    {
+        var filePath = Path.Combine(drive.Name, _artifactSubFolder, _contextFilename);
+        if (File.Exists(filePath))
+        {
+            var contextData = await ReadFileAsync(filePath);
+            var context = new CiphertextElectionContext(contextData);
+            return context.ManifestHash.Equals(electionHash);
+        }
+        return false;
     }
 
     public override async Task OnAppearing()

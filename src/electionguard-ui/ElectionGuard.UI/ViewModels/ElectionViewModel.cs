@@ -49,6 +49,10 @@ public partial class ElectionViewModel : BaseViewModel
     private Election? _currentElection;
 
     [ObservableProperty]
+    [NotifyCanExecuteChangedFor(nameof(ViewCommand))]
+    private bool _isViewing;
+
+    [ObservableProperty]
     private string _electionId;
 
     [ObservableProperty]
@@ -315,13 +319,20 @@ public partial class ElectionViewModel : BaseViewModel
         Step1Complete = true;
     }
 
-    [RelayCommand]
+    [RelayCommand(CanExecute = nameof(CanView))]
     private async Task View()
     {
+        IsViewing = true;
         var vm = (ManifestViewModel)Ioc.Default.GetService(typeof(ManifestViewModel));
         vm.Manifest = new Manifest(Manifest.ToJson());
 
         await NavigationService.GoToModal(typeof(ManifestViewModel));
+        IsViewing = false;
+    }
+
+    private bool CanView()
+    {
+        return !IsViewing;
     }
 
     partial void OnManifestRecordChanged(ManifestRecord value)
