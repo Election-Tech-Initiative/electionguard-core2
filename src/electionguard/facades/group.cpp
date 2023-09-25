@@ -684,9 +684,8 @@ EG_API eg_electionguard_status_t eg_element_mod_q_pow_mod_q(eg_element_mod_q_t *
 }
 
 // TODO: rename to eg_element_mod_q_pow_mod_q_with_long_exp
-EG_API eg_electionguard_status_t eg_element_long_pow_mod_q(eg_element_mod_q_t *base,
-                                                           uint64_t exponent,
-                                                           eg_element_mod_q_t **out_handle)
+eg_electionguard_status_t eg_element_long_pow_mod_q(eg_element_mod_q_t *base, uint64_t exponent,
+                                                    eg_element_mod_q_t **out_handle)
 {
     try {
         auto *b = AS_TYPE(ElementModQ, base);
@@ -701,15 +700,35 @@ EG_API eg_electionguard_status_t eg_element_long_pow_mod_q(eg_element_mod_q_t *b
     }
 }
 
-EG_API eg_electionguard_status_t
-eg_element_mod_q_a_plus_b_mul_c_mod_q(eg_element_mod_q_t *a, eg_element_mod_q_t *b,
-                                      eg_element_mod_q_t *c, eg_element_mod_q_t **out_handle)
+eg_electionguard_status_t eg_element_mod_q_a_plus_b_mul_c_mod_q(eg_element_mod_q_t *a,
+                                                                eg_element_mod_q_t *b,
+                                                                eg_element_mod_q_t *c,
+                                                                eg_element_mod_q_t **out_handle)
 {
     try {
         auto *a_local = AS_TYPE(ElementModQ, a);
         auto *b_local = AS_TYPE(ElementModQ, b);
         auto *c_local = AS_TYPE(ElementModQ, c);
         auto result = a_plus_bc_mod_q(*a_local, *b_local, *c_local);
+
+        *out_handle = AS_TYPE(eg_element_mod_q_t, result.release());
+        return ELECTIONGUARD_STATUS_SUCCESS;
+    } catch (const exception &e) {
+        Log::error(__func__, e);
+        return ELECTIONGUARD_STATUS_ERROR_BAD_ALLOC;
+    }
+}
+
+eg_electionguard_status_t eg_element_mod_q_a_minus_b_mul_c_mod_q(eg_element_mod_q_t *a,
+                                                                 eg_element_mod_q_t *b,
+                                                                 eg_element_mod_q_t *c,
+                                                                 eg_element_mod_q_t **out_handle)
+{
+    try {
+        auto *a_local = AS_TYPE(ElementModQ, a);
+        auto *b_local = AS_TYPE(ElementModQ, b);
+        auto *c_local = AS_TYPE(ElementModQ, c);
+        auto result = a_minus_bc_mod_q(*a_local, *b_local, *c_local);
 
         *out_handle = AS_TYPE(eg_element_mod_q_t, result.release());
         return ELECTIONGUARD_STATUS_SUCCESS;

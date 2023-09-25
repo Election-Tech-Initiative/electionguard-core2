@@ -48,7 +48,7 @@ namespace ElectionGuard
         }
 
         /// <Summary>
-        ///  H = (HP ; 10, i, j, Ki,j , hi,j ). Guardin Share proof challenge 3.2.2
+        ///  H = (HP;10,i,j,Ki,j,hi,j). Guardin Share proof challenge 3.2.2
         /// </Summary>
         public static string Prefix_GuardianShareChallenge
         {

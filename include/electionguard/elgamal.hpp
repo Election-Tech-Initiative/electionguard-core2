@@ -11,7 +11,7 @@
 namespace electionguard
 {
     /// <summary>
-    /// An exponential ElGamal keypair.
+    /// An exponential ElGamal keypair computed as K = g^a mod p.
     /// </summary>
     class EG_API ElGamalKeyPair
     {
@@ -26,27 +26,27 @@ namespace electionguard
         ElGamalKeyPair &operator=(ElGamalKeyPair &&rhs);
 
         /// <Summary>
-        /// The ElGamal Secret Key.
+        /// The ElGamal Secret Key (a,k, or s in the spec).
         /// </Summary>
         ElementModQ *getSecretKey();
 
         /// <Summary>
-        /// The ElGamal Secret Key.
+        /// The ElGamal Secret Key (a,k, or s in the spec).
         /// </Summary>
         ElementModQ *getSecretKey() const;
 
         /// <Summary>
-        /// The ElGamal Public Key.
+        /// The ElGamal Public Key (K in the spec).
         /// </Summary>
         ElementModP *getPublicKey();
 
         /// <Summary>
-        /// The ElGamal Public Key.
+        /// The ElGamal Public Key (K in the spec).
         /// </Summary>
         ElementModP *getPublicKey() const;
 
         /// <Summary>
-        /// Make an elgamal keypair from a secret.
+        /// Make an elgamal keypair from a secret by computing K = g^a mod p.
         /// </Summary>
         static std::unique_ptr<ElGamalKeyPair> fromSecret(const ElementModQ &secretKey,
                                                           bool isFixedBase = true);

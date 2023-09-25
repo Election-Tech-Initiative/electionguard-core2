@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using Newtonsoft.Json;
 
 namespace ElectionGuard.Proofs
@@ -8,8 +9,10 @@ namespace ElectionGuard.Proofs
     /// </summary>
     public class SchnorrProof : DisposableBase
     {
+
+
         /// <summary>
-        /// k in the spec
+        /// K in the spec
         /// </summary>
         public ElementModP PublicKey { get; private set; }
 
@@ -24,7 +27,7 @@ namespace ElectionGuard.Proofs
         public ElementModQ Challenge { get; private set; }
 
         /// <summary>
-        /// u in the spec
+        /// v in the spec
         /// </summary>
         public ElementModQ Response { get; private set; }
 
@@ -46,56 +49,74 @@ namespace ElectionGuard.Proofs
         /// <summary>
         /// Create a new instance of a Schnorr proof using the provided secret and a random seed.
         /// </summary>
-        public SchnorrProof(ElementModQ secretKey)
+        public SchnorrProof(
+            ulong offset,
+            int index,
+            ElementModQ parameterHash,
+            ElementModQ secretKey)
         {
             using (var keyPair = ElGamalKeyPair.FromSecret(secretKey))
             using (var seed = BigMath.RandQ())
             {
                 PublicKey = new ElementModP(keyPair.PublicKey);
                 Commitment = BigMath.GPowP(seed);
-                Challenge = Hash.HashElems(PublicKey, Commitment);
-                Response = BigMath.APlusBMulCModQ(seed, keyPair.SecretKey, Challenge);
+                Challenge = ComputeChallenge(parameterHash, offset, index, PublicKey, Commitment);
+                Response = BigMath.AMinusBMulCModQ(seed, keyPair.SecretKey, Challenge);
             }
         }
 
         /// <summary>
         /// Create a new instance of a Schnorr proof using the provided key pair and a random seed.
         /// </summary>
-        public SchnorrProof(ElGamalKeyPair keyPair)
+        public SchnorrProof(
+            ulong offset,
+            int index,
+            ElementModQ parameterHash,
+            ElGamalKeyPair keyPair)
         {
             using (var seed = BigMath.RandQ())
             {
                 PublicKey = new ElementModP(keyPair.PublicKey);
                 Commitment = BigMath.GPowP(seed);
-                Challenge = Hash.HashElems(PublicKey, Commitment);
-                Response = BigMath.APlusBMulCModQ(seed, keyPair.SecretKey, Challenge);
+                Challenge = ComputeChallenge(parameterHash, offset, index, PublicKey, Commitment);
+                Response = BigMath.AMinusBMulCModQ(seed, keyPair.SecretKey, Challenge);
             }
         }
 
         /// <summary>
         /// Create a new instance of a Schnorr proof using the provided secret and seed.
         /// </summary>
-        public SchnorrProof(ElementModQ secretKey, ElementModQ seed)
+        public SchnorrProof(
+            ulong offset,
+            int index,
+            ElementModQ parameterHash,
+            ElementModQ secretKey,
+            ElementModQ seed)
         {
             using (var keyPair = ElGamalKeyPair.FromSecret(secretKey))
             {
 
                 PublicKey = new ElementModP(keyPair.PublicKey);
                 Commitment = BigMath.GPowP(seed);
-                Challenge = Hash.HashElems(PublicKey, Commitment);
-                Response = BigMath.APlusBMulCModQ(seed, keyPair.SecretKey, Challenge);
+                Challenge = ComputeChallenge(parameterHash, offset, index, PublicKey, Commitment);
+                Response = BigMath.AMinusBMulCModQ(seed, keyPair.SecretKey, Challenge);
             }
         }
 
         /// <summary>
         /// Create a new instance of a Schnorr proof using the provided key pair and seed.
         /// </summary>
-        public SchnorrProof(ElGamalKeyPair keyPair, ElementModQ seed)
+        public SchnorrProof(
+            ulong offset,
+            int index,
+            ElementModQ parameterHash,
+            ElGamalKeyPair keyPair,
+            ElementModQ seed)
         {
             PublicKey = new ElementModP(keyPair.PublicKey);
             Commitment = BigMath.GPowP(seed);
-            Challenge = Hash.HashElems(PublicKey, Commitment);
-            Response = BigMath.APlusBMulCModQ(seed, keyPair.SecretKey, Challenge);
+            Challenge = ComputeChallenge(parameterHash, offset, index, PublicKey, Commitment);
+            Response = BigMath.AMinusBMulCModQ(seed, keyPair.SecretKey, Challenge);
         }
 
         public SchnorrProof(SchnorrProof other)
@@ -107,49 +128,43 @@ namespace ElectionGuard.Proofs
         }
 
         /// <summary>
-        /// Check validity of the `proof` for proving possession of the secret key corresponding to the public key
+        /// Verification 2 (Guardian public-key validation).
+        /// Check validity of the `proof` for proving possession of the secret key 
+        /// corresponding to the public key.
         /// </summary>     
-        public bool IsValid()
+        public ValidationResult IsValid(
+            ulong offset,
+            int index,
+            ElementModQ parameterHash
+        )
         {
-            var k = PublicKey;
-            var h = Commitment;
-            var u = Response;
-            var validPublicKey = k.IsValidResidue();
-            var inBoundsH = h.IsInBounds();
-            var inBoundsU = u.IsInBounds();
 
 #pragma warning disable IDE0063 // Use simple 'using' statement. Need to support Net Standard 2.0, which doesn't have this.
-            using (var c = Hash.HashElems(k, h))
-            using (var gp = BigMath.GPowP(u))
-            using (var pp = BigMath.PowModP(k, c))
-            using (var mp = BigMath.MultModP(h, pp))
+            using (var challenge = ComputeChallenge(parameterHash, offset, index, PublicKey, Commitment))
+            using (var gv = BigMath.GPowP(Response)) // G^v mod p
+            using (var kc = BigMath.PowModP(PublicKey, challenge)) // K^c mod p
+            using (var gvkc = BigMath.MultModP(gv, kc)) // G^v * K^c mod p
 #pragma warning restore IDE0063
             {
+                var validCommitment = Commitment.Equals(gvkc); // hi,j = gvi,j · Kci,j mod p
+                var validChallenge = Challenge.Equals(challenge); // ci,j = H (HP;0x10,i,j,Kij,hij)
 
-                var validChallenge = c.Equals(Challenge);
-                var validProof = gp.Equals(mp);
-
-                var success = validPublicKey && inBoundsH && inBoundsU && validChallenge && validProof;
+                var messages = new List<string>();
+                var success = PublicKey.IsValidResidue()
+                    && Commitment.IsInBounds()
+                    && Response.IsInBounds()
+                    && validCommitment && validChallenge;
                 if (success is false)
                 {
-                    #region commented Code
-                    // TODO: result
-                    //log_warning(
-                    //    "found an invalid Schnorr proof: %s",
-                    //    str(
-                    //            {
-                    //    "in_bounds_h": in_bounds_h,
-                    //                "in_bounds_u": in_bounds_u,
-                    //                "valid_public_key": valid_public_key,
-                    //                "valid_challenge": valid_challenge,
-                    //                "valid_proof": valid_proof,
-                    //                "proof": self,
-                    //            }
-                    //        ),
-                    //    )
-                    #endregion
+
+                    messages.Add("found an invalid Schnorr proof");
+                    messages.Add($"in_bounds_h: {Commitment.IsInBounds()}");
+                    messages.Add($"in_bounds_v: {Response.IsInBounds()}");
+                    messages.Add($"valid_public_key: {PublicKey.IsValidResidue()}");
+                    messages.Add($"valid_commitment: {validCommitment}");
+                    messages.Add($"valid_challenge: {validChallenge}");
                 }
-                return success;
+                return new ValidationResult() { Success = success, Error = messages };
             }
         }
 
@@ -161,6 +176,27 @@ namespace ElectionGuard.Proofs
             Commitment.Dispose();
             Challenge.Dispose();
             Response.Dispose();
+        }
+
+        /// <Summary>
+        ///  H = (HP;10,i,j,Ki,j,hi,j). Guardin Share proof challenge 3.2.2
+        /// </Summary>
+        private ElementModQ ComputeChallenge(
+            ElementModQ parameterHash,
+            ulong offset,
+            int index,
+            ElementModP publicKey,
+            ElementModP commitment)
+        {
+            using (var offsetElement = new ElementModQ(offset))
+            using (var indexElement = new ElementModQ((ulong)index))
+            {
+                return Hash.HashElems(
+                    parameterHash,
+                    Hash.Prefix_GuardianShareChallenge,
+                    offsetElement, indexElement,
+                    publicKey, commitment);
+            }
         }
     }
 }

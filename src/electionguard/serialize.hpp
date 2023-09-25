@@ -774,14 +774,16 @@ namespace electionguard
                   {"max_votes", serializable.getConfiguration()->getMaxNumberOfBallots()}};
 
                 json j = {
-                  {"crypto_base_hash", serializable.getCryptoBaseHash()->toHex()},
-                  {"crypto_extended_base_hash", serializable.getCryptoExtendedBaseHash()->toHex()},
-                  {"commitment_hash", serializable.getCommitmentHash()->toHex()},
-                  {"manifest_hash", serializable.getManifestHash()->toHex()},
-                  {"elgamal_public_key", serializable.getElGamalPublicKey()->toHex()},
                   {"number_of_guardians", serializable.getNumberOfGuardians()},
                   {"quorum", serializable.getQuorum()},
-                  {"configuration", config}};
+                  {"configuration", config},
+                  {"elgamal_public_key", serializable.getElGamalPublicKey()->toHex()},
+                  {"parameter_hash", serializable.getParameterHash()->toHex()},
+                  {"commitment_hash", serializable.getCommitmentHash()->toHex()},
+                  {"manifest_hash", serializable.getManifestHash()->toHex()},
+                  {"crypto_base_hash", serializable.getCryptoBaseHash()->toHex()},
+                  {"crypto_extended_base_hash", serializable.getCryptoExtendedBaseHash()->toHex()}};
+
                 if (serializable.getExtendedData().size() > 0) {
                     j["extended_data"] = extendedData;
                 }
@@ -790,13 +792,18 @@ namespace electionguard
             }
             static unique_ptr<electionguard::CiphertextElectionContext> toObject(json j)
             {
-                auto crypto_base_hash = j["crypto_base_hash"].get<string>();
-                auto crypto_extended_base_hash = j["crypto_extended_base_hash"].get<string>();
-                auto commitment_hash = j["commitment_hash"].get<string>();
-                auto manifest_hash = j["manifest_hash"].get<string>();
-                auto elgamal_public_key = j["elgamal_public_key"].get<string>();
                 auto number_of_guardians = j["number_of_guardians"].get<uint64_t>();
                 auto quorum = j["quorum"].get<uint64_t>();
+                auto elgamal_public_key = j["elgamal_public_key"].get<string>();
+                auto commitment_hash = j["commitment_hash"].get<string>();
+                auto manifest_hash = j["manifest_hash"].get<string>();
+                auto crypto_base_hash = j["crypto_base_hash"].get<string>();
+                auto crypto_extended_base_hash = j["crypto_extended_base_hash"].get<string>();
+
+                auto parameter_hash = j.contains("parameter_hash") && !j["parameter_hash"].is_null()
+                                        ? j["parameter_hash"].get<string>()
+                                        : PARAMETER_BASE_HASH().toHex();
+
                 bool allows_overvotes = true;
                 uint64_t max_ballots = DEFAULT_MAX_BALLOTS;
                 if (j.contains("configuration") && !j["configuration"].is_null()) {
@@ -804,11 +811,12 @@ namespace electionguard
                     max_ballots = j["configuration"]["max_votes"].get<uint64_t>();
                 }
 
+                auto elGamalPublicKey = ElementModP::fromHex(elgamal_public_key);
+                auto parameterHash = ElementModQ::fromHex(parameter_hash);
                 auto commitmentHash = ElementModQ::fromHex(commitment_hash);
                 auto manifestHash = ElementModQ::fromHex(manifest_hash);
                 auto cryptoBaseHash = ElementModQ::fromHex(crypto_base_hash);
                 auto cryptoExtendedBaseHash = ElementModQ::fromHex(crypto_extended_base_hash);
-                auto elGamalPublicKey = ElementModP::fromHex(elgamal_public_key);
 
                 // ensure the elgamal public key instance is set as a fixed base
                 elGamalPublicKey->setIsFixedBase(true);
@@ -823,15 +831,15 @@ namespace electionguard
                     }
 
                     return make_unique<electionguard::CiphertextElectionContext>(
-                      number_of_guardians, quorum, move(elGamalPublicKey), move(commitmentHash),
-                      move(manifestHash), move(cryptoBaseHash), move(cryptoExtendedBaseHash),
-                      move(config), move(extendedDataMap));
+                      number_of_guardians, quorum, move(elGamalPublicKey), move(parameterHash),
+                      move(commitmentHash), move(manifestHash), move(cryptoBaseHash),
+                      move(cryptoExtendedBaseHash), move(config), move(extendedDataMap));
                 }
 
                 return make_unique<electionguard::CiphertextElectionContext>(
-                  number_of_guardians, quorum, move(elGamalPublicKey), move(commitmentHash),
-                  move(manifestHash), move(cryptoBaseHash), move(cryptoExtendedBaseHash),
-                  move(config));
+                  number_of_guardians, quorum, move(elGamalPublicKey), move(parameterHash),
+                  move(commitmentHash), move(manifestHash), move(cryptoBaseHash),
+                  move(cryptoExtendedBaseHash), move(config));
             }
 
           public:

@@ -9,11 +9,26 @@ namespace ElectionGuard.Ballot
     /// </summary>
     public class BallotValidationResult
     {
+        /// <summary>
+        /// Was the ballot validation valid
+        /// </summary>
         public bool IsValid { get; set; }
+
+        /// <summary>
+        /// Message to use for errors
+        /// </summary>
         public string Message { get; set; }
 
+        /// <summary>
+        /// Heirarchy for the children validations
+        /// </summary>
         public List<BallotValidationResult> Children { get; set; }
 
+        /// <summary>
+        /// Constructor for BallotValidationResult
+        /// </summary>
+        /// <param name="isValid">was the check valid or not</param>
+        /// <param name="children">a list of children results</param>
         public BallotValidationResult(
             bool isValid,
             List<BallotValidationResult> children = null)
@@ -23,6 +38,11 @@ namespace ElectionGuard.Ballot
             Children = children ?? new List<BallotValidationResult>();
         }
 
+        /// <summary>
+        /// Constructor for BallotValidationResult
+        /// </summary>
+        /// <param name="message">message to provide the user</param>
+        /// <param name="children">a list of children results</param>
         public BallotValidationResult(
             string message,
             List<BallotValidationResult> children = null)
@@ -32,6 +52,12 @@ namespace ElectionGuard.Ballot
             Children = children ?? new List<BallotValidationResult>();
         }
 
+        /// <summary>
+        /// Constructor for BallotValidationResult
+        /// </summary>
+        /// <param name="isValid">was the check valid or not</param>
+        /// <param name="message">message to provide the user</param>
+        /// <param name="children">a list of children results</param>
         public BallotValidationResult(
             bool isValid,
             string message,
@@ -42,6 +68,9 @@ namespace ElectionGuard.Ballot
             Children = children ?? new List<BallotValidationResult>();
         }
 
+        /// <summary>
+        /// Get the string describing the results
+        /// </summary>
         public override string ToString()
         {
             if (IsValid)

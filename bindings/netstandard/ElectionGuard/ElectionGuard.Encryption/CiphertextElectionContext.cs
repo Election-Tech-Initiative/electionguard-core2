@@ -15,6 +15,23 @@ namespace ElectionGuard
     public class CiphertextElectionContext : DisposableBase, IEquatable<CiphertextElectionContext>
     {
         /// <summary>
+        /// the `parameter hash HP = H(ver;0x00,p,q,g)` of the parameters compiled into the software.
+        ///
+        /// This static instance variable is populated when the software is compiled
+        /// and may be different than the parameters used in an election.
+        /// </summary>
+        public static ElementModQ ParameterBaseHash
+        {
+            get
+            {
+                var status = NativeInterface.CiphertextElectionContext.ParameterBaseHash(
+                    out var value);
+                status.ThrowIfError();
+                return value.IsInvalid ? null : new ElementModQ(value);
+            }
+        }
+
+        /// <summary>
         /// Get a linked list containing the extended data of the election.
         /// </summary>
         public ContextConfiguration Configuration
@@ -69,6 +86,23 @@ namespace ElectionGuard
                     Handle, out var value);
                 status.ThrowIfError();
                 return value.IsInvalid ? null : new ElementModP(value);
+            }
+        }
+
+        /// <summary>
+        /// the `parameter hash HP = H(ver;0x00,p,q,g)` of the parameters used in the election.
+        ///
+        /// This instance variable is populated when the `CiphertextElectionContext` is created
+        /// and may use different parameters than the version that is compiled into the software.
+        /// </summary>
+        public ElementModQ ParameterHash
+        {
+            get
+            {
+                var status = NativeInterface.CiphertextElectionContext.GetParameterHash(
+                    Handle, out var value);
+                status.ThrowIfError();
+                return value.IsInvalid ? null : new ElementModQ(value);
             }
         }
 
@@ -142,7 +176,6 @@ namespace ElectionGuard
                 return value.IsInvalid ? null : new LinkedList(value);
             }
         }
-
 
         internal NativeInterface.CiphertextElectionContext.CiphertextElectionContextHandle Handle;
 

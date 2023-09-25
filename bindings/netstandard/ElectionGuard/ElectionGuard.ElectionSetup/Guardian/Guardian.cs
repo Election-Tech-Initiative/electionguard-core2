@@ -91,12 +91,13 @@ public partial class Guardian : DisposableBase, IElectionGuardian
         ulong sequenceOrder,
         int numberOfGuardians,
         int quorum,
+        ElementModQ parameterHash,
         string keyCeremonyId)
     {
         GuardianId = guardianId;
         SequenceOrder = sequenceOrder;
 
-        _myElectionKeys = new(guardianId, sequenceOrder, quorum);
+        _myElectionKeys = new(guardianId, sequenceOrder, quorum, parameterHash);
         _commitmentSeed = BigMath.RandQ();
         CeremonyDetails = new(keyCeremonyId, numberOfGuardians, quorum);
 
@@ -113,6 +114,7 @@ public partial class Guardian : DisposableBase, IElectionGuardian
         ulong sequenceOrder,
         int numberOfGuardians,
         int quorum,
+        ElementModQ parameterHash,
         string keyCeremonyId,
         Random random)
     {
@@ -121,7 +123,7 @@ public partial class Guardian : DisposableBase, IElectionGuardian
 
         using var nextRandom = random.NextElementModQ();
         var keyPair = new ElGamalKeyPair(nextRandom);
-        _myElectionKeys = new(guardianId, sequenceOrder, quorum, keyPair, random);
+        _myElectionKeys = new(guardianId, sequenceOrder, quorum, parameterHash, keyPair, random);
         _commitmentSeed = keyPair.SecretKey;
         CeremonyDetails = new(keyCeremonyId, numberOfGuardians, quorum);
 
@@ -134,6 +136,7 @@ public partial class Guardian : DisposableBase, IElectionGuardian
     public Guardian(
         string guardianId,
         ulong sequenceOrder,
+        ElementModQ parameterHash,
         CeremonyDetails ceremonyDetails,
         ElementModQ secretKey)
     {
@@ -141,7 +144,7 @@ public partial class Guardian : DisposableBase, IElectionGuardian
         SequenceOrder = sequenceOrder;
 
         var keyPair = new ElGamalKeyPair(secretKey);
-        _myElectionKeys = new(guardianId, sequenceOrder, ceremonyDetails.Quorum, keyPair);
+        _myElectionKeys = new(guardianId, sequenceOrder, ceremonyDetails.Quorum, parameterHash, keyPair);
         _commitmentSeed = BigMath.RandQ();
         CeremonyDetails = ceremonyDetails;
 
@@ -155,13 +158,14 @@ public partial class Guardian : DisposableBase, IElectionGuardian
         string guardianId,
         ulong sequenceOrder,
         CeremonyDetails ceremonyDetails,
+        ElementModQ parameterHash,
         ElGamalKeyPair elGamalKeyPair,
         ElementModQ commitmentSeed)
     {
         GuardianId = guardianId;
         SequenceOrder = sequenceOrder;
 
-        _myElectionKeys = new(guardianId, sequenceOrder, ceremonyDetails.Quorum, elGamalKeyPair);
+        _myElectionKeys = new(guardianId, sequenceOrder, ceremonyDetails.Quorum, parameterHash, elGamalKeyPair);
         _commitmentSeed = new(commitmentSeed);
         CeremonyDetails = ceremonyDetails;
 

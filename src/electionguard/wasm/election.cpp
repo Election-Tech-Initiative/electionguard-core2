@@ -24,7 +24,13 @@ EMSCRIPTEN_BINDINGS(electionguard)
       .function("getElGamalPublicKey", &CiphertextElectionContext::getElGamalPublicKey,
                 allow_raw_pointers())
       .function("getElGamalPublicKeyRef", &CiphertextElectionContext::getElGamalPublicKeyRef)
+      .function("getParameterHash", &CiphertextElectionContext::getParameterHash,
+                allow_raw_pointers())
+      .function("getCommitmentHash", &CiphertextElectionContext::getCommitmentHash,
+                allow_raw_pointers())
       .function("getManifestHash", &CiphertextElectionContext::getManifestHash,
+                allow_raw_pointers())
+      .function("getCryptoBaseHash", &CiphertextElectionContext::getCryptoBaseHash,
                 allow_raw_pointers())
       .function("getCryptoExtendedBaseHash", &CiphertextElectionContext::getCryptoExtendedBaseHash,
                 allow_raw_pointers())

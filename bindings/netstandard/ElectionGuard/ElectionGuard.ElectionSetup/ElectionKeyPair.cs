@@ -44,13 +44,14 @@ public class ElectionKeyPair : DisposableBase, IElectionGuardian
     public ElectionKeyPair(
         string ownerId,
         ulong sequenceOrder,
-        int quorum)
+        int quorum,
+        ElementModQ parameterHash)
     {
         GuardianId = ownerId;
         SequenceOrder = sequenceOrder;
         using var randQ = BigMath.RandQ();
         KeyPair = new(randQ);
-        Polynomial = new ElectionPolynomial(quorum, KeyPair);
+        Polynomial = new ElectionPolynomial(sequenceOrder, quorum, parameterHash, KeyPair);
     }
 
     /// <summary>
@@ -62,25 +63,27 @@ public class ElectionKeyPair : DisposableBase, IElectionGuardian
         string ownerId,
         ulong sequenceOrder,
         int quorum,
+        ElementModQ parameterHash,
         ElGamalKeyPair keyPair)
     {
         GuardianId = ownerId;
         SequenceOrder = sequenceOrder;
         KeyPair = new(keyPair);
-        Polynomial = new(quorum, keyPair);
+        Polynomial = new(sequenceOrder, quorum, parameterHash, keyPair);
     }
 
     public ElectionKeyPair(
         string ownerId,
         ulong sequenceOrder,
         int quorum,
+        ElementModQ parameterHash,
         ElGamalKeyPair keyPair,
         Random random)
     {
         GuardianId = ownerId;
         SequenceOrder = sequenceOrder;
         KeyPair = new(keyPair);
-        Polynomial = new(quorum, keyPair, random);
+        Polynomial = new(sequenceOrder, quorum, parameterHash, keyPair, random);
     }
 
     /// <summary>
@@ -118,8 +121,6 @@ public class ElectionKeyPair : DisposableBase, IElectionGuardian
         SequenceOrder = sequenceOrder;
         KeyPair = new(keyPair.SecretKey, keyPair.PublicKey);
         Polynomial = new(polynomial);
-
-        // TODO: verify the polynomial is valid for the keypair
     }
 
     public ElectionKeyPair(ElectionKeyPair other)
@@ -128,8 +129,6 @@ public class ElectionKeyPair : DisposableBase, IElectionGuardian
         SequenceOrder = other.SequenceOrder;
         KeyPair = new(other.KeyPair.SecretKey, other.KeyPair.PublicKey);
         Polynomial = new(other.Polynomial);
-
-        // TODO: verify the polynomial is valid for the keypair
     }
 
     public ElectionPublicKey Share()

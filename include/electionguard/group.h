@@ -190,6 +190,10 @@ EG_API eg_electionguard_status_t
 eg_element_mod_q_a_plus_b_mul_c_mod_q(eg_element_mod_q_t *a, eg_element_mod_q_t *b,
                                       eg_element_mod_q_t *c, eg_element_mod_q_t **out_handle);
 
+EG_API eg_electionguard_status_t
+eg_element_mod_q_a_minus_b_mul_c_mod_q(eg_element_mod_q_t *a, eg_element_mod_q_t *b,
+                                       eg_element_mod_q_t *c, eg_element_mod_q_t **out_handle);
+
 EG_API eg_electionguard_status_t eg_element_mod_q_rand_q_new(eg_element_mod_q_t **out_handle);
 
 #endif
