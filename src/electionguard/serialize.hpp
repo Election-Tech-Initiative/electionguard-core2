@@ -1146,7 +1146,7 @@ namespace electionguard
                             };
                         }
 
-                        integer_proofs.push_back({{"index", i}, {"value", proof_json}});
+                        integer_proofs.push_back({{"index", i}, {"proof", proof_json}});
                         i++;
                     }
 
@@ -1250,12 +1250,12 @@ namespace electionguard
                     for (auto &proof : proof["proofs"]) {
                         auto proof_index = proof["index"].get<uint64_t>();
 
-                        auto proof_challenge = proof["value"]["challenge"].get<string>();
-                        auto proof_response = proof["value"]["response"].get<string>();
+                        auto proof_challenge = proof["proof"]["challenge"].get<string>();
+                        auto proof_response = proof["proof"]["response"].get<string>();
 
-                        if (proof["value"].contains("pad")) {
-                            auto proof_pad = proof["value"]["pad"].get<string>();
-                            auto proof_data = proof["value"]["data"].get<string>();
+                        if (proof["proof"].contains("pad")) {
+                            auto proof_pad = proof["proof"]["pad"].get<string>();
+                            auto proof_data = proof["proof"]["data"].get<string>();
 
                             integer_proofs[proof_index] = make_unique<ZeroKnowledgeProof>(
                               ElementModP::fromHex(proof_pad), ElementModP::fromHex(proof_data),
