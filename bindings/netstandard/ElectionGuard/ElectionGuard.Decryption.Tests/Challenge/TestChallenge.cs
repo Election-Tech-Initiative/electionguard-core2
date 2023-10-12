@@ -76,7 +76,7 @@ public class TestChallenge : DisposableBase
             guardianShares, coefficients);
 
         // create challenge
-        // c = H(06,Q;K,A,B,a,b,M)                          Equation (71) in v2.0.0
+        // c = H("30",Q;K,A,B,a,b,M)                          Equation (71) in v2.0.0
         var challenge = SelectionChallenge.ComputeChallenge(
                     context,
                     selection,
@@ -149,5 +149,19 @@ public class TestChallenge : DisposableBase
             accumulation, context.ElGamalPublicKey);
 
         Assert.That(decrypted.Tally, Is.EqualTo(plaintext.Tally));
+
+        // recompute the challenge
+        var m = BigMath.DivModP(selection.Ciphertext.Data, decrypted.Value);
+        var computedChallenge = Hash.HashElems(
+                    Hash.Prefix_DecryptSelectionProof,
+                    context.CryptoExtendedBaseHash,
+                    context.ElGamalPublicKey,
+                    selection.Ciphertext.Pad,
+                    selection.Ciphertext.Data,
+                    proof.Pad,
+                    proof.Data,
+                    m);
+
+        Assert.That(computedChallenge, Is.EqualTo(challenge));
     }
 }
