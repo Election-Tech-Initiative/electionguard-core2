@@ -303,17 +303,19 @@ jobs:
 
   publish_admin:
     name: ${{ matrix.name }}
-    needs: [get_version_code, maccatalyst_build_arm64, windows_build_x64]
+    # needs: [get_version_code, maccatalyst_build_arm64, windows_build_x64]
+    needs: [get_version_code, windows_build_x64]
     runs-on: ${{ matrix.os }}
     strategy:
       fail-fast: false
       matrix:
-        name: ["macOS", "windows-os"]
+        # name: ["macOS", "windows-os"]
+        name: ["windows-os"]
         include:
-          - name: macOS
-            os: macOS-13
-            version: "14.2"
-            osFolder: "maccatalyst"
+          # - name: macOS
+          #   os: macOS-13
+          #   version: "14.2"
+          #   osFolder: "maccatalyst"
           - name: windows-os
             os: windows-2022
             version: "latest"
@@ -331,21 +333,21 @@ jobs:
         with:
           dotnet-version: 7.0.x
 
-      - name: Update Mac Environment
-        if: runner.os == 'macOS'
-        run: |
-          ls -ls /Applications/
-          ls -ls $ANDROID_SDK_ROOT/ndk
-          sudo xcode-select -switch /Applications/Xcode_${{ matrix.version }}.app
+      # - name: Update Mac Environment
+      #   if: runner.os == 'macOS'
+      #   run: |
+      #     ls -ls /Applications/
+      #     ls -ls $ANDROID_SDK_ROOT/ndk
+      #     sudo xcode-select -switch /Applications/Xcode_${{ matrix.version }}.app
 
       - name: Configure Environment
         run: make environment-ui
 
-      - name: Get MacCatalyst arm64 Artifacts
-        uses: actions/download-artifact@v3
-        with:
-          name: maccatalyst-arm64
-          path: build/libs/MacCatalyst/arm64/Release
+      # - name: Get MacCatalyst arm64 Artifacts
+      #   uses: actions/download-artifact@v3
+      #   with:
+      #     name: maccatalyst-arm64
+      #     path: build/libs/MacCatalyst/arm64/Release
 
       - name: Get Windows x64 Artifacts
         uses: actions/download-artifact@v3
