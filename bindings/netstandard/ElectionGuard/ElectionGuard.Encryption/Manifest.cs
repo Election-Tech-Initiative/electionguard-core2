@@ -79,7 +79,8 @@ namespace ElectionGuard
             var status = NativeInterface.Manifest.FromJson(data, out Handle);
             if (status != Status.ELECTIONGUARD_STATUS_SUCCESS)
             {
-                throw new ElectionGuardException($"Manifest Error Status: {status}");
+                ExceptionHandler.GetData(out var function, out var message, out var _);
+                throw new ElectionGuardException($"Manifest Error Status: {status} function: {function} message: {message}");
             }
         }
 
@@ -97,7 +98,8 @@ namespace ElectionGuard
                     : NativeInterface.Manifest.FromMsgPack(pointer, (ulong)data.Length, out Handle);
                 if (status != Status.ELECTIONGUARD_STATUS_SUCCESS)
                 {
-                    throw new ElectionGuardException($"Manifest Error Binary Ctor: {status}");
+                    ExceptionHandler.GetData(out var function, out var message, out var _);
+                    throw new ElectionGuardException($"Manifest Error Binary Ctor: {status} function: {function} message: {message}");
                 }
             }
         }
@@ -169,7 +171,8 @@ namespace ElectionGuard
                  out Handle);
             if (status != Status.ELECTIONGUARD_STATUS_SUCCESS)
             {
-                throw new ElectionGuardException($"Manifest Error Status: {status}");
+                ExceptionHandler.GetData(out var function, out var message, out var _);
+                throw new ElectionGuardException($"Manifest Error Status: {status} function: {function} message: {message}");
             }
         }
 
@@ -268,7 +271,8 @@ namespace ElectionGuard
                 out Handle);
             if (status != Status.ELECTIONGUARD_STATUS_SUCCESS)
             {
-                throw new ElectionGuardException($"Manifest Error Status: {status}");
+                ExceptionHandler.GetData(out var function, out var message, out var _);
+                throw new ElectionGuardException($"Manifest Error Status: {status} function: {function} message: {message}");
             }
         }
 
@@ -362,7 +366,8 @@ namespace ElectionGuard
                 Handle, out var pointer, out _);
             if (status != Status.ELECTIONGUARD_STATUS_SUCCESS)
             {
-                throw new ElectionGuardException($"ToJson Error Status: {status}");
+                ExceptionHandler.GetData(out var function, out var message, out var _);
+                throw new ElectionGuardException($"ToJson Error Status: {status} function: {function} message: {message}");
             }
             var json = pointer.PtrToStringUTF8();
             _ = NativeInterface.Memory.FreeIntPtr(pointer);
@@ -380,7 +385,8 @@ namespace ElectionGuard
 
             if (status != Status.ELECTIONGUARD_STATUS_SUCCESS)
             {
-                throw new ElectionGuardException($"Manifest Error ToBson: {status}");
+                ExceptionHandler.GetData(out var function, out var message, out var _);
+                throw new ElectionGuardException($"Manifest Error ToBson: {status} function: {function} message: {message}");
             }
 
             if (size > int.MaxValue)
@@ -405,7 +411,8 @@ namespace ElectionGuard
 
             if (status != Status.ELECTIONGUARD_STATUS_SUCCESS)
             {
-                throw new ElectionGuardException($"Manifest Error ToMsgPack: {status}");
+                ExceptionHandler.GetData(out var function, out var message, out var _);
+                throw new ElectionGuardException($"Manifest Error ToMsgPack: {status} function: {function} message: {message}");
             }
 
             if (size > int.MaxValue)
