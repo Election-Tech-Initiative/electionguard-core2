@@ -98,13 +98,14 @@ public record SelectionChallenge : DisposableRecordBase
 
     public SelectionChallenge(
         IElectionSelection selection,
-        IElectionGuardian guardian,
+        string guardianId,
+        ulong sequenceOrder,
         ElementModQ coefficient,
         ElementModQ challenge)
     {
         ObjectId = selection.ObjectId;
-        GuardianId = guardian.GuardianId;
-        SequenceOrder = guardian.SequenceOrder;
+        GuardianId = guardianId;
+        SequenceOrder = sequenceOrder;
         Coefficient = new(coefficient);
         // 𝑐𝑖 = (𝑐 • ω𝑖) mod q
         Challenge = BigMath.MultModQ(challenge, coefficient);
@@ -123,7 +124,7 @@ public record SelectionChallenge : DisposableRecordBase
         SequenceOrder = sequenceOrder;
         Coefficient = new(coefficient);
         // 𝑐𝑖 = (𝑐 • ω𝑖) mod q
-        Challenge = BigMath.MultModQ(challenge, coefficient);
+        Challenge = new(challenge);
     }
 
     public SelectionChallenge(

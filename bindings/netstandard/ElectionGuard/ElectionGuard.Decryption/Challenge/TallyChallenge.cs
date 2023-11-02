@@ -148,7 +148,7 @@ public record TallyChallenge
     {
         Contests[contest.ObjectId].Add(
             new SelectionChallenge(
-                selection.ObjectId,
+                selection,
                 GuardianId,
                 SequenceOrder,
                 Coefficient,

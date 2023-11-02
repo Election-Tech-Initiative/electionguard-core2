@@ -159,7 +159,7 @@ namespace ElectionGuard.UI.Services
             var mediator = await CreateDecryptionMediator(_adminUser, tally);
             await LoadAllShares(mediator, tally);
 
-            mediator.AccumulateShares(tally.TallyId, true);
+            mediator.AccumulateShares(tally.TallyId, false);
             // mediator.CreateChallenge(tallyId);
             var challengeRecords = await _challengeService.GetAllByTallyIdAsync(tally.TallyId) ?? throw new ArgumentException(nameof(tally.TallyId));
             foreach (var challengeRecord in challengeRecords)
@@ -183,7 +183,7 @@ namespace ElectionGuard.UI.Services
                 throw new ElectionGuardException("did not validate");
             }
 
-            using var result = mediator.Decrypt(tally.TallyId, true);
+            using var result = mediator.Decrypt(tally.TallyId, false);
             var plaintextTallyRecord = new PlaintextTallyRecord()
             {
                 TallyId = tally.TallyId,

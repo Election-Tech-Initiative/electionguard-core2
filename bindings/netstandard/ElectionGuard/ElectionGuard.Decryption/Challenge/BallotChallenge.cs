@@ -178,7 +178,7 @@ public record BallotChallenge
         ElementModQ challenge)
     {
         Contests[contest.ObjectId].Add(new SelectionChallenge(
-            selection.ObjectId,
+            selection,
             GuardianId,
             SequenceOrder,
             Coefficient,
