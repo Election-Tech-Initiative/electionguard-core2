@@ -778,7 +778,8 @@ public static class VerifyElection
             var contestResults = new List<VerificationResult>();
             foreach (var (selectionId, plaintext) in contest.Selections)
             {
-                var ciphertext = encryptedTally.Contests[contestId].Selections[selectionId].Ciphertext;
+                var encrypted = encryptedTally.Contests[contestId].Selections[selectionId];
+                var ciphertext = encrypted.Ciphertext;
 
                 // Verification 9.1 - M = B · T^−1 mod p
                 using var m = BigMath.DivModP(ciphertext.Data, plaintext.Value);
@@ -811,9 +812,18 @@ public static class VerifyElection
                 contestResults.Add(new VerificationResult(consistentV, $"- Verification 9.A: Selection {plaintext.ObjectId} Consistent Response V"));
 
                 // Verification 9.B
-                // TODO: Issue #433 - E.G. 2.0 - implement
-                // https://github.com/microsoft/electionguard-core2/issues/433
-                contestResults.Add(new VerificationResult(IsValidwithKnownSpecDeviations, "- Verification 9.B: TODO: E.G. 2.0 - implement"));
+                var computedChallenge = Hash.HashElems(
+                    Hash.Prefix_DecryptSelectionProof,
+                    context.CryptoExtendedBaseHash,
+                    context.ElGamalPublicKey,
+                    ciphertext.Pad,
+                    ciphertext.Data,
+                    plaintext.Proof.Pad,
+                    plaintext.Proof.Data,
+                    m);
+
+                var consistentC = plaintext.Proof.Challenge.Equals(computedChallenge);
+                contestResults.Add(new VerificationResult(consistentC, $"- Verification 9.B: Selection {plaintext.ObjectId} Computed challenge does not match proof"));
             }
             results.Add(new VerificationResult($"- Verification 9: Contest {contestId}", contestResults));
         }
