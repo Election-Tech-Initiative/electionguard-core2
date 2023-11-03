@@ -312,11 +312,13 @@ eg_ciphertext_ballot_selection_get_nonce(eg_ciphertext_ballot_selection_t *handl
 
 eg_electionguard_status_t
 eg_ciphertext_ballot_selection_get_proof(eg_ciphertext_ballot_selection_t *handle,
-                                         eg_disjunctive_chaum_pedersen_proof_t **out_proof_ref)
+                                         eg_ranged_chaum_pedersen_proof_t **out_proof_ref)
+//eg_disjunctive_chaum_pedersen_proof_t **out_proof_ref)
 {
     try {
         auto *reference = AS_TYPE(CiphertextBallotSelection, handle)->getProof();
-        *out_proof_ref = AS_TYPE(eg_disjunctive_chaum_pedersen_proof_t, reference);
+        *out_proof_ref = AS_TYPE(eg_ranged_chaum_pedersen_proof_t, reference);
+        //*out_proof_ref = AS_TYPE(eg_disjunctive_chaum_pedersen_proof_t, reference);
         return ELECTIONGUARD_STATUS_SUCCESS;
     } catch (const exception &e) {
         Log::error("eg_ciphertext_ballot_selection_get_proof", e);

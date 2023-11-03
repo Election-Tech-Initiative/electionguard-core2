@@ -125,18 +125,19 @@ namespace ElectionGuard
         /// <Summary>
         /// The proof that demonstrates the selection is an encryption of 0 or 1, and was encrypted using the `nonce`
         /// </Summary>
-        public DisjunctiveChaumPedersenProof Proof
+//        public DisjunctiveChaumPedersenProof Proof
+        public RangedChaumPedersenProof Proof
         {
             get
             {
                 var status = External.GetProof(
-                    Handle, out NativeInterface.DisjunctiveChaumPedersenProof.DisjunctiveChaumPedersenProofHandle value);
+                    Handle, out var value);
                 status.ThrowIfError();
                 if (value.IsInvalid)
                 {
                     return null;
                 }
-                return new DisjunctiveChaumPedersenProof(value);
+                return new RangedChaumPedersenProof(value);
             }
         }
 
@@ -287,7 +288,8 @@ namespace ElectionGuard
                 SetLastError = true)]
             internal static extern Status GetProof(
                 CiphertextBallotSelectionHandle handle,
-                out NativeInterface.DisjunctiveChaumPedersenProof.DisjunctiveChaumPedersenProofHandle objectId
+                out NativeInterface.RangedChaumPedersenProof.RangedChaumPedersenProofHandle objectId
+                // out NativeInterface.DisjunctiveChaumPedersenProof.DisjunctiveChaumPedersenProofHandle objectId
                 );
 
             [DllImport(
