@@ -36,7 +36,7 @@ Learn More in the [ElectionGuard Repository](https://github.com/microsoft/electi
 
 ElectionGuard supports a variety of use cases. The Primary use case is to generate verifiable end-to-end (E2E) encrypted elections. The ElectionGuard process can also be used for other use cases such as privacy enhanced risk-limiting audits (RLAs). This implementation only includes encryption functions and cannot be used to generate election keys and it cannot decrypt tally results.
 
-This c++ implementation also includes a C API that can be consumed from anywhere that can call C code directly. A .Net Standard package is also provided.
+This C++ implementation also includes a C API that can be consumed from anywhere that can call C code directly. A .Net Standard package is also provided.
 
 ## 💻 Requirements
 
@@ -67,7 +67,7 @@ The automated install of dependencies is currently only supported on debian-base
 
 ### Web Assembly
 
-Building for WebAssembly (wasm) is supported with the `emscripten` toolchain.
+Building for WebAssembly (wasm) is supported with the `emscripten` toolchain. This currently is setup for compiling on Linux and Mac only.
 
 - Install [emscripten](https://emscripten.org/docs/getting_started/downloads.html)
 - Install [Node Version Manager](https://github.com/nvm-sh/nvm)
@@ -77,36 +77,19 @@ Building for WebAssembly (wasm) is supported with the `emscripten` toolchain.
 
 ### 🖥️ Windows (using MSVC)
 
-Building on windows is supported using the `MSVC` toolchain. MSVC is the default toolchain on Windows.
+Building on windows is supported using the `MSVC` toolchain. MSVC is the default toolchain on Windows. All of these tools should be installed as admin or in a command prompt as admin to make sure that all of the security settings are appropriate. As for the Visual Studio 2022 install, VS 2022 Community edition will work for developing ElectionGuard. You also may use Professional or Enterprise versions.
 
 - Install [Chocolatey](https://chocolatey.org/install)
+- Install [Visual Studio Code](https://code.visualstudio.com/) or [Visual Studio Code](https://community.chocolatey.org/packages/vscode)
+- Install [Github CommandLine](https://community.chocolatey.org/packages/git) or [Github CLI](https://community.chocolatey.org/packages/gh) or [Github Desktop](https://community.chocolatey.org/packages/github-desktop)
 - Install [Powershell Core](https://github.com/powershell/powershell)
-- Install [VS 2022](https://visualstudio.microsoft.com/vs/)
+- Install [VS 2022](https://visualstudio.microsoft.com/vs/) or [VS 2022](https://community.chocolatey.org/packages/visualstudio2022community)
 - Open the Visual Studio Installer and install
-  -- MSVC v142 - VS 2022 C++ x64/x86 build tools
-  -- Windows 10 SDK (latest)
-  -- C++ CMake tools for Windows
-  -- C++/CLI support for v142 build tools
-
-### 🖥️ Windows (using MSYS2)
-
-Building on windows is supported using the `MSYS2` toolchain. 
-
-- Install [Chocolatey](https://chocolatey.org/install)
-- Install [Powershell Core](https://github.com/powershell/powershell)
-- Install [MSYS2](https://www.msys2.org)
-- Open the MSYS2 prompt by running the newly-created "MSYS2 MSYS" shortcut in your start menu.
-- Inside the prompt, run `pacman -Syu`, then close the window when it prompts you to.
-- Reopen the MSYS2 prompt and run:
-  ```
-  pacman -Syu
-  pacman -S mingw-w64-x86_64-gcc mingw-w64-x86_64-cmake make
-  ```
-- Modify your `%Path%` to include the newly-installed software. You should include these two paths:
-  ```
-  C:\msys64\mingw64\bin
-  C:\msys64\usr\bin
-  ```
+  - MSVC v142 - VS 2022 C++ x64/x86 build tools
+  - Windows 10 SDK (latest)
+  - C++ CMake tools for Windows
+  - C++/CLI support for v142 build tools
+  - ![Visual Studio Options][vs options]
 
 #### 🚧 The Procedure Entry Point Could not be Located
 
@@ -165,16 +148,13 @@ make build-ios
 
 ### Windows
 
-Using the default MSYS2 toolchain:
+Using the default MSVC 2022 toolchain (with optional platform builds):
 
-```pwsh
+```sh
 make build
-```
-
-Using the MSVC toolchain:
-
-```pwsh
-make build-msvc
+make build-arm64
+make build-x86
+make build-x64
 ```
 
 ## Build Wrappers
@@ -189,16 +169,10 @@ make build-netstandard
 
 ## Test
 
-### Running the C++ and C tests
+### Running the C++ and C tests on Windows using the MSVC toolchain
 
 ```sh
 make test
-```
-
-#### Running the tests on Windows using the MSVC toolchain
-
-```sh
-make test-msvc
 ```
 
 ### Running the netstandard tests
@@ -224,6 +198,12 @@ Then, open Visual studio for Mac and run the `ElectionGuard.Tests.Android` or `E
 
 There is a command line interface in the `./apps/electionguard-cli` folder. This is a tool useful for generating test data and interacting with ElectionGuard.
 
+```sh
+make build-cli
+make test-cli
+make verify
+```
+
 ## 📄 Documentation
 
 ## Contributing
@@ -240,7 +220,7 @@ Please report any bugs, feature requests, or enhancements using the [GitHub Issu
 
 ### Have Questions?
 
-ElectionGuard would love for you to ask questions out in the open using GitHub Discussions. If you really want to email the ElectionGuard team, reach out at electionguard@microsoft.com.
+ElectionGuard would love for you to ask questions out in the open using GitHub Discussions.
 
 ## License
 
@@ -254,9 +234,19 @@ A huge thank you to those who helped to contribute to this project so far, inclu
 
 <a href="https://www.microsoft.com/en-us/research/people/benaloh/"><img src="https://www.microsoft.com/en-us/research/wp-content/uploads/2016/09/avatar_user__1473484671-180x180.jpg" title="Josh Benaloh" width="80" height="80"></a>
 
+**[Michael Naehrig _(Microsoft)_](https://www.microsoft.com/en-us/research/people/mnaehrig/)**
+
+<a href="https://www.microsoft.com/en-us/research/people/mnaehrig/"><img src="https://www.microsoft.com/en-us/research/uploads/prod/2023/09/square_small.jpg" title="Michael Naehrig" width="80" height="80"></a>
+
+**Olivier Pereira _(Microsoft)_**
+
+**[RC Carter _(Election Tech)_](https://www.election.tech/)**
+
+<a href="https://github.com/rc-eti"><img src="https://avatars.githubusercontent.com/u/139162996?v=4" title="rc-eti" width="80" height="80"></a>
+
 **[Steve Maier](https://github.com/SteveMaier-IRT) [_(InfernoRed Technology)_](https://infernored.com/)**
 
-<a href="https://github.com/SteveMaier-IRT"><img src="https://avatars2.githubusercontent.com/u82616727?v=4" title="SteveMaier-IRT" width="80" height="80"></a>
+<a href="https://github.com/SteveMaier-IRT"><img src="https://avatars.githubusercontent.com/u/82616727?v=4" title="SteveMaier-IRT" width="80" height="80"></a>
 
 **[Keith Fung](https://github.com/keithrfung) [_(InfernoRed Technology)_](https://infernored.com/)**
 
@@ -289,3 +279,4 @@ A huge thank you to those who helped to contribute to this project so far, inclu
 [contributing]: https://github.com/microsoft/electionguard-core2/blob/main/CONTRIBUTING.md
 [security]: https://github.com/microsoft/electionguard-core2/blob/main/SECURITY.md
 [mit license]: https://github.com/microsoft/electionguard-core2/blob/main/LICENSE
+[vs options]: https://github.com/microsoft/electionguard-core2/blob/main/images/vs_options.png
