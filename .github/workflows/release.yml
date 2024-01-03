@@ -224,37 +224,37 @@ jobs:
         run: make environment
 
       - name: Get Linux x64 Artifacts
-        uses: actions/download-artifact@v3
+        uses: actions/download-artifact@v4
         with:
           name: linux-x64
           path: build/libs/Linux/x64/Release
 
       - name: Get MacCatalyst arm64 Artifacts
-        uses: actions/download-artifact@v3
+        uses: actions/download-artifact@v4
         with:
           name: maccatalyst-arm64
           path: build/libs/MacCatalyst/arm64/Release
 
       - name: Get MacOS arm64 Artifacts
-        uses: actions/download-artifact@v3
+        uses: actions/download-artifact@v4
         with:
           name: osx-arm64
           path: build/libs/Darwin/arm64/Release
 
       - name: Get MacOS x64 Artifacts
-        uses: actions/download-artifact@v3
+        uses: actions/download-artifact@v4
         with:
           name: osx-x64
           path: build/libs/Darwin/x64/Release
 
       - name: Get Windows x86 Artifacts
-        uses: actions/download-artifact@v3
+        uses: actions/download-artifact@v4
         with:
           name: win-x86
           path: build/libs/Windows/x86/Release
 
       - name: Get Windows x64 Artifacts
-        uses: actions/download-artifact@v3
+        uses: actions/download-artifact@v4
         with:
           name: win-x64
           path: build/libs/Windows/x64/Release
@@ -284,7 +284,7 @@ jobs:
         with:
           node-version: 16
       - name: Get WASM Artifacts
-        uses: actions/download-artifact@v3
+        uses: actions/download-artifact@v4
         with:
           name: wasm
           path: bindings/typescript/src/wasm
@@ -344,13 +344,13 @@ jobs:
         run: make environment-ui
 
       # - name: Get MacCatalyst arm64 Artifacts
-      #   uses: actions/download-artifact@v3
+      #   uses: actions/download-artifact@v4
       #   with:
       #     name: maccatalyst-arm64
       #     path: build/libs/MacCatalyst/arm64/Release
 
       - name: Get Windows x64 Artifacts
-        uses: actions/download-artifact@v3
+        uses: actions/download-artifact@v4
         with:
           name: win-x64
           path: build/libs/Windows/x64/Release
