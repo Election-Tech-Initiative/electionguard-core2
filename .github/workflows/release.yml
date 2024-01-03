@@ -50,7 +50,7 @@ jobs:
       - name: Build
         run: make build-x64
       - name: Upload Library (x64)
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: linux-x64
           path: |
@@ -72,7 +72,7 @@ jobs:
       - name: Build
         run: make build-maccatalyst
       - name: Upload Library (arm64)
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: maccatalyst-arm64
           path: |
@@ -95,7 +95,7 @@ jobs:
       - name: Build
         run: make build-arm64
       - name: Upload Library (x64)
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: osx-arm64
           path: |
@@ -118,7 +118,7 @@ jobs:
       - name: Build
         run: make build-x64
       - name: Upload Library (x64)
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: osx-x64
           path: |
@@ -145,7 +145,7 @@ jobs:
       - name: Build
         run: make build-wasm
       - name: Upload Library (wasm)
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: wasm
           path: |
@@ -167,7 +167,7 @@ jobs:
       - name: Build
         run: make build-x86
       - name: Upload Library (x86)
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: win-x86
           path: |
@@ -193,7 +193,7 @@ jobs:
       - name: Build
         run: make build-x64
       - name: Upload Library (x64)
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: win-x64
           path: |
@@ -364,7 +364,7 @@ jobs:
         run: make publish-ui
 
       - name: save build artifacts
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: electionguard-admin
           path: ./publish/*
