@@ -279,7 +279,7 @@ jobs:
 
       # Tools
       - name: Install .NET
-        uses: actions/setup-dotnet@v3
+        uses: actions/setup-dotnet@v4
         if: (steps.filter.outputs.any == 'true')
         with:
           dotnet-version: 7.0.x
