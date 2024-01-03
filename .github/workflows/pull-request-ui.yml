@@ -105,7 +105,7 @@ jobs:
 
       - name: Install .NET
         if: (steps.filter.outputs.any == 'true')
-        uses: actions/setup-dotnet@v3
+        uses: actions/setup-dotnet@v4
         with:
           dotnet-version: 7.0.x
 
@@ -144,7 +144,7 @@ jobs:
 
       - name: save build artifacts
         if: (steps.filter.outputs.bindings == 'true' || steps.filter.outputs.source == 'true')
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: electionguard-admin
           retention-days: 7
