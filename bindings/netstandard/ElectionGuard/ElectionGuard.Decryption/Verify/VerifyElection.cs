@@ -405,34 +405,40 @@ public static class VerifyElection
     {
         var results = new List<VerificationResult>();
 
-        // Verification 4.1 - 𝑎0 = 𝑔^𝑣0 mod 𝑝 ⋅ 𝛼^𝑐0 mod 𝑝
-        using var gv0 = BigMath.PowModP(constants.G, selection.Proof.ZeroResponse);
-        using var ac0 = BigMath.PowModP(selection.Ciphertext.Pad, selection.Proof.ZeroChallenge);
-        using var gv0ac0 = BigMath.MultModP(gv0, ac0);
-        var consistent_gv0 = selection.Proof.ZeroPad.Equals(gv0ac0);
-        results.Add(new VerificationResult(consistent_gv0, $"      - Verification 4.1: 𝑎0 = 𝑔^𝑣0 mod 𝑝 ⋅ 𝛼^𝑐0 mod 𝑝"));
+        var temp_internal_check_is_valid = selection.Proof.IsValid(
+            selection.Ciphertext,
+            context.ElGamalPublicKey,
+            context.CryptoExtendedBaseHash, Hash.Prefix_SelectionProof);
+        results.Add(new VerificationResult(temp_internal_check_is_valid.IsValid, $"      - Verification 4.1, 4.2, 4.3, 4.4, 4.5, 4.A, 4.B, 4.C: temp internal check is valid"));
 
-        // Verification 4.2 - 𝑎1 = 𝑔^𝑣1 mod 𝑝 ⋅ 𝛼^𝑐1 mod 𝑝
-        using var gv1 = BigMath.PowModP(constants.G, selection.Proof.OneResponse);
-        using var ac1 = BigMath.PowModP(selection.Ciphertext.Pad, selection.Proof.OneChallenge);
-        using var gv1ac1 = BigMath.MultModP(gv1, ac1);
-        var consistent_gv1 = selection.Proof.OnePad.Equals(gv1ac1);
-        results.Add(new VerificationResult(consistent_gv1, $"      - Verification 4.2: 𝑎1 = 𝑔^𝑣1 mod 𝑝 ⋅ 𝛼^𝑐1 mod 𝑝"));
+        // // Verification 4.1 - 𝑎0 = 𝑔^𝑣0 mod 𝑝 ⋅ 𝛼^𝑐0 mod 𝑝
+        // using var gv0 = BigMath.PowModP(constants.G, selection.Proof.ZeroResponse);
+        // using var ac0 = BigMath.PowModP(selection.Ciphertext.Pad, selection.Proof.ZeroChallenge);
+        // using var gv0ac0 = BigMath.MultModP(gv0, ac0);
+        // var consistent_gv0 = selection.Proof.ZeroPad.Equals(gv0ac0);
+        // results.Add(new VerificationResult(consistent_gv0, $"      - Verification 4.1: 𝑎0 = 𝑔^𝑣0 mod 𝑝 ⋅ 𝛼^𝑐0 mod 𝑝"));
 
-        // Verification 4.3 - 𝑏0 = 𝐾^𝑣0 mod 𝑝 ⋅ 𝛽^𝑐0 mod 𝑝
-        using var kv0 = BigMath.PowModP(context.ElGamalPublicKey, selection.Proof.ZeroResponse);
-        using var bc0 = BigMath.PowModP(selection.Ciphertext.Data, selection.Proof.ZeroChallenge);
-        using var kv0bc0 = BigMath.MultModP(kv0, bc0);
-        var consistent_kv0 = selection.Proof.ZeroData.Equals(kv0bc0);
-        results.Add(new VerificationResult(consistent_kv0, $"      - Verification 4.3: 𝑏0 = 𝐾^𝑣0 mod 𝑝 ⋅ 𝛽^𝑐0 mod 𝑝"));
+        // // Verification 4.2 - 𝑎1 = 𝑔^𝑣1 mod 𝑝 ⋅ 𝛼^𝑐1 mod 𝑝
+        // using var gv1 = BigMath.PowModP(constants.G, selection.Proof.OneResponse);
+        // using var ac1 = BigMath.PowModP(selection.Ciphertext.Pad, selection.Proof.OneChallenge);
+        // using var gv1ac1 = BigMath.MultModP(gv1, ac1);
+        // var consistent_gv1 = selection.Proof.OnePad.Equals(gv1ac1);
+        // results.Add(new VerificationResult(consistent_gv1, $"      - Verification 4.2: 𝑎1 = 𝑔^𝑣1 mod 𝑝 ⋅ 𝛼^𝑐1 mod 𝑝"));
 
-        // Verification 4.4 - 𝑏1 = 𝐾^w1 mod 𝑝 ⋅ 𝛽^𝑐1 mod 𝑝
-        using var w1 = BigMath.SubModQ(selection.Proof.OneResponse, selection.Proof.OneChallenge);
-        using var kw1 = BigMath.PowModP(context.ElGamalPublicKey, w1);
-        using var bc1 = BigMath.PowModP(selection.Ciphertext.Data, selection.Proof.OneChallenge);
-        using var kw1bc1 = BigMath.MultModP(kw1, bc1);
-        var consistent_kw1 = selection.Proof.OneData.Equals(kw1bc1);
-        results.Add(new VerificationResult(consistent_kw1, $"      - Verification 4.4: 𝑏1 = 𝐾^w1 mod 𝑝 ⋅ 𝛽^𝑐1 mod 𝑝"));
+        // // Verification 4.3 - 𝑏0 = 𝐾^𝑣0 mod 𝑝 ⋅ 𝛽^𝑐0 mod 𝑝
+        // using var kv0 = BigMath.PowModP(context.ElGamalPublicKey, selection.Proof.ZeroResponse);
+        // using var bc0 = BigMath.PowModP(selection.Ciphertext.Data, selection.Proof.ZeroChallenge);
+        // using var kv0bc0 = BigMath.MultModP(kv0, bc0);
+        // var consistent_kv0 = selection.Proof.ZeroData.Equals(kv0bc0);
+        // results.Add(new VerificationResult(consistent_kv0, $"      - Verification 4.3: 𝑏0 = 𝐾^𝑣0 mod 𝑝 ⋅ 𝛽^𝑐0 mod 𝑝"));
+
+        // // Verification 4.4 - 𝑏1 = 𝐾^w1 mod 𝑝 ⋅ 𝛽^𝑐1 mod 𝑝
+        // using var w1 = BigMath.SubModQ(selection.Proof.OneResponse, selection.Proof.OneChallenge);
+        // using var kw1 = BigMath.PowModP(context.ElGamalPublicKey, w1);
+        // using var bc1 = BigMath.PowModP(selection.Ciphertext.Data, selection.Proof.OneChallenge);
+        // using var kw1bc1 = BigMath.MultModP(kw1, bc1);
+        // var consistent_kw1 = selection.Proof.OneData.Equals(kw1bc1);
+        // results.Add(new VerificationResult(consistent_kw1, $"      - Verification 4.4: 𝑏1 = 𝐾^w1 mod 𝑝 ⋅ 𝛽^𝑐1 mod 𝑝"));
 
         // Verification 4.5 - c = H(04,Q,K,α,β,a0,b0,a1,b1)
         // using var recomputedHash = Hash.HashElems(
@@ -454,25 +460,25 @@ public static class VerifyElection
 
 
         // Verification 4.A
-        var inBoundsAlpha = selection.Ciphertext.Pad.IsInBounds();
-        results.Add(new VerificationResult(inBoundsAlpha, $"      - Verification 4.A: Alpha is in bounds"));
-        var inboundsBeta = selection.Ciphertext.Data.IsInBounds();
-        results.Add(new VerificationResult(inboundsBeta, $"      - Verification 4.A: Beta is in bounds"));
+        // var inBoundsAlpha = selection.Ciphertext.Pad.IsInBounds();
+        // results.Add(new VerificationResult(inBoundsAlpha, $"      - Verification 4.A: Alpha is in bounds"));
+        // var inboundsBeta = selection.Ciphertext.Data.IsInBounds();
+        // results.Add(new VerificationResult(inboundsBeta, $"      - Verification 4.A: Beta is in bounds"));
 
-        // Verification 4.B
-        var inBoundsC0 = selection.Proof.ZeroChallenge.IsInBounds();
-        results.Add(new VerificationResult(inBoundsC0, $"      - Verification 4.B: C0 is in bounds"));
-        var inBoundsC1 = selection.Proof.OneChallenge.IsInBounds();
-        results.Add(new VerificationResult(inBoundsC1, $"      - Verification 4.B: C1 is in bounds"));
-        var inBoundsV0 = selection.Proof.ZeroResponse.IsInBounds();
-        results.Add(new VerificationResult(inBoundsV0, $"      - Verification 4.B: V0 is in bounds"));
-        var inBoundsV1 = selection.Proof.OneResponse.IsInBounds();
-        results.Add(new VerificationResult(inBoundsV1, $"      - Verification 4.B: V1 is in bounds"));
+        // // Verification 4.B
+        // var inBoundsC0 = selection.Proof.ZeroChallenge.IsInBounds();
+        // results.Add(new VerificationResult(inBoundsC0, $"      - Verification 4.B: C0 is in bounds"));
+        // var inBoundsC1 = selection.Proof.OneChallenge.IsInBounds();
+        // results.Add(new VerificationResult(inBoundsC1, $"      - Verification 4.B: C1 is in bounds"));
+        // var inBoundsV0 = selection.Proof.ZeroResponse.IsInBounds();
+        // results.Add(new VerificationResult(inBoundsV0, $"      - Verification 4.B: V0 is in bounds"));
+        // var inBoundsV1 = selection.Proof.OneResponse.IsInBounds();
+        // results.Add(new VerificationResult(inBoundsV1, $"      - Verification 4.B: V1 is in bounds"));
 
-        // Verification 4.C
-        using var c0c1 = BigMath.AddModQ(selection.Proof.ZeroChallenge, selection.Proof.OneChallenge);
-        var consistent_c = c0c1.Equals(selection.Proof.Challenge);
-        results.Add(new VerificationResult(consistent_c, $"      - Verification 4.C: C = (c0 + c1) mod q"));
+        // // Verification 4.C
+        // using var c0c1 = BigMath.AddModQ(selection.Proof.ZeroChallenge, selection.Proof.OneChallenge);
+        // var consistent_c = c0c1.Equals(selection.Proof.Challenge);
+        // results.Add(new VerificationResult(consistent_c, $"      - Verification 4.C: C = (c0 + c1) mod q"));
 
         // note numbered Verification 4 in spec v1.5.3
         // note numbered Verification 5 in spec v2.0.0

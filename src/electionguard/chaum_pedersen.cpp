@@ -703,6 +703,19 @@ namespace electionguard
     {
     }
 
+    std::unique_ptr<RangedChaumPedersenProof> RangedChaumPedersenProof::clone() const
+    {
+        map<uint64_t, unique_ptr<ZeroKnowledgeProof>> _proofs;
+        auto integerProofs = this->getProofs();
+        int index = 0;
+        for (auto &proof : integerProofs) {
+            _proofs[index++] = proof.get().clone();
+        }
+
+        return make_unique<RangedChaumPedersenProof>(this->getRangeLimit(),
+                                                     this->getChallenge()->clone(), move(_proofs));
+    }
+
     RangedChaumPedersenProof::RangedChaumPedersenProof(RangedChaumPedersenProof &&other)
         : pimpl(move(other.pimpl))
     {
@@ -835,6 +848,10 @@ namespace electionguard
 
         // validate the integer proofs against the message
         auto validationResult = pimpl->isValid(message, k);
+        if (!validationResult.isValid) {
+            validationResult.isValid = false;
+            Log::info("- Verification 6.5a: invalid ranged computed challenge");
+        }
 
         auto commitments = pimpl->getHashableCommitments(message, k);
 

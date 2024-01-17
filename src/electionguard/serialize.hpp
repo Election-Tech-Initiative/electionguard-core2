@@ -1085,17 +1085,42 @@ namespace electionguard
                         json ciphertext = {
                           {"pad", selection.get().getCiphertext()->getPad()->toHex()},
                           {"data", selection.get().getCiphertext()->getData()->toHex()}};
+
+                        // RangedChaumPedersenProof
                         auto *p = selection.get().getProof();
+                        json integer_proofs;
+                        uint64_t i = 0;
+                        for (const auto &proof : p->getProofs()) {
+                            json proof_json;
+
+                            // HACK: disable serializing out commitments
+                            // as a means of enforcing that commitments are not
+                            // included in the election record.
+                            // TODO: allow a caller to specify this behavior
+                            auto expliclyDisableSerializingCommimtnets = true;
+                            if (proof.get().commitment.has_value() &&
+                                !expliclyDisableSerializingCommimtnets) {
+                                proof_json = {
+                                  {"pad", proof.get().commitment.value()->getPad()->toHex()},
+                                  {"data", proof.get().commitment.value()->getData()->toHex()},
+                                  {"challenge", proof.get().challenge->toHex()},
+                                  {"response", proof.get().response->toHex()},
+                                };
+                            } else {
+                                proof_json = {
+                                  {"challenge", proof.get().challenge->toHex()},
+                                  {"response", proof.get().response->toHex()},
+                                };
+                            }
+
+                            integer_proofs.push_back({{"index", i}, {"proof", proof_json}});
+                            i++;
+                        }
+
                         json selection_proof = {
-                          {"proof_zero_pad", p->getProofZeroPad()->toHex()},
-                          {"proof_zero_data", p->getProofZeroData()->toHex()},
-                          {"proof_one_pad", p->getProofOnePad()->toHex()},
-                          {"proof_one_data", p->getProofOneData()->toHex()},
-                          {"proof_zero_challenge", p->getProofZeroChallenge()->toHex()},
-                          {"proof_one_challenge", p->getProofOneChallenge()->toHex()},
+                          {"range_limit", p->getRangeLimit()},
                           {"challenge", p->getChallenge()->toHex()},
-                          {"proof_zero_response", p->getProofZeroResponse()->toHex()},
-                          {"proof_one_response", p->getProofOneResponse()->toHex()},
+                          {"proofs", integer_proofs},
                         };
 
                         json selection_props = {
@@ -1297,37 +1322,44 @@ namespace electionguard
                           ElementModP::fromHex(ciphertext_pad),
                           ElementModP::fromHex(ciphertext_data));
 
-                        // disjunctive proof
+                        // range proof
                         auto selection_proof = selection["proof"];
-                        auto selection_proof_zero_pad =
-                          selection_proof["proof_zero_pad"].get<string>();
-                        auto selection_proof_zero_data =
-                          selection_proof["proof_zero_data"].get<string>();
-                        auto selection_proof_one_pad =
-                          selection_proof["proof_one_pad"].get<string>();
-                        auto selection_proof_one_data =
-                          selection_proof["proof_one_data"].get<string>();
-                        auto selection_proof_zero_challenge =
-                          selection_proof["proof_zero_challenge"].get<string>();
-                        auto selection_proof_one_challenge =
-                          selection_proof["proof_one_challenge"].get<string>();
+                        auto selection_proof_range_limit =
+                          selection_proof["range_limit"].get<uint64_t>();
                         auto selection_proof_challenge = selection_proof["challenge"].get<string>();
-                        auto selection_proof_zero_response =
-                          selection_proof["proof_zero_response"].get<string>();
-                        auto selection_proof_one_response =
-                          selection_proof["proof_one_response"].get<string>();
 
-                        auto deserializedDisjunctive =
-                          make_unique<electionguard::DisjunctiveChaumPedersenProof>(
-                            ElementModP::fromHex(selection_proof_zero_pad),
-                            ElementModP::fromHex(selection_proof_zero_data),
-                            ElementModP::fromHex(selection_proof_one_pad),
-                            ElementModP::fromHex(selection_proof_one_data),
-                            ElementModQ::fromHex(selection_proof_zero_challenge),
-                            ElementModQ::fromHex(selection_proof_one_challenge),
+                        map<uint64_t, unique_ptr<ZeroKnowledgeProof>> selection_integer_proofs;
+
+                        for (auto &s_proof : selection_proof["proofs"]) {
+                            auto proof_index = s_proof["index"].get<uint64_t>();
+
+                            auto proof_challenge = s_proof["proof"]["challenge"].get<string>();
+                            auto proof_response = s_proof["proof"]["response"].get<string>();
+
+                            if (s_proof["proof"].contains("pad")) {
+                                auto proof_pad = s_proof["proof"]["pad"].get<string>();
+                                auto proof_data = s_proof["proof"]["data"].get<string>();
+
+                                selection_integer_proofs[proof_index] =
+                                  make_unique<ZeroKnowledgeProof>(
+                                    ElementModP::fromHex(proof_pad),
+                                    ElementModP::fromHex(proof_data),
+                                    ElementModQ::fromHex(proof_challenge),
+                                    ElementModQ::fromHex(proof_response));
+                            } else {
+                                selection_integer_proofs[proof_index] =
+                                  make_unique<ZeroKnowledgeProof>(
+                                    ElementModQ::fromHex(proof_challenge),
+                                    ElementModQ::fromHex(proof_response));
+                            }
+                        }
+
+                        // TODO: handle deserialization
+                        auto deserializedProof =
+                          make_unique<electionguard::RangedChaumPedersenProof>(
+                            selection_proof_range_limit,
                             ElementModQ::fromHex(selection_proof_challenge),
-                            ElementModQ::fromHex(selection_proof_zero_response),
-                            ElementModQ::fromHex(selection_proof_one_response));
+                            move(selection_integer_proofs));
 
                         auto nonce = selection_nonce.empty()
                                        ? make_unique<ElementModQ>(ZERO_MOD_Q())
@@ -1339,7 +1371,7 @@ namespace electionguard
                             *ElementModQ::fromHex(selection_description_hash),
                             move(deserializedCiphertext), selection_is_placeholder_selection,
                             move(nonce), ElementModQ::fromHex(selection_crypto_hash),
-                            move(deserializedDisjunctive)));
+                            move(deserializedProof)));
                     }
 
                     auto nonce = contest_nonce.empty() ? make_unique<ElementModQ>(ZERO_MOD_Q())
