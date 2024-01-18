@@ -417,7 +417,7 @@ publish-ui-appcenter:
 ifneq ($(APPCENTER_SECRET_UWP),)
 ifeq ($(OPERATING_SYSTEM),Windows)
 	@echo "Publishing UWP to AppCenter"
-	appcenter distribute release -f $(ELECTIONGUARD_PUBLISH_DIR)/ElectionGuard.UI.zip -g QualityAssurance -a "InfernoRed-Technology/ElectionGuard-Admin-1" -n $(BUILD_NUMBER) -b $(BUILD_VERSION) --disable-telemetry --token $(APPCENTER_API_TOKEN_UWP)
+	appcenter distribute release -f $(ELECTIONGUARD_PUBLISH_DIR)/ElectionGuard.UI.zip -g QualityAssurance -a "Election-Technology-Initiative/ElectionGuard-Admin-1" -n $(BUILD_NUMBER) -b $(BUILD_VERSION) --disable-telemetry --token $(APPCENTER_API_TOKEN_UWP)
 endif
 else
 	@echo "APPCENTER_SECRET_UWP not set. Skipping AppCenter publish"
@@ -426,7 +426,7 @@ endif
 ifneq ($(APPCENTER_SECRET_MACOS),)
 ifeq ($(OPERATING_SYSTEM),Darwin)
 	@echo "Publishing MacCatalyst to AppCenter"
-	appcenter distribute release -f $(ELECTIONGUARD_PUBLISH_DIR)/*.pkg -g QualityAssurance -a "InfernoRed-Technology/ElectionGuard-Admin" -n $(BUILD_NUMBER) -b $(BUILD_VERSION) --disable-telemetry --token $(APPCENTER_API_TOKEN_MACOS)
+	appcenter distribute release -f $(ELECTIONGUARD_PUBLISH_DIR)/*.pkg -g QualityAssurance -a "Election-Technology-Initiative/ElectionGuard-Admin" -n $(BUILD_NUMBER) -b $(BUILD_VERSION) --disable-telemetry --token $(APPCENTER_API_TOKEN_MACOS)
 endif
 else
 	@echo "APPCENTER_SECRET_MACOS not set. Skipping AppCenter publish"
