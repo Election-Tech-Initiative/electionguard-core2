@@ -50,7 +50,7 @@ jobs:
       - name: Build
         run: make build-x64
       - name: Upload Library (x64)
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: linux-x64
           path: |
@@ -72,7 +72,7 @@ jobs:
       - name: Build
         run: make build-maccatalyst
       - name: Upload Library (arm64)
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: maccatalyst-arm64
           path: |
@@ -95,7 +95,7 @@ jobs:
       - name: Build
         run: make build-arm64
       - name: Upload Library (x64)
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: osx-arm64
           path: |
@@ -118,7 +118,7 @@ jobs:
       - name: Build
         run: make build-x64
       - name: Upload Library (x64)
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: osx-x64
           path: |
@@ -145,7 +145,7 @@ jobs:
       - name: Build
         run: make build-wasm
       - name: Upload Library (wasm)
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: wasm
           path: |
@@ -159,7 +159,7 @@ jobs:
       - name: Checkout Code
         uses: actions/checkout@v4
       - name: Install .NET
-        uses: actions/setup-dotnet@v3
+        uses: actions/setup-dotnet@v4
         with:
           dotnet-version: 7.0.x
       - name: Setup Environment
@@ -167,7 +167,7 @@ jobs:
       - name: Build
         run: make build-x86
       - name: Upload Library (x86)
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: win-x86
           path: |
@@ -185,7 +185,7 @@ jobs:
       - name: Checkout Code
         uses: actions/checkout@v4
       - name: Install .NET
-        uses: actions/setup-dotnet@v3
+        uses: actions/setup-dotnet@v4
         with:
           dotnet-version: 7.0.x
       - name: Setup Environment
@@ -193,7 +193,7 @@ jobs:
       - name: Build
         run: make build-x64
       - name: Upload Library (x64)
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: win-x64
           path: |
@@ -224,37 +224,37 @@ jobs:
         run: make environment
 
       - name: Get Linux x64 Artifacts
-        uses: actions/download-artifact@v3
+        uses: actions/download-artifact@v4
         with:
           name: linux-x64
           path: build/libs/Linux/x64/Release
 
       - name: Get MacCatalyst arm64 Artifacts
-        uses: actions/download-artifact@v3
+        uses: actions/download-artifact@v4
         with:
           name: maccatalyst-arm64
           path: build/libs/MacCatalyst/arm64/Release
 
       - name: Get MacOS arm64 Artifacts
-        uses: actions/download-artifact@v3
+        uses: actions/download-artifact@v4
         with:
           name: osx-arm64
           path: build/libs/Darwin/arm64/Release
 
       - name: Get MacOS x64 Artifacts
-        uses: actions/download-artifact@v3
+        uses: actions/download-artifact@v4
         with:
           name: osx-x64
           path: build/libs/Darwin/x64/Release
 
       - name: Get Windows x86 Artifacts
-        uses: actions/download-artifact@v3
+        uses: actions/download-artifact@v4
         with:
           name: win-x86
           path: build/libs/Windows/x86/Release
 
       - name: Get Windows x64 Artifacts
-        uses: actions/download-artifact@v3
+        uses: actions/download-artifact@v4
         with:
           name: win-x64
           path: build/libs/Windows/x64/Release
@@ -284,7 +284,7 @@ jobs:
         with:
           node-version: 16
       - name: Get WASM Artifacts
-        uses: actions/download-artifact@v3
+        uses: actions/download-artifact@v4
         with:
           name: wasm
           path: bindings/typescript/src/wasm
@@ -329,7 +329,7 @@ jobs:
         run: cd ${{ github.workspace }}
 
       - name: Install .NET
-        uses: actions/setup-dotnet@v3
+        uses: actions/setup-dotnet@v4
         with:
           dotnet-version: 7.0.x
 
@@ -344,13 +344,13 @@ jobs:
         run: make environment-ui
 
       # - name: Get MacCatalyst arm64 Artifacts
-      #   uses: actions/download-artifact@v3
+      #   uses: actions/download-artifact@v4
       #   with:
       #     name: maccatalyst-arm64
       #     path: build/libs/MacCatalyst/arm64/Release
 
       - name: Get Windows x64 Artifacts
-        uses: actions/download-artifact@v3
+        uses: actions/download-artifact@v4
         with:
           name: win-x64
           path: build/libs/Windows/x64/Release
@@ -364,7 +364,7 @@ jobs:
         run: make publish-ui
 
       - name: save build artifacts
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: electionguard-admin
           path: ./publish/*
