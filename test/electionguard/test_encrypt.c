@@ -92,7 +92,7 @@ bool test_encrypt_selection(void)
         assert(false);
     }
 
-    eg_disjunctive_chaum_pedersen_proof_t *proof = NULL;
+    eg_ranged_chaum_pedersen_proof_t *proof = NULL;
     if (eg_ciphertext_ballot_selection_get_proof(result, &proof)) {
         assert(false);
     }
@@ -100,8 +100,10 @@ bool test_encrypt_selection(void)
     assert(eg_ciphertext_ballot_selection_is_valid_encryption(result, hash_context, public_key,
                                                               one_mod_q) == true);
 
-    assert(eg_disjunctive_chaum_pedersen_proof_is_valid(proof, ciphertext, public_key, one_mod_q) ==
-           true);
+    bool isValid = false;
+    eg_ranged_chaum_pedersen_proof_is_valid(proof, ciphertext, public_key, one_mod_q,
+                                            eg_hash_get_prefix_selection_proof(), &isValid);
+    assert(isValid == true);
 
     // Clean Up
     if (eg_element_mod_q_free(one_mod_q)) {
