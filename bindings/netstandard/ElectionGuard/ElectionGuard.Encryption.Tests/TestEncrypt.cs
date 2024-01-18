@@ -87,7 +87,7 @@ namespace ElectionGuard.Encryption.Tests
             await Task.Delay(2000);
 
             // encrypt a ballot using the default method (currently precompute = true)
-            var ciphertext = mediator.Encrypt(ballot);
+            var ciphertext = mediator.Encrypt(ballot, true, false);
 
             var timestamp = ciphertext.Timestamp;
             var nonce = ciphertext.Nonce;
