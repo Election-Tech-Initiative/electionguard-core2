@@ -198,7 +198,7 @@ jobs:
       - name: Setup Dependency Cache
         id: dependency-cache
         if: (steps.filter.outputs.any == 'true')
-        uses: actions/cache@v3
+        uses: actions/cache@v4
         with:
           path: |
             .cache/
@@ -207,7 +207,7 @@ jobs:
       - name: Setup C++ Build Cache
         id: build-cache
         if: (steps.filter.outputs.any == 'true')
-        uses: actions/cache@v3
+        uses: actions/cache@v4
         with:
           path: |
             build/
@@ -216,7 +216,7 @@ jobs:
       - name: Setup Node Cache
         id: node-cache
         if: (matrix.compiler == 'emscripten' && steps.filter.outputs.typescript == 'true')
-        uses: actions/cache@v3
+        uses: actions/cache@v4
         with:
           path: |
             bindings/typescript/node_modules/
