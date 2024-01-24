@@ -94,9 +94,7 @@ EG_API eg_electionguard_status_t eg_ciphertext_ballot_selection_get_nonce(
  * @retval ELECTIONGUARD_STATUS_ERROR_BAD_ALLOC The function was unable to allocate memory
  */
 EG_API eg_electionguard_status_t eg_ciphertext_ballot_selection_get_proof(
-  eg_ciphertext_ballot_selection_t *handle, eg_ranged_chaum_pedersen_proof_t **out_proof
-  //	eg_disjunctive_chaum_pedersen_proof_t **out_proof
-);
+  eg_ciphertext_ballot_selection_t *handle, eg_ranged_chaum_pedersen_proof_t **out_proof);
 
 /**
  * Given an encrypted BallotSelection, generates a hash, suitable for rolling up into a hash / tracking code for an entire ballot. Of note, this particular hash examines the `encryptionSeed` and `message`, but not the proof. This is deliberate, allowing for the possibility of ElectionGuard variants running on much more limited hardware, wherein the Disjunctive Chaum-Pedersen proofs might be computed later on. In most cases the encryption_seed should match the `description_hash`.

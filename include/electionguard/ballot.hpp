@@ -201,7 +201,6 @@ namespace electionguard
                                   std::unique_ptr<ElementModQ> nonce,
                                   std::unique_ptr<ElementModQ> cryptoHash,
                                   std::unique_ptr<RangedChaumPedersenProof> proof,
-                                  // std::unique_ptr<DisjunctiveChaumPedersenProof> proof,
                                   std::unique_ptr<ElGamalCiphertext> extendedData = nullptr);
         ~CiphertextBallotSelection();
 
@@ -249,7 +248,6 @@ namespace electionguard
         /// and was encrypted using the `nonce`
         /// </summary>
         RangedChaumPedersenProof *getProof() const;
-        //        DisjunctiveChaumPedersenProof *getProof() const;
 
         /// <summary>
         /// Given an encrypted BallotSelection, generates a hash, suitable for rolling up
@@ -292,7 +290,6 @@ namespace electionguard
              std::unique_ptr<ElementModQ> nonce = nullptr,
              std::unique_ptr<ElementModQ> cryptoHash = nullptr,
              std::unique_ptr<RangedChaumPedersenProof> proof = nullptr,
-             //             std::unique_ptr<DisjunctiveChaumPedersenProof> proof = nullptr,
              std::unique_ptr<ElGamalCiphertext> extendedData = nullptr);
 
         /// <summary>

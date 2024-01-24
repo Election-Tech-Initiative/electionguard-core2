@@ -125,7 +125,6 @@ namespace ElectionGuard
         /// <Summary>
         /// The proof that demonstrates the selection is an encryption of 0 or 1, and was encrypted using the `nonce`
         /// </Summary>
-//        public DisjunctiveChaumPedersenProof Proof
         public RangedChaumPedersenProof Proof
         {
             get
@@ -289,7 +288,6 @@ namespace ElectionGuard
             internal static extern Status GetProof(
                 CiphertextBallotSelectionHandle handle,
                 out NativeInterface.RangedChaumPedersenProof.RangedChaumPedersenProofHandle objectId
-                // out NativeInterface.DisjunctiveChaumPedersenProof.DisjunctiveChaumPedersenProofHandle objectId
                 );
 
             [DllImport(
