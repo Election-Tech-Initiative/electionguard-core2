@@ -1,4 +1,5 @@
-﻿using ElectionGuard.Ballot;
+﻿using System.Text;
+using ElectionGuard.Ballot;
 using ElectionGuard.ElectionSetup.Extensions;
 
 namespace ElectionGuard.Decryption.Tally;
@@ -82,7 +83,18 @@ public class CiphertextTallyContest : DisposableBase, ICiphertextContest, IEquat
 
         if (!Selections.Keys.All(contestSelectionIds.Contains))
         {
-            throw new ArgumentException("Selections do not match contest");
+            StringBuilder sb = new StringBuilder();
+            sb.AppendLine("selections keys");
+            foreach (var item in Selections.Keys)
+            {
+                sb.AppendLine(item);
+            }
+            sb.AppendLine("contestSelectionIds");
+            foreach (var item in contestSelectionIds)
+            {
+                sb.AppendLine(item);
+            }
+            throw new ArgumentException("Selections do not match contest " + sb.ToString());
         }
         foreach (var selection in ballotSelections)
         {
