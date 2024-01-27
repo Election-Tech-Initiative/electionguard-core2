@@ -89,6 +89,11 @@ public class CiphertextTallyContest : DisposableBase, ICiphertextContest, IEquat
             {
                 sb.AppendLine(item);
             }
+            sb.AppendLine("contest.Selections");
+            foreach (var item in contest.Selections)
+            {
+                sb.AppendLine(item.ObjectId);
+            }
             sb.AppendLine("contestSelectionIds");
             foreach (var item in contestSelectionIds)
             {
