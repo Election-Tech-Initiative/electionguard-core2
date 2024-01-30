@@ -159,14 +159,13 @@ namespace electionguard
         bool isPlaceholder;
         unique_ptr<ElementModQ> nonce;
         unique_ptr<ElementModQ> cryptoHash;
-        unique_ptr<DisjunctiveChaumPedersenProof> proof;
+        unique_ptr<RangedChaumPedersenProof> proof;
         unique_ptr<ElGamalCiphertext> extendedData;
 
         Impl(string objectId, uint64_t sequenceOrder, unique_ptr<ElementModQ> descriptionHash,
              unique_ptr<ElGamalCiphertext> ciphertext, bool isPlaceholder,
              unique_ptr<ElementModQ> nonce, unique_ptr<ElementModQ> cryptoHash,
-             unique_ptr<DisjunctiveChaumPedersenProof> proof,
-             unique_ptr<ElGamalCiphertext> extendedData)
+             unique_ptr<RangedChaumPedersenProof> proof, unique_ptr<ElGamalCiphertext> extendedData)
             : objectId(move(objectId)), sequenceOrder(sequenceOrder),
               descriptionHash(move(descriptionHash)), ciphertext(move(ciphertext)),
               nonce(move(nonce)), cryptoHash(move(cryptoHash)), proof(move(proof)),
@@ -181,7 +180,7 @@ namespace electionguard
             auto _ciphertext = make_unique<ElGamalCiphertext>(*ciphertext);
             auto _nonce = make_unique<ElementModQ>(*nonce);
             auto _cryptoHash = make_unique<ElementModQ>(*cryptoHash);
-            auto _proof = make_unique<DisjunctiveChaumPedersenProof>(*proof);
+            auto _proof = make_unique<RangedChaumPedersenProof>(*proof);
             auto _extendedData =
               extendedData != nullptr ? make_unique<ElGamalCiphertext>(*extendedData) : nullptr;
 
@@ -201,7 +200,7 @@ namespace electionguard
     CiphertextBallotSelection::CiphertextBallotSelection(
       const string &objectId, uint64_t sequenceOrder, const ElementModQ &descriptionHash,
       unique_ptr<ElGamalCiphertext> ciphertext, bool isPlaceholder, unique_ptr<ElementModQ> nonce,
-      unique_ptr<ElementModQ> cryptoHash, unique_ptr<DisjunctiveChaumPedersenProof> proof,
+      unique_ptr<ElementModQ> cryptoHash, unique_ptr<RangedChaumPedersenProof> proof,
       unique_ptr<ElGamalCiphertext> extendedData)
         : pimpl(new Impl(objectId, sequenceOrder, make_unique<ElementModQ>(descriptionHash),
                          move(ciphertext), isPlaceholder, move(nonce), move(cryptoHash),
@@ -243,7 +242,7 @@ namespace electionguard
 
     ElementModQ *CiphertextBallotSelection::getNonce() const { return pimpl->nonce.get(); }
 
-    DisjunctiveChaumPedersenProof *CiphertextBallotSelection::getProof() const
+    RangedChaumPedersenProof *CiphertextBallotSelection::getProof() const
     {
         return pimpl->proof.get();
     }
@@ -269,12 +268,12 @@ namespace electionguard
             cryptoHash = ciphertext->crypto_hash();
         }
 
-        unique_ptr<DisjunctiveChaumPedersenProof> proof = nullptr;
+        unique_ptr<RangedChaumPedersenProof> proof = nullptr;
         if (computeProof) {
             // always make a proof using the faster, non-deterministic method
-            proof = DisjunctiveChaumPedersenProof::make(
-              *ciphertext, *nonce, *context.getElGamalPublicKey(),
-              *context.getCryptoExtendedBaseHash(), plaintext);
+            proof = RangedChaumPedersenProof::make(
+              *ciphertext, *nonce, plaintext, 1, *context.getElGamalPublicKey(),
+              *context.getCryptoExtendedBaseHash(), HashPrefix::get_prefix_selection_proof());
         }
 
         return make_unique<CiphertextBallotSelection>(
@@ -288,7 +287,7 @@ namespace electionguard
       const ElementModQ &proofSeed, uint64_t plaintext, bool isPlaceholder /* = false */,
       unique_ptr<ElementModQ> nonce /* = nullptr */,
       unique_ptr<ElementModQ> cryptoHash /* = nullptr */,
-      unique_ptr<DisjunctiveChaumPedersenProof> proof /* = nullptr */,
+      unique_ptr<RangedChaumPedersenProof> proof /* = nullptr */,
       unique_ptr<ElGamalCiphertext> extendedData /* = nullptr */)
     {
         if (cryptoHash == nullptr) {
@@ -297,14 +296,19 @@ namespace electionguard
         // if no proof is provided and there is a nonce
         // then make a proof using the deterministic method
         if (proof == nullptr && nonce != nullptr) {
-            proof = DisjunctiveChaumPedersenProof::make(
-              *ciphertext, *nonce, *context.getElGamalPublicKey(),
-              *context.getCryptoExtendedBaseHash(), proofSeed, plaintext);
+            proof = RangedChaumPedersenProof::make(
+              *ciphertext, *nonce, plaintext, 1, *context.getElGamalPublicKey(),
+              *context.getCryptoExtendedBaseHash(), HashPrefix::get_prefix_selection_proof(),
+              proofSeed);
+
         } else if (proof != nullptr) {
             // validate the proof because the caller can provide an invalid one
-            if (!proof->isValid(*ciphertext, *context.getElGamalPublicKey(),
-                                *context.getCryptoExtendedBaseHash())) {
-                throw domain_error("proof is not valid");
+            ValidationResult result = proof->isValid(*ciphertext, *context.getElGamalPublicKey(),
+                                                     *context.getCryptoExtendedBaseHash(),
+                                                     HashPrefix::get_prefix_selection_proof());
+            {
+                if (!result.isValid)
+                    throw domain_error("proof is not valid");
             }
         }
         return make_unique<CiphertextBallotSelection>(
@@ -328,15 +332,11 @@ namespace electionguard
         // need to make sure we use the nonce used in precomputed values
         auto nonce = precomputedValues->getPartialEncryption()->getSecret()->clone();
 
-        unique_ptr<DisjunctiveChaumPedersenProof> proof = nullptr;
+        unique_ptr<RangedChaumPedersenProof> proof = nullptr;
         if (computeProof) {
-            // always make a proof using the faster, non-deterministic method
-            auto real = precomputedValues->getRealCommitment()->clone();
-            auto fake = precomputedValues->getFakeCommitment()->clone();
-
-            proof = DisjunctiveChaumPedersenProof::make(
-              *ciphertext, *nonce, move(real), move(fake), *context.getElGamalPublicKey(),
-              *context.getCryptoExtendedBaseHash(), plaintext);
+            proof = RangedChaumPedersenProof::make(
+              *ciphertext, *nonce, plaintext, 1, *context.getElGamalPublicKey(),
+              *context.getCryptoExtendedBaseHash(), HashPrefix::get_prefix_selection_proof());
         }
 
         return make_unique<CiphertextBallotSelection>(
@@ -371,7 +371,10 @@ namespace electionguard
             Log::info(": No proof exists for: " + pimpl->objectId);
             return false;
         }
-        return pimpl->proof->isValid(*pimpl->ciphertext, elgamalPublicKey, cryptoExtendedBaseHash);
+        return pimpl->proof
+          ->isValid(*pimpl->ciphertext, elgamalPublicKey, cryptoExtendedBaseHash,
+                    HashPrefix::get_prefix_selection_proof())
+          .isValid;
     }
 
     void CiphertextBallotSelection::resetNonce() const { return pimpl->nonce.reset(); }

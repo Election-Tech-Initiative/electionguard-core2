@@ -38,10 +38,10 @@ namespace ElectionGuard.CLI.Generate
 
             var plaintextPath = Path.Combine(options.WorkingDir, "plaintext");
             var encryptedPath = Path.Combine(options.WorkingDir, "encrypted_ballots");
-
+            var index = 0;
             foreach (var ballot in plaintextBallots)
             {
-                var ciphertext = encryptionMediator.Encrypt(ballot, false);
+                var ciphertext = encryptionMediator.Encrypt(ballot, options.BallotValidate);
                 if (Random.Shared.NextSingle() > options.SpoiledPercent / 100.0)
                 {
                     ciphertext.Cast();
@@ -71,7 +71,7 @@ namespace ElectionGuard.CLI.Generate
                 {
                     File.WriteAllText(Path.Combine(plaintextPath, $"{ballotCode}.json"), data);
                 }
-                Console.WriteLine($"Generated Ballot {ballotCode}.json");
+                Console.WriteLine($"Generated Ballot {index++} {ballotCode}.json");
                 ciphertext.Dispose();
             }
             var tallyJson = JsonConvert.SerializeObject(tally);
