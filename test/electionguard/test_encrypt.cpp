@@ -36,8 +36,11 @@ TEST_CASE("Encrypt simple selection succeeds")
     CHECK(result->getCiphertext() != nullptr);
     CHECK(result->isValidEncryption(*hashContext, *keypair->getPublicKey(),
                                     *context->getCryptoExtendedBaseHash()) == true);
-    CHECK(result->getProof()->isValid(*result->getCiphertext(), *keypair->getPublicKey(),
-                                      *context->getCryptoExtendedBaseHash()) == true);
+    CHECK(result->getProof()
+            ->isValid(*result->getCiphertext(), *keypair->getPublicKey(),
+                      *context->getCryptoExtendedBaseHash(),
+                      HashPrefix::get_prefix_selection_proof())
+            .isValid == true);
 }
 
 TEST_CASE("Encrypt simple selection using precomputed values succeeds")
@@ -72,8 +75,11 @@ TEST_CASE("Encrypt simple selection using precomputed values succeeds")
     CHECK(result->getCiphertext() != nullptr);
     CHECK(result->isValidEncryption(*hashContext, *keypair->getPublicKey(),
                                     *context->getCryptoExtendedBaseHash()) == true);
-    CHECK(result->getProof()->isValid(*result->getCiphertext(), *keypair->getPublicKey(),
-                                      *context->getCryptoExtendedBaseHash()) == true);
+    CHECK(result->getProof()
+            ->isValid(*result->getCiphertext(), *keypair->getPublicKey(),
+                      *context->getCryptoExtendedBaseHash(),
+                      HashPrefix::get_prefix_selection_proof())
+            .isValid == true);
     // need to empty the queues because future tests don't use the same keys
     PrecomputeBufferContext::clear();
 }

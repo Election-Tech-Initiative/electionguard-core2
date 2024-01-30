@@ -72,8 +72,7 @@ namespace ElectionGuard.Ballot
         /// </summary>
         public static BallotValidationResult IsValid(
             this CiphertextBallotSelection selection,
-            SelectionDescription description,
-             bool isPlaceholder = false)
+            SelectionDescription description)
         {
             return selection.ObjectId != description.ObjectId
                 ? new BallotValidationResult(
@@ -81,9 +80,6 @@ namespace ElectionGuard.Ballot
                 : selection.DescriptionHash != description.CryptoHash()
                 ? new BallotValidationResult(
                     $"Description hashes do not match for selection {selection.ObjectId}")
-                : selection.IsPlaceholder != isPlaceholder
-                ? new BallotValidationResult(
-                    $"IsPlaceholder does not match for selection {selection.ObjectId}")
                 : new BallotValidationResult(true);
         }
 
@@ -132,6 +128,8 @@ namespace ElectionGuard.Ballot
                 }
                 else
                 {
+                    var placeholder = description.Placeholders
+                        .FirstOrDefault(i => i.ObjectId == selectionDescription.ObjectId);
                     // validate the selection is valid
                     var result = selection.IsValid(selectionDescription);
                     if (!result.IsValid)

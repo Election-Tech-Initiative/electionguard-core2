@@ -742,7 +742,7 @@ namespace ElectionGuard
 
                     var status = RangedChaumPedersenProof.Free(TypedPtr);
                     return status != Status.ELECTIONGUARD_STATUS_SUCCESS
-                        ? throw new ElectionGuardException($"DisjunctiveChaumPedersenProof Error Free: {status}", status)
+                        ? throw new ElectionGuardException($"RangedChaumPedersenProof Error Free: {status}", status)
                         : true;
                 }
             }

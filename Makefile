@@ -107,7 +107,7 @@ ifeq ($(OPERATING_SYSTEM),Darwin)
 	brew install cmake
 	brew install cppcheck
 	brew install clang-format
-	brew install include-what-you-use
+# brew install include-what-you-use
 	brew install llvm
 	brew install ninja
 	test -f /usr/local/bin/clang-tidy || sudo ln -sf "$(shell brew --prefix llvm)/bin/clang-tidy" "/usr/local/bin/clang-tidy"

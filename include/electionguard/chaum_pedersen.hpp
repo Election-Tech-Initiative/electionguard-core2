@@ -318,6 +318,8 @@ namespace electionguard
         RangedChaumPedersenProof &operator=(RangedChaumPedersenProof other);
         RangedChaumPedersenProof &operator=(RangedChaumPedersenProof &&other);
 
+        std::unique_ptr<RangedChaumPedersenProof> clone() const;
+
         /// <Summary>
         /// L in the spec
         /// </Summary>
