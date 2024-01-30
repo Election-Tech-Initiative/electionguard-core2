@@ -260,7 +260,7 @@ namespace electionguard
         // TODO: complete according to spec
         // HB =(HP;02,n,k,date,info,HM). Election Base Hash 3.1.5
         auto cryptoBaseHash = hash_elems({parameterHash.get(), HashPrefix::get_prefix_base_hash(),
-                                          numberOfGuardians, quorum, manifestDigest.get()});
+                                          manifestDigest.get(), numberOfGuardians, quorum});
 
         // HE = H(HB;12,K,K1,0,K1,1,...,K1,k−1,K2,0,...,Kn,k−2,Kn,k−1). // Extended Base Hash 3.2.3
         auto cryptoExtendedBaseHash =
@@ -295,7 +295,7 @@ namespace electionguard
         // TODO: complete according to spec
         // HB =(HP;02,n,k,date,info,HM). Election Base Hash 3.1.5
         auto cryptoBaseHash = hash_elems({parameterHash.get(), HashPrefix::get_prefix_base_hash(),
-                                          numberOfGuardians, quorum, manifestDigest.get()});
+                                          manifestDigest.get(), numberOfGuardians, quorum});
 
         // HE = H(HB;12,K,K1,0,K1,1,...,K1,k−1,K2,0,...,Kn,k−2,Kn,k−1). // Extended Base Hash 3.2.3
         auto cryptoExtendedBaseHash =
@@ -332,7 +332,7 @@ namespace electionguard
         // TODO: complete according to spec
         // HB =(HP;02,n,k,date,info,HM). Election Base Hash 3.1.5
         auto cryptoBaseHash = hash_elems({parameterHash.get(), HashPrefix::get_prefix_base_hash(),
-                                          numberOfGuardians, quorum, manifestDigest.get()});
+                                          manifestDigest.get(), numberOfGuardians, quorum});
 
         // HE = H(HB;12,K,K1,0,K1,1,...,K1,k−1,K2,0,...,Kn,k−2,Kn,k−1). // Extended Base Hash 3.2.3
         auto cryptoExtendedBaseHash =

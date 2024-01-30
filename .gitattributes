@@ -1,0 +1,49 @@
+# Set default behaviour, in case users don't have core.autocrlf set.
+* text=auto eol=lf
+
+# Explicitly declare text files we want to always be normalized and converted 
+# to native line endings on checkout.
+*.cs text diff=csharp
+
+*.cpp text diff=cpp
+*.h text diff=cpp
+*.hpp text diff=cpp
+*.c text diff=cpp
+
+*.txt text
+Makefile text
+*.json text
+*.plist text
+
+*.xaml text eol=crlf
+
+# Declare files that will always have CRLF line endings on checkout.
+*.sln text eol=crlf merge=binary
+*.csproj text eol=lf merge=binary
+# Denote all files that are truly binary and should not be modified.
+*.png binary
+*.svg binary
+*.jpg binary
+*.jpeg binary
+*.ttf binary
+
+*.resx text eol=crlf
+*.md text
+
+###############################################################################
+# diff behavior for common document formats
+# 
+# Convert binary document formats to text before diffing them. This feature
+# is only available from the command line. Turn it on by uncommenting the 
+# entries below.
+###############################################################################
+*.doc   diff=astextplain
+*.DOC   diff=astextplain
+*.docx  diff=astextplain
+*.DOCX  diff=astextplain
+*.dot   diff=astextplain
+*.DOT   diff=astextplain
+*.pdf   diff=astextplain
+*.PDF   diff=astextplain
+*.rtf   diff=astextplain
+*.RTF   diff=astextplain

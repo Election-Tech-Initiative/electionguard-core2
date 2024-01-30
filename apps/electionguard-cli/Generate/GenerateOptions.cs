@@ -17,6 +17,9 @@ internal class GenerateOptions
     [Option('c', "count", Required = false, HelpText = "Number of ballots to generate and encrypt. Defaults to 100.")]
     public int BallotCount { get; set; } = 100;
 
+    [Option('v', "validate", Required = false, HelpText = "Validate the ballots when generating. Defaults to false.")]
+    public bool BallotValidate { get; set; } = false;
+
     public void Validate()
     {
         ValidateDirectories();

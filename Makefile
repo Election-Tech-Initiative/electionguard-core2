@@ -107,7 +107,7 @@ ifeq ($(OPERATING_SYSTEM),Darwin)
 	brew install cmake
 	brew install cppcheck
 	brew install clang-format
-	brew install include-what-you-use
+# brew install include-what-you-use
 	brew install llvm
 	brew install ninja
 	test -f /usr/local/bin/clang-tidy || sudo ln -sf "$(shell brew --prefix llvm)/bin/clang-tidy" "/usr/local/bin/clang-tidy"
@@ -153,12 +153,20 @@ ifeq ($(OPERATING_SYSTEM),Windows)
             git
 endif
 
+devcontainer: fetch-sample-data environment-ui
+	dotnet tool restore
+
 environment-ui:
 ifeq ($(OPERATING_SYSTEM),Windows)
 	dotnet workload install maui
 	dotnet workload restore ./src/electionguard-ui/ElectionGuard.UI/ElectionGuard.UI.csproj && dotnet restore ./src/electionguard-ui/ElectionGuard.UI.sln
-else
+endif
+ifeq ($(OPERATING_SYSTEM),Darwin)
 	sudo dotnet workload install maui
+	sudo dotnet workload restore ./src/electionguard-ui/ElectionGuard.UI/ElectionGuard.UI.csproj && dotnet restore ./src/electionguard-ui/ElectionGuard.UI.sln
+endif
+ifeq ($(OPERATING_SYSTEM),Linux)
+	sudo dotnet workload install maui-windows
 	sudo dotnet workload restore ./src/electionguard-ui/ElectionGuard.UI/ElectionGuard.UI.csproj && dotnet restore ./src/electionguard-ui/ElectionGuard.UI.sln
 endif
 	dotnet tool restore
