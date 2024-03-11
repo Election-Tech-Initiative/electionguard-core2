@@ -385,7 +385,7 @@ jobs:
     runs-on: ubuntu-22.04
     steps:
       - name: Create Github Release
-        uses: softprops/action-gh-release@v1
+        uses: softprops/action-gh-release@v2
         with:
           name: Release ${{needs.get_version_code.outputs.version}}
           tag_name: ${{needs.get_version_code.outputs.version}}
