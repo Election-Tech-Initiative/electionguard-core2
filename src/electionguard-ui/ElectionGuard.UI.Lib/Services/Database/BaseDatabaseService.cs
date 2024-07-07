@@ -244,7 +244,7 @@ public class BaseDatabaseService<T> : IDatabaseService<T> where T : DatabaseReco
     }
 
     /// <summary>
-    /// Get existance of documents that match the filter
+    /// Get existence of documents that match the filter
     /// </summary>
     /// <param name="filter">filter used to search</param>
     /// <param name="table">collection to use</param>
