@@ -70,7 +70,7 @@ jobs:
             "ubuntu-22.04-gcc-12.1.0",
             "macos-15-intel-xcode-16.4",
             "macos-15-xcode-16.4-arm64",
-            "windows-2022-gcc-11",
+            "windows-2022-msys2-clang-14",
             "windows-2022-msvc-latest-x86",
             "windows-2022-msvc-latest-x64",
             "ubuntu-22.04-linter",
@@ -121,11 +121,11 @@ jobs:
             lint: false
             runCsTests: false
             runTsTests: false
-          - name: windows-2022-gcc-11
+          - name: windows-2022-msys2-clang-14
             os: windows-2022
             processor: x64
-            compiler: gcc
-            version: "11"
+            compiler: clang
+            version: "14"
             makeReleaseBuild: false
             lint: false
             runCsTests: false
@@ -319,6 +319,13 @@ jobs:
           PROCESSOR: ${{ matrix.processor }}
         if: (runner.os == 'Windows' && matrix.compiler == 'msvc' && steps.filter.outputs.cpp == 'true')
         run: make test
+
+      - name: Run Tests (Windows MSYS2)
+        env:
+          PROCESSOR: ${{ matrix.processor }}
+        if: (runner.os == 'Windows' && matrix.compiler == 'clang' && steps.filter.outputs.cpp == 'true')
+        shell: msys2 {0}
+        run: make test-msys2
 
       - name: Run Tests (Windows-x86)
         env:
