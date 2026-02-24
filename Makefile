@@ -117,40 +117,32 @@ ifeq ($(OPERATING_SYSTEM),Linux)
 	@echo 🐧 LINUX INSTALL
 	if [ -f /etc/os-release ] && grep -qi "alpine" /etc/os-release; then \
 		echo "🏔️ Alpine Linux detected"; \
-		sudo apk update; \		
+		sudo apk update; \
 		echo "Installing CXX dependencies"; \
 		sudo apk add make musl-dev g++ cmake; \
-		echo "Installing DotNet dependencies"
-# See https://learn.microsoft.com/en-us/dotnet/core/install/linux-alpine?tabs=dotnet9
-		sudo apk add dotnet9-sdk dotnetcore9-runtime
+		echo "Installing DotNet dependencies"; \
+		sudo apk add dotnet10-sdk dotnetcore10-runtime; \
 	else \
 		echo "🐧 Debian-based Linux detected"; \
-# to get Debian version of .NET
-		wget https://packages.microsoft.com/config/debian/12/packages-microsoft-prod.deb -O packages-microsoft-prod.deb
-		sudo dpkg -i packages-microsoft-prod.deb
-		rm packages-microsoft-prod.deb
-		
+		wget https://packages.microsoft.com/config/debian/12/packages-microsoft-prod.deb -O packages-microsoft-prod.deb; \
+		sudo dpkg -i packages-microsoft-prod.deb; \
+		rm packages-microsoft-prod.deb; \
 		sudo apt update; \
-		sudo apt install -y build-essential
-		sudo apt install -y iwyu
-		sudo apt install -y llvm
-# must update to bc bookworm doesn't have clang 12 anymore...
-# maybe don't specify a version unless we need older behavior??
-		sudo apt install -y clang-14
-		sudo apt install -y cmake
-		sudo apt install -y lcov
-		sudo apt install -y cppcheck
-		sudo apt install -y clang-format
-		sudo apt install -y clang-tidy
-		sudo apt install -y ninja-build
-		sudo apt install -y valgrind
-		sudo apt install -y unzip	
-# dotnet deps
-		sudo apt install -y dotnet-sdk-9.0
-# wasm deps
-		sudo apt install -y npm
+		sudo apt install -y build-essential; \
+		sudo apt install -y iwyu; \
+		sudo apt install -y llvm; \
+		sudo apt install -y clang-14; \
+		sudo apt install -y cmake; \
+		sudo apt install -y lcov; \
+		sudo apt install -y cppcheck; \
+		sudo apt install -y clang-format; \
+		sudo apt install -y clang-tidy; \
+		sudo apt install -y ninja-build; \
+		sudo apt install -y valgrind; \
+		sudo apt install -y unzip; \
+		sudo apt install -y dotnet-sdk-10.0; \
+		sudo apt install -y npm; \
 	fi
-	
 endif
 ifeq ($(OPERATING_SYSTEM),Windows)
 	@echo 🏁 WINDOWS INSTALL
@@ -160,17 +152,18 @@ ifeq ($(OPERATING_SYSTEM),Windows)
 	choco upgrade ninja -y
 	choco upgrade vswhere -y
 	choco upgrade llvm -y
+	choco install dotnet-sdk
 endif
 	wget -O cmake/CPM.cmake https://github.com/cpm-cmake/CPM.cmake/releases/download/v0.38.2/CPM.cmake
 	make fetch-sample-data
 	dotnet tool restore
 
-environment-dotnet:
-ifeq ($(OPERATING_SYSTEM),Linux)
-# Ubuntu 22.04 and later?
-	sudo add-apt-repository ppa:dotnet/backports
-	apt-get update &&   sudo apt-get install -y dotnet-sdk-7.0
-endif
+# environment-dotnet:
+# ifeq ($(OPERATING_SYSTEM),Linux)
+# # Ubuntu 22.04 and later?
+# 	sudo add-apt-repository ppa:dotnet/backports
+# 	apt-get update &&   sudo apt-get install -y dotnet-sdk-10.0
+# endif
 
 environment-msys2:
 ifeq ($(OPERATING_SYSTEM),Windows)
