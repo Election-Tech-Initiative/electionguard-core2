@@ -282,7 +282,7 @@ jobs:
         uses: actions/setup-dotnet@v4
         if: (steps.filter.outputs.any == 'true')
         with:
-          dotnet-version: 7.0.x
+          dotnet-version: 10.0.x
 
       # Environment
       - name: Configure Environment

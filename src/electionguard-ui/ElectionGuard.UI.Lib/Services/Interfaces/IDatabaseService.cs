@@ -5,7 +5,7 @@ namespace ElectionGuard.UI.Lib.Services;
 /// <summary>
 /// static class used for constant strings used in database calls
 /// </summary>
-internal static class Constants
+internal static class DbConstants
 {
     public readonly static string DataType = "DataType";
 

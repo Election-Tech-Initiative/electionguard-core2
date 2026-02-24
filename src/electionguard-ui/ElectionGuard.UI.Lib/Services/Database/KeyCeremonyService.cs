@@ -21,7 +21,7 @@ public class KeyCeremonyService : BaseDatabaseService<KeyCeremonyRecord>, IKeyCe
     /// <summary>
     /// The collection name to use to get/save data into
     /// </summary>
-    private readonly static string _collection = Constants.TableKeyCeremonies;
+    private readonly static string _collection = DbConstants.TableKeyCeremonies;
 
     /// <summary>
     /// Default constructor that sets the collection name
@@ -34,7 +34,7 @@ public class KeyCeremonyService : BaseDatabaseService<KeyCeremonyRecord>, IKeyCe
     /// <param name="keyCeremonyId">key ceremony id to search for</param>
     public async Task<KeyCeremonyRecord?> GetByKeyCeremonyIdAsync(string keyCeremonyId)
     {
-        return await GetByFieldAsync(Constants.KeyCeremonyId, keyCeremonyId);
+        return await GetByFieldAsync(DbConstants.KeyCeremonyId, keyCeremonyId);
     }
 
     /// <summary>
@@ -43,7 +43,7 @@ public class KeyCeremonyService : BaseDatabaseService<KeyCeremonyRecord>, IKeyCe
     public async Task<List<KeyCeremonyRecord>?> GetAllNotCompleteAsync()
     {
         var filterBuilder = Builders<KeyCeremonyRecord>.Filter;
-        var filter = filterBuilder.Ne(Constants.State, KeyCeremonyState.Complete);
+        var filter = filterBuilder.Ne(DbConstants.State, KeyCeremonyState.Complete);
 
         return await GetAllByFilterAsync(filter);
     }
@@ -54,7 +54,7 @@ public class KeyCeremonyService : BaseDatabaseService<KeyCeremonyRecord>, IKeyCe
     public async Task<List<KeyCeremonyRecord>?> GetAllCompleteAsync()
     {
         var filterBuilder = Builders<KeyCeremonyRecord>.Filter;
-        var filter = filterBuilder.Eq(Constants.State, KeyCeremonyState.Complete);
+        var filter = filterBuilder.Eq(DbConstants.State, KeyCeremonyState.Complete);
 
         return await GetAllByFilterAsync(filter);
     }
@@ -67,11 +67,11 @@ public class KeyCeremonyService : BaseDatabaseService<KeyCeremonyRecord>, IKeyCe
     public virtual async Task UpdateStateAsync(string keyCeremonyId, KeyCeremonyState state)
     {
         var filterBuilder = Builders<KeyCeremonyRecord>.Filter;
-        var filter = filterBuilder.And(filterBuilder.Eq(Constants.KeyCeremonyId, keyCeremonyId));
+        var filter = filterBuilder.And(filterBuilder.Eq(DbConstants.KeyCeremonyId, keyCeremonyId));
 
         var updateBuilder = Builders<KeyCeremonyRecord>.Update;
-        var update = updateBuilder.Set(Constants.State, state)
-                                    .Set(Constants.UpdatedAt, DateTime.UtcNow);
+        var update = updateBuilder.Set(DbConstants.State, state)
+                                    .Set(DbConstants.UpdatedAt, DateTime.UtcNow);
 
         await UpdateAsync(filter, update);
     }
@@ -83,13 +83,13 @@ public class KeyCeremonyService : BaseDatabaseService<KeyCeremonyRecord>, IKeyCe
     public virtual async Task UpdateCompleteAsync(string keyCeremonyId, ElectionJointKey jointKey)
     {
         var filterBuilder = Builders<KeyCeremonyRecord>.Filter;
-        var filter = filterBuilder.And(filterBuilder.Eq(Constants.KeyCeremonyId, keyCeremonyId));
+        var filter = filterBuilder.And(filterBuilder.Eq(DbConstants.KeyCeremonyId, keyCeremonyId));
 
         var updateBuilder = Builders<KeyCeremonyRecord>.Update;
-        var update = updateBuilder.Set(Constants.State, KeyCeremonyState.Complete)
-                                    .Set(Constants.CompletedAt, DateTime.UtcNow)
-                                    .Set(Constants.UpdatedAt, DateTime.UtcNow)
-                                    .Set(Constants.JointKey, jointKey);
+        var update = updateBuilder.Set(DbConstants.State, KeyCeremonyState.Complete)
+                                    .Set(DbConstants.CompletedAt, DateTime.UtcNow)
+                                    .Set(DbConstants.UpdatedAt, DateTime.UtcNow)
+                                    .Set(DbConstants.JointKey, jointKey);
 
         await UpdateAsync(filter, update);
     }

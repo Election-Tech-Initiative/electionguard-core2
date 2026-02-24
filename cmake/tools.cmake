@@ -5,7 +5,7 @@
 option(CODE_COVERAGE "Enable code coverage" OFF)
 option(USE_STATIC_ANALYSIS "use static analysis tools" OFF)
 option(USE_DYNAMIC_ANALYSIS "use dynamic analysis tools" OFF)
-option(USE_FORMATTING "use formatting tools" ON)
+option(USE_FORMATTING "use formatting tools" OFF)
 
 function(use_valgrind TARGET_NAME)
     set(VALGRIND_LOG ${PROJECT_BINARY_DIR}/valgrind.log)
@@ -20,7 +20,7 @@ function(use_valgrind TARGET_NAME)
 endfunction()
 
 # ---- Dependencies ----
-include(cmake/CPM.cmake)
+include(cmake/CPM_0.31.0.cmake)
 
 CPMAddPackage(
     NAME StableCoder-cmake-scripts
@@ -111,7 +111,7 @@ if(USE_DYNAMIC_ANALYSIS)
     endif()
 endif()
 
-if(USE_FORMATTING)
-    message("++ Running with formatting")
-    include(${StableCoder-cmake-scripts_SOURCE_DIR}/formatting.cmake)
-endif()
+#if(USE_FORMATTING)
+#    message("++ Running with formatting")
+#    include(${StableCoder-cmake-scripts_SOURCE_DIR}/formatting.cmake)
+#endif()

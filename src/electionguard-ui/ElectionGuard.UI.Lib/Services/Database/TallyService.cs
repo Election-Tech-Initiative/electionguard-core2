@@ -12,7 +12,7 @@ public class TallyService : BaseDatabaseService<TallyRecord>
     /// <summary>
     /// The collection name to use to get/save data into
     /// </summary>
-    private readonly static string _collection = Constants.TableTallies;
+    private readonly static string _collection = DbConstants.TableTallies;
 
     /// <summary>
     /// Default constructor that sets the collection name
@@ -26,8 +26,8 @@ public class TallyService : BaseDatabaseService<TallyRecord>
     public async Task<List<TallyRecord>> GetAllActiveByElectionIdAsync(string electionId)
     {
         var filter = FilterBuilder.And(
-            FilterBuilder.Eq(Constants.ElectionId, electionId),
-            FilterBuilder.Ne(Constants.State, TallyState.Abandoned));
+            FilterBuilder.Eq(DbConstants.ElectionId, electionId),
+            FilterBuilder.Ne(DbConstants.State, TallyState.Abandoned));
 
         return await GetAllByFilterAsync(filter);
     }
@@ -38,7 +38,7 @@ public class TallyService : BaseDatabaseService<TallyRecord>
     /// <param name="tallyId">tally id to search for</param>
     public async Task<bool> IsRunningByTallyIdAsync(string tallyId)
     {
-        var tally = await GetByFieldAsync(Constants.TallyId, tallyId);
+        var tally = await GetByFieldAsync(DbConstants.TallyId, tallyId);
         return tally?.State is not TallyState.Complete and not TallyState.Abandoned;
     }
 
@@ -48,7 +48,7 @@ public class TallyService : BaseDatabaseService<TallyRecord>
     /// <param name="tallyId">tally id to search for</param>
     public async Task<TallyRecord?> GetByTallyIdAsync(string tallyId)
     {
-        return await GetByFieldAsync(Constants.TallyId, tallyId);
+        return await GetByFieldAsync(DbConstants.TallyId, tallyId);
     }
 
     public async Task<bool> TallyNameExistsAsync(string name)
@@ -60,7 +60,7 @@ public class TallyService : BaseDatabaseService<TallyRecord>
     public async Task<List<TallyRecord>> GetAllByKeyCeremoniesAsync(List<string> ids)
     {
         BsonArray array = new(ids);
-        return await GetAllByFieldInListAsync(Constants.KeyCeremonyId, array);
+        return await GetAllByFieldInListAsync(DbConstants.KeyCeremonyId, array);
     }
 
     /// <summary>
@@ -69,12 +69,12 @@ public class TallyService : BaseDatabaseService<TallyRecord>
     /// <param name="keyCeremonyId">key ceremony id to update</param>
     virtual public async Task UpdateCompleteAsync(string tallyId)
     {
-        var filter = FilterBuilder.And(FilterBuilder.Eq(Constants.TallyId, tallyId));
+        var filter = FilterBuilder.And(FilterBuilder.Eq(DbConstants.TallyId, tallyId));
 
         var updateBuilder = Builders<TallyRecord>.Update;
-        var update = updateBuilder.Set(Constants.State, TallyState.Complete)
-                                    .Set(Constants.CompletedAt, DateTime.UtcNow)
-                                    .Set(Constants.UpdatedAt, DateTime.UtcNow);
+        var update = updateBuilder.Set(DbConstants.State, TallyState.Complete)
+                                    .Set(DbConstants.CompletedAt, DateTime.UtcNow)
+                                    .Set(DbConstants.UpdatedAt, DateTime.UtcNow);
 
         await UpdateAsync(filter, update);
     }
@@ -86,10 +86,10 @@ public class TallyService : BaseDatabaseService<TallyRecord>
     /// <param name="state">new state to put the tally into</param>
     public virtual async Task UpdateStateAsync(string tallyId, TallyState state)
     {
-        var filter = FilterBuilder.And(FilterBuilder.Eq(Constants.TallyId, tallyId));
+        var filter = FilterBuilder.And(FilterBuilder.Eq(DbConstants.TallyId, tallyId));
 
         var updateBuilder = Builders<TallyRecord>.Update;
-        var update = updateBuilder.Set(Constants.State, state);
+        var update = updateBuilder.Set(DbConstants.State, state);
 
         await UpdateAsync(filter, update);
     }

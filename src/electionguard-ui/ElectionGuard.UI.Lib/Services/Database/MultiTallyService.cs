@@ -10,7 +10,7 @@ public class MultiTallyService : BaseDatabaseService<MultiTallyRecord>
     /// <summary>
     /// The collection name to use to get/save data into
     /// </summary>
-    private readonly static string _collection = Constants.TableTallies;
+    private readonly static string _collection = DbConstants.TableTallies;
 
     /// <summary>
     /// Default constructor that sets the collection name
@@ -23,7 +23,7 @@ public class MultiTallyService : BaseDatabaseService<MultiTallyRecord>
     /// <param name="multiTallyId">multi tally id to search for</param>
     public async Task<MultiTallyRecord?> GetByMultiTallyIdAsync(string multiTallyId)
     {
-        return await GetByFieldAsync(Constants.MultiTallyId, multiTallyId);
+        return await GetByFieldAsync(DbConstants.MultiTallyId, multiTallyId);
     }
 
 

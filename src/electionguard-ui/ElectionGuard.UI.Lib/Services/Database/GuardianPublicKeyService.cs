@@ -20,7 +20,7 @@ public class GuardianPublicKeyService : BaseDatabaseService<GuardianPublicKey>, 
     /// <summary>
     /// The collection name to use to get/save data into
     /// </summary>
-    private static readonly string _collection = Constants.TableKeyCeremonies;
+    private static readonly string _collection = DbConstants.TableKeyCeremonies;
 
     /// <summary>
     /// Default constructor that sets the collection name
@@ -34,7 +34,7 @@ public class GuardianPublicKeyService : BaseDatabaseService<GuardianPublicKey>, 
     /// <returns></returns>
     public async Task<List<GuardianPublicKey>> GetAllByKeyCeremonyIdAsync(string keyCeremonyId)
     {
-        return await GetAllByFieldAsync(Constants.KeyCeremonyId, keyCeremonyId);
+        return await GetAllByFieldAsync(DbConstants.KeyCeremonyId, keyCeremonyId);
     }
 
     /// <summary>
@@ -47,10 +47,10 @@ public class GuardianPublicKeyService : BaseDatabaseService<GuardianPublicKey>, 
         string keyCeremonyId, string guardianId, ElectionPublicKey? key)
     {
         var filterBuilder = Builders<GuardianPublicKey>.Filter;
-        var filter = filterBuilder.And(filterBuilder.Eq(Constants.KeyCeremonyId, keyCeremonyId),
-            filterBuilder.Eq(Constants.GuardianId, guardianId));
+        var filter = filterBuilder.And(filterBuilder.Eq(DbConstants.KeyCeremonyId, keyCeremonyId),
+            filterBuilder.Eq(DbConstants.GuardianId, guardianId));
 
-        var update = Builders<GuardianPublicKey>.Update.Set(Constants.PublicKey, key!);
+        var update = Builders<GuardianPublicKey>.Update.Set(DbConstants.PublicKey, key!);
 
         await UpdateAsync(filter, update);
     }
@@ -58,7 +58,7 @@ public class GuardianPublicKeyService : BaseDatabaseService<GuardianPublicKey>, 
     public async Task<long> CountAsync(string keyCeremonyId)
     {
         var filterBuilder = Builders<GuardianPublicKey>.Filter;
-        var filter = filterBuilder.And(filterBuilder.Eq(Constants.KeyCeremonyId, keyCeremonyId));
+        var filter = filterBuilder.And(filterBuilder.Eq(DbConstants.KeyCeremonyId, keyCeremonyId));
 
         return await CountByFilterAsync(filter);
     }
@@ -66,8 +66,8 @@ public class GuardianPublicKeyService : BaseDatabaseService<GuardianPublicKey>, 
     public async Task<GuardianPublicKey?> GetByIdsAsync(string keyCeremonyId, string guardianId)
     {
         var filterBuilder = Builders<GuardianPublicKey>.Filter;
-        var filter = filterBuilder.And(filterBuilder.Eq(Constants.KeyCeremonyId, keyCeremonyId),
-            filterBuilder.Eq(Constants.GuardianId, guardianId));
+        var filter = filterBuilder.And(filterBuilder.Eq(DbConstants.KeyCeremonyId, keyCeremonyId),
+            filterBuilder.Eq(DbConstants.GuardianId, guardianId));
 
         var list = await GetAllByFilterAsync(filter);
         return list.FirstOrDefault();
@@ -75,7 +75,7 @@ public class GuardianPublicKeyService : BaseDatabaseService<GuardianPublicKey>, 
 
     public async Task<List<string>> GetKeyCeremonyIdsAsync(string guardianId)
     {
-        var list = await GetAllByFieldAsync(Constants.GuardianId, guardianId);
+        var list = await GetAllByFieldAsync(DbConstants.GuardianId, guardianId);
         return list.Select(g => g.KeyCeremonyId!).ToList();
     }
 

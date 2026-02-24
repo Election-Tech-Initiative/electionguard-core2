@@ -1,9 +1,11 @@
 ﻿using ElectionGuard.Converters;
 using ElectionGuard.Guardians;
+using ElectionGuard.ElectionSetup;
 using ElectionGuard.UI.Lib.Models;
-using ElectionGuard.UI.Lib.Services;
+using Newtonsoft.Json;
+using ElectionGuard.ElectionSetup.Records;
 
-namespace ElectionGuard.ElectionSetup;
+namespace ElectionGuard.UI.Lib.Services;
 
 /// <summary>
 /// Guardian storage extensions for working with local storage
@@ -20,12 +22,12 @@ public static class GuardianStorageExtensions
         int numberOfGuardians,
         int quorum,
         Dictionary<string, ElectionPublicKey>? publicKeys = null,
-        Dictionary<string, ElectionPartialKeyBackup>? otherBackups = null)
+        Dictionary<string, ElectionPartialKeyBackupRecord>? otherBackups = null)
     {
         return new(
             privateGuardianRecord.ElectionKeys,
             privateGuardianRecord.CommitmentSeed,
-            new(keyCeremonyId, numberOfGuardians, quorum),
+            new CeremonyDetails(keyCeremonyId, numberOfGuardians, quorum),
             publicKeys,
             otherBackups);
     }
@@ -44,7 +46,7 @@ public static class GuardianStorageExtensions
         int guardianCount,
         int quorum,
         Dictionary<string, ElectionPublicKey>? publicKeys = null,
-        Dictionary<string, ElectionPartialKeyBackup>? otherBackups = null)
+        Dictionary<string, ElectionPartialKeyBackupRecord>? otherBackups = null)
     {
         var storage = StorageService.GetInstance();
 
@@ -78,7 +80,7 @@ public static class GuardianStorageExtensions
         string guardianId,
         KeyCeremonyRecord keyCeremony,
         Dictionary<string, ElectionPublicKey>? publicKeys = null,
-        Dictionary<string, ElectionPartialKeyBackup>? otherBackups = null)
+        Dictionary<string, ElectionPartialKeyBackupRecord>? otherBackups = null)
     {
         return Load(guardianId, keyCeremony.KeyCeremonyId!, keyCeremony.NumberOfGuardians, keyCeremony.Quorum, publicKeys, otherBackups);
     }

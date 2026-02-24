@@ -1,5 +1,6 @@
 ﻿using MongoDB.Driver;
 using ElectionGuard.UI.Lib.Models;
+using ElectionGuard.ElectionSetup.Records;
 
 namespace ElectionGuard.UI.Lib.Services;
 
@@ -19,7 +20,7 @@ public class GuardianBackupService : BaseDatabaseService<GuardianBackups>, IGuar
     /// <summary>
     /// The collection name to use to get/save data into
     /// </summary>
-    private readonly static string _collection = Constants.TableKeyCeremonies;
+    private readonly static string _collection = DbConstants.TableKeyCeremonies;
 
     /// <summary>
     /// Default constructor that sets the collection name
@@ -32,7 +33,7 @@ public class GuardianBackupService : BaseDatabaseService<GuardianBackups>, IGuar
     /// <param name="keyCeremonyId">key ceremony id to search for</param>
     public async Task<List<GuardianBackups>?> GetByKeyCeremonyIdAsync(string keyCeremonyId)
     {
-        return await GetAllByFieldAsync(Constants.KeyCeremonyId, keyCeremonyId);
+        return await GetAllByFieldAsync(DbConstants.KeyCeremonyId, keyCeremonyId);
     }
 
     /// <summary>
@@ -44,8 +45,8 @@ public class GuardianBackupService : BaseDatabaseService<GuardianBackups>, IGuar
     public async Task<List<GuardianBackups>?> GetByGuardianIdAsync(string keyCeremonyId, string DesignatedId)
     {
         var filterBuilder = Builders<GuardianBackups>.Filter;
-        var filter = filterBuilder.And(filterBuilder.Eq(Constants.KeyCeremonyId, keyCeremonyId),
-            filterBuilder.Eq(Constants.DesignatedId, DesignatedId));
+        var filter = filterBuilder.And(filterBuilder.Eq(DbConstants.KeyCeremonyId, keyCeremonyId),
+            filterBuilder.Eq(DbConstants.DesignatedId, DesignatedId));
 
         return await GetAllByFilterAsync(filter);
     }
@@ -53,7 +54,7 @@ public class GuardianBackupService : BaseDatabaseService<GuardianBackups>, IGuar
     public async Task<long> CountAsync(string keyCeremonyId)
     {
         var filterBuilder = Builders<GuardianBackups>.Filter;
-        var filter = filterBuilder.And(filterBuilder.Eq(Constants.KeyCeremonyId, keyCeremonyId));
+        var filter = filterBuilder.And(filterBuilder.Eq(DbConstants.KeyCeremonyId, keyCeremonyId));
 
         return await CountByFilterAsync(filter);
     }
@@ -61,8 +62,8 @@ public class GuardianBackupService : BaseDatabaseService<GuardianBackups>, IGuar
     public async Task<long> CountAsync(string keyCeremonyId, string guardianId)
     {
         var filterBuilder = Builders<GuardianBackups>.Filter;
-        var filter = filterBuilder.And(filterBuilder.Eq(Constants.KeyCeremonyId, keyCeremonyId),
-            filterBuilder.Eq(Constants.GuardianId, guardianId));
+        var filter = filterBuilder.And(filterBuilder.Eq(DbConstants.KeyCeremonyId, keyCeremonyId),
+            filterBuilder.Eq(DbConstants.GuardianId, guardianId));
 
         return await CountByFilterAsync(filter);
     }

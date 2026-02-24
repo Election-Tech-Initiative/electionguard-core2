@@ -1,4 +1,6 @@
-﻿namespace ElectionGuard.UI.Lib.Models;
+﻿using ElectionGuard.ElectionSetup.Records;
+
+namespace ElectionGuard.UI.Lib.Models;
 
 /// <summary>
 /// Election partial key backup used for key sharing
@@ -23,6 +25,7 @@ public class ElectionPartialKeyBackup : DisposableBase
 
     public HashedElGamalCiphertext EncryptedCoordinate { get; set; }
 
+
     public ElectionPartialKeyBackup(
         string ownerId,
         ulong ownerSequenceOrder,
@@ -44,6 +47,19 @@ public class ElectionPartialKeyBackup : DisposableBase
         DesignatedId = other.DesignatedId;
         DesignatedSequenceOrder = other.DesignatedSequenceOrder;
         EncryptedCoordinate = new(other.EncryptedCoordinate);
+    }
+    public ElectionPartialKeyBackup(ElectionPartialKeyBackupRecord contract)
+    {
+        OwnerId = contract.OwnerId;
+        OwnerSequenceOrder = contract.OwnerSequenceOrder;
+        DesignatedId = contract.DesignatedId;
+        DesignatedSequenceOrder = contract.DesignatedSequenceOrder;
+        EncryptedCoordinate = contract.EncryptedCoordinate;
+    }
+
+    public ElectionPartialKeyBackupRecord ToRecord()
+    {
+        return new(OwnerId, OwnerSequenceOrder, DesignatedId, DesignatedSequenceOrder, EncryptedCoordinate);
     }
 
     protected override void DisposeUnmanaged()

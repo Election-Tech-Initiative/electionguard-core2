@@ -4,7 +4,7 @@ cmake_minimum_required(VERSION 3.14...3.16 FATAL_ERROR)
 list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/../cmake")
 
 # ---- Dependencies ----
-include(../cmake/CPM.cmake)
+include(../cmake/CPM_0.31.0.cmake)
 
 CPMAddPackage(
     NAME date
@@ -266,7 +266,7 @@ if(CODE_COVERAGE)
     target_code_coverage(${META_PROJECT_TARGET} AUTO)
 endif()
 
-if(USE_FORMATTING)
-    message("++ Building with formatting")
-    clang_format(format ${PROJECT_SOURCE_FILES})
-endif()
+#if(USE_FORMATTING)
+#    message("++ Building with formatting")
+#    clang_format(format ${PROJECT_SOURCE_FILES})
+#endif()

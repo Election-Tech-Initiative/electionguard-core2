@@ -63,7 +63,7 @@ public class BaseDatabaseService<T> : IDatabaseService<T> where T : DatabaseReco
         try
         {
             var collection = DbService.GetCollection<T>(table ?? _collection);
-            var filter = FilterBuilder.Eq(Constants.Id, data.Id);
+            var filter = FilterBuilder.Eq(DbConstants.Id, data.Id);
             _ = await collection.ReplaceOneAsync(UpdateFilter(customFilter ?? filter), data, new ReplaceOptions { IsUpsert = true });
             return data;
         }
@@ -184,7 +184,7 @@ public class BaseDatabaseService<T> : IDatabaseService<T> where T : DatabaseReco
     /// <returns>Document that matches the given id</returns>
     public async Task<T?> GetByIdAsync(string id, string? table = null)
     {
-        return await GetByFieldAsync(Constants.Id, id, table);
+        return await GetByFieldAsync(DbConstants.Id, id, table);
     }
 
     /// <summary>
@@ -195,7 +195,7 @@ public class BaseDatabaseService<T> : IDatabaseService<T> where T : DatabaseReco
     /// <returns>Document that matches the given name</returns>
     public virtual async Task<T?> GetByNameAsync(string name, string? table = null)
     {
-        return await GetByFieldAsync(Constants.Name, name, table);
+        return await GetByFieldAsync(DbConstants.Name, name, table);
     }
 
     /// <summary>
@@ -220,8 +220,8 @@ public class BaseDatabaseService<T> : IDatabaseService<T> where T : DatabaseReco
     {
         var builder = Builders<T>.Filter;
         return builder.And(filter,
-                           builder.Eq(Constants.SoftDeleted, getDeleted),
-                           builder.Eq(Constants.DataType, _type));
+                           builder.Eq(DbConstants.SoftDeleted, getDeleted),
+                           builder.Eq(DbConstants.DataType, _type));
     }
 
     /// <summary>
@@ -275,7 +275,7 @@ public class BaseDatabaseService<T> : IDatabaseService<T> where T : DatabaseReco
             var collection = DbService.GetCollection<T>(table ?? _collection);
 
             var updateBuilder = Builders<T>.Update;
-            var update = updateBuilder.Set(Constants.SoftDeleted, deleted);
+            var update = updateBuilder.Set(DbConstants.SoftDeleted, deleted);
 
             _ = await collection.UpdateOneAsync(UpdateFilter(filter), update);
         }

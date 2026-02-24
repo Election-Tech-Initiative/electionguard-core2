@@ -11,7 +11,7 @@ public class BallotUploadService : BaseDatabaseService<BallotUpload>
     /// <summary>
     /// The collection name to use to get/save data into
     /// </summary>
-    private readonly static string _collection = Constants.TableBallots;
+    private readonly static string _collection = DbConstants.TableBallots;
 
     /// <summary>
     /// Default constructor that sets the collection name
@@ -24,13 +24,13 @@ public class BallotUploadService : BaseDatabaseService<BallotUpload>
     /// <param name="electionId">election id to search for</param>
     public async Task<List<BallotUpload>> GetByElectionIdAsync(string electionId)
     {
-        return await GetAllByFieldAsync(Constants.ElectionId, electionId);
+        return await GetAllByFieldAsync(DbConstants.ElectionId, electionId);
     }
 
     public async Task<bool> DriveUsed(long serialNumber, string electionId)
     {
         var filterBuilder = Builders<BallotUpload>.Filter;
-        var filter = filterBuilder.And(filterBuilder.Eq(Constants.SerialNumber, serialNumber), filterBuilder.Eq(Constants.ElectionId, electionId));
+        var filter = filterBuilder.And(filterBuilder.Eq(DbConstants.SerialNumber, serialNumber), filterBuilder.Eq(DbConstants.ElectionId, electionId));
 
         var uploadCount = await CountByFilterAsync(filter);
         return uploadCount > 0;
@@ -38,11 +38,11 @@ public class BallotUploadService : BaseDatabaseService<BallotUpload>
 
     public async Task DecrementBallotsChallenged(string uploadId)
     {
-        var filter = FilterBuilder.And(FilterBuilder.Eq(Constants.UploadId, uploadId));
-        var upload = await GetByFieldAsync(Constants.UploadId, uploadId);
+        var filter = FilterBuilder.And(FilterBuilder.Eq(DbConstants.UploadId, uploadId));
+        var upload = await GetByFieldAsync(DbConstants.UploadId, uploadId);
         var update = Builders<BallotUpload>.Update
-                        .Set(Constants.BallotChallenged, upload!.BallotChallenged - 1)
-                        .Set(Constants.BallotSpoiled, upload!.BallotSpoiled + 1);
+                        .Set(DbConstants.BallotChallenged, upload!.BallotChallenged - 1)
+                        .Set(DbConstants.BallotSpoiled, upload!.BallotSpoiled + 1);
 
         await UpdateAsync(filter, update);
     }

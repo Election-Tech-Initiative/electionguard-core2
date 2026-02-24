@@ -10,7 +10,7 @@ public class ChallengeResponseService : BaseDatabaseService<ChallengeResponseRec
     /// <summary>
     /// The collection name to use to get/save data into
     /// </summary>
-    private readonly static string _collection = Constants.TableTallies;
+    private readonly static string _collection = DbConstants.TableTallies;
 
     /// <summary>
     /// Default constructor that sets the collection name
@@ -23,14 +23,14 @@ public class ChallengeResponseService : BaseDatabaseService<ChallengeResponseRec
     /// <param name="electionId">election id to search for</param>
     public async Task<List<ChallengeResponseRecord>> GetAllByTallyIdAsync(string tallyId)
     {
-        return await GetAllByFieldAsync(Constants.TallyId, tallyId);
+        return await GetAllByFieldAsync(DbConstants.TallyId, tallyId);
     }
 
     public async Task<ChallengeResponseRecord?> GetByGuardianIdAsync(string tallyId, string guardianId)
     {
         var filter = FilterBuilder.And(
-            FilterBuilder.Eq(Constants.TallyId, tallyId),
-            FilterBuilder.Eq(Constants.GuardianId, guardianId)
+            FilterBuilder.Eq(DbConstants.TallyId, tallyId),
+            FilterBuilder.Eq(DbConstants.GuardianId, guardianId)
             );
 
         return (await GetAllByFilterAsync(filter)).FirstOrDefault();
@@ -38,15 +38,15 @@ public class ChallengeResponseService : BaseDatabaseService<ChallengeResponseRec
 
     public async Task<long> GetCountByTallyAsync(string tallyId)
     {
-        var filter = FilterBuilder.Eq(Constants.TallyId, tallyId);
+        var filter = FilterBuilder.Eq(DbConstants.TallyId, tallyId);
         return await CountByFilterAsync(filter);
     }
 
     public async Task<bool> GetExistsByTallyAsync(string tallyId, string guardianId)
     {
         var filter = FilterBuilder.And(
-            FilterBuilder.Eq(Constants.TallyId, tallyId),
-            FilterBuilder.Eq(Constants.GuardianId, guardianId)
+            FilterBuilder.Eq(DbConstants.TallyId, tallyId),
+            FilterBuilder.Eq(DbConstants.GuardianId, guardianId)
             );
         return await ExistsByFilterAsync(filter);
     }

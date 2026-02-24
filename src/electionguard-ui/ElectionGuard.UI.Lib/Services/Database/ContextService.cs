@@ -10,7 +10,7 @@ public class ContextService : BaseDatabaseService<ContextRecord>
     /// <summary>
     /// The collection name to use to get/save data into
     /// </summary>
-    private readonly static string _collection = Constants.TableElections;
+    private readonly static string _collection = DbConstants.TableElections;
 
     /// <summary>
     /// Default constructor that sets the collection name
@@ -23,6 +23,6 @@ public class ContextService : BaseDatabaseService<ContextRecord>
     /// <param name="electionId">election id to search for</param>
     public async Task<ContextRecord?> GetByElectionIdAsync(string electionId)
     {
-        return await GetByFieldAsync(Constants.ElectionId, electionId);
+        return await GetByFieldAsync(DbConstants.ElectionId, electionId);
     }
 }

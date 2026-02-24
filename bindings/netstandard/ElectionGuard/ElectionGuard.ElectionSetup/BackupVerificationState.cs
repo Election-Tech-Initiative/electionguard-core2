@@ -1,4 +1,6 @@
-﻿namespace ElectionGuard.ElectionSetup;
+﻿using ElectionGuard.ElectionSetup.Records;
+
+namespace ElectionGuard.ElectionSetup;
 
 /// <summary>
 /// The state of the verifications of all guardian election partial key backups

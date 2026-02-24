@@ -1,4 +1,4 @@
-
+﻿
 using ElectionGuard.UI.Lib.Models;
 using ElectionGuard.ElectionSetup.Tests.KeyCeremony;
 using ElectionGuard.ElectionSetup.Tests.Mocks;
@@ -179,7 +179,7 @@ public class KeyCeremonyGenerator
                     data.KeyCeremony.Id,
                     guardian.GuardianId,
                     b.DesignatedId!,
-                    b)
+                    new(b))
             ).ToList());
         }
 
@@ -187,7 +187,7 @@ public class KeyCeremonyGenerator
         foreach (var guardian in data.Guardians)
         {
             var backups = data.Mediator.ShareBackups(guardian.GuardianId);
-            backups!.ForEach(guardian.SaveElectionPartialKeyBackup);
+            backups!.ForEach(g=>guardian.SaveElectionPartialKeyBackup(g.ToRecord()));
         }
 
         // ROUND 3: Joint Key
@@ -199,7 +199,7 @@ public class KeyCeremonyGenerator
             {
                 var verification = guardian.VerifyElectionPartialKeyBackup(
                     owner.GuardianId, data.KeyCeremony.Id);
-                data.Mediator.ReceiveElectionPartialKeyVerification(verification!);
+                data.Mediator.ReceiveElectionPartialKeyVerification(new(verification!));
             });
         }
         Assert.That(data.Mediator.AllBackupsVerified(), data.Mediator.GetVerificationState().ToString());

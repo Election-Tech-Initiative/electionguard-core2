@@ -10,7 +10,7 @@ public class CiphertextTallyService : BaseDatabaseService<CiphertextTallyRecord>
     /// <summary>
     /// The collection name to use to get/save data into
     /// </summary>
-    private readonly static string _collection = Constants.TableTallies;
+    private readonly static string _collection = DbConstants.TableTallies;
 
     /// <summary>
     /// Default constructor that sets the collection name
@@ -24,8 +24,8 @@ public class CiphertextTallyService : BaseDatabaseService<CiphertextTallyRecord>
     public async Task<CiphertextTallyRecord?> GetByTallyIdAsync(string tallyId)
     {
         var filter = FilterBuilder.And(
-            FilterBuilder.Eq(Constants.TallyId, tallyId),
-            FilterBuilder.Eq(Constants.IsExportable, true));
+            FilterBuilder.Eq(DbConstants.TallyId, tallyId),
+            FilterBuilder.Eq(DbConstants.IsExportable, true));
         return (await GetAllByFilterAsync(filter)).LastOrDefault();
     }
 
@@ -36,9 +36,9 @@ public class CiphertextTallyService : BaseDatabaseService<CiphertextTallyRecord>
     public async Task<List<CiphertextTallyRecord>> GetAllByElectionIdAsync(string electionId)
     {
         var filter = FilterBuilder.And(
-            FilterBuilder.Eq(Constants.ElectionId, electionId),
-            FilterBuilder.Eq(Constants.IsExportable, false),
-            FilterBuilder.Eq(Constants.TallyId, string.Empty));
+            FilterBuilder.Eq(DbConstants.ElectionId, electionId),
+            FilterBuilder.Eq(DbConstants.IsExportable, false),
+            FilterBuilder.Eq(DbConstants.TallyId, string.Empty));
         return await GetAllByFilterAsync(filter);
     }
 
@@ -48,7 +48,7 @@ public class CiphertextTallyService : BaseDatabaseService<CiphertextTallyRecord>
     /// <param name="uploadId">upload id to search for</param>
     public async Task<CiphertextTallyRecord?> GetByUploadIdIdAsync(string uploadId)
     {
-        return await GetByFieldAsync(Constants.UploadId, uploadId);
+        return await GetByFieldAsync(DbConstants.UploadId, uploadId);
     }
 
 }

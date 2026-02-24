@@ -1,6 +1,6 @@
-using System.Diagnostics;
+﻿using System.Diagnostics;
 using ElectionGuard.Guardians;
-using ElectionGuard.UI.Lib.Models;
+using ElectionGuard.ElectionSetup.Records;
 
 namespace ElectionGuard.ElectionSetup;
 
@@ -34,13 +34,13 @@ public partial class Guardian
     }
 
     // save_election_partial_key_verification
-    public void SaveElectionPartialKeyVerification(ElectionPartialKeyVerification verification)
+    public void SaveElectionPartialKeyVerification(ElectionPartialKeyVerificationRecord verification)
     {
         _partialVerifications[verification.DesignatedId!] = verification;
     }
 
     // verify_election_partial_key_backup
-    public ElectionPartialKeyVerification? VerifyElectionPartialKeyBackup(
+    public ElectionPartialKeyVerificationRecord? VerifyElectionPartialKeyBackup(
         string guardianId, string keyCeremonyId)
     {
         var backup = _partialKeyBackups[guardianId];
@@ -59,9 +59,9 @@ public partial class Guardian
             backup?.DesignatedId!, backup!, publicKey, _myElectionKeys, keyCeremonyId);
     }
 
-    private static ElectionPartialKeyVerification VerifyElectionPartialKeyBackup(
+    private static ElectionPartialKeyVerificationRecord VerifyElectionPartialKeyBackup(
         string receiverGuardianId,
-        ElectionPartialKeyBackup senderGuardianBackup,
+        ElectionPartialKeyBackupRecord senderGuardianBackup,
         ElectionPublicKey senderGuardianPublicKey,
         ElectionKeyPair myKeyPair, string keyCeremonyId)
     {
@@ -69,14 +69,7 @@ public partial class Guardian
         if (coordinateData is null)
         {
             Debug.WriteLine($"VerifyElectionPartialKeyBackup: {receiverGuardianId} -> {senderGuardianBackup.OwnerId} {senderGuardianBackup.DesignatedSequenceOrder} failed to decrypt");
-            return new()
-            {
-                KeyCeremonyId = keyCeremonyId,
-                OwnerId = senderGuardianBackup.OwnerId,
-                DesignatedId = senderGuardianBackup.DesignatedId,
-                VerifierId = receiverGuardianId,
-                Verified = false
-            };
+            return new(keyCeremonyId, senderGuardianBackup.OwnerId, senderGuardianBackup.DesignatedId, receiverGuardianId, false);
         }
 
         var verified = ElectionPolynomial.VerifyCoordinate(
@@ -85,13 +78,6 @@ public partial class Guardian
                 senderGuardianPublicKey.CoefficientCommitments
             );
         Debug.WriteLine($"VerifyElectionPartialKeyBackup: {receiverGuardianId} -> {senderGuardianBackup.OwnerId} {senderGuardianBackup.DesignatedSequenceOrder} {verified}");
-        return new()
-        {
-            KeyCeremonyId = keyCeremonyId,
-            OwnerId = senderGuardianBackup.OwnerId,
-            DesignatedId = senderGuardianBackup.DesignatedId,
-            VerifierId = receiverGuardianId,
-            Verified = verified
-        };
+        return new(keyCeremonyId, senderGuardianBackup.OwnerId, senderGuardianBackup.DesignatedId, receiverGuardianId, verified);
     }
 }

@@ -1,4 +1,6 @@
-﻿namespace ElectionGuard.UI.Lib.Models;
+﻿using ElectionGuard.ElectionSetup.Records;
+
+namespace ElectionGuard.UI.Lib.Models;
 
 /// <summary>
 /// Data for the key ceremony that is saved to the database

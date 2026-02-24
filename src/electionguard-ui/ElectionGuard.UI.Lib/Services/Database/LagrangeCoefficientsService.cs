@@ -10,7 +10,7 @@ public class LagrangeCoefficientsService : BaseDatabaseService<LagrangeCoefficie
     /// <summary>
     /// The collection name to use to get/save data into
     /// </summary>
-    private readonly static string _collection = Constants.TableTallies;
+    private readonly static string _collection = DbConstants.TableTallies;
 
     /// <summary>
     /// Default constructor that sets the collection name
@@ -23,7 +23,7 @@ public class LagrangeCoefficientsService : BaseDatabaseService<LagrangeCoefficie
     /// <param name="tallyId">tally id to search for</param>
     public async Task<LagrangeCoefficientsRecord?> GetByTallyIdAsync(string tallyId)
     {
-        return await GetByFieldAsync(Constants.TallyId, tallyId);
+        return await GetByFieldAsync(DbConstants.TallyId, tallyId);
     }
 
 }

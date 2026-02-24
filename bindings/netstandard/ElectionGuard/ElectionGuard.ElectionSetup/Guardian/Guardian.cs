@@ -1,8 +1,8 @@
-using System.Diagnostics;
+﻿using System.Diagnostics;
 using ElectionGuard.ElectionSetup.Extensions;
 using ElectionGuard.Extensions;
-using ElectionGuard.UI.Lib.Models;
 using ElectionGuard.Guardians;
+using ElectionGuard.ElectionSetup.Records;
 
 namespace ElectionGuard.ElectionSetup;
 
@@ -28,8 +28,8 @@ public partial class Guardian : DisposableBase, IElectionGuardian
     private readonly ElementModQ _commitmentSeed;
     private ElementModQ? _myPartialSecretKey;
     private readonly Dictionary<string, ElectionPublicKey> _publicKeys = new();
-    private readonly Dictionary<string, ElectionPartialKeyBackup> _partialKeyBackups = new();
-    private readonly Dictionary<string, ElectionPartialKeyVerification> _partialVerifications = new();
+    private readonly Dictionary<string, ElectionPartialKeyBackupRecord> _partialKeyBackups = new();
+    private readonly Dictionary<string, ElectionPartialKeyVerificationRecord> _partialVerifications = new();
 
     public string ObjectId => GuardianId;
 
@@ -51,7 +51,7 @@ public partial class Guardian : DisposableBase, IElectionGuardian
     /// <summary>
     /// Encrypted segments of the guardian's private key that are shared with other guardians.
     /// </summary>
-    public Dictionary<string, ElectionPartialKeyBackup> BackupsToShare { get; set; } = new();
+    public Dictionary<string, ElectionPartialKeyBackupRecord> BackupsToShare { get; set; } = new();
 
     private ElementModP? _commitmentOffset;
 
@@ -204,9 +204,9 @@ public partial class Guardian : DisposableBase, IElectionGuardian
         ElementModQ commitmentSeed,
         CeremonyDetails ceremonyDetails,
         Dictionary<string, ElectionPublicKey>? otherKeys = null,
-        Dictionary<string, ElectionPartialKeyBackup>? otherBackups = null,
-        Dictionary<string, ElectionPartialKeyBackup>? backupsToShare = null,
-        Dictionary<string, ElectionPartialKeyVerification>? otherVerifications = null
+        Dictionary<string, ElectionPartialKeyBackupRecord>? otherBackups = null,
+        Dictionary<string, ElectionPartialKeyBackupRecord>? backupsToShare = null,
+        Dictionary<string, ElectionPartialKeyVerificationRecord>? otherVerifications = null
         )
     {
         _myElectionKeys = new(keyPair);
@@ -311,25 +311,25 @@ public partial class Guardian : DisposableBase, IElectionGuardian
                 SequenceOrder,
                 _myElectionKeys.Polynomial,
                 guardianKey);
-            BackupsToShare[guardianKey.GuardianId] = new(backup);
+            BackupsToShare[guardianKey.GuardianId] = new(backup.OwnerId, backup.OwnerSequenceOrder, backup.DesignatedId, backup.DesignatedSequenceOrder, backup.EncryptedCoordinate);
         }
         return true;
     }
 
     // share_election_partial_key_backups
-    public List<ElectionPartialKeyBackup> ShareElectionPartialKeyBackups()
+    public List<ElectionPartialKeyBackupRecord> ShareElectionPartialKeyBackups()
     {
         return BackupsToShare.Values.ToList();
     }
 
     // save_election_partial_key_backup
     public void SaveElectionPartialKeyBackup(
-        ElectionPartialKeyBackup backup)
+        ElectionPartialKeyBackupRecord backup)
     {
-        _partialKeyBackups[backup.OwnerId!] = new(backup);
+        _partialKeyBackups[backup.OwnerId!] = new(backup.OwnerId, backup.OwnerSequenceOrder, backup.DesignatedId, backup.DesignatedSequenceOrder, backup.EncryptedCoordinate);
     }
 
-    private static ElectionPartialKeyBackup GenerateElectionPartialKeyBackup(
+    private static ElectionPartialKeyBackupRecord GenerateElectionPartialKeyBackup(
         string myGuardianId,
         ulong mySequenceOrder,
         ElectionPolynomial myPolynomial,

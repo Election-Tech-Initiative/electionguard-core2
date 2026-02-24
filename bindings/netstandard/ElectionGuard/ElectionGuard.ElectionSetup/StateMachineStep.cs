@@ -1,6 +1,4 @@
-﻿using ElectionGuard.UI.Lib.Models;
-
-namespace ElectionGuard.ElectionSetup;
+﻿namespace ElectionGuard.ElectionSetup;
 
 /// <summary>
 /// Data structure for keeping track of the steps needed for admin/guardians

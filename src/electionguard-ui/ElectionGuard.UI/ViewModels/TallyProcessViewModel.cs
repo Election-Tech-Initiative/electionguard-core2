@@ -1,7 +1,7 @@
 ﻿using System.Threading.Tasks;
 using CommunityToolkit.Maui.Core.Extensions;
 using CommunityToolkit.Mvvm.Input;
-using ElectionGuard.UI.Lib.Extensions;
+using ElectionGuard.ElectionSetup.Extensions;
 using ElectionGuard.UI.Models;
 using ElectionGuard.UI.Services;
 

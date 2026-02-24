@@ -161,7 +161,7 @@ jobs:
       - name: Install .NET
         uses: actions/setup-dotnet@v4
         with:
-          dotnet-version: 7.0.x
+          dotnet-version: 10.0.x
       - name: Setup Environment
         run: make environment
       - name: Build
@@ -187,7 +187,7 @@ jobs:
       - name: Install .NET
         uses: actions/setup-dotnet@v4
         with:
-          dotnet-version: 7.0.x
+          dotnet-version: 10.0.x
       - name: Setup Environment
         run: make environment
       - name: Build
@@ -331,7 +331,7 @@ jobs:
       - name: Install .NET
         uses: actions/setup-dotnet@v4
         with:
-          dotnet-version: 7.0.x
+          dotnet-version: 10.0.x
 
       # - name: Update Mac Environment
       #   if: runner.os == 'macOS'

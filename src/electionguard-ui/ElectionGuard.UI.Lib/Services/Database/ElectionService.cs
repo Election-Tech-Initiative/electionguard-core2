@@ -11,7 +11,7 @@ public class ElectionService : BaseDatabaseService<Election>
     /// <summary>
     /// The collection name to use to get/save data into
     /// </summary>
-    private readonly static string _collection = Constants.TableElections;
+    private readonly static string _collection = DbConstants.TableElections;
 
     /// <summary>
     /// Default constructor that sets the collection name
@@ -24,7 +24,7 @@ public class ElectionService : BaseDatabaseService<Election>
     /// <param name="electionId">election id to search for</param>
     public async Task<Election?> GetByElectionIdAsync(string electionId)
     {
-        return await GetByFieldAsync(Constants.ElectionId, electionId);
+        return await GetByFieldAsync(DbConstants.ElectionId, electionId);
     }
 
     /// <summary>
@@ -45,10 +45,10 @@ public class ElectionService : BaseDatabaseService<Election>
     virtual public async Task UpdateEncryptionExportDateAsync(string electionId, DateTime date)
     {
         var filterBuilder = Builders<Election>.Filter;
-        var filter = filterBuilder.And(filterBuilder.Eq(Constants.ElectionId, electionId));
+        var filter = filterBuilder.And(filterBuilder.Eq(DbConstants.ElectionId, electionId));
 
         var updateBuilder = Builders<Election>.Update;
-        var update = updateBuilder.Set(Constants.ExportEncryptionDateTime, date);
+        var update = updateBuilder.Set(DbConstants.ExportEncryptionDateTime, date);
 
         await UpdateAsync(filter, update);
     }
@@ -60,7 +60,7 @@ public class ElectionService : BaseDatabaseService<Election>
     public async Task<long> CountByKeyCeremonyIdAsync(string keyCeremonyId)
     {
         var filterBuilder = Builders<Election>.Filter;
-        var filter = filterBuilder.Eq(Constants.KeyCeremonyId, keyCeremonyId);
+        var filter = filterBuilder.Eq(DbConstants.KeyCeremonyId, keyCeremonyId);
         return await CountByFilterAsync(filter);
     }
 
@@ -71,7 +71,7 @@ public class ElectionService : BaseDatabaseService<Election>
     public async Task<List<Election>> GetAllByKeyCeremonyIdAsync(string keyCeremonyId)
     {
         var filterBuilder = Builders<Election>.Filter;
-        var filter = filterBuilder.Eq(Constants.KeyCeremonyId, keyCeremonyId);
+        var filter = filterBuilder.Eq(DbConstants.KeyCeremonyId, keyCeremonyId);
         return await GetAllByFilterAsync(filter);
     }
 

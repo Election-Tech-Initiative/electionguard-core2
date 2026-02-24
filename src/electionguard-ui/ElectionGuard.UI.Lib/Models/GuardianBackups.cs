@@ -1,4 +1,6 @@
-﻿namespace ElectionGuard.UI.Lib.Models;
+﻿using ElectionGuard.ElectionSetup.Records;
+
+namespace ElectionGuard.UI.Lib.Models;
 
 public class GuardianBackups : DatabaseRecord, IDisposable
 {
@@ -9,6 +11,14 @@ public class GuardianBackups : DatabaseRecord, IDisposable
     public string? DesignatedId { get; set; }
 
     public ElectionPartialKeyBackup? Backup { get; set; }
+
+    public GuardianBackups(GuardianBackups guardianBackups) : base(nameof(GuardianBackups))
+    {
+        KeyCeremonyId = guardianBackups.KeyCeremonyId;
+        GuardianId = guardianBackups.GuardianId;
+        DesignatedId = guardianBackups.DesignatedId;
+        Backup = guardianBackups.Backup != null ? new ElectionPartialKeyBackup(guardianBackups.Backup) : null;
+    }
 
     public GuardianBackups() : base(nameof(GuardianBackups))
     {
@@ -26,7 +36,7 @@ public class GuardianBackups : DatabaseRecord, IDisposable
         Backup = new(backup);
     }
 
-    public GuardianBackups(GuardianBackups other) : base(nameof(GuardianBackups))
+    public GuardianBackups(GuardianBackupsRecord other) : base(nameof(GuardianBackups))
     {
         KeyCeremonyId = other.KeyCeremonyId;
         GuardianId = other.GuardianId;

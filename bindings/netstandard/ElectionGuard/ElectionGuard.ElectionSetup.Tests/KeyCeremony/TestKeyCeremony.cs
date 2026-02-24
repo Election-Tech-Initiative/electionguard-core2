@@ -1,4 +1,4 @@
-using ElectionGuard.ElectionSetup.Tests.Generators;
+﻿using ElectionGuard.ElectionSetup.Tests.Generators;
 using ElectionGuard.UI.Lib.Models;
 
 namespace ElectionGuard.ElectionSetup.Tests.KeyCeremony;
@@ -61,7 +61,7 @@ public class TestKeyCeremony : DisposableBase
                     keyCeremony.Id,
                     sender.GuardianId,
                     b.DesignatedId!,
-                    b
+                    new(b)
                 )).ToList()
             );
         }
@@ -72,7 +72,7 @@ public class TestKeyCeremony : DisposableBase
         foreach (var guardian in guardians)
         {
             var backups = mediator.ShareBackups(guardian.GuardianId);
-            backups!.ForEach(guardian.SaveElectionPartialKeyBackup);
+            backups!.ForEach(g => guardian.SaveElectionPartialKeyBackup(g.ToRecord()));
         }
 
         // ROUND 3: Partial Key Verification
@@ -83,7 +83,7 @@ public class TestKeyCeremony : DisposableBase
             .ForEach(owner =>
             {
                 var verification = guardian.VerifyElectionPartialKeyBackup(owner.GuardianId, keyCeremony.Id);
-                mediator.ReceiveElectionPartialKeyVerification(verification!);
+                mediator.ReceiveElectionPartialKeyVerification(new(verification!));
             });
         }
 

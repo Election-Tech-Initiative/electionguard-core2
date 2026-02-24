@@ -1,7 +1,7 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFramework>net7.0</TargetFramework>
+    <TargetFramework>net10.0</TargetFramework>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
     <EnableNETAnalyzers>true</EnableNETAnalyzers>
@@ -27,6 +27,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\..\..\..\src\electionguard-ui\ElectionGuard.UI.Lib\ElectionGuard.UI.Lib.csproj" />
     <ProjectReference Include="..\ElectionGuard.ElectionSetup\ElectionGuard.ElectionSetup.csproj" />
     <ProjectReference Include="..\ElectionGuard.Encryption\ElectionGuard.Encryption.csproj" />
     <ProjectReference Include="..\ElectionGuard.Encryption.Utils\ElectionGuard.Encryption.Utils.csproj" />

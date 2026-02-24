@@ -1,4 +1,4 @@
-using ElectionGuard.UI.Lib.Models;
+﻿using ElectionGuard.ElectionSetup.Records;
 
 namespace ElectionGuard.ElectionSetup;
 
@@ -19,14 +19,14 @@ public partial class Guardian
     }
 
     // verify_election_partial_key_challenge
-    public ElectionPartialKeyVerification VerifyElectionPartialKeyChallenge(
+    public ElectionPartialKeyVerificationRecord VerifyElectionPartialKeyChallenge(
         ElectionPartialKeyChallenge challenge)
     {
         return VerifyElectionPartialKeyChallenge(GuardianId, challenge);
     }
 
     private static ElectionPartialKeyChallenge GenerateElectionPartialKeyChallenge(
-        ElectionPartialKeyBackup backup, ElectionPolynomial polynomial)
+        ElectionPartialKeyBackupRecord backup, ElectionPolynomial polynomial)
     {
         return new()
         {
@@ -39,18 +39,13 @@ public partial class Guardian
         };
     }
 
-    private static ElectionPartialKeyVerification VerifyElectionPartialKeyChallenge(
+    private static ElectionPartialKeyVerificationRecord VerifyElectionPartialKeyChallenge(
         string verifierId, ElectionPartialKeyChallenge challenge)
     {
-        return new ElectionPartialKeyVerification()
-        {
-            OwnerId = challenge.OwnerId,
-            DesignatedId = challenge.DesignatedId,
-            VerifierId = verifierId,
-            Verified = ElectionPolynomial.VerifyCoordinate(
+        return new ElectionPartialKeyVerificationRecord(null, challenge.OwnerId, challenge.DesignatedId, verifierId, ElectionPolynomial.VerifyCoordinate(
                 challenge.DesignatedSequenceOrder,
                 challenge.Value!,
-                challenge.CoefficientCommitments!)
-        };
+                challenge.CoefficientCommitments!));
+        
     }
 }

@@ -1,4 +1,4 @@
-namespace ElectionGuard.ElectionSetup;
+﻿namespace ElectionGuard.ElectionSetup.Records;
 
 /// <summary>
 /// A guardian is a person or entity that is responsible for decrypting a share of the election record.

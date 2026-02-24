@@ -5,12 +5,12 @@ using ElectionGuard.Decryption.Decryption;
 using ElectionGuard.Decryption.Extensions;
 using ElectionGuard.Decryption.Shares;
 using ElectionGuard.Decryption.Tally;
-using ElectionGuard.ElectionSetup;
 using ElectionGuard.Converters;
 using ElectionGuard.Extensions;
 using ElectionGuard.Guardians;
 using MongoDB.Driver;
 using Newtonsoft.Json;
+using ElectionGuard.ElectionSetup;
 
 namespace ElectionGuard.UI.Services
 {
@@ -381,7 +381,7 @@ namespace ElectionGuard.UI.Services
                     userId,
                     keyCeremony,
                     publicKeys,
-                    backups.ToDictionary(k => k.GuardianId!, v => v.Backup!)) ?? throw new ElectionGuardException(nameof(userId));
+                    backups.ToDictionary(k => k.GuardianId!, v => v.Backup!.ToRecord())) ?? throw new ElectionGuardException(nameof(userId));
                 return guardian;
             }
             catch (Exception ex)

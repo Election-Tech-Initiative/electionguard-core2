@@ -1,6 +1,6 @@
 ﻿using System.Collections.ObjectModel;
 
-namespace ElectionGuard.UI.Lib.Extensions
+namespace ElectionGuard.ElectionSetup.Extensions
 {
     public static class ObservableCollectionExtension
     {

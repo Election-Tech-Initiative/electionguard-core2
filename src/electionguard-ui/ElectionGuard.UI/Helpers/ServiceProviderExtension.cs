@@ -1,4 +1,4 @@
-﻿namespace ElectionGuard.UI.Lib.Extensions;
+﻿namespace ElectionGuard.UI.Helpers;
 
 public static class ServiceProviderExtension
 {

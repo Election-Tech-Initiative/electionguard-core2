@@ -1,4 +1,4 @@
-using ElectionGuard.UI.Lib.Extensions;
+﻿using ElectionGuard.UI.Helpers;
 using CommunityToolkit.Mvvm.DependencyInjection;
 
 namespace ElectionGuard.UI;

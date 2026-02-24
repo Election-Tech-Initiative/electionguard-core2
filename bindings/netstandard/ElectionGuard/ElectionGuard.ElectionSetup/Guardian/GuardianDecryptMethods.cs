@@ -1,4 +1,4 @@
-using ElectionGuard.UI.Lib.Models;
+﻿using ElectionGuard.ElectionSetup.Records;
 
 namespace ElectionGuard.ElectionSetup;
 
@@ -66,7 +66,7 @@ public partial class Guardian
     /// </summary>
     /// <param name="guardianBackup">Missing guardian's backup</param>
     /// <returns>coordinatedata of the decryption and its proof</returns>
-    private ElementModQ? DecryptBackup(ElectionPartialKeyBackup backup)
+    private ElementModQ? DecryptBackup(ElectionPartialKeyBackupRecord backup)
     {
         return DecryptBackup(backup, _myElectionKeys);
     }
@@ -78,7 +78,7 @@ public partial class Guardian
     /// <param name="myKeyPair">The present guardian's key pair that will be used to decrypt the backup</param>
     /// <returns>coordinatedata of the decryption and its proof</returns>
     private static ElementModQ? DecryptBackup(
-        ElectionPartialKeyBackup guardianBackup, ElectionKeyPair myKeyPair)
+        ElectionPartialKeyBackupRecord guardianBackup, ElectionKeyPair myKeyPair)
     {
         var encryptionSeed = GetBackupSeed(
             myKeyPair.SequenceOrder,

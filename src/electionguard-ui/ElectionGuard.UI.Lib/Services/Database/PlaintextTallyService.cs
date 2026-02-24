@@ -10,7 +10,7 @@ public class PlaintextTallyService : BaseDatabaseService<PlaintextTallyRecord>
     /// <summary>
     /// The collection name to use to get/save data into
     /// </summary>
-    private readonly static string _collection = Constants.TableTallies;
+    private readonly static string _collection = DbConstants.TableTallies;
 
     /// <summary>
     /// Default constructor that sets the collection name
@@ -23,12 +23,12 @@ public class PlaintextTallyService : BaseDatabaseService<PlaintextTallyRecord>
     /// <param name="tallyId">tally id to search for</param>
     public async Task<PlaintextTallyRecord?> GetByTallyIdAsync(string tallyId)
     {
-        return await GetByFieldAsync(Constants.TallyId, tallyId);
+        return await GetByFieldAsync(DbConstants.TallyId, tallyId);
     }
 
     public Task<PlaintextTallyRecord> SaveAsync(PlaintextTallyRecord data)
     {
-        var filter = FilterBuilder.Eq(Constants.TallyId, data.TallyId);
+        var filter = FilterBuilder.Eq(DbConstants.TallyId, data.TallyId);
         return SaveAsync(data, filter);
     }
 

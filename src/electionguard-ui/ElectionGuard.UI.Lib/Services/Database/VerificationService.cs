@@ -18,7 +18,7 @@ public class VerificationService : BaseDatabaseService<ElectionPartialKeyVerific
     /// <summary>
     /// The collection name to use to get/save data into
     /// </summary>
-    private readonly static string _collection = Constants.TableKeyCeremonies;
+    private readonly static string _collection = DbConstants.TableKeyCeremonies;
 
     /// <summary>
     /// Default constructor that sets the collection name
@@ -31,21 +31,21 @@ public class VerificationService : BaseDatabaseService<ElectionPartialKeyVerific
     /// <param name="keyCeremonyId">key ceremony id to search for</param>
     public async Task<List<ElectionPartialKeyVerification>?> GetAllByKeyCeremonyIdAsync(string keyCeremonyId)
     {
-        return await GetAllByFieldAsync(Constants.KeyCeremonyId, keyCeremonyId);
+        return await GetAllByFieldAsync(DbConstants.KeyCeremonyId, keyCeremonyId);
     }
 
     public async Task<long> CountAsync(string keyCeremonyId, string guardianId)
     {
         var filterBuilder = Builders<ElectionPartialKeyVerification>.Filter;
-        var filter = filterBuilder.And(filterBuilder.Eq(Constants.KeyCeremonyId, keyCeremonyId),
-            filterBuilder.Eq(Constants.DesignatedId, guardianId));
+        var filter = filterBuilder.And(filterBuilder.Eq(DbConstants.KeyCeremonyId, keyCeremonyId),
+            filterBuilder.Eq(DbConstants.DesignatedId, guardianId));
 
         return await CountByFilterAsync(filter);
     }
     public async Task<long> CountAsync(string keyCeremonyId)
     {
         var filterBuilder = Builders<ElectionPartialKeyVerification>.Filter;
-        var filter = filterBuilder.And(filterBuilder.Eq(Constants.KeyCeremonyId, keyCeremonyId));
+        var filter = filterBuilder.And(filterBuilder.Eq(DbConstants.KeyCeremonyId, keyCeremonyId));
 
         return await CountByFilterAsync(filter);
     }

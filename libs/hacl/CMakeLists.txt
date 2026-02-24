@@ -6,7 +6,7 @@ cmake_minimum_required(VERSION 3.14...3.16 FATAL_ERROR)
 list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/../cmake")
 
 # ---- Dependencies ----
-include(../../cmake/CPM.cmake)
+include(../../cmake/CPM_0.31.0.cmake)
 
 if(MSVC)
     set(HACL_CUSTOM_CONFIG_FILE_PATH ${PROJECT_SOURCE_DIR}/libs/hacl/config.msvc.cmake)

@@ -1,4 +1,4 @@
-﻿namespace ElectionGuard.UI.Lib.Models;
+﻿namespace ElectionGuard.ElectionSetup.Records;
 
 /// <summary>
 /// Details of key ceremony

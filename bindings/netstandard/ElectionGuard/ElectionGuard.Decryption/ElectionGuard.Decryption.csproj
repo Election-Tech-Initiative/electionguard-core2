@@ -1,11 +1,37 @@
+<?xml version="1.0" encoding="utf-8"?>
 <Project Sdk="Microsoft.NET.Sdk">
-
   <PropertyGroup>
-    <TargetFramework>net7.0</TargetFramework>
-    <ImplicitUsings>enable</ImplicitUsings>
-    <Nullable>enable</Nullable>
+    <TargetFramework>net10.0</TargetFramework>
+    <!-- Project -->
+    <RootNamespace>ElectionGuard</RootNamespace>
+    <AssemblyName>ElectionGuard.Decryption</AssemblyName>
+    <Version>1.75.17</Version>
+    <AssemblyVersion>1.75.17.0</AssemblyVersion>
+    <AssemblyFileVersion>1.75.17.0</AssemblyFileVersion>
     <EnableNETAnalyzers>true</EnableNETAnalyzers>
     <EnforceCodeStyleInBuild>true</EnforceCodeStyleInBuild>
+    <Platforms>arm64;x64;x86</Platforms>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+  </PropertyGroup>
+
+  <PropertyGroup>
+    <!-- Package -->
+    <PackageId>ElectionGuard.Decryption</PackageId>
+    <Title>ElectionGuard Decryption</Title>
+    <Description>Open source implementation of ElectionGuard's ballot decryption.</Description>
+    <Authors>Microsoft</Authors>
+    <PackageVersion>1.75.17</PackageVersion>
+    <PackageLicenseExpression>MIT</PackageLicenseExpression>
+    <PackageProjectUrl>https://github.com/Election-Tech-Initiative/electionguard-core2</PackageProjectUrl>
+    <RepositoryUrl>https://github.com/Election-Tech-Initiative/electionguard-core2</RepositoryUrl>
+    <PackageTags>Electionguard;Decryption;Windows;Linux</PackageTags>
+    <PackageReadmeFile>README.md</PackageReadmeFile>
+    <PackageIcon>icon.png</PackageIcon>
+    <RestoreProjectStyle>PackageReference</RestoreProjectStyle>
+    <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
+    <!-- <CopyLocalLockFileAssemblies>true</CopyLocalLockFileAssemblies> -->
+    <!-- <PackageReleaseNotes>Changelog</PackageReleaseNotes> -->
     <Platforms>arm64;x64;x86</Platforms>
   </PropertyGroup>
 
@@ -28,6 +54,12 @@
     <NoWarn>1701;1702</NoWarn>
     <WarningLevel>4</WarningLevel>
     <WarningsNotAsErrors>SYSLIB0004</WarningsNotAsErrors>
+    <GenerateDocumentationFile>true</GenerateDocumentationFile>
   </PropertyGroup>
+
+  <ItemGroup Label="Additional Package Files">
+    <None Name="ReadMe" Include="..\README.md" Pack="true" PackagePath="\" />
+    <None Name="Icon" Include="..\icon.png" Pack="true" PackagePath="\" />
+  </ItemGroup>
 
 </Project>

@@ -1,4 +1,6 @@
-﻿namespace ElectionGuard.ElectionSetup.Extensions;
+﻿using ElectionGuard.ElectionSetup.Records;
+
+namespace ElectionGuard.ElectionSetup.Extensions;
 
 public static class DictionaryExtensions
 {
