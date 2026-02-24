@@ -313,8 +313,8 @@ jobs:
         name: ["windows-os"]
         include:
           # - name: macOS
-          #   os: macos-15
-          #   version: "16.4"
+          #   os: macos-26
+          #   version: "26.2"
           #   osFolder: "maccatalyst"
           - name: windows-os
             os: windows-2022
