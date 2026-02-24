@@ -69,8 +69,8 @@ jobs:
         name: ["macOS", "windows-os"]
         include:
           - name: macOS
-            os: macOS-13
-            version: "14.2"
+            os: macos-15
+            version: "16.4"
             osFolder: "maccatalyst"
           - name: windows-os
             os: windows-2022
@@ -113,7 +113,7 @@ jobs:
         if: (runner.os == 'macOS' && steps.filter.outputs.any == 'true')
         run: |
           ls -ls /Applications/
-          ls -ls $ANDROID_SDK_ROOT/ndk
+          # ANDROID_SDK_ROOT may not be set on all runners
           sudo xcode-select -switch /Applications/Xcode_${{ matrix.version }}.app
 
       - name: Configure Environment

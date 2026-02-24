@@ -59,9 +59,9 @@ jobs:
 
   maccatalyst_build_arm64:
     name: MacCatalyst Build (arm64)
-    runs-on: macos-13
+    runs-on: macos-15
     env:
-      compiler_version: 14.2
+      compiler_version: 16.4
     steps:
       - name: Checkout Code
         uses: actions/checkout@v4
@@ -82,9 +82,9 @@ jobs:
 
   macos_build_arm64:
     name: MacOS Build (arm64)
-    runs-on: macos-13
+    runs-on: macos-15
     env:
-      compiler_version: 14.2
+      compiler_version: 16.4
     steps:
       - name: Checkout Code
         uses: actions/checkout@v4
@@ -105,9 +105,9 @@ jobs:
 
   macos_build_x64:
     name: MacOS Build (x64)
-    runs-on: macos-13
+    runs-on: macos-15-intel
     env:
-      compiler_version: 14.2
+      compiler_version: 16.4
     steps:
       - name: Checkout Code
         uses: actions/checkout@v4
@@ -313,8 +313,8 @@ jobs:
         name: ["windows-os"]
         include:
           # - name: macOS
-          #   os: macOS-13
-          #   version: "14.2"
+          #   os: macos-15
+          #   version: "16.4"
           #   osFolder: "maccatalyst"
           - name: windows-os
             os: windows-2022
