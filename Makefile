@@ -332,10 +332,14 @@ build-cli:
 	dotnet build -c $(TARGET) $(ELECTIONGUARD_APP_CLI_DIR)/ElectionGuard.CLI.sln /p:Platform=$(PROCESSOR)
 
 build-ui:
-# TODO: add platform checks, will not work on Linux!
 	@echo 🖥️ BUILD UI $(OPERATING_SYSTEM) $(PROCESSOR) $(TARGET)
 	cd ./src/electionguard-ui && dotnet restore
+ifeq ($(OPERATING_SYSTEM),Darwin)
+	dotnet build -f net10.0-maccatalyst -c $(TARGET) ./$(ELECTIONGUARD_APP_ADMIN_DIR)/ElectionGuard.UI/ElectionGuard.UI.csproj /p:APPCENTER_SECRET_MACOS=$(APPCENTER_SECRET_MACOS)
+endif
+ifeq ($(OPERATING_SYSTEM),Windows)
 	dotnet build -c $(TARGET) ./src/electionguard-ui/ElectionGuard.UI.sln /p:Platform=$(PROCESSOR) /p:APPCENTER_SECRET_UWP=$(APPCENTER_SECRET_UWP) /p:APPCENTER_SECRET_MACOS=$(APPCENTER_SECRET_MACOS)
+endif
 
 build-wasm:
 	@echo 🌐 BUILD WASM $(OPERATING_SYSTEM) $(PROCESSOR) $(TARGET)
