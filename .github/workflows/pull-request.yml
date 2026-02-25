@@ -65,19 +65,19 @@ jobs:
       matrix:
         name:
           [
-            "ubuntu-22.04-clang-14.0.0",
-            "ubuntu-22.04-emscripten-3.1",
-            "ubuntu-22.04-gcc-12.1.0",
+            "ubuntu-24.04-clang-14.0.0",
+            "ubuntu-24.04-emscripten-3.1",
+            "ubuntu-24.04-gcc-12.1.0",
             "macos-15-intel-xcode-16.4",
             "macos-15-xcode-16.4-arm64",
             "windows-2022-msys2-clang-14",
             "windows-2022-msvc-latest-x86",
             "windows-2022-msvc-latest-x64",
-            "ubuntu-22.04-linter",
+            "ubuntu-24.04-linter",
           ]
         include:
-          - name: ubuntu-22.04-clang-14.0.0
-            os: ubuntu-22.04
+          - name: ubuntu-24.04-clang-14.0.0
+            os: ubuntu-24.04
             processor: x64
             compiler: clang
             version: "14"
@@ -85,8 +85,8 @@ jobs:
             lint: false
             runCsTests: false
             runTsTests: false
-          - name: ubuntu-22.04-emscripten-3.1
-            os: ubuntu-22.04
+          - name: ubuntu-24.04-emscripten-3.1
+            os: ubuntu-24.04
             processor: x64
             compiler: emscripten
             version: "3.1.35"
@@ -94,8 +94,8 @@ jobs:
             lint: false
             runCsTests: false
             runTsTests: true
-          - name: ubuntu-22.04-gcc-12.1.0
-            os: ubuntu-22.04
+          - name: ubuntu-24.04-gcc-12.1.0
+            os: ubuntu-24.04
             processor: x64
             compiler: gcc
             version: "12"
@@ -148,8 +148,8 @@ jobs:
             lint: false
             runCsTests: true
             runTsTests: false
-          - name: ubuntu-22.04-linter
-            os: ubuntu-22.04
+          - name: ubuntu-24.04-linter
+            os: ubuntu-24.04
             processor: x64
             compiler: clang
             version: "14"

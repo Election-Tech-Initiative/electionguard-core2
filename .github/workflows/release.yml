@@ -11,7 +11,7 @@ env:
 jobs:
   get_version_code:
     name: Get Version Code
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-24.04
     outputs:
       version: ${{ steps.get_version_code.outputs.version }}
       build_number: ${{ steps.get_version_code.outputs.build_number }}
@@ -32,7 +32,7 @@ jobs:
 
   linux_build_x64:
     name: Linux Build (x64)
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-24.04
     env:
       compiler: clang
       compiler_version: 14
@@ -128,7 +128,7 @@ jobs:
 
   wasm_build:
     name: WASM Build
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-24.04
     env:
       compiler: clang
       compiler_version: 14
@@ -216,7 +216,7 @@ jobs:
         windows_build_x64,
         windows_build_x86,
       ]
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-24.04
     steps:
       - name: Checkout Code
         uses: actions/checkout@v4
@@ -275,7 +275,7 @@ jobs:
   publish_npm:
     name: Publish NPM
     needs: [get_version_code, wasm_build]
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-24.04
     steps:
       - name: Checkout Code
         uses: actions/checkout@v4
@@ -382,7 +382,7 @@ jobs:
   publish_release:
     name: Publish Release
     needs: [get_version_code, publish_nuget, publish_npm, publish_admin]
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-24.04
     steps:
       - name: Create Github Release
         uses: softprops/action-gh-release@v1

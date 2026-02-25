@@ -11,7 +11,7 @@ env:
 jobs:
   get_version_code:
     name: Get Version Code
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-24.04
     outputs:
       version: ${{ steps.get_version_code.outputs.version }}
       build_number: ${{ steps.get_version_code.outputs.build_number }}
