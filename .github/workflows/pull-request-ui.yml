@@ -43,7 +43,7 @@ jobs:
       source: ${{ steps.filter.outputs.source }}
     steps:
       # For pull requests it's not necessary to checkout the code
-      - uses: dorny/paths-filter@v2
+      - uses: dorny/paths-filter@v3
         id: filter
         with:
           filters: |
