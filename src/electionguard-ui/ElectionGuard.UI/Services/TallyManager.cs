@@ -381,7 +381,7 @@ namespace ElectionGuard.UI.Services
                     userId,
                     keyCeremony,
                     publicKeys,
-                    backups.ToDictionary(k => k.GuardianId!, v => v.Backup!)) ?? throw new ElectionGuardException(nameof(userId));
+                    backups.ToDictionary(k => k.GuardianId!, v => v.Backup!.ToRecord())) ?? throw new ElectionGuardException(nameof(userId));
                 return guardian;
             }
             catch (Exception ex)
