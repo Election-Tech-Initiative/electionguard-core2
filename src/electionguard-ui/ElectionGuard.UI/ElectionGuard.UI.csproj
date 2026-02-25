@@ -69,7 +69,7 @@
 	<PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
 		<IntermediateOutputPath></IntermediateOutputPath>
 		<DebugSymbols></DebugSymbols>
-		<DebugType></DebugType>
+		<DebugType>portable</DebugType>
 		<Optimize></Optimize>
 		<OutputPath></OutputPath>
 		<DefineConstants></DefineConstants>
@@ -96,7 +96,7 @@
 	<PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
 		<IntermediateOutputPath></IntermediateOutputPath>
 		<DebugSymbols></DebugSymbols>
-		<DebugType></DebugType>
+		<DebugType>portable</DebugType>
 		<Optimize></Optimize>
 		<OutputPath></OutputPath>
 		<DefineConstants></DefineConstants>
