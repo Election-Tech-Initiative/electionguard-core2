@@ -70,9 +70,9 @@ jobs:
             "ubuntu-24.04-gcc-12.1.0",
             "macos-15-intel-xcode-16.4",
             "macos-15-xcode-16.4-arm64",
-            "windows-2022-msys2-clang-14",
-            "windows-2022-msvc-latest-x86",
-            "windows-2022-msvc-latest-x64",
+            "windows-2025-msys2-clang-14",
+            "windows-2025-msvc-latest-x86",
+            "windows-2025-msvc-latest-x64",
             "ubuntu-24.04-linter",
           ]
         include:
@@ -121,8 +121,8 @@ jobs:
             lint: false
             runCsTests: false
             runTsTests: false
-          - name: windows-2022-msys2-clang-14
-            os: windows-2022
+          - name: windows-2025-msys2-clang-14
+            os: windows-2025-vs2026
             processor: x64
             compiler: clang
             version: "14"
@@ -130,8 +130,8 @@ jobs:
             lint: false
             runCsTests: false
             runTsTests: false
-          - name: windows-2022-msvc-latest-x86
-            os: windows-2022
+          - name: windows-2025-msvc-latest-x86
+            os: windows-2025-vs2026
             processor: x86
             compiler: msvc
             version: "latest"
@@ -139,8 +139,8 @@ jobs:
             lint: false
             runCsTests: false
             runTsTests: false
-          - name: windows-2022-msvc-latest-x64
-            os: windows-2022
+          - name: windows-2025-msvc-latest-x64
+            os: windows-2025-vs2026
             processor: x64
             compiler: msvc
             version: "latest"

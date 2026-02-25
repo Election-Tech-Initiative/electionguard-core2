@@ -73,7 +73,7 @@ jobs:
             version: "26.2"
             osFolder: "maccatalyst"
           - name: windows-os
-            os: windows-2022
+            os: windows-2025-vs2026
             version: "latest"
             osFolder: "windows"
 

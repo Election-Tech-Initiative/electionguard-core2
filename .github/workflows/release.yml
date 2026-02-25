@@ -154,7 +154,7 @@ jobs:
 
   windows_build_x86:
     name: Windows Build (x86)
-    runs-on: windows-2022
+    runs-on: windows-2025-vs2026
     steps:
       - name: Checkout Code
         uses: actions/checkout@v4
@@ -180,7 +180,7 @@ jobs:
 
   windows_build_x64:
     name: Windows Build (x64)
-    runs-on: windows-2022
+    runs-on: windows-2025-vs2026
     steps:
       - name: Checkout Code
         uses: actions/checkout@v4
@@ -317,7 +317,7 @@ jobs:
           #   version: "26.2"
           #   osFolder: "maccatalyst"
           - name: windows-os
-            os: windows-2022
+            os: windows-2025-vs2026
             version: "latest"
             osFolder: "windows"
 
@@ -385,7 +385,7 @@ jobs:
     runs-on: ubuntu-24.04
     steps:
       - name: Create Github Release
-        uses: softprops/action-gh-release@v1
+        uses: softprops/action-gh-release@v2
         with:
           name: Release ${{needs.get_version_code.outputs.version}}
           tag_name: ${{needs.get_version_code.outputs.version}}
