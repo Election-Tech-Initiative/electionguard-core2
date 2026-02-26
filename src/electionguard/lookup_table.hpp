@@ -5,6 +5,7 @@
 #include "facades/bignum4096.hpp"
 #include "utils.hpp"
 
+#include <algorithm>
 #include <array>
 #include <cstdint>
 #include <electionguard/async.hpp>

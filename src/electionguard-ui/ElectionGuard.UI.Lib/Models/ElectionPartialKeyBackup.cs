@@ -54,7 +54,7 @@ public class ElectionPartialKeyBackup : DisposableBase
         OwnerSequenceOrder = contract.OwnerSequenceOrder;
         DesignatedId = contract.DesignatedId;
         DesignatedSequenceOrder = contract.DesignatedSequenceOrder;
-        EncryptedCoordinate = contract.EncryptedCoordinate;
+        EncryptedCoordinate = new(contract.EncryptedCoordinate);
     }
 
     public ElectionPartialKeyBackupRecord ToRecord()

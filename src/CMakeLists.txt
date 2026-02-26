@@ -4,7 +4,7 @@ cmake_minimum_required(VERSION 3.14...3.16 FATAL_ERROR)
 list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/../cmake")
 
 # ---- Dependencies ----
-include(../cmake/CPM_0.31.0.cmake)
+include(../cmake/CPM.cmake)
 
 CPMAddPackage(
     NAME date
@@ -14,9 +14,9 @@ CPMAddPackage(
 
 CPMAddPackage(
     NAME nlohmann_json
-    VERSION 3.11.2
-    URL https://github.com/nlohmann/json/releases/download/v3.11.2/include.zip
-    URL_HASH SHA256=e5c7a9f49a16814be27e4ed0ee900ecd0092bfb7dbfca65b5a421b774dccaaed
+    VERSION 3.11.3
+    URL https://github.com/nlohmann/json/releases/download/v3.11.3/include.zip
+    URL_HASH SHA256=a22461d13119ac5c78f205d3df1db13403e58ce1bb1794edc9313677313f4a9d
 )
 
 CPMAddPackage(
@@ -266,7 +266,7 @@ if(CODE_COVERAGE)
     target_code_coverage(${META_PROJECT_TARGET} AUTO)
 endif()
 
-#if(USE_FORMATTING)
-#    message("++ Building with formatting")
-#    clang_format(format ${PROJECT_SOURCE_FILES})
-#endif()
+## if(USE_FORMATTING)
+##     message("++ Building with formatting")
+##     clang_format(format ${PROJECT_SOURCE_FILES})
+## endif()

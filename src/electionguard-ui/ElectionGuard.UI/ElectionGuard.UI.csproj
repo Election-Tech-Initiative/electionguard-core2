@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
 	<PropertyGroup>
-		
+		<TargetFrameworks Condition="$([MSBuild]::IsOSPlatform('OSX'))">net10.0-maccatalyst</TargetFrameworks>
 		<TargetFrameworks Condition="$([MSBuild]::IsOSPlatform('windows'))">net10.0-windows10.0.19041.0</TargetFrameworks>
 		<OutputType>Exe</OutputType>
 		<ManagePackageVersionsCentrally>true</ManagePackageVersionsCentrally>
@@ -20,15 +20,18 @@
 		<!-- Versions -->
 		<ApplicationDisplayVersion>1.92.0</ApplicationDisplayVersion>
 		<ApplicationVersion>19</ApplicationVersion>
-		
+
 		<SupportedOSPlatformVersion Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'maccatalyst'">15.3</SupportedOSPlatformVersion>
+		<RuntimeIdentifiers Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'maccatalyst'">maccatalyst-arm64</RuntimeIdentifiers>
+		<!-- Workaround: ILLink crashes with NullReferenceException on .NET 10 SDK (ShouldTreatWarningAsError bug) -->
+		<MtouchLink Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'maccatalyst'">None</MtouchLink>
 		<SupportedOSPlatformVersion Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'windows'">10.0.19041.0</SupportedOSPlatformVersion>
 		<TargetPlatformMinVersion Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'windows'">10.0.19041.0</TargetPlatformMinVersion>
 		<Nullable>enable</Nullable>
 		<CopyLocalLockFileAssemblies>true</CopyLocalLockFileAssemblies>
 		<RestoreProjectStyle>PackageReference</RestoreProjectStyle>
 		<!--<Configurations>Release;Debug</Configurations>-->
-		<Platforms Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'maccatalyst'">arm64;x64</Platforms>
+		<Platforms Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'maccatalyst'">arm64</Platforms>
 		<Platforms Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'windows'">AnyCPU</Platforms>
 		<UserSecretsId>efb177b9-29c3-4df1-adaa-be7e64bdc8ce</UserSecretsId>
 	</PropertyGroup>
@@ -37,24 +40,15 @@
 		<DefineConstants>$(DefineConstants);APPCENTER_SECRET_MACOS=$(APPCENTER_SECRET_MACOS);APPCENTER_SECRET_UWP=$(APPCENTER_SECRET_UWP)</DefineConstants>
 	</PropertyGroup>
 
+
 	<PropertyGroup Label="Debug|arm64" Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Debug|net10.0-maccatalyst|arm64'">
 		<CreatePackage>false</CreatePackage>
-		<RuntimeIdentifiers>maccatalyst-arm64;maccatalyst-x64</RuntimeIdentifiers>
+		<RuntimeIdentifiers>maccatalyst-arm64</RuntimeIdentifiers>
 	</PropertyGroup>
 
 	<PropertyGroup Label="Release|arm64" Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Release|net10.0-maccatalyst|arm64'">
 		<CreatePackage>true</CreatePackage>
-		<RuntimeIdentifiers>maccatalyst-arm64;maccatalyst-x64</RuntimeIdentifiers>
-	</PropertyGroup>
-
-	<PropertyGroup Label="Debug|x64" Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Debug|net10.0-maccatalyst|x64'">
-		<CreatePackage>false</CreatePackage>
-		<RuntimeIdentifiers>maccatalyst-x64</RuntimeIdentifiers>
-	</PropertyGroup>
-
-	<PropertyGroup Label="Release|x64" Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Release|net10.0-maccatalyst|x64'">
-		<CreatePackage>false</CreatePackage>
-		<RuntimeIdentifiers>maccatalyst-x64</RuntimeIdentifiers>
+		<RuntimeIdentifiers>maccatalyst-arm64</RuntimeIdentifiers>
 	</PropertyGroup>
 
 	<PropertyGroup Label="Debug|x64" Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Debug|net10.0-windows10.0.19041.0|x64'">
@@ -68,8 +62,8 @@
 	<PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
 		<IntermediateOutputPath></IntermediateOutputPath>
 		<DebugSymbols></DebugSymbols>
-		<DebugType></DebugType>
-		<Optimize>False</Optimize>
+		<DebugType>portable</DebugType>
+		<Optimize></Optimize>
 		<OutputPath></OutputPath>
 		<DefineConstants></DefineConstants>
 		<WarningLevel></WarningLevel>
@@ -95,8 +89,8 @@
 	<PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
 		<IntermediateOutputPath></IntermediateOutputPath>
 		<DebugSymbols></DebugSymbols>
-		<DebugType></DebugType>
-		<Optimize>False</Optimize>
+		<DebugType>portable</DebugType>
+		<Optimize></Optimize>
 		<OutputPath></OutputPath>
 		<DefineConstants></DefineConstants>
 		<WarningLevel></WarningLevel>
@@ -149,11 +143,12 @@
 		<PackageReference Include="CommunityToolkit.Maui" />
 		<PackageReference Include="CommunityToolkit.Mvvm" />
 		<PackageReference Include="Microsoft.Maui.Controls" />
-		<PackageReference Include="Microsoft.Maui.Controls.Xaml" />
+		<PackageReference Include="Microsoft.Maui.Core" />
 	</ItemGroup>
 
 	<ItemGroup>
 		<ProjectReference Include="..\..\..\bindings\netstandard\ElectionGuard\ElectionGuard.Decryption\ElectionGuard.Decryption.csproj" />
+		<ProjectReference Include="..\..\..\bindings\netstandard\ElectionGuard\ElectionGuard.ElectionSetup\ElectionGuard.ElectionSetup.csproj" />
 		<ProjectReference Include="..\..\..\bindings\netstandard\ElectionGuard\ElectionGuard.Encryption\ElectionGuard.Encryption.csproj">
 			<!-- <CopyLocalSatelliteAssemblies>True</CopyLocalSatelliteAssemblies>
 	    <Private>True</Private> -->

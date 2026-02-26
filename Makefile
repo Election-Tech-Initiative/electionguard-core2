@@ -26,6 +26,7 @@ EMSDK?=$(ELECTIONGUARD_CACHE)/emscripten
 # not all platforms can compile all targets.
 # valid values:
 # OPERATING_SYSTEM: Android, Ios, Linux, Darwin, Windows
+# OS_VARIANT: Debian, Alpine
 # PROCESSOR: arm64, x64, x86
 ifeq ($(OS),Windows_NT)
 	OPERATING_SYSTEM ?= Windows
@@ -114,18 +115,34 @@ ifeq ($(OPERATING_SYSTEM),Darwin)
 endif
 ifeq ($(OPERATING_SYSTEM),Linux)
 	@echo 🐧 LINUX INSTALL
-	sudo apt install -y build-essential
-	sudo apt install -y iwyu
-	sudo apt install -y llvm
-	sudo apt install -y clang-12
-	sudo apt install -y cmake
-	sudo apt install -y lcov
-	sudo apt install -y cppcheck
-	sudo apt install -y clang-format
-	sudo apt install -y clang-tidy
-	sudo apt install -y ninja-build
-	sudo apt install -y valgrind
-	sudo apt install -y unzip
+	if [ -f /etc/os-release ] && grep -qi "alpine" /etc/os-release; then \
+		echo "🏔️ Alpine Linux detected"; \
+		sudo apk update; \
+		echo "Installing CXX dependencies"; \
+		sudo apk add make musl-dev g++ cmake; \
+		echo "Installing DotNet dependencies"; \
+		sudo apk add dotnet10-sdk dotnetcore10-runtime; \
+	else \
+		echo "🐧 Debian-based Linux detected"; \
+		wget https://packages.microsoft.com/config/debian/12/packages-microsoft-prod.deb -O packages-microsoft-prod.deb; \
+		sudo dpkg -i packages-microsoft-prod.deb; \
+		rm packages-microsoft-prod.deb; \
+		sudo apt update; \
+		sudo apt install -y build-essential; \
+		sudo apt install -y iwyu; \
+		sudo apt install -y llvm; \
+		sudo apt install -y clang-14; \
+		sudo apt install -y cmake; \
+		sudo apt install -y lcov; \
+		sudo apt install -y cppcheck; \
+		sudo apt install -y clang-format; \
+		sudo apt install -y clang-tidy; \
+		sudo apt install -y ninja-build; \
+		sudo apt install -y valgrind; \
+		sudo apt install -y unzip; \
+		sudo apt install -y dotnet-sdk-10.0; \
+		sudo apt install -y npm; \
+	fi
 endif
 ifeq ($(OPERATING_SYSTEM),Windows)
 	@echo 🏁 WINDOWS INSTALL
@@ -134,10 +151,19 @@ ifeq ($(OPERATING_SYSTEM),Windows)
 	choco upgrade cmake -y
 	choco upgrade ninja -y
 	choco upgrade vswhere -y
+	choco upgrade llvm -y
+	choco install dotnet-sdk
 endif
 	wget -O cmake/CPM.cmake https://github.com/cpm-cmake/CPM.cmake/releases/download/v0.38.2/CPM.cmake
 	make fetch-sample-data
 	dotnet tool restore
+
+# environment-dotnet:
+# ifeq ($(OPERATING_SYSTEM),Linux)
+# # Ubuntu 22.04 and later?
+# 	sudo add-apt-repository ppa:dotnet/backports
+# 	apt-get update &&   sudo apt-get install -y dotnet-sdk-10.0
+# endif
 
 environment-msys2:
 ifeq ($(OPERATING_SYSTEM),Windows)
@@ -187,6 +213,7 @@ ifeq ($(OPERATING_SYSTEM),Windows)
 	cmake -S . -B $(ELECTIONGUARD_BUILD_LIBS_DIR)/$(OPERATING_SYSTEM)/$(PROCESSOR)/$(TARGET) \
 		-G "Visual Studio 18" -A $(VSPLATFORM) \
 		-DCMAKE_BUILD_TYPE=$(TARGET) \
+		-DCMAKE_OBJECT_PATH_MAX=200 \
 		-DBUILD_SHARED_LIBS=ON \
 		-DDISABLE_VALE=$(TEMP_DISABLE_VALE) \
 		-DUSE_MSVC=ON \
@@ -307,7 +334,12 @@ build-cli:
 build-ui:
 	@echo 🖥️ BUILD UI $(OPERATING_SYSTEM) $(PROCESSOR) $(TARGET)
 	cd ./src/electionguard-ui && dotnet restore
+ifeq ($(OPERATING_SYSTEM),Darwin)
+	dotnet build -f net10.0-maccatalyst -c $(TARGET) ./$(ELECTIONGUARD_APP_ADMIN_DIR)/ElectionGuard.UI/ElectionGuard.UI.csproj /p:APPCENTER_SECRET_MACOS=$(APPCENTER_SECRET_MACOS)
+endif
+ifeq ($(OPERATING_SYSTEM),Windows)
 	dotnet build -c $(TARGET) ./src/electionguard-ui/ElectionGuard.UI.sln /p:Platform=$(PROCESSOR) /p:APPCENTER_SECRET_UWP=$(APPCENTER_SECRET_UWP) /p:APPCENTER_SECRET_MACOS=$(APPCENTER_SECRET_MACOS)
+endif
 
 build-wasm:
 	@echo 🌐 BUILD WASM $(OPERATING_SYSTEM) $(PROCESSOR) $(TARGET)
@@ -388,7 +420,7 @@ generate-interop:
 # Lint / Format
 
 format: build
-	cd $(ELECTIONGUARD_BUILD_LIBS_DIR)/$(PROCESSOR) && $(MAKE) format
+	cd $(ELECTIONGUARD_BUILD_LIBS_DIR)/$(OPERATING_SYSTEM)/$(PROCESSOR) && $(MAKE) format
 
 lint:
 	dotnet jb inspectcode -o="lint-results.xml" -f="Xml" --build --verbosity="WARN" --severity="Warning" bindings/netstandard/ElectionGuard/ElectionGuard.sln
@@ -419,6 +451,7 @@ endif
 ifeq ($(OPERATING_SYSTEM),Darwin)
 	dotnet publish -f net10.0-maccatalyst -c $(TARGET) /p:CreatePackage=true /p:ApplicationVersion=$(BUILD_NUMBER) /p:APPCENTER_SECRET_MACOS=$(APPCENTER_SECRET_MACOS) ./$(ELECTIONGUARD_APP_ADMIN_DIR)/ElectionGuard.UI/ElectionGuard.UI.csproj -o ./publish
 endif
+# add error for running on Linuxx!
 
 publish-ui-appcenter: 
 	@echo 🧱 PUBLISH UI APPCENTER
@@ -440,7 +473,7 @@ else
 	@echo "APPCENTER_SECRET_MACOS not set. Skipping AppCenter publish"
 	exit 1
 endif
-
+# add linux check
 publish-wasm: build-npm
 	@echo 🌐 PUBLISH WASM
 ifeq ($(OPERATING_SYSTEM),Windows)
@@ -728,7 +761,7 @@ fetch-sample-data:
 	@echo ⬇️ FETCH Sample Data
 	wget -O $(TEMPFILE) https://github.com/microsoft/electionguard/releases/download/v1.0/sample-data.zip
 	unzip -o $(TEMPFILE)
-	rm -f $(TEMPFILE)
+#	rm -f $(TEMPFILE)
 
 generate-sample-data: build-netstandard
 	@echo Generate Sample Data
