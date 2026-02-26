@@ -28,7 +28,7 @@
 		<CopyLocalLockFileAssemblies>true</CopyLocalLockFileAssemblies>
 		<RestoreProjectStyle>PackageReference</RestoreProjectStyle>
 		<!--<Configurations>Release;Debug</Configurations>-->
-		<Platforms Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'maccatalyst'">arm64;x64</Platforms>
+		<Platforms Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'maccatalyst'">arm64</Platforms>
 		<Platforms Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'windows'">AnyCPU</Platforms>
 		<UserSecretsId>efb177b9-29c3-4df1-adaa-be7e64bdc8ce</UserSecretsId>
 	</PropertyGroup>
@@ -46,16 +46,6 @@
 	<PropertyGroup Label="Release|arm64" Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Release|net10.0-maccatalyst|arm64'">
 		<CreatePackage>true</CreatePackage>
 		<RuntimeIdentifiers>maccatalyst-arm64</RuntimeIdentifiers>
-	</PropertyGroup>
-
-	<PropertyGroup Label="Debug|x64" Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Debug|net10.0-maccatalyst|x64'">
-		<CreatePackage>false</CreatePackage>
-		<RuntimeIdentifiers>maccatalyst-x64</RuntimeIdentifiers>
-	</PropertyGroup>
-
-	<PropertyGroup Label="Release|x64" Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Release|net10.0-maccatalyst|x64'">
-		<CreatePackage>false</CreatePackage>
-		<RuntimeIdentifiers>maccatalyst-x64</RuntimeIdentifiers>
 	</PropertyGroup>
 
 	<PropertyGroup Label="Debug|x64" Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Debug|net10.0-windows10.0.19041.0|x64'">
