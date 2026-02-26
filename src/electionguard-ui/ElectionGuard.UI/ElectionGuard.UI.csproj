@@ -40,12 +40,12 @@
 
 	<PropertyGroup Label="Debug|arm64" Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Debug|net10.0-maccatalyst|arm64'">
 		<CreatePackage>false</CreatePackage>
-		<RuntimeIdentifiers>maccatalyst-arm64;maccatalyst-x64</RuntimeIdentifiers>
+		<RuntimeIdentifiers>maccatalyst-arm64</RuntimeIdentifiers>
 	</PropertyGroup>
 
 	<PropertyGroup Label="Release|arm64" Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Release|net10.0-maccatalyst|arm64'">
 		<CreatePackage>true</CreatePackage>
-		<RuntimeIdentifiers>maccatalyst-arm64;maccatalyst-x64</RuntimeIdentifiers>
+		<RuntimeIdentifiers>maccatalyst-arm64</RuntimeIdentifiers>
 	</PropertyGroup>
 
 	<PropertyGroup Label="Debug|x64" Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Debug|net10.0-maccatalyst|x64'">
